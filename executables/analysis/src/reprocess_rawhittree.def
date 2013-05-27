@@ -1,0 +1,11 @@
+comptonsoft::SaveData
+comptonsoft::CSHitCollection
+comptonsoft::ConstructDetector_Sim
+comptonsoft::ConstructChannelTable
+comptonsoft::DefineBadChannel_Sim
+comptonsoft::SetNoiseLevel
+comptonsoft::SetSimGainCorrection
+comptonsoft::ReadRawHitTree
+comptonsoft::MakeDetectorHit
+comptonsoft::EventSelection
+comptonsoft::HitTree_Sim

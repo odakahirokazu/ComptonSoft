@@ -1,0 +1,12 @@
+comptonsoft::CSHitCollection
+comptonsoft::ConstructDetector
+comptonsoft::ConstructChannelTable
+comptonsoft::ReadDataFile_SpW
+comptonsoft::DefineBadChannel
+comptonsoft::CorrectPHA
+comptonsoft::MakePI
+comptonsoft::HistPI
+comptonsoft::SelectHit
+comptonsoft::EventSelection
+comptonsoft::HitTree
+comptonsoft::SaveData

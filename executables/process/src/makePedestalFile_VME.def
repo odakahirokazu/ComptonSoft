@@ -1,0 +1,4 @@
+comptonsoft::ConstructDetector
+comptonsoft::ReadDataFile_VME
+comptonsoft::CalcPedestal
+comptonsoft::SaveData

@@ -1,0 +1,63 @@
+/*************************************************************************
+ *                                                                       *
+ * Copyright (c) 2011 Hirokazu Odaka                                     *
+ *                                                                       *
+ * This program is free software: you can redistribute it and/or modify  *
+ * it under the terms of the GNU General Public License as published by  *
+ * the Free Software Foundation, either version 3 of the License, or     *
+ * (at your option) any later version.                                   *
+ *                                                                       *
+ * This program is distributed in the hope that it will be useful,       *
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of        *
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
+ * GNU General Public License for more details.                          *
+ *                                                                       *
+ * You should have received a copy of the GNU General Public License     *
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>. *
+ *                                                                       *
+ *************************************************************************/
+
+// ReadDataFile.hh
+// 2007-10-02  Hirokazu Odaka 
+// 2007-11-02  Hirokazu Odaka
+// 2008-08-31  Hirokazu Odaka 
+// 2011-04-13  Hirokazu Odaka 
+
+#ifndef COMPTONSOFT_ReadDataFile_H
+#define COMPTONSOFT_ReadDataFile_H 1
+
+#include "VCSModule.hh"
+
+#include <fstream>
+#include <string>
+#include <list>
+
+namespace comptonsoft {
+
+class ReadDataFile : public VCSModule
+{
+  DEFINE_ANL_MODULE(ReadDataFile, 3.1);
+public:
+  ReadDataFile();
+  ~ReadDataFile() {}
+
+  anl::ANLStatus mod_startup();
+  anl::ANLStatus mod_ana() { ++m_EventID; return anl::AS_OK; }
+
+  int EventID() const { return m_EventID; }
+  int Time() const { return m_Time; }
+
+protected:
+  void setTime(int v) { m_Time = v; }
+
+protected:
+  std::list<std::string> m_FileNameList;
+
+private:
+  int m_EventID;
+  int m_Time;
+};
+
+}
+
+#endif /* COMPTONSOFT_ReadDataFile_H */

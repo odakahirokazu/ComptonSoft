@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+  
+  <head>
+    <meta name="author" content="ODAKA Hirokazu" />
+    <meta name="copyright" content="Copyright (c) 2008 Hirokazu Odaka and Compton Team" />
+    <link rel="stylesheet" href="design_top.css" type="text/css" />
+    <title>Compton Soft</title>
+  </head>
+
+  <body>
+    <div><a href="http://www.astro.isas.jaxa.jp/~odaka/anlnext/">ANL Next Framework</a> | <a href="cs_modules.xml">ANL Modules in Compton Soft</a></div>
+    
+    <h1>Compton Soft</h1>
+
+    <h2>1. Introduction</h2>
+    
+    <p>Compton Soft is an integrated analysis software package for Si/CdTe semiconductor Compton cameras. This software provides</p>
+    <ul>
+      <li>data processes of Si/CdTe detector systems</li>
+      <li>simulations of Si/CdTe detector systems</li>
+      <li>data analysis including Compton reconstruction</li>
+      <li>simulation and analysis for HXI/SGD on board the Astro-H X-ray observatory.</li>
+    </ul>
+
+    <p>Compton Soft provides a toolkit class library for development of Compton camera analysis software, and executable applications built by the ANL Next framework.</p>
+
+    <h3>Basic Info</h3>
+    <p>Latest version: 4.9</p>
+    <p>Git repository: https://github.com/odakahirokazu/ComptonSoft/</p>
+  
+    <h3>Contact</h3>
+    <p>Hirokazu Odaka<br />ISAS/JAXA<br />odaka(AT)astro.isas.jaxa.jp</p>
+
+    <h2>2. Installation</h2>
+    <p>See <a href="https://github.com/odakahirokazu/ComptonSoft#readme">README</a> on the github repository.</p>
+    
+    <h2>3. Getting Started</h2>
+    
+    <h3>Simulation</h3>
+    <p>This is an example Ruby script for running a simple simulation:</p>
+    <pre class="example">
+require "cslib"
+
+numTrial = 10000000 <span class="code_comment">## number of Monte Carlo trials</span>
+
+<span class="code_comment">### create a simulation application</span>
+sim = Simulation.new
+
+<span class="code_comment">### set parameters</span>
+sim.output = "sim_output.root"
+sim.detector_config = "mydetector_config.xml"
+sim.simulation_param = "mydetector_sim_param.xml"
+sim.analysis_param = "analysis_param.xml"
+sim.random_seed = Time.now.to_i
+
+<span class="code_comment">### register a geometry modele.</span>
+# sim.set_geometry :&lt;geometry_module_name&gt;
+<span class="code_comment">### or give a GDML file.</span>
+sim.use_gdml("mydetector.gdml")
+
+
+<span class="code_comment">### register a primary generation modele.</span>
+sim.set_primary_generator :PlaneWavePrimaryGen, {
+  "Particle name" => "gamma",
+  "Photon index" => 1.0,
+  "Energy min" => 10.0,
+  "Energy max" => 1000.0,
+  "Center position" => vec(0.0, 0.0, 0.0),
+  "Direction" => vec(0.0, 0.0, -1.0),
+  "Radius" => 10.0,
+}
+
+<span class="code_comment">### run this simulation. The second parameter is display frequency of the event loop.</span>
+sim.run(numTrials, numTrials/100)
+    </pre>
+        
+    <h2>4. <a href="doxygen/index.html">Class Library Reference<a/></h2>
+   
+    <h2>5. <a href="cs_modules.xml">ANL Module Reference</a></h2>
+
+    <h2>Appendix</h2>
+    <h3>Directory structure</h3>
+    <pre>
+ComptonSoft/
+    anlgeant4/
+      --- Geant4 interface of ANL Next framework
+    cmake/
+      --- CMake files
+    documentation/
+      --- documentation
+    examples/
+      --- example scripts
+    executables/
+      --- standalone executables
+        process/
+        simulation/
+        analysis/
+    ruby/
+      --- Ruby binding (extension library) using SWIG
+    scripts/
+      --- utility scripts
+    source/
+      --- source directory
+        tools/
+          --- class library for basis functions of the software
+        modules/
+          --- ANL modules
+        simulation/
+          --- ANL modules and classes for Geant4 simulation
+    xmlstyle/
+      --- XSL files for XML database files of Compton Soft
+</pre>
+
+    <h3>History</h3>
+    <ul>
+      <li>4.9.0 2013-05-21 H. Odaka: Beta version for version 5</li>
+      <li>4.8.0 2011-11-15 H. Odaka: </li>
+      <li>4.7.0 2011-07-29 H. Odaka: Ruby binding, parallel geometry</li>
+      <li>4.6.0 2011-07-21 H. Odaka: ANL Next 1.0</li>
+      <li>4.5.6 2011-07-13 H. Odaka: analysis for CCMk5, event: NDIP2011</li>
+      <li>4.5.5 2011-06-xx H. Odaka: analysis for CCMk5/development</li>
+      <li>4.5.4 2011-06-08 H. Odaka: CMake</li>
+      <li>4.5   2011-04-26 H. Odaka: ANL Next</li>
+      <li>4.4   2011-04-04 H. Odaka: introduce sensitive detector </li>
+    </ul>
+    <ul>
+      <li>Version 4 (2009) H. Odaka: General treatment of the detector response (Sugimoto's Master thesis) </li>
+      <li>Version 3 (2008) H. Odaka: Treatment of activation background (Odaka), detector response of semiconductor detectors (Takeda's PhD thesis, Aono's Master thesis)</li>
+      <li>Version 2 (2007) H. Odaka: Monte Carlo simulation (Odaka's Master Thesis)</li>
+      <li>Version 1 (2007) H. Odaka: Data reduction of Si/CdTe Compton cameras (Odaka's Master Thesis)</li>
+    </ul>
+    
+    <h3>References</h3>
+    <ol>
+      <li>Odaka et al. (2010) NIM A, 624, 303</li>
+    </ol>
+    
+  <div>
+    <hr />
+    <address>e-mail: odaka(AT)astro.isas.jaxa.jp</address>
+  </div>
+
+</body>
+</html>
