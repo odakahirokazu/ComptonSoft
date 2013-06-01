@@ -139,12 +139,9 @@ There are several options:
 
 #### library options
 - `CS_USE_GDML`    (Default=OFF): enable GDML.
-<!-- - `CS_USE_FITSIO`  (Default=OFF): enable FITSIO. -->
 - `CS_USE_SIMX`    (Default=OFF): enable SimX interface.
 - `CS_USE_VIS`     (Default=OFF): enable OpenGL visualization of Geant4.
 - `CS_USE_VIS_QT` (Default=OFF): enable Qt visualization of Geant4.
-<!-- - `CS_USE_ROOT`    (Default=ON):  enable ROOT analysis framework -->
-<!-- - `CS_USE_SYSTEM_CLHEP` (Default=OFF): use system-clhep -->
 
 #### install options
 - `CS_INSTALL_HEADERS` (Default=ON): install all header files.
