@@ -18,14 +18,18 @@ include(${SWIG_USE_FILE})
 find_package(Ruby)
 set(RUBY_LINK_FLAGS " ")
 if(${RUBY_VERSION} VERSION_GREATER 1.9.0)
-  set(RUBY_INCLUDE_DIRS ${RUBY_HDR_DIR})
+  find_path(RUBY_CONFIG_FILE_DIR
+    NAMES ruby/config.h
+    PATHS ${RUBY_HDR_DIR}/*
+    NO_DEFAULT_PATH)
+  message("-- RUBY_HDR_DIR: ${RUBY_HDR_DIR}")
+  message("-- RUBY_CONFIG_FILE_DIR: ${RUBY_CONFIG_FILE_DIR}")
+  set(RUBY_INCLUDE_DIRS ${RUBY_HDR_DIR} ${RUBY_CONFIG_FILE_DIR})
   set(RUBY_LIBRARY "")
   if(APPLE)
     set(RUBY_LINK_FLAGS "-Wl,-undefined,dynamic_lookup -Wl,-multiply_defined,suppress -Wl,-flat_namespace")
   endif()
 endif()
-message("-- Ruby include: ${RUBY_INCLUDE_DIRS}")
-message("-- Ruby library: ${RUBY_LIBRARY}")
 
 include_directories(
   ../source/tools/include
@@ -68,7 +72,6 @@ add_definitions(${sflags})
 # set(sflags ${sflags} -includeall)
 set_source_files_properties(${SWIG_IF_FILE} PROPERTIES CPLUSPLUS ON)
 set_source_files_properties(${SWIG_IF_FILE} PROPERTIES SWIG_FLAGS "${sflags}")
-add_definitions(-DHAVE_STRUCT_TIMESPEC -DHAVE_STRUCT_TIMEZONE -DHAVE_SIGNBIT)
 
 swig_add_module(${TARGET_EXT_LIBRARY} ruby ${SWIG_IF_FILE})
 swig_link_libraries(${TARGET_EXT_LIBRARY}

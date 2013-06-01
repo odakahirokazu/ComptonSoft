@@ -1,5 +1,5 @@
 ### BOOST ###
-find_package(Boost 1.48.0 REQUIRED)
+find_package(Boost 1.50.0 REQUIRED)
 set(BOOST_INC_DIR ${Boost_INCLUDE_DIRS})
 set(BOOST_LIB_DIR ${Boost_LIBRARY_DIRS})
 if(NOT (Boost_VERSION VERSION_LESS 105000))
@@ -32,16 +32,21 @@ message("-- ANLNEXT_INSTALL = ${ANLNEXT_INSTALL}")
 ### ROOT ###
 if(CS_USE_ROOT)
   set(ROOTSYS $ENV{ROOTSYS})
-  set(ROOTDIR "/root")
-  # set(ROOTDIR "")
-  set(ROOT_INC_DIR ${ROOTSYS}/include${ROOTDIR})
-  set(ROOT_LIB_DIR ${ROOTSYS}/lib${ROOTDIR})
+  find_path(ROOT_INC_DIR
+    NAMES TH1.h TTree.h
+    PATHS ${ROOTSYS}/include/root ${ROOTSYS}/include)
+  find_path(ROOT_LIB_DIR
+    NAMES libHist.so libTree.so
+    PATHS ${ROOTSYS}/lib/root ${ROOTSYS}/lib)
   set(ROOT_LIB
     Core Cint RIO Net Hist Graf Graf3d Gpad Tree
     Rint Postscript Matrix Physics MathCore Thread)
+  message("-- ROOTSYS = ${ROOTSYS}")
+  message("-- ROOT_INC_DIR = ${ROOT_INC_DIR}")
+  message("-- ROOT_LIB_DIR = ${ROOT_LIB_DIR}")
+  
   add_definitions(-DUSE_ROOT)
   add_definitions(-DCS_BASIC2)
-  message("-- ROOTSYS = ${ROOTSYS}")
 endif(CS_USE_ROOT)
 
 ### Geant4 ###
