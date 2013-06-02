@@ -30,6 +30,7 @@ for radioactive sources.
 - odaka(AT)astro.isas.jaxa.jp
 
 ### (2) Authors
+
 - Hirokazu Odaka
 - Shin Watanabe
 - Shin'ichiro Takeda
