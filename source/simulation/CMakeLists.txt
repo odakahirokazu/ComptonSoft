@@ -50,6 +50,7 @@ set(CS_SIMULATION_CLASSES_BASIC1
   src/AHStandardANLPhysicsList.cc
   # others
   src/AssignG4CopyNumber.cc
+  src/DumpMass.cc
   )
 
 if(CS_USE_ROOT)

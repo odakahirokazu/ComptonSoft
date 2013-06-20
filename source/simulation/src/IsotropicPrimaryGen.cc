@@ -28,7 +28,7 @@ using namespace comptonsoft;
 
 IsotropicPrimaryGen::IsotropicPrimaryGen()
   : m_CenterPosition(0.0, 0.0, 0.0),
-    m_Radius(100.0*cm),
+    m_Radius(100.0*cm), m_Distance(-1.0),
     m_CenterDirection(0.0, 0.0, 1.0),
     m_ThetaMin(0.0), m_ThetaMax(pi),
     m_CosTheta0(1.0), m_CosTheta1(-1.0), m_CoveringFactor(1.0),
@@ -46,7 +46,9 @@ ANLStatus IsotropicPrimaryGen::mod_startup()
   register_parameter(&m_CenterPosition, "Center position", cm, "cm");
   set_parameter_description("Position of the sphere.");
   register_parameter(&m_Radius, "Radius", cm, "cm");
-  set_parameter_description("Radius of the sphere.");
+  set_parameter_description("Radius of a disk where primaries are generated.");
+  register_parameter(&m_Distance, "Distance", cm, "cm");
+  set_parameter_description("Distance between the sphere center and a disk where primaries are generated. If this value is negative, then this parameter is set to be the same as the disk radius [Radius].");
   register_parameter(&m_CenterDirection, "Center direction");
   set_parameter_description("Center direction of the primaries.");
   register_parameter(&m_ThetaMin, "Theta min", 1.0, "radian");
@@ -60,13 +62,6 @@ ANLStatus IsotropicPrimaryGen::mod_startup()
 }
 
 
-ANLStatus IsotropicPrimaryGen::mod_prepare()
-{
-  m_CenterDirection = m_CenterDirection.unit();
-  return AS_OK;
-}
-
-
 ANLStatus IsotropicPrimaryGen::mod_init()
 {
   using std::cos;
@@ -74,6 +69,9 @@ ANLStatus IsotropicPrimaryGen::mod_init()
   using std::sqrt;
   
   BasicPrimaryGen::mod_init();
+
+  m_CenterDirection = m_CenterDirection.unit();
+  if (m_Distance < 0.0) { m_Distance = m_Radius; }
   
   const G4double posx = m_CenterPosition.x();
   const G4double posy = m_CenterPosition.y();
@@ -93,6 +91,7 @@ ANLStatus IsotropicPrimaryGen::mod_init()
   G4cout << "  Center Position: "
          << posx/cm << " " << posy/cm << " " << posz/cm << " cm" <<G4endl;
   G4cout << "  Radius: " << m_Radius/cm << " cm" << G4endl;
+  G4cout << "  Distance: " << m_Distance/cm << " cm" << G4endl;
 
   G4cout << "  Center Direction: "
          << dirx << " " << diry << " " << dirz << G4endl;
@@ -118,10 +117,10 @@ ANLStatus IsotropicPrimaryGen::mod_ana()
   G4double cosTheta = m_CosTheta0 + (m_CosTheta1-m_CosTheta0) * G4UniformRand();
   G4double sinTheta = sqrt(1.0-cosTheta*cosTheta);
   G4double phi = twopi * G4UniformRand();
-  G4ThreeVector v(m_Radius*sinTheta*cos(phi),
-                  m_Radius*sinTheta*sin(phi),
-                  m_Radius*cosTheta);
-  v.rotateUz(m_CenterDirection);
+  G4ThreeVector v(m_Distance*sinTheta*cos(phi),
+                  m_Distance*sinTheta*sin(phi),
+                  m_Distance*cosTheta);
+  v.rotateUz(-m_CenterDirection);
   
   G4ThreeVector v2 = v.orthogonal();
   v2.setMag( m_Radius * sqrt(G4UniformRand()) );

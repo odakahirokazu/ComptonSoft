@@ -32,6 +32,7 @@ clSim = [# primary generator
          ANLSwigClass.new('OutputSimXPrimaries', false, 'USE_SIMX'),
          ANLSwigClass.new('AssignG4CopyNumber'),
          ANLSwigClass.new('InitialParticleTree', false, 'CS_BASIC2'),
+         ANLSwigClass.new('DumpMass'),
         ]
 
 clMod = [ANLSwigClass.new('VCSModule'),

@@ -222,7 +222,7 @@ void RealDetectorUnit::assignDetectorInfo()
       hit->setChannel(channel);
     }
     OneASICData* chip = getASICData(chipid);
-    if (chip->isAnodeSide()) {
+    if (chip && chip->isAnodeSide()) {
       hit->addFlag(ANODE_SIDE);
     }
   }

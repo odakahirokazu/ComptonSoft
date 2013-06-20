@@ -17,52 +17,44 @@
  *                                                                       *
  *************************************************************************/
 
-#ifndef COMPTONSOFT_IsotropicPrimaryGen_H
-#define COMPTONSOFT_IsotropicPrimaryGen_H 1
+#include "DumpMass.hh"
+#include <fstream>
+#include "G4LogicalVolumeStore.hh"
+#include "G4LogicalVolume.hh"
 
-#include "BasicPrimaryGen.hh"
-#include "G4ThreeVector.hh"
-
-namespace comptonsoft {
+using namespace anl;
+using namespace comptonsoft;
 
 
-/**
- * ANLGeant4 PrimaryGen module.
- * Isotropic and homogeneous particle distribution are realized.
- *
- * @author Hirokazu Odaka
- * @date 2010-xx-xx
- */
-class IsotropicPrimaryGen : public anlgeant4::BasicPrimaryGen
+DumpMass::DumpMass()
+  : m_FileName("mass_volumes.txt")
 {
-  DEFINE_ANL_MODULE(IsotropicPrimaryGen, 1.1);
-public:
-  IsotropicPrimaryGen();
-  
-  anl::ANLStatus mod_startup();
-  anl::ANLStatus mod_init();
-  anl::ANLStatus mod_ana();
-  anl::ANLStatus mod_endrun();
-
-protected:
-  double Radius() const { return m_Radius; }
-  double Distance() const { return m_Distance; }
-  double CoveringFactor() const { return m_CoveringFactor; }
-  
-private:
-  G4ThreeVector m_CenterPosition;
-  G4double m_Radius;
-  G4double m_Distance;
-  G4ThreeVector m_CenterDirection;
-  G4double m_ThetaMin;
-  G4double m_ThetaMax;
-  G4double m_CosTheta0;
-  G4double m_CosTheta1;
-  G4double m_CoveringFactor;
-
-  G4double m_Flux; // energy per unit {time, area, solid angle}
-};
-
 }
 
-#endif /* COMPTONSOFT_IsotropicPrimaryGen_H */
+
+DumpMass::~DumpMass()
+{
+}
+
+
+ANLStatus DumpMass::mod_startup()
+{
+  register_parameter(&m_FileName, "File name");
+  return AS_OK;
+}
+
+
+ANLStatus DumpMass::mod_bgnrun()
+{
+  typedef G4LogicalVolumeStore::iterator LVIter;
+
+  std::ofstream fout(m_FileName.c_str());
+  G4LogicalVolumeStore* store = G4LogicalVolumeStore::GetInstance();
+  for (LVIter it=store->begin(); it!=store->end(); ++it) {
+    G4LogicalVolume* lv = *it;
+    fout << lv->GetName() << "    " << lv->GetMass()/g << std::endl;
+  }
+  fout.close();
+
+  return AS_OK;
+}

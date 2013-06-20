@@ -49,7 +49,7 @@ for radioactive sources.
  3. Supported System
 ----------------------------------------------------------------
 
-- Mac OS X
+- Mac OS X: the author's standard environment
 - (Linux): possible to run on Linux
 
 
@@ -115,7 +115,7 @@ A data analysis framework.
  5. Installation
 ----------------------------------------------------------------
 
-### (1) Obtain ANL Next.
+### (1) Obtain Compton Soft via GitHub.
 
     unix> git clone git://github.com/odakahirokazu/ComptonSoft.git
 
@@ -149,8 +149,8 @@ There are several options:
 - `CS_INSTALL_CMAKE_FILES` (Default=ON): install all cmake files.
 
 By default, the install destination is set to `${HOME}`. So `make install` will
-install binaries and libraries into the user's home directory, such as
-`${HOME}/bin` or `${HOME}/lib`. You can change it by setting
+install headers and libraries into the user's home directory, such as
+`${HOME}/include` or `${HOME}/lib`. You can change it by setting
 `CMAKE_INSTALL_PREFIX`.
 
 This is an example to turn on GDML and Qt-visualization for Geant4:
@@ -165,6 +165,8 @@ This is an example to turn on GDML and Qt-visualization for Geant4:
     unix> make
     unix> make install
 
+NOTE: you can use `make -jN` (N: number of parallel complilation processes)
+instead of `make` for faster build.
 
  6. Getting Started
 ----------------------------------------------------------------

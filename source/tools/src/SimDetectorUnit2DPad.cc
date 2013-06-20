@@ -176,34 +176,42 @@ void SimDetectorUnit2DPad::simulatePulseHeights()
      
       adjacentPixel.set(sp.X()+1, sp.Y()+1);
       hit = generateHit(*rawhit, adjacentPixel);
+      hit->setEdep(0.0);
       insertSimulatedHit(hit);
       
       adjacentPixel.set(sp.X()+1, sp.Y());
       hit = generateHit(*rawhit, adjacentPixel);
+      hit->setEdep(0.0);
       insertSimulatedHit(hit);
       
       adjacentPixel.set(sp.X()+1, sp.Y()-1);
       hit = generateHit(*rawhit, adjacentPixel);
+      hit->setEdep(0.0);
       insertSimulatedHit(hit);
       
       adjacentPixel.set(sp.X()  , sp.Y()+1);
       hit = generateHit(*rawhit, adjacentPixel);
+      hit->setEdep(0.0);
       insertSimulatedHit(hit);
       
       adjacentPixel.set(sp.X()  , sp.Y()-1);
       hit = generateHit(*rawhit, adjacentPixel);
+      hit->setEdep(0.0);
       insertSimulatedHit(hit);
       
       adjacentPixel.set(sp.X()-1, sp.Y()+1);
       hit = generateHit(*rawhit, adjacentPixel);
+      hit->setEdep(0.0);
       insertSimulatedHit(hit);
       
       adjacentPixel.set(sp.X()-1, sp.Y()  );
       hit = generateHit(*rawhit, adjacentPixel);
+      hit->setEdep(0.0);
       insertSimulatedHit(hit);
       
       adjacentPixel.set(sp.X()-1, sp.Y()-1);
       hit = generateHit(*rawhit, adjacentPixel);
+      hit->setEdep(0.0);
       insertSimulatedHit(hit);
     }
   }

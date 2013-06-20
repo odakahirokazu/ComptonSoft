@@ -1,6 +1,6 @@
 /*************************************************************************
  *                                                                       *
- * Copyright (c) 2011 Hirokazu Odaka                                     *
+ * Copyright (c) 2012 Hirokazu Odaka                                     *
  *                                                                       *
  * This program is free software: you can redistribute it and/or modify  *
  * it under the terms of the GNU General Public License as published by  *
@@ -17,52 +17,34 @@
  *                                                                       *
  *************************************************************************/
 
-#ifndef COMPTONSOFT_IsotropicPrimaryGen_H
-#define COMPTONSOFT_IsotropicPrimaryGen_H 1
+#ifndef COMPTONSOFT_DumpMass_H
+#define COMPTONSOFT_DumpMass_H 1
 
-#include "BasicPrimaryGen.hh"
-#include "G4ThreeVector.hh"
+#include "BasicModule.hh"
 
 namespace comptonsoft {
 
 
 /**
- * ANLGeant4 PrimaryGen module.
- * Isotropic and homogeneous particle distribution are realized.
+ * Dump mass of all logical volumes.
  *
  * @author Hirokazu Odaka
- * @date 2010-xx-xx
+ * @date 2013-06-17
  */
-class IsotropicPrimaryGen : public anlgeant4::BasicPrimaryGen
+class DumpMass : public anl::BasicModule
 {
-  DEFINE_ANL_MODULE(IsotropicPrimaryGen, 1.1);
+  DEFINE_ANL_MODULE(DumpMass, 1.0);
 public:
-  IsotropicPrimaryGen();
-  
+  DumpMass();
+  ~DumpMass();
+
   anl::ANLStatus mod_startup();
-  anl::ANLStatus mod_init();
-  anl::ANLStatus mod_ana();
-  anl::ANLStatus mod_endrun();
+  anl::ANLStatus mod_bgnrun();
 
-protected:
-  double Radius() const { return m_Radius; }
-  double Distance() const { return m_Distance; }
-  double CoveringFactor() const { return m_CoveringFactor; }
-  
 private:
-  G4ThreeVector m_CenterPosition;
-  G4double m_Radius;
-  G4double m_Distance;
-  G4ThreeVector m_CenterDirection;
-  G4double m_ThetaMin;
-  G4double m_ThetaMax;
-  G4double m_CosTheta0;
-  G4double m_CosTheta1;
-  G4double m_CoveringFactor;
-
-  G4double m_Flux; // energy per unit {time, area, solid angle}
+  std::string m_FileName;
 };
 
 }
 
-#endif /* COMPTONSOFT_IsotropicPrimaryGen_H */
+#endif /* COMPTONSOFT_DumpMass_H */

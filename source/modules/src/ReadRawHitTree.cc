@@ -27,7 +27,20 @@ using namespace comptonsoft;
 using namespace anl;
 
 ReadRawHitTree::ReadRawHitTree()
-  : InitialInformation(false)
+  : InitialInformation(false),
+    hittree(0), nevent(0), id(0),
+    eventid(0), seqnum(0), totalhit(0),
+    ini_energy(0.0), ini_dirx(0.0), ini_diry(0.0), ini_dirz(0.0),
+    ini_time(0.0), ini_posx(0.0), ini_posy(0.0), ini_posz(0.0),
+    ini_polarx(0.0), ini_polary(0.0), ini_polarz(0.0),
+    weight(1.0),
+    realposx(0.0), realposy(0.0), realposz(0.0),
+    localposx(0.0), localposy(0.0), localposz(0.0),
+    posx(0.0), posy(0.0), posz(0.0),
+    edep(0.0), e_pha(0.0), e_pi(0.0), time(0.0),
+    process(0), grade(0),
+    detid(0), stripx(0), stripy(0), chip(0), channel(0),
+    time_group(0), flag(0)
 {
   add_alias("InitialInformation");
 }

@@ -247,34 +247,42 @@ void SimDetectorUnit2DStrip::simulatePulseHeights()
      
       nearStrip.set(sp.X()+2, comptonsoft::NO_STRIP);
       hit = generateHit(*rawhit, nearStrip);
+      hit->setEdep(0.0);
       insertSimulatedHit(hit);
 
       nearStrip.set(sp.X()+1, comptonsoft::NO_STRIP);
       hit = generateHit(*rawhit, nearStrip);
+      hit->setEdep(0.0);
       insertSimulatedHit(hit);
 
       nearStrip.set(sp.X()-1, comptonsoft::NO_STRIP);
       hit = generateHit(*rawhit, nearStrip);
+      hit->setEdep(0.0);
       insertSimulatedHit(hit);
 
       nearStrip.set(sp.X()-2, comptonsoft::NO_STRIP);
       hit = generateHit(*rawhit, nearStrip);
+      hit->setEdep(0.0);
       insertSimulatedHit(hit);
     
       nearStrip.set(comptonsoft::NO_STRIP, sp.Y()+2);
       hit = generateHit(*rawhit, nearStrip);
+      hit->setEdep(0.0);
       insertSimulatedHit(hit);
 
       nearStrip.set(comptonsoft::NO_STRIP, sp.Y()+1);
       hit = generateHit(*rawhit, nearStrip);
+      hit->setEdep(0.0);
       insertSimulatedHit(hit);
 
       nearStrip.set(comptonsoft::NO_STRIP, sp.Y()-1);
       hit = generateHit(*rawhit, nearStrip);
+      hit->setEdep(0.0);
       insertSimulatedHit(hit);
 
       nearStrip.set(comptonsoft::NO_STRIP, sp.Y()-2);
       hit = generateHit(*rawhit, nearStrip);
+      hit->setEdep(0.0);
       insertSimulatedHit(hit);   
     }
   }

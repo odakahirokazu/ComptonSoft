@@ -221,6 +221,7 @@
 #ifdef CS_BASIC2
 #include "InitialParticleTree.hh"
 #endif
+#include "DumpMass.hh"
 
 #include "class_list_anlGeant4.hh"
 
@@ -1080,5 +1081,13 @@ public:
 };
 
 #endif
+
+class DumpMass : public anl::BasicModule
+{
+public:
+  DumpMass();
+  ~DumpMass();
+};
+
 
 }

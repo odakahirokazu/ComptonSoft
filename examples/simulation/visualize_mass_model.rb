@@ -26,13 +26,13 @@ def run_simulation(num, random, output)
   }
   
   sim.thread_mode = false
+  sim.visualize('Mode'=>'OGLSQt')
   sim.run(num)
 end
 
 ### main ###
 
-num = 10000000
-run_id = 0
-output = "simulation_%03d.root" % run_id
-random = run_id
+num = 100
+output = "vis.root"
+random = 0
 run_simulation(num, random, output)

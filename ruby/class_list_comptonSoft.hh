@@ -90,4 +90,5 @@ class GenerateSimXEvent;
 class OutputSimXPrimaries;
 class AssignG4CopyNumber;
 class InitialParticleTree;
+class DumpMass;
 }
