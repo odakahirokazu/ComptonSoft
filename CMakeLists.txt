@@ -21,7 +21,7 @@ message("-- Install destination prefix: ${CMAKE_INSTALL_PREFIX}")
 option(CS_USE_RUBY "enable Ruby binding" ON)
 option(CS_USE_EXE "enable standalone executables" OFF)
 ## library options
-option(CS_USE_GDML "enable GDML" OFF)
+option(CS_USE_GDML "enable GDML" ON)
 option(CS_USE_FITSIO "enable FITS IO" OFF)
 option(CS_USE_SIMX "enable SimX compatible simulation" OFF)
 option(CS_USE_VIS "enable visualization with OpenGL" OFF)

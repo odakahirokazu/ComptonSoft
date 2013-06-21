@@ -195,7 +195,9 @@
 #include "SimXPrimaryGen.hh"
 #endif
 #include "SpenvisIsotropicPrimaryGen.hh"
+#ifdef CS_BASIC2
 #include "AHRadiationBackgroundPrimaryGen.hh"
+#endif
 #include "RDPickUpData.hh"
 #include "ActivationPickUpData.hh"
 #ifdef USE_SIMX
@@ -225,11 +227,8 @@
 
 #include "class_list_anlGeant4.hh"
 
-using namespace comptonsoft;
-
 %}
 
-%include "std_vector.i"
 
 %import "anl.i"
 %import "anlGeant4.i"
@@ -977,12 +976,14 @@ public:
 };
 
 
+#ifdef CS_BASIC2
 class AHRadiationBackgroundPrimaryGen : public IsotropicPrimaryGen
 {
 public:
   AHRadiationBackgroundPrimaryGen();
 };
 
+#endif
 
 class RDPickUpData : public anlgeant4::StandardPickUpData
 {

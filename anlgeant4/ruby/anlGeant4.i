@@ -19,12 +19,8 @@
 #endif
 
 
-using namespace anlgeant4;
-
 %}
 
-%include "std_string.i"
-%include "std_vector.i"
 
 %import "anl.i"
 

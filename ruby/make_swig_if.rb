@@ -17,7 +17,7 @@ clSim = [# primary generator
          ANLSwigClass.new('AHRayTracingPrimaryGen', false, 'USE_SIMX'),
          ANLSwigClass.new('SimXPrimaryGen', false, 'USE_SIMX'),
          ANLSwigClass.new('SpenvisIsotropicPrimaryGen'),
-         ANLSwigClass.new('AHRadiationBackgroundPrimaryGen'),
+         ANLSwigClass.new('AHRadiationBackgroundPrimaryGen', false, 'CS_BASIC2'),
          # pick up data
          ANLSwigClass.new('RDPickUpData'),
          ANLSwigClass.new('ActivationPickUpData'),
@@ -113,7 +113,7 @@ classList.each{|s|
 m = ANLSwigModule.new(name, classList, namespace)
 m.includeFiles = ['class_list_anlGeant4.hh']
 m.importModules = ['anl.i', 'anlGeant4.i']
-m.includeModules = ['std_vector.i']
+m.includeModules = []
 
 if ARGV.include? '-l'
   m.print_class_list
