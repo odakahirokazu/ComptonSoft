@@ -23,6 +23,7 @@
 
 #include <boost/property_tree/xml_parser.hpp>
 #include <boost/lexical_cast.hpp>
+#include <boost/filesystem/path.hpp>
 #include <boost/foreach.hpp>
 #define foreach BOOST_FOREACH
 
@@ -321,7 +322,6 @@ bool DetectorManager::loadSimulationParameter(const char* filename)
     std::cout << "cannot parse: " << filename << std::endl;
     return false;
   }
-
   
   std::cout << "Detector Name: " << pt.get<std::string>("simulation.name") << std::endl;
 
@@ -329,8 +329,12 @@ bool DetectorManager::loadSimulationParameter(const char* filename)
   boost::optional<std::string> cceFile = rootNode.get_optional<std::string>("cce_file");
 #if USE_ROOT
   if ( cceFile ) {
-    std::cout << "CCE map file: " << *cceFile << std::endl;
-    m_CCEMapFile = new TFile(cceFile->c_str());
+    boost::filesystem::path paramFilePath(filename);
+    boost::filesystem::path dir = paramFilePath.branch_path();
+    boost::filesystem::path relativePath(*cceFile);
+    boost::filesystem::path fullPath = dir / relativePath;
+    std::cout << "CCE map file: " << fullPath << std::endl;
+    m_CCEMapFile = new TFile(fullPath.c_str());
   }
 #endif
 
