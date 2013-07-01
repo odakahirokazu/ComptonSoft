@@ -44,6 +44,7 @@ public:
 private:
   CSHitCollection* m_HitCollection;
   const anlgeant4::InitialInformation* m_InitialInfo;
+  std::string m_EnergyBinType;
   int m_NumBinEnergy;
   double m_RangeEnergy1;
   double m_RangeEnergy2;

@@ -31,7 +31,7 @@ using namespace anl;
 
 
 EnergySpectrum::EnergySpectrum()
-  : m_HitCollection(0), m_InitialInfo(0),
+  : m_HitCollection(0), m_InitialInfo(0), m_EnergyBinType("lin"),
     m_NumBinEnergy(720), m_RangeEnergy1(0.0), m_RangeEnergy2(720.0)
 {
 }
@@ -39,6 +39,7 @@ EnergySpectrum::EnergySpectrum()
 
 ANLStatus EnergySpectrum::mod_startup()
 {
+  register_parameter(&m_EnergyBinType, "Energy bin type");
   register_parameter(&m_NumBinEnergy, "Number of bins");
   register_parameter(&m_RangeEnergy1, "Energy min", 1, "keV");
   register_parameter(&m_RangeEnergy2, "Energy max", 1, "keV");
@@ -61,11 +62,25 @@ ANLStatus EnergySpectrum::mod_his()
   VCSModule::mod_his();
   mkdir_module();
 
+  std::vector<double> xs(m_NumBinEnergy+1);
+  if (m_EnergyBinType=="log") {
+    const double width = std::log(m_RangeEnergy2-m_RangeEnergy1)/m_NumBinEnergy;
+    for (size_t k=0; k<xs.size(); k++) {
+      xs[k] = m_RangeEnergy1 * std::exp( k*width );
+    }
+  }
+
   const size_t n = m_Selections.size();
   for (size_t i=0; i<n; i++) {
     std::string name = (boost::format("hist_%04d") % i).str();
-    TH1F* hist = new TH1F(name.c_str(), "energy spectrum",
-                          m_NumBinEnergy, m_RangeEnergy1, m_RangeEnergy2);
+    TH1F* hist = 0;
+    if (m_EnergyBinType=="log") {
+      hist = new TH1F(name.c_str(), "energy spectrum", m_NumBinEnergy, &xs[0]);
+    }
+    else {
+      hist = new TH1F(name.c_str(), "energy spectrum",
+                      m_NumBinEnergy, m_RangeEnergy1, m_RangeEnergy2);
+    }
     hist->Sumw2();
     m_Responses[m_Selections[i]] = hist;
   }

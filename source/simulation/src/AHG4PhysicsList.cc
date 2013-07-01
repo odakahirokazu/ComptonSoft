@@ -26,6 +26,7 @@
 #include "G4EmExtraPhysics.hh"
 #include "G4DecayPhysics.hh"
 #include "G4HadronElasticPhysics.hh"
+#include "G4HadronElasticPhysicsHP.hh"
 #include "HadronPhysicsQGSP_BERT.hh"
 #include "HadronPhysicsQGSP_BERT_HP.hh"
 #include "HadronPhysicsQGSP_BIC.hh"
@@ -78,7 +79,12 @@ AHG4PhysicsList::AHG4PhysicsList(G4String option)
   this->RegisterPhysics( new G4DecayPhysics(ver) );
   
   // Hadron Elastic scattering
-  this->RegisterPhysics( new G4HadronElasticPhysics(ver) );
+  if (option.find("HP") != std::string::npos) {
+    this->RegisterPhysics( new G4HadronElasticPhysicsHP(ver) );
+  }
+  else {
+    this->RegisterPhysics( new G4HadronElasticPhysics(ver) );
+  }
   
   // Hadron Physics
   if (option.find("INCLXX") != std::string::npos) {
