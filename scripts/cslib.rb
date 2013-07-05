@@ -371,6 +371,7 @@ class Visualization < ANLApp
   def initialize()
     @geometry = nil
     @vis = {"Mode" => "OGLSQt"}
+    @primary_generator = nil
     super
     self.thread_mode = false
   end
@@ -384,6 +385,13 @@ class Visualization < ANLApp
       "Detector geometry file" => gdml_file,
     }
     @geometry = [:ReadGDML, params]
+  end
+
+  def set_primary_generator(mod, params)
+    @primary_generator = [mod, params]
+    if mod.to_s.include?("Pol")
+      @physics += " PC"
+    end
   end
 
   def set_visualize_mode(mode)
@@ -405,12 +413,17 @@ class Visualization < ANLApp
 
     chain @geometry[0]
     chain :AHStandardANLPhysicsList
-    chain :PlaneWavePrimaryGen
+    if @primary_generator
+      chain @primary_generator[0]
+    else
+      chain :PlaneWavePrimaryGen
+    end
     chain :Geant4Body
     chain :StandardPickUpData
     chain :VisualizeG4Geom
 
     set_parameters *@geometry
+    set_parameters *@primary_generator if @primary_generator
 
     set_parameters :Geant4Body, {
       "Random engine" => "MTwistEngine",
