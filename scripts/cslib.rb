@@ -239,7 +239,7 @@ class Simulation < ANLApp
     end
 
     set_parameters :SetNoiseLevel, { "Set by file?" => false, }
-  
+    
     set_parameters *@geometry
 
     set_parameters :AHStandardANLPhysicsList, {
@@ -361,4 +361,67 @@ class Simx2Xrrt < Simulation
       "Area" => @area,
     }
   end
+end
+
+
+# minimum configration of anlapp for visualization
+
+class Visualization < ANLApp
+
+  def initialize()
+    @geometry = nil
+    @vis = {"Mode" => "OGLSQt"}
+    super
+    self.thread_mode = false
+  end
+
+  def set_geometry(mod, params={})
+    @geometry = [mod, params]
+  end
+
+  def use_gdml(gdml_file)
+    params = {
+      "Detector geometry file" => gdml_file,
+    }
+    @geometry = [:ReadGDML, params]
+  end
+
+  def set_visualize_mode(mode)
+    @vis["Mode"] = mode
+  end
+
+  def set_visualize_params(params={})
+    @vis = params
+  end
+
+  def run(n_loop=0, display_frequency=nil, &set_param)
+    make_chain()
+    super
+  end
+
+  protected
+
+  def make_chain()
+
+    chain @geometry[0]
+    chain :AHStandardANLPhysicsList
+    chain :PlaneWavePrimaryGen
+    chain :Geant4Body
+    chain :StandardPickUpData
+    chain :VisualizeG4Geom
+
+    set_parameters *@geometry
+
+    set_parameters :Geant4Body, {
+      "Random engine" => "MTwistEngine",
+      "Random initialization mode" => 1,
+      "Random seed" => 0,
+      "Random initial status file" => "",
+      "Random final status file" => "",
+      "Verbose level" => 0,
+    }
+
+    set_parameters :VisualizeG4Geom, @vis
+  end
+
 end
