@@ -17,10 +17,11 @@
  *                                                                       *
  *************************************************************************/
 
-// 
-// ComptonCamera Mark3 Hit Data Flag Definition
+//
+// ComptonCamera Hit Data Flag Definition
 // HXISGDFlagDef.hh
 // 2008-08-23 Hirokazu Odaka
+// 2013-07-08 Yuto Ichinohe
 //
 
 #ifndef COMPTONSOFT_HXISGDFlagDef_H
@@ -32,7 +33,22 @@ const unsigned int PROC_PHOTOABS        = 0x00000001u;
 const unsigned int PROC_COMPTON         = 0x00000002u;
 const unsigned int PROC_RAYLEIGH        = 0x00000004u;
 const unsigned int PROC_GAMMACONVERSION = 0x00000008u;
-const unsigned int QUENCHING = 0x00010000u;
+
+// const unsigned int PROC_FLUOR = 0x00000010u;
+// const unsigned int PROC_BREMS = 0x00000020u;
+// const unsigned int PROC_0ENE = 0x00000080u;
+
+// const unsigned int ORIG_INCIDENT = 0x00000100u;
+// const unsigned int ORIG_FLUOR = 0x00000200u;
+// const unsigned int ORIG_BREMS = 0x00000400u;
+
+// const unsigned int EV_RAYL = 0x00001000u;
+// const unsigned int EV_PASSIVE = 0x00002000u;
+// const unsigned int EV_ESCAPE = 0x00004000u;
+// const unsigned int EV_GUARDRING = 0x00008000u;
+// const unsigned int EV_RAYLONLYSD = 0x00010000u;
+
+const unsigned int QUENCHING = 0x10000000u;
 
 // grade
 const int GRADE1        = 1;
@@ -71,4 +87,4 @@ const int GUARD_RING     = -2;
 const int NOTIMEGROUP   = -1;
 }
 
-#endif /* COMPTONSOFT_HXISGDFlagDef_H */ 
+#endif /* COMPTONSOFT_HXISGDFlagDef_H */
