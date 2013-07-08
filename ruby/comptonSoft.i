@@ -223,6 +223,10 @@
 #ifdef CS_BASIC2
 #include "InitialParticleTree.hh"
 #endif
+#ifdef CS_BASIC2
+#include "ProcessInvestigationPickUpData.hh"
+#endif
+
 #include "DumpMass.hh"
 
 #include "class_list_anlGeant4.hh"
@@ -1079,6 +1083,16 @@ class InitialParticleTree : public VCSModule
 public:
   InitialParticleTree();
   ~InitialParticleTree() {}
+};
+
+#endif
+
+#ifdef CS_BASIC2
+class ProcessInvestigationPickUpData : public anlgeant4::StandardPickUpData
+{
+public:
+  ProcessInvestigationPickUpData();
+  ~ProcessInvestigationPickUpData() {}
 };
 
 #endif

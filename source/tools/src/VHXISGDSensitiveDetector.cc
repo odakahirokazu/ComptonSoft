@@ -68,13 +68,24 @@ VHXISGDSensitiveDetector::ProcessHits(G4Step* aStep, G4TouchableHistory* )
     else if(processName.find("conv") != std::string::npos) {
       process = comptonsoft::PROC_GAMMACONVERSION;
     }
+    else if(processName.find("eBrem") != std::string::npos) {
+      process = comptonsoft::PROC_BREMS;
+    }
+
+    if (processName.find("Coupled") == std::string::npos
+        && processName.find("Rayl") == std::string::npos
+        && edep == 0.0) {
+      process |= comptonsoft::PROC_0ENE;
+    }
   }
 
   if (aTrack->GetDefinition()->GetParticleType() == "nucleus") {
     process |= comptonsoft::QUENCHING;
   }
     
-  if (edep == 0.0 && process == 0) return true;
+  // e- coupled transportation (ignoring e.g. edep~e-26)
+  if (edep < 1.0e-15 && process == 0) return true;
+  //  if (edep == 0.0 && process == 0) return true;
   
   comptonsoft::DetectorHit_sptr hit(new comptonsoft::DetectorHit);
   hit->setDetectorID(detid);
@@ -89,7 +100,7 @@ VHXISGDSensitiveDetector::ProcessHits(G4Step* aStep, G4TouchableHistory* )
       break;
     case fAlongStepDoItProc:
       position = 0.5*(aStep->GetPreStepPoint()->GetPosition() + 
-		      aStep->GetPostStepPoint()->GetPosition());
+                      aStep->GetPostStepPoint()->GetPosition());
       break;
     default:
       position = aStep->GetPreStepPoint()->GetPosition();

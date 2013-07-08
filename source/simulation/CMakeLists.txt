@@ -43,6 +43,8 @@ set(CS_SIMULATION_CLASSES_BASIC1
   src/RDPickUpData.cc
   src/ActivationStackingAction.cc
   src/ActivationPickUpData.cc
+  src/ProcessInvestigationTrackingAction.cc
+  src/ProcessInvestigationPickUpData.cc
   # physics list
   src/AHG4EmLivermorePhysics.cc
   src/AHG4RadioactiveDecayConstructor.cc

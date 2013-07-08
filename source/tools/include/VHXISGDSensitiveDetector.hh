@@ -34,6 +34,8 @@ class DetectorManager;
  * This implementaion is based on comptonsoft::SimpleDetPickUpData.
  * @author Hirokazu Odaka
  * @date 2011-04-04
+ * @author Yuto Ichinohe
+ * @date 2013-07-08 | flags
  */
 class VHXISGDSensitiveDetector : public G4VSensitiveDetector
 {

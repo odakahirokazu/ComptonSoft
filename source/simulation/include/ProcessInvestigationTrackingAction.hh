@@ -1,6 +1,6 @@
 /*************************************************************************
  *                                                                       *
- * Copyright (c) 2011 Shin Watanabe, Hirokazu Odaka                      *
+ * Copyright (c) 2013 Yuto Ichinohe                                      *
  *                                                                       *
  * This program is free software: you can redistribute it and/or modify  *
  * it under the terms of the GNU General Public License as published by  *
@@ -17,47 +17,51 @@
  *                                                                       *
  *************************************************************************/
 
+#ifndef ProcessInvestigationTrackingAction_H
+#define ProcessInvestigationTrackingAction_H
+
+#include "G4UserTrackingAction.hh"
+#include "DetectorManager.hh"
 #include "VPickUpData.hh"
+#include "HXISGDSensitiveDetector.hh"
 
-#include "G4RunManager.hh"
+#include <vector>
+#include <map>
+#include <string>
+#include <iostream>
 
-#include "PickUpDataRunAction.hh"
-#include "PickUpDataEventAction.hh"
-#include "PickUpDataTrackingAction.hh"
-#include "PickUpDataSteppingAction.hh"
-
+using namespace std;
 using namespace anlgeant4;
 
-VPickUpData::VPickUpData()
-  : m_StepActOn(true), m_StackingAction(0), m_TrackingAction(0)
-{
-  add_alias("VPickUpData");
-  add_alias("PickUpData");
+namespace comptonsoft {
+
+class ProcessInvestigationTrackingAction : public G4UserTrackingAction {
+/**
+ * TrackingAction class for physics process investigation
+ * @author Yuto Ichinohe
+ * @date 2013-07-08
+ */
+public:
+  ProcessInvestigationTrackingAction();
+  ProcessInvestigationTrackingAction(VPickUpData* vpud);
+  ~ProcessInvestigationTrackingAction();
+
+  void PreUserTrackingAction(const G4Track* aTrack);
+  void PostUserTrackingAction(const G4Track* aTrack);
+
+  vector<pair<int, pair<int, string> > > getVec() { return vec; }
+  void clearVec() { vec.clear(); }
+  bool escapep() { return m_escapep; }
+  void initescapep() { m_escapep = false; }
+
+  void setDetectorManager(DetectorManager* man) { detector_manager = man; }
+
+private:
+  VPickUpData* vpickupdata;
+  vector<pair<int, pair<int, string> > > vec;
+  DetectorManager* detector_manager;
+  bool m_escapep;
+};
+
 }
-
-
-void VPickUpData::CreateUserActions()
-{
-}
-
-
-void VPickUpData::RegisterUserActions(G4RunManager* run_manager)
-{
-  CreateUserActions();
-
-  PickUpDataRunAction* runAction = new PickUpDataRunAction(this);
-  PickUpDataEventAction* eventAction = new PickUpDataEventAction(this);
-  PickUpDataTrackingAction* trackingAction = new PickUpDataTrackingAction(this);
-
-  run_manager->SetUserAction(runAction);
-  run_manager->SetUserAction(eventAction);
-  run_manager->SetUserAction(trackingAction);
-
-  if (StepActOn()) {
-    PickUpDataSteppingAction* steppingAction = new PickUpDataSteppingAction(this);
-    run_manager->SetUserAction(steppingAction);
-  }
-  
-  if (m_StackingAction) run_manager->SetUserAction(m_StackingAction);
-  if (m_TrackingAction) run_manager->SetUserAction(m_TrackingAction);
-}
+#endif

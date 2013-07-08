@@ -29,6 +29,7 @@ class G4Run;
 
 class G4RunManager;
 class G4UserStackingAction;
+class G4UserTrackingAction;
 
 namespace anlgeant4
 {
@@ -56,6 +57,7 @@ public:
   void SetStepActOn(bool on) { m_StepActOn = on; }
 
   void SetStackingAction(G4UserStackingAction* v) { m_StackingAction = v; }
+  void SetTrackingAction(G4UserTrackingAction* v) { m_TrackingAction = v; }
   
   virtual void CreateUserActions();
   void RegisterUserActions(G4RunManager* run_manager);
@@ -63,6 +65,7 @@ public:
 private:
   bool m_StepActOn;
   G4UserStackingAction* m_StackingAction;
+  G4UserTrackingAction* m_TrackingAction;
 };
 
 }

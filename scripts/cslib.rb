@@ -216,11 +216,11 @@ class Simulation < ANLApp
     push_simx()
     chain @primary_generator[0]
     chain :Geant4Body
+    chain @pickup_data[0]
     chain :MakeDetectorHit
     chain :EventSelection
     chain :EventReconstruction if @compton_mode
     chain :HitTree_Sim unless @basic_mode
-    chain @pickup_data[0]
     chain @vis[0] if @vis
     
     unless @basic_mode

@@ -40,7 +40,9 @@ class DetectorHit;
  * @date 2007-xx-xx | DeviceSimulation
  * @date 2008-07-29
  * @date 2009-10-26 
- * @date 2012-07-01 | VDeviceSimulation 
+ * @date 2012-07-01 | VDeviceSimulation
+ * @author Yuto Ichinohe 
+ * @date 2013-07-08 | getRawHitNC()
  */
 class VDeviceSimulation : private boost::noncopyable
 {
@@ -107,6 +109,7 @@ public:
   void insertRawHit(DetectorHit_sptr hit) { m_RawHits.push_back(hit); }
   int NumRawHits() { return m_RawHits.size(); }
   const_DetectorHit_sptr getRawHit(int i) { return m_RawHits[i]; }
+  DetectorHit_sptr getRawHitNC(int i) { return m_RawHits[i]; }
   void clearRawHits() { return m_RawHits.clear(); }
 
   int makeDetectorHits();

@@ -32,6 +32,8 @@
 #include "StripPair.hh"
 #include "HXISGDFlagDef.hh"
 
+#include <string>
+
 namespace comptonsoft {
 
 
@@ -42,6 +44,8 @@ namespace comptonsoft {
  * @author Hirokazu Odaka
  * @date 2008-08-22
  * @date 2012-06-29 | rename DetectorID; add Instrument ID
+ * @author Yuto Ichinohe
+ * @data 2013-07-08 | addflag(), set/getTrackID(), set/getParticleType()
  */
 class DetectorHit
 {
@@ -78,6 +82,7 @@ public:
   void setTime(double val) { time = val; }
 
   void setProcess(int val) { process = val; }
+  void addProcess(int val) { process |= val; }
   
   void setGrade(unsigned int val) { grade = val; }
 
@@ -94,6 +99,9 @@ public:
 
   void setFlag(unsigned int v) { flag = v; }
   
+  void setTrackID(int val) { trackid = val; }
+  void setParticleType(std::string val) { particletype = val; }
+
   // getter methods
   double getRealPosX() const { return realposx; }
   double getRealPosY() const { return realposy; }
@@ -135,6 +143,9 @@ public:
   int getTimeGroup() const { return time_group; }
 
   unsigned int getFlag() const { return flag; }
+
+  int getTrackID() const { return trackid; }
+  std::string getParticleType() const { return particletype; }
 
   // utility
   bool areAdjacent(const DetectorHit& r, int mode = 1) const;
@@ -205,6 +216,9 @@ private:
   int time_group;
 
   unsigned int flag;
+
+  int trackid;
+  std::string particletype;
 };
 
 
