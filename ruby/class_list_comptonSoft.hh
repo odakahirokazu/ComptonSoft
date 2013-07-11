@@ -84,6 +84,7 @@ class ActivationPickUpData;
 class AHStandardPickUpData;
 class KillStepPickUpData;
 class MaterialSamplePickUpData;
+class ScatteringPickUpData;
 class AHStandardANLPhysicsList;
 class SimXIF;
 class GenerateSimXEvent;

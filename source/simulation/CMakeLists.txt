@@ -65,6 +65,7 @@ if(CS_USE_ROOT)
     # pick up data
     src/KillStepPickUpData.cc
     src/MaterialSamplePickUpData.cc
+    src/ScatteringPickUpData.cc
     # others
     src/InitialParticleTree.cc
     )

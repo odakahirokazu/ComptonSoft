@@ -24,6 +24,7 @@ clSim = [# primary generator
          ANLSwigClass.new('AHStandardPickUpData', false, 'USE_SIMX'),
          ANLSwigClass.new('KillStepPickUpData', false, 'CS_BASIC2'),
          ANLSwigClass.new('MaterialSamplePickUpData', false, 'CS_BASIC2'),
+         ANLSwigClass.new('ScatteringPickUpData', false, 'CS_BASIC2'),
          # physics list
          ANLSwigClass.new('AHStandardANLPhysicsList'),
          # others

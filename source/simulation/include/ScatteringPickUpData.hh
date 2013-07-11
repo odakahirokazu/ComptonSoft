@@ -17,10 +17,11 @@
  *                                                                       *
  *************************************************************************/
 
-#ifndef COMPTONSOFT_RDPickUpData_H
-#define COMPTONSOFT_RDPickUpData_H 1
+#ifndef COMPTONSOFT_ScatteringPickUpData_H
+#define COMPTONSOFT_ScatteringPickUpData_H 1
 
 #include "StandardPickUpData.hh"
+#include "TTree.h"
 
 namespace comptonsoft {
 
@@ -32,27 +33,28 @@ namespace comptonsoft {
  * @date 2008-08-27
  * @date 2011-04-08
  */
-class RDPickUpData : public anlgeant4::StandardPickUpData
+class ScatteringPickUpData : public anlgeant4::StandardPickUpData
 {
-  DEFINE_ANL_MODULE(RDPickUpData, 2.0);
+  DEFINE_ANL_MODULE(ScatteringPickUpData, 2.0);
 public:
-  RDPickUpData();
+  ScatteringPickUpData();
   
   virtual anl::ANLStatus mod_startup();
+  virtual anl::ANLStatus mod_his();
 
-  virtual void EventAct_end(const G4Event*);
+  virtual void EventAct_begin(const G4Event*);
   virtual void StepAct(const G4Step* aStep, G4Track* aTrack);
 
-  void SetTerminationTime(double v) { m_TerminationTime = v; }
-  double TerminationTime() const { return m_TerminationTime; }
-
-  double FirstDecayTime() const { return m_FirstDecayTime; }
-
 private:
-  double m_TerminationTime;
-  double m_FirstDecayTime;
+  TTree* m_Tree;
+  double m_DirX;
+  double m_DirY;
+  double m_DirZ;
+  double m_Energy;
+  bool m_FirstInteraction;
+  std::string m_ProcessName;
 };
 
 }
 
-#endif /* COMPTONSOFT_RDPickUpData_H */
+#endif /* COMPTONSOFT_ScatteringPickUpData_H */

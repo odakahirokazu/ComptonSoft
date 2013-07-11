@@ -209,6 +209,9 @@
 #ifdef CS_BASIC2
 #include "MaterialSamplePickUpData.hh"
 #endif
+#ifdef CS_BASIC2
+#include "ScatteringPickUpData.hh"
+#endif
 #include "AHStandardANLPhysicsList.hh"
 #ifdef USE_SIMX
 #include "SimXIF.hh"
@@ -1024,6 +1027,15 @@ class MaterialSamplePickUpData : public anlgeant4::StandardPickUpData
 {
 public:
   MaterialSamplePickUpData();
+};
+
+#endif
+
+#ifdef CS_BASIC2
+class ScatteringPickUpData : public anlgeant4::StandardPickUpData
+{
+public:
+  ScatteringPickUpData();
 };
 
 #endif

@@ -66,11 +66,12 @@ ANLStatus AHRadiationBackgroundPrimaryGen::mod_init()
   
   for (int bin=1; bin<=N; bin++) {
     double energy = m_Hist->GetBinCenter(bin);
-    double flux = graph->Eval(energy/GeV) * (1.0/s/m2/sr/GeV);
-    m_Hist->SetBinContent(bin, flux);
+    double differentialFlux = graph->Eval(energy/GeV) * (1.0/s/m2/sr/GeV);
     double deltaE = m_Hist->GetBinWidth(bin);
-    sum += flux*deltaE;
-    G4cout << energy/MeV << " [MeV] : " << flux/(1.0/s/cm2/sr/MeV) << " [#/s/cm2/sr/MeV] " << G4endl;
+    double flux = differentialFlux * deltaE;
+    m_Hist->SetBinContent(bin, flux);
+    sum += flux;
+    G4cout << energy/MeV << " [MeV] : " << differentialFlux/(1.0/s/cm2/sr/MeV) << " [#/s/cm2/sr/MeV] " << G4endl;
   }
   
   double circleArea = Radius()*Radius()*pi;
