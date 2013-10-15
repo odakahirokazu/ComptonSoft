@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 2.8)
 
 include_directories(include
+  ${ANLG4_INC_DIR}
   ${ROOT_INC_DIR}
   ${G4_INC_DIR}
   ${CLHEP_INC_DIR}

@@ -33,6 +33,7 @@ class G4ParticleDefinition;
 namespace anlgeant4 {
 
 class BasicPrimaryGeneratorAction;
+class VANLGeometry;
 
 
 /**
@@ -47,9 +48,19 @@ class BasicPrimaryGen : public VANLPrimaryGen, public InitialInformation
 {
   DEFINE_ANL_MODULE(BasicPrimaryGen, 1.3);
 public:
+  enum SpectralShape {
+    User = 0,
+    Mono = 1,
+    PowerLaw = 2,
+    Gaussian = 3,
+    BlackBody = 4,
+    Undefined = -1,
+  };
+
   BasicPrimaryGen();
   
   virtual anl::ANLStatus mod_startup();
+  virtual anl::ANLStatus mod_prepare();
   virtual anl::ANLStatus mod_init();
   virtual anl::ANLStatus mod_bgnrun();
   virtual anl::ANLStatus mod_ana();
@@ -115,24 +126,48 @@ protected:
 
   void setDefinition(G4ParticleDefinition* def);
   void setParticleName(const std::string& name) { m_ParticleName = name; }
-  void disablePowerLawInput();
+
+  void setEnergyDistribution(SpectralShape v, const std::string& name)
+  {
+    m_EnergyDistribution = v;
+    m_EnergyDistributionName = name;
+  }
+  
   void enablePowerLawInput();
+  void enableGaussianInput();
+  void enableBlackBodyInput();
+  void disableDefaultEnergyInput();
+
   virtual void printSpectralInfo();
 
   /**
-   * Sample a value of energy from energy distribution of the primaries. Since this methods is virtual, you can override its implimentation. By default, it samples an energy from a power-law distribution specified by registered parameters.
+   * Sample a value of energy from energy distribution of the primaries.
+   * Since this methods is virtual, you can override its implimentation.
+   * By default, it samples an energy from a power-law distribution
+   * specified by registered parameters.
+   *
    * @return sampled energy
    */
   virtual G4double sampleEnergy();
+  G4double sampleFromPowerLaw(double gamma, double e0, double e1);
+  G4double sampleFromPowerLaw();
+  G4double sampleFromGaussian(double mean, double sigma);
+  G4double sampleFromGaussian();
+  G4double sampleFromBlackBody(double kT, double upper_limit_factor);
+  G4double sampleFromBlackBody();
 
   virtual G4ThreeVector sampleDirection() { return m_Direction; }
   virtual G4ThreeVector samplePosition() { return m_Position; }
 
   void setUnpolarized();
+
+  double LengthUnit() const;
+  std::string LengthUnitName() const;
   
 private:
   BasicPrimaryGeneratorAction* m_PrimaryGen;
   const anlgeant4::StandardPickUpData* m_PickUpData;
+  const anlgeant4::VANLGeometry* m_Geometry;
 
   std::string m_ParticleName;
 
@@ -146,12 +181,21 @@ private:
   G4double m_TotalEnergy;
 
   G4ParticleDefinition* m_Definition;
-  
-  G4double m_PhotonIndex;
-  G4double m_EnergyMin;
-  G4double m_EnergyMax;
 
   G4int m_PolarizationMode;
+
+  /* properties for the energy distribution */
+  std::string m_EnergyDistributionName;
+  SpectralShape m_EnergyDistribution;
+  G4double m_EnergyMin;
+  G4double m_EnergyMax;
+  // power-law distribution
+  G4double m_PhotonIndex;
+  // Gaussin distribution
+  G4double m_EnergyMean;
+  G4double m_EnergySigma;
+  // black-body distribution
+  G4double m_KT;
 };
 
 }

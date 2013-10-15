@@ -17,15 +17,13 @@
  *                                                                       *
  *************************************************************************/
 
-#ifndef COMPTONSOFT_PointSourcePrimaryGen_H
-#define COMPTONSOFT_PointSourcePrimaryGen_H 1
+#ifndef ANLGEANT4_PointSourcePrimaryGen_H
+#define ANLGEANT4_PointSourcePrimaryGen_H 1
 
 #include "BasicPrimaryGen.hh"
-
-#include "globals.hh"
 #include "G4ThreeVector.hh"
 
-namespace comptonsoft {
+namespace anlgeant4 {
 
 
 /**
@@ -36,15 +34,15 @@ namespace comptonsoft {
  * @date xxxx-xx-xx | Shin Watanabe | NSPrimaryGen
  * @date 2010-02-17 | Hirokazu Odaka | PointSourcePrimaryGen
  * @date 2012-07-10 | Hirokazu Odaka | virtual methods: sampleDirection(), samplePosition()
+ * @date 2013-08-18 | Hirokazu Odaka | be moved to anlgeant4
  */
-class PointSourcePrimaryGen : public anlgeant4::BasicPrimaryGen
+class PointSourcePrimaryGen : public BasicPrimaryGen
 {
-  DEFINE_ANL_MODULE(PointSourcePrimaryGen, 1.5);
+  DEFINE_ANL_MODULE(PointSourcePrimaryGen, 1.6);
 public:
   PointSourcePrimaryGen();
 
   anl::ANLStatus mod_startup();
-  anl::ANLStatus mod_prepare();
   anl::ANLStatus mod_init();
   anl::ANLStatus mod_ana();
   anl::ANLStatus mod_endrun();
@@ -56,6 +54,8 @@ protected:
 
   G4ThreeVector sampleDirection();
   G4ThreeVector samplePosition();
+
+  G4ThreeVector SourcePosition() { return m_SourcePosition; }
 
 private:
   G4ThreeVector m_SourcePosition;
@@ -72,4 +72,4 @@ private:
 
 }
 
-#endif /* COMPTONSOFT_PointSourcePrimaryGen_H */
+#endif /* ANLGEANT4_PointSourcePrimaryGen_H */

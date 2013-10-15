@@ -23,7 +23,7 @@
 
 #include "Randomize.hh"
 #include "G4ThreeVector.hh"
-#include "AstroUnit.hh"
+#include "AstroUnits.hh"
 #include "PhaseSpaceVector.hh"
 
 #include "RealDetectorUnit.hh"

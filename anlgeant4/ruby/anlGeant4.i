@@ -12,6 +12,8 @@
 #endif
 #include "VANLPrimaryGen.hh"
 #include "BasicPrimaryGen.hh"
+#include "PlaneWavePrimaryGen.hh"
+#include "PointSourcePrimaryGen.hh"
 #include "VPickUpData.hh"
 #include "StandardPickUpData.hh"
 #ifdef USE_VIS
@@ -52,6 +54,10 @@ class VANLPhysicsList : public anl::BasicModule
 %nodefault;
 class VANLGeometry : public anl::BasicModule
 {
+public:
+  void SetLengthUnit(const std::string& name);
+  double GetLengthUnit() const;
+  std::string GetLengthUnitName() const;
 };
 %makedefault;
 
@@ -84,7 +90,20 @@ class VANLPrimaryGen : public anl::BasicModule
 class BasicPrimaryGen : public VANLPrimaryGen
 {
 public:
-  BasicPrimaryGen();
+  };
+
+
+class PlaneWavePrimaryGen : public anlgeant4::BasicPrimaryGen
+{
+public:
+  PlaneWavePrimaryGen();
+};
+
+
+class PointSourcePrimaryGen : public BasicPrimaryGen
+{
+public:
+  PointSourcePrimaryGen();
 };
 
 

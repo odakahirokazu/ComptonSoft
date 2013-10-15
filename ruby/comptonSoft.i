@@ -171,15 +171,7 @@
 #include "EfficiencyMapSky.hh"
 #endif
 #include "HXIEventSelection.hh"
-#include "PlaneWavePrimaryGen.hh"
-#ifdef CS_BASIC2
-#include "PlaneWavePrimaryGenPol.hh"
-#endif
 #include "PlaneWaveRectanglePrimaryGen.hh"
-#ifdef CS_BASIC2
-#include "PlaneWaveRectanglePrimaryGenPol.hh"
-#endif
-#include "PointSourcePrimaryGen.hh"
 #include "IsotropicPrimaryGen.hh"
 #ifdef CS_BASIC2
 #include "PrimaryGenInVolume.hh"
@@ -880,42 +872,10 @@ public:
 };
 
 
-class PlaneWavePrimaryGen : public anlgeant4::BasicPrimaryGen
-{
-public:
-  PlaneWavePrimaryGen();
-};
-
-
-#ifdef CS_BASIC2
-class PlaneWavePrimaryGenPol : public PlaneWavePrimaryGen
-{
-public:
-  PlaneWavePrimaryGenPol() {}
-};
-
-#endif
-
-class PlaneWaveRectanglePrimaryGen : public PlaneWavePrimaryGen
+class PlaneWaveRectanglePrimaryGen : public anlgeant4::PlaneWavePrimaryGen
 {
 public:
   PlaneWaveRectanglePrimaryGen();
-};
-
-
-#ifdef CS_BASIC2
-class PlaneWaveRectanglePrimaryGenPol : public PlaneWaveRectanglePrimaryGen
-{
-public:
-  PlaneWaveRectanglePrimaryGenPol() {}
-};
-
-#endif
-
-class PointSourcePrimaryGen : public anlgeant4::BasicPrimaryGen
-{
-public:
-  PointSourcePrimaryGen();
 };
 
 
@@ -927,7 +887,7 @@ public:
 
 
 #ifdef CS_BASIC2
-class PrimaryGenInVolume : public PointSourcePrimaryGen
+class PrimaryGenInVolume : public anlgeant4::PointSourcePrimaryGen
 {
 public:
   PrimaryGenInVolume();

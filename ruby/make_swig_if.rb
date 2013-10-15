@@ -5,11 +5,7 @@ name = 'comptonSoft'
 namespace = 'comptonsoft'
 
 clSim = [# primary generator
-         ANLSwigClass.new('PlaneWavePrimaryGen'),
-         ANLSwigClass.new('PlaneWavePrimaryGenPol', false, 'CS_BASIC2'),
          ANLSwigClass.new('PlaneWaveRectanglePrimaryGen'),
-         ANLSwigClass.new('PlaneWaveRectanglePrimaryGenPol', false, 'CS_BASIC2'),
-         ANLSwigClass.new('PointSourcePrimaryGen'),
          ANLSwigClass.new('IsotropicPrimaryGen'),
          ANLSwigClass.new('PrimaryGenInVolume', false, 'CS_BASIC2'),
          ANLSwigClass.new('NucleusPrimaryGen'),

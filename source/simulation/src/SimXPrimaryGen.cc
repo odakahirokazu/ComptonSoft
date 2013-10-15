@@ -20,7 +20,7 @@
 #include "SimXPrimaryGen.hh"
 
 #include "Randomize.hh"
-#include "AstroUnit.hh"
+#include "AstroUnits.hh"
 #include "PhaseSpaceVector.hh"
 #include "SimXIF.hh"
 

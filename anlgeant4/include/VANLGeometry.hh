@@ -32,17 +32,29 @@ namespace anlgeant4
  * @author Hirokazu Odaka
  * @date xxxx-xx-xx
  * @date 2012-05-30
+ * @date 2013-08-18 | H. Odaka | length unit, surface check
  */
 class VANLGeometry : public anl::BasicModule
 {
-  DEFINE_ANL_MODULE(VANLGeometry, 4.0);
+  DEFINE_ANL_MODULE(VANLGeometry, 4.1);
 public:
-  VANLGeometry()
-  {
-    add_alias("VANLGeometry");
-  }
+  VANLGeometry();
 
   virtual G4VUserDetectorConstruction* create() = 0;
+
+  void SetLengthUnit(double unit, const std::string& name);
+  void SetLengthUnit(const std::string& name);
+  double GetLengthUnit() const { return m_LengthUnit; }
+  std::string GetLengthUnitName() const { return m_LengthUnitName; }
+
+  bool SurfaceCheck() const { return m_SurfaceCheck; }
+
+  anl::ANLStatus mod_startup();
+
+private:
+  double m_LengthUnit;
+  std::string m_LengthUnitName;
+  bool m_SurfaceCheck;
 };
 
 }

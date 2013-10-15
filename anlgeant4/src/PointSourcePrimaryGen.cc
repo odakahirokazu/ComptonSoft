@@ -19,12 +19,11 @@
 
 #include "PointSourcePrimaryGen.hh"
 #include "Randomize.hh"
-#include "AstroUnit.hh"
+#include "VANLGeometry.hh"
+#include "AstroUnits.hh"
 
 using namespace anl;
 using namespace anlgeant4;
-using namespace comptonsoft;
-
 
 PointSourcePrimaryGen::PointSourcePrimaryGen()
   : m_SourcePosition(0.0, 0.0, 0.0),
@@ -39,9 +38,10 @@ PointSourcePrimaryGen::PointSourcePrimaryGen()
 ANLStatus PointSourcePrimaryGen::mod_startup()
 {
   BasicPrimaryGen::mod_startup();
-  
+
   enablePowerLawInput();
-  register_parameter(&m_SourcePosition, "Source position", cm, "cm");
+  register_parameter(&m_SourcePosition, "Source position",
+                     LengthUnit(), LengthUnitName());
   set_parameter_description("Position of the source.");
   register_parameter(&m_CenterDirection, "Center direction");
   set_parameter_description("Center direction of the primaries.");
@@ -56,18 +56,12 @@ ANLStatus PointSourcePrimaryGen::mod_startup()
 }
 
 
-ANLStatus PointSourcePrimaryGen::mod_prepare()
-{
-  m_CenterDirection = m_CenterDirection.unit();
-  return AS_OK;
-}
-
-
 ANLStatus PointSourcePrimaryGen::mod_init()
 {
   using std::cos;
   
   BasicPrimaryGen::mod_init();
+  m_CenterDirection = m_CenterDirection.unit();
 
   const G4double posx = m_SourcePosition.x();
   const G4double posy = m_SourcePosition.y();
@@ -82,13 +76,10 @@ ANLStatus PointSourcePrimaryGen::mod_init()
   m_CoveringFactor = 0.5*(m_CosTheta0-m_CosTheta1);
   
   G4cout << "--------" << G4endl;
-  G4cout << "PSPrimaryGen status" << G4endl;
-
+  G4cout << "PrimaryGen status (point source)" << G4endl;
   G4cout << "  Source Position: "
          << posx/cm << " " << posy/cm << " " << posz/cm << " cm" <<G4endl;
-  
   printSpectralInfo();
-
   G4cout << "  Direction: "
          << dirx << " " << diry << " " << dirz << '\n' 
          << "    theta: " << m_Theta0/degree << " - " << m_Theta1/degree
@@ -100,14 +91,10 @@ ANLStatus PointSourcePrimaryGen::mod_init()
 
 ANLStatus PointSourcePrimaryGen::mod_ana()
 {
-  using std::cos;
-  using std::sin;
-  using std::sqrt;
+  const G4ThreeVector position = samplePosition();
+  const G4ThreeVector direction = sampleDirection();
+  const G4double energy = sampleEnergy();
 
-  G4double energy = sampleEnergy();
-  G4ThreeVector direction = sampleDirection();
-  G4ThreeVector position = samplePosition();
-  
   setPrimary(position, energy, direction);
 
   if (PolarizationMode()==0) {

@@ -19,7 +19,7 @@
 
 #include "IsotropicPrimaryGen.hh"
 #include "Randomize.hh"
-#include "AstroUnit.hh"
+#include "AstroUnits.hh"
 
 using namespace anl;
 using namespace anlgeant4;
@@ -86,18 +86,15 @@ ANLStatus IsotropicPrimaryGen::mod_init()
   m_CoveringFactor = 0.5*(m_CosTheta0-m_CosTheta1);
 
   G4cout << "--------" << G4endl;
-  G4cout << "IsotropicPrimaryGen status" << G4endl;
-
+  G4cout << "PrimaryGen status (isotropic)" << G4endl;
   G4cout << "  Center Position: "
          << posx/cm << " " << posy/cm << " " << posz/cm << " cm" <<G4endl;
   G4cout << "  Radius: " << m_Radius/cm << " cm" << G4endl;
   G4cout << "  Distance: " << m_Distance/cm << " cm" << G4endl;
-
   G4cout << "  Center Direction: "
          << dirx << " " << diry << " " << dirz << G4endl;
   G4cout << "  Theta: "
          << m_ThetaMin/degree << " - " << m_ThetaMax/degree << " deg" << G4endl;
-  
   printSpectralInfo();
   
   return AS_OK;
@@ -110,9 +107,6 @@ ANLStatus IsotropicPrimaryGen::mod_ana()
   using std::sin;
   using std::sqrt;
 
-  // set energy
-  G4double energy = sampleEnergy();
-  
   // set position and direction
   G4double cosTheta = m_CosTheta0 + (m_CosTheta1-m_CosTheta0) * G4UniformRand();
   G4double sinTheta = sqrt(1.0-cosTheta*cosTheta);
@@ -129,6 +123,9 @@ ANLStatus IsotropicPrimaryGen::mod_ana()
 
   G4ThreeVector position = m_CenterPosition + v + v2;
   G4ThreeVector direction = (-v).unit();
+
+  // set energy
+  G4double energy = sampleEnergy();
 
   setPrimary(position, energy, direction);
   

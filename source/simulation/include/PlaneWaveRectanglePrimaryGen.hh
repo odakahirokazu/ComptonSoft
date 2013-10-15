@@ -21,8 +21,6 @@
 #define COMPTONSOFT_PlaneWaveRectanglePrimaryGen_H 1
 
 #include "PlaneWavePrimaryGen.hh"
-
-#include "globals.hh"
 #include "G4ThreeVector.hh"
 
 namespace comptonsoft {
@@ -35,7 +33,7 @@ namespace comptonsoft {
  * @date 2011-06-15 | Hirokazu Odaka | based on PlaneWavePrimaryGen
  * @date 2011-07-10 | Hirokazu Odaka | derived from PlaneWavePrimaryGen
  */
-class PlaneWaveRectanglePrimaryGen : public PlaneWavePrimaryGen
+class PlaneWaveRectanglePrimaryGen : public anlgeant4::PlaneWavePrimaryGen
 {
   DEFINE_ANL_MODULE(PlaneWaveRectanglePrimaryGen, 1.3);
 public:

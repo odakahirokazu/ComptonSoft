@@ -32,9 +32,7 @@ link_directories(
 
 set(CS_SIMULATION_CLASSES_BASIC1
   # primary geneator
-  src/PlaneWavePrimaryGen.cc
   src/PlaneWaveRectanglePrimaryGen.cc
-  src/PointSourcePrimaryGen.cc
   src/IsotropicPrimaryGen.cc
   src/NucleusPrimaryGen.cc
   src/ReadSPENVIS.cc
@@ -56,8 +54,6 @@ set(CS_SIMULATION_CLASSES_BASIC1
 if(CS_USE_ROOT)
   set(CS_SIMULATION_CLASSES_BASIC2
     # primary geneator
-    src/PlaneWavePrimaryGenPol.cc
-    src/PlaneWaveRectanglePrimaryGenPol.cc
     src/VolumeInsideSample.cc
     src/PrimaryGenInVolume.cc
     src/NucleusPrimaryGenInVolume.cc

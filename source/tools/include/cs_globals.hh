@@ -24,7 +24,7 @@
 #include <CLHEP/Vector/ThreeVector.h>
 #include <CLHEP/Vector/LorentzVector.h>
 
-#include "AstroUnit.hh"
+#include "AstroUnits.hh"
 
 namespace comptonsoft {
 

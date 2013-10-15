@@ -19,7 +19,7 @@
 
 #include "PlaneWaveRectanglePrimaryGen.hh"
 #include "Randomize.hh"
-#include "AstroUnit.hh"
+#include "AstroUnits.hh"
 
 using namespace anl;
 using namespace comptonsoft;

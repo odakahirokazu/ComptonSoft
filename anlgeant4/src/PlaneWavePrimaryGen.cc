@@ -19,11 +19,10 @@
 
 #include "PlaneWavePrimaryGen.hh"
 #include "Randomize.hh"
-#include "AstroUnit.hh"
+#include "AstroUnits.hh"
 
 using namespace anl;
 using namespace anlgeant4;
-using namespace comptonsoft;
 
 
 PlaneWavePrimaryGen::PlaneWavePrimaryGen()
@@ -44,11 +43,13 @@ ANLStatus PlaneWavePrimaryGen::mod_startup()
   BasicPrimaryGen::mod_startup();
 
   enablePowerLawInput();
-  register_parameter(&m_CenterPosition, "Center position", cm, "cm");
+  register_parameter(&m_CenterPosition, "Center position",
+                     LengthUnit(), LengthUnitName());
   set_parameter_description("Center of the circle where primary particles are generated.");
   register_parameter(&m_Direction0, "Direction");
   set_parameter_description("Propagation direction of the plane wave.");
-  register_parameter(&m_Radius, "Radius", cm, "cm");
+  register_parameter(&m_Radius, "Radius",
+                     LengthUnit(), LengthUnitName());
   set_parameter_description("Radius of the circle where parimary particles are generated.");
   register_parameter(&m_Flux, "Flux", erg/s/cm2, "erg/s/cm2");
   set_parameter_description("Energy flux of the plane wave. This parameter is used only for calculating real time correspoing to a simulation.");
@@ -63,7 +64,7 @@ ANLStatus PlaneWavePrimaryGen::mod_startup()
 
 ANLStatus PlaneWavePrimaryGen::mod_com()
 {
-  if (PolarizationMode() != 1) {
+  if (PolarizationMode() < 1) {
     hide_parameter("Polarization vector");
   }
   
@@ -71,30 +72,21 @@ ANLStatus PlaneWavePrimaryGen::mod_com()
 }
 
 
-ANLStatus PlaneWavePrimaryGen::mod_prepare()
-{
-  m_Direction0 = m_Direction0.unit();
-  return AS_OK;
-}
-
-
 ANLStatus PlaneWavePrimaryGen::mod_init()
 {
   BasicPrimaryGen::mod_init();
 
+  m_Direction0 = m_Direction0.unit();
   m_DirectionOrthogonal = m_Direction0.orthogonal().unit();
 
   G4cout << "--------" << G4endl;
-  G4cout << "PWPrimaryGen status" << G4endl;
-
+  G4cout << "PrimaryGen status (plane wave)" << G4endl;
   G4double posx = m_CenterPosition.x();
   G4double posy = m_CenterPosition.y();
   G4double posz = m_CenterPosition.z();
-  G4cout << "  Center Position: "
+  G4cout << "  Center position: "
          << posx/cm << " " << posy/cm << " " << posz/cm << " cm" << G4endl;
-
   printSpectralInfo();
-
   G4double dirx = m_Direction0.x();
   G4double diry = m_Direction0.y();
   G4double dirz = m_Direction0.z();
@@ -107,11 +99,8 @@ ANLStatus PlaneWavePrimaryGen::mod_init()
 
 ANLStatus PlaneWavePrimaryGen::mod_ana()
 {
-  using std::acos;
-  using std::sqrt;
-
-  G4double energy = sampleEnergy();
-  G4ThreeVector position = samplePosition();
+  const G4ThreeVector position = samplePosition();
+  const G4double energy = sampleEnergy();
   
   if (PolarizationMode()==0) {
     setPrimary(position, energy, m_Direction0);
@@ -139,6 +128,8 @@ ANLStatus PlaneWavePrimaryGen::mod_ana()
 
 G4ThreeVector PlaneWavePrimaryGen::samplePosition()
 {
+  using std::sqrt;
+
   G4ThreeVector position(m_DirectionOrthogonal);
   G4double r = m_Radius * sqrt(G4UniformRand());
   G4double t = twopi * G4UniformRand();

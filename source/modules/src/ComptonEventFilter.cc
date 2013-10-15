@@ -29,14 +29,14 @@ using namespace comptonsoft;
 using namespace anl;
 
 ComptonEventFilter::ComptonEventFilter()
-  : EventReconstruction_ptr(0), hitpat_name(""), hitpat_selection(false)
+  : EventReconstruction_ptr(0)
 {
 }
 
 
 ANLStatus ComptonEventFilter::mod_startup()
 {
-  register_parameter(&hitpat_name, "Hit pattern");
+  register_parameter(&hitpat_names, "Hit patterns");
   
   return AS_OK;
 }
@@ -53,7 +53,9 @@ ANLStatus ComptonEventFilter::mod_com()
     std::cout << "  " << hitpat_vec[i].Name() << std::endl;
   }
 
+  std::string hitpat_name;
   CLread("Select Hit Pattern : ", &hitpat_name);
+  hitpat_names.push_back(hitpat_name);
 
   int num_conditions = 1;
   CLread("Number of conditions : ", &num_conditions);
@@ -186,20 +188,21 @@ ANLStatus ComptonEventFilter::mod_init()
   GetANLModuleNC("EventReconstruction", &EventReconstruction_ptr);
   std::vector<HitPattern>& hitpat_vec = EventReconstruction_ptr->GetHitPatternVector();
   
-  if (hitpat_name != "") {
-    for(unsigned int i=0; i<hitpat_vec.size(); i++) {
-      if (hitpat_vec[i].Name() == hitpat_name) {
-        hitpat_selection = true;
-        hitpat = hitpat_vec[i];
+  for (size_t l=0; l<hitpat_names.size(); l++) {
+    bool selected = false;
+    for(size_t i=0; i<hitpat_vec.size(); i++) {
+      if (hitpat_vec[i].Name() == hitpat_names[l]) {
+        selected = true;
+        hitpats.push_back(hitpat_vec[i]);
         break;
       }
     }
 
-    if (hitpat_selection) {
-      std::cout << "Hit pattern \"" << hitpat_name << "\" is selected." << std::endl;
+    if (selected) {
+      std::cout << "Hit pattern \"" << hitpat_names[l] << "\" is selected." << std::endl;
     }
     else {
-      std::cout << "There is not Hit Pattern named " << hitpat_name << std::endl;
+      std::cout << "There is not Hit Pattern named " << hitpat_names[l] << std::endl;
       return AS_QUIT_ERR;
     }
   }
@@ -212,14 +215,20 @@ ANLStatus ComptonEventFilter::mod_ana()
 {
   const TwoHitComptonEvent& compton_event = EventReconstruction_ptr->GetTwoHitData();
 
-  if (hitpat_selection) {
+  if (hitpats.size() != 0) {
     std::vector<int> detids(2);
     detids[0] = compton_event.getH1DetId();
     detids[1] = compton_event.getH2DetId();
-    
-    if(!hitpat.match(detids)) {
-      return AS_SKIP;
+
+    bool matched = false;
+    for (size_t l=0; l<hitpats.size(); l++) {
+      if(hitpats[l].match(detids)) {
+        matched = true;
+        break;
+      }
     }
+    
+    if (!matched) return AS_SKIP;
   }
 
   if (conditions_vector.empty()) {

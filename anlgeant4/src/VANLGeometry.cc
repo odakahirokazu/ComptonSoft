@@ -1,6 +1,6 @@
 /*************************************************************************
  *                                                                       *
- * Copyright (c) 2011 Shin Watanabe, Hirokazu Odaka                      *
+ * Copyright (c) 2011 Hirokazu Odaka                                     *
  *                                                                       *
  * This program is free software: you can redistribute it and/or modify  *
  * it under the terms of the GNU General Public License as published by  *
@@ -17,33 +17,44 @@
  *                                                                       *
  *************************************************************************/
 
-#ifndef ANLGEANT4_AstroUnit_H
-#define ANLGEANT4_AstroUnit_H 1
-
-#define INCLUDE_G4GLOBALS 1
-#if INCLUDE_G4GLOBALS
+#include "VANLGeometry.hh"
 #include "globals.hh"
-#else
-#include "CLHEP/Units/PhysicalConstants.h"
-#include "CLHEP/Units/SystemOfUnits.h"
-#endif
-#undef INCLUDE_G4GLOBALS
 
-namespace comptonsoft {
+using namespace anl;
+using namespace anlgeant4;
 
-static const double erg = 1.E-07 * joule;
 
-static const double ksec = 1.E+03 * second;
-static const double ks = ksec;
-static const double hour = 3600.0 * second;
-static const double day = 24.0 * hour;
-static const double year = 365.242199 * day;
-
-static const double solar_mass = 1.98892E+30 * kg;
-static const double astronomical_unit = 149597870.700 * km;
-static const double AU = astronomical_unit;
-static const double solar_radius = 6.955E+08 * m;
-
+VANLGeometry::VANLGeometry()
+  : m_LengthUnit(1.0), m_LengthUnitName(""),
+    m_SurfaceCheck(true)
+{
+  add_alias("VANLGeometry");
 }
 
-#endif /* ANLGEANT4_AstroUnit_H */
+
+void VANLGeometry::SetLengthUnit(double unit, const std::string& name)
+{
+  m_LengthUnit = unit;
+  m_LengthUnitName = name;
+}
+
+
+void VANLGeometry::SetLengthUnit(const std::string& name)
+{
+  if (name=="cm") {
+    SetLengthUnit(cm, name);
+  }
+  else if (name=="pc") {
+    SetLengthUnit(pc, name);
+  }
+  else {
+    SetLengthUnit(1.0, "");
+  }
+}
+
+
+ANLStatus VANLGeometry::mod_startup()
+{
+  register_parameter(&m_SurfaceCheck, "Surface check");
+  return AS_OK;
+}

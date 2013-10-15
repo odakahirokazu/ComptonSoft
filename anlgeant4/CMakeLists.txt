@@ -50,10 +50,13 @@ add_library(${TARGET_LIBRARY} SHARED
   src/Geant4Simple.cc
   src/BasicPrimaryGeneratorAction.cc
   src/BasicPrimaryGen.cc
+  src/PointSourcePrimaryGen.cc
+  src/PlaneWavePrimaryGen.cc
   src/PickUpDataRunAction.cc
   src/PickUpDataEventAction.cc
   src/PickUpDataTrackingAction.cc
   src/PickUpDataSteppingAction.cc
+  src/VANLGeometry.cc
   src/VPickUpData.cc
   src/StandardPickUpData.cc
   ${GDML_CLASSES}

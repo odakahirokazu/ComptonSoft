@@ -1,6 +1,6 @@
 /*************************************************************************
  *                                                                       *
- * Copyright (c) 2011 Hirokazu Odaka                                     *
+ * Copyright (c) 2011 Shin Watanabe, Hirokazu Odaka                      *
  *                                                                       *
  * This program is free software: you can redistribute it and/or modify  *
  * it under the terms of the GNU General Public License as published by  *
@@ -17,21 +17,33 @@
  *                                                                       *
  *************************************************************************/
 
-#include "PlaneWavePrimaryGenPol.hh"
-#include "NextCLI.hh"
+#ifndef ANLGEANT4_AstroUnits_H
+#define ANLGEANT4_AstroUnits_H 1
 
-using namespace comptonsoft;
+#define INCLUDE_G4GLOBALS 1
+#if INCLUDE_G4GLOBALS
+#include "globals.hh"
+#else
+#include "CLHEP/Units/PhysicalConstants.h"
+#include "CLHEP/Units/SystemOfUnits.h"
+#endif
+#undef INCLUDE_G4GLOBALS
 
+namespace anlgeant4 {
 
-anl::ANLStatus PlaneWavePrimaryGenPol::mod_com()
-{
-  bool pol = false;
-  anl::CLread("Polarized?", &pol);
-  if (pol) {
-    setPolarizationMode(1);
-  }
-  else {
-    setPolarizationMode(0);
-  }
-  return PlaneWavePrimaryGen::mod_com();
+static const double erg = 1.E-07 * joule;
+
+static const double ksec = 1.E+03 * second;
+static const double ks = ksec;
+static const double hour = 3600.0 * second;
+static const double day = 24.0 * hour;
+static const double year = 365.242199 * day;
+
+static const double solar_mass = 1.98892E+30 * kg;
+static const double astronomical_unit = 149597870.700 * km;
+static const double AU = astronomical_unit;
+static const double solar_radius = 6.955E+08 * m;
+
 }
+
+#endif /* ANLGEANT4_AstroUnits_H */

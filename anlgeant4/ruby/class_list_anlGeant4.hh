@@ -7,6 +7,8 @@ class ReadGDML;
 class WriteGDML;
 class VANLPrimaryGen;
 class BasicPrimaryGen;
+class PlaneWavePrimaryGen;
+class PointSourcePrimaryGen;
 class VPickUpData;
 class StandardPickUpData;
 class VisualizeG4Geom;

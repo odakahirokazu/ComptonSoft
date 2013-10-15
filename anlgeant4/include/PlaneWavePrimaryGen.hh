@@ -17,15 +17,13 @@
  *                                                                       *
  *************************************************************************/
 
-#ifndef COMPTONSOFT_PlaneWavePrimaryGen_H
-#define COMPTONSOFT_PlaneWavePrimaryGen_H 1
+#ifndef ANLGEANT4_PlaneWavePrimaryGen_H
+#define ANLGEANT4_PlaneWavePrimaryGen_H 1
 
 #include "BasicPrimaryGen.hh"
-
-#include "globals.hh"
 #include "G4ThreeVector.hh"
 
-namespace comptonsoft {
+namespace anlgeant4 {
 
 
 /**
@@ -38,16 +36,16 @@ namespace comptonsoft {
  * @date 2011-04-08 | Hirokazu Odaka | particle name
  * @date 2011-04-11 | Hirokazu Odaka | derived from AHPrimaryGen (BasicPrimaryGen)
  * @date 2012-07-10 | Hirokazu Odaka | add degree of polarization
+ * @date 2013-08-18 | Hirokazu Odaka | v1.4: be moved to anlgeant4
  */
 class PlaneWavePrimaryGen : public anlgeant4::BasicPrimaryGen
 {
-  DEFINE_ANL_MODULE(PlaneWavePrimaryGen, 1.3);
+  DEFINE_ANL_MODULE(PlaneWavePrimaryGen, 1.4);
 public:
   PlaneWavePrimaryGen();
 
   virtual anl::ANLStatus mod_startup();
   virtual anl::ANLStatus mod_com();
-  virtual anl::ANLStatus mod_prepare();
   virtual anl::ANLStatus mod_init();
   virtual anl::ANLStatus mod_ana();
   virtual anl::ANLStatus mod_endrun();
@@ -74,4 +72,4 @@ private:
 
 }
 
-#endif /* COMPTONSOFT_PlaneWavePrimaryGen_H */
+#endif /* ANLGEANT4_PlaneWavePrimaryGen_H */

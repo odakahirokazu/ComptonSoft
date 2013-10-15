@@ -29,7 +29,7 @@
 namespace comptonsoft {
 
 
-class PrimaryGenInVolume : public PointSourcePrimaryGen
+class PrimaryGenInVolume : public anlgeant4::PointSourcePrimaryGen
 {
   DEFINE_ANL_MODULE(PrimaryGenInVolume, 1.2);
 public: 

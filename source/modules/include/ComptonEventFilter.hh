@@ -53,9 +53,8 @@ public:
     
 private:
   EventReconstruction* EventReconstruction_ptr;
-  std::string hitpat_name;
-  comptonsoft::HitPattern hitpat;
-  bool hitpat_selection;
+  std::vector<std::string> hitpat_names;
+  std::vector<comptonsoft::HitPattern> hitpats;
 
   std::vector< std::vector< boost::function<bool (const comptonsoft::TwoHitComptonEvent&)> > > conditions_vector;
 };

@@ -33,7 +33,7 @@ SpenvisIsotropicPrimaryGen::SpenvisIsotropicPrimaryGen()
 ANLStatus SpenvisIsotropicPrimaryGen::mod_startup()
 {
   IsotropicPrimaryGen::mod_startup();
-  disablePowerLawInput();
+  disableDefaultEnergyInput();
   register_parameter(&m_SpenvisFileName, "File name");
   
   return AS_OK;
