@@ -18,6 +18,8 @@
  *************************************************************************/
 
 #include "SpenvisIsotropicPrimaryGen.hh"
+#include "G4SystemOfUnits.hh"
+#include "G4PhysicalConstants.hh"
 
 using namespace anl;
 using namespace comptonsoft;

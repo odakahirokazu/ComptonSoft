@@ -18,6 +18,8 @@
  *************************************************************************/
 
 #include "AHRadiationBackgroundPrimaryGen.hh"
+#include "G4SystemOfUnits.hh"
+#include "G4PhysicalConstants.hh"
 #include "TGraph.h"
 
 using namespace anl;

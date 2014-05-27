@@ -1,6 +1,6 @@
 /*************************************************************************
  *                                                                       *
- * Copyright (c) 2011 Hirokazu Odaka                                     *
+ * Copyright (c) 2013 Hirokazu Odaka                                     *
  *                                                                       *
  * This program is free software: you can redistribute it and/or modify  *
  * it under the terms of the GNU General Public License as published by  *
@@ -17,44 +17,42 @@
  *                                                                       *
  *************************************************************************/
 
-#include "VANLGeometry.hh"
-#include "G4SystemOfUnits.hh"
+#ifndef COMPTONSOFT_ReadHXIEventTree_H
+#define COMPTONSOFT_ReadHXIEventTree_H 1
 
-using namespace anl;
-using namespace anlgeant4;
+#include <vector>
+#include "VCSModule.hh"
+#include "InitialInformation.hh"
+#include "TChain.h"
 
+namespace comptonsoft {
 
-VANLGeometry::VANLGeometry()
-  : m_LengthUnit(1.0), m_LengthUnitName(""),
-    m_SurfaceCheck(true)
+/**
+ * ANL module to read HXI event ROOT files.
+ *
+ * @author Hirokazu Odaka
+ * @date 2013-12-16
+ */
+class ReadHXIEventTree : public VCSModule, public anlgeant4::InitialInformation
 {
-  add_alias("VANLGeometry");
+  DEFINE_ANL_MODULE(ReadHXIEventTree, 0.0);
+public:
+  ReadHXIEventTree();
+  ~ReadHXIEventTree() {}
+  
+  anl::ANLStatus mod_startup();
+  anl::ANLStatus mod_init();
+  anl::ANLStatus mod_ana();
+  
+private:
+  std::vector<std::string> file_names;
+  std::vector<std::string> tree_names;
+
+  TChain* event_tree;
+  Long64_t num_events;
+  Long64_t index;
+};
+
 }
 
-
-void VANLGeometry::SetLengthUnit(double unit, const std::string& name)
-{
-  m_LengthUnit = unit;
-  m_LengthUnitName = name;
-}
-
-
-void VANLGeometry::SetLengthUnit(const std::string& name)
-{
-  if (name=="cm") {
-    SetLengthUnit(cm, name);
-  }
-  else if (name=="pc") {
-    SetLengthUnit(pc, name);
-  }
-  else {
-    SetLengthUnit(1.0, "");
-  }
-}
-
-
-ANLStatus VANLGeometry::mod_startup()
-{
-  register_parameter(&m_SurfaceCheck, "Surface check");
-  return AS_OK;
-}
+#endif /* COMPTONSOFT_ReadHXIEventTree_H */

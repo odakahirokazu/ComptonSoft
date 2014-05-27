@@ -20,8 +20,10 @@
 // Hiro Odaka
 
 #include "EFieldModel.hh"
+
 #include <iostream>
-#include "globals.hh"
+#include "G4SystemOfUnits.hh"
+#include "G4PhysicalConstants.hh"
 #include "TMath.h"
 
 namespace comptonsoft {

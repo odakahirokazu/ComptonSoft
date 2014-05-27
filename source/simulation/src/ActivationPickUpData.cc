@@ -22,6 +22,8 @@
 #include <fstream>
 #include <iomanip>
 
+#include "G4SystemOfUnits.hh"
+#include "G4PhysicalConstants.hh"
 #include "G4Run.hh"
 #include "G4VProcess.hh"
 #include "G4ProcessManager.hh"

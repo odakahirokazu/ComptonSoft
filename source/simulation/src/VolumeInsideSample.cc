@@ -18,6 +18,7 @@
  *************************************************************************/
 
 #include "VolumeInsideSample.hh"
+#include "G4SystemOfUnits.hh"
 #include "Randomize.hh"
 
 #include "G4LogicalVolume.hh"

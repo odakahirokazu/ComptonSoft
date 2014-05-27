@@ -13,6 +13,7 @@ set(CMAKE_C_FLAGS_RELEASE "-O3 -W -Wall" CACHE STRING "C_FLAGS for release")
 ### Definition of project
 project(ComptonSoft)
 set(CMAKE_MODULE_PATH ${ComptonSoft_SOURCE_DIR}/cmake ${CMAKE_MODULE_PATH})
+add_definitions("-std=c++11")
 
 message("-- Install destination prefix: ${CMAKE_INSTALL_PREFIX}")
 

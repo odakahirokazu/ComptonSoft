@@ -19,6 +19,7 @@
 
 #include "AHRayTracingPrimaryGen.hh"
 #include "fitsio.h"
+#include "G4SystemOfUnits.hh"
 
 using namespace anl;
 using namespace anlgeant4;

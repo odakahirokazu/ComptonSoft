@@ -36,11 +36,11 @@ public:
   AHG4PhysicsList(G4String option="");
   ~AHG4PhysicsList() {}
 
-  virtual void ConstructProcess();
+  // virtual void ConstructProcess();
   virtual void SetCuts();
   
 private:
-  void AddParallelWorldProcess();
+  // void AddParallelWorldProcess();
 };
 
 #endif /* AHG4PhysicsList_H */

@@ -19,7 +19,9 @@
 
 #include "OneASICDataGainCal.hh"
 
-#include "globals.hh"
+#include <iostream>
+#include "G4SystemOfUnits.hh"
+#include "G4PhysicalConstants.hh"
 #include "TSpline.h"
 
 namespace comptonsoft {

@@ -19,6 +19,7 @@
 
 #include "PrimaryGenInVolume.hh"
 
+#include "G4SystemOfUnits.hh"
 
 using namespace anl;
 using namespace comptonsoft;

@@ -21,8 +21,6 @@
 #define COMPTONSOFT_NucleusPrimaryGen_H 1
 
 #include "BasicPrimaryGen.hh"
-
-#include "globals.hh"
 #include "G4ThreeVector.hh"
 
 class G4ParticleDefinition;

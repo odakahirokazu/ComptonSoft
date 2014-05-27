@@ -21,8 +21,6 @@
 #define AHG4EmLivermorePhysics_H 1
 
 #include "G4VPhysicsConstructor.hh"
-#include "globals.hh"
-
 
 /**
  * ASTRO-H standard EM physics.

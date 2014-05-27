@@ -22,7 +22,8 @@
 
 #define INCLUDE_G4GLOBALS 1
 #if INCLUDE_G4GLOBALS
-#include "globals.hh"
+#include "G4PhysicalConstants.hh"
+#include "G4SystemOfUnits.hh"
 #else
 #include "CLHEP/Units/PhysicalConstants.h"
 #include "CLHEP/Units/SystemOfUnits.h"

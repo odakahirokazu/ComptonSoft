@@ -18,7 +18,7 @@
  *************************************************************************/
 
 #include "OutputSimXPrimaries.hh"
-#include "globals.hh"
+#include "G4SystemOfUnits.hh"
 #include "SimXIF.hh"
 
 using namespace anl;

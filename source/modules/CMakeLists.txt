@@ -56,6 +56,7 @@ if(CS_USE_ROOT)
     src/ReadDataFile_SpW2.cc
     src/ReadDataFile_NT.cc
     src/ReadDataFile_NB0.cc
+    src/ReadHXIEventTree.cc
     # processing analysis
     src/CorrectPHA.cc
     src/MakePI.cc

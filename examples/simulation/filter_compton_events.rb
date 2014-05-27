@@ -37,7 +37,7 @@ anl.set_parameters :ReadComptonTree, {
 }
 
 anl.set_parameters :ComptonEventFilter, {
-  "Hit pattern" => "Si-CdTe",
+  "Hit patterns" => ["Si-CdTe"],
 } do |m|
   m.define_condition
   m.add_condition("E1+E2", emin, emax)

@@ -22,10 +22,7 @@
 
 #include "VANLPrimaryGen.hh"
 #include "InitialInformation.hh"
-
-#include "globals.hh"
 #include "G4ThreeVector.hh"
-
 #include "StandardPickUpData.hh"
 
 class G4ParticleDefinition;

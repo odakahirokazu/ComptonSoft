@@ -27,12 +27,12 @@
 #include "G4DecayPhysics.hh"
 #include "G4HadronElasticPhysics.hh"
 #include "G4HadronElasticPhysicsHP.hh"
-#include "HadronPhysicsQGSP_BERT.hh"
-#include "HadronPhysicsQGSP_BERT_HP.hh"
-#include "HadronPhysicsQGSP_BIC.hh"
-#include "HadronPhysicsQGSP_BIC_HP.hh"
-#include "HadronPhysicsQGSP_INCLXX.hh"
-#include "G4QStoppingPhysics.hh"
+#include "G4HadronPhysicsQGSP_BERT.hh"
+#include "G4HadronPhysicsQGSP_BERT_HP.hh"
+#include "G4HadronPhysicsQGSP_BIC.hh"
+#include "G4HadronPhysicsQGSP_BIC_HP.hh"
+#include "G4HadronPhysicsINCLXX.hh"
+#include "G4StoppingPhysics.hh"
 #include "G4IonPhysics.hh"
 // #include "G4AdjointPhysicsList.hh"
 
@@ -88,27 +88,27 @@ AHG4PhysicsList::AHG4PhysicsList(G4String option)
   
   // Hadron Physics
   if (option.find("INCLXX") != std::string::npos) {
-    this->RegisterPhysics( new HadronPhysicsQGSP_INCLXX(ver) );
+    this->RegisterPhysics( new G4HadronPhysicsINCLXX(ver) );
   }
   else if (option.find("BIC") != std::string::npos) {
     if (option.find("HP") != std::string::npos) {
-      this->RegisterPhysics( new HadronPhysicsQGSP_BIC_HP(ver) );
+      this->RegisterPhysics( new G4HadronPhysicsQGSP_BIC_HP(ver) );
     }
     else {
-      this->RegisterPhysics( new HadronPhysicsQGSP_BIC(ver) );
+      this->RegisterPhysics( new G4HadronPhysicsQGSP_BIC(ver) );
     }
   }
   else {
     if (option.find("HP") != std::string::npos) {
-      this->RegisterPhysics( new HadronPhysicsQGSP_BERT_HP(ver) );
+      this->RegisterPhysics( new G4HadronPhysicsQGSP_BERT_HP(ver) );
     }
     else {
-      this->RegisterPhysics( new HadronPhysicsQGSP_BERT(ver) );
+      this->RegisterPhysics( new G4HadronPhysicsQGSP_BERT(ver) );
     }
   }
   
   // Stopping Physics
-  this->RegisterPhysics( new G4QStoppingPhysics(ver) );
+  this->RegisterPhysics( new G4StoppingPhysics(ver) );
   
   // Ion Physics
   this->RegisterPhysics( new G4IonPhysics(ver) );
@@ -129,6 +129,7 @@ void AHG4PhysicsList::SetCuts()
 }
 
 
+#if 0
 void AHG4PhysicsList::ConstructProcess()
 {
   AddTransportation();
@@ -140,8 +141,9 @@ void AHG4PhysicsList::ConstructProcess()
     (*itr)->ConstructProcess();
   }
 }
+#endif
 
-
+#if 0
 void AHG4PhysicsList::AddParallelWorldProcess()
 {
   const G4VUserDetectorConstruction* userDetectorConstruction
@@ -157,9 +159,9 @@ void AHG4PhysicsList::AddParallelWorldProcess()
     theParallelWorldProcess->SetParallelWorld(parallelWorldName);
     theParallelWorldProcess->SetLayeredMaterialFlag();
     
-    theParticleIterator->reset();
-    while( (*theParticleIterator)() ){
-      G4ParticleDefinition* particle = theParticleIterator->value();
+    aParticleIterator->reset();
+    while( (*aParticleIterator)() ){
+      G4ParticleDefinition* particle = aParticleIterator->value();
       if(particle!=G4ChargedGeantino::Definition()) {
         G4ProcessManager* pmanager = particle->GetProcessManager();
         pmanager->AddProcess(theParallelWorldProcess);
@@ -171,14 +173,15 @@ void AHG4PhysicsList::AddParallelWorldProcess()
     }
   }
 }
+#endif
 
 
 #if 0
 void AHG4PhysicsList::AddXrayBoundary()
 {
-  theParticleIterator->reset();
-  while( (*theParticleIterator)() ) {
-    G4ParticleDefinition* particle = theParticleIterator->value();
+  aParticleIterator->reset();
+  while( (*aParticleIterator)() ) {
+    G4ParticleDefinition* particle = aParticleIterator->value();
     G4ProcessManager* pmanager = particle->GetProcessManager();
     G4String particleName = particle->GetParticleName();
     

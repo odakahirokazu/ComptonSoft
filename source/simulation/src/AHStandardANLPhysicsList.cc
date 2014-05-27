@@ -18,6 +18,7 @@
  *************************************************************************/
 
 #include "AHStandardANLPhysicsList.hh"
+#include "G4SystemOfUnits.hh"
 #include "AHG4PhysicsList.hh"
 
 using namespace anl;

@@ -48,6 +48,7 @@
 
 using namespace anl;
 using namespace anlgeant4;
+using CLHEP::cm;
 
 
 VisualizeG4Geom::VisualizeG4Geom()

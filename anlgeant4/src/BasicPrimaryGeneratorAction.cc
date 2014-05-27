@@ -22,6 +22,7 @@
 #include "G4ParticleGun.hh"
 #include "G4ParticleTable.hh"
 
+using CLHEP::keV;
 using namespace anlgeant4;
 
 

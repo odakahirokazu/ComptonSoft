@@ -18,7 +18,8 @@
  *************************************************************************/
 
 #include "RDPickUpData.hh"
-#include "globals.hh"
+#include "G4SystemOfUnits.hh"
+#include "G4PhysicalConstants.hh"
 #include "G4Track.hh"
 #include "G4VProcess.hh"
 

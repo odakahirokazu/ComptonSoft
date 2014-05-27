@@ -18,6 +18,8 @@
  *************************************************************************/
 
 #include "PointSourcePrimaryGen.hh"
+#include "G4SystemOfUnits.hh"
+#include "G4PhysicalConstants.hh"
 #include "Randomize.hh"
 #include "VANLGeometry.hh"
 #include "AstroUnits.hh"

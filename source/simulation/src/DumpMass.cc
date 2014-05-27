@@ -19,6 +19,7 @@
 
 #include "DumpMass.hh"
 #include <fstream>
+#include "G4SystemOfUnits.hh"
 #include "G4LogicalVolumeStore.hh"
 #include "G4LogicalVolume.hh"
 

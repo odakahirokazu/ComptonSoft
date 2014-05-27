@@ -18,12 +18,11 @@
  *************************************************************************/
 
 #include "MaterialSamplePickUpData.hh"
-#include "globals.hh"
 
 #include "TFile.h"
 #include "TTree.h"
 #include "TH1.h"
-
+#include "G4SystemOfUnits.hh"
 #include "G4Run.hh"
 #include "G4Event.hh"
 #include "G4Track.hh"

@@ -19,10 +19,13 @@
 
 #include "BasicPrimaryGen.hh"
 
+#include "G4SystemOfUnits.hh"
+#include "G4PhysicalConstants.hh"
 #include "Randomize.hh"
 #include "BasicPrimaryGeneratorAction.hh"
 #include "VANLGeometry.hh"
 
+//using CLHEP::keV;
 using namespace anl;
 using namespace anlgeant4;
 

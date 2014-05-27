@@ -43,9 +43,9 @@ void AHG4RadioactiveDecayConstructor::ConstructProcess()
 {
   G4RadioactiveDecay* RadioactiveDecay = new G4RadioactiveDecay();
   
-  theParticleIterator->reset();
-  while( (*theParticleIterator)() ){
-    G4ParticleDefinition* Particle = theParticleIterator->value();
+  aParticleIterator->reset();
+  while( (*aParticleIterator)() ){
+    G4ParticleDefinition* Particle = aParticleIterator->value();
     G4ProcessManager* Manager = Particle->GetProcessManager();
     G4String ParticleName = Particle->GetParticleName();
 

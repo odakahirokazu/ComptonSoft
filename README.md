@@ -1,7 +1,7 @@
 Compton Soft
 ================================================================
 
-- Version: 4.9
+- Version: 4.10
 - Maintenance by Hirokazu Odaka
 
 
@@ -98,13 +98,13 @@ Following building options are required:
 Example of running cmake:
 
     unix> cmake \
-      -DCMAKE_INSTALL_PREFIX=../geant4.9.6.p01-install \
+      -DCMAKE_INSTALL_PREFIX=../geant4.9.6.p02-install \
       -DGEANT4_USE_GDML=ON \
       -DGEANT4_USE_QT=ON \
       -DGEANT4_USE_OPENGL_X11=ON \
       -DGEANT4_USE_RAYTRACER_X11=ON \
       -DGEANT4_USE_NETWORKDAWN=ON \
-      ../geant4.9.6.p01
+      ../geant4.9.6.p02
 
 ### (6) [ROOT](http://root.cern.ch/)
 *version 5.34.05 or later*
