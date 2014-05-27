@@ -1,7 +1,7 @@
 Compton Soft
 ================================================================
 
-- Version: 4.10
+- Version: 4.11
 - Maintenance by Hirokazu Odaka
 
 
@@ -65,10 +65,10 @@ For easy installation, this package uses CMake to generate building tools such
 as Makefile.
 
 ### (3) [Boost C++ library](http://www.boost.org/)
-*version 1.53.0 or later*
+*version 1.55.0 or later*
 
 ### (4) [ANL Next framework](http://www.astro.isas.jaxa.jp/~odaka/anlnext/)
-*version 1.3 or later*
+*version 1.4.2 or later*
 
 Compton Soft uses the ANL Next framework. ANL Next is a framework for
 constructing software that performs event-by-event analysis, which usually
@@ -85,7 +85,7 @@ You can find
 of ANL Next.
 
 ### (5) [Geant4](http://geant4.cern.ch/)
-*version 9.5 or later*
+*version 10.0 or later*
 
 A toolkit library for Monte Carlo simulations.
 Following building options are required:
