@@ -253,7 +253,7 @@ bool DetectorManager::constructASICs(const ptree& ASICsNode, RealDetectorUnit* d
       const ptree& asicNode = v.second;
       int numChannel = asicNode.get<int>("<xmlattr>.channel");
       bool nside = asicNode.get<bool>("<xmlattr>.nside");
-      OneASICData* asicData = new OneASICData(numChannel, nside);
+      OneASICData* asicData = new OneASICDataGainCal(numChannel, nside);
       if (nside == priority_to_anode) {
         asicData->setPrioritySide(true);
       }

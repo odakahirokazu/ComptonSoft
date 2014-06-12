@@ -179,7 +179,7 @@ bool OneASICDataGainCal::convertPHA2PI()
         setPI(i, ( m_CalSpline[i]->Eval(calmax) + derivative * (getPHA(i)-calmax) ) * keV);
       }
       else {
-        setPI(i, m_CalSpline[i]->Eval(getPHA(i) * keV));
+        setPI(i, m_CalSpline[i]->Eval(getPHA(i)) * keV);
       }
     }
     else {
