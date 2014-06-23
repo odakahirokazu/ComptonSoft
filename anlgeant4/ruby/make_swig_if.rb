@@ -20,7 +20,7 @@ classList = [ANLSwigClass.new('Geant4Body'),
 
 m = ANLSwigModule.new(name, classList, namespace)
 m.includeFiles = []
-m.importModules = ['anl.i']
+m.importModules = ['ANL.i']
 m.includeModules = []
 
 if ARGV.include? '-l'

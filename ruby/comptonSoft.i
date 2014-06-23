@@ -225,7 +225,7 @@
 %}
 
 
-%import "anl.i"
+%import "ANL.i"
 %import "anlGeant4.i"
 
 namespace comptonsoft {

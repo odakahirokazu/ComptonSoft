@@ -1,11 +1,11 @@
 #! /usr/bin/env ruby
 
 def run_simulation(num, random, output)
-  require 'cslib'
-  
+  require 'ComptonSoftLib'
+
   energy = 661.7 # keV
 
-  sim = Simulation.new
+  sim = ComptonSoft::Simulation.new
   sim.output = output
   sim.random_seed = random
 
@@ -24,9 +24,9 @@ def run_simulation(num, random, output)
     "Direction" => vec(0.0, 0.0, -1.0),
     "Radius" => 10.0,
   }
-  
+
   sim.thread_mode = false
-  sim.visualize('Mode'=>'OGLSQt')
+  sim.visualize(Mode: 'OGLSQt')
   sim.run(num)
 end
 

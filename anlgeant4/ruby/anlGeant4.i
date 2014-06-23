@@ -24,7 +24,7 @@
 %}
 
 
-%import "anl.i"
+%import "ANL.i"
 
 namespace anlgeant4 {
 

@@ -1,7 +1,7 @@
 Compton Soft
 ================================================================
 
-- Version: 4.11
+- Version: 4.12
 - Maintenance by Hirokazu Odaka
 
 
@@ -68,7 +68,7 @@ as Makefile.
 *version 1.55.0 or later*
 
 ### (4) [ANL Next framework](http://www.astro.isas.jaxa.jp/~odaka/anlnext/)
-*version 1.4.2 or later*
+*version 1.5.0 or later*
 
 Compton Soft uses the ANL Next framework. ANL Next is a framework for
 constructing software that performs event-by-event analysis, which usually

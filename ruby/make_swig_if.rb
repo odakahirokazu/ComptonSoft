@@ -109,7 +109,7 @@ classList.each{|s|
 
 m = ANLSwigModule.new(name, classList, namespace)
 m.includeFiles = ['class_list_anlGeant4.hh']
-m.importModules = ['anl.i', 'anlGeant4.i']
+m.importModules = ['ANL.i', 'anlGeant4.i']
 m.includeModules = []
 
 if ARGV.include? '-l'
