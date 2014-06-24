@@ -26,6 +26,7 @@
 #include "PickUpDataTrackingAction.hh"
 #include "PickUpDataSteppingAction.hh"
 
+using namespace anl;
 using namespace anlgeant4;
 
 VPickUpData::VPickUpData()
@@ -33,6 +34,13 @@ VPickUpData::VPickUpData()
 {
   add_alias("VPickUpData");
   add_alias("PickUpData");
+}
+
+
+ANLStatus VPickUpData::mod_startup()
+{
+  register_parameter(&m_StepActOn, "stepping_action_enable");
+  return AS_OK;
 }
 
 

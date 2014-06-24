@@ -43,6 +43,8 @@ class VPickUpData : public anl::BasicModule
   DEFINE_ANL_MODULE(VPickUpData, 4.0);
 public:
   VPickUpData();
+
+  anl::ANLStatus mod_startup();
   
   virtual void RunAct_begin(const G4Run*) {}
   virtual void RunAct_end(const G4Run*)   {}
