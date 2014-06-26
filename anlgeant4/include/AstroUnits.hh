@@ -45,6 +45,9 @@ static const double astronomical_unit = 149597870.700 * km;
 static const double AU = astronomical_unit;
 static const double solar_radius = 6.955E+08 * m;
 
+static const double sigma_thomson =
+  (8.0*pi/3.0)*classic_electr_radius*classic_electr_radius;
+
 }
 
 #endif /* ANLGEANT4_AstroUnits_H */
