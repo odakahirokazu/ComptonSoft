@@ -3,8 +3,6 @@ require 'ComptonSoftLib'
 
 Degree = Math::PI / 180.0
 
-
-
 class MyApp < ANL::ANLApp
   attr_accessor :file
   attr_accessor :emin, :emax, :thetamin, :thetamax, :emin_si, :emax_si, :emin_cdte, :emax_cdte
