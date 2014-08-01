@@ -50,22 +50,22 @@ ANLStatus SimXPrimaryGen::mod_startup()
 {
   BasicPrimaryGen::mod_startup();
 
-  register_parameter(&m_CenterPosition, "Center position", cm, "cm");
+  register_parameter(&m_CenterPosition, "center_position", cm, "cm");
   set_parameter_description("Position of the sphere.");
-  register_parameter(&m_Radius, "Radius", cm, "cm");
+  register_parameter(&m_Radius, "radius", cm, "cm");
   set_parameter_description("Radius of the sphere.");
 
-  register_parameter(&m_Polarization0, "Polarization vector");
+  register_parameter(&m_Polarization0, "polarization_vector");
   set_parameter_description("Polarization vector (if polarization is enable).");
-  register_parameter(&m_PolarizationDegree, "Degree of polarization");
+  register_parameter(&m_PolarizationDegree, "degree_of_polarization");
   set_parameter_description("Degree of polarization (if polarization is enable).");
 
-  register_parameter(&m_Flux, "Flux", (erg/cm2/s/sr), "erg/cm2/s/sr");
+  register_parameter(&m_Flux, "flux", (erg/cm2/s/sr), "erg/cm2/s/sr");
   set_parameter_description("Energy flux of the primaries. This parameter is used only for calculating real time correspoing to a simulation.");
 
-  unregister_parameter("Photon index");
-  unregister_parameter("Energy min");
-  unregister_parameter("Energy max");
+  unregister_parameter("photon_index");
+  unregister_parameter("energy_min");
+  unregister_parameter("energy_max");
 
   return AS_OK;
 }

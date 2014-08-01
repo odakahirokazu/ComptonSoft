@@ -44,7 +44,7 @@ ReadDataFile_NB0::ReadDataFile_NB0()
 
 ANLStatus ReadDataFile_NB0::mod_startup()
 {
-  register_parameter(&m_EventLength, "Event length");
+  register_parameter(&m_EventLength, "event_length");
 
   return ReadDataFile::mod_startup();
 }

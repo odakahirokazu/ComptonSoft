@@ -51,6 +51,8 @@ public:
   int EventID() const { return event_id; }
   double Weight() const { return weight; }
 
+  void setEventID(int i) { event_id = i; }
+
 protected:
   void setInitialEnergy(double v)
   { energy = v; }
@@ -69,7 +71,6 @@ protected:
   void setInitialPolarization(double x, double y, double z)
   { polarization.set(x, y, z); }
   
-  void setEventID(int i) { event_id = i; }
   void setWeight(double v) { weight = v; }
 
 private:

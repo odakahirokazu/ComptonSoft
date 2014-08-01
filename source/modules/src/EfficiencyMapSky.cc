@@ -35,7 +35,7 @@ EfficiencyMapSky::EfficiencyMapSky()
 ANLStatus EfficiencyMapSky::mod_startup()
 {
   SetUnit(degree, "degree");
-  register_parameter(&m_Scale, "Scale");
+  register_parameter(&m_Scale, "scale");
 
   return BackProjection::mod_startup();
 }

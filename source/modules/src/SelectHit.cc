@@ -40,14 +40,14 @@ ANLStatus SelectHit::mod_startup()
 {
   hit_collection = 0;
 
-  register_parameter_map(&m_AnalysisMap, "Analysis map",
-                         "Detector name prefix", "Si");
-  add_map_value(&m_DetectorType, "Detector type", "",
+  register_parameter_map(&m_AnalysisMap, "analysis_map",
+                         "detector_name_prefix", "Si");
+  add_map_value(&m_DetectorType, "detector_type", "",
                 "Detector type (1: pad, 2: DSD, 3: scintillator)");
-  add_map_value(&m_AnalysisMode, "Analysis mode");
-  add_map_value(&m_Threshold, "Threshold", keV, "keV");
-  add_map_value(&m_ThresholdCathode, "Threshold (cathode)", keV, "keV");
-  add_map_value(&m_ThresholdAnode, "Threshold (anode)", keV, "keV");
+  add_map_value(&m_AnalysisMode, "analysis_mode");
+  add_map_value(&m_Threshold, "threshold", keV, "keV");
+  add_map_value(&m_ThresholdCathode, "threshold_cathode", keV, "keV");
+  add_map_value(&m_ThresholdAnode, "threshold_anode", keV, "keV");
   std::vector<int> enable1(2); enable1[0] = 1; enable1[1]= 2;
   std::vector<int> enable2(3); enable2[0] = 1; enable2[1]= 3; enable2[2] = 4;
   std::vector<int> enable3(2); enable3[0] = 1; enable3[1]= 2;

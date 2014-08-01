@@ -40,7 +40,7 @@ CalcARMPos::CalcARMPos()
 ANLStatus CalcARMPos::mod_startup()
 {
   CalcARM::mod_startup();
-  register_parameter(&SourceDirection, "Source direction");
+  register_parameter(&SourceDirection, "source_direction");
   
   return AS_OK;
 }

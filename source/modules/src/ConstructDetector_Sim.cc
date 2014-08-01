@@ -47,8 +47,8 @@ ANLStatus ConstructDetector_Sim::mod_startup()
   detector_manager = new DetectorManager;
   detector_manager->setMCSimulation(true);
 
-  register_parameter(&configuration_file_name, "Detector configuration file");
-  register_parameter(&simparam_file_name, "Simulation parameter file");
+  register_parameter(&configuration_file_name, "detector_configuration");
+  register_parameter(&simparam_file_name, "simulation_parameters");
 
   return AS_OK;
 }

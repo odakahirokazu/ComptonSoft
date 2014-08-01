@@ -40,11 +40,11 @@ AzimuthDistribution::AzimuthDistribution()
 
 ANLStatus AzimuthDistribution::mod_startup()
 {
-  register_parameter(&NumBin, "Number of bins");
-  register_parameter(&RangePhi1, "phi min", 1.0, "degree");
-  register_parameter(&RangePhi2, "phi max", 1.0, "degree");
-  register_parameter(&ThetaLD, "Theta LD", 1.0, "degree");
-  register_parameter(&ThetaUD, "Theta UD", 1.0, "degree");
+  register_parameter(&NumBin, "number_of_bins");
+  register_parameter(&RangePhi1, "phi_min", 1.0, "degree");
+  register_parameter(&RangePhi2, "phi_max", 1.0, "degree");
+  register_parameter(&ThetaLD, "theta_LD", 1.0, "degree");
+  register_parameter(&ThetaUD, "theta_UD", 1.0, "degree");
   
   return AS_OK;
 }

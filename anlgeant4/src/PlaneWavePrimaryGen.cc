@@ -45,19 +45,19 @@ ANLStatus PlaneWavePrimaryGen::mod_startup()
   BasicPrimaryGen::mod_startup();
 
   enablePowerLawInput();
-  register_parameter(&m_CenterPosition, "Center position",
+  register_parameter(&m_CenterPosition, "position",
                      LengthUnit(), LengthUnitName());
   set_parameter_description("Center of the circle where primary particles are generated.");
-  register_parameter(&m_Direction0, "Direction");
+  register_parameter(&m_Direction0, "direction");
   set_parameter_description("Propagation direction of the plane wave.");
-  register_parameter(&m_Radius, "Radius",
+  register_parameter(&m_Radius, "radius",
                      LengthUnit(), LengthUnitName());
   set_parameter_description("Radius of the circle where parimary particles are generated.");
-  register_parameter(&m_Flux, "Flux", erg/s/cm2, "erg/s/cm2");
+  register_parameter(&m_Flux, "flux", erg/s/cm2, "erg/s/cm2");
   set_parameter_description("Energy flux of the plane wave. This parameter is used only for calculating real time correspoing to a simulation.");
-  register_parameter(&m_Polarization0, "Polarization vector");
+  register_parameter(&m_Polarization0, "polarization_vector");
   set_parameter_description("Polarization vector (if polarization is enable).");
-  register_parameter(&m_PolarizationDegree, "Degree of polarization");
+  register_parameter(&m_PolarizationDegree, "degree_of_polarization");
   set_parameter_description("Degree of polarization (if polarization is enable).");
  
   return AS_OK;
@@ -67,7 +67,7 @@ ANLStatus PlaneWavePrimaryGen::mod_startup()
 ANLStatus PlaneWavePrimaryGen::mod_com()
 {
   if (PolarizationMode() < 1) {
-    hide_parameter("Polarization vector");
+    hide_parameter("polarization_vector");
   }
   
   return BasicPrimaryGen::mod_com();

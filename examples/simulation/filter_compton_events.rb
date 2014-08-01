@@ -12,16 +12,16 @@ class MyApp < ANL::ANLApp
 
     chain :CSHitCollection
     chain :ReadComptonTree
-    with_parameters("Detector group file" => "database/detector_group.txt",
-                    "Maximum hit number to analyze" => 2,
-                    "Cut by total energy?" => false,
-                    "Source distant?" => true,
-                    "Source direction x" => 0.0,
-                    "Source direction y" => 0.0,
-                    "Source direction z" => 1.0,
-                    "Compton event tree file" => [@file])
+    with_parameters(detector_group: "database/detector_group.txt",
+                    maximum_hits_for_analysis: 2,
+                    total_energy_cut: false,
+                    source_distant: true,
+                    source_direction_x: 0.0,
+                    source_direction_y: 0.0,
+                    source_direction_z: 1.0,
+                    file_list: [@file])
     chain :ComptonEventFilter
-    with_parameters("Hit patterns" => ["Si-CdTe"]) do |m|
+    with_parameters(hit_patterns: ["Si-CdTe"]) do |m|
       m.define_condition
       m.add_condition("E1+E2", @emin, @emax)
       m.add_condition("E1", @emin_si, @emax_si)
@@ -29,9 +29,9 @@ class MyApp < ANL::ANLApp
       m.add_condition("theta K", @thetamin, @thetamax)
     end
     chain :ComptonTree
-    with_parameters("Save detector detail?" => false)
+    with_parameters(record_detector_details: false)
     chain :SaveData
-    with_parameters("Output file" => file.sub(".root", "_cut.root"))
+    with_parameters(output: file.sub(".root", "_cut.root"))
   end
 end
 

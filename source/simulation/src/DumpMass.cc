@@ -40,7 +40,7 @@ DumpMass::~DumpMass()
 
 ANLStatus DumpMass::mod_startup()
 {
-  register_parameter(&m_FileName, "File name");
+  register_parameter(&m_FileName, "filename");
   return AS_OK;
 }
 

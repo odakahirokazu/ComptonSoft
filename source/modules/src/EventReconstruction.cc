@@ -43,19 +43,19 @@ EventReconstruction::EventReconstruction()
 
 ANLStatus EventReconstruction::mod_startup()
 {
-  register_parameter(&dg_filename, "Detector group file");
-  register_parameter(&max_hit, "Maximum hit number to analyze");
-  register_parameter(&ecut, "Cut by total energy?");
-  register_parameter(&energy_range0, "Lower energy range", keV, "keV");
-  register_parameter(&energy_range1, "Upper energy range", keV, "keV");
+  register_parameter(&dg_filename, "detector_group");
+  register_parameter(&max_hit, "maximum_hits_for_analysis");
+  register_parameter(&ecut, "total_energy_cut");
+  register_parameter(&energy_range0, "energy_min", keV, "keV");
+  register_parameter(&energy_range1, "energy_max", keV, "keV");
 
-  register_parameter(&source_distant, "Source distant?");
-  register_parameter(&source_direction_x, "Source direction x");
-  register_parameter(&source_direction_y, "Source direction y");
-  register_parameter(&source_direction_z, "Source direction z");
-  register_parameter(&source_position_x, "Source position x", cm, "cm");
-  register_parameter(&source_position_y, "Source position y", cm, "cm");
-  register_parameter(&source_position_z, "Source position z", cm, "cm");
+  register_parameter(&source_distant, "source_distant");
+  register_parameter(&source_direction_x, "source_direction_x");
+  register_parameter(&source_direction_y, "source_direction_y");
+  register_parameter(&source_direction_z, "source_direction_z");
+  register_parameter(&source_position_x, "source_position_x", cm, "cm");
+  register_parameter(&source_position_y, "source_position_y", cm, "cm");
+  register_parameter(&source_position_z, "source_position_z", cm, "cm");
 
   init_bnk_evs();
 
@@ -65,26 +65,26 @@ ANLStatus EventReconstruction::mod_startup()
 
 ANLStatus EventReconstruction::mod_com()
 {
-  ask_parameter("Cut by total energy?", "Cut by total energy? (1:yes, 0:no)");
-  hide_parameter("Cut by total energy?");
+  ask_parameter("total_energy_cut", "Cut by total energy? (1:yes, 0:no)");
+  hide_parameter("total_energy_cut");
   
-  ask_parameter("Source distant?", "Is the source infinitely distant? (1:yes, 0:no)");
-  hide_parameter("Source distant?");
+  ask_parameter("source_distant", "Is the source infinitely distant? (1:yes, 0:no)");
+  hide_parameter("source_distant");
   
   if (!ecut) {
-    unregister_parameter("Lower energy range");
-    unregister_parameter("Upper energy range");
+    unregister_parameter("energy_min");
+    unregister_parameter("energy_max");
   }
   
   if (source_distant) {
-    unregister_parameter("Source position x");
-    unregister_parameter("Source position y");
-    unregister_parameter("Source position z");
+    unregister_parameter("source_position_x");
+    unregister_parameter("source_position_y");
+    unregister_parameter("source_position_z");
   }
   else {
-    unregister_parameter("Source direction x");
-    unregister_parameter("Source direction y");
-    unregister_parameter("Source direction z");
+    unregister_parameter("source_direction_x");
+    unregister_parameter("source_direction_y");
+    unregister_parameter("source_direction_z");
   }
 
   ask_parameters();

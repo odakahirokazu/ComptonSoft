@@ -46,7 +46,7 @@ ComptonTree::ComptonTree()
 
 ANLStatus ComptonTree::mod_startup()
 {
-  register_parameter(&detector_detail, "Save detector detail?");
+  register_parameter(&detector_detail, "record_detector_details");
 
   return AS_OK;
 }

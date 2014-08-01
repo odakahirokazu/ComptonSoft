@@ -42,16 +42,16 @@ ANLStatus PointSourcePrimaryGen::mod_startup()
   BasicPrimaryGen::mod_startup();
 
   enablePowerLawInput();
-  register_parameter(&m_SourcePosition, "Source position",
+  register_parameter(&m_SourcePosition, "position",
                      LengthUnit(), LengthUnitName());
   set_parameter_description("Position of the source.");
-  register_parameter(&m_CenterDirection, "Center direction");
+  register_parameter(&m_CenterDirection, "direction");
   set_parameter_description("Center direction of the primaries.");
-  register_parameter(&m_Theta0, "theta min", 1.0, "radian");
+  register_parameter(&m_Theta0, "theta_min", 1.0, "radian");
   set_parameter_description("Minimum angle between the primary direction and the center direction.");
-  register_parameter(&m_Theta1, "theta max", 1.0, "radian");
+  register_parameter(&m_Theta1, "theta_max", 1.0, "radian");
   set_parameter_description("Maximum angle between the primary direction and the center direction.");
-  register_parameter(&m_Luminosity, "Luminosity", erg/s, "erg/s");
+  register_parameter(&m_Luminosity, "luminosity", erg/s, "erg/s");
   set_parameter_description("Energy luminosity of the point source. This parameter is used only for calculating real time correspoing to a simulation.");
 
   return AS_OK;

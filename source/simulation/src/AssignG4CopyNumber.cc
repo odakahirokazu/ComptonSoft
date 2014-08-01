@@ -40,7 +40,7 @@ AssignG4CopyNumber::~AssignG4CopyNumber()
 
 ANLStatus AssignG4CopyNumber::mod_startup()
 {
-  register_parameter(&m_FileName, "File name");
+  register_parameter(&m_FileName, "filename");
 
   return AS_OK;
 }

@@ -42,7 +42,7 @@ ReadComptonTree::ReadComptonTree()
 ANLStatus ReadComptonTree::mod_startup()
 {
   EventReconstruction::mod_startup();
-  register_parameter(&filename, "Compton event tree file", "seq", "ce.root");
+  register_parameter(&filename, "file_list", "seq", "ce.root");
   
   return AS_OK;
 }

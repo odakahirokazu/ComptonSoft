@@ -70,16 +70,16 @@ Geant4Body::~Geant4Body()
 
 ANLStatus Geant4Body::mod_startup()
 {
-  register_parameter(&m_RandomEngine, "Random engine");
-  register_parameter(&m_RandomInitMode, "Random initialization mode");
+  register_parameter(&m_RandomEngine, "random_engine");
+  register_parameter(&m_RandomInitMode, "random_initialization_mode");
   set_parameter_question("Random initialization mode (0: auto, 1: interger, 2: state file)");
-  register_parameter(&m_RandomSeed1, "Random seed");
+  register_parameter(&m_RandomSeed1, "random_seed");
   register_parameter(&m_RandomInitialStatusFileName,
-                     "Random initial status file");
+                     "random_initial_status_file");
   register_parameter(&m_RandomFinalStatusFileName,
-                     "Random final status file");
+                     "random_final_status_file");
 
-  register_parameter(&m_VerboseLevel, "Verbose level");
+  register_parameter(&m_VerboseLevel, "verbose");
   
   return AS_OK;
 }
@@ -87,10 +87,10 @@ ANLStatus Geant4Body::mod_startup()
 
 ANLStatus Geant4Body::mod_com()
 {
-  ask_parameter("Random initialization mode");
-  hide_parameter("Random initialization mode");
+  ask_parameter("random_initialization_mode");
+  hide_parameter("random_initialization_mode");
   if (m_RandomInitMode!=1) {
-    hide_parameter("Random seed");
+    hide_parameter("random_seed");
   }
   return BasicModule::mod_com();
 }

@@ -40,14 +40,14 @@ ReprocessPI::ReprocessPI()
 
 ANLStatus ReprocessPI::mod_startup()
 {
-  register_parameter(&dg_filename, "Detector group file");
+  register_parameter(&dg_filename, "detector_group");
   
-  register_parameter_map(&param_map, "Parameter map",
-                         "Detector group", "Si");
-  add_map_value(&m_Factor0, "Gain correction factor");
-  add_map_value(&m_Noise00, "Noise parameter 0");
-  add_map_value(&m_Noise01, "Noise parameter 1");
-  add_map_value(&m_Noise02, "Noise parameter 2");
+  register_parameter_map(&param_map, "parameter_map",
+                         "detector_group", "Si");
+  add_map_value(&m_Factor0, "gain_correction_factor");
+  add_map_value(&m_Noise00, "noise_coefficient_0");
+  add_map_value(&m_Noise01, "noise_coefficient_1");
+  add_map_value(&m_Noise02, "noise_coefficient_2");
   
   return AS_OK;
 }

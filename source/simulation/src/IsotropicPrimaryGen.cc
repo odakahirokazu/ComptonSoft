@@ -43,19 +43,19 @@ ANLStatus IsotropicPrimaryGen::mod_startup()
   BasicPrimaryGen::mod_startup();
 
   enablePowerLawInput();
-  register_parameter(&m_CenterPosition, "Center position", cm, "cm");
+  register_parameter(&m_CenterPosition, "center_position", cm, "cm");
   set_parameter_description("Position of the sphere.");
-  register_parameter(&m_Radius, "Radius", cm, "cm");
+  register_parameter(&m_Radius, "radius", cm, "cm");
   set_parameter_description("Radius of a disk where primaries are generated.");
-  register_parameter(&m_Distance, "Distance", cm, "cm");
+  register_parameter(&m_Distance, "distance", cm, "cm");
   set_parameter_description("Distance between the sphere center and a disk where primaries are generated. If this value is negative, then this parameter is set to be the same as the disk radius [Radius].");
-  register_parameter(&m_CenterDirection, "Center direction");
+  register_parameter(&m_CenterDirection, "center_direction");
   set_parameter_description("Center direction of the primaries.");
-  register_parameter(&m_ThetaMin, "Theta min", 1.0, "radian");
+  register_parameter(&m_ThetaMin, "theta_min", 1.0, "radian");
   set_parameter_description("Minimum angle between the primary direction and the center direction.");
-  register_parameter(&m_ThetaMax, "Theta max", 1.0, "radian");
+  register_parameter(&m_ThetaMax, "theta_max", 1.0, "radian");
   set_parameter_description("Maximum angle between the primary direction and the center direction.");
-  register_parameter(&m_Flux, "Flux", (erg/cm2/s/sr), "erg/cm2/s/sr");
+  register_parameter(&m_Flux, "flux", (erg/cm2/s/sr), "erg/cm2/s/sr");
   set_parameter_description("Energy flux of the primaries. This parameter is used only for calculating real time correspoing to a simulation.");
 
   return AS_OK;

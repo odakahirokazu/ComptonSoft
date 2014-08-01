@@ -36,7 +36,7 @@ VAnalyzeHitList::VAnalyzeHitList()
 
 ANLStatus VAnalyzeHitList::mod_startup()
 {
-  register_parameter(&directory_name, "Directory name");
+  register_parameter(&directory_name, "directory");
   return AS_OK;
 }
 

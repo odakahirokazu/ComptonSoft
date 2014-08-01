@@ -4,7 +4,7 @@ require 'comptonSoft'
 require 'anlGeant4'
 require 'ANLLib'
 
-a = ANLApp.new
+a = ANL::AnalysisChain.new
 
 a.push ComptonSoft::AnalyzeDSD.new
 a.push ComptonSoft::AnalyzeHit.new
@@ -96,19 +96,13 @@ a.push ComptonSoft::MaterialSamplePickUpData.new
 a.push ComptonSoft::NucleusPrimaryGen.new
 a.text "Primary generator of MC simulations. This module puts a nucleus (radioactive isotope) as a point source."
 
-a.push ComptonSoft::PlaneWavePrimaryGen.new
+a.push AnlGeant4::PlaneWavePrimaryGen.new
 a.text "Primary generator of MC simulations. Primaries are generated as a plane wave inside a circle."
-
-a.push ComptonSoft::PlaneWavePrimaryGenPol.new
-a.text "Primary generator of MC simulations. Primaries are generated as a plane wave inside a circle. Polarization is enable by default."
 
 a.push ComptonSoft::PlaneWaveRectanglePrimaryGen.new
 a.text "Primary generator of MC simulations. Primaries are generated as a plane wave inside a rectangle."
 
-a.push ComptonSoft::PlaneWaveRectanglePrimaryGenPol.new
-a.text "Primary generator of MC simulations. Primaries are generated as a plane wave inside a rectangle. Polarization is enable by default."
-
-a.push ComptonSoft::PointSourcePrimaryGen.new
+a.push AnlGeant4::PointSourcePrimaryGen.new
 a.text "Primary generator of MC simulations. Primaries are generated as point source emissions."
 
 a.push ComptonSoft::PrimaryGenInVolume.new

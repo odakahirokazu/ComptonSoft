@@ -37,7 +37,7 @@ ANLStatus AHRadiationBackgroundPrimaryGen::mod_startup()
 {
   IsotropicPrimaryGen::mod_startup();
   disableDefaultEnergyInput();
-  register_parameter(&m_Filename, "File name");
+  register_parameter(&m_Filename, "filename");
   set_parameter_description("ROOT file of background radiation spectrum.");
   return AS_OK;
 }

@@ -37,7 +37,7 @@ MakePI::MakePI()
 
 ANLStatus MakePI::mod_startup()
 {
-  register_parameter(&m_CalFileName, "Calibration file name");
+  register_parameter(&m_CalFileName, "calibration_file");
   return AS_OK;
 }
 

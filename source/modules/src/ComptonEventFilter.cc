@@ -36,7 +36,7 @@ ComptonEventFilter::ComptonEventFilter()
 
 ANLStatus ComptonEventFilter::mod_startup()
 {
-  register_parameter(&hitpat_names, "Hit patterns");
+  register_parameter(&hitpat_names, "hit_patterns");
   
   return AS_OK;
 }

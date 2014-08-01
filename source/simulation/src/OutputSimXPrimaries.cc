@@ -33,8 +33,8 @@ OutputSimXPrimaries::OutputSimXPrimaries()
 
 ANLStatus OutputSimXPrimaries::mod_startup()
 {
-  register_parameter(&m_FileName, "File name");
-  register_parameter(&m_Area, "Area", cm2, "cm2");
+  register_parameter(&m_FileName, "filename");
+  register_parameter(&m_Area, "area", cm2, "cm2");
   return AS_OK;
 }
 

@@ -41,14 +41,14 @@ BackProjection::BackProjection()
 
 ANLStatus BackProjection::mod_startup()
 {
-  register_parameter(&m_PlaneNormal, "Plane normal");
-  register_parameter(&m_PlanePoint, "Plane point", 1, m_PixelUnitName);
-  register_parameter(&m_NumPixelX, "Number of pixels x");
-  register_parameter(&m_NumPixelY, "Number of pixels y");
-  register_parameter(&m_RangeX1, "x min", 1, m_PixelUnitName);
-  register_parameter(&m_RangeX2, "x max", 1, m_PixelUnitName);
-  register_parameter(&m_RangeY1, "y min", 1, m_PixelUnitName);
-  register_parameter(&m_RangeY2, "y max", 1, m_PixelUnitName);
+  register_parameter(&m_PlaneNormal, "plane_normal");
+  register_parameter(&m_PlanePoint, "plane_point", 1, m_PixelUnitName);
+  register_parameter(&m_NumPixelX, "num_pixel_x");
+  register_parameter(&m_NumPixelY, "num_pixel_y");
+  register_parameter(&m_RangeX1, "x_min", 1, m_PixelUnitName);
+  register_parameter(&m_RangeX2, "x_max", 1, m_PixelUnitName);
+  register_parameter(&m_RangeY1, "y_min", 1, m_PixelUnitName);
+  register_parameter(&m_RangeY2, "y_max", 1, m_PixelUnitName);
 
   return AS_OK;
 }

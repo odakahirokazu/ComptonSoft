@@ -67,9 +67,9 @@ Geant4Simple::~Geant4Simple()
 
 ANLStatus Geant4Simple::mod_startup()
 {
-  register_parameter(&m_RandomSeed1, "Random seed");
-  register_parameter(&m_NumberOfTrial, "Number of trials");
-  register_parameter(&m_VerboseLevel, "Verbose level");
+  register_parameter(&m_RandomSeed1, "random_seed");
+  register_parameter(&m_NumberOfTrial, "number_of_trials");
+  register_parameter(&m_VerboseLevel, "verbose");
   
   return AS_OK;
 }

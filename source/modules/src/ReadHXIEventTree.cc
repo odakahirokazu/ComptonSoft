@@ -36,8 +36,8 @@ ReadHXIEventTree::ReadHXIEventTree()
 
 ANLStatus ReadHXIEventTree::mod_startup()
 {
-  register_parameter(&file_names, "Event files", "seq", "hxi_event.root");
-  register_parameter(&tree_names, "Tree names", "seq", "event_tree");
+  register_parameter(&file_names, "file_list", "seq", "hxi_event.root");
+  register_parameter(&tree_names, "trees", "seq", "event_tree");
 
   return AS_OK;
 }

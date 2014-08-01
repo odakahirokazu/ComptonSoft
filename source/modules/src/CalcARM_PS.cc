@@ -36,7 +36,7 @@ CalcARM_PS::CalcARM_PS()
 
 ANLStatus CalcARM_PS::mod_startup()
 {
-  register_parameter(&SourcePos, "Source position", cm, "cm");
+  register_parameter(&SourcePos, "source_position", cm, "cm");
   
   return AS_OK;
 }

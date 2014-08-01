@@ -22,11 +22,21 @@ module ComptonSoft
   module_function :noise_param1
 
 
+  module SimulationMode
+    Minimal = 0
+    Basic = 1
+    Normal = 2
+  end
+
+
   # Simulation application class inherited from ANLApp
   #
   # @author Yuto Ichinohe, Hirokazu Odaka
   #
   class Simulation < ANL::ANLApp
+    ### Mode
+    attr_accessor :mode
+
     ### Input files
     attr_writer :detector_config, :channel_table, :detector_group
     attr_writer :simulation_param
@@ -52,14 +62,10 @@ module ComptonSoft
 
     def initialize()
       ### mode
-      @basic_mode = false
+      @mode = SimulationMode::Normal
 
       ### Modules
-      @geometry = nil
-      @primary_generator = nil
-      @pickup_data = ANL::ModuleInitializer.new(:StandardPickUpData)
       @simx = nil
-      @vis = nil
 
       ### Input files
       @detector_config = "detector_config.xml"
@@ -101,12 +107,19 @@ module ComptonSoft
       super
     end
 
-    # Set geometry builder to this simulator.
-    # This method should be called before running this simulation.
-    # @param [Symbol] mod symbol of a primary generator module
-    # @param [Hash] params parameter list of this module
-    def set_geometry(mod, params={})
-      @geometry = ANL::ModuleInitializer.new(mod, nil, param)
+    ### ANL module setup.
+    define_setup_module("geometry", take_parameters: true)
+    define_setup_module("primary_generator", take_parameters: true)
+    define_setup_module("pickup_data", take_parameters: true)
+    define_setup_module("visualization", :VisualizeG4Geom)
+
+    # Enable visualization.
+    #
+    def visualize(params={})
+      self.thread_mode = false
+      self.mode = SimulationMode::Minimal
+      set_visualization()
+      with(params)
     end
 
     # Use GDML file for geometry building.
@@ -114,27 +127,8 @@ module ComptonSoft
     # @param [String] gdml_file GDML file name
     # @param [Bool] validate Validate the GDML file?
     def use_gdml(gdml_file, validate=true)
-      @geometry = ANL::ModuleInitializer.new(:ReadGDML)
-      @geometry.with_parameters("Detector geometry file" => gdml_file,
-                                "Validate GDML?" => validate)
-    end
-
-    # Set primary generator to this simulator.
-    # This method should be called before running this simulation.
-    # @param [Symbol] mod symbol of a primary generator module
-    # @param [Hash] params parameter list of this module
-    def set_primary_generator(mod, params)
-      @primary_generator = ANL::ModuleInitializer.new(mod, nil, params)
-      if mod.to_s.include?("Pol")
-        @physics += " PC"
-      end
-    end
-
-    # Set pickup data module to this simulator.
-    # @param [Symbol] mod symbol of a pickup data module
-    # @param [Hash] params parameter list of this module
-    def set_pickup_data(mod, params={})
-      @pickup_data = ANL::ModuleInitializer.new(mod, nil, params)
+      set_geometry :ReadGDML
+      with(file: gdml_file, validate: validate)
     end
 
     def simx_on(simx=nil)
@@ -150,15 +144,6 @@ module ComptonSoft
 
     def compton_mode_on()
       @compton_mode = true
-    end
-
-    def visualize(params={})
-      self.thread_mode = false
-      @vis = ANL::ModuleInitializer.new(:VisualizeG4Geom, nil, params)
-    end
-
-    def basic_mode_on()
-      @basic_mode = true
     end
 
     def setup_simx()
@@ -188,71 +173,71 @@ module ComptonSoft
 
     def setup()
       add_namespace ComptonSoft
+      set_pickup_data :StandardPickUpData
 
-      unless @basic_mode
+      if mode >= SimulationMode::Normal
         chain :SaveData
-        with_parameters("Output file" => @output)
-      end
-      chain :CSHitCollection
-
-      chain :ConstructDetector_Sim
-      with_parameters("Detector configuration file" => @detector_config,
-                      "Simulation parameter file" => @simulation_param)
-
-      if @channel_table
-        chain :ConstructChannelTable
-        with_parameters("Detector channel table file" => @channel_table)
+        with_parameters(output: @output)
       end
 
-      chain :SetNoiseLevel
-      with_parameters("Set by file?" => false)
+      if mode >= SimulationMode::Basic
+        chain :CSHitCollection
+        chain :ConstructDetector_Sim
+        with_parameters(detector_configuration: @detector_config,
+                        simulation_parameters: @simulation_param)
+        if @channel_table
+          chain :ConstructChannelTable
+          with_parameters(filename: @channel_table)
+        end
+        chain :SetNoiseLevel
+      end
 
-      chain_with_parameters @geometry
-
+      chain_with_parameters module_of_geometry
       chain :AHStandardANLPhysicsList
-      with_parameters("Physics option" => @physics,
-                      "Cut value" => @cut_value)
+      with_parameters(physics_option: @physics,
+                      cut_value: @cut_value)
       push_simx()
-
-      chain_with_parameters @primary_generator
-
+      chain_with_parameters module_of_primary_generator
       chain :Geant4Body
-      with_parameters("Random engine" => "MTwistEngine",
-                      "Random initialization mode" => 1,
-                      "Random seed" => @random_seed,
-                      "Random initial status file" => @output.gsub(/.root/, "")+"_seed_I.txt",
-                      "Random final status file" => @output.gsub(/.root/, "")+"_seed_F.txt",
-                      "Verbose level" => @verbose)
+      with_parameters(random_engine: "MTwistEngine",
+                      random_initialization_mode: 1,
+                      random_seed: @random_seed,
+                      random_initial_status_file: @output.gsub(/.root/, "")+"_seed_I.txt",
+                      random_final_status_file: @output.gsub(/.root/, "")+"_seed_F.txt",
+                      verbose: @verbose)
 
-      chain :MakeDetectorHit
+      if mode >= SimulationMode::Basic
+        chain :MakeDetectorHit
+        chain :EventSelection
+        with_parameters(detector_group: @detector_group,
+                        apply_veto: @enable_veto,
+                        tolerance_for_fluorescence_lines: @fluorescence_range)
+        if @compton_mode
+          chain :EventReconstruction
+          with_parameters(detector_group: @detector_group,
+                          maximum_hits_for_analysis: 3,
+                          total_energy_cut: false,
+                          energy_min: 0.0,
+                          energy_max: 10000.0,
+                          source_distant: true,
+                          source_direction_x: 0.0,
+                          source_direction_y: 0.0,
+                          source_direction_z: 1.0)
+        end
+        if mode >= SimulationMode::Normal
+          chain :HitTree_Sim
+        end
+      end
+      chain_with_parameters module_of_pickup_data
 
-      chain :EventSelection
-      with_parameters("Detector group file" => @detector_group,
-                      "Remove veto events?" => @enable_veto,
-                      "Range of fluorescence lines" => @fluorescence_range)
-
-      if @compton_mode
-        chain :EventReconstruction
-        with_parameters("Detector group file" => @detector_group,
-                        "Maximum hit number to analyze" => 3,
-                        "Cut by total energy?" => false,
-                        "Lower energy range" => 0.0,
-                        "Upper energy range" => 10000.0,
-                        "Source distant?" => true,
-                        "Source direction x" => 0.0,
-                        "Source direction y" => 0.0,
-                        "Source direction z" => 1.0)
+      if vis = module_of_visualization
+        chain_with_parameters vis
       end
 
-      chain :HitTree_Sim unless @basic_mode
-      chain_with_parameters @pickup_data
-
-      if @vis
-        chain_with_parameters @vis
-      end
-
-      if @analysis_param
-        load_analysis_param(@analysis_param)
+      if mode >= SimulationMode::Normal
+        if @analysis_param
+          load_analysis_param(@analysis_param)
+        end
       end
     end
 
@@ -272,29 +257,29 @@ module ComptonSoft
             end
           end
           set_parameters :SetNoiseLevel
-          insert_map "Noise level map", name, {
-            "Detector type" => type,
-            "Noise parameter 00" => get_noise_level.("param00"),
-            "Noise parameter 01" => get_noise_level.("param01"),
-            "Noise parameter 02" => get_noise_level.("param02"),
-            "Noise parameter 10" => get_noise_level.("param10"),
-            "Noise parameter 11" => get_noise_level.("param11"),
-            "Noise parameter 12" => get_noise_level.("param12"),
+          insert_map "noise_level_map", name, {
+            detector_type: type,
+            noise_coefficient_00: get_noise_level.("param00"),
+            noise_coefficient_01: get_noise_level.("param01"),
+            noise_coefficient_02: get_noise_level.("param02"),
+            noise_coefficient_10: get_noise_level.("param10"),
+            noise_coefficient_11: get_noise_level.("param11"),
+            noise_coefficient_12: get_noise_level.("param12")
           }
         end
 
         analysis = elem.elements["analysis"]
         if analysis
           m1 = {
-            "Detector type" => type,
-            "Analysis mode" => analysis.elements["mode"].text.to_i,
+            detector_type: type,
+            analysis_mode: analysis.elements["mode"].text.to_i,
           }
-          if n = analysis.elements["threshold"]; m1["Threshold"] = n.text.to_f; end
-          if n = analysis.elements["threshold_cathode"]; m1["Threshold (cathode)"] = n.text.to_f; end
-          if n = analysis.elements["threshold_anode"]; m1["Threshold (anode)"] = n.text.to_f; end
+          if n = analysis.elements["threshold"]; m1["threshold"] = n.text.to_f; end
+          if n = analysis.elements["threshold_cathode"]; m1["threshold_cathode"] = n.text.to_f; end
+          if n = analysis.elements["threshold_anode"]; m1["threshold_anode"] = n.text.to_f; end
 
           set_parameters :MakeDetectorHit
-          insert_map "Analysis map", name, m1
+          insert_map "analysis_map", name, m1
         end
       end
     end
@@ -324,8 +309,8 @@ module ComptonSoft
       chain :OutputSimXPrimaries
 
       set_parameters :OutputSimXPrimaries, {
-        "File name" => self.output.sub(".root", "")+"_incident_photons.fits",
-        "Area" => @area,
+        filename: self.output.sub(".root", "")+"_incident_photons.fits",
+        area: @area,
       }
     end
   end

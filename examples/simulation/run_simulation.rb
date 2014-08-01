@@ -16,13 +16,13 @@ def run_simulation(num, random, output)
   sim.use_gdml "database/mass_model.gdml"
 
   sim.set_primary_generator :PlaneWavePrimaryGen, {
-    "Particle name" => "gamma",
-    "Photon index" => 0.0,
-    "Energy min" => energy,
-    "Energy max" => energy,
-    "Center position" => vec(0.0, 0.0, 10.0),
-    "Direction" => vec(0.0, 0.0, -1.0),
-    "Radius" => 10.0,
+    particle: "gamma",
+    photon_index: 0.0,
+    energy_min: energy,
+    energy_max: energy,
+    position: vec(0.0, 0.0, 10.0),
+    direction: vec(0.0, 0.0, -1.0),
+    radius: 10.0
   }
 
   sim.run(num)

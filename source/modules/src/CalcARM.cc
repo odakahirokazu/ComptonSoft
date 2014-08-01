@@ -37,9 +37,9 @@ CalcARM::CalcARM()
 
 ANLStatus CalcARM::mod_startup()
 {
-  register_parameter(&NumBin, "Number of bins");
-  register_parameter(&RangeTheta1, "Range min", 1.0, "degree");
-  register_parameter(&RangeTheta2, "Range max", 1.0, "degree");
+  register_parameter(&NumBin, "number_of_bins");
+  register_parameter(&RangeTheta1, "range_min", 1.0, "degree");
+  register_parameter(&RangeTheta2, "range_max", 1.0, "degree");
   
   return AS_OK;
 }
@@ -47,9 +47,9 @@ ANLStatus CalcARM::mod_startup()
 
 ANLStatus CalcARM::mod_com()
 {
-  hide_parameter("Number of bins");
-  hide_parameter("Range min");
-  hide_parameter("Range max");
+  hide_parameter("number_of_bins");
+  hide_parameter("range_min");
+  hide_parameter("range_max");
   
   return VCSModule::mod_com();
 }

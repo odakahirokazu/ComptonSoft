@@ -37,7 +37,7 @@ ScatteringPickUpData::ScatteringPickUpData()
 
 ANLStatus ScatteringPickUpData::mod_startup()
 {
-  register_parameter(&m_ProcessName, "Process name");
+  register_parameter(&m_ProcessName, "process_name");
   return AS_OK;
 }
 

@@ -34,7 +34,7 @@ ReadHitTree::ReadHitTree()
 
 ANLStatus ReadHitTree::mod_startup()
 {
-  register_parameter(&inputfilename, "Hit tree file", "seq", "hittree.root");
+  register_parameter(&inputfilename, "file_list", "seq", "hittree.root");
   return AS_OK;
 }
 

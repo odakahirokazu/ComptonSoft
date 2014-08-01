@@ -37,11 +37,11 @@ ANLStatus PlaneWaveRectanglePrimaryGen::mod_startup()
 {
   PlaneWavePrimaryGen::mod_startup();
 
-  unregister_parameter("Radius");
+  unregister_parameter("radius");
   
-  register_parameter(&m_SizeX, "Size x", cm, "cm");
+  register_parameter(&m_SizeX, "size_x", cm, "cm");
   set_parameter_description("Size x of the rectangle where parimary particles are generated.");  
-  register_parameter(&m_SizeY, "Size y", cm, "cm");
+  register_parameter(&m_SizeY, "size_y", cm, "cm");
   set_parameter_description("Size y of the rectangle where parimary particles are generated.");   
   
   return AS_OK;

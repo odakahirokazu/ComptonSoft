@@ -37,9 +37,9 @@ PhAbsModeSpectrum::PhAbsModeSpectrum()
 
 ANLStatus PhAbsModeSpectrum::mod_startup()
 {
-  register_parameter(&NumBinEnergy, "Number of bins");
-  register_parameter(&RangeEnergy1, "Energy min", 1, "keV");
-  register_parameter(&RangeEnergy2, "Energy max", 1, "keV");
+  register_parameter(&NumBinEnergy, "number_of_bins");
+  register_parameter(&RangeEnergy1, "energy_min", 1, "keV");
+  register_parameter(&RangeEnergy2, "energy_max", 1, "keV");
   
   return AS_OK;
 }

@@ -42,8 +42,8 @@ KillStepPickUpData::KillStepPickUpData()
 ANLStatus KillStepPickUpData::mod_startup()
 {
   //register_parameter(&enable,"Enabel Kill");
-  register_parameter(&m_ParticleName, "Kill Particle Name");
-  register_parameter(&stopping_volume_name, "Volume name of the stopper");
+  register_parameter(&m_ParticleName, "particle");
+  register_parameter(&stopping_volume_name, "volume");
   
   return AS_OK;
 }

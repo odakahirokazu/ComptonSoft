@@ -10,30 +10,30 @@ class MyApp < ANL::ANLApp
 
     chain :CSHitCollection
     chain :ReadHitTree
-    with_parameters("Hit tree file" => @inputs)
+    with_parameters(file_list: @inputs)
     chain :EventReconstruction
-    with_parameters("Detector group file" => "database/detector_group.txt",
-                    "Maximum hit number to analyze" => 2,
-                    "Cut by total energy?" => false,
-                    "Lower energy range" => 0.0,
-                    "Upper energy range" => 10000.0,
-                    "Source distant?" => true,
-                    "Source direction x" => 0.0,
-                    "Source direction y" => 0.0,
-                    "Source direction z" => 1.0)
+    with_parameters(detector_group: "database/detector_group.txt",
+                    maximum_hits_for_analysis: 2,
+                    total_energy_cut: false,
+                    energy_min: 0.0,
+                    energy_max: 10000.0,
+                    source_distant: true,
+                    source_direction_x: 0.0,
+                    source_direction_y: 0.0,
+                    source_direction_z: 1.0)
     chain :ComptonModeFilter
     chain :Edep2DMap
-    with_parameters("Number of bins" => 720,
-                    "Energy min" => 0.0,
-                    "Energy max" => 720.0)
+    with_parameters(number_of_bins: 720,
+                    energy_min: 0.0,
+                    energy_max: 720.0)
     chain :CalcARM
-    with_parameters("Number of bins" => 500,
-                    "Range min" => -25.0,
-                    "Range max" => 25.0)
+    with_parameters(number_of_bins: 500,
+                    range_min: -25.0,
+                    range_max: 25.0)
     chain :ComptonTree
-    with_parameters("Save detector detail?" => false)
+    with_parameters(record_detector_details: false)
     chain :SaveData
-    with_parameters("Output file" => @output)
+    with_parameters(output: @output)
   end
 end
 

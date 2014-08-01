@@ -21,20 +21,28 @@
 #include "globals.hh"
 #include "G4Event.hh"
 #include "G4VProcess.hh"
+#include "InitialInformation.hh"
 
 using namespace anl;
 using namespace anlgeant4;
 
 StandardPickUpData::StandardPickUpData()
-  : m_EventID(0), m_StartTime(0.0)
+  : m_StartTime(0.0), m_InitialInfo(0)
 {
-  add_alias("StandardPickUpData"),
+  add_alias("StandardPickUpData");
   SetStepActOn(false);
+}
+
+
+ANLStatus StandardPickUpData::mod_init()
+{
+  GetANLModuleIFNC("InitialInformation", &m_InitialInfo);
+  return AS_OK;
 }
 
 
 void StandardPickUpData::EventAct_begin(const G4Event* aEvent)
 {
-  m_EventID = aEvent->GetEventID();
+  m_InitialInfo->setEventID(aEvent->GetEventID());
   SetStartTime(0.0);
 }

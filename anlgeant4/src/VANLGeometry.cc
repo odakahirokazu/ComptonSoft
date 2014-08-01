@@ -55,6 +55,6 @@ void VANLGeometry::SetLengthUnit(const std::string& name)
 
 ANLStatus VANLGeometry::mod_startup()
 {
-  register_parameter(&m_SurfaceCheck, "Surface check");
+  register_parameter(&m_SurfaceCheck, "surface_check");
   return AS_OK;
 }

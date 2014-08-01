@@ -35,9 +35,9 @@ ANLStatus PrimaryGenInVolume::mod_startup()
 {
   PointSourcePrimaryGen::mod_startup();
 
-  register_parameter(&m_TargetPosition, "Target position", cm, "cm");
+  register_parameter(&m_TargetPosition, "target_position", cm, "cm");
   set_parameter_description("Position of the target. The primary direction is distrubuted around the vector toward this target position.");
-  register_parameter(&m_VolumeHierarchy, "Volume hierarchy", "seq", "World");
+  register_parameter(&m_VolumeHierarchy, "volume_hierarchy", "seq", "World");
   set_parameter_description("Volume hierarchy that identifies the primary generating volume.");
 
   return AS_OK;
@@ -46,8 +46,8 @@ ANLStatus PrimaryGenInVolume::mod_startup()
 
 ANLStatus PrimaryGenInVolume::mod_com()
 {
-  unregister_parameter("Source position");
-  unregister_parameter("Center direction");
+  unregister_parameter("source_position");
+  unregister_parameter("center_direction");
 
   return PointSourcePrimaryGen::mod_com();
 }

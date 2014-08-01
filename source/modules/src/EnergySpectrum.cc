@@ -39,11 +39,11 @@ EnergySpectrum::EnergySpectrum()
 
 ANLStatus EnergySpectrum::mod_startup()
 {
-  register_parameter(&m_EnergyBinType, "Energy bin type");
-  register_parameter(&m_NumBinEnergy, "Number of bins");
-  register_parameter(&m_RangeEnergy1, "Energy min", 1, "keV");
-  register_parameter(&m_RangeEnergy2, "Energy max", 1, "keV");
-  register_parameter(&m_Selections, "Event selections");
+  register_parameter(&m_EnergyBinType, "bin_type");
+  register_parameter(&m_NumBinEnergy, "number_of_bins");
+  register_parameter(&m_RangeEnergy1, "energy_min", 1, "keV");
+  register_parameter(&m_RangeEnergy2, "energy_max", 1, "keV");
+  register_parameter(&m_Selections, "event_selections");
   
   return AS_OK;
 }

@@ -42,7 +42,7 @@ DefineBadChannel::DefineBadChannel()
 
 ANLStatus DefineBadChannel::mod_startup()
 {
-  register_parameter(&m_FileName, "File for bad channel definition");
+  register_parameter(&m_FileName, "filename");
 
   return AS_OK;
 }

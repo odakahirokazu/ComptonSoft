@@ -37,30 +37,28 @@ using namespace anl;
 
 
 SetNoiseLevel::SetNoiseLevel()
-  : m_ByFile(false),
-    m_FileName("noiselevel.xml"),
+  : m_ByFile(true),
+    m_FileName(""),
     m_DetectorType(1),
     m_Noise00(0.0), m_Noise01(0.0), m_Noise02(0.0),
     m_Noise10(0.0), m_Noise11(0.0), m_Noise12(0.0)
-    // m_Noise00(1.0), m_Noise01(0.044), m_Noise02(0.0),
-    // m_Noise10(1.0), m_Noise11(0.044), m_Noise12(0.0)
 {
 }
 
 
 ANLStatus SetNoiseLevel::mod_startup()
 {
-  register_parameter(&m_ByFile, "Set by file?");
-  register_parameter(&m_FileName, "File name");
-  register_parameter_map(&m_NoiseLevelMap, "Noise level map", "Detector name prefix", "Si");
-  add_map_value(&m_DetectorType, "Detector type", "",
+  register_parameter(&m_FileName, "filename");
+  register_parameter_map(&m_NoiseLevelMap, "noise_level_map",
+                         "detector_name_prefix", "Si");
+  add_map_value(&m_DetectorType, "detector_type", "",
                 "Detector type (1: pad, 2: DSD, 3: scintillator)");
-  add_map_value(&m_Noise00, "Noise parameter 00");
-  add_map_value(&m_Noise01, "Noise parameter 01");
-  add_map_value(&m_Noise02, "Noise parameter 02");
-  add_map_value(&m_Noise10, "Noise parameter 10");
-  add_map_value(&m_Noise11, "Noise parameter 11");
-  add_map_value(&m_Noise12, "Noise parameter 12");
+  add_map_value(&m_Noise00, "noise_coefficient_00");
+  add_map_value(&m_Noise01, "noise_coefficient_01");
+  add_map_value(&m_Noise02, "noise_coefficient_02");
+  add_map_value(&m_Noise10, "noise_coefficient_10");
+  add_map_value(&m_Noise11, "noise_coefficient_11");
+  add_map_value(&m_Noise12, "noise_coefficient_12");
   
   return AS_OK;
 }
@@ -68,11 +66,12 @@ ANLStatus SetNoiseLevel::mod_startup()
 
 ANLStatus SetNoiseLevel::mod_com()
 {
-  hide_parameter("Noise level map");
+  hide_parameter("noise_level_map");
 
   CLread("Set by file (1:yes 0:no)", &m_ByFile);
 
   if (m_ByFile) {
+    m_FileName = "noiselevel.xml";
     CLread("File name", &m_FileName);
   }
   else {
@@ -159,6 +158,8 @@ ANLStatus SetNoiseLevel::mod_com()
 ANLStatus SetNoiseLevel::mod_init()
 {
   VCSModule::mod_init();
+
+  if (m_FileName == "") m_ByFile = false;
 
   bool rval;
   if (m_ByFile) {

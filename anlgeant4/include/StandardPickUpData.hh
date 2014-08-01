@@ -24,6 +24,8 @@
 
 namespace anlgeant4 {
 
+class InitialInformation;
+
 /**
  * @author Hirokazu Odaka
  * @date 2011-04-11
@@ -34,17 +36,19 @@ class StandardPickUpData : public VPickUpData
 public:
   StandardPickUpData();
 
+  anl::ANLStatus mod_init();
+
   void EventAct_begin(const G4Event* aEvent);
 
   double StartTime() const { return m_StartTime; }
-  int EventID() const { return m_EventID; }
+  // int EventID() const { return m_EventID; }
   
 protected:
   void SetStartTime(double v) { m_StartTime = v; }
 
 private:
-  int m_EventID;
   double m_StartTime;
+  InitialInformation* m_InitialInfo;
 };
 
 }

@@ -38,9 +38,9 @@ ANLStatus BackProjectionSky::mod_startup()
 {
   BackProjection::mod_startup();
 
-  unregister_parameter("Plane normal");
-  unregister_parameter("Plane point");
-  register_parameter(&m_Rotation, "Rotation angle", degree, "degree");
+  unregister_parameter("plane_normal");
+  unregister_parameter("plane_point");
+  register_parameter(&m_Rotation, "rotation_angle", degree, "degree");
 
   return AS_OK;
 }

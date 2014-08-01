@@ -38,9 +38,9 @@ CorrectPHA::CorrectPHA()
 
 ANLStatus CorrectPHA::mod_startup()
 {
-  register_parameter(&m_PedestalFileName, "Pedestal file name");
+  register_parameter(&m_PedestalFileName, "pedestal_data");
   set_parameter_description("ROOT file of pedestal levels.");
-  register_parameter(&m_CMNByMedian, "CMN estimation by median");
+  register_parameter(&m_CMNByMedian, "median_CMN_estimation");
   set_parameter_description("Calculation method of common mode noise values. Median (1) or mean (0).");
   
   return AS_OK;

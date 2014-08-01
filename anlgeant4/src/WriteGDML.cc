@@ -31,7 +31,7 @@ WriteGDML::WriteGDML()
 
 ANLStatus WriteGDML::mod_startup()
 {
-  register_parameter(&m_GeometryFileName, "Detector geometry file");
+  register_parameter(&m_GeometryFileName, "file");
     
   return AS_OK;
 }

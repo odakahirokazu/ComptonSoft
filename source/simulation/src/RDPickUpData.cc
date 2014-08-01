@@ -36,7 +36,7 @@ RDPickUpData::RDPickUpData()
 
 ANLStatus RDPickUpData::mod_startup()
 {
-  register_parameter(&m_TerminationTime, "Termination time", s, "s");
+  register_parameter(&m_TerminationTime, "termination_time", s, "s");
 
   return AS_OK;
 }

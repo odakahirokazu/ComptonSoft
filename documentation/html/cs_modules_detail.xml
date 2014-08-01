@@ -7,21 +7,21 @@
     <text></text>
     <parameters>
       <param map_type=''>
-        <name>Detector ID</name>
+        <name>detector_id</name>
         <type>int</type>
         <unit></unit>
         <default_value>0</default_value>
         <description></description>
       </param>
       <param map_type=''>
-        <name>Energy min</name>
+        <name>energy_min</name>
         <type>double</type>
         <unit>keV</unit>
         <default_value>0</default_value>
         <description></description>
       </param>
       <param map_type=''>
-        <name>Energy max</name>
+        <name>energy_max</name>
         <type>double</type>
         <unit>keV</unit>
         <default_value>2000</default_value>
@@ -35,49 +35,49 @@
     <text></text>
     <parameters>
       <param map_type='map'>
-        <name>Analysis map</name>
+        <name>analysis_map</name>
         <type>map</type>
         <unit></unit>
         <default_value> </default_value>
         <description></description>
       </param>
       <param map_type='key'>
-        <name>Detector name prefix</name>
+        <name>detector_name_prefix</name>
         <type>string</type>
         <unit></unit>
         <default_value>Si</default_value>
         <description></description>
       </param>
       <param map_type='value'>
-        <name>Detector type</name>
+        <name>detector_type</name>
         <type>int</type>
         <unit></unit>
         <default_value>1</default_value>
         <description></description>
       </param>
       <param map_type='value'>
-        <name>Analysis mode</name>
+        <name>analysis_mode</name>
         <type>int</type>
         <unit></unit>
         <default_value>0</default_value>
         <description></description>
       </param>
       <param map_type='value'>
-        <name>Threshold</name>
+        <name>threshold</name>
         <type>double</type>
         <unit>keV</unit>
         <default_value>1</default_value>
         <description></description>
       </param>
       <param map_type='value'>
-        <name>Threshold (cathode)</name>
+        <name>threshold_cathode</name>
         <type>double</type>
         <unit>keV</unit>
         <default_value>1</default_value>
         <description></description>
       </param>
       <param map_type='value'>
-        <name>Threshold (anode)</name>
+        <name>threshold_anode</name>
         <type>double</type>
         <unit>keV</unit>
         <default_value>1</default_value>
@@ -91,7 +91,7 @@
     <text></text>
     <parameters>
       <param map_type=''>
-        <name>Calibration file name</name>
+        <name>calibration_file</name>
         <type>string</type>
         <unit></unit>
         <default_value>calibration.root</default_value>
@@ -105,35 +105,35 @@
     <text></text>
     <parameters>
       <param map_type=''>
-        <name>Number of bins</name>
+        <name>number_of_bins</name>
         <type>int</type>
         <unit></unit>
         <default_value>72</default_value>
         <description></description>
       </param>
       <param map_type=''>
-        <name>phi min</name>
+        <name>phi_min</name>
         <type>double</type>
         <unit>degree</unit>
         <default_value>-180</default_value>
         <description></description>
       </param>
       <param map_type=''>
-        <name>phi max</name>
+        <name>phi_max</name>
         <type>double</type>
         <unit>degree</unit>
         <default_value>180</default_value>
         <description></description>
       </param>
       <param map_type=''>
-        <name>Theta LD</name>
+        <name>theta_LD</name>
         <type>double</type>
         <unit>degree</unit>
         <default_value>-1</default_value>
         <description></description>
       </param>
       <param map_type=''>
-        <name>Theta UD</name>
+        <name>theta_UD</name>
         <type>double</type>
         <unit>degree</unit>
         <default_value>181</default_value>
@@ -147,56 +147,56 @@
     <text></text>
     <parameters>
       <param map_type=''>
-        <name>Plane normal</name>
+        <name>plane_normal</name>
         <type>3-vector</type>
         <unit></unit>
         <default_value>0 0 1</default_value>
         <description></description>
       </param>
       <param map_type=''>
-        <name>Plane point</name>
+        <name>plane_point</name>
         <type>3-vector</type>
         <unit>cm</unit>
         <default_value>0 0 100</default_value>
         <description></description>
       </param>
       <param map_type=''>
-        <name>Number of pixels x</name>
+        <name>num_pixel_x</name>
         <type>int</type>
         <unit></unit>
         <default_value>256</default_value>
         <description></description>
       </param>
       <param map_type=''>
-        <name>Number of pixels y</name>
+        <name>num_pixel_y</name>
         <type>int</type>
         <unit></unit>
         <default_value>256</default_value>
         <description></description>
       </param>
       <param map_type=''>
-        <name>x min</name>
+        <name>x_min</name>
         <type>double</type>
         <unit>cm</unit>
         <default_value>-40</default_value>
         <description></description>
       </param>
       <param map_type=''>
-        <name>x max</name>
+        <name>x_max</name>
         <type>double</type>
         <unit>cm</unit>
         <default_value>40</default_value>
         <description></description>
       </param>
       <param map_type=''>
-        <name>y min</name>
+        <name>y_min</name>
         <type>double</type>
         <unit>cm</unit>
         <default_value>-40</default_value>
         <description></description>
       </param>
       <param map_type=''>
-        <name>y max</name>
+        <name>y_max</name>
         <type>double</type>
         <unit>cm</unit>
         <default_value>40</default_value>
@@ -216,21 +216,21 @@
     <text></text>
     <parameters>
       <param map_type=''>
-        <name>Number of bins</name>
+        <name>number_of_bins</name>
         <type>int</type>
         <unit></unit>
         <default_value>500</default_value>
         <description></description>
       </param>
       <param map_type=''>
-        <name>Range min</name>
+        <name>range_min</name>
         <type>double</type>
         <unit>degree</unit>
         <default_value>-25</default_value>
         <description></description>
       </param>
       <param map_type=''>
-        <name>Range max</name>
+        <name>range_max</name>
         <type>double</type>
         <unit>degree</unit>
         <default_value>25</default_value>
@@ -244,21 +244,21 @@
     <text></text>
     <parameters>
       <param map_type=''>
-        <name>Number of bins</name>
+        <name>number_of_bins</name>
         <type>int</type>
         <unit></unit>
         <default_value>500</default_value>
         <description></description>
       </param>
       <param map_type=''>
-        <name>Range min</name>
+        <name>range_min</name>
         <type>double</type>
         <unit>degree</unit>
         <default_value>-25</default_value>
         <description></description>
       </param>
       <param map_type=''>
-        <name>Range max</name>
+        <name>range_max</name>
         <type>double</type>
         <unit>degree</unit>
         <default_value>25</default_value>
@@ -272,28 +272,28 @@
     <text></text>
     <parameters>
       <param map_type=''>
-        <name>Number of bins</name>
+        <name>number_of_bins</name>
         <type>int</type>
         <unit></unit>
         <default_value>500</default_value>
         <description></description>
       </param>
       <param map_type=''>
-        <name>Range min</name>
+        <name>range_min</name>
         <type>double</type>
         <unit>degree</unit>
         <default_value>-25</default_value>
         <description></description>
       </param>
       <param map_type=''>
-        <name>Range max</name>
+        <name>range_max</name>
         <type>double</type>
         <unit>degree</unit>
         <default_value>25</default_value>
         <description></description>
       </param>
       <param map_type=''>
-        <name>Source direction</name>
+        <name>source_direction</name>
         <type>3-vector</type>
         <unit></unit>
         <default_value>0 0 1</default_value>
@@ -307,7 +307,7 @@
     <text></text>
     <parameters>
       <param map_type=''>
-        <name>Source position</name>
+        <name>source_position</name>
         <type>3-vector</type>
         <unit>cm</unit>
         <default_value>0 0 0</default_value>
@@ -348,21 +348,21 @@
     <text></text>
     <parameters>
       <param map_type=''>
-        <name>Number of bins</name>
+        <name>number_of_bins</name>
         <type>int</type>
         <unit></unit>
         <default_value>720</default_value>
         <description></description>
       </param>
       <param map_type=''>
-        <name>Energy min</name>
+        <name>energy_min</name>
         <type>double</type>
         <unit>keV</unit>
         <default_value>0</default_value>
         <description></description>
       </param>
       <param map_type=''>
-        <name>Energy max</name>
+        <name>energy_max</name>
         <type>double</type>
         <unit>keV</unit>
         <default_value>720</default_value>
@@ -376,8 +376,8 @@
     <text></text>
     <parameters>
       <param map_type=''>
-        <name>Hit pattern</name>
-        <type>string</type>
+        <name>hit_patterns</name>
+        <type>vector of string</type>
         <unit></unit>
         <default_value></default_value>
         <description></description>
@@ -390,7 +390,7 @@
     <text></text>
     <parameters>
       <param map_type=''>
-        <name>Save detector detail?</name>
+        <name>record_detector_details</name>
         <type>bool</type>
         <unit></unit>
         <default_value>0</default_value>
@@ -404,7 +404,7 @@
     <text></text>
     <parameters>
       <param map_type=''>
-        <name>Detector channel table file</name>
+        <name>filename</name>
         <type>string</type>
         <unit></unit>
         <default_value>channeltable.xml</default_value>
@@ -421,7 +421,7 @@
     </text>
     <parameters>
       <param map_type=''>
-        <name>Detector configuration file</name>
+        <name>detector_configuration</name>
         <type>string</type>
         <unit></unit>
         <default_value>detector_config.xml</default_value>
@@ -438,14 +438,14 @@
     </text>
     <parameters>
       <param map_type=''>
-        <name>Detector configuration file</name>
+        <name>detector_configuration</name>
         <type>string</type>
         <unit></unit>
         <default_value>detector_config.xml</default_value>
         <description></description>
       </param>
       <param map_type=''>
-        <name>Simulation parameter file</name>
+        <name>simulation_parameters</name>
         <type>string</type>
         <unit></unit>
         <default_value>simparam.xml</default_value>
@@ -462,14 +462,14 @@
     </text>
     <parameters>
       <param map_type=''>
-        <name>Pedestal file name</name>
+        <name>pedestal_data</name>
         <type>string</type>
         <unit></unit>
         <default_value>pedestal.root</default_value>
         <description>ROOT file of pedestal levels.</description>
       </param>
       <param map_type=''>
-        <name>CMN estimation by median</name>
+        <name>median_CMN_estimation</name>
         <type>bool</type>
         <unit></unit>
         <default_value>1</default_value>
@@ -492,7 +492,7 @@
     <text></text>
     <parameters>
       <param map_type=''>
-        <name>File for bad channel definition</name>
+        <name>filename</name>
         <type>string</type>
         <unit></unit>
         <default_value>bad_channel.txt</default_value>
@@ -506,7 +506,7 @@
     <text></text>
     <parameters>
       <param map_type=''>
-        <name>File for bad channel definition</name>
+        <name>filename</name>
         <type>string</type>
         <unit></unit>
         <default_value>bad_channel.txt</default_value>
@@ -520,21 +520,21 @@
     <text></text>
     <parameters>
       <param map_type=''>
-        <name>Number of bins</name>
+        <name>number_of_bins</name>
         <type>int</type>
         <unit></unit>
         <default_value>720</default_value>
         <description></description>
       </param>
       <param map_type=''>
-        <name>Energy min</name>
+        <name>energy_min</name>
         <type>double</type>
         <unit>keV</unit>
         <default_value>0</default_value>
         <description></description>
       </param>
       <param map_type=''>
-        <name>Energy max</name>
+        <name>energy_max</name>
         <type>double</type>
         <unit>keV</unit>
         <default_value>720</default_value>
@@ -548,84 +548,84 @@
     <text></text>
     <parameters>
       <param map_type=''>
-        <name>Detector group file</name>
+        <name>detector_group</name>
         <type>string</type>
         <unit></unit>
         <default_value>detector_group.txt</default_value>
         <description></description>
       </param>
       <param map_type=''>
-        <name>Maximum hit number to analyze</name>
+        <name>maximum_hits_for_analysis</name>
         <type>int</type>
         <unit></unit>
         <default_value>2</default_value>
         <description></description>
       </param>
       <param map_type=''>
-        <name>Cut by total energy?</name>
+        <name>total_energy_cut</name>
         <type>bool</type>
         <unit></unit>
         <default_value>0</default_value>
         <description></description>
       </param>
       <param map_type=''>
-        <name>Lower energy range</name>
+        <name>energy_min</name>
         <type>double</type>
         <unit>keV</unit>
         <default_value>0</default_value>
         <description></description>
       </param>
       <param map_type=''>
-        <name>Upper energy range</name>
+        <name>energy_max</name>
         <type>double</type>
         <unit>keV</unit>
         <default_value>10000</default_value>
         <description></description>
       </param>
       <param map_type=''>
-        <name>Source distant?</name>
+        <name>source_distant</name>
         <type>bool</type>
         <unit></unit>
         <default_value>1</default_value>
         <description></description>
       </param>
       <param map_type=''>
-        <name>Source direction x</name>
+        <name>source_direction_x</name>
         <type>double</type>
         <unit></unit>
         <default_value>0</default_value>
         <description></description>
       </param>
       <param map_type=''>
-        <name>Source direction y</name>
+        <name>source_direction_y</name>
         <type>double</type>
         <unit></unit>
         <default_value>0</default_value>
         <description></description>
       </param>
       <param map_type=''>
-        <name>Source direction z</name>
+        <name>source_direction_z</name>
         <type>double</type>
         <unit></unit>
         <default_value>1</default_value>
         <description></description>
       </param>
       <param map_type=''>
-        <name>Source position x</name>
+        <name>source_position_x</name>
         <type>double</type>
         <unit>cm</unit>
         <default_value>0</default_value>
         <description></description>
       </param>
       <param map_type=''>
-        <name>Source position y</name>
+        <name>source_position_y</name>
         <type>double</type>
         <unit>cm</unit>
         <default_value>0</default_value>
         <description></description>
       </param>
       <param map_type=''>
-        <name>Source position z</name>
+        <name>source_position_z</name>
         <type>double</type>
         <unit>cm</unit>
         <default_value>0</default_value>
@@ -639,21 +639,21 @@
     <text></text>
     <parameters>
       <param map_type=''>
-        <name>Detector group file</name>
+        <name>detector_group</name>
         <type>string</type>
         <unit></unit>
         <default_value>detector_group.txt</default_value>
         <description></description>
       </param>
       <param map_type=''>
-        <name>Remove veto events?</name>
+        <name>apply_veto</name>
         <type>bool</type>
         <unit></unit>
         <default_value>1</default_value>
         <description></description>
       </param>
       <param map_type=''>
-        <name>Range of fluorescence lines</name>
+        <name>tolerance_for_fluorescence_lines</name>
         <type>double</type>
         <unit>keV</unit>
         <default_value>0.5</default_value>
@@ -667,7 +667,7 @@
     <text></text>
     <parameters>
       <param map_type=''>
-        <name>Detector group file</name>
+        <name>detector_group</name>
         <type>string</type>
         <unit></unit>
         <default_value>detector_group.txt</default_value>
@@ -717,14 +717,14 @@
     <text></text>
     <parameters>
       <param map_type=''>
-        <name>Initail energy minimum</name>
+        <name>energy_min</name>
         <type>double</type>
         <unit>keV</unit>
         <default_value>-100000</default_value>
         <description></description>
       </param>
       <param map_type=''>
-        <name>Initail energy maximum</name>
+        <name>energy_max</name>
         <type>double</type>
         <unit>keV</unit>
         <default_value>100000</default_value>
@@ -738,49 +738,49 @@
     <text></text>
     <parameters>
       <param map_type='map'>
-        <name>Analysis map</name>
+        <name>analysis_map</name>
         <type>map</type>
         <unit></unit>
         <default_value> </default_value>
         <description></description>
       </param>
       <param map_type='key'>
-        <name>Detector name prefix</name>
+        <name>detector_name_prefix</name>
         <type>string</type>
         <unit></unit>
         <default_value>Si</default_value>
         <description></description>
       </param>
       <param map_type='value'>
-        <name>Detector type</name>
+        <name>detector_type</name>
         <type>int</type>
         <unit></unit>
         <default_value>1</default_value>
         <description></description>
       </param>
       <param map_type='value'>
-        <name>Analysis mode</name>
+        <name>analysis_mode</name>
         <type>int</type>
         <unit></unit>
         <default_value>0</default_value>
         <description></description>
       </param>
       <param map_type='value'>
-        <name>Threshold</name>
+        <name>threshold</name>
         <type>double</type>
         <unit>keV</unit>
         <default_value>1</default_value>
         <description></description>
       </param>
       <param map_type='value'>
-        <name>Threshold (cathode)</name>
+        <name>threshold_cathode</name>
         <type>double</type>
         <unit>keV</unit>
         <default_value>1</default_value>
         <description></description>
       </param>
       <param map_type='value'>
-        <name>Threshold (anode)</name>
+        <name>threshold_anode</name>
         <type>double</type>
         <unit>keV</unit>
         <default_value>1</default_value>
@@ -794,49 +794,49 @@
     <text></text>
     <parameters>
       <param map_type='map'>
-        <name>Analysis map</name>
+        <name>analysis_map</name>
         <type>map</type>
         <unit></unit>
         <default_value> </default_value>
         <description></description>
       </param>
       <param map_type='key'>
-        <name>Detector name prefix</name>
+        <name>detector_name_prefix</name>
         <type>string</type>
         <unit></unit>
         <default_value>Si</default_value>
         <description></description>
       </param>
       <param map_type='value'>
-        <name>Detector type</name>
+        <name>detector_type</name>
         <type>int</type>
         <unit></unit>
         <default_value>1</default_value>
         <description></description>
       </param>
       <param map_type='value'>
-        <name>Analysis mode</name>
+        <name>analysis_mode</name>
         <type>int</type>
         <unit></unit>
         <default_value>0</default_value>
         <description></description>
       </param>
       <param map_type='value'>
-        <name>Threshold</name>
+        <name>threshold</name>
         <type>double</type>
         <unit>keV</unit>
         <default_value>1</default_value>
         <description></description>
       </param>
       <param map_type='value'>
-        <name>Threshold (cathode)</name>
+        <name>threshold_cathode</name>
         <type>double</type>
         <unit>keV</unit>
         <default_value>1</default_value>
         <description></description>
       </param>
       <param map_type='value'>
-        <name>Threshold (anode)</name>
+        <name>threshold_anode</name>
         <type>double</type>
         <unit>keV</unit>
         <default_value>1</default_value>
@@ -850,7 +850,7 @@
     <text></text>
     <parameters>
       <param map_type=''>
-        <name>Calibration file name</name>
+        <name>calibration_file</name>
         <type>string</type>
         <unit></unit>
         <default_value>calibration.root</default_value>
@@ -864,49 +864,49 @@
     <text></text>
     <parameters>
       <param map_type='map'>
-        <name>Analysis map</name>
+        <name>analysis_map</name>
         <type>map</type>
         <unit></unit>
         <default_value> </default_value>
         <description></description>
       </param>
       <param map_type='key'>
-        <name>Detector name prefix</name>
+        <name>detector_name_prefix</name>
         <type>string</type>
         <unit></unit>
         <default_value>Si</default_value>
         <description></description>
       </param>
       <param map_type='value'>
-        <name>Detector type</name>
+        <name>detector_type</name>
         <type>int</type>
         <unit></unit>
         <default_value>1</default_value>
         <description></description>
       </param>
       <param map_type='value'>
-        <name>Analysis mode</name>
+        <name>analysis_mode</name>
         <type>int</type>
         <unit></unit>
         <default_value>0</default_value>
         <description></description>
       </param>
       <param map_type='value'>
-        <name>Threshold</name>
+        <name>threshold</name>
         <type>double</type>
         <unit>keV</unit>
         <default_value>1</default_value>
         <description></description>
       </param>
       <param map_type='value'>
-        <name>Threshold (cathode)</name>
+        <name>threshold_cathode</name>
         <type>double</type>
         <unit>keV</unit>
         <default_value>1</default_value>
         <description></description>
       </param>
       <param map_type='value'>
-        <name>Threshold (anode)</name>
+        <name>threshold_anode</name>
         <type>double</type>
         <unit>keV</unit>
         <default_value>1</default_value>
@@ -920,21 +920,21 @@
     <text></text>
     <parameters>
       <param map_type=''>
-        <name>Number of bins</name>
+        <name>number_of_bins</name>
         <type>int</type>
         <unit></unit>
         <default_value>720</default_value>
         <description></description>
       </param>
       <param map_type=''>
-        <name>Energy min</name>
+        <name>energy_min</name>
         <type>double</type>
         <unit>keV</unit>
         <default_value>0</default_value>
         <description></description>
       </param>
       <param map_type=''>
-        <name>Energy max</name>
+        <name>energy_max</name>
         <type>double</type>
         <unit>keV</unit>
         <default_value>720</default_value>
@@ -960,91 +960,91 @@
     <text></text>
     <parameters>
       <param map_type=''>
-        <name>Detector group file</name>
+        <name>detector_group</name>
         <type>string</type>
         <unit></unit>
         <default_value>detector_group.txt</default_value>
         <description></description>
       </param>
       <param map_type=''>
-        <name>Maximum hit number to analyze</name>
+        <name>maximum_hits_for_analysis</name>
         <type>int</type>
         <unit></unit>
         <default_value>2</default_value>
         <description></description>
       </param>
       <param map_type=''>
-        <name>Cut by total energy?</name>
+        <name>total_energy_cut</name>
         <type>bool</type>
         <unit></unit>
         <default_value>0</default_value>
         <description></description>
       </param>
       <param map_type=''>
-        <name>Lower energy range</name>
+        <name>energy_min</name>
         <type>double</type>
         <unit>keV</unit>
         <default_value>0</default_value>
         <description></description>
       </param>
       <param map_type=''>
-        <name>Upper energy range</name>
+        <name>energy_max</name>
         <type>double</type>
         <unit>keV</unit>
         <default_value>10000</default_value>
         <description></description>
       </param>
       <param map_type=''>
-        <name>Source distant?</name>
+        <name>source_distant</name>
         <type>bool</type>
         <unit></unit>
         <default_value>1</default_value>
         <description></description>
       </param>
       <param map_type=''>
-        <name>Source direction x</name>
+        <name>source_direction_x</name>
         <type>double</type>
         <unit></unit>
         <default_value>0</default_value>
         <description></description>
       </param>
       <param map_type=''>
-        <name>Source direction y</name>
+        <name>source_direction_y</name>
         <type>double</type>
         <unit></unit>
         <default_value>0</default_value>
         <description></description>
       </param>
       <param map_type=''>
-        <name>Source direction z</name>
+        <name>source_direction_z</name>
         <type>double</type>
         <unit></unit>
         <default_value>1</default_value>
         <description></description>
       </param>
       <param map_type=''>
-        <name>Source position x</name>
+        <name>source_position_x</name>
         <type>double</type>
         <unit>cm</unit>
         <default_value>0</default_value>
         <description></description>
       </param>
       <param map_type=''>
-        <name>Source position y</name>
+        <name>source_position_y</name>
         <type>double</type>
         <unit>cm</unit>
         <default_value>0</default_value>
         <description></description>
       </param>
       <param map_type=''>
-        <name>Source position z</name>
+        <name>source_position_z</name>
         <type>double</type>
         <unit>cm</unit>
         <default_value>0</default_value>
         <description></description>
       </param>
       <param map_type=''>
-        <name>Compton event tree file</name>
+        <name>file_list</name>
         <type>vector of string</type>
         <unit></unit>
         <default_value>ce.root</default_value>
@@ -1058,7 +1058,7 @@
     <text>An abstract module for reading experimental data file.</text>
     <parameters>
       <param map_type=''>
-        <name>Data file name</name>
+        <name>file_list</name>
         <type></type>
         <unit></unit>
         <default_value></default_value>
@@ -1072,7 +1072,7 @@
     <text></text>
     <parameters>
       <param map_type=''>
-        <name>Data file name</name>
+        <name>file_list</name>
         <type>vector of string</type>
         <unit></unit>
         <default_value>data</default_value>
@@ -1086,7 +1086,7 @@
     <text></text>
     <parameters>
       <param map_type=''>
-        <name>Data file name</name>
+        <name>file_list</name>
         <type></type>
         <unit></unit>
         <default_value></default_value>
@@ -1100,7 +1100,7 @@
     <text></text>
     <parameters>
       <param map_type=''>
-        <name>Data file name</name>
+        <name>file_list</name>
         <type></type>
         <unit></unit>
         <default_value></default_value>
@@ -1114,7 +1114,7 @@
     <text></text>
     <parameters>
       <param map_type=''>
-        <name>Hit tree file</name>
+        <name>file_list</name>
         <type>vector of string</type>
         <unit></unit>
         <default_value>hittree.root</default_value>
@@ -1128,7 +1128,7 @@
     <text></text>
     <parameters>
       <param map_type=''>
-        <name>Hit tree file</name>
+        <name>file_list</name>
         <type>vector of string</type>
         <unit></unit>
         <default_value>hittree.root</default_value>
@@ -1142,7 +1142,7 @@
     <text></text>
     <parameters>
       <param map_type=''>
-        <name>Hit tree file</name>
+        <name>file_list</name>
         <type>vector of string</type>
         <unit></unit>
         <default_value>hittree.root</default_value>
@@ -1156,49 +1156,49 @@
     <text></text>
     <parameters>
       <param map_type=''>
-        <name>Detector group file</name>
+        <name>detector_group</name>
         <type>string</type>
         <unit></unit>
         <default_value>detector_group.txt</default_value>
         <description></description>
       </param>
       <param map_type='map'>
-        <name>Parameter map</name>
+        <name>parameter_map</name>
         <type>map</type>
         <unit></unit>
         <default_value> </default_value>
         <description></description>
       </param>
       <param map_type='key'>
-        <name>Detector group</name>
+        <name>detector_group</name>
         <type>string</type>
         <unit></unit>
         <default_value>Si</default_value>
         <description></description>
       </param>
       <param map_type='value'>
-        <name>Gain correction factor</name>
+        <name>gain_correction_factor</name>
         <type>double</type>
         <unit></unit>
         <default_value>1</default_value>
         <description></description>
       </param>
       <param map_type='value'>
-        <name>Noise parameter 0</name>
+        <name>noise_coefficient_0</name>
         <type>double</type>
         <unit></unit>
         <default_value>0</default_value>
         <description></description>
       </param>
       <param map_type='value'>
-        <name>Noise parameter 1</name>
+        <name>noise_coefficient_1</name>
         <type>double</type>
         <unit></unit>
         <default_value>0</default_value>
         <description></description>
       </param>
       <param map_type='value'>
-        <name>Noise parameter 2</name>
+        <name>noise_coefficient_2</name>
         <type>double</type>
         <unit></unit>
         <default_value>0</default_value>
@@ -1212,21 +1212,21 @@
     <text></text>
     <parameters>
       <param map_type=''>
-        <name>Number of bins</name>
+        <name>number_of_bins</name>
         <type>int</type>
         <unit></unit>
         <default_value>720</default_value>
         <description></description>
       </param>
       <param map_type=''>
-        <name>Energy min</name>
+        <name>energy_min</name>
         <type>double</type>
         <unit>keV</unit>
         <default_value>0</default_value>
         <description></description>
       </param>
       <param map_type=''>
-        <name>Energy max</name>
+        <name>energy_max</name>
         <type>double</type>
         <unit>keV</unit>
         <default_value>720</default_value>
@@ -1240,7 +1240,7 @@
     <text></text>
     <parameters>
       <param map_type=''>
-        <name>Output file</name>
+        <name>output</name>
         <type>string</type>
         <unit></unit>
         <default_value>output.root</default_value>
@@ -1254,49 +1254,49 @@
     <text></text>
     <parameters>
       <param map_type='map'>
-        <name>Analysis map</name>
+        <name>analysis_map</name>
         <type>map</type>
         <unit></unit>
         <default_value> </default_value>
         <description></description>
       </param>
       <param map_type='key'>
-        <name>Detector name prefix</name>
+        <name>detector_name_prefix</name>
         <type>string</type>
         <unit></unit>
         <default_value>Si</default_value>
         <description></description>
       </param>
       <param map_type='value'>
-        <name>Detector type</name>
+        <name>detector_type</name>
         <type>int</type>
         <unit></unit>
         <default_value>1</default_value>
         <description></description>
       </param>
       <param map_type='value'>
-        <name>Analysis mode</name>
+        <name>analysis_mode</name>
         <type>int</type>
         <unit></unit>
         <default_value>0</default_value>
         <description></description>
       </param>
       <param map_type='value'>
-        <name>Threshold</name>
+        <name>threshold</name>
         <type>double</type>
         <unit>keV</unit>
         <default_value>1</default_value>
         <description></description>
       </param>
       <param map_type='value'>
-        <name>Threshold (cathode)</name>
+        <name>threshold_cathode</name>
         <type>double</type>
         <unit>keV</unit>
         <default_value>1</default_value>
         <description></description>
       </param>
       <param map_type='value'>
-        <name>Threshold (anode)</name>
+        <name>threshold_anode</name>
         <type>double</type>
         <unit>keV</unit>
         <default_value>1</default_value>
@@ -1310,14 +1310,14 @@
     <text></text>
     <parameters>
       <param map_type=''>
-        <name>Time start</name>
+        <name>time_start</name>
         <type>int</type>
         <unit></unit>
         <default_value>0</default_value>
         <description></description>
       </param>
       <param map_type=''>
-        <name>Time end</name>
+        <name>time_end</name>
         <type>int</type>
         <unit></unit>
         <default_value>0</default_value>
@@ -1331,77 +1331,70 @@
     <text></text>
     <parameters>
       <param map_type=''>
-        <name>Set by file?</name>
-        <type>bool</type>
-        <unit></unit>
-        <default_value>0</default_value>
-        <description></description>
-      </param>
-      <param map_type=''>
-        <name>File name</name>
+        <name>filename</name>
         <type>string</type>
         <unit></unit>
-        <default_value>noiselevel.xml</default_value>
+        <default_value></default_value>
         <description></description>
       </param>
       <param map_type='map'>
-        <name>Noise level map</name>
+        <name>noise_level_map</name>
         <type>map</type>
         <unit></unit>
         <default_value> </default_value>
         <description></description>
       </param>
       <param map_type='key'>
-        <name>Detector name prefix</name>
+        <name>detector_name_prefix</name>
         <type>string</type>
         <unit></unit>
         <default_value>Si</default_value>
         <description></description>
       </param>
       <param map_type='value'>
-        <name>Detector type</name>
+        <name>detector_type</name>
         <type>int</type>
         <unit></unit>
         <default_value>1</default_value>
         <description></description>
       </param>
       <param map_type='value'>
-        <name>Noise parameter 00</name>
+        <name>noise_coefficient_00</name>
         <type>double</type>
         <unit></unit>
         <default_value>0</default_value>
         <description></description>
       </param>
       <param map_type='value'>
-        <name>Noise parameter 01</name>
+        <name>noise_coefficient_01</name>
         <type>double</type>
         <unit></unit>
         <default_value>0</default_value>
         <description></description>
       </param>
       <param map_type='value'>
-        <name>Noise parameter 02</name>
+        <name>noise_coefficient_02</name>
         <type>double</type>
         <unit></unit>
         <default_value>0</default_value>
         <description></description>
       </param>
       <param map_type='value'>
-        <name>Noise parameter 10</name>
+        <name>noise_coefficient_10</name>
         <type>double</type>
         <unit></unit>
         <default_value>0</default_value>
         <description></description>
       </param>
       <param map_type='value'>
-        <name>Noise parameter 11</name>
+        <name>noise_coefficient_11</name>
         <type>double</type>
         <unit></unit>
         <default_value>0</default_value>
         <description></description>
       </param>
       <param map_type='value'>
-        <name>Noise parameter 12</name>
+        <name>noise_coefficient_12</name>
         <type>double</type>
         <unit></unit>
         <default_value>0</default_value>
@@ -1415,56 +1408,56 @@
     <text></text>
     <parameters>
       <param map_type=''>
-        <name>File name</name>
+        <name>filename</name>
         <type>string</type>
         <unit></unit>
-        <default_value>gain_cor.xml</default_value>
+        <default_value></default_value>
         <description></description>
       </param>
       <param map_type='map'>
-        <name>Gain correction map</name>
+        <name>gain_correction_map</name>
         <type>map</type>
         <unit></unit>
         <default_value> </default_value>
         <description></description>
       </param>
       <param map_type='key'>
-        <name>Detector name prefix</name>
+        <name>detector_name_prefix</name>
         <type>string</type>
         <unit></unit>
         <default_value>Si</default_value>
         <description></description>
       </param>
       <param map_type='value'>
-        <name>Type of detector/function</name>
+        <name>analysis_method</name>
         <type>int</type>
         <unit></unit>
         <default_value>3</default_value>
         <description></description>
       </param>
       <param map_type='value'>
-        <name>Gain function 0</name>
+        <name>gain_function_0</name>
         <type>string</type>
         <unit></unit>
         <default_value></default_value>
         <description></description>
       </param>
       <param map_type='value'>
-        <name>Gain function 1</name>
+        <name>gain_function_1</name>
         <type>string</type>
         <unit></unit>
         <default_value></default_value>
         <description></description>
       </param>
       <param map_type='value'>
-        <name>Gain coefficient 0</name>
+        <name>gain_coefficient_0</name>
         <type>double</type>
         <unit></unit>
         <default_value>1</default_value>
         <description></description>
       </param>
       <param map_type='value'>
-        <name>Gain coefficient 1</name>
+        <name>gain_coefficient_1</name>
         <type>double</type>
         <unit></unit>
         <default_value>1</default_value>
@@ -1478,7 +1471,7 @@
     <text></text>
     <parameters>
       <param map_type=''>
-        <name>Output file name base</name>
+        <name>output_filename_base</name>
         <type>string</type>
         <unit></unit>
         <default_value>activation</default_value>
@@ -1495,80 +1488,119 @@
     </text>
     <parameters>
       <param map_type=''>
-        <name>Particle name</name>
+        <name>particle</name>
         <type>string</type>
         <unit></unit>
         <default_value>gamma</default_value>
-        <description>Particle name (gamma, electron, positron, proton, neutron, geantino...)</description>
+        <description>Particle name (gamma, e-, e+, proton, neutron, geantino...)</description>
       </param>
       <param map_type=''>
-        <name>Photon index</name>
-        <type>double</type>
+        <name>spectral_distribution</name>
+        <type>string</type>
         <unit></unit>
-        <default_value>0</default_value>
-        <description>Power law index of the photon spectrum</description>
+        <default_value>power law</default_value>
+        <description></description>
       </param>
       <param map_type=''>
-        <name>Energy min</name>
+        <name>energy_min</name>
         <type>double</type>
         <unit>keV</unit>
         <default_value>0.1</default_value>
         <description>Minimum value of the energy distribution</description>
       </param>
       <param map_type=''>
-        <name>Energy max</name>
+        <name>energy_max</name>
         <type>double</type>
         <unit>keV</unit>
         <default_value>1000</default_value>
         <description>Maximum value of the energy distribution</description>
       </param>
       <param map_type=''>
-        <name>Polarization mode</name>
+        <name>photon_index</name>
+        <type>double</type>
+        <unit></unit>
+        <default_value>0</default_value>
+        <description>Power law index of the photon spectrum</description>
+      </param>
+      <param map_type=''>
+        <name>energy_mean</name>
+        <type>double</type>
+        <unit>keV</unit>
+        <default_value>511</default_value>
+        <description>Mean energy of the Gaussian distribution</description>
+      </param>
+      <param map_type=''>
+        <name>energy_sigma</name>
+        <type>double</type>
+        <unit>keV</unit>
+        <default_value>2</default_value>
+        <description>Standard deviation of the Gaussian distribution</description>
+      </param>
+      <param map_type=''>
+        <name>radiation_temperature</name>
+        <type>double</type>
+        <unit>keV</unit>
+        <default_value>10</default_value>
+        <description>Radiation temperature in units of keV</description>
+      </param>
+      <param map_type=''>
+        <name>polarization_mode</name>
         <type>int</type>
         <unit></unit>
         <default_value>-1</default_value>
         <description>
           Polarization mode. -1: polarization disable, 0: unpolarized, 1:
-          linearly polarized.
+          linearly polarized (100%), 2: partially linearly polarized
         </description>
       </param>
       <param map_type=''>
-        <name>Center position</name>
+        <name>center_position</name>
         <type>3-vector</type>
         <unit>cm</unit>
         <default_value>0 0 0</default_value>
         <description>Position of the sphere.</description>
       </param>
       <param map_type=''>
-        <name>Radius</name>
+        <name>radius</name>
         <type>double</type>
         <unit>cm</unit>
         <default_value>100</default_value>
-        <description>Radius of the sphere.</description>
+        <description>Radius of a disk where primaries are generated.</description>
       </param>
       <param map_type=''>
-        <name>Center direction</name>
+        <name>distance</name>
+        <type>double</type>
+        <unit>cm</unit>
+        <default_value>-0.1</default_value>
+        <description>
+          Distance between the sphere center and a disk where primaries are
+          generated. If this value is negative, then this parameter is set to be
+          the same as the disk radius [Radius].
+        </description>
+      </param>
+      <param map_type=''>
+        <name>center_direction</name>
         <type>3-vector</type>
         <unit></unit>
         <default_value>0 0 1</default_value>
         <description>Center direction of the primaries.</description>
       </param>
       <param map_type=''>
-        <name>Theta min</name>
+        <name>theta_min</name>
         <type>double</type>
         <unit>radian</unit>
         <default_value>0</default_value>
         <description>Minimum angle between the primary direction and the center direction.</description>
       </param>
       <param map_type=''>
-        <name>Theta max</name>
+        <name>theta_max</name>
         <type>double</type>
         <unit>radian</unit>
         <default_value>3.14159</default_value>
         <description>Maximum angle between the primary direction and the center direction.</description>
       </param>
       <param map_type=''>
-        <name>Flux</name>
+        <name>flux</name>
         <type>double</type>
         <unit>erg/cm2/s/sr</unit>
         <default_value>1e-09</default_value>
@@ -1585,7 +1617,7 @@
     <text></text>
     <parameters>
       <param map_type=''>
-        <name>Termination time</name>
+        <name>termination_time</name>
         <type>double</type>
         <unit>s</unit>
         <default_value>0.001</default_value>
@@ -1599,14 +1631,14 @@
     <text></text>
     <parameters>
       <param map_type=''>
-        <name>Kill Particle Name</name>
+        <name>particle</name>
         <type>string</type>
         <unit></unit>
         <default_value>gamma</default_value>
         <description></description>
       </param>
       <param map_type=''>
-        <name>Volume name of the stopper</name>
+        <name>volume</name>
         <type>string</type>
         <unit></unit>
         <default_value>Tele</default_value>
@@ -1629,59 +1661,87 @@
     </text>
     <parameters>
       <param map_type=''>
-        <name>Photon index</name>
-        <type>double</type>
+        <name>spectral_distribution</name>
+        <type>string</type>
         <unit></unit>
-        <default_value>0</default_value>
-        <description>Power law index of the photon spectrum</description>
+        <default_value>power law</default_value>
+        <description></description>
       </param>
       <param map_type=''>
-        <name>Energy min</name>
+        <name>energy_min</name>
         <type>double</type>
         <unit>keV</unit>
         <default_value>0.1</default_value>
         <description>Minimum value of the energy distribution</description>
       </param>
       <param map_type=''>
-        <name>Energy max</name>
+        <name>energy_max</name>
         <type>double</type>
         <unit>keV</unit>
         <default_value>1000</default_value>
         <description>Maximum value of the energy distribution</description>
       </param>
       <param map_type=''>
-        <name>Polarization mode</name>
+        <name>photon_index</name>
+        <type>double</type>
+        <unit></unit>
+        <default_value>0</default_value>
+        <description>Power law index of the photon spectrum</description>
+      </param>
+      <param map_type=''>
+        <name>energy_mean</name>
+        <type>double</type>
+        <unit>keV</unit>
+        <default_value>511</default_value>
+        <description>Mean energy of the Gaussian distribution</description>
+      </param>
+      <param map_type=''>
+        <name>energy_sigma</name>
+        <type>double</type>
+        <unit>keV</unit>
+        <default_value>2</default_value>
+        <description>Standard deviation of the Gaussian distribution</description>
+      </param>
+      <param map_type=''>
+        <name>radiation_temperature</name>
+        <type>double</type>
+        <unit>keV</unit>
+        <default_value>10</default_value>
+        <description>Radiation temperature in units of keV</description>
+      </param>
+      <param map_type=''>
+        <name>polarization_mode</name>
         <type>int</type>
         <unit></unit>
         <default_value>-1</default_value>
         <description>
           Polarization mode. -1: polarization disable, 0: unpolarized, 1:
-          linearly polarized.
+          linearly polarized (100%), 2: partially linearly polarized
         </description>
       </param>
       <param map_type=''>
-        <name>Position</name>
+        <name>position</name>
         <type>3-vector</type>
         <unit>cm</unit>
         <default_value>0 0 0</default_value>
         <description>Position of the source.</description>
       </param>
       <param map_type=''>
-        <name>RI Z</name>
+        <name>atomic_number</name>
         <type>int</type>
         <unit></unit>
         <default_value>55</default_value>
         <description>Atomic number of the radioactive isotope.</description>
       </param>
       <param map_type=''>
-        <name>RI A</name>
+        <name>mass_number</name>
         <type>int</type>
         <unit></unit>
         <default_value>137</default_value>
         <description>Mass number of the radioactive isotope.</description>
       </param>
       <param map_type=''>
-        <name>RI Energy</name>
+        <name>energy</name>
         <type>double</type>
         <unit>keV</unit>
         <default_value>0</default_value>
@@ -1694,73 +1754,101 @@
   </module>
   <module>
     <name>PlaneWavePrimaryGen</name>
-    <version>1.3</version>
+    <version>1.4</version>
     <text>
       Primary generator of MC simulations. Primaries are generated as a plane
       wave inside a circle.
     </text>
     <parameters>
       <param map_type=''>
-        <name>Particle name</name>
+        <name>particle</name>
         <type>string</type>
         <unit></unit>
         <default_value>gamma</default_value>
-        <description>Particle name (gamma, electron, positron, proton, neutron, geantino...)</description>
+        <description>Particle name (gamma, e-, e+, proton, neutron, geantino...)</description>
       </param>
       <param map_type=''>
-        <name>Photon index</name>
-        <type>double</type>
+        <name>spectral_distribution</name>
+        <type>string</type>
         <unit></unit>
-        <default_value>0</default_value>
-        <description>Power law index of the photon spectrum</description>
+        <default_value>power law</default_value>
+        <description></description>
       </param>
       <param map_type=''>
-        <name>Energy min</name>
+        <name>energy_min</name>
         <type>double</type>
         <unit>keV</unit>
         <default_value>0.1</default_value>
         <description>Minimum value of the energy distribution</description>
       </param>
       <param map_type=''>
-        <name>Energy max</name>
+        <name>energy_max</name>
         <type>double</type>
         <unit>keV</unit>
         <default_value>1000</default_value>
         <description>Maximum value of the energy distribution</description>
       </param>
       <param map_type=''>
-        <name>Polarization mode</name>
+        <name>photon_index</name>
+        <type>double</type>
+        <unit></unit>
+        <default_value>0</default_value>
+        <description>Power law index of the photon spectrum</description>
+      </param>
+      <param map_type=''>
+        <name>energy_mean</name>
+        <type>double</type>
+        <unit>keV</unit>
+        <default_value>511</default_value>
+        <description>Mean energy of the Gaussian distribution</description>
+      </param>
+      <param map_type=''>
+        <name>energy_sigma</name>
+        <type>double</type>
+        <unit>keV</unit>
+        <default_value>2</default_value>
+        <description>Standard deviation of the Gaussian distribution</description>
+      </param>
+      <param map_type=''>
+        <name>radiation_temperature</name>
+        <type>double</type>
+        <unit>keV</unit>
+        <default_value>10</default_value>
+        <description>Radiation temperature in units of keV</description>
+      </param>
+      <param map_type=''>
+        <name>polarization_mode</name>
         <type>int</type>
         <unit></unit>
         <default_value>-1</default_value>
         <description>
           Polarization mode. -1: polarization disable, 0: unpolarized, 1:
-          linearly polarized.
+          linearly polarized (100%), 2: partially linearly polarized
         </description>
       </param>
       <param map_type=''>
-        <name>Center position</name>
+        <name>position</name>
         <type>3-vector</type>
-        <unit>cm</unit>
+        <unit></unit>
         <default_value>0 0 0</default_value>
         <description>Center of the circle where primary particles are generated.</description>
       </param>
       <param map_type=''>
-        <name>Direction</name>
+        <name>direction</name>
         <type>3-vector</type>
         <unit></unit>
         <default_value>0 0 -1</default_value>
         <description>Propagation direction of the plane wave.</description>
       </param>
       <param map_type=''>
-        <name>Radius</name>
+        <name>radius</name>
         <type>double</type>
-        <unit>cm</unit>
-        <default_value>100</default_value>
+        <unit></unit>
+        <default_value>1000</default_value>
         <description>Radius of the circle where parimary particles are generated.</description>
       </param>
       <param map_type=''>
-        <name>Flux</name>
+        <name>flux</name>
         <type>double</type>
         <unit>erg/s/cm2</unit>
         <default_value>1e-09</default_value>
@@ -1770,107 +1858,14 @@
         </description>
       </param>
       <param map_type=''>
-        <name>Polarization vector</name>
+        <name>polarization_vector</name>
         <type>3-vector</type>
         <unit></unit>
         <default_value>1 0 0</default_value>
         <description>Polarization vector (if polarization is enable).</description>
       </param>
       <param map_type=''>
-        <name>Degree of polarization</name>
-        <type>double</type>
-        <unit></unit>
-        <default_value>0</default_value>
-        <description>Degree of polarization (if polarization is enable).</description>
-      </param>
-    </parameters>
-  </module>
-  <module>
-    <name>PlaneWavePrimaryGen</name>
-    <version>1.3</version>
-    <text>
-      Primary generator of MC simulations. Primaries are generated as a plane
-      wave inside a circle. Polarization is enable by default.
-    </text>
-    <parameters>
-      <param map_type=''>
-        <name>Particle name</name>
-        <type>string</type>
-        <unit></unit>
-        <default_value>gamma</default_value>
-        <description>Particle name (gamma, electron, positron, proton, neutron, geantino...)</description>
-      </param>
-      <param map_type=''>
-        <name>Photon index</name>
-        <type>double</type>
-        <unit></unit>
-        <default_value>0</default_value>
-        <description>Power law index of the photon spectrum</description>
-      </param>
-      <param map_type=''>
-        <name>Energy min</name>
-        <type>double</type>
-        <unit>keV</unit>
-        <default_value>0.1</default_value>
-        <description>Minimum value of the energy distribution</description>
-      </param>
-      <param map_type=''>
-        <name>Energy max</name>
-        <type>double</type>
-        <unit>keV</unit>
-        <default_value>1000</default_value>
-        <description>Maximum value of the energy distribution</description>
-      </param>
-      <param map_type=''>
-        <name>Polarization mode</name>
-        <type>int</type>
-        <unit></unit>
-        <default_value>-1</default_value>
-        <description>
-          Polarization mode. -1: polarization disable, 0: unpolarized, 1:
-          linearly polarized.
-        </description>
-      </param>
-      <param map_type=''>
-        <name>Center position</name>
-        <type>3-vector</type>
-        <unit>cm</unit>
-        <default_value>0 0 0</default_value>
-        <description>Center of the circle where primary particles are generated.</description>
-      </param>
-      <param map_type=''>
-        <name>Direction</name>
-        <type>3-vector</type>
-        <unit></unit>
-        <default_value>0 0 -1</default_value>
-        <description>Propagation direction of the plane wave.</description>
-      </param>
-      <param map_type=''>
-        <name>Radius</name>
-        <type>double</type>
-        <unit>cm</unit>
-        <default_value>100</default_value>
-        <description>Radius of the circle where parimary particles are generated.</description>
-      </param>
-      <param map_type=''>
-        <name>Flux</name>
-        <type>double</type>
-        <unit>erg/s/cm2</unit>
-        <default_value>1e-09</default_value>
-        <description>
-          Energy flux of the plane wave. This parameter is used only for
-          calculating real time correspoing to a simulation.
-        </description>
-      </param>
-      <param map_type=''>
-        <name>Polarization vector</name>
-        <type>3-vector</type>
-        <unit></unit>
-        <default_value>1 0 0</default_value>
-        <description>Polarization vector (if polarization is enable).</description>
-      </param>
-      <param map_type=''>
-        <name>Degree of polarization</name>
+        <name>degree_of_polarization</name>
         <type>double</type>
         <unit></unit>
         <default_value>0</default_value>
@@ -1887,59 +1882,87 @@
     </text>
     <parameters>
       <param map_type=''>
-        <name>Particle name</name>
+        <name>particle</name>
         <type>string</type>
         <unit></unit>
         <default_value>gamma</default_value>
-        <description>Particle name (gamma, electron, positron, proton, neutron, geantino...)</description>
+        <description>Particle name (gamma, e-, e+, proton, neutron, geantino...)</description>
       </param>
       <param map_type=''>
-        <name>Photon index</name>
-        <type>double</type>
+        <name>spectral_distribution</name>
+        <type>string</type>
         <unit></unit>
-        <default_value>0</default_value>
-        <description>Power law index of the photon spectrum</description>
+        <default_value>power law</default_value>
+        <description></description>
       </param>
       <param map_type=''>
-        <name>Energy min</name>
+        <name>energy_min</name>
         <type>double</type>
         <unit>keV</unit>
         <default_value>0.1</default_value>
         <description>Minimum value of the energy distribution</description>
       </param>
       <param map_type=''>
-        <name>Energy max</name>
+        <name>energy_max</name>
         <type>double</type>
         <unit>keV</unit>
         <default_value>1000</default_value>
         <description>Maximum value of the energy distribution</description>
       </param>
       <param map_type=''>
-        <name>Polarization mode</name>
+        <name>photon_index</name>
+        <type>double</type>
+        <unit></unit>
+        <default_value>0</default_value>
+        <description>Power law index of the photon spectrum</description>
+      </param>
+      <param map_type=''>
+        <name>energy_mean</name>
+        <type>double</type>
+        <unit>keV</unit>
+        <default_value>511</default_value>
+        <description>Mean energy of the Gaussian distribution</description>
+      </param>
+      <param map_type=''>
+        <name>energy_sigma</name>
+        <type>double</type>
+        <unit>keV</unit>
+        <default_value>2</default_value>
+        <description>Standard deviation of the Gaussian distribution</description>
+      </param>
+      <param map_type=''>
+        <name>radiation_temperature</name>
+        <type>double</type>
+        <unit>keV</unit>
+        <default_value>10</default_value>
+        <description>Radiation temperature in units of keV</description>
+      </param>
+      <param map_type=''>
+        <name>polarization_mode</name>
         <type>int</type>
         <unit></unit>
         <default_value>-1</default_value>
         <description>
           Polarization mode. -1: polarization disable, 0: unpolarized, 1:
-          linearly polarized.
+          linearly polarized (100%), 2: partially linearly polarized
         </description>
       </param>
       <param map_type=''>
-        <name>Center position</name>
+        <name>position</name>
         <type>3-vector</type>
-        <unit>cm</unit>
+        <unit></unit>
         <default_value>0 0 0</default_value>
         <description>Center of the circle where primary particles are generated.</description>
       </param>
       <param map_type=''>
-        <name>Direction</name>
+        <name>direction</name>
         <type>3-vector</type>
         <unit></unit>
         <default_value>0 0 -1</default_value>
         <description>Propagation direction of the plane wave.</description>
       </param>
       <param map_type=''>
-        <name>Flux</name>
+        <name>flux</name>
         <type>double</type>
         <unit>erg/s/cm2</unit>
         <default_value>1e-09</default_value>
@@ -1949,128 +1972,28 @@
         </description>
       </param>
       <param map_type=''>
-        <name>Polarization vector</name>
+        <name>polarization_vector</name>
         <type>3-vector</type>
         <unit></unit>
         <default_value>1 0 0</default_value>
         <description>Polarization vector (if polarization is enable).</description>
       </param>
       <param map_type=''>
-        <name>Degree of polarization</name>
+        <name>degree_of_polarization</name>
         <type>double</type>
         <unit></unit>
         <default_value>0</default_value>
         <description>Degree of polarization (if polarization is enable).</description>
       </param>
       <param map_type=''>
-        <name>Size x</name>
+        <name>size_x</name>
         <type>double</type>
         <unit>cm</unit>
         <default_value>100</default_value>
         <description>Size x of the rectangle where parimary particles are generated.</description>
       </param>
       <param map_type=''>
-        <name>Size y</name>
-        <type>double</type>
-        <unit>cm</unit>
-        <default_value>100</default_value>
-        <description>Size y of the rectangle where parimary particles are generated.</description>
-      </param>
-    </parameters>
-  </module>
-  <module>
-    <name>PlaneWaveRectanglePrimaryGen</name>
-    <version>1.3</version>
-    <text>
-      Primary generator of MC simulations. Primaries are generated as a plane
-      wave inside a rectangle. Polarization is enable by default.
-    </text>
-    <parameters>
-      <param map_type=''>
-        <name>Particle name</name>
-        <type>string</type>
-        <unit></unit>
-        <default_value>gamma</default_value>
-        <description>Particle name (gamma, electron, positron, proton, neutron, geantino...)</description>
-      </param>
-      <param map_type=''>
-        <name>Photon index</name>
-        <type>double</type>
-        <unit></unit>
-        <default_value>0</default_value>
-        <description>Power law index of the photon spectrum</description>
-      </param>
-      <param map_type=''>
-        <name>Energy min</name>
-        <type>double</type>
-        <unit>keV</unit>
-        <default_value>0.1</default_value>
-        <description>Minimum value of the energy distribution</description>
-      </param>
-      <param map_type=''>
-        <name>Energy max</name>
-        <type>double</type>
-        <unit>keV</unit>
-        <default_value>1000</default_value>
-        <description>Maximum value of the energy distribution</description>
-      </param>
-      <param map_type=''>
-        <name>Polarization mode</name>
-        <type>int</type>
-        <unit></unit>
-        <default_value>-1</default_value>
-        <description>
-          Polarization mode. -1: polarization disable, 0: unpolarized, 1:
-          linearly polarized.
-        </description>
-      </param>
-      <param map_type=''>
-        <name>Center position</name>
-        <type>3-vector</type>
-        <unit>cm</unit>
-        <default_value>0 0 0</default_value>
-        <description>Center of the circle where primary particles are generated.</description>
-      </param>
-      <param map_type=''>
-        <name>Direction</name>
-        <type>3-vector</type>
-        <unit></unit>
-        <default_value>0 0 -1</default_value>
-        <description>Propagation direction of the plane wave.</description>
-      </param>
-      <param map_type=''>
-        <name>Flux</name>
-        <type>double</type>
-        <unit>erg/s/cm2</unit>
-        <default_value>1e-09</default_value>
-        <description>
-          Energy flux of the plane wave. This parameter is used only for
-          calculating real time correspoing to a simulation.
-        </description>
-      </param>
-      <param map_type=''>
-        <name>Polarization vector</name>
-        <type>3-vector</type>
-        <unit></unit>
-        <default_value>1 0 0</default_value>
-        <description>Polarization vector (if polarization is enable).</description>
-      </param>
-      <param map_type=''>
-        <name>Degree of polarization</name>
-        <type>double</type>
-        <unit></unit>
-        <default_value>0</default_value>
-        <description>Degree of polarization (if polarization is enable).</description>
-      </param>
-      <param map_type=''>
-        <name>Size x</name>
-        <type>double</type>
-        <unit>cm</unit>
-        <default_value>100</default_value>
-        <description>Size x of the rectangle where parimary particles are generated.</description>
-      </param>
-      <param map_type=''>
-        <name>Size y</name>
+        <name>size_y</name>
         <type>double</type>
         <unit>cm</unit>
         <default_value>100</default_value>
@@ -2080,80 +2003,108 @@
   </module>
   <module>
     <name>PointSourcePrimaryGen</name>
-    <version>1.5</version>
+    <version>1.6</version>
     <text>
       Primary generator of MC simulations. Primaries are generated as point
       source emissions.
     </text>
     <parameters>
       <param map_type=''>
-        <name>Particle name</name>
+        <name>particle</name>
         <type>string</type>
         <unit></unit>
         <default_value>gamma</default_value>
-        <description>Particle name (gamma, electron, positron, proton, neutron, geantino...)</description>
+        <description>Particle name (gamma, e-, e+, proton, neutron, geantino...)</description>
       </param>
       <param map_type=''>
-        <name>Photon index</name>
-        <type>double</type>
+        <name>spectral_distribution</name>
+        <type>string</type>
         <unit></unit>
-        <default_value>0</default_value>
-        <description>Power law index of the photon spectrum</description>
+        <default_value>power law</default_value>
+        <description></description>
       </param>
       <param map_type=''>
-        <name>Energy min</name>
+        <name>energy_min</name>
         <type>double</type>
         <unit>keV</unit>
         <default_value>0.1</default_value>
         <description>Minimum value of the energy distribution</description>
       </param>
       <param map_type=''>
-        <name>Energy max</name>
+        <name>energy_max</name>
         <type>double</type>
         <unit>keV</unit>
         <default_value>1000</default_value>
         <description>Maximum value of the energy distribution</description>
       </param>
       <param map_type=''>
-        <name>Polarization mode</name>
+        <name>photon_index</name>
+        <type>double</type>
+        <unit></unit>
+        <default_value>0</default_value>
+        <description>Power law index of the photon spectrum</description>
+      </param>
+      <param map_type=''>
+        <name>energy_mean</name>
+        <type>double</type>
+        <unit>keV</unit>
+        <default_value>511</default_value>
+        <description>Mean energy of the Gaussian distribution</description>
+      </param>
+      <param map_type=''>
+        <name>energy_sigma</name>
+        <type>double</type>
+        <unit>keV</unit>
+        <default_value>2</default_value>
+        <description>Standard deviation of the Gaussian distribution</description>
+      </param>
+      <param map_type=''>
+        <name>radiation_temperature</name>
+        <type>double</type>
+        <unit>keV</unit>
+        <default_value>10</default_value>
+        <description>Radiation temperature in units of keV</description>
+      </param>
+      <param map_type=''>
+        <name>polarization_mode</name>
         <type>int</type>
         <unit></unit>
         <default_value>-1</default_value>
         <description>
           Polarization mode. -1: polarization disable, 0: unpolarized, 1:
-          linearly polarized.
+          linearly polarized (100%), 2: partially linearly polarized
         </description>
       </param>
       <param map_type=''>
-        <name>Source position</name>
+        <name>position</name>
         <type>3-vector</type>
-        <unit>cm</unit>
+        <unit></unit>
         <default_value>0 0 0</default_value>
         <description>Position of the source.</description>
       </param>
       <param map_type=''>
-        <name>Center direction</name>
+        <name>direction</name>
         <type>3-vector</type>
         <unit></unit>
         <default_value>0 0 -1</default_value>
         <description>Center direction of the primaries.</description>
       </param>
       <param map_type=''>
-        <name>theta min</name>
+        <name>theta_min</name>
         <type>double</type>
         <unit>radian</unit>
         <default_value>0</default_value>
         <description>Minimum angle between the primary direction and the center direction.</description>
       </param>
       <param map_type=''>
-        <name>theta max</name>
+        <name>theta_max</name>
         <type>double</type>
         <unit>radian</unit>
         <default_value>3.14159</default_value>
         <description>Maximum angle between the primary direction and the center direction.</description>
       </param>
       <param map_type=''>
-        <name>Luminosity</name>
+        <name>luminosity</name>
         <type>double</type>
         <unit>erg/s</unit>
         <default_value>1</default_value>
@@ -2173,73 +2124,101 @@
     </text>
     <parameters>
       <param map_type=''>
-        <name>Particle name</name>
+        <name>particle</name>
         <type>string</type>
         <unit></unit>
         <default_value>gamma</default_value>
-        <description>Particle name (gamma, electron, positron, proton, neutron, geantino...)</description>
+        <description>Particle name (gamma, e-, e+, proton, neutron, geantino...)</description>
       </param>
       <param map_type=''>
-        <name>Photon index</name>
-        <type>double</type>
+        <name>spectral_distribution</name>
+        <type>string</type>
         <unit></unit>
-        <default_value>0</default_value>
-        <description>Power law index of the photon spectrum</description>
+        <default_value>power law</default_value>
+        <description></description>
       </param>
       <param map_type=''>
-        <name>Energy min</name>
+        <name>energy_min</name>
         <type>double</type>
         <unit>keV</unit>
         <default_value>0.1</default_value>
         <description>Minimum value of the energy distribution</description>
       </param>
       <param map_type=''>
-        <name>Energy max</name>
+        <name>energy_max</name>
         <type>double</type>
         <unit>keV</unit>
         <default_value>1000</default_value>
         <description>Maximum value of the energy distribution</description>
       </param>
       <param map_type=''>
-        <name>Polarization mode</name>
+        <name>photon_index</name>
+        <type>double</type>
+        <unit></unit>
+        <default_value>0</default_value>
+        <description>Power law index of the photon spectrum</description>
+      </param>
+      <param map_type=''>
+        <name>energy_mean</name>
+        <type>double</type>
+        <unit>keV</unit>
+        <default_value>511</default_value>
+        <description>Mean energy of the Gaussian distribution</description>
+      </param>
+      <param map_type=''>
+        <name>energy_sigma</name>
+        <type>double</type>
+        <unit>keV</unit>
+        <default_value>2</default_value>
+        <description>Standard deviation of the Gaussian distribution</description>
+      </param>
+      <param map_type=''>
+        <name>radiation_temperature</name>
+        <type>double</type>
+        <unit>keV</unit>
+        <default_value>10</default_value>
+        <description>Radiation temperature in units of keV</description>
+      </param>
+      <param map_type=''>
+        <name>polarization_mode</name>
         <type>int</type>
         <unit></unit>
         <default_value>-1</default_value>
         <description>
           Polarization mode. -1: polarization disable, 0: unpolarized, 1:
-          linearly polarized.
+          linearly polarized (100%), 2: partially linearly polarized
         </description>
       </param>
       <param map_type=''>
-        <name>Source position</name>
+        <name>position</name>
         <type>3-vector</type>
-        <unit>cm</unit>
+        <unit></unit>
         <default_value>0 0 0</default_value>
         <description>Position of the source.</description>
       </param>
       <param map_type=''>
-        <name>Center direction</name>
+        <name>direction</name>
         <type>3-vector</type>
         <unit></unit>
         <default_value>0 0 -1</default_value>
         <description>Center direction of the primaries.</description>
       </param>
       <param map_type=''>
-        <name>theta min</name>
+        <name>theta_min</name>
         <type>double</type>
         <unit>radian</unit>
         <default_value>0</default_value>
         <description>Minimum angle between the primary direction and the center direction.</description>
       </param>
       <param map_type=''>
-        <name>theta max</name>
+        <name>theta_max</name>
         <type>double</type>
         <unit>radian</unit>
         <default_value>3.14159</default_value>
         <description>Maximum angle between the primary direction and the center direction.</description>
       </param>
       <param map_type=''>
-        <name>Luminosity</name>
+        <name>luminosity</name>
         <type>double</type>
         <unit>erg/s</unit>
         <default_value>1</default_value>
@@ -2249,7 +2228,7 @@
         </description>
       </param>
       <param map_type=''>
-        <name>Target position</name>
+        <name>target_position</name>
         <type>3-vector</type>
         <unit>cm</unit>
         <default_value>0 0 0</default_value>
@@ -2259,7 +2238,7 @@
         </description>
       </param>
       <param map_type=''>
-        <name>Volume hierarchy</name>
+        <name>volume_hierarchy</name>
         <type>vector of string</type>
         <unit></unit>
         <default_value>World</default_value>
@@ -2276,59 +2255,87 @@
     </text>
     <parameters>
       <param map_type=''>
-        <name>Photon index</name>
-        <type>double</type>
+        <name>spectral_distribution</name>
+        <type>string</type>
         <unit></unit>
-        <default_value>0</default_value>
-        <description>Power law index of the photon spectrum</description>
+        <default_value>power law</default_value>
+        <description></description>
       </param>
       <param map_type=''>
-        <name>Energy min</name>
+        <name>energy_min</name>
         <type>double</type>
         <unit>keV</unit>
         <default_value>0.1</default_value>
         <description>Minimum value of the energy distribution</description>
       </param>
       <param map_type=''>
-        <name>Energy max</name>
+        <name>energy_max</name>
         <type>double</type>
         <unit>keV</unit>
         <default_value>1000</default_value>
         <description>Maximum value of the energy distribution</description>
       </param>
       <param map_type=''>
-        <name>Polarization mode</name>
+        <name>photon_index</name>
+        <type>double</type>
+        <unit></unit>
+        <default_value>0</default_value>
+        <description>Power law index of the photon spectrum</description>
+      </param>
+      <param map_type=''>
+        <name>energy_mean</name>
+        <type>double</type>
+        <unit>keV</unit>
+        <default_value>511</default_value>
+        <description>Mean energy of the Gaussian distribution</description>
+      </param>
+      <param map_type=''>
+        <name>energy_sigma</name>
+        <type>double</type>
+        <unit>keV</unit>
+        <default_value>2</default_value>
+        <description>Standard deviation of the Gaussian distribution</description>
+      </param>
+      <param map_type=''>
+        <name>radiation_temperature</name>
+        <type>double</type>
+        <unit>keV</unit>
+        <default_value>10</default_value>
+        <description>Radiation temperature in units of keV</description>
+      </param>
+      <param map_type=''>
+        <name>polarization_mode</name>
         <type>int</type>
         <unit></unit>
         <default_value>-1</default_value>
         <description>
           Polarization mode. -1: polarization disable, 0: unpolarized, 1:
-          linearly polarized.
+          linearly polarized (100%), 2: partially linearly polarized
         </description>
       </param>
       <param map_type=''>
-        <name>Position</name>
+        <name>position</name>
         <type>3-vector</type>
         <unit>cm</unit>
         <default_value>0 0 0</default_value>
         <description>Position of the source.</description>
       </param>
       <param map_type=''>
-        <name>RI Z</name>
+        <name>atomic_number</name>
         <type>int</type>
         <unit></unit>
         <default_value>55</default_value>
         <description>Atomic number of the radioactive isotope.</description>
       </param>
       <param map_type=''>
-        <name>RI A</name>
+        <name>mass_number</name>
         <type>int</type>
         <unit></unit>
         <default_value>137</default_value>
         <description>Mass number of the radioactive isotope.</description>
       </param>
       <param map_type=''>
-        <name>RI Energy</name>
+        <name>energy</name>
         <type>double</type>
         <unit>keV</unit>
         <default_value>0</default_value>
@@ -2338,7 +2345,7 @@
         </description>
       </param>
       <param map_type=''>
-        <name>Volume hierarchy</name>
+        <name>volume_hierarchy</name>
         <type>vector of string</type>
         <unit></unit>
         <default_value>World</default_value>
@@ -2352,42 +2359,42 @@
     <text>Geant4 run manager module</text>
     <parameters>
       <param map_type=''>
-        <name>Random engine</name>
+        <name>random_engine</name>
         <type>string</type>
         <unit></unit>
         <default_value>MTwistEngine</default_value>
         <description></description>
       </param>
       <param map_type=''>
-        <name>Random initialization mode</name>
+        <name>random_initialization_mode</name>
         <type>int</type>
         <unit></unit>
         <default_value>1</default_value>
         <description></description>
       </param>
       <param map_type=''>
-        <name>Random seed</name>
+        <name>random_seed</name>
         <type>int</type>
         <unit></unit>
         <default_value>0</default_value>
         <description></description>
       </param>
       <param map_type=''>
-        <name>Random initial status file</name>
+        <name>random_initial_status_file</name>
         <type>string</type>
         <unit></unit>
         <default_value>RandomSeed_I.txt</default_value>
         <description></description>
       </param>
       <param map_type=''>
-        <name>Random final status file</name>
+        <name>random_final_status_file</name>
         <type>string</type>
         <unit></unit>
         <default_value>RandomSeed_F.txt</default_value>
         <description></description>
       </param>
       <param map_type=''>
-        <name>Verbose level</name>
+        <name>verbose</name>
         <type>int</type>
         <unit></unit>
         <default_value>0</default_value>
@@ -2401,14 +2408,14 @@
     <text>This module reads GDML mass model file and builds the geometry.</text>
     <parameters>
       <param map_type=''>
-        <name>Detector geometry file</name>
+        <name>file</name>
         <type>string</type>
         <unit></unit>
         <default_value>detector.gdml</default_value>
         <description></description>
       </param>
       <param map_type=''>
-        <name>Validate GDML?</name>
+        <name>validate</name>
         <type>bool</type>
         <unit></unit>
         <default_value>1</default_value>
@@ -2422,7 +2429,7 @@
     <text>This module writes geometry built in Geant4 to GDML format.</text>
     <parameters>
       <param map_type=''>
-        <name>Detector geometry file</name>
+        <name>file</name>
         <type>string</type>
         <unit></unit>
         <default_value>detector.gdml</default_value>
@@ -2436,41 +2443,69 @@
     <text>Basic primary generator of MC simulations.</text>
     <parameters>
       <param map_type=''>
-        <name>Particle name</name>
+        <name>particle</name>
         <type>string</type>
         <unit></unit>
         <default_value>gamma</default_value>
-        <description>Particle name (gamma, electron, positron, proton, neutron, geantino...)</description>
+        <description>Particle name (gamma, e-, e+, proton, neutron, geantino...)</description>
       </param>
       <param map_type=''>
-        <name>Photon index</name>
-        <type>double</type>
+        <name>spectral_distribution</name>
+        <type>string</type>
         <unit></unit>
-        <default_value>0</default_value>
-        <description>Power law index of the photon spectrum</description>
+        <default_value>power law</default_value>
+        <description></description>
       </param>
       <param map_type=''>
-        <name>Energy min</name>
+        <name>energy_min</name>
         <type>double</type>
         <unit>keV</unit>
         <default_value>0.1</default_value>
         <description>Minimum value of the energy distribution</description>
       </param>
       <param map_type=''>
-        <name>Energy max</name>
+        <name>energy_max</name>
         <type>double</type>
         <unit>keV</unit>
         <default_value>1000</default_value>
         <description>Maximum value of the energy distribution</description>
       </param>
       <param map_type=''>
-        <name>Polarization mode</name>
+        <name>photon_index</name>
+        <type>double</type>
+        <unit></unit>
+        <default_value>0</default_value>
+        <description>Power law index of the photon spectrum</description>
+      </param>
+      <param map_type=''>
+        <name>energy_mean</name>
+        <type>double</type>
+        <unit>keV</unit>
+        <default_value>511</default_value>
+        <description>Mean energy of the Gaussian distribution</description>
+      </param>
+      <param map_type=''>
+        <name>energy_sigma</name>
+        <type>double</type>
+        <unit>keV</unit>
+        <default_value>2</default_value>
+        <description>Standard deviation of the Gaussian distribution</description>
+      </param>
+      <param map_type=''>
+        <name>radiation_temperature</name>
+        <type>double</type>
+        <unit>keV</unit>
+        <default_value>10</default_value>
+        <description>Radiation temperature in units of keV</description>
+      </param>
+      <param map_type=''>
+        <name>polarization_mode</name>
         <type>int</type>
         <unit></unit>
         <default_value>-1</default_value>
         <description>
           Polarization mode. -1: polarization disable, 0: unpolarized, 1:
-          linearly polarized.
+          linearly polarized (100%), 2: partially linearly polarized
         </description>
       </param>
     </parameters>
@@ -2479,7 +2514,15 @@
     <name>StandardPickUpData</name>
     <version>2.0</version>
     <text></text>
-    <parameters/>
+    <parameters>
+      <param map_type=''>
+        <name>stepping_action_enable</name>
+        <type>bool</type>
+        <unit></unit>
+        <default_value>0</default_value>
+        <description></description>
+      </param>
+    </parameters>
   </module>
   <module>
     <name>VisualizeG4Geom</name>
@@ -2487,42 +2530,42 @@
     <text>This module applies visualization for Geant4 simulation.</text>
     <parameters>
       <param map_type=''>
-        <name>Mode</name>
+        <name>mode</name>
         <type>string</type>
         <unit></unit>
         <default_value>OGL</default_value>
         <description></description>
       </param>
       <param map_type=''>
-        <name>Target point</name>
+        <name>target_point</name>
         <type>3-vector</type>
         <unit>cm</unit>
         <default_value>0 0 0</default_value>
         <description></description>
       </param>
       <param map_type=''>
-        <name>View point</name>
+        <name>view_point</name>
         <type>3-vector</type>
         <unit></unit>
         <default_value>0 1 0</default_value>
         <description></description>
       </param>
       <param map_type=''>
-        <name>Up direction</name>
+        <name>up_direction</name>
         <type>3-vector</type>
         <unit></unit>
         <default_value>0 0 1</default_value>
         <description></description>
       </param>
       <param map_type=''>
-        <name>Zoom</name>
+        <name>zoom</name>
         <type>double</type>
         <unit></unit>
         <default_value>1</default_value>
         <description></description>
       </param>
       <param map_type=''>
-        <name>Auxiliary edge</name>
+        <name>auxiliary_edge</name>
         <type>bool</type>
         <unit></unit>
         <default_value>1</default_value>

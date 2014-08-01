@@ -36,7 +36,7 @@ ANLStatus SpenvisIsotropicPrimaryGen::mod_startup()
 {
   IsotropicPrimaryGen::mod_startup();
   disableDefaultEnergyInput();
-  register_parameter(&m_SpenvisFileName, "File name");
+  register_parameter(&m_SpenvisFileName, "filename");
   
   return AS_OK;
 }

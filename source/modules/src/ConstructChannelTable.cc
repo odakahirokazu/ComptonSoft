@@ -39,7 +39,7 @@ ConstructChannelTable::ConstructChannelTable()
 
 ANLStatus ConstructChannelTable::mod_startup()
 {
-  register_parameter(&m_FileName, "Detector channel table file");
+  register_parameter(&m_FileName, "filename");
   set_parameter_description("XML data file describing a channel table.");
   return AS_OK;
 }

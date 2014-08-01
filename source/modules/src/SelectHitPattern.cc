@@ -40,7 +40,7 @@ SelectHitPattern::SelectHitPattern()
 
 ANLStatus SelectHitPattern::mod_startup()
 {
-  register_parameter(&dg_filename, "Detector group file");
+  register_parameter(&dg_filename, "detector_group");
   
   return AS_OK;
 }

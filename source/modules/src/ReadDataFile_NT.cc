@@ -34,8 +34,8 @@ using namespace anl;
 
 ANLStatus ReadDataFile_NT::mod_startup()
 {
-  unregister_parameter("Data file name");
-  register_parameter(&m_FileNameVector, "Data file name", "seq", "data");
+  unregister_parameter("file_list");
+  register_parameter(&m_FileNameVector, "file_list", "seq", "data");
   return VCSModule::mod_startup();
 }
 

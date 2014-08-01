@@ -34,8 +34,8 @@ InitialConditionFilter::InitialConditionFilter()
 
 ANLStatus InitialConditionFilter::mod_startup()
 {
-  register_parameter(&energy0, "Initail energy minimum", keV, "keV");
-  register_parameter(&energy1, "Initail energy maximum", keV, "keV");
+  register_parameter(&energy0, "energy_min", keV, "keV");
+  register_parameter(&energy1, "energy_max", keV, "keV");
   GetANLModule("ReadHitTree", &read_hittree);
   return AS_OK;
 }

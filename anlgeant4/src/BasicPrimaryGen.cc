@@ -58,27 +58,27 @@ ANLStatus BasicPrimaryGen::mod_startup()
 
   GetANLModule("VANLGeometry", &m_Geometry);
 
-  register_parameter(&m_ParticleName, "Particle name");
+  register_parameter(&m_ParticleName, "particle");
   set_parameter_description("Particle name (gamma, e-, e+, proton, neutron, geantino...)");
 
-  register_parameter(&m_EnergyDistributionName, "Energy distribution");
+  register_parameter(&m_EnergyDistributionName, "spectral_distribution");
 
-  register_parameter(&m_EnergyMin, "Energy min", keV, "keV");
+  register_parameter(&m_EnergyMin, "energy_min", keV, "keV");
   set_parameter_description("Minimum value of the energy distribution");
-  register_parameter(&m_EnergyMax, "Energy max", keV, "keV");
+  register_parameter(&m_EnergyMax, "energy_max", keV, "keV");
   set_parameter_description("Maximum value of the energy distribution");
-  register_parameter(&m_PhotonIndex, "Photon index");
+  register_parameter(&m_PhotonIndex, "photon_index");
   set_parameter_description("Power law index of the photon spectrum");
-  register_parameter(&m_EnergyMean, "Energy mean", keV, "keV");
+  register_parameter(&m_EnergyMean, "energy_mean", keV, "keV");
   set_parameter_description("Mean energy of the Gaussian distribution");
-  register_parameter(&m_EnergySigma, "Energy sigma", keV, "keV");
+  register_parameter(&m_EnergySigma, "energy_sigma", keV, "keV");
   set_parameter_description("Standard deviation of the Gaussian distribution");
-  register_parameter(&m_KT, "Radiation temperature", keV, "keV");
+  register_parameter(&m_KT, "radiation_temperature", keV, "keV");
   set_parameter_description("Radiation temperature in units of keV");
 
   disableDefaultEnergyInput();
 
-  register_parameter(&m_PolarizationMode, "Polarization mode");
+  register_parameter(&m_PolarizationMode, "polarization_mode");
   set_parameter_description("Polarization mode. -1: polarization disable, 0: unpolarized, 1: linearly polarized (100%), 2: partially linearly polarized");
 
   return AS_OK;
@@ -155,7 +155,6 @@ ANLStatus BasicPrimaryGen::mod_ana()
   m_TotalEnergy += m_Energy;
   m_PrimaryGen->Set(m_Time, m_Position, m_Energy, m_Direction, m_Polarization);
 
-  setEventID(m_PickUpData->EventID());
   setInitialEnergy(m_Energy);
   setInitialDirection(m_Direction);
   setInitialTime(m_Time);
@@ -175,34 +174,34 @@ void BasicPrimaryGen::setDefinition(G4ParticleDefinition* def)
 
 void BasicPrimaryGen::enablePowerLawInput()
 {
-  expose_parameter("Photon index");
-  expose_parameter("Energy min");
-  expose_parameter("Energy max");
+  expose_parameter("ehoton_index");
+  expose_parameter("energy_min");
+  expose_parameter("energy_max");
 }
 
 
 void BasicPrimaryGen::enableGaussianInput()
 {
-  expose_parameter("Energy mean");
-  expose_parameter("Energy sigma");
+  expose_parameter("energy_mean");
+  expose_parameter("energy_sigma");
 }
 
 
 void BasicPrimaryGen::enableBlackBodyInput()
 {
-  expose_parameter("Radiation temperature");
-  expose_parameter("Energy max");
+  expose_parameter("radiation_temperature");
+  expose_parameter("energy_max");
 }
 
 
 void BasicPrimaryGen::disableDefaultEnergyInput()
 {
-  hide_parameter("Energy min");
-  hide_parameter("Energy max");
-  hide_parameter("Photon index");
-  hide_parameter("Energy mean");
-  hide_parameter("Energy sigma");
-  hide_parameter("Radiation temperature");
+  hide_parameter("energy_min");
+  hide_parameter("energy_max");
+  hide_parameter("photon_index");
+  hide_parameter("energy_mean");
+  hide_parameter("energy_sigma");
+  hide_parameter("radiation_temperature");
 }
 
 

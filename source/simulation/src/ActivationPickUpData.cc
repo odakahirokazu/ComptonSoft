@@ -79,7 +79,7 @@ ActivationPickUpData::~ActivationPickUpData()
 
 ANLStatus ActivationPickUpData::mod_startup()
 {
-  register_parameter(&m_FileNameBase, "Output file name base");
+  register_parameter(&m_FileNameBase, "output_filename_base");
   return AS_OK;
 }
 

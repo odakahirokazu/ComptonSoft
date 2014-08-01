@@ -32,8 +32,8 @@ SelectTime::SelectTime()
 
 ANLStatus SelectTime::mod_startup()
 {
-  register_parameter(&m_Time0, "Time start");
-  register_parameter(&m_Time1, "Time end");
+  register_parameter(&m_Time0, "time_start");
+  register_parameter(&m_Time1, "time_end");
   
   return AS_OK;
 }

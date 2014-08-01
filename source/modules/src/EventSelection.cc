@@ -52,10 +52,10 @@ ANLStatus EventSelection::mod_startup()
   fluor_cdte[9] = 0.0316841 * MeV;
   fluor_range = 0.5 * keV;
 
-  register_parameter(&filename, "Detector group file",
+  register_parameter(&filename, "detector_group",
                      "", "Detector group definition file (0 for no group)");
-  register_parameter(&remove_veto_event, "Remove veto events?");
-  register_parameter(&fluor_range, "Range of fluorescence lines", keV, "keV"); 
+  register_parameter(&remove_veto_event, "apply_veto");
+  register_parameter(&fluor_range, "tolerance_for_fluorescence_lines", keV, "keV"); 
 
   return AS_OK;
 }

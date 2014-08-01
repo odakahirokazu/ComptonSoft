@@ -60,7 +60,7 @@ AHStandardPickUpData::~AHStandardPickUpData()
 
 ANLStatus AHStandardPickUpData::mod_startup()
 {
-  register_parameter(&m_FileName, "Output file");
+  register_parameter(&m_FileName, "output");
   return AS_OK;
 }
 

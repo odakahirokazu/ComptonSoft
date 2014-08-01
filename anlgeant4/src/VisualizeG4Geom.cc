@@ -71,12 +71,12 @@ VisualizeG4Geom::~VisualizeG4Geom()
 
 ANLStatus VisualizeG4Geom::mod_startup()
 {
-  register_parameter(&m_Mode, "Mode");
-  register_parameter(&m_TargetPoint, "Target point", cm, "cm");
-  register_parameter(&m_ViewPoint, "View point");
-  register_parameter(&m_UpVector, "Up direction");
-  register_parameter(&m_Zoom, "Zoom");
-  register_parameter(&m_AuxiliaryEdge, "Auxiliary edge");
+  register_parameter(&m_Mode, "mode");
+  register_parameter(&m_TargetPoint, "target_point", cm, "cm");
+  register_parameter(&m_ViewPoint, "view_point");
+  register_parameter(&m_UpVector, "up_direction");
+  register_parameter(&m_Zoom, "zoom");
+  register_parameter(&m_AuxiliaryEdge, "auxiliary_edge");
   
   return AS_OK;
 }

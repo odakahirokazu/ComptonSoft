@@ -39,9 +39,9 @@ AnalyzeDSD::AnalyzeDSD()
 
 ANLStatus AnalyzeDSD::mod_startup()
 {
-  register_parameter(&m_DetID, "Detector ID");
-  register_parameter(&m_Energy0, "Energy min", keV, "keV");
-  register_parameter(&m_Energy1, "Energy max", keV, "keV");
+  register_parameter(&m_DetID, "detector_id");
+  register_parameter(&m_Energy0, "energy_min", keV, "keV");
+  register_parameter(&m_Energy1, "energy_max", keV, "keV");
   return AS_OK;
 }
 

@@ -40,23 +40,23 @@ using namespace anl;
 
 
 SetSimGainCorrection::SetSimGainCorrection()
-  : m_ByFile(false), m_FileName("gain_cor.xml"), m_FunctionFile(0),
+  : m_ByFile(true), m_FileName(""), m_FunctionFile(0),
     m_Type(3), m_GainFunction0(""), m_GainFunction1(""), m_GainCoeff0(1.0), m_GainCoeff1(1.0)
 {}
 
 
 ANLStatus SetSimGainCorrection::mod_startup()
 {
-  register_parameter(&m_FileName, "File name");
+  register_parameter(&m_FileName, "filename");
 
-  register_parameter_map(&m_GainMap, "Gain correction map",
-                         "Detector name prefix", "Si");
-  add_map_value(&m_Type, "Type of detector/function", "",
+  register_parameter_map(&m_GainMap, "gain_correction_map",
+                         "detector_name_prefix", "Si");
+  add_map_value(&m_Type, "analysis_method", "",
                 "Type of detector/function (1: single/spline, 2: double/spline, 3: single/linear, 4:double/linear)");
-  add_map_value(&m_GainFunction0, "Gain function 0");
-  add_map_value(&m_GainFunction1, "Gain function 1");
-  add_map_value(&m_GainCoeff0, "Gain coefficient 0");
-  add_map_value(&m_GainCoeff1, "Gain coefficient 1");
+  add_map_value(&m_GainFunction0, "gain_function_0");
+  add_map_value(&m_GainFunction1, "gain_function_1");
+  add_map_value(&m_GainCoeff0, "gain_coefficient_0");
+  add_map_value(&m_GainCoeff1, "gain_coefficient_1");
   std::vector<int> enable1(1); enable1[0] = 1;
   std::vector<int> enable2(2); enable2[0] = 1; enable2[1]= 2;
   std::vector<int> enable3(1); enable3[0] = 3;
@@ -77,10 +77,11 @@ ANLStatus SetSimGainCorrection::mod_com()
   m_ByFile = byFile;
 
   if (m_ByFile) {
-    unregister_parameter("Gain correction map");
+    m_FileName = "gain_corr.xml";
+    unregister_parameter("gain_correction_map");
   }
   else {
-    unregister_parameter("File name");
+    unregister_parameter("filename");
   }
   ask_parameters();
   return AS_OK;
@@ -90,6 +91,8 @@ ANLStatus SetSimGainCorrection::mod_com()
 ANLStatus SetSimGainCorrection::mod_init()
 {
   VCSModule::mod_init();
+
+  if (m_FileName == "") m_ByFile = false;
 
   bool rval;
   if (m_ByFile) {

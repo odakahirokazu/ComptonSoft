@@ -36,8 +36,8 @@ AHStandardANLPhysicsList::AHStandardANLPhysicsList()
 ANLStatus AHStandardANLPhysicsList::mod_startup()
 {
   anlgeant4::VANLPhysicsList::mod_startup();
-  register_parameter(&m_PhysicsOption, "Physics option");
-  register_parameter(&m_DefaultCut, "Cut value", cm, "cm");
+  register_parameter(&m_PhysicsOption, "physics_option");
+  register_parameter(&m_DefaultCut, "cut_value", cm, "cm");
   
   return AS_OK;
 }

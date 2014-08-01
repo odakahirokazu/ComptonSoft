@@ -39,14 +39,14 @@ ANLStatus AHRayTracingPrimaryGen::mod_startup()
 {
   BasicPrimaryGen::mod_startup();
   
-  unregister_parameter("Particle name");
+  unregister_parameter("particle");
   setParticleName("gamma");
-  unregister_parameter("Photon index");
-  unregister_parameter("Energy min");
-  unregister_parameter("Energy max");
+  unregister_parameter("photon_index");
+  unregister_parameter("energy_min");
+  unregister_parameter("energy_max");
   
-  register_parameter(&m_FileName, "Input FITS file name");
-  register_parameter(&m_offset, "Position offset", mm, "mm");
+  register_parameter(&m_FileName, "filename");
+  register_parameter(&m_offset, "position_offset", mm, "mm");
   
   return AS_OK;
 }

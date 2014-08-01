@@ -31,8 +31,8 @@ ReadGDML::ReadGDML()
 
 ANLStatus ReadGDML::mod_startup()
 {
-  register_parameter(&m_GeometryFileName, "Detector geometry file");
-  register_parameter(&m_Validate, "Validate GDML?");
+  register_parameter(&m_GeometryFileName, "file");
+  register_parameter(&m_Validate, "validate");
     
   return AS_OK;
 }

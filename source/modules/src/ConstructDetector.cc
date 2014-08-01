@@ -40,7 +40,7 @@ ANLStatus ConstructDetector::mod_startup()
   detector_manager = new DetectorManager;
   detector_manager->setMCSimulation(false);
 
-  register_parameter(&configuration_file_name, "Detector configuration file");
+  register_parameter(&configuration_file_name, "detector_configuration");
   set_parameter_description("XML data file describing a detector configuration.");
 
   return AS_OK;

@@ -35,7 +35,7 @@ using namespace anl;
 ANLStatus DefineBadChannel_Sim::mod_startup()
 {
   m_FileName = "bad_channel.txt";
-  register_parameter(&m_FileName, "File for bad channel definition");
+  register_parameter(&m_FileName, "filename");
 
   return AS_OK;
 }
