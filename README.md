@@ -1,7 +1,7 @@
 Compton Soft
 ================================================================
 
-- Version: 4.12
+- Version: 4.13
 - Maintenance by Hirokazu Odaka
 
 
