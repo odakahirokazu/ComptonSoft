@@ -85,5 +85,5 @@ if(CS_USE_SIMX)
   set(SIMX_LIB_DIR
     ${SIMX_TOP}/lib
     )
-  set(SIMX_LIB simx cfitsio ape wcs fftw3 history readline termcap)
+  set(SIMX_LIB simx simput cfitsio ape wcs fftw3 readline termcap)
 endif(CS_USE_SIMX)
