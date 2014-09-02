@@ -39,7 +39,7 @@ module ComptonSoft
 
     ### Input files
     attr_writer :detector_config, :channel_table, :detector_group
-    attr_writer :simulation_param
+    attr_writer :simulation_param, :noise_level
 
     ### Output files
     attr_accessor :output
@@ -72,6 +72,7 @@ module ComptonSoft
       @channel_table = nil # "channel_table.xml"
       @simulation_param = "simulation_param.xml"
       @detector_group = '0' # "detector_group.txt"
+      @noise_level = nil
 
       ### Output files
       @output = "output.root"
@@ -190,6 +191,9 @@ module ComptonSoft
           with_parameters(filename: @channel_table)
         end
         chain :SetNoiseLevel
+        if @noise_level
+          with_parameters(filename: @noise_level)
+        end
       end
 
       chain_with_parameters module_of_geometry
