@@ -38,6 +38,7 @@ include_directories(include
   )
 
 link_directories(
+  /usr/local/lib
   ${CLHEP_LIB_DIR}
   ${G4_LIB_DIR}
   ${ANLNEXT_LIB_DIR}

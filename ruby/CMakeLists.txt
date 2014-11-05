@@ -17,6 +17,7 @@ set(RUBY_EXT_INCLUDE_DIRS
   ${ANLNEXT_INC_DIR}/ruby
   )
 set(RUBY_EXT_LIBRARY_DIRS
+  /usr/local/lib
   ${ANLNEXT_LIB_DIR}
   ${ROOT_LIB_DIR}
   ${CLHEP_LIB_DIR}

@@ -21,6 +21,7 @@ include_directories(
   )
 
 link_directories(
+  /usr/local/lib
   ${ANLNEXT_LIB_DIR}
   ${ROOT_LIB_DIR}
   ${G4_LIB_DIR}
