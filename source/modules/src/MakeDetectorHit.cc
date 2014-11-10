@@ -44,6 +44,7 @@ void MakeDetectorHit::doProcessing()
   std::vector<RealDetectorUnit*>::iterator itDetEnd = GetDetectorVector().end();
 
   for (itDet = GetDetectorVector().begin(); itDet != itDetEnd; itDet++) {
+    (*itDet)->assignDetectorInfo();
     (*itDet)->analyzeHits();
   }
 }

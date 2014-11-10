@@ -158,6 +158,8 @@ ANLStatus ReadHitTree::mod_ana()
     hit->setDetectorID(detid);
     hit->setStripX(stripx);
     hit->setStripY(stripy);
+    hit->setChipID(chip);
+    hit->setChannel(channel);
     hit->setTimeGroup(time_group);
     hit->setFlag(flag);
 

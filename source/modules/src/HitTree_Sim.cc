@@ -137,6 +137,8 @@ ANLStatus HitTree_Sim::mod_ana()
       detid = hitVec[i]->getDetectorID();
       stripx = hitVec[i]->getStripX();
       stripy = hitVec[i]->getStripY();
+      chip = hitVec[i]->getChipID();
+      channel = hitVec[i]->getChannel();
       time_group = hitVec[i]->getTimeGroup();
       
       flag |= hitVec[i]->getFlag();

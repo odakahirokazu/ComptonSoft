@@ -25,7 +25,7 @@ using namespace anlgeant4;
 
 
 VANLGeometry::VANLGeometry()
-  : m_LengthUnit(1.0), m_LengthUnitName(""),
+  : m_LengthUnit(mm), m_LengthUnitName("mm"),
     m_SurfaceCheck(true)
 {
   add_alias("VANLGeometry");

@@ -216,13 +216,11 @@ bool DetectorManager::constructDetectorUnits(const ptree& DetectorsNode)
         detStrip->setPriorityToAnodeSide(priorityToAnode);
       }
       
-      if (!m_MCSimulation) {
-        ptree::const_assoc_iterator ASICsNode = detNode.find("asics");
-        if ( ASICsNode != detNode.not_found() ) {
-          if ( !constructASICs(ASICsNode->second, det, priorityToAnode) ) {
-            delete det;
-            return false;
-          }
+      ptree::const_assoc_iterator ASICsNode = detNode.find("asics");
+      if ( ASICsNode != detNode.not_found() ) {
+        if ( !constructASICs(ASICsNode->second, det, priorityToAnode) ) {
+          delete det;
+          return false;
         }
       }
       
