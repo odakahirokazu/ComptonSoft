@@ -40,12 +40,13 @@ class VANLGeometry;
  * @date 2011-04-11
  * @date 2012-07-04 | Hirokazu Odaka | sampleEnergy(), printSpectralInfo() as virtual
  * @date 2012-07-10 | Hirokazu Odaka | virtual methods: sampleDirection(), samplePosition()
+ * @date 2014-12-14 | Hirokazu Odaka | user-defined spectral distribution
  */
 class BasicPrimaryGen : public VANLPrimaryGen, public InitialInformation
 {
   DEFINE_ANL_MODULE(BasicPrimaryGen, 1.3);
 public:
-  enum SpectralShape {
+  enum class SpectralShape {
     User = 0,
     Mono = 1,
     PowerLaw = 2,
@@ -64,11 +65,11 @@ public:
   
   G4VUserPrimaryGeneratorAction* create();
   
-  G4int Number() const { return m_Number; }
-  G4double TotalEnergy() const { return m_TotalEnergy; }
+  G4int Number() const { return number_; }
+  G4double TotalEnergy() const { return totalEnergy_; }
 
-  void setPolarizationMode(int v) { m_PolarizationMode = v; }
-  int PolarizationMode() const { return m_PolarizationMode; }
+  void setPolarizationMode(int v) { polarizationMode_ = v; }
+  int PolarizationMode() const { return polarizationMode_; }
   
 protected:
   void setPrimary(G4double time0,
@@ -77,11 +78,11 @@ protected:
                   G4ThreeVector direction,
                   G4ThreeVector polarization)
   {
-    m_Time = time0;
-    m_Position = position;
-    m_Energy = energy;
-    m_Direction = direction;
-    m_Polarization = polarization;
+    time_ = time0;
+    position_ = position;
+    energy_ = energy;
+    direction_ = direction;
+    polarization_ = polarization;
   }
 
   void setPrimary(G4double time0,
@@ -89,10 +90,10 @@ protected:
                   G4double energy,
                   G4ThreeVector direction)
   {
-    m_Time = time0;
-    m_Position = position;
-    m_Energy = energy;
-    m_Direction = direction;
+    time_ = time0;
+    position_ = position;
+    energy_ = energy;
+    direction_ = direction;
   }
 
   void setPrimary(G4ThreeVector position,
@@ -100,40 +101,43 @@ protected:
                   G4ThreeVector direction,
                   G4ThreeVector polarization)
   {
-    m_Position = position;
-    m_Energy = energy;
-    m_Direction = direction;
-    m_Polarization = polarization;
+    position_ = position;
+    energy_ = energy;
+    direction_ = direction;
+    polarization_ = polarization;
   }
 
   void setPrimary(G4ThreeVector position,
                   G4double energy,
                   G4ThreeVector direction)
   {
-    m_Position = position;
-    m_Energy = energy;
-    m_Direction = direction;
+    position_ = position;
+    energy_ = energy;
+    direction_ = direction;
   }
 
-  void setTime(G4double time0) { m_Time = time0; }
-  void setPosition(G4ThreeVector position) { m_Position = position; }
-  void setEnergy(G4double energy) { m_Energy = energy; }
-  void setDirection(G4ThreeVector direction) { m_Direction = direction; }
-  void setPolarization(G4ThreeVector polarization) { m_Polarization = polarization; }
+  void setTime(G4double time0) { time_ = time0; }
+  void setPosition(G4ThreeVector position) { position_ = position; }
+  void setEnergy(G4double energy) { energy_ = energy; }
+  void setDirection(G4ThreeVector direction) { direction_ = direction; }
+  void setPolarization(G4ThreeVector polarization) { polarization_ = polarization; }
 
   void setDefinition(G4ParticleDefinition* def);
-  void setParticleName(const std::string& name) { m_ParticleName = name; }
+  void setParticleName(const std::string& name) { particleName_ = name; }
 
   void setEnergyDistribution(SpectralShape v, const std::string& name)
   {
-    m_EnergyDistribution = v;
-    m_EnergyDistributionName = name;
+    energyDistribution_ = v;
+    energyDistributionName_ = name;
   }
   
   void enablePowerLawInput();
   void enableGaussianInput();
   void enableBlackBodyInput();
+  void enableUserInput();
   void disableDefaultEnergyInput();
+
+  void buildSpectrumPhotonIntegral();
 
   virtual void printSpectralInfo();
 
@@ -152,9 +156,10 @@ protected:
   G4double sampleFromGaussian();
   G4double sampleFromBlackBody(double kT, double upper_limit_factor);
   G4double sampleFromBlackBody();
-
-  virtual G4ThreeVector sampleDirection() { return m_Direction; }
-  virtual G4ThreeVector samplePosition() { return m_Position; }
+  G4double sampleFromUserDefinedSpectrum();
+  
+  virtual G4ThreeVector sampleDirection() { return direction_; }
+  virtual G4ThreeVector samplePosition() { return position_; }
 
   void setUnpolarized();
 
@@ -162,39 +167,43 @@ protected:
   std::string LengthUnitName() const;
   
 private:
-  BasicPrimaryGeneratorAction* m_PrimaryGen;
-  const anlgeant4::StandardPickUpData* m_PickUpData;
-  const anlgeant4::VANLGeometry* m_Geometry;
+  BasicPrimaryGeneratorAction* primaryGenerator_;
+  const anlgeant4::StandardPickUpData* pickupData_;
+  const anlgeant4::VANLGeometry* geometry_;
 
-  std::string m_ParticleName;
+  std::string particleName_;
 
-  G4double m_Time;
-  G4ThreeVector m_Position;
-  G4double m_Energy;
-  G4ThreeVector m_Direction;
-  G4ThreeVector m_Polarization;  
+  G4double time_;
+  G4ThreeVector position_;
+  G4double energy_;
+  G4ThreeVector direction_;
+  G4ThreeVector polarization_;
 
-  G4int m_Number;
-  G4double m_TotalEnergy;
+  G4int number_;
+  G4double totalEnergy_;
 
-  G4ParticleDefinition* m_Definition;
+  G4ParticleDefinition* definition_;
 
-  G4int m_PolarizationMode;
+  G4int polarizationMode_;
 
   /* properties for the energy distribution */
-  std::string m_EnergyDistributionName;
-  SpectralShape m_EnergyDistribution;
-  G4double m_EnergyMin;
-  G4double m_EnergyMax;
+  std::string energyDistributionName_;
+  SpectralShape energyDistribution_;
+  G4double energyMin_;
+  G4double energyMax_;
   // power-law distribution
-  G4double m_PhotonIndex;
+  G4double photonIndex_;
   // Gaussin distribution
-  G4double m_EnergyMean;
-  G4double m_EnergySigma;
+  G4double energyMean_;
+  G4double energySigma_;
   // black-body distribution
-  G4double m_KT;
+  G4double kT_;
+  // user
+  std::vector<double> spectrumEnergy_;
+  std::vector<double> spectrumPhotons_;
+  std::vector<double> spectrumPhotonIntegral_;
 };
 
-}
+} /* namespace anlgeant4 */
 
 #endif /* ANLGEANT4_BasicPrimaryGen_H */

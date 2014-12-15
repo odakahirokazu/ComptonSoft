@@ -19,102 +19,110 @@
 
 #include "BasicPrimaryGen.hh"
 
+#include <algorithm>
+#include <iterator>
+#include <boost/format.hpp>
 #include "G4SystemOfUnits.hh"
 #include "G4PhysicalConstants.hh"
 #include "Randomize.hh"
 #include "BasicPrimaryGeneratorAction.hh"
 #include "VANLGeometry.hh"
 
-//using CLHEP::keV;
+// using CLHEP::keV;
 using namespace anl;
-using namespace anlgeant4;
 
+namespace anlgeant4
+{
 
 BasicPrimaryGen::BasicPrimaryGen()
   : InitialInformation(true),
-    m_PrimaryGen(0), m_PickUpData(0), m_Geometry(0),
-    m_ParticleName("gamma"),
-    m_Time(0.0),
-    m_Position(0.0, 0.0, 0.0),
-    m_Energy(0.0), m_Direction(0.0, 0.0, -1.0),
-    m_Polarization(0.0, 0.0, 0.0),
-    m_Number(0), m_TotalEnergy(0.0),
-    m_Definition(0),
-    m_PolarizationMode(-1),
-    m_EnergyDistributionName("power law"), m_EnergyDistribution(Undefined),
-    m_EnergyMin(0.1*keV), m_EnergyMax(1000.0*keV),
-    m_PhotonIndex(0.0), 
-    m_EnergyMean(511.0*keV), m_EnergySigma(2.0*keV),
-    m_KT(10.0*keV)
+    primaryGenerator_(0), pickupData_(0), geometry_(0),
+    particleName_("gamma"),
+    time_(0.0),
+    position_(0.0, 0.0, 0.0),
+    energy_(0.0), direction_(0.0, 0.0, -1.0),
+    polarization_(0.0, 0.0, 0.0),
+    number_(0), totalEnergy_(0.0),
+    definition_(0),
+    polarizationMode_(-1),
+    energyDistributionName_("power law"),
+    energyDistribution_(SpectralShape::Undefined),
+    energyMin_(0.1*keV), energyMax_(1000.0*keV),
+    photonIndex_(0.0),
+    energyMean_(511.0*keV), energySigma_(2.0*keV),
+    kT_(10.0*keV)
 {
   add_alias("BasicPrimaryGen");
   add_alias("InitialInformation");
 }
 
-
 ANLStatus BasicPrimaryGen::mod_startup()
 {
   VANLPrimaryGen::mod_startup();
 
-  GetANLModule("VANLGeometry", &m_Geometry);
+  GetANLModule("VANLGeometry", &geometry_);
 
-  register_parameter(&m_ParticleName, "particle");
+  register_parameter(&particleName_, "particle");
   set_parameter_description("Particle name (gamma, e-, e+, proton, neutron, geantino...)");
 
-  register_parameter(&m_EnergyDistributionName, "spectral_distribution");
+  register_parameter(&energyDistributionName_, "spectral_distribution");
 
-  register_parameter(&m_EnergyMin, "energy_min", keV, "keV");
+  register_parameter(&energyMin_, "energy_min", keV, "keV");
   set_parameter_description("Minimum value of the energy distribution");
-  register_parameter(&m_EnergyMax, "energy_max", keV, "keV");
+  register_parameter(&energyMax_, "energy_max", keV, "keV");
   set_parameter_description("Maximum value of the energy distribution");
-  register_parameter(&m_PhotonIndex, "photon_index");
+  register_parameter(&photonIndex_, "photon_index");
   set_parameter_description("Power law index of the photon spectrum");
-  register_parameter(&m_EnergyMean, "energy_mean", keV, "keV");
+  register_parameter(&energyMean_, "energy_mean", keV, "keV");
   set_parameter_description("Mean energy of the Gaussian distribution");
-  register_parameter(&m_EnergySigma, "energy_sigma", keV, "keV");
+  register_parameter(&energySigma_, "energy_sigma", keV, "keV");
   set_parameter_description("Standard deviation of the Gaussian distribution");
-  register_parameter(&m_KT, "radiation_temperature", keV, "keV");
+  register_parameter(&kT_, "radiation_temperature", keV, "keV");
   set_parameter_description("Radiation temperature in units of keV");
+  register_parameter(&spectrumEnergy_, "energy_array", keV, "keV");
+  set_parameter_description("Energy array of user-defined spectrum");
+  register_parameter(&spectrumPhotons_, "photons_array");
+  set_parameter_description("Photons array of user-defined spectrum");
 
   disableDefaultEnergyInput();
 
-  register_parameter(&m_PolarizationMode, "polarization_mode");
+  register_parameter(&polarizationMode_, "polarization_mode");
   set_parameter_description("Polarization mode. -1: polarization disable, 0: unpolarized, 1: linearly polarized (100%), 2: partially linearly polarized");
 
   return AS_OK;
 }
 
-
 ANLStatus BasicPrimaryGen::mod_prepare()
 {
   disableDefaultEnergyInput();
   
-  if (m_EnergyDistribution==Undefined) {
-    if (m_EnergyDistributionName=="user") {
-      m_EnergyDistribution = User;
+  if (energyDistribution_==SpectralShape::Undefined) {
+    if (energyDistributionName_=="user") {
+      energyDistribution_ = SpectralShape::User;
+      enableUserInput();
     }
-    else if (m_EnergyDistributionName=="mono") {
-      m_EnergyDistribution = Mono;
+    else if (energyDistributionName_=="mono") {
+      energyDistribution_ = SpectralShape::Mono;
       enableGaussianInput();
     }
-    else if (m_EnergyDistributionName=="power law") {
-      m_EnergyDistribution = PowerLaw;
+    else if (energyDistributionName_=="power law") {
+      energyDistribution_ = SpectralShape::PowerLaw;
       enablePowerLawInput();
     }
-    else if (m_EnergyDistributionName=="gaussian") {
-      m_EnergyDistribution = Gaussian;
+    else if (energyDistributionName_=="gaussian") {
+      energyDistribution_ = SpectralShape::Gaussian;
       enableGaussianInput();
     }
-    else if (m_EnergyDistributionName=="black body") {
-      m_EnergyDistribution = BlackBody;
+    else if (energyDistributionName_=="black body") {
+      energyDistribution_ = SpectralShape::BlackBody;
       enableBlackBodyInput();
     }
-    else if (m_EnergyDistributionName=="undefined") {
-      m_EnergyDistribution = Undefined;
+    else if (energyDistributionName_=="undefined") {
+      energyDistribution_ = SpectralShape::Undefined;
     }
     else {
       std::cout << "Invalid input to \"Energy distribution\": "
-                << m_EnergyDistributionName
+                << energyDistributionName_
                 << std::endl;
       return AS_QUIT_ERR;
     }
@@ -123,54 +131,60 @@ ANLStatus BasicPrimaryGen::mod_prepare()
   return AS_OK;
 }
 
-
 ANLStatus BasicPrimaryGen::mod_init()
 {
-  GetANLModule("PickUpData", &m_PickUpData);
+  GetANLModule("PickUpData", &pickupData_);
  
   EvsDef("Polarization enable");
   if (PolarizationMode()>=0) {
     EvsSet("Polarization enable");
   }
 
-  if (m_EnergyMin == 0.0) {
-    m_EnergyMin = 1.0e-9 * keV;
+  if (energyMin_ == 0.0) {
+    energyMin_ = 1.0e-9 * keV;
     std::cout << "Energy min is reset to 1.0e-9 keV." << std::endl;
+  }
+
+  if (energyDistribution_ == SpectralShape::User) {
+    if (spectrumEnergy_.size() != spectrumPhotons_.size()+1) {
+      std::cout << "User-defined spectrum binning is invalid.\n"
+                << "Should be energy_array.size == photons_array.size+1."
+                << std::endl;
+      return AS_QUIT_ERR;
+    }
+
+    buildSpectrumPhotonIntegral();
   }
   
   return AS_OK;
 }
 
-
 ANLStatus BasicPrimaryGen::mod_bgnrun()
 {
-  m_TotalEnergy = 0.0;
+  totalEnergy_ = 0.0;
   return AS_OK;
 }
-
 
 ANLStatus BasicPrimaryGen::mod_ana()
 {
-  m_Number++;
-  m_TotalEnergy += m_Energy;
-  m_PrimaryGen->Set(m_Time, m_Position, m_Energy, m_Direction, m_Polarization);
+  number_++;
+  totalEnergy_ += energy_;
+  primaryGenerator_->Set(time_, position_, energy_, direction_, polarization_);
 
-  setInitialEnergy(m_Energy);
-  setInitialDirection(m_Direction);
-  setInitialTime(m_Time);
-  setInitialPosition(m_Position);
-  setInitialPolarization(m_Polarization);
+  setInitialEnergy(energy_);
+  setInitialDirection(direction_);
+  setInitialTime(time_);
+  setInitialPosition(position_);
+  setInitialPolarization(polarization_);
 
   return AS_OK;
 }
 
-
 void BasicPrimaryGen::setDefinition(G4ParticleDefinition* def)
 {
-  m_Definition = def;
-  if (m_PrimaryGen) m_PrimaryGen->SetDefinition(def);
+  definition_ = def;
+  if (primaryGenerator_) primaryGenerator_->SetDefinition(def);
 }
-
 
 void BasicPrimaryGen::enablePowerLawInput()
 {
@@ -179,13 +193,11 @@ void BasicPrimaryGen::enablePowerLawInput()
   expose_parameter("energy_max");
 }
 
-
 void BasicPrimaryGen::enableGaussianInput()
 {
   expose_parameter("energy_mean");
   expose_parameter("energy_sigma");
 }
-
 
 void BasicPrimaryGen::enableBlackBodyInput()
 {
@@ -193,6 +205,11 @@ void BasicPrimaryGen::enableBlackBodyInput()
   expose_parameter("energy_max");
 }
 
+void BasicPrimaryGen::enableUserInput()
+{
+  expose_parameter("energy_array");
+  expose_parameter("photons_array");
+}
 
 void BasicPrimaryGen::disableDefaultEnergyInput()
 {
@@ -202,64 +219,64 @@ void BasicPrimaryGen::disableDefaultEnergyInput()
   hide_parameter("energy_mean");
   hide_parameter("energy_sigma");
   hide_parameter("radiation_temperature");
+  hide_parameter("energy_array");
+  hide_parameter("photons_array");
 }
-
 
 void BasicPrimaryGen::printSpectralInfo()
 {
-  switch (m_EnergyDistribution) {
-  case Mono:
+  switch (energyDistribution_) {
+  case SpectralShape::Mono:
     G4cout << "  Spectral shape: mono => "
-           << "Mean: " << m_EnergyMean/keV  << " keV" 
+           << "Mean: " << energyMean_/keV  << " keV"
            << G4endl;
     break;
-  case PowerLaw:
+  case SpectralShape::PowerLaw:
     G4cout << "  Spectral shape: power law =>"
-           << " photon index = " << m_PhotonIndex
-           << " ( " << m_EnergyMin/keV  << " -- " << m_EnergyMax/keV  << " keV )"
+           << " photon index = " << photonIndex_
+           << " ( " << energyMin_/keV  << " -- " << energyMax_/keV  << " keV )"
            << G4endl;
     break;
-  case Gaussian:
+  case SpectralShape::Gaussian:
     G4cout << "  Spectral shape: Gaussian =>"
-           << " mean: " << m_EnergyMean/keV  << " keV ;"
-           << " sigma: " << m_EnergySigma/keV  << " keV" 
+           << " mean: " << energyMean_/keV  << " keV ;"
+           << " sigma: " << energySigma_/keV  << " keV"
            << G4endl;
     break;
-  case BlackBody:
+  case SpectralShape::BlackBody:
     G4cout << "  Spectral shape: black body => "
-           << " temperature: " << m_KT/keV  << " keV" 
-           << " ( < " << m_EnergyMax/keV  << " keV )"
+           << " temperature: " << kT_/keV  << " keV"
+           << " ( < " << energyMax_/keV  << " keV )"
            << G4endl;
     break;
   default:
     break;
   }
 }
-
 
 G4double BasicPrimaryGen::sampleEnergy()
 {
-  switch (m_EnergyDistribution) {
-  case Mono:
-    break;
-  case PowerLaw:
-    return sampleFromPowerLaw();
-  case Gaussian:
-    return sampleFromGaussian();
-  case BlackBody:
-    return sampleFromBlackBody();
-  default:
-    break;
+  switch (energyDistribution_) {
+    case SpectralShape::Mono:
+      break;
+    case SpectralShape::PowerLaw:
+      return sampleFromPowerLaw();
+    case SpectralShape::Gaussian:
+      return sampleFromGaussian();
+    case SpectralShape::BlackBody:
+      return sampleFromBlackBody();
+    case SpectralShape::User:
+      return sampleFromUserDefinedSpectrum();
+    default:
+      break;
   }
-  return m_EnergyMean;
+  return energyMean_;
 }
-
 
 G4double BasicPrimaryGen::sampleFromPowerLaw()
 {
-  return sampleFromPowerLaw(m_PhotonIndex, m_EnergyMin, m_EnergyMax);
+  return sampleFromPowerLaw(photonIndex_, energyMin_, energyMax_);
 }
-
 
 G4double BasicPrimaryGen::sampleFromPowerLaw(double gamma, double e0, double e1)
 {
@@ -281,12 +298,10 @@ G4double BasicPrimaryGen::sampleFromPowerLaw(double gamma, double e0, double e1)
   return energy;
 }
 
-
 G4double BasicPrimaryGen::sampleFromGaussian()
 {
-  return sampleFromGaussian(m_EnergyMean, m_EnergySigma);
+  return sampleFromGaussian(energyMean_, energySigma_);
 }
-
 
 G4double BasicPrimaryGen::sampleFromGaussian(double mean, double sigma)
 {
@@ -295,12 +310,10 @@ G4double BasicPrimaryGen::sampleFromGaussian(double mean, double sigma)
   return energy;
 }
 
-
 G4double BasicPrimaryGen::sampleFromBlackBody()
 {
-  return sampleFromBlackBody(m_KT, m_EnergyMax/m_KT);
+  return sampleFromBlackBody(kT_, energyMax_/kT_);
 }
-
 
 G4double BasicPrimaryGen::sampleFromBlackBody(double kT,
                                               double upper_limit_factor)
@@ -321,37 +334,74 @@ G4double BasicPrimaryGen::sampleFromBlackBody(double kT,
   return energy;
 }
 
+void BasicPrimaryGen::buildSpectrumPhotonIntegral()
+{
+  std::size_t NBins = spectrumPhotons_.size();
+  spectrumPhotonIntegral_.resize(spectrumEnergy_.size());
+  spectrumPhotonIntegral_[0] = 0.0;
+  for (std::size_t i=0; i<NBins; i++) {
+    spectrumPhotonIntegral_[i+1]
+      = spectrumPhotonIntegral_[i] + spectrumPhotons_[i];
+  }
+  const double Norm = spectrumPhotonIntegral_.back();
+  for (auto& v: spectrumPhotonIntegral_) {
+    v /= Norm;
+  }
+
+  std::cout << "Spectrum: (energy in keV, photon integral)\n";
+  for (std::size_t i=0; i<spectrumEnergy_.size(); i++) {
+    std::cout << boost::format("%10.3E %8.3f")
+      % (spectrumEnergy_[i]/keV) % spectrumPhotonIntegral_[i] << '\n';
+  }
+  std::cout << std::endl;
+}
+
+G4double BasicPrimaryGen::sampleFromUserDefinedSpectrum()
+{
+  const std::vector<double>& energies = spectrumEnergy_;
+  const std::vector<double>& integrals = spectrumPhotonIntegral_;
+  const double r = G4UniformRand();
+  const std::vector<double>::const_iterator it
+    = std::upper_bound(std::begin(integrals), std::end(integrals), r);
+  const double r0 = *(it-1);
+  const double r1 = *it;
+  const std::vector<double>::const_iterator itEnergy
+    = std::begin(energies)+(it-std::begin(integrals));
+  const double energy0 = *(itEnergy-1);
+  const double energy1 = *itEnergy;
+  const double energy = energy0 + (energy1-energy0)*(r-r0)/(r1-r0);
+  return energy;
+}
 
 void BasicPrimaryGen::setUnpolarized()
 {
   G4double phi2 = twopi * G4UniformRand();
-  G4ThreeVector directionOrthogonal = m_Direction.orthogonal().unit();
-  m_Polarization = directionOrthogonal.rotate(phi2, m_Direction);
+  G4ThreeVector directionOrthogonal = direction_.orthogonal().unit();
+  polarization_ = directionOrthogonal.rotate(phi2, direction_);
 }
-
 
 G4VUserPrimaryGeneratorAction* BasicPrimaryGen::create()
 {
-  if (m_Definition) {
-    m_PrimaryGen = new BasicPrimaryGeneratorAction(m_Definition);
+  if (definition_) {
+    primaryGenerator_ = new BasicPrimaryGeneratorAction(definition_);
   }
-  else if (m_ParticleName != "") {
-    m_PrimaryGen = new BasicPrimaryGeneratorAction(m_ParticleName);
+  else if (particleName_ != "") {
+    primaryGenerator_ = new BasicPrimaryGeneratorAction(particleName_);
   }
   else {
-    m_PrimaryGen = new BasicPrimaryGeneratorAction;
+    primaryGenerator_ = new BasicPrimaryGeneratorAction;
   }
-  return m_PrimaryGen;
+  return primaryGenerator_;
 }
-
 
 double BasicPrimaryGen::LengthUnit() const
 {
-  return m_Geometry->GetLengthUnit();
+  return geometry_->GetLengthUnit();
 }
 
-  
 std::string BasicPrimaryGen::LengthUnitName() const
 {
-  return m_Geometry->GetLengthUnitName();
+  return geometry_->GetLengthUnitName();
 }
+
+} /* namespace anlgeant4 */
