@@ -40,19 +40,14 @@ class VANLGeometry;
  * @date 2011-04-11
  * @date 2012-07-04 | Hirokazu Odaka | sampleEnergy(), printSpectralInfo() as virtual
  * @date 2012-07-10 | Hirokazu Odaka | virtual methods: sampleDirection(), samplePosition()
- * @date 2014-12-14 | Hirokazu Odaka | user-defined spectral distribution
+ * @date 2014-12-15 | Hirokazu Odaka | histogram spectral distribution
  */
 class BasicPrimaryGen : public VANLPrimaryGen, public InitialInformation
 {
   DEFINE_ANL_MODULE(BasicPrimaryGen, 1.3);
 public:
   enum class SpectralShape {
-    User = 0,
-    Mono = 1,
-    PowerLaw = 2,
-    Gaussian = 3,
-    BlackBody = 4,
-    Undefined = -1,
+    Undefined, Mono, PowerLaw, Gaussian, BlackBody, Histogram, User,
   };
 
   BasicPrimaryGen();
@@ -134,7 +129,7 @@ protected:
   void enablePowerLawInput();
   void enableGaussianInput();
   void enableBlackBodyInput();
-  void enableUserInput();
+  void enableHistogramInput();
   void disableDefaultEnergyInput();
 
   void buildSpectrumPhotonIntegral();
@@ -156,7 +151,7 @@ protected:
   G4double sampleFromGaussian();
   G4double sampleFromBlackBody(double kT, double upper_limit_factor);
   G4double sampleFromBlackBody();
-  G4double sampleFromUserDefinedSpectrum();
+  G4double sampleFromHistogram();
   
   virtual G4ThreeVector sampleDirection() { return direction_; }
   virtual G4ThreeVector samplePosition() { return position_; }
@@ -198,7 +193,7 @@ private:
   G4double energySigma_;
   // black-body distribution
   G4double kT_;
-  // user
+  // histogram
   std::vector<double> spectrumEnergy_;
   std::vector<double> spectrumPhotons_;
   std::vector<double> spectrumPhotonIntegral_;

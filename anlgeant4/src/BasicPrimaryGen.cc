@@ -80,9 +80,9 @@ ANLStatus BasicPrimaryGen::mod_startup()
   register_parameter(&kT_, "radiation_temperature", keV, "keV");
   set_parameter_description("Radiation temperature in units of keV");
   register_parameter(&spectrumEnergy_, "energy_array", keV, "keV");
-  set_parameter_description("Energy array of user-defined spectrum");
+  set_parameter_description("Energy array of spectral histogram");
   register_parameter(&spectrumPhotons_, "photons_array");
-  set_parameter_description("Photons array of user-defined spectrum");
+  set_parameter_description("Photons array of spectral histogram");
 
   disableDefaultEnergyInput();
 
@@ -99,7 +99,6 @@ ANLStatus BasicPrimaryGen::mod_prepare()
   if (energyDistribution_==SpectralShape::Undefined) {
     if (energyDistributionName_=="user") {
       energyDistribution_ = SpectralShape::User;
-      enableUserInput();
     }
     else if (energyDistributionName_=="mono") {
       energyDistribution_ = SpectralShape::Mono;
@@ -116,6 +115,10 @@ ANLStatus BasicPrimaryGen::mod_prepare()
     else if (energyDistributionName_=="black body") {
       energyDistribution_ = SpectralShape::BlackBody;
       enableBlackBodyInput();
+    }
+    else if (energyDistributionName_=="histogram") {
+      energyDistribution_ = SpectralShape::Histogram;
+      enableHistogramInput();
     }
     else if (energyDistributionName_=="undefined") {
       energyDistribution_ = SpectralShape::Undefined;
@@ -145,9 +148,9 @@ ANLStatus BasicPrimaryGen::mod_init()
     std::cout << "Energy min is reset to 1.0e-9 keV." << std::endl;
   }
 
-  if (energyDistribution_ == SpectralShape::User) {
+  if (energyDistribution_ == SpectralShape::Histogram) {
     if (spectrumEnergy_.size() != spectrumPhotons_.size()+1) {
-      std::cout << "User-defined spectrum binning is invalid.\n"
+      std::cout << "Spectral historam binning is invalid.\n"
                 << "Should be energy_array.size == photons_array.size+1."
                 << std::endl;
       return AS_QUIT_ERR;
@@ -205,7 +208,7 @@ void BasicPrimaryGen::enableBlackBodyInput()
   expose_parameter("energy_max");
 }
 
-void BasicPrimaryGen::enableUserInput()
+void BasicPrimaryGen::enableHistogramInput()
 {
   expose_parameter("energy_array");
   expose_parameter("photons_array");
@@ -265,8 +268,8 @@ G4double BasicPrimaryGen::sampleEnergy()
       return sampleFromGaussian();
     case SpectralShape::BlackBody:
       return sampleFromBlackBody();
-    case SpectralShape::User:
-      return sampleFromUserDefinedSpectrum();
+    case SpectralShape::Histogram:
+      return sampleFromHistogram();
     default:
       break;
   }
@@ -356,7 +359,7 @@ void BasicPrimaryGen::buildSpectrumPhotonIntegral()
   std::cout << std::endl;
 }
 
-G4double BasicPrimaryGen::sampleFromUserDefinedSpectrum()
+G4double BasicPrimaryGen::sampleFromHistogram()
 {
   const std::vector<double>& energies = spectrumEnergy_;
   const std::vector<double>& integrals = spectrumPhotonIntegral_;
