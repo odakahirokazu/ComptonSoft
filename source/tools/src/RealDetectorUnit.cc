@@ -210,6 +210,8 @@ void RealDetectorUnit::applyNewPI()
 
 void RealDetectorUnit::assignDetectorInfo()
 {
+  if (!m_ChannelTable) return;
+  
   for (DetectorHitVIter it=m_DetectorHits.begin(); it!=m_DetectorHits.end(); ++it) {
     DetectorHit_sptr hit = *it;
     int chipid = hit->getChipID();
