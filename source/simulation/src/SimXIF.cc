@@ -26,9 +26,9 @@
 #include "AstroUnits.hh"
 #include "PhaseSpaceVector.hh"
 
-#include "RealDetectorUnit.hh"
-#include "DetectorManager.hh"
-#include "ConstructDetector_Sim.hh"
+#include "VRealDetectorUnit.hh"
+#include "DetectorSystem.hh"
+#include "ConstructDetectorForSimulation.hh"
 
 #include "fitsio.h"
 
@@ -182,7 +182,7 @@ ANLStatus SimXIF::mod_init()
   off();
 
   if (ModuleExist("ConstructDetector_Sim")) {
-    m_DetectorManager = GetANLModuleNC<ConstructDetector_Sim>("ConstructDetector_Sim")->GetDetectorManager();
+    m_DetectorManager = GetANLModuleNC<ConstructDetectorForSimulation>("ConstructDetectorForSimulation")->getDetectorManager();
   }
   
   return AS_OK;
@@ -232,11 +232,11 @@ void SimXIF::addEvent(double time, double energy, int stripx, int stripy,
   double widthy(0.0);
 
   if (m_DetectorManager==0 && ModuleExist("ConstructDetector_Sim")) {
-    m_DetectorManager = GetANLModuleNC<ConstructDetector_Sim>("ConstructDetector_Sim")->GetDetectorManager();
+    m_DetectorManager = GetANLModuleNC<ConstructDetectorForSimulation>("ConstructDetectorForSimulation")->getDetectorManager();
   }
   
   if (m_DetectorManager) {
-    RealDetectorUnit* det = m_DetectorManager->getDetectorByID(detector_id);
+    VRealDetectorUnit* det = m_DetectorManager->getDetectorByID(detector_id);
     if (det) {
       double offsetx = det->getCenterPositionX() / det->getPixelPitchX();
       double offsety = det->getCenterPositionY() / det->getPixelPitchY();

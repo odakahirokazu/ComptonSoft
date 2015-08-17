@@ -38,14 +38,14 @@ module ComptonSoft
     attr_accessor :mode
 
     ### Input files
-    attr_writer :detector_config, :channel_table, :detector_group
-    attr_writer :simulation_param, :noise_level
+    attr_writer :detector_config, :channel_map, :detector_group
+    attr_writer :simulation_param, :noise_levels
 
     ### Output files
     attr_accessor :output
 
     ### Geant4 setting
-    attr_writer :random_seed, :verbose, :physics, :cut_value
+    attr_writer :random_seed, :verbose
 
     ### Analysis parameters
     attr_writer :analysis_param
@@ -69,10 +69,10 @@ module ComptonSoft
 
       ### Input files
       @detector_config = "detector_config.xml"
-      @channel_table = nil # "channel_table.xml"
+      @channel_map = nil # "channel_map.xml"
       @simulation_param = "simulation_param.xml"
       @detector_group = '0' # "detector_group.txt"
-      @noise_level = nil
+      @noise_levels = nil
 
       ### Output files
       @output = "output.root"
@@ -80,8 +80,6 @@ module ComptonSoft
       ### Geant4 settings
       @random_seed = 0
       @verbose = 0
-      @physics = ""
-      @cut_value = 0.0001
 
       ### analysis settings
       @analysis_param = nil # "analysis_param.xml"
@@ -110,6 +108,7 @@ module ComptonSoft
 
     ### ANL module setup.
     define_setup_module("geometry", take_parameters: true)
+    define_setup_module("physics", :PhysicsListManager, take_parameters: true)
     define_setup_module("primary_generator", take_parameters: true)
     define_setup_module("pickup_data", take_parameters: true)
     define_setup_module("visualization", :VisualizeG4Geom)
@@ -174,7 +173,10 @@ module ComptonSoft
 
     def setup()
       add_namespace ComptonSoft
-      set_pickup_data :StandardPickUpData
+
+      unless module_of_pickup_data()
+        set_pickup_data :StandardPickUpData
+      end
 
       if mode >= SimulationMode::Normal
         chain :SaveData
@@ -183,23 +185,26 @@ module ComptonSoft
 
       if mode >= SimulationMode::Basic
         chain :CSHitCollection
-        chain :ConstructDetector_Sim
+        chain :ConstructDetectorForSimulation
         with_parameters(detector_configuration: @detector_config,
                         simulation_parameters: @simulation_param)
-        if @channel_table
-          chain :ConstructChannelTable
-          with_parameters(filename: @channel_table)
+        if @channel_map
+          chain :ConstructChannelMap
+          with_parameters(filename: @channel_map)
         end
-        chain :SetNoiseLevel
-        if @noise_level
-          with_parameters(filename: @noise_level)
+        chain :SetNoiseLevels
+        if @noise_levels
+          with_parameters(filename: @noise_levels)
         end
       end
 
       chain_with_parameters module_of_geometry
-      chain :AHStandardANLPhysicsList
-      with_parameters(physics_option: @physics,
-                      cut_value: @cut_value)
+
+      unless module_of_physics()
+        set_physics()
+      end
+      chain_with_parameters module_of_physics
+
       push_simx()
       chain_with_parameters module_of_primary_generator
       chain :Geant4Body
@@ -211,11 +216,11 @@ module ComptonSoft
                       verbose: @verbose)
 
       if mode >= SimulationMode::Basic
-        chain :MakeDetectorHit
+        chain :MakeDetectorHits
+        chain :DetectorGroupManager
+        with_parameters(filename: @detector_group)
         chain :EventSelection
-        with_parameters(detector_group: @detector_group,
-                        apply_veto: @enable_veto,
-                        tolerance_for_fluorescence_lines: @fluorescence_range)
+        with_parameters(enable_veto: @enable_veto)
         if @compton_mode
           chain :EventReconstruction
           with_parameters(detector_group: @detector_group,
@@ -229,7 +234,7 @@ module ComptonSoft
                           source_direction_z: 1.0)
         end
         if mode >= SimulationMode::Normal
-          chain :HitTree_Sim
+          chain :WriteHitTree
         end
       end
       chain_with_parameters module_of_pickup_data
@@ -260,7 +265,7 @@ module ComptonSoft
               0.0
             end
           end
-          set_parameters :SetNoiseLevel
+          set_parameters :SetNoiseLevels
           insert_map "noise_level_map", name, {
             detector_type: type,
             noise_coefficient_00: get_noise_level.("param00"),
@@ -282,7 +287,7 @@ module ComptonSoft
           if n = analysis.elements["threshold_cathode"]; m1["threshold_cathode"] = n.text.to_f; end
           if n = analysis.elements["threshold_anode"]; m1["threshold_anode"] = n.text.to_f; end
 
-          set_parameters :MakeDetectorHit
+          set_parameters :MakeDetectorHits
           insert_map "analysis_map", name, m1
         end
       end

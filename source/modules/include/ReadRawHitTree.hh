@@ -20,90 +20,25 @@
 #ifndef COMPTONSOFT_ReadRawHitTree_H
 #define COMPTONSOFT_ReadRawHitTree_H 1
 
-#include <vector>
-#include <iostream>
-
-#include "G4ThreeVector.hh"
-
-#include "VCSModule.hh"
-#include "InitialInformation.hh"
-
-#include "TChain.h"
-#include "CSHitCollection.hh"
-
+#include "ReadHitTree.hh"
 
 namespace comptonsoft {
 
-class ReadRawHitTree : public VCSModule, public anlgeant4::InitialInformation
+/**
+ * @author Hitokazu Odaka
+ * @date 2014-11-30
+ */
+class ReadRawHitTree : public ReadHitTree
 {
-  DEFINE_ANL_MODULE(ReadRawHitTree, 1.2);
+  DEFINE_ANL_MODULE(ReadRawHitTree, 2.0);
 public:
   ReadRawHitTree();
-  ~ReadRawHitTree() {}
-  
-  anl::ANLStatus mod_startup();
-  anl::ANLStatus mod_his();
-  anl::ANLStatus mod_ana();
+  ~ReadRawHitTree() = default;
   
 protected:
-  virtual void insertHit(int detid, comptonsoft::DetectorHit_sptr hit);
-  
-private:
-  std::vector <std::string> inputfilename;
-
-  TChain* hittree;
-  Long64_t nevent;
-  Long64_t id;
-
-  int eventid;
-  int seqnum;
-  int totalhit;
-  double ini_energy;
-  double ini_dirx;
-  double ini_diry;
-  double ini_dirz;
-  double ini_time;
-  double ini_posx;
-  double ini_posy;
-  double ini_posz;
-  double ini_polarx;
-  double ini_polary;
-  double ini_polarz;
-  double weight;
-
-  double realposx;
-  double realposy;
-  double realposz;
-
-  double localposx;
-  double localposy;
-  double localposz;
-
-  double posx;
-  double posy;
-  double posz;
-
-  double edep;
-  double e_pha;
-  double e_pi;
-  
-  double time;
-
-  unsigned int process;
-  
-  int grade;
-  
-  int detid;
-  int stripx;
-  int stripy;
-  int chip;
-  int channel;
-
-  int time_group;
-
-  unsigned int flag;
+  void insertHit(const DetectorHit_sptr& hit);
 };
 
-}
+} /* namespace comptonsoft */
 
 #endif /* COMPTONSOFT_ReadRawHitTree_H */

@@ -21,13 +21,11 @@
 #define COMPTONSOFT_VCSModule_H 1
 
 #include "BasicModule.hh"
+#include <memory>
+#include "DetectorSystem.hh"
+#include "VRealDetectorUnit.hh"
 
-#include "DetectorManager.hh"
-#include "RealDetectorUnit.hh"
-
-#if USE_ROOT
 class TDirectory;
-#endif
 
 namespace comptonsoft {
 
@@ -35,36 +33,27 @@ namespace comptonsoft {
  * class VCSModule
  * @author Hirokazu Odaka
  * @date 2008-08-30
+ * @date 2014-11-22
  */
 class VCSModule : public anl::BasicModule
 {
-  DEFINE_ANL_MODULE(VCSModule, 1.0);
+  DEFINE_ANL_MODULE(VCSModule, 1.1);
 public:
   VCSModule();
   ~VCSModule();
   
   virtual anl::ANLStatus mod_init();
-
-#if USE_ROOT
   virtual anl::ANLStatus mod_his();
 
 protected:
-  void mkdir_module(const std::string& name="");
-#endif
-  
-protected:
-  comptonsoft::DetectorManager* GetDetectorManager() { return detector_manager; } 
-  
-  std::vector<comptonsoft::RealDetectorUnit*>& GetDetectorVector() 
-  { return detector_manager->getDetectorVector(); }
+  void mkdir(const std::string& name="");
+  DetectorSystem* getDetectorManager() { return detectorSystem_; } 
 
 private:
-  comptonsoft::DetectorManager* detector_manager;
-#if USE_ROOT
-  TDirectory* save_dir;
-#endif
+  DetectorSystem* detectorSystem_;
+  TDirectory* saveDir_;
 };
 
-}
+} /* namespace comptonsoft */
 
 #endif /* COMPTONSOFT_VCSModule_H */

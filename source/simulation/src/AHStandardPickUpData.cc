@@ -23,6 +23,7 @@
 #include <iomanip>
 #include <algorithm>
 
+#include "G4SystemOfUnits.hh"
 #include "G4Run.hh"
 #include "G4Event.hh"
 #include "G4RootAnalysisManager.hh"
@@ -32,6 +33,7 @@
 #include "SimXIF.hh"
 #include "EventReconstruction.hh"
 #include "DetectorHit.hh"
+#include "BasicComptonEvent.hh"
 
 using namespace anl;
 using namespace comptonsoft;
@@ -91,7 +93,7 @@ ANLStatus AHStandardPickUpData::mod_init()
 
 ANLStatus AHStandardPickUpData::mod_ana()
 {
-  const std::vector<DetectorHit_sptr>& hitVec = m_HitCollection->GetHits();
+  const std::vector<DetectorHit_sptr>& hitVec = m_HitCollection->getHits();
 
   int num = hitVec.size();
   if (num>0) { EvsSet("HitTree:Fill"); }
@@ -188,22 +190,22 @@ void AHStandardPickUpData::Fill(int seqnum,
   const G4ThreeVector iniPos = m_InitialInfo->InitialPosition();
   const G4ThreeVector iniPolar = m_InitialInfo->InitialPolarization();
 
-  G4double realposx = hit->getRealPosX();
-  G4double realposy = hit->getRealPosY();
-  G4double realposz = hit->getRealPosZ();
-  G4double posx = hit->getPosX();
-  G4double posy = hit->getPosY();
-  G4double posz = hit->getPosZ();
+  G4double realposx = hit->RealPositionX();
+  G4double realposy = hit->RealPositionY();
+  G4double realposz = hit->RealPositionZ();
+  G4double posx = hit->PositionX();
+  G4double posy = hit->PositionY();
+  G4double posz = hit->PositionZ();
   
-  G4double edep  = hit->getEdep();
-  G4double e_pha = hit->getPHA();
-  G4double e_pi  = hit->getPI();
+  G4double edep  = hit->EnergyDeposit();
+  G4double e_pha = hit->PHA();
+  G4double e_pi  = hit->EPI();
   
-  G4double time1 = hit->getTime();
+  G4double time1 = hit->Time();
   
-  G4double detid = hit->getDetectorID();
-  G4double stripx = hit->getStripX();
-  G4double stripy = hit->getStripY();
+  G4double detid = hit->DetectorID();
+  G4double stripx = hit->PixelX();
+  G4double stripy = hit->PixelY();
 
   // fill ntuple
   m_AnalysisManager->FillNtupleIColumn(0, eventID);
@@ -262,7 +264,7 @@ int findMaxPI(const std::vector<DetectorHit_sptr>& hits)
   int index = -1;
   double x = -1.0;
   for (size_t i=0; i<hits.size(); i++) {
-    double ePI = hits[i]->getPI();
+    double ePI = hits[i]->EPI();
     if (x < ePI) {
       x = ePI;
       index = i;
@@ -281,7 +283,7 @@ void AHStandardPickUpData::MakeEvent(const std::vector<DetectorHit_sptr>& hits)
   int detectorID(0);
 
   if (m_EventReconstruction) {
-    const TwoHitComptonEvent& twoHitData = m_EventReconstruction->GetTwoHitData();
+    const BasicComptonEvent& twoHitData = m_EventReconstruction->getComptonEvent();
     const double dtheta = std::abs(twoHitData.DeltaTheta());
     energy = twoHitData.TotalEnergy();
 
@@ -291,21 +293,21 @@ void AHStandardPickUpData::MakeEvent(const std::vector<DetectorHit_sptr>& hits)
     }
 
     EvsSet("CompMode:DeltaTheta:GOOD");
-    time1 = twoHitData.getH1Time();
-    stripx = twoHitData.getH1StripX();
-    stripy = twoHitData.getH1StripY();
-    detectorID = twoHitData.getH1DetId();
+    time1 = twoHitData.Hit1Time();
+    stripx = twoHitData.Hit1Pixel().X();
+    stripy = twoHitData.Hit1Pixel().Y();
+    detectorID = twoHitData.Hit1DetectorID();
   }
   else {
     int i = findMaxPI(hits);
     if (i<0) return;
 
     DetectorHit_sptr hit(hits[i]);
-    time1 = hit->getTime();
-    stripx = hit->getStripX();
-    stripy = hit->getStripY();
-    energy = hit->getPI();
-    detectorID = hit->getDetectorID();
+    time1 = hit->Time();
+    stripx = hit->PixelX();
+    stripy = hit->PixelY();
+    energy = hit->EPI();
+    detectorID = hit->DetectorID();
   }
 
   m_SimXIF->addEvent(time1, energy, stripx, stripy, detectorID);

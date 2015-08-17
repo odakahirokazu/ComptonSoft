@@ -17,30 +17,32 @@
  *                                                                       *
  *************************************************************************/
 
-// Hiro Odaka
-
 #ifndef COMPTONSOFT_ComptonEventFilter_H
 #define COMPTONSOFT_ComptonEventFilter_H 1
 
-#include <vector>
-#include <boost/function.hpp>
-
 #include "BasicModule.hh"
 
-#include "globals.hh"
-
-#include "TwoHitComptonEvent.hh"
-#include "EventReconstruction.hh"
+#include <functional>
 #include "HitPattern.hh"
 
 namespace comptonsoft {
 
+class BasicComptonEvent;
+class DetectorGroupManager;
+class EventReconstruction;
+
+/**
+ *
+ * @author Hirokazu Odaka
+ * @date 2011-xx-xx
+ * @date 2014-11-26
+ */
 class ComptonEventFilter : public anl::BasicModule
 {
-  DEFINE_ANL_MODULE(ComptonEventFilter, 3.1);
+  DEFINE_ANL_MODULE(ComptonEventFilter, 3.2);
 public:
   ComptonEventFilter();
-  ~ComptonEventFilter() {}
+  ~ComptonEventFilter() = default;
 
   anl::ANLStatus mod_startup();
   anl::ANLStatus mod_com();
@@ -49,16 +51,17 @@ public:
 
   void define_condition();
   void add_condition(const std::string& type,
-                     double min_value, double max_value);
+                     double minValue,
+                     double maxValue);
     
 private:
-  EventReconstruction* EventReconstruction_ptr;
-  std::vector<std::string> hitpat_names;
-  std::vector<comptonsoft::HitPattern> hitpats;
-
-  std::vector< std::vector< boost::function<bool (const comptonsoft::TwoHitComptonEvent&)> > > conditions_vector;
+  const DetectorGroupManager* m_DetectorGroupManager;
+  const EventReconstruction* m_EventReconstruction;
+  std::vector<std::string> m_HitPatternNames;
+  std::vector<HitPattern> m_HitPatterns;
+  std::vector<std::vector<std::function<bool (const BasicComptonEvent&)>>> m_ConditionsVector;
 };
 
-}
+} /* namespace comptonsoft */
 
 #endif /* COMPTONSOFT_ComptonEventFilter_H */

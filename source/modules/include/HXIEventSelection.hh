@@ -22,24 +22,29 @@
 
 #include "VCSModule.hh"
 
-#include "CSHitCollection.hh"
-
 namespace comptonsoft {
 
+class CSHitCollection;
+
+/**
+ * HXI event selection.
+ * @author Hirokazu Odaka
+ * @date 2011-xx-xx
+ */
 class HXIEventSelection : public VCSModule
 {
-  DEFINE_ANL_MODULE(HXIEventSelection, 1.0);
+  DEFINE_ANL_MODULE(HXIEventSelection, 1.1);
 public:
-  HXIEventSelection() {}
-  ~HXIEventSelection() {}
+  HXIEventSelection() = default;
+  ~HXIEventSelection() = default;
 
   anl::ANLStatus mod_init();
   anl::ANLStatus mod_ana();
 
 private:
-  CSHitCollection* hit_collection;
+  CSHitCollection* m_HitCollection = nullptr;
 };
 
-}
+} /* namespace comptonsoft */
 
 #endif /* COMPTONSOFT_HXIEventSelection_H */

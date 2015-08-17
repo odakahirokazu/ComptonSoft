@@ -25,64 +25,48 @@
 
 #include "TChain.h"
 
-#include "DetectorReadModule.hh"
-#include "OneASICData.hh"
+#include "DetectorReadoutModule.hh"
+#include "MultiChannelData.hh"
 
-using namespace comptonsoft;
 using namespace anl;
 
-
-ANLStatus ReadDataFile_NT::mod_startup()
+namespace comptonsoft
 {
-  unregister_parameter("file_list");
-  register_parameter(&m_FileNameVector, "file_list", "seq", "data");
-  return VCSModule::mod_startup();
-}
-
 
 ANLStatus ReadDataFile_NT::mod_init()
 {
   ReadDataFile::mod_init();
 
   m_Tree = new TChain("eventtree");
-  for(std::vector<std::string>::iterator it=m_FileNameVector.begin();
-      it!=m_FileNameVector.end(); ++it) {
-    m_Tree->Add(it->c_str());
+  while (!wasLastFile()) {
+    m_Tree->Add(nextFile().c_str());
   }
   
-  m_NEvent = m_Tree->GetEntries();
-  std::cout << "Total Event : " << m_NEvent << std::endl;
+  m_NEvents = m_Tree->GetEntries();
+  std::cout << "Total Event : " << m_NEvents << std::endl;
   
-  int m_NumASIC = 0;
-  std::vector<DetectorReadModule*>::iterator itModule = GetDetectorManager()->getReadModuleVector().begin();
-  std::vector<DetectorReadModule*>::iterator itModuleEnd = GetDetectorManager()->getReadModuleVector().end();
-  while ( itModule != itModuleEnd ) {
-    m_NumASIC += (*itModule)->NumASIC();
-    itModule++;
+  int numASICs = 0;
+  DetectorSystem* detectorManager = getDetectorManager();
+  for (auto& readoutModule: detectorManager->getReadoutModules()) {
+    numASICs += readoutModule->NumberOfReadoutSections();
   }
+  std::cout << "Total readout ASICs : " << numASICs << std::endl;
+  m_ADC.reset(new std::unique_ptr<uint16_t[]>[numASICs]);
 
-  std::cout << "Total readout ASICs : " << m_NumASIC << std::endl;
-  m_ADC = new unsigned short int*[m_NumASIC];
   int iASIC = 0;
-
-  itModule = GetDetectorManager()->getReadModuleVector().begin();
-  while ( itModule != itModuleEnd ) {
-    std::vector<OneASICData*>::iterator itChip = (*itModule)->ASICDataBegin();
-    std::vector<OneASICData*>::iterator itChipEnd = (*itModule)->ASICDataEnd();
-    while ( itChip != itChipEnd ) {
-      int numChannel = (*itChip)->NumChannel();
-      m_ADC[iASIC] = new unsigned short int[numChannel];
+  for (auto& readoutModule: detectorManager->getReadoutModules()) {
+    for (auto& section: readoutModule->getReadoutSections()) {
+      MultiChannelData* mcd = detectorManager->getMultiChannelData(section);
+      int numChannels = mcd->NumberOfChannels();
+      m_ADC[iASIC].reset(new uint16_t[numChannels]);
       std::ostringstream oss;
       oss << "adc" << iASIC;
       std::string branchName = oss.str();
-      m_Tree->SetBranchAddress(branchName.c_str(), m_ADC[iASIC]);
-
-      std::cout << branchName << " " << numChannel << std::endl;
+      m_Tree->SetBranchAddress(branchName.c_str(), m_ADC[iASIC].get());
+      std::cout << branchName << " " << numChannels << std::endl;
    
       iASIC++;
-      itChip++;
     }
-    itModule++;
   }
 
   m_Tree->SetBranchAddress("unixtime", &m_UnixTime);
@@ -90,47 +74,33 @@ ANLStatus ReadDataFile_NT::mod_init()
   return AS_OK;
 }
 
-
 ANLStatus ReadDataFile_NT::mod_ana()
 {
-  static unsigned int i = 0;
-  if(i == m_NEvent) {
+  static unsigned int iEvent = 0;
+  if(iEvent == m_NEvents) {
     return AS_QUIT;
   }
   
-  m_Tree->GetEntry(i);
+  m_Tree->GetEntry(iEvent);
 
   setTime(m_UnixTime);
-  
+
+  DetectorSystem* detectorManager = getDetectorManager();
   int iASIC = 0;
-  std::vector<DetectorReadModule*>::iterator itModule = GetDetectorManager()->getReadModuleVector().begin();
-  std::vector<DetectorReadModule*>::iterator itModuleEnd = GetDetectorManager()->getReadModuleVector().end();
-  while ( itModule != itModuleEnd ) {
-    std::vector<OneASICData*>::iterator itChip = (*itModule)->ASICDataBegin();
-    std::vector<OneASICData*>::iterator itChipEnd = (*itModule)->ASICDataEnd();
-    while ( itChip != itChipEnd ) {
-      int nCh = (*itChip)->NumChannel();
-      for (int i=0; i<nCh; i++) {
-	unsigned int data = m_ADC[iASIC][i];
-	(*itChip)->setRawADC(i, data);
+  for (auto& readoutModule: detectorManager->getReadoutModules()) {
+    for (auto& section: readoutModule->getReadoutSections()) {
+      MultiChannelData* mcd = detectorManager->getMultiChannelData(section);
+      int numChannels = mcd->NumberOfChannels();
+      for (int i=0; i<numChannels; i++) {
+        uint16_t data = m_ADC[iASIC][i];
+        mcd->setRawADC(i, data);
       }
       iASIC++;
-      itChip++;
     }
-    itModule++;
   }
   
-  i++;
+  iEvent++;
   return ReadDataFile::mod_ana();
 }
 
-
-ANLStatus ReadDataFile_NT::mod_exit()
-{
-  for (int i=0; i<m_NumASIC; i++) {
-    delete[] m_ADC[i];
-  }
-  delete[] m_ADC;
-
-  return AS_OK;
-}
+} /* namespace comptonsoft */

@@ -191,7 +191,7 @@ void BasicPrimaryGen::setDefinition(G4ParticleDefinition* def)
 
 void BasicPrimaryGen::enablePowerLawInput()
 {
-  expose_parameter("ehoton_index");
+  expose_parameter("photon_index");
   expose_parameter("energy_min");
   expose_parameter("energy_max");
 }

@@ -17,32 +17,49 @@
  *                                                                       *
  *************************************************************************/
 
-// 2007-12-xx Hirokazu Odaka 
-// 2009-06-22 Hirokazu Odaka 
-
 #ifndef COMPTONSOFT_CorrectPHA_H
 #define COMPTONSOFT_CorrectPHA_H 1
 
 #include "VCSModule.hh"
+#include <memory>
 
 namespace comptonsoft {
 
+/**
+ *
+ * @author Hirokazu Odaka 
+ * @date 2007-12-xx 
+ * @date 2009-06-22
+ * @date 2014-09-09
+ */
 class CorrectPHA : public VCSModule
 {
-  DEFINE_ANL_MODULE(CorrectPHA, 2.1)
+  DEFINE_ANL_MODULE(CorrectPHA, 3.0)
+public:
+  enum class CMNSubtractionMode {
+    No, Given, Median, Mean
+  };
+
 public:
   CorrectPHA();
-  ~CorrectPHA() {}
+  ~CorrectPHA();
 
   anl::ANLStatus mod_startup();
   anl::ANLStatus mod_init();
   anl::ANLStatus mod_ana();
+  anl::ANLStatus mod_exit();
 
 private:
+  bool m_PedestalCorrection;
+  CMNSubtractionMode m_CMNSubtraction;
+  bool m_GainCorrection;
+
   std::string m_PedestalFileName;
-  bool m_CMNByMedian;
+  int m_CMNSubtractionInteger;
+  std::string m_GainFileName;
+  std::unique_ptr<TFile> m_GainFile;
 };
 
-}
+} /* namespace comptonsoft */
 
 #endif /* COMPTONSOFT_CorrectPHA_H */

@@ -18,20 +18,22 @@
  *************************************************************************/
 
 #include "ComptonModeFilter.hh"
-#include "TDirectory.h"
+#include <cmath>
+#include "TGraph.h"
+#include "AstroUnits.hh"
+#include "BasicComptonEvent.hh"
+#include "EventReconstruction.hh"
 
-#include "globals.hh"
-#include "TMath.h"
-
-using namespace comptonsoft;
 using namespace anl;
 
+namespace comptonsoft
+{
+
 ComptonModeFilter::ComptonModeFilter()
-  : EventReconstruction_ptr(0),
-    armcut_curve_ss(0), armcut_curve_sc(0), armcut_curve_cc(0)
+  : m_EventReconstruction(nullptr),
+    m_ARMCutCurveSS(nullptr), m_ARMCutCurveSC(nullptr), m_ARMCutCurveCC(nullptr)
 {
 }
-
 
 ANLStatus ComptonModeFilter::mod_init()
 {
@@ -45,31 +47,30 @@ ANLStatus ComptonModeFilter::mod_init()
   EvsDef("ComptonMode:DeltaTheta:GOOD");
   EvsDef("ComptonMode:DeltaTheta:GOOD2");
 
-  GetANLModuleNC("EventReconstruction", &EventReconstruction_ptr);
+  GetANLModuleNC("EventReconstruction", &m_EventReconstruction);
   
   return AS_OK;
 }
 
-
 ANLStatus ComptonModeFilter::mod_his()
 {
   VCSModule::mod_his();
-  mkdir_module();
+  mkdir();
   create_armcut_curves();
 
   return AS_OK;
 }
 
-
 ANLStatus ComptonModeFilter::mod_ana()
 {
-  if (!Evs("EventReconst:Stored")) {
+  if (!Evs("EventReconstruction:OK")) {
     return AS_OK;
   }
   
-  const TwoHitComptonEvent& twoHitData = EventReconstruction_ptr->GetTwoHitData();
-  const double dtheta = TMath::Abs(twoHitData.DeltaTheta());
-  const double e_gamma = twoHitData.TotalEnergy();
+  const BasicComptonEvent& ComptonEvent
+    = m_EventReconstruction->getComptonEvent();
+  const double dtheta = std::abs(ComptonEvent.DeltaTheta());
+  const double e_gamma = ComptonEvent.TotalEnergy();
 
   if (dtheta < 2.0*degree) {
     EvsSet("ComptonMode:DeltaTheta:02");
@@ -110,56 +111,53 @@ ANLStatus ComptonModeFilter::mod_ana()
   return AS_OK;
 }
 
-
 // function formula taken from HXISGDComptonMode_Ana.cc by S.Watanabe
-double ComptonModeFilter::theta_cut_limit(double ene) const
+double ComptonModeFilter::theta_cut_limit(double energy) const
 {
-  if( ene > 300. *keV) ene = 300. * keV;
-  double limit = (26.0 - ene/keV * 0.06) * deg;
+  if( energy > 300. *keV) energy = 300. * keV;
+  double limit = (26.0 - energy/keV * 0.06) * deg;
   return limit;
 }
 
 // function formula taken from MakeAnaSpectrum.cc by S.Watanabe
-double ComptonModeFilter::theta_cut_limit2(double ene) const
+double ComptonModeFilter::theta_cut_limit2(double energy) const
 {
   double armcut = 180.0*deg;
-  if (Evs("EventReconst:2Hit:Si-Si")) {
-    armcut = armcut_curve_ss->Eval(ene/keV,0,"S") * deg;
+  if (Evs("HitPattern:SS")) {
+    armcut = m_ARMCutCurveSS->Eval(energy/keV,0,"S") * deg;
   }
-  else if (Evs("EventReconst:2Hit:Si-CdTe")) {
-    armcut = armcut_curve_sc->Eval(ene/keV,0,"S") * deg;
+  else if (Evs("HitPattern:SC")) {
+    armcut = m_ARMCutCurveSC->Eval(energy/keV,0,"S") * deg;
   }
-  else if (Evs("EventReconst:2Hit:CdTe-CdTe")) {
-    armcut = armcut_curve_cc->Eval(ene/keV,0,"S") * deg;
-  }
-  else if (Evs("EventReconst:3Hit")) {
-    armcut = armcut_curve_sc->Eval(ene/keV,0,"S") * deg;
+  else if (Evs("HitPattern:CC")) {
+    armcut = m_ARMCutCurveCC->Eval(energy/keV,0,"S") * deg;
   }
 
   return armcut;
 }
 
-
 void ComptonModeFilter::create_armcut_curves()
 {
   const int graph_point = 15;
-  double ene_ss[graph_point]={0., 40., 50., 60., 70., 80., 90.,100.,120.,140.,160.,200.,600.,800.,1000.};
-  double ene_sc[graph_point]={0., 60., 80.,100.,120.,150.,180.,220.,250.,300.,350.,400.,500.,600.,1000.};
-  double ene_cc[graph_point]={0.,100.,150.,200.,250.,300.,350.,400.,450.,500.,600.,700.,800.,900.,1000.};
+  double energy_ss[graph_point]={0., 40., 50., 60., 70., 80., 90.,100.,120.,140.,160.,200.,600.,800.,1000.};
+  double energy_sc[graph_point]={0., 60., 80.,100.,120.,150.,180.,220.,250.,300.,350.,400.,500.,600.,1000.};
+  double energy_cc[graph_point]={0.,100.,150.,200.,250.,300.,350.,400.,450.,500.,600.,700.,800.,900.,1000.};
 
   double armlimit_ss[graph_point]={62.37,62.37,62.37,49.95,45.63,44.19,44.01,42.93,42.93,42.93,42.93,42.93,42.93,42.93,42.93};
   double armlimit_sc[graph_point]={29.97,29.97,20.07,16.29,13.95,12.51,11.79,10.53, 9.81, 9.09, 9.09, 8.91, 6.39, 5.13, 5.13};
   double armlimit_cc[graph_point]={48.15,48.15,48.15,47.97,42.39,32.49,26.19,21.15,19.17,16.65,13.23,13.23,13.23,13.23,13.23};
   
-  armcut_curve_ss = new TGraph(graph_point, ene_ss, armlimit_ss);
-  armcut_curve_sc = new TGraph(graph_point, ene_sc, armlimit_sc);
-  armcut_curve_cc = new TGraph(graph_point, ene_cc, armlimit_cc);
+  m_ARMCutCurveSS = new TGraph(graph_point, energy_ss, armlimit_ss);
+  m_ARMCutCurveSC = new TGraph(graph_point, energy_sc, armlimit_sc);
+  m_ARMCutCurveCC = new TGraph(graph_point, energy_cc, armlimit_cc);
   
-  armcut_curve_ss->SetName("armcut_curve_ss");
-  armcut_curve_sc->SetName("armcut_curve_sc");
-  armcut_curve_cc->SetName("armcut_curve_cc");
+  m_ARMCutCurveSS->SetName("armcut_curve_ss");
+  m_ARMCutCurveSC->SetName("armcut_curve_sc");
+  m_ARMCutCurveCC->SetName("armcut_curve_cc");
   
-  armcut_curve_ss->Write();
-  armcut_curve_sc->Write();
-  armcut_curve_cc->Write();
+  m_ARMCutCurveSS->Write();
+  m_ARMCutCurveSC->Write();
+  m_ARMCutCurveCC->Write();
 }
+
+} /* namespace comptonsoft */

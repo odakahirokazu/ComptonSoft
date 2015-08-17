@@ -17,49 +17,43 @@
  *                                                                       *
  *************************************************************************/
 
-// ReadDataFile_NT.hh
-// 2007-10-02  Hirokazu Odaka 
-// 2007-11-02  Hirokazu Odaka 
-// 2008-08-31  Hirokazu Odaka 
-// 2009-09-21  Hirokazu Odaka 
-// 2011-11-20  Hirokazu Odaka : file vector
-
 #ifndef COMPTONSOFT_ReadDataFile_NT_H
 #define COMPTONSOFT_ReadDataFile_NT_H 1
 
 #include "ReadDataFile.hh"
 
-#include <fstream>
-#include <string>
-#include <vector>
+#include <cstdint>
+#include <memory>
 
 class TChain;
 
 namespace comptonsoft {
 
+/**
+ * Read data file: "NabeTree" format.
+ * @author Hirokazu Odaka
+ * @date 2011-11-20
+ * @date 2014-11-25
+ */
 class ReadDataFile_NT : public ReadDataFile
 {
-  DEFINE_ANL_MODULE(ReadDataFile_NT, 3.1);
+  DEFINE_ANL_MODULE(ReadDataFile_NT, 3.2);
 public:
-  ReadDataFile_NT() {}
-  ~ReadDataFile_NT() {}
+  ReadDataFile_NT() = default;
+  ~ReadDataFile_NT() = default;
 
-  anl::ANLStatus mod_startup();
   anl::ANLStatus mod_init();
   anl::ANLStatus mod_ana();
-  anl::ANLStatus mod_exit();
 
 private:
-  TChain* m_Tree;
-  std::vector<std::string> m_FileNameVector;
-  unsigned int m_NEvent;
-  unsigned short int** m_ADC;
-  int m_UnixTime;
-  int m_NumASIC;
+  TChain* m_Tree = nullptr;
+  uint32_t m_NEvents = 0u;
+  std::unique_ptr<std::unique_ptr<uint16_t[]>[]> m_ADC;
+  int m_UnixTime = 0;
   // unsigned int m_LiveTime;
   // unsigned int m_IntegralLiveTime;
 };
 
-}
+} /* namespace comptonsoft */
 
 #endif /* COMPTONSOFT_ReadDataFile_NT_H */

@@ -35,7 +35,7 @@ struct Event_Type;
 
 namespace comptonsoft {
 
-class DetectorManager;
+class DetectorSystem;
 
 
 /**
@@ -80,7 +80,7 @@ private:
   std::vector<PhaseSpaceVector> m_Primaries;
   std::vector<PhaseSpaceVector>::const_iterator m_PrimaryIter;
 
-  comptonsoft::DetectorManager* m_DetectorManager;
+  comptonsoft::DetectorSystem* m_DetectorManager;
 };
 
 }

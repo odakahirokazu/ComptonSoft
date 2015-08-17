@@ -22,9 +22,10 @@
 
 #include "StandardPickUpData.hh"
 
+#include <cstdint>
+#include <memory>
 #include <vector>
 #include <map>
-#include <boost/cstdint.hpp>
 
 #include "IsotopeInfo.hh"
 
@@ -35,7 +36,6 @@ class G4VAnalysisManager;
 
 namespace comptonsoft {
 
-
 /**
  * PickUpData module for radioactivation
  *
@@ -43,10 +43,11 @@ namespace comptonsoft {
  * @date 2011-07-28 | T. Sato  | for ANLNext
  * @date 2012-02-06 | H. Odaka | code cleanup
  * @date 2012-06-13 | T. Sato & H. Odaka
+ * @date 2015-06-01 | Hiro Odaka
  */
 class ActivationPickUpData : public anlgeant4::StandardPickUpData
 {
-  DEFINE_ANL_MODULE(ActivationPickUpData, 1.2);
+  DEFINE_ANL_MODULE(ActivationPickUpData, 1.3);
 
   typedef std::map<std::string, int> volume_map_t;
   typedef std::map<int64_t, IsotopeInfo> data_map_t;
@@ -68,15 +69,15 @@ protected:
   void Fill(const G4Ions* nucleus,
             const G4VTouchable* touchable,
             double posx, double posy, double posz);
-  void OutputVolumeInfo(const std::string& fileName="");
-  void OutputSummary(const std::string& fileName, int numberOfRun);
+  void OutputVolumeInfo(const std::string& filename="");
+  void OutputSummary(const std::string& filename, int numberOfRun);
   
   int NumberOfVolumes();
   std::string VolumeName(int index);
   
 private:
-  G4VAnalysisManager* m_AnalysisManager;
-  std::string m_FileNameBase;
+  std::unique_ptr<G4VAnalysisManager> m_AnalysisManager;
+  std::string m_FilenameBase;
   
   double m_InitialEnergy;
       
@@ -85,6 +86,6 @@ private:
   std::vector<data_map_t> m_RIMapVector;
 };
   
-}
+} /* namespace comptonsoft */
 
 #endif /* COMPTONSOFT_ActivationPickUpData_H */

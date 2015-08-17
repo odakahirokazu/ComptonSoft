@@ -17,37 +17,39 @@
  *                                                                       *
  *************************************************************************/
 
-// ConstructDetector.hh
-// 2008-08-27 Hirokazu Odaka
-
 #ifndef COMPTONSOFT_ConstructDetector_H
 #define COMPTONSOFT_ConstructDetector_H 1
 
 #include "BasicModule.hh"
-#include "DetectorManager.hh"
 
 namespace comptonsoft {
 
+class DetectorSystem;
+
+/**
+ * construct detector system
+ * @author Hirokazu Odaka
+ * @date 2008-08-27
+ */
 class ConstructDetector : public anl::BasicModule
 {
-  DEFINE_ANL_MODULE(ConstructDetector, 2.0);
+  DEFINE_ANL_MODULE(ConstructDetector, 3.0);
 public:
   ConstructDetector();
-  ~ConstructDetector() {}
+  ~ConstructDetector();
 
   anl::ANLStatus mod_startup();
   anl::ANLStatus mod_prepare();
   anl::ANLStatus mod_init();
   anl::ANLStatus mod_ana();
-  anl::ANLStatus mod_exit();
-  
-  comptonsoft::DetectorManager* GetDetectorManager() { return detector_manager; }
+
+  DetectorSystem* getDetectorManager() { return detectorManager_.get(); }
 
 private:
-  comptonsoft::DetectorManager* detector_manager;
-  std::string configuration_file_name;
+  std::unique_ptr<DetectorSystem> detectorManager_;
+  std::string configurationFile_;
 };
 
-}
+} /* namespace comptonsoft */
 
 #endif /* COMPTONSOFT_ConstructDetector_H */

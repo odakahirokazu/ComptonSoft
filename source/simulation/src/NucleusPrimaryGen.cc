@@ -61,10 +61,9 @@ ANLStatus NucleusPrimaryGen::mod_bgnrun()
 {
   BasicPrimaryGen::mod_bgnrun();
   
-  G4IonTable ionTable;
-  ionTable.RegisterIsotopeTable(new G4RIsotopeTable);
+  G4IonTable* ionTable = static_cast<G4IonTable*>(G4ParticleTable::GetParticleTable()->GetIonTable());
   G4ParticleDefinition* particle = 
-    ionTable.GetIon(m_RIZ, m_RIA, m_RIEnergy);
+    ionTable->GetIon(m_RIZ, m_RIA, m_RIEnergy);
   setDefinition(particle);
   
   G4double energy(0.0);

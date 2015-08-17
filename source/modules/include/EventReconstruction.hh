@@ -17,81 +17,70 @@
  *                                                                       *
  *************************************************************************/
 
-// 2008-12-15 Hirokazu Odaka
-
 #ifndef COMPTONSOFT_EventReconstruction_H
 #define COMPTONSOFT_EventReconstruction_H 1
 
-#include <vector>
-
 #include "BasicModule.hh"
 
-#include "DetectorGroup.hh"
-#include "HitPattern.hh"
-#include "CSHitCollection.hh"
-#include "ComptonEvent.hh"
+#include <vector>
+#include "CSTypes.hh"
+#include "DetectorHit_sptr.hh"
 
 namespace comptonsoft {
 
+class BasicComptonEvent;
+class VEventReconstructionAlgorithm;
+class CSHitCollection;
+class DetectorGroupManager;
+
+/**
+ * Event reconstruction.
+ * @author Hirokazu Odaka
+ * @date 2008-12-15
+ * @date 2014-11-25
+ */
 class EventReconstruction : public anl::BasicModule
 {
-  DEFINE_ANL_MODULE(EventReconstruction, 1.3)
+  DEFINE_ANL_MODULE(EventReconstruction, 2.0)
 public:
   EventReconstruction();
-  ~EventReconstruction() {}
+  ~EventReconstruction() = default;
 
   anl::ANLStatus mod_startup();
-  anl::ANLStatus mod_com();
-  anl::ANLStatus mod_prepare();
   anl::ANLStatus mod_init();
   anl::ANLStatus mod_ana();
-  anl::ANLStatus mod_exit();
+  anl::ANLStatus mod_endrun();
 
-  ComptonEvent& GetComptonEvent() { return compton_event; }
-  const TwoHitComptonEvent& GetTwoHitData()
-  { return compton_event.getReconstructedEvent(); }
+  const BasicComptonEvent& getComptonEvent() const
+  { return *m_ComptonEvent; }
   
-  std::vector<HitPattern>& GetHitPatternVector() { return hit_pattern_vec; }
-  int HitPatternFlag(int index) { return hit_pattern_flags[index]; }
+  int HitPatternFlag(int index) const { return m_HitPatternFlags[index]; }
 
 protected:
-  const DetectorGroup* get_detector_group(const std::string& name);
-  void com_base();
-  bool load_detector_groups();
-  void init_bnk_evs();
+  void assignSourceInformation();
+  void initializeHitPatternData();
+  void determineHitPattern(const std::vector<DetectorHit_sptr>& hitvec);
+  void determineHitPattern(const std::vector<int>& idvec);
+  void printHitPatternData();
+
+  void resetComptonEvent(BasicComptonEvent* event);
   
-  void determine_hit_pattern(const std::vector<DetectorHit_sptr>& hitvec);
-  void determine_hit_pattern(const std::vector<DetectorHit*>& hitvec);
-  void determine_hit_pattern(const std::vector<int>& idvec);
-  void assign_source_information();
-
-  ComptonEvent compton_event;
-
 private:
-  CSHitCollection* hit_collection;
+  int m_MaxHits;
+  bool m_SourceDistant;
+  vector3_t m_SourceDirection;
+  vector3_t m_SourcePosition;
 
-  int min_hit;
-  int max_hit;
-  bool ecut;
-  double energy_range0;
-  double energy_range1;
+  CSHitCollection* m_HitCollection;
+  const DetectorGroupManager* m_DetectorGroupManager;
 
-  std::string dg_filename;
-  std::vector<DetectorGroup> detector_groups;
+  std::unique_ptr<BasicComptonEvent> m_ComptonEvent;
+  std::unique_ptr<VEventReconstructionAlgorithm> m_Reconstruction;
 
-  std::vector<HitPattern> hit_pattern_vec;
-  std::vector<int> hit_pattern_flags;
-  std::vector<int> hit_pattern_counts;
-
-  bool source_distant;
-  double source_direction_x;
-  double source_direction_y;
-  double source_direction_z;
-  double source_position_x;
-  double source_position_y;
-  double source_position_z;
+  std::vector<int> m_HitPatternFlags;
+  std::vector<int> m_HitPatternCounts;
 };
 
-}
+} /* namespace comptonsoft */
 
 #endif /* COMPTONSOFT_EventReconstruction_H */

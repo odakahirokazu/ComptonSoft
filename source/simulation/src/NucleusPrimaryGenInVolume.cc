@@ -20,13 +20,13 @@
 #include "NucleusPrimaryGenInVolume.hh"
 
 using namespace anl;
-using namespace comptonsoft;
 
+namespace comptonsoft
+{
 
 NucleusPrimaryGenInVolume::NucleusPrimaryGenInVolume()
 {
 }
-
 
 ANLStatus NucleusPrimaryGenInVolume::mod_startup()
 {
@@ -38,13 +38,11 @@ ANLStatus NucleusPrimaryGenInVolume::mod_startup()
   return AS_OK;
 }
 
-
 ANLStatus NucleusPrimaryGenInVolume::mod_com()
 {
   unregister_parameter("position");
   return NucleusPrimaryGen::mod_com();
 }
-
 
 ANLStatus NucleusPrimaryGenInVolume::mod_bgnrun()
 {
@@ -59,7 +57,6 @@ ANLStatus NucleusPrimaryGenInVolume::mod_bgnrun()
   return AS_OK;
 }
 
-
 ANLStatus NucleusPrimaryGenInVolume::mod_ana()
 {
   G4ThreeVector position(m_PositionSampler.samplePosition());
@@ -70,3 +67,5 @@ ANLStatus NucleusPrimaryGenInVolume::mod_ana()
   
   return NucleusPrimaryGen::mod_ana();
 }
+
+} /* namespace comptonsoft */

@@ -18,24 +18,20 @@
  *************************************************************************/
 
 #include "ReadDataFile_SpW2.hh"
-
 #include <iostream>
 #include <iomanip>
-
-#include "DetectorReadModule.hh"
-#include "OneASICData.hh"
-
-
-using namespace comptonsoft;
-
+#include "DetectorReadoutModule.hh"
+#include "MultiChannelData.hh"
 
 using namespace anl;
+
+namespace comptonsoft
+{
 
 ReadDataFile_SpW2::ReadDataFile_SpW2()
   : m_ReadPacketSize(0), m_DeltaTime(0)
 {
 }
-
 
 ANLStatus ReadDataFile_SpW2::mod_startup()
 {
@@ -47,47 +43,32 @@ ANLStatus ReadDataFile_SpW2::mod_startup()
   EvsDef("ReadDataFile_SpW2:Error4");
   EvsDef("ReadDataFile_SpW2:Error5");
 
-  //  BnkDef("ReadDataFile_SpW2:DeltaT", sizeof(unsigned int));
-
   return ReadDataFile::mod_startup();
 }
-
 
 ANLStatus ReadDataFile_SpW2::mod_init()
 {
   ReadDataFile::mod_init();
 
   // check file open
-  std::list<std::string>::iterator itFileName;
-  for (itFileName = m_FileNameList.begin(); itFileName != m_FileNameList.end(); itFileName++) {
-    std::ifstream fin;
-    fin.open( itFileName->c_str() );
-    if (!fin) {
-      std::cout << "ReadDataFile: cannot open " << *itFileName << std::endl;
-      return AS_QUIT;
-    }
-    fin.close();
-  }
+  bool check = checkFiles();
+  if (!check) return AS_QUIT_ERR;
   
   int readPacketSize = HEADER_SIZE;
-  std::vector<DetectorReadModule*>::iterator itModule = GetDetectorManager()->getReadModuleVector().begin();
-  std::vector<DetectorReadModule*>::iterator itModuleEnd = GetDetectorManager()->getReadModuleVector().end();
-  while ( itModule != itModuleEnd ) {
+  DetectorSystem* detectorManager = getDetectorManager();
+  for (auto& readoutModule: detectorManager->getReadoutModules()) {
     readPacketSize += (DATA_HEADER_LENGTH * sizeof(short));
-    std::vector<OneASICData*>::iterator itChip = (*itModule)->ASICDataBegin();
-    std::vector<OneASICData*>::iterator itChipEnd = (*itModule)->ASICDataEnd();
-    while ( itChip != itChipEnd ) {
-      readPacketSize += ( (*itChip)->NumChannel() * sizeof(short) );
-      itChip++;
+    for (auto& section: readoutModule->getReadoutSections()) {
+      MultiChannelData* mcd = detectorManager->getMultiChannelData(section);
+      readPacketSize += ( mcd->NumberOfChannels() * sizeof(short) );
     }
-    itModule++;
   }
 
   std::cout << std::endl;
   std::cout << "Data size: " << readPacketSize << std::endl;
 
   if (readPacketSize > READ_BUF_SIZE) {
-    std::cout << "Read buffer is too small ." << std::endl;
+    std::cout << "Read buffer is too small." << std::endl;
     return AS_QUIT;
   }
 
@@ -96,21 +77,21 @@ ANLStatus ReadDataFile_SpW2::mod_init()
   return AS_OK;
 }
 
-
 ANLStatus ReadDataFile_SpW2::mod_bgnrun()
 {
-  m_fin.open( m_FileNameList.front().c_str() );
-  if (!m_fin) {
-    std::cout << "ReadDataFile: cannot open " << m_FileNameList.front() << std::endl;
+  if (wasLastFile()) {
+    std::cout << "The file list seems empty." << std::endl;
     return AS_QUIT;
-    
   }
-
-  m_FileNameList.pop_front();
-
+  
+  std::string filename = nextFile();
+  m_fin.open(filename.c_str());
+  if (!m_fin) {
+    std::cout << "ReadDataFile: cannot open " << filename << std::endl;
+    return AS_QUIT;
+  }
   return AS_OK;
 }
-
 
 ANLStatus ReadDataFile_SpW2::mod_ana()
 {
@@ -120,22 +101,22 @@ ANLStatus ReadDataFile_SpW2::mod_ana()
   m_fin.read((char*)buf, m_ReadPacketSize);
 
   if (m_fin.eof()) {
-    std::cout << "ReadDataFile: reach end of file" << std::endl;
+    std::cout << "ReadDataFile: reach end of file." << std::endl;
     m_fin.close();
-    
-    if (!m_FileNameList.empty()) {
-      m_fin.open( m_FileNameList.front().c_str() );
-      if (!m_fin) {
-	std::cout << "ReadDataFile: cannot open " << m_FileNameList.front() << std::endl;
-	return AS_QUIT;
-      }
-      std::cout << "ReadDataFile: open next file " << std::endl;
-      m_FileNameList.pop_front();
-      goto read_start;
+
+    if (wasLastFile()) {
+      std::cout << "ReadDataFile: the last file was processed." << std::endl;
+      return AS_QUIT;
     }
     else {
-      std::cout << "ReadDataFile: data file queue is empty" << std::endl;
-      return AS_QUIT;
+      std::string filename = nextFile();
+      m_fin.open(filename.c_str());
+      if (!m_fin) {
+        std::cout << "ReadDataFile: cannot open " << filename << std::endl;
+        return AS_QUIT;
+      }
+      std::cout << "ReadDataFile: open next file." << std::endl;
+      goto read_start;
     }
   }
 
@@ -178,50 +159,47 @@ ANLStatus ReadDataFile_SpW2::mod_ana()
 
   int deltaTime = 0x10000;
   
-  std::vector<DetectorReadModule*>::iterator itModule = GetDetectorManager()->getReadModuleVector().begin();
-  std::vector<DetectorReadModule*>::iterator itModuleEnd = GetDetectorManager()->getReadModuleVector().end();
-  while ( itModule != itModuleEnd ) {
+  DetectorSystem* detectorManager = getDetectorManager();
+  for (auto& readoutModule: detectorManager->getReadoutModules()) {
     // read Header of one module
     for (int i=0; i<DATA_HEADER_LENGTH; i++) {
       unsigned short int tmp;
       tmp = (static_cast<unsigned short int>(*(p+1))<<8) + *p;
 
       if (i==3) {
-	if (tmp < deltaTime) {
-	  deltaTime = tmp;
-	}
+        if (tmp < deltaTime) {
+          deltaTime = tmp;
+        }
       }
-      
       p+=2;
     }
 
     // read data body
-    std::vector<OneASICData*>::iterator itChip = (*itModule)->ASICDataBegin();
-    std::vector<OneASICData*>::iterator itChipEnd = (*itModule)->ASICDataEnd();
-    while ( itChip != itChipEnd ) {
-      int nCh = (*itChip)->NumChannel();
+    for (auto& section: readoutModule->getReadoutSections()) {
+      MultiChannelData* mcd = detectorManager->getMultiChannelData(section);
+      int nCh = mcd->NumberOfChannels();
       for (int i=0; i<nCh; i++) {
-	unsigned int data;
-	data = (static_cast<unsigned short int>(*(p+1))<<8) + *p;
-	data = data & 0x0FFFu;
-	int rawadc;
-	if ((data&0x800u) == 0x800u) {
-	  // data is negative
-	  rawadc = static_cast<signed int>(data+0xFFFFF000u);
-	}
-	else {
-	  rawadc = data;
-	}
-
-	(*itChip)->setRawADC(i, rawadc);
-	p+=2;
+        unsigned int data;
+        data = (static_cast<unsigned short int>(*(p+1))<<8) + *p;
+        data = data & 0x0FFFu;
+        int rawadc;
+        if ((data&0x800u) == 0x800u) {
+          // data is negative
+          rawadc = static_cast<signed int>(data+0xFFFFF000u);
+        }
+        else {
+          rawadc = data;
+        }
+        
+        mcd->setRawADC(i, rawadc);
+        p+=2;
       }
-      itChip++;
     }
-    itModule++;
   }
 
   m_DeltaTime = deltaTime;
    
   return ReadDataFile::mod_ana();
 }
+
+} /* namespace comptonsoft */

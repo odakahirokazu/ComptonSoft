@@ -18,17 +18,17 @@
  *************************************************************************/
 
 #include "SelectTime.hh"
-
 #include "ReadDataFile.hh"
 
 using namespace anl;
-using namespace comptonsoft;
+
+namespace comptonsoft
+{
 
 SelectTime::SelectTime()
   : m_ReadDataModule(0), m_Time0(0), m_Time1(0)
 {
 }
-
 
 ANLStatus SelectTime::mod_startup()
 {
@@ -38,20 +38,17 @@ ANLStatus SelectTime::mod_startup()
   return AS_OK;
 }
 
-
 ANLStatus SelectTime::mod_init()
 {
   GetANLModuleNC("ReadDataFile", &m_ReadDataModule);
-
   EvsDef("SelectTime:OK");
 
   return AS_OK;
 }
 
-
 ANLStatus SelectTime::mod_ana()
 {
-  int t = m_ReadDataModule->Time();
+  const int t = m_ReadDataModule->Time();
   if (t < m_Time0 || m_Time1 < t) {
     return AS_SKIP;
   }
@@ -60,3 +57,5 @@ ANLStatus SelectTime::mod_ana()
 
   return AS_OK;
 }
+
+} /* namespace comptonsoft */

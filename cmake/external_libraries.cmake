@@ -27,24 +27,21 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${ANLNEXT_LIB_DIR}/anl)
 message("-- ANLNEXT_INSTALL = ${ANLNEXT_INSTALL}")
 
 ### ROOT ###
-if(CS_USE_ROOT)
-  set(ROOTSYS $ENV{ROOTSYS})
-  find_path(ROOT_INC_DIR
-    NAMES TH1.h TTree.h
-    PATHS ${ROOTSYS}/include/root ${ROOTSYS}/include)
-  find_path(ROOT_LIB_DIR
-    NAMES libHist.so libTree.so
-    PATHS ${ROOTSYS}/lib/root ${ROOTSYS}/lib)
-  set(ROOT_LIB
-    Core Cint RIO Net Hist Graf Graf3d Gpad Tree
-    Rint Postscript Matrix Physics MathCore Thread)
-  message("-- ROOTSYS = ${ROOTSYS}")
-  message("-- ROOT_INC_DIR = ${ROOT_INC_DIR}")
-  message("-- ROOT_LIB_DIR = ${ROOT_LIB_DIR}")
-  
-  add_definitions(-DUSE_ROOT)
-  add_definitions(-DCS_BASIC2)
-endif(CS_USE_ROOT)
+set(ROOTSYS $ENV{ROOTSYS})
+find_path(ROOT_INC_DIR
+  NAMES TH1.h TTree.h
+  PATHS ${ROOTSYS}/include/root ${ROOTSYS}/include)
+find_path(ROOT_LIB_DIR
+  NAMES libHist.so libTree.so
+  PATHS ${ROOTSYS}/lib/root ${ROOTSYS}/lib)
+set(ROOT_LIB
+  Core Cint RIO Net Hist Graf Graf3d Gpad Tree
+  Rint Postscript Matrix Physics MathCore Thread)
+message("-- ROOTSYS = ${ROOTSYS}")
+message("-- ROOT_INC_DIR = ${ROOT_INC_DIR}")
+message("-- ROOT_LIB_DIR = ${ROOT_LIB_DIR}")
+add_definitions(-DUSE_ROOT)
+add_definitions(-DCS_BASIC2)
 
 ### Geant4 ###
 find_package(Geant4 REQUIRED)
@@ -69,10 +66,12 @@ endif(CS_USE_SYSTEM_CLHEP)
 
 ### FITS IO ###
 if(CS_USE_FITSIO)
-  set(CFITSIO_INC_DIR $ENV{HEADAS}/include)
-  set(CFITSIO_LIB_DIR $ENV{HEADAS}/lib)
-  # set(CFITSIO_LIB cfitsio CCfits)
-  set(CFITSIO_LIB cfitsio)
+  find_path(CFITSIO_INC_DIR
+    NAMES fitsio.h
+    PATHS /usr/local/include $ENV{HEADAS}/include)
+  find_library(CFITSIO_LIB
+    NAMES cfitsio
+    PATHS /usr/local/lib $ENV{HEADAS}/lib)
 endif(CS_USE_FITSIO)
 
 ### SIMX ###

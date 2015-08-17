@@ -22,7 +22,7 @@
 #include "TH1.h"
 #include "TH2.h"
 
-#include "globals.hh"
+#include "AstroUnits.hh"
 
 #include "DetectorHit.hh"
 #include "RealDetectorUnit2DStrip.hh"

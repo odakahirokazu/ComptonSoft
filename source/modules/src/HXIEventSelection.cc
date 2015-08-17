@@ -19,19 +19,23 @@
 
 #include "HXIEventSelection.hh"
 #include <boost/format.hpp>
+#include "FlagDefinition.hh"
 #include "DetectorHit.hh"
+#include "CSHitCollection.hh"
 
 using namespace anl;
-using namespace comptonsoft;
 
+namespace comptonsoft
+{
 
 ANLStatus HXIEventSelection::mod_init()
 {
   VCSModule::mod_init();
-  GetANLModuleNC("CSHitCollection", &hit_collection);
+  GetANLModuleNC("CSHitCollection", &m_HitCollection);
 
-  for (std::vector<RealDetectorUnit*>::iterator it=GetDetectorVector().begin(); it!=GetDetectorVector().end(); ++it) {
-    int detid = (*it)->getID();
+  DetectorSystem* detectorManager = getDetectorManager();
+  for (auto& detector: detectorManager->getDetectors()) {
+    int detid = detector->getID();
     EvsDef((boost::format("HXIEventSelection:detection:%04d") % detid).str());
     EvsDef((boost::format("HXIEventSelection:1hit:%04d") % detid).str());
   }
@@ -51,53 +55,50 @@ ANLStatus HXIEventSelection::mod_init()
   return AS_OK;
 }
 
-
 ANLStatus HXIEventSelection::mod_ana()
 {
-  typedef std::vector<DetectorHit_sptr> HitVector;
-  
-  HitVector& hitVec = hit_collection->GetHits(comptonsoft::NOTIMEGROUP);
-  for (HitVector::iterator it=hitVec.begin(); it!=hitVec.end(); ++it) {
-    int detid = (*it)->getDetectorID();
+  auto& hits = m_HitCollection->getHits();
+  for (auto& hit: hits) {
+    int detid = hit->DetectorID();
     EvsSet((boost::format("HXIEventSelection:detection:%04d") % detid).str());
   }
 
-  if (hitVec.size() == 1) {
+  if (hits.size() == 1) {
     EvsSet("HXIEventSelection:1hit");
-    const_DetectorHit_sptr hit = hitVec[0];
-    if (hit->isFlag(SI_HIT)) EvsSet("HXIEventSelection:1hit:Si");
-    if (hit->isFlag(CDTE_HIT)) EvsSet("HXIEventSelection:1hit:CdTe");
-    int detid = hit->getDetectorID();
+    const_DetectorHit_sptr hit = hits[0];
+    if (hit->isFlags(flag::LowZHit)) EvsSet("HXIEventSelection:1hit:Si");
+    if (hit->isFlags(flag::HighZHit)) EvsSet("HXIEventSelection:1hit:CdTe");
+    int detid = hit->DetectorID();
     EvsSet((boost::format("HXIEventSelection:1hit:%04d") % detid).str());
   }
-  else if (hitVec.size() == 2) {
+  else if (hits.size() == 2) {
     EvsSet("HXIEventSelection:2hit");
-    const_DetectorHit_sptr hit0 = hitVec[0];
-    const_DetectorHit_sptr hit1 = hitVec[1];
-    if (hit0->isFlag(SI_HIT) && hit1->isFlag(SI_HIT)) {
+    const_DetectorHit_sptr hit0 = hits[0];
+    const_DetectorHit_sptr hit1 = hits[1];
+    if (hit0->isFlags(flag::LowZHit) && hit1->isFlags(flag::LowZHit)) {
       EvsSet("HXIEventSelection:2hit:Si-Si");
     }
-    else if (hit0->isFlag(SI_HIT) && hit1->isFlag(CDTE_HIT)) {
+    else if (hit0->isFlags(flag::LowZHit) && hit1->isFlags(flag::HighZHit)) {
       EvsSet("HXIEventSelection:2hit:Si-CdTe");
-      if (hit0->isFlag(CDTE_FLUOR)) {
+      if (hit0->isFlags(flag::FluorescenceHit)) {
         EvsSet("HXIEventSelection:2hit:Si-CdTe:fluorescence");
       }
       else {
         EvsSet("HXIEventSelection:2hit:Si-CdTe:not-fluorescence");
       }
     }
-    else if (hit1->isFlag(SI_HIT) && hit0->isFlag(CDTE_HIT)) {
+    else if (hit1->isFlags(flag::LowZHit) && hit0->isFlags(flag::HighZHit)) {
       EvsSet("HXIEventSelection:2hit:Si-CdTe");
-      if (hit1->isFlag(CDTE_FLUOR)) {
+      if (hit1->isFlags(flag::FluorescenceHit)) {
         EvsSet("HXIEventSelection:2hit:Si-CdTe:fluorescence");
       }
       else {
         EvsSet("HXIEventSelection:2hit:Si-CdTe:not-fluorescence");
       }
     }
-    else if (hit1->isFlag(CDTE_HIT) && hit0->isFlag(CDTE_HIT)) {
+    else if (hit1->isFlags(flag::HighZHit) && hit0->isFlags(flag::HighZHit)) {
       EvsSet("HXIEventSelection:2hit:CdTe-CdTe");
-      if (hit0->isFlag(CDTE_FLUOR) || hit1->isFlag(CDTE_FLUOR)) {
+      if (hit0->isFlags(flag::FluorescenceHit) || hit1->isFlags(flag::FluorescenceHit)) {
         EvsSet("HXIEventSelection:2hit:CdTe-CdTe:fluorescence");
       }
       else {
@@ -108,3 +109,5 @@ ANLStatus HXIEventSelection::mod_ana()
   
   return AS_OK;
 }
+
+} /* namespace comptonsoft */

@@ -17,35 +17,31 @@
  *                                                                       *
  *************************************************************************/
 
-// 2008-04-30 Hirokazu Odaka
-
 #include "SaveData.hh"
-
 #include <cstdio>
 #include <iostream>
-
+#include "TFile.h"
 
 using namespace anl;
-using namespace comptonsoft;
 
+namespace comptonsoft
+{
 
 SaveData::SaveData()
-  : m_FileName("output.root"),
-    m_RootFile(0)
+  : m_Filename("output.root"),
+    m_RootFile(nullptr)
 {
 }
-
 
 ANLStatus SaveData::mod_startup()
 {
-  register_parameter(&m_FileName, "output");
+  register_parameter(&m_Filename, "output");
   return AS_OK;
 }
 
-
 ANLStatus SaveData::mod_init()
 {
-  m_RootFile = new TFile(m_FileName.c_str(), "recreate");
+  m_RootFile = new TFile(m_Filename.c_str(), "recreate");
   if ( !m_RootFile ) {
     std::cout << "SaveData: cannot create ROOT file" << std::endl;
     return AS_QUIT;
@@ -53,7 +49,6 @@ ANLStatus SaveData::mod_init()
   
   return AS_OK;
 }
-
 
 ANLStatus SaveData::mod_exit()
 {
@@ -65,3 +60,15 @@ ANLStatus SaveData::mod_exit()
   
   return AS_OK;
 }
+
+TDirectory* SaveData::GetDirectory()
+{
+  return m_RootFile->GetDirectory(0);
+}
+
+bool SaveData::cd()
+{
+  return m_RootFile->cd();
+}
+
+} /* namespace comptonsoft */

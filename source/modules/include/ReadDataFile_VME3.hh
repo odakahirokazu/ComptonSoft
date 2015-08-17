@@ -23,7 +23,6 @@
 // 2008-xx-xx  read dead time by Aono
 // 2008-08-31  Hirokazu Odaka 
 
-
 #ifndef COMPTONSOFT_ReadDataFile_VME3_H
 #define COMPTONSOFT_ReadDataFile_VME3_H 1
 
@@ -32,15 +31,14 @@
 #include <fstream>
 #include <string>
 
-
 namespace comptonsoft {
 
 class ReadDataFile_VME3 : public ReadDataFile
 {
-  DEFINE_ANL_MODULE(ReadDataFile_VME3, 3.0);
+  DEFINE_ANL_MODULE(ReadDataFile_VME3, 3.2);
 public:
   ReadDataFile_VME3();
-  ~ReadDataFile_VME3() {}
+  ~ReadDataFile_VME3() = default;
 
   anl::ANLStatus mod_startup();
   anl::ANLStatus mod_init();
@@ -61,6 +59,6 @@ private:
   unsigned short int m_DeadTime;
 };
 
-}
+} /* namespace comptonsoft */
 
 #endif /* COMPTONSOFT_ReadDataFile_VME3_H */

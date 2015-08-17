@@ -20,37 +20,37 @@
 #ifndef COMPTONSOFT_ComptonModeFilter_H
 #define COMPTONSOFT_ComptonModeFilter_H 1
 
-#include "TGraph.h"
-
 #include "VCSModule.hh"
 
-#include "EventReconstruction.hh"
+class TGraph;
 
 namespace comptonsoft {
 
+class EventReconstruction;
+
 class ComptonModeFilter : public VCSModule
 {
-  DEFINE_ANL_MODULE(ComptonModeFilter, 1.0);
+  DEFINE_ANL_MODULE(ComptonModeFilter, 1.1);
 public:
   ComptonModeFilter();
-  ~ComptonModeFilter() {}
+  ~ComptonModeFilter() = default;
 
   anl::ANLStatus mod_init();
   anl::ANLStatus mod_his();
   anl::ANLStatus mod_ana();
 
-  double theta_cut_limit(double ene) const;
-  double theta_cut_limit2(double ene) const;
+  double theta_cut_limit(double energy) const;
+  double theta_cut_limit2(double energy) const;
   
 private:
   void create_armcut_curves();
 
-  EventReconstruction* EventReconstruction_ptr;
-  TGraph* armcut_curve_ss;
-  TGraph* armcut_curve_sc;
-  TGraph* armcut_curve_cc;
+  EventReconstruction* m_EventReconstruction;
+  TGraph* m_ARMCutCurveSS;
+  TGraph* m_ARMCutCurveSC;
+  TGraph* m_ARMCutCurveCC;
 };
 
-}
+} /* namespace comptonsoft */
 
 #endif /* COMPTONSOFT_ComptonModeFilter_H */

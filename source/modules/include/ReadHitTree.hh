@@ -20,90 +20,50 @@
 #ifndef COMPTONSOFT_ReadHitTree_H
 #define COMPTONSOFT_ReadHitTree_H 1
 
-#include <vector>
-#include <iostream>
-
-#include "G4ThreeVector.hh"
-
-#include "BasicModule.hh"
+#include "VCSModule.hh"
 #include "InitialInformation.hh"
 
-#include "TChain.h"
-#include "CSHitCollection.hh"
+#include <vector>
+#include <string>
+#include <cstdint>
+#include "DetectorHit_sptr.hh"
 
+class TChain;
 
 namespace comptonsoft {
 
-class ReadHitTree : public anl::BasicModule, public anlgeant4::InitialInformation
+class CSHitCollection;
+class HitTreeIOWithInitialInfo;
+
+/**
+ * @author Hitokazu Odaka
+ * @date 2014-11-30
+ */
+class ReadHitTree : public VCSModule, public anlgeant4::InitialInformation
 {
-  DEFINE_ANL_MODULE(ReadHitTree, 1.4);
+  DEFINE_ANL_MODULE(ReadHitTree, 2.0);
 public:
   ReadHitTree();
-  ~ReadHitTree() {}
+  ~ReadHitTree();
   
   anl::ANLStatus mod_startup();
   anl::ANLStatus mod_init();
-  anl::ANLStatus mod_his();
   anl::ANLStatus mod_ana();
+
+protected:
+  virtual void insertHit(const DetectorHit_sptr& hit);
   
 private:
-  std::vector <std::string> inputfilename;
+  std::vector<std::string> fileList_;
 
-  TChain* hittree;
-  Long64_t nevent;
-  Long64_t id;
+  TChain* hittree_;
+  int64_t numEntries_ = 0;
+  int64_t entryIndex_ = 0;
 
-  CSHitCollection* hit_collection;
-
-  int eventid;
-  int seqnum;
-  int totalhit;
-  double ini_energy;
-  double ini_dirx;
-  double ini_diry;
-  double ini_dirz;
-  double ini_time;
-  double ini_posx;
-  double ini_posy;
-  double ini_posz;
-  double ini_polarx;
-  double ini_polary;
-  double ini_polarz;
-  double weight;
-
-  double realposx;
-  double realposy;
-  double realposz;
-
-  double localposx;
-  double localposy;
-  double localposz;
-
-  double posx;
-  double posy;
-  double posz;
-
-  double edep;
-  double e_pha;
-  double e_pi;
-  
-  double time;
-
-  unsigned int process;
-  
-  int grade;
-  
-  int detid;
-  int stripx;
-  int stripy;
-  int chip;
-  int channel;
-
-  int time_group;
-
-  unsigned int flag;
+  CSHitCollection* hitCollection_;
+  std::unique_ptr<HitTreeIOWithInitialInfo> treeIO_;
 };
 
-}
+} /* namespace comptonsoft */
 
 #endif /* COMPTONSOFT_ReadHitTree_H */

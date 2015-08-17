@@ -17,33 +17,33 @@
  *                                                                       *
  *************************************************************************/
 
-// 2011-02-09 Hirokazu Odaka
-
 #ifndef COMPTONSOFT_InitialConditionFilter_H
 #define COMPTONSOFT_InitialConditionFilter_H 1
 
 #include "BasicModule.hh"
 
+namespace anlgeant4 {
+class InitialInformation;
+}
+
 namespace comptonsoft {
-
-class ReadHitTree;
-
 
 class InitialConditionFilter : public anl::BasicModule
 {
-  DEFINE_ANL_MODULE(InitialConditionFilter, 1.0);
+  DEFINE_ANL_MODULE(InitialConditionFilter, 1.1);
 public:
   InitialConditionFilter();
+  ~InitialConditionFilter() = default;
 
   anl::ANLStatus mod_startup();
   anl::ANLStatus mod_ana();
 
 private:
-  double energy0;
-  double energy1;
-  const ReadHitTree* read_hittree;
+  double energy0_;
+  double energy1_;
+  const anlgeant4::InitialInformation* initialInfo_;
 };
 
-}
+} /* namespace comptonsoft */
 
 #endif /* COMPTONSOFT_InitialConditionFilter_H */

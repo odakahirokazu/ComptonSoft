@@ -23,7 +23,7 @@
 #include "VCSModule.hh"
 
 #include "TH2.h"
-#include "cs_globals.hh"
+#include "CSTypes.hh"
 #include "EventReconstruction.hh"
 
 namespace comptonsoft {

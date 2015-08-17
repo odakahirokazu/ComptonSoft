@@ -18,32 +18,18 @@
  *************************************************************************/
 
 #include "ReadDetectorHitTree.hh"
-
 #include "DetectorHit.hh"
-#include "RealDetectorUnit.hh"
+#include "VRealDetectorUnit.hh"
 
-using namespace comptonsoft;
-using namespace anl;
-
-
-ANLStatus ReadDetectorHitTree::mod_ana()
+namespace comptonsoft
 {
-  ANLStatus status = ReadRawHitTree::mod_ana();
-  if (status == AS_OK) {
-    std::vector<RealDetectorUnit*>::iterator itDet = GetDetectorVector().begin();
-    std::vector<RealDetectorUnit*>::iterator itDetEnd = GetDetectorVector().end();
-    while ( itDet != itDetEnd ) {
-      (*itDet)->assignDetectorInfo();
-      itDet++;
-    }
-  }
-  return status;
+
+void ReadDetectorHitTree::insertHit(const DetectorHit_sptr& hit)
+{
+  const int DetectorID = hit->DetectorID();
+  VRealDetectorUnit* detector
+    = getDetectorManager()->getDetectorByID(DetectorID);
+  detector->insertDetectorHit(hit);
 }
 
-
-void ReadDetectorHitTree::insertHit(int detid, DetectorHit_sptr hit)
-{
-  RealDetectorUnit* det
-    = GetDetectorManager()->getDetectorByID(detid);
-  det->insertDetectorHit(hit);
-}
+} /* namespace comptonsoft */

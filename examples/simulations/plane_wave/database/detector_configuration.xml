@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="http://www.astro.isas.jaxa.jp/~odaka/xmlstyle/detector_config_v3.xsl" ?>
+
+<configuration>
+  <name>CC</name>
+  <comment>H. Odaka | 2013-04-22</comment>
+  <detectors>
+    <detector id="100">
+      <type>Detector2DPad</type>
+      <name>SiPad:0</name>
+      <geometry>
+        <widthx>64.0</widthx><widthy>64.0</widthy><thickness>2.0</thickness>
+        <offsetx>0.0</offsetx><offsety>0.0</offsety>
+      </geometry>
+      <pixel>
+        <numx>32</numx><numy>32</numy>
+        <pitchx>2.0</pitchx><pitchy>2.0</pitchy>
+      </pixel>
+      <position><x>0.0</x><y>0.0</y><z>0.0</z></position>
+      <direction_xaxis><x>+1.0</x><y>0.0</y><z>0.0</z></direction_xaxis>
+      <direction_yaxis><x>0.0</x><y>+1.0</y><z>0.0</z></direction_yaxis>
+      <energy_priority>P-side</energy_priority> 
+    </detector>
+    <detector id="200">
+      <type>Detector2DPad</type>
+      <name>CdTePad:0</name>
+      <geometry>
+        <widthx>64.0</widthx><widthy>64.0</widthy><thickness>2.0</thickness>
+        <offsetx>0.0</offsetx><offsety>0.0</offsety>
+      </geometry>
+      <pixel>
+        <numx>32</numx><numy>32</numy>
+        <pitchx>2.0</pitchx><pitchy>2.0</pitchy>
+      </pixel>
+      <position><x>0.0</x><y>0.0</y><z>-20.0</z></position>
+      <direction_xaxis><x>+1.0</x><y>0.0</y><z>0.0</z></direction_xaxis>
+      <direction_yaxis><x>0.0</x><y>+1.0</y><z>0.0</z></direction_yaxis>
+      <energy_priority>Al-side</energy_priority> 
+    </detector>
+  </detectors>
+  
+  <readout />
+</configuration>

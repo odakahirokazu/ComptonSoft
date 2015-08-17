@@ -9,6 +9,7 @@ class VANLPrimaryGen;
 class BasicPrimaryGen;
 class PlaneWavePrimaryGen;
 class PointSourcePrimaryGen;
+class PrimaryGenUniformSourceInVolume;
 class VPickUpData;
 class StandardPickUpData;
 class VisualizeG4Geom;

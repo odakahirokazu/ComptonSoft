@@ -20,70 +20,54 @@
 #include "VCSModule.hh"
 
 #include "ConstructDetector.hh"
-#include "ConstructDetector_Sim.hh"
-
-#if USE_ROOT
 #include "TDirectory.h"
 #include "SaveData.hh"
-#endif
 
 using namespace anl;
-using namespace comptonsoft;
+
+namespace comptonsoft
+{
 
 VCSModule::VCSModule()
-  : detector_manager(0)
-#if USE_ROOT
-  , save_dir(0)
-#endif
+  : detectorSystem_(nullptr), saveDir_(nullptr)
 {
 }
 
-
-VCSModule::~VCSModule()
-{
-}
-
+VCSModule::~VCSModule() = default;
 
 ANLStatus VCSModule::mod_init()
 {
-  if (ModuleExist("ConstructDetector_Sim")) {
-    ConstructDetector_Sim* detectorModule;
-    GetANLModuleNC("ConstructDetector_Sim", &detectorModule);
-    detector_manager = detectorModule->GetDetectorManager();
-  }
-  else if (ModuleExist("ConstructDetector")) {
+  if (ModuleExist("ConstructDetector")) {
     ConstructDetector* detectorModule;
     GetANLModuleNC("ConstructDetector", &detectorModule);
-    detector_manager = detectorModule->GetDetectorManager();
+    detectorSystem_ = detectorModule->getDetectorManager();
   }
   
   return AS_OK;
 }
 
-
-#if USE_ROOT
 ANLStatus VCSModule::mod_his()
 {
   if (ModuleExist("SaveData")) {
     SaveData* saveModule;
     GetANLModuleNC("SaveData", &saveModule);
-    save_dir = saveModule->GetDirectory();
-    save_dir->cd();
+    saveDir_ = saveModule->GetDirectory();
+    saveDir_->cd();
   }
   
   return AS_OK;
 }
 
-
-void VCSModule::mkdir_module(const std::string& name)
+void VCSModule::mkdir(const std::string& name)
 {
   if (name=="") {
-    save_dir->mkdir(module_name().c_str());
-    save_dir->cd(module_name().c_str());
+    saveDir_->mkdir(module_name().c_str());
+    saveDir_->cd(module_name().c_str());
   }
   else {
-    save_dir->mkdir(name.c_str());
-    save_dir->cd(name.c_str());
+    saveDir_->mkdir(name.c_str());
+    saveDir_->cd(name.c_str());
   }
 }
-#endif
+
+} /* namespace comptonsoft */

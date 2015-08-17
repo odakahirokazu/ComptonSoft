@@ -17,45 +17,44 @@
  *                                                                       *
  *************************************************************************/
 
-// 2008-08-28 Hirokazu Odaka
-
 #ifndef COMPTONSOFT_EventSelection_H
 #define COMPTONSOFT_EventSelection_H 1
 
 #include "VCSModule.hh"
 
-#include "DetectorGroup.hh"
-#include "CSHitCollection.hh"
+#include <vector>
+#include <memory>
+#include <utility>
 
 namespace comptonsoft {
 
+class CSHitCollection;
+class DetectorGroupManager;
+
+/**
+ * event selection
+ * @author Hirokazu Odaka
+ * @date 2008-08-28
+ * @date 2014-11-25
+ */
 class EventSelection : public VCSModule
 {
-  DEFINE_ANL_MODULE(EventSelection, 1.0)
+  DEFINE_ANL_MODULE(EventSelection, 2.0)
 public:
   EventSelection();
-  ~EventSelection() {}
+  ~EventSelection() = default;
 
   anl::ANLStatus mod_startup();
   anl::ANLStatus mod_init();
   anl::ANLStatus mod_ana();
 
 private:
-  CSHitCollection* hit_collection;
-
-  std::string filename;
-  comptonsoft::DetectorGroup si_detector_group;
-  comptonsoft::DetectorGroup cdte_detector_group;
-  comptonsoft::DetectorGroup anti_detector_group;
-
-  bool remove_veto_event;
-
-  static const int NUM_OF_FLUOR_CDTE = 10; 
-  double fluor_cdte[NUM_OF_FLUOR_CDTE];
-  double check_fluor_cdte(double ene, int& index, double& fluorene);
-  double fluor_range;
+  bool m_VetoEnabled;
+  CSHitCollection* m_HitCollection;
+  const DetectorGroupManager* m_DetectorGroupManager;
+  std::vector<std::pair<double, double>> m_FluoresenceRanges;
 };
 
-}
+} /* namespace comptonsoft */
 
 #endif /* COMPTONSOFT_EventSelection_H */

@@ -17,78 +17,55 @@
  *                                                                       *
  *************************************************************************/
 
-// ConstructDetector.cc
-// 2008-08-27 Hirokazu Odaka
-
 #include "ConstructDetector.hh"
 #include <iostream>
-#include "RealDetectorUnit.hh"
+#include "VRealDetectorUnit.hh"
+#include "DetectorSystem.hh"
 
-using namespace comptonsoft;
 using namespace anl;
 
+namespace comptonsoft {
 
 ConstructDetector::ConstructDetector()
-  : detector_manager(0),
-    configuration_file_name("detector_config.xml")
+  : detectorManager_(new DetectorSystem),
+    configurationFile_("detector_config.xml")
 {
+  add_alias("ConstructDetector");
 }
 
+ConstructDetector::~ConstructDetector() = default;
 
 ANLStatus ConstructDetector::mod_startup()
 {
-  detector_manager = new DetectorManager;
-  detector_manager->setMCSimulation(false);
+  detectorManager_->setMCSimulation(false);
 
-  register_parameter(&configuration_file_name, "detector_configuration");
+  register_parameter(&configurationFile_, "detector_configuration");
   set_parameter_description("XML data file describing a detector configuration.");
 
   return AS_OK;
 }
 
-
 ANLStatus ConstructDetector::mod_prepare()
 {
-  detector_manager->loadDetectorConfiguration(configuration_file_name.c_str());
-
+  detectorManager_->loadDetectorConfiguration(configurationFile_.c_str());
   return AS_OK;
 }
 
-
 ANLStatus ConstructDetector::mod_init()
 {
-  if (detector_manager->IsConstructed()) {
+  if (detectorManager_->isConstructed()) {
     return AS_OK;
   }
   else {
+    std::cout << "Detector construction is not completed." << std::endl;
     return AS_QUIT;
   }
 }
 
-
 ANLStatus ConstructDetector::mod_ana()
 {
-  for (DetectorIter it=detector_manager->DetectorBegin();
-       it!=detector_manager->DetectorEnd();
-       ++it) {
-    (*it)->clearDetectorHits();
-    (*it)->clearAnalyzedHits();
-  }
+  detectorManager_->initializeEvent();
   return AS_OK;
 }
 
-
-ANLStatus ConstructDetector::mod_exit()
-{
-  std::cout << "deleting Detector Manager" << std::endl;
-  std::cout << "detector number " << detector_manager->NumDetector() 
-	    << std::endl;
-  std::cout << "read module number " << detector_manager->NumReadModule()
-	    << std::endl;
-
-  delete detector_manager;
-
-  std::cout << "delete Detector Manager done" << std::endl;
-
-  return AS_OK;
-}
+} /* namespace comptonsoft */

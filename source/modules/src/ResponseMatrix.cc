@@ -22,6 +22,7 @@
 #include <boost/format.hpp>
 #include "TDirectory.h"
 #include "TH2.h"
+#include "AstroUnits.hh"
 #include "CSHitCollection.hh"
 #include "InitialInformation.hh"
 #include "DetectorHit.hh"

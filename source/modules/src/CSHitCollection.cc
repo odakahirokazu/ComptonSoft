@@ -17,45 +17,53 @@
  *                                                                       *
  *************************************************************************/
 
-// CSHitCollection.cc
-// 2008-08-28 Hirokazu Odaka
-
 #include "CSHitCollection.hh"
 #include "DetectorHit.hh"
 
-using namespace comptonsoft;
 using namespace anl;
 
+namespace comptonsoft
+{
+
+CSHitCollection::CSHitCollection()
+  : eventID_(-1)
+{
+}
+
+CSHitCollection::~CSHitCollection() = default;
+
+ANLStatus CSHitCollection::mod_bgnrun()
+{
+  initializeEvent();
+  return AS_OK;
+}
 
 ANLStatus CSHitCollection::mod_ana()
 {
-  hitvec_tg.clear();
-  hitvec_notg.clear();
+  initializeEvent();
+  ++eventID_;
 
   return AS_OK;
 }
-
 
 ANLStatus CSHitCollection::mod_endrun()
 {
-  hitvec_tg.clear();
-  hitvec_notg.clear();
-  
+  initializeEvent();
   return AS_OK;
 }
 
-
-void CSHitCollection::InsertHit(DetectorHit_sptr hit)
+void CSHitCollection::initializeEvent()
 {
-  int timeGroup = hit->getTimeGroup();
-  if (timeGroup == comptonsoft::NOTIMEGROUP) {
-    hitvec_notg.push_back(hit);
-  }
-  else {
-    int timeGroupSize = hitvec_tg.size();
-    if (timeGroup >= timeGroupSize) {
-      hitvec_tg.resize(timeGroup+1);
-    }
-    hitvec_tg[timeGroup].push_back(hit);
-  }
+  hitsVector_.clear();
 }
+
+void CSHitCollection::insertHit(const DetectorHit_sptr& hit)
+{
+  const int timeGroup = hit->TimeGroup();
+  if (timeGroup >= NumberOfTimeGroups()) {
+    hitsVector_.resize(timeGroup+1);
+  }
+  hitsVector_[timeGroup].push_back(hit);
+}
+
+} /* namespace comptonsoft */

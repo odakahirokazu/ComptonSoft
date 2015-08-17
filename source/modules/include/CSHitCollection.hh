@@ -17,67 +17,50 @@
  *                                                                       *
  *************************************************************************/
 
-// CSHitCollection.hh
-// 2008-08-28 Hirokazu Odaka
-// 2011-04-22 Hirokazu Odaka
-
 #ifndef COMPTONSOFT_CSHitCollection_H
 #define COMPTONSOFT_CSHitCollection_H 1
 
-#include <vector>
-
 #include "BasicModule.hh"
+#include <cstdint>
+#include <vector>
 #include "DetectorHit_sptr.hh"
-#include "HXISGDFlagDef.hh"
 
 namespace comptonsoft {
-
+/**
+ * @author Hirokazu Odaka
+ * @date 2008-08-28
+ * @date 2014-11-22
+ */
 class CSHitCollection : public anl::BasicModule
 {
-  DEFINE_ANL_MODULE(CSHitCollection, 1.0);
+  DEFINE_ANL_MODULE(CSHitCollection, 1.1);
 public:
-  CSHitCollection() {}
-  ~CSHitCollection() {}
+  CSHitCollection();
+  ~CSHitCollection();
 
-  std::vector<comptonsoft::DetectorHit_sptr>& GetHits() { return hitvec_notg; }
-  std::vector<comptonsoft::DetectorHit_sptr>& GetHits(int time_group);
-   
-  void InsertHit(comptonsoft::DetectorHit_sptr hit);
-  void ClearHits() { GetHits().clear(); }
-  void ClearHits(int time_group) { GetHits(time_group).clear(); }
+  void setEventID(int64_t v) { eventID_ = v; }
+  int64_t EventID() const { return eventID_; }
 
-  int NumHits() { return hitvec_notg.size(); }
-  int NumHits(int time_group);
+  std::vector<DetectorHit_sptr>& getHits(int timeGroup=0)
+  { return hitsVector_[timeGroup]; }
 
-  int NumTimeGroup() { return hitvec_tg.size(); }
+  const std::vector<DetectorHit_sptr>& getHits(int timeGroup=0) const
+  { return hitsVector_[timeGroup]; }
+  
+  virtual void initializeEvent();
+  
+  void insertHit(const DetectorHit_sptr& hit);
+  int NumberOfTimeGroups() const { return hitsVector_.size(); }
 
+  anl::ANLStatus mod_bgnrun();
   anl::ANLStatus mod_ana();
   anl::ANLStatus mod_endrun();
 
 private:
-  //std::vector<DetectorHit*> hitvec;
-  std::vector< std::vector<comptonsoft::DetectorHit_sptr> > hitvec_tg;
-  std::vector<comptonsoft::DetectorHit_sptr> hitvec_notg;
+  int64_t eventID_;
+  std::vector<std::vector<comptonsoft::DetectorHit_sptr>> hitsVector_;
 };
 
-
-inline
-std::vector<comptonsoft::DetectorHit_sptr>& CSHitCollection::GetHits(int time_group)
-{
-  if (time_group == comptonsoft::NOTIMEGROUP) { return hitvec_notg; }
-  
-  return hitvec_tg[time_group];
-}
-
-
-inline
-int CSHitCollection::NumHits(int time_group)
-{
-  if (time_group == comptonsoft::NOTIMEGROUP) { return hitvec_notg.size(); }
-  
-  return hitvec_tg[time_group].size();
-}
-
-}
+} /* namespace comptonsoft */
 
 #endif /* COMPTONSOFT_CSHitCollection_H */

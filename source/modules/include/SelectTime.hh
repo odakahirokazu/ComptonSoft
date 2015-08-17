@@ -26,13 +26,15 @@ namespace comptonsoft {
 
 class ReadDataFile;
 
-
+/**
+ * @author Hirokazu Odaka
+ */
 class SelectTime : public anl::BasicModule
 {
-  DEFINE_ANL_MODULE(SelectTime, 1.0);
+  DEFINE_ANL_MODULE(SelectTime, 1.1);
 public:
   SelectTime();
-  ~SelectTime() {}
+  ~SelectTime() = default;
 
   anl::ANLStatus mod_startup();
   anl::ANLStatus mod_init();
@@ -44,6 +46,6 @@ private:
   int m_Time1;
 };
 
-}
+} /* namespace comptonsoft */
 
 #endif /* COMPTONSOFT_SelectTime_H */

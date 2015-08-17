@@ -17,51 +17,215 @@
  *                                                                       *
  *************************************************************************/
 
-// Hiro Odaka
-
 #include "ComptonEventFilter.hh"
-
-#include <boost/bind.hpp>
-#include "TMath.h"
+#include <algorithm>
 #include "NextCLI.hh"
+#include "AstroUnits.hh"
+#include "BasicComptonEvent.hh"
+#include "DetectorGroupManager.hh"
+#include "EventReconstruction.hh"
 
-using namespace comptonsoft;
 using namespace anl;
 
+namespace comptonsoft
+{
+
 ComptonEventFilter::ComptonEventFilter()
-  : EventReconstruction_ptr(0)
+  : m_DetectorGroupManager(nullptr), m_EventReconstruction(nullptr)
 {
 }
 
-
 ANLStatus ComptonEventFilter::mod_startup()
 {
-  register_parameter(&hitpat_names, "hit_patterns");
+  register_parameter(&m_HitPatternNames, "hit_patterns");
+  return AS_OK;
+}
+
+ANLStatus ComptonEventFilter::mod_init()
+{
+  EvsDef("ComptonEventFilter:RejectedByHitPattern");
+  EvsDef("ComptonEventFilter:RejectedByConditions");
+  
+  GetANLModule("DetectorGroupManager", &m_DetectorGroupManager);
+  GetANLModule("EventReconstruction", &m_EventReconstruction);
+  
+  auto& hitPatterns = m_DetectorGroupManager->getHitPatterns();
+  for (const std::string& hitpatName: m_HitPatternNames) {
+    auto it = std::find_if(std::begin(hitPatterns), std::end(hitPatterns),
+                           [&](const HitPattern hitpat) {
+                             return (hitpat.Name()==hitpatName);
+                           });
+    if (it!=std::end(hitPatterns)) {
+      m_HitPatterns.push_back(*it);
+      std::cout << "Hit pattern \"" << hitpatName << "\" is selected." << std::endl;
+    }
+    else {
+      std::cout << "Hit pattern \"" << hitpatName << "\" is not found." << std::endl;
+    }
+  }
   
   return AS_OK;
 }
 
+ANLStatus ComptonEventFilter::mod_ana()
+{
+  const BasicComptonEvent& comptonEvent = m_EventReconstruction->getComptonEvent();
+
+  if (m_HitPatterns.size() != 0) {
+    std::vector<int> detids(2);
+    detids[0] = comptonEvent.Hit1DetectorID();
+    detids[1] = comptonEvent.Hit2DetectorID();
+    
+    bool matched = false;
+    for (auto& hitpat: m_HitPatterns) {
+      if (hitpat.match(detids)) {
+        matched = true;
+        break;
+      }
+    }
+    
+    if (!matched) {
+      EvsSet("ComptonEventFilter:RejectedByHitPattern");
+      return AS_SKIP;
+    }
+  }
+
+  if (m_ConditionsVector.empty()) {
+    return AS_OK;
+  }
+  
+  bool selected = false;
+  for (auto it=m_ConditionsVector.begin(); it!=m_ConditionsVector.end(); ++it) {
+    std::vector<std::function<bool (const BasicComptonEvent&)>>::iterator condition = it->begin();  
+    bool good = true;
+    while (condition!=it->end()) {
+      if ( !(*condition)(comptonEvent) ) {
+        good = false;
+        break;
+      }
+      condition++;
+    }
+    if (good) {
+      selected = true;
+      break;
+    }
+  }
+  
+  if (!selected) {
+    EvsSet("ComptonEventFilter:RejectedByConditions");
+    return AS_SKIP;
+  }
+  
+  return AS_OK;
+}
+
+void ComptonEventFilter::define_condition()
+{
+  m_ConditionsVector.resize(m_ConditionsVector.size()+1);
+}
+
+void ComptonEventFilter::add_condition(const std::string& type,
+                                       double min_value, double max_value)
+{
+  if (m_ConditionsVector.size()==0) {
+    define_condition();
+  }
+
+  std::function<bool (const BasicComptonEvent&)> condition;
+
+  namespace arg = std::placeholders;
+  if (type == "E1") {
+    condition = std::bind(filter_compton<double>,
+                          &BasicComptonEvent::Hit1Energy,
+                          arg::_1, min_value*keV, max_value*keV);
+  }
+  else if (type == "E2") {
+    condition = std::bind(filter_compton<double>,
+                          &BasicComptonEvent::Hit2Energy,
+                          arg::_1, min_value*keV, max_value*keV);
+  }
+  else if (type == "E1+E2") {
+    condition = std::bind(filter_compton<double>,
+                          &BasicComptonEvent::TotalEnergy,
+                          arg::_1, min_value*keV, max_value*keV);
+  }
+  else if (type == "theta K") {
+    condition = std::bind(filter_compton<double>,
+                          &BasicComptonEvent::ThetaE,
+                          arg::_1, min_value, max_value);
+  }
+  else if (type == "theta G") {
+    condition = std::bind(filter_compton<double>,
+                          &BasicComptonEvent::ThetaG,
+                          arg::_1, min_value, max_value);
+  }
+  else if (type == "delta theta") {
+    condition = std::bind(filter_compton<double>,
+                          &BasicComptonEvent::DeltaTheta,
+                          arg::_1, min_value, max_value);
+  }
+  else if (type == "time") {
+    condition = std::bind(filter_compton<double>,
+                          &BasicComptonEvent::Hit1Time,
+                          arg::_1, min_value*s, max_value*s);
+  }
+  else if (type == "hit 1 position x") {
+    condition = std::bind(filter_compton<double>,
+                          &BasicComptonEvent::Hit1PositionX,
+                          arg::_1, min_value*cm, max_value*cm);
+  }
+  else if (type == "hit 1 position y") {
+    condition = std::bind(filter_compton<double>,
+                          &BasicComptonEvent::Hit1PositionY,
+                          arg::_1, min_value*cm, max_value*cm);
+  }
+  else if (type == "hit 1 position z") {
+    condition = std::bind(filter_compton<double>,
+                          &BasicComptonEvent::Hit1PositionZ,
+                          arg::_1, min_value*cm, max_value*cm);
+  }
+  else if (type == "hit 2 position x") {
+    condition = std::bind(filter_compton<double>,
+                          &BasicComptonEvent::Hit2PositionX,
+                          arg::_1, min_value*cm, max_value*cm);
+  }
+  else if (type == "hit 2 position y") {
+    condition = std::bind(filter_compton<double>,
+                          &BasicComptonEvent::Hit2PositionY,
+                          arg::_1, min_value*cm, max_value*cm);
+  }
+  else if (type == "hit 2 position z") {
+    condition = std::bind(filter_compton<double>,
+                          &BasicComptonEvent::Hit2PositionZ,
+                          arg::_1, min_value*cm, max_value*cm);
+  }
+  else {
+    std::cout << "invalid condition type: " << type << std::endl;
+    return;
+  }
+  
+  m_ConditionsVector.back().push_back(condition);
+}
 
 ANLStatus ComptonEventFilter::mod_com()
 {
-  GetANLModuleNC("EventReconstruction", &EventReconstruction_ptr);
-  std::vector<HitPattern>& hitpat_vec = EventReconstruction_ptr->GetHitPatternVector();
+  GetANLModule("DetectorGroupManager", &m_DetectorGroupManager);
 
   std::cout << std::endl;
   std::cout << " ***** Hit Pattern List *****" << std::endl;
-  for(unsigned int i=0; i<hitpat_vec.size(); i++) {
-    std::cout << "  " << hitpat_vec[i].Name() << std::endl;
+  for (auto& hitpatName: m_HitPatternNames) {
+    std::cout << "  " << hitpatName << std::endl;
   }
 
-  std::string hitpat_name;
-  CLread("Select Hit Pattern : ", &hitpat_name);
-  hitpat_names.push_back(hitpat_name);
+  std::string hitpatName;
+  CLread("Select Hit Pattern : ", &hitpatName);
+  m_HitPatternNames.push_back(hitpatName);
 
-  int num_conditions = 1;
-  CLread("Number of conditions : ", &num_conditions);
-  conditions_vector.resize(num_conditions);
-
-  for (int i=0; i<num_conditions; i++) {
+  int numConditions = 1;
+  CLread("Number of conditions : ", &numConditions);
+  m_ConditionsVector.resize(numConditions);
+  
+  for (int i=0; i<numConditions; i++) {
     while (1) {
       std::cout << "Selection mode list:" << '\n'
                 << "  1: E1" << '\n'
@@ -81,7 +245,8 @@ ANLStatus ComptonEventFilter::mod_com()
       int mode = 0;
       CLread("Selection mode (0 for quit)", &mode);
       
-      boost::function<bool (const comptonsoft::TwoHitComptonEvent&)> condition;
+      std::function<bool (const BasicComptonEvent&)> condition;
+      namespace arg = std::placeholders;
       if (mode==0) {
         break;
       }
@@ -92,19 +257,19 @@ ANLStatus ComptonEventFilter::mod_com()
         CLread("Maximum value", &max, keV, "keV");
 	
         if (mode==1) {
-          condition = boost::bind(comptonsoft::filter_compton<double>,
-                                  &comptonsoft::TwoHitComptonEvent::getH1Energy, _1, min, max);
-          conditions_vector[i].push_back(condition);
+          condition = std::bind(filter_compton<double>,
+                                &BasicComptonEvent::Hit1Energy, arg::_1, min, max);
+          m_ConditionsVector[i].push_back(condition);
         }
         else if (mode==2) {
-          condition = boost::bind(comptonsoft::filter_compton<double>,
-                                  &comptonsoft::TwoHitComptonEvent::getH2Energy, _1, min, max);
-          conditions_vector[i].push_back(condition);
+          condition = std::bind(filter_compton<double>,
+                                &BasicComptonEvent::Hit2Energy, arg::_1, min, max);
+          m_ConditionsVector[i].push_back(condition);
         }
         else if (mode==3) {
-          condition = boost::bind(comptonsoft::filter_compton<double>,
-                                  &comptonsoft::TwoHitComptonEvent::TotalEnergy, _1, min, max);
-          conditions_vector[i].push_back(condition);
+          condition = std::bind(filter_compton<double>,
+                                &BasicComptonEvent::TotalEnergy, arg::_1, min, max);
+          m_ConditionsVector[i].push_back(condition);
         }
       }
       else if (4<=mode && mode<=6) {
@@ -112,20 +277,20 @@ ANLStatus ComptonEventFilter::mod_com()
         double max = 180.0*degree;
         CLread("Minimum value", &min, degree, "degree");
         CLread("Maximum value", &max, degree, "degree");
-	if (mode==4) {
-          condition = boost::bind(comptonsoft::filter_compton<double>,
-                                  &comptonsoft::TwoHitComptonEvent::ThetaE, _1, min, max);
-          conditions_vector[i].push_back(condition);
+        if (mode==4) {
+          condition = std::bind(filter_compton<double>,
+                                &BasicComptonEvent::ThetaE, arg::_1, min, max);
+          m_ConditionsVector[i].push_back(condition);
         }
         else if (mode==5) {
-          condition = boost::bind(comptonsoft::filter_compton<double>,
-                                  &comptonsoft::TwoHitComptonEvent::ThetaG, _1, min, max);
-          conditions_vector[i].push_back(condition);
+          condition = std::bind(filter_compton<double>,
+                                &BasicComptonEvent::ThetaG, arg::_1, min, max);
+          m_ConditionsVector[i].push_back(condition);
         }
         else if (mode==6) {
-          condition = boost::bind(comptonsoft::filter_compton<double>,
-                                  &comptonsoft::TwoHitComptonEvent::DeltaTheta, _1, min, max);
-          conditions_vector[i].push_back(condition);
+          condition = std::bind(filter_compton<double>,
+                                &BasicComptonEvent::DeltaTheta, arg::_1, min, max);
+          m_ConditionsVector[i].push_back(condition);
         }
       }
       else if (mode==7) {
@@ -133,9 +298,9 @@ ANLStatus ComptonEventFilter::mod_com()
         double max = 0.0;
         CLread("Minimum value", &min, second, "second");
         CLread("Maximum value", &max, second, "second");
-        condition = boost::bind(comptonsoft::filter_compton<double>,
-                                &comptonsoft::TwoHitComptonEvent::getH1Time, _1, min, max);
-        conditions_vector[i].push_back(condition);     
+        condition = std::bind(filter_compton<double>,
+                              &BasicComptonEvent::Hit1Time, arg::_1, min, max);
+        m_ConditionsVector[i].push_back(condition);     
       }
       else if (8<=mode && mode<=13) {
         double min = -100.0*cm;
@@ -143,34 +308,34 @@ ANLStatus ComptonEventFilter::mod_com()
         CLread("Minimum value", &min, cm, "cm");
         CLread("Maximum value", &max, cm, "cm");
         if (mode==8) {
-          condition = boost::bind(comptonsoft::filter_compton<double>,
-                                  &comptonsoft::TwoHitComptonEvent::getH1PosX, _1, min, max);
-          conditions_vector[i].push_back(condition);
+          condition = std::bind(filter_compton<double>,
+                                &BasicComptonEvent::Hit1PositionX, arg::_1, min, max);
+          m_ConditionsVector[i].push_back(condition);
         }
         else if (mode==9) {
-          condition = boost::bind(comptonsoft::filter_compton<double>,
-                                  &comptonsoft::TwoHitComptonEvent::getH1PosY, _1, min, max);
-          conditions_vector[i].push_back(condition);
+          condition = std::bind(filter_compton<double>,
+                                &BasicComptonEvent::Hit1PositionY, arg::_1, min, max);
+          m_ConditionsVector[i].push_back(condition);
         }
         else if (mode==10) {
-          condition = boost::bind(comptonsoft::filter_compton<double>,
-                                  &comptonsoft::TwoHitComptonEvent::getH1PosZ, _1, min, max);
-          conditions_vector[i].push_back(condition);
+          condition = std::bind(filter_compton<double>,
+                                &BasicComptonEvent::Hit1PositionZ, arg::_1, min, max);
+          m_ConditionsVector[i].push_back(condition);
         }
         else if (mode==11) {
-          condition = boost::bind(comptonsoft::filter_compton<double>,
-                                  &comptonsoft::TwoHitComptonEvent::getH2PosX, _1, min, max);
-          conditions_vector[i].push_back(condition);
+          condition = std::bind(filter_compton<double>,
+                                &BasicComptonEvent::Hit2PositionX, arg::_1, min, max);
+          m_ConditionsVector[i].push_back(condition);
         }
         else if (mode==12) {
-          condition = boost::bind(comptonsoft::filter_compton<double>,
-                                  &comptonsoft::TwoHitComptonEvent::getH2PosY, _1, min, max);
-          conditions_vector[i].push_back(condition);
+          condition = std::bind(filter_compton<double>,
+                                &BasicComptonEvent::Hit2PositionY, arg::_1, min, max);
+          m_ConditionsVector[i].push_back(condition);
         }
         else if (mode==13) {
-          condition = boost::bind(comptonsoft::filter_compton<double>,
-                                  &comptonsoft::TwoHitComptonEvent::getH2PosZ, _1, min, max);
-          conditions_vector[i].push_back(condition);
+          condition = std::bind(filter_compton<double>,
+                                &BasicComptonEvent::Hit2PositionZ, arg::_1, min, max);
+          m_ConditionsVector[i].push_back(condition);
         }
       }
       else {
@@ -182,169 +347,4 @@ ANLStatus ComptonEventFilter::mod_com()
   return AS_OK;
 }
 
-
-ANLStatus ComptonEventFilter::mod_init()
-{
-  GetANLModuleNC("EventReconstruction", &EventReconstruction_ptr);
-  std::vector<HitPattern>& hitpat_vec = EventReconstruction_ptr->GetHitPatternVector();
-  
-  for (size_t l=0; l<hitpat_names.size(); l++) {
-    bool selected = false;
-    for(size_t i=0; i<hitpat_vec.size(); i++) {
-      if (hitpat_vec[i].Name() == hitpat_names[l]) {
-        selected = true;
-        hitpats.push_back(hitpat_vec[i]);
-        break;
-      }
-    }
-
-    if (selected) {
-      std::cout << "Hit pattern \"" << hitpat_names[l] << "\" is selected." << std::endl;
-    }
-    else {
-      std::cout << "There is not Hit Pattern named " << hitpat_names[l] << std::endl;
-      return AS_QUIT_ERR;
-    }
-  }
-  
-  return AS_OK;
-}
-
-
-ANLStatus ComptonEventFilter::mod_ana()
-{
-  const TwoHitComptonEvent& compton_event = EventReconstruction_ptr->GetTwoHitData();
-
-  if (hitpats.size() != 0) {
-    std::vector<int> detids(2);
-    detids[0] = compton_event.getH1DetId();
-    detids[1] = compton_event.getH2DetId();
-
-    bool matched = false;
-    for (size_t l=0; l<hitpats.size(); l++) {
-      if(hitpats[l].match(detids)) {
-        matched = true;
-        break;
-      }
-    }
-    
-    if (!matched) return AS_SKIP;
-  }
-
-  if (conditions_vector.empty()) {
-    return AS_OK;
-  }
-
-  bool selected = false;
-  std::vector< std::vector< boost::function<bool (const comptonsoft::TwoHitComptonEvent&)> > >::iterator it;
-  for (it=conditions_vector.begin(); it!=conditions_vector.end(); it++) {
-    std::vector< boost::function<bool (const comptonsoft::TwoHitComptonEvent&)> >::iterator condition = it->begin();  
-    bool good = true;
-    while (condition!=it->end()) {
-      if ( !(*condition)(compton_event) ) {
-        good = false;
-        break;
-      }
-      condition++;
-    }
-    if (good) {
-      selected = true;
-      break;
-    }
-  }
-
-  if (!selected) {
-    return AS_SKIP;
-  }
-  
-  return AS_OK;
-}
-
-
-void ComptonEventFilter::define_condition()
-{
-  conditions_vector.resize(conditions_vector.size()+1);
-}
-
-
-void ComptonEventFilter::add_condition(const std::string& type,
-                                       double min_value, double max_value)
-{
-  if (conditions_vector.size()==0) {
-    define_condition();
-  }
-
-  boost::function<bool (const comptonsoft::TwoHitComptonEvent&)> condition;
-
-  if (type == "E1") {
-    condition = boost::bind(comptonsoft::filter_compton<double>,
-                            &comptonsoft::TwoHitComptonEvent::getH1Energy,
-                            _1, min_value*keV, max_value*keV);
-  }
-  else if (type == "E2") {
-    condition = boost::bind(comptonsoft::filter_compton<double>,
-                            &comptonsoft::TwoHitComptonEvent::getH2Energy,
-                            _1, min_value*keV, max_value*keV);
-  }
-  else if (type == "E1+E2") {
-    condition = boost::bind(comptonsoft::filter_compton<double>,
-                            &comptonsoft::TwoHitComptonEvent::TotalEnergy,
-                            _1, min_value*keV, max_value*keV);
-  }
-  else if (type == "theta K") {
-    condition = boost::bind(comptonsoft::filter_compton<double>,
-                            &comptonsoft::TwoHitComptonEvent::ThetaE,
-                            _1, min_value, max_value);
-  }
-  else if (type == "theta G") {
-    condition = boost::bind(comptonsoft::filter_compton<double>,
-                            &comptonsoft::TwoHitComptonEvent::ThetaG,
-                            _1, min_value, max_value);
-  }
-  else if (type == "delta theta") {
-    condition = boost::bind(comptonsoft::filter_compton<double>,
-                            &comptonsoft::TwoHitComptonEvent::DeltaTheta,
-                            _1, min_value, max_value);
-  }
-  else if (type == "time") {
-    condition = boost::bind(comptonsoft::filter_compton<double>,
-                            &comptonsoft::TwoHitComptonEvent::getH1Time,
-                            _1, min_value*s, max_value*s);
-  }
-  else if (type == "hit 1 position x") {
-    condition = boost::bind(comptonsoft::filter_compton<double>,
-                            &comptonsoft::TwoHitComptonEvent::getH1PosX,
-                            _1, min_value*cm, max_value*cm);
-  }
-  else if (type == "hit 1 position y") {
-    condition = boost::bind(comptonsoft::filter_compton<double>,
-                            &comptonsoft::TwoHitComptonEvent::getH1PosY,
-                            _1, min_value*cm, max_value*cm);
-  }
-  else if (type == "hit 1 position z") {
-    condition = boost::bind(comptonsoft::filter_compton<double>,
-                            &comptonsoft::TwoHitComptonEvent::getH1PosZ,
-                            _1, min_value*cm, max_value*cm);
-  }
-  else if (type == "hit 2 position x") {
-    condition = boost::bind(comptonsoft::filter_compton<double>,
-                            &comptonsoft::TwoHitComptonEvent::getH2PosX,
-                            _1, min_value*cm, max_value*cm);
-  }
-  else if (type == "hit 2 position y") {
-    condition = boost::bind(comptonsoft::filter_compton<double>,
-                            &comptonsoft::TwoHitComptonEvent::getH2PosY,
-                            _1, min_value*cm, max_value*cm);
-  }
-  else if (type == "hit 2 position z") {
-    condition = boost::bind(comptonsoft::filter_compton<double>,
-                            &comptonsoft::TwoHitComptonEvent::getH2PosZ,
-                            _1, min_value*cm, max_value*cm);
-  }
-  else {
-    std::cout << "invalid condition type: " << type << std::endl;
-    return;
-  }
-  
-  conditions_vector.back().push_back(condition);
-}
+} /* namespace comptonsoft */

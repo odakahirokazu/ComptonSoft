@@ -18,36 +18,38 @@
  *************************************************************************/
 
 #include "InitialConditionFilter.hh"
-#include "ReadHitTree.hh"
-#include "G4SystemOfUnits.hh"
-#include "G4PhysicalConstants.hh"
-
+#include "AstroUnits.hh"
+#include "InitialInformation.hh"
 
 using namespace anl;
-using namespace comptonsoft;
+
+namespace comptonsoft
+{
 
 InitialConditionFilter::InitialConditionFilter()
-  : energy0(-100.0*MeV), energy1(100.0*MeV), read_hittree(0)
+  : energy0_(-100.0*MeV), energy1_(100.0*MeV), initialInfo_(nullptr)
 {
 }
-
 
 ANLStatus InitialConditionFilter::mod_startup()
 {
-  register_parameter(&energy0, "energy_min", keV, "keV");
-  register_parameter(&energy1, "energy_max", keV, "keV");
-  GetANLModule("ReadHitTree", &read_hittree);
+  register_parameter(&energy0_, "energy_min", keV, "keV");
+  register_parameter(&energy1_, "energy_max", keV, "keV");
+
+  GetANLModuleIF("InitialInformation", &initialInfo_);
+
   return AS_OK;
 }
 
-
 ANLStatus InitialConditionFilter::mod_ana()
 {
-  double ini_energy = read_hittree->InitialEnergy();
+  const double initialEnergy = initialInfo_->InitialEnergy();
   
-  if (ini_energy < energy0 || energy1 < ini_energy) {
+  if (initialEnergy < energy0_ || energy1_ < initialEnergy) {
     return AS_SKIP;
   }
 
   return AS_OK;
 }
+
+} /* namespace comptonsoft */

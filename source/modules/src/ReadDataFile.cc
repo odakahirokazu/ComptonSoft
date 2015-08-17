@@ -19,10 +19,10 @@
 
 #include "ReadDataFile.hh"
 
-#include "NextCLI.hh"
-
-using namespace comptonsoft;
 using namespace anl;
+
+namespace comptonsoft
+{
 
 ReadDataFile::ReadDataFile()
   : m_EventID(0), m_Time(0)
@@ -30,9 +30,30 @@ ReadDataFile::ReadDataFile()
   add_alias("ReadDataFile");
 }
 
-
 ANLStatus ReadDataFile::mod_startup()
 {
-  register_parameter(&m_FileNameList, "file_list", "seq", "data");
+  register_parameter(&m_FileList, "file_list", "seq", "data");
   return VCSModule::mod_startup();
 }
+
+ANLStatus ReadDataFile::mod_init()
+{
+  m_FileIterator = m_FileList.begin();
+  return AS_OK;
+}
+
+bool ReadDataFile::checkFiles()
+{
+  for (auto& filename: m_FileList) {
+    std::ifstream fin;
+    fin.open( filename.c_str() );
+    if (!fin) {
+      std::cout << "ReadDataFile: cannot open " << filename << std::endl;
+      return false;
+    }
+    fin.close();
+  }
+  return true;
+}
+
+} /* namespace comptonsoft */

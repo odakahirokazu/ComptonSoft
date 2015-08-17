@@ -17,31 +17,31 @@
  *                                                                       *
  *************************************************************************/
 
-// ReadDataFile.hh
-// 2007-10-02  Hirokazu Odaka 
-// 2007-11-02  Hirokazu Odaka
-// 2008-08-31  Hirokazu Odaka 
-// 2011-04-13  Hirokazu Odaka 
-
 #ifndef COMPTONSOFT_ReadDataFile_H
 #define COMPTONSOFT_ReadDataFile_H 1
 
 #include "VCSModule.hh"
-
-#include <fstream>
 #include <string>
 #include <list>
 
 namespace comptonsoft {
 
+/**
+ * Module for reading data files.
+ * @author Hirokazu Odaka
+ * @date 2007-10-02
+ * @date 2011-04-13
+ * @date 2014-11-25
+ */
 class ReadDataFile : public VCSModule
 {
-  DEFINE_ANL_MODULE(ReadDataFile, 3.1);
+  DEFINE_ANL_MODULE(ReadDataFile, 3.2);
 public:
   ReadDataFile();
-  ~ReadDataFile() {}
+  ~ReadDataFile() = default;
 
   anl::ANLStatus mod_startup();
+  anl::ANLStatus mod_init();
   anl::ANLStatus mod_ana() { ++m_EventID; return anl::AS_OK; }
 
   int EventID() const { return m_EventID; }
@@ -49,15 +49,17 @@ public:
 
 protected:
   void setTime(int v) { m_Time = v; }
-
-protected:
-  std::list<std::string> m_FileNameList;
-
+  std::string nextFile() { return *(m_FileIterator++); }
+  bool wasLastFile() const { return (m_FileIterator==m_FileList.end()); }
+  bool checkFiles();
+  
 private:
   int m_EventID;
   int m_Time;
+  std::list<std::string> m_FileList;
+  std::list<std::string>::const_iterator m_FileIterator;
 };
 
-}
+} /* namespace comptonsoft */
 
 #endif /* COMPTONSOFT_ReadDataFile_H */

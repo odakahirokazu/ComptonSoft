@@ -20,7 +20,7 @@
 #include "ActivationPickUpData.hh"
 
 #include <fstream>
-#include <iomanip>
+#include <boost/format.hpp>
 
 #include "G4SystemOfUnits.hh"
 #include "G4PhysicalConstants.hh"
@@ -34,7 +34,6 @@
 #include "G4Ions.hh"
 
 #include "ActivationStackingAction.hh"
-
 
 namespace {
   
@@ -53,48 +52,41 @@ int64_t IsotopeID(int z, int a, double energy)
   return id;
 }
 
-}
+} /* anonymous namespace */
+
 
 using namespace anl;
-using namespace comptonsoft;
 
+namespace comptonsoft
+{
 
 ActivationPickUpData::ActivationPickUpData()
-  : m_AnalysisManager(0),
-    m_FileNameBase("activation"),
+  : m_AnalysisManager(G4RootAnalysisManager::Instance()),
+    m_FilenameBase("activation"),
     m_InitialEnergy(0.0)
 {
   add_alias("ActivationPickUpData");
   SetStepActOn(true);
-  
-  m_AnalysisManager = G4RootAnalysisManager::Instance();
 }
 
-
-ActivationPickUpData::~ActivationPickUpData()
-{
-  if (m_AnalysisManager) delete m_AnalysisManager;
-}
-
+ActivationPickUpData::~ActivationPickUpData() = default;
 
 ANLStatus ActivationPickUpData::mod_startup()
 {
-  register_parameter(&m_FileNameBase, "output_filename_base");
+  register_parameter(&m_FilenameBase, "output_filename_base");
   return AS_OK;
 }
-
 
 void ActivationPickUpData::CreateUserActions()
 {
   SetStackingAction(new ActivationStackingAction);
 }
 
-
 void ActivationPickUpData::RunAct_begin(const G4Run*)
 {
-  G4String fileName(m_FileNameBase+".root");
-  m_AnalysisManager->OpenFile(fileName);
+  const G4String filename(m_FilenameBase+".root");
   m_AnalysisManager->SetNtupleDirectoryName("activation");
+  m_AnalysisManager->OpenFile(filename);
   
   m_AnalysisManager->CreateNtuple("ritree", "ritree");
   m_AnalysisManager->CreateNtupleIColumn("Z");
@@ -107,16 +99,14 @@ void ActivationPickUpData::RunAct_begin(const G4Run*)
   m_AnalysisManager->CreateNtupleDColumn("ini_energy");
 }
 
-
 void ActivationPickUpData::RunAct_end(const G4Run* aRun)
 {
-  OutputVolumeInfo(m_FileNameBase+"_volume.txt");
-  OutputSummary(m_FileNameBase+"_summary.txt", aRun->GetNumberOfEvent());
+  OutputVolumeInfo(m_FilenameBase+"_volume.txt");
+  OutputSummary(m_FilenameBase+"_summary.txt", aRun->GetNumberOfEvent());
   
   m_AnalysisManager->Write();
   m_AnalysisManager->CloseFile();
 }
-
 
 void ActivationPickUpData::TrackAct_begin(const G4Track* aTrack)
 {
@@ -125,7 +115,6 @@ void ActivationPickUpData::TrackAct_begin(const G4Track* aTrack)
     SetInitialEnergy(aTrack->GetKineticEnergy());
   }
 }
-
 
 void ActivationPickUpData::StepAct(const G4Step* aStep, G4Track* aTrack)
 {
@@ -167,18 +156,15 @@ void ActivationPickUpData::StepAct(const G4Step* aStep, G4Track* aTrack)
   }
 }
 
-
 int ActivationPickUpData::NumberOfVolumes()
 {
   return m_VolumeArray.size();
 }
 
-
 std::string ActivationPickUpData::VolumeName(int index)
 {
   return m_VolumeArray.at(index);
 }
-
 
 void ActivationPickUpData::Fill(const G4Ions* nucleus,
                                 const G4VTouchable* touchable,
@@ -232,10 +218,9 @@ void ActivationPickUpData::Fill(const G4Ions* nucleus,
   }
 }
 
-
-void ActivationPickUpData::OutputVolumeInfo(const std::string& fileName)
+void ActivationPickUpData::OutputVolumeInfo(const std::string& filename)
 {
-  std::ofstream fout(fileName.c_str());
+  std::ofstream fout(filename.c_str());
   size_t numVolume = NumberOfVolumes();
   for (size_t i=0; i<numVolume; i++) {
     fout << std::setw(7) << i << " " << VolumeName(i) << '\n';
@@ -243,11 +228,10 @@ void ActivationPickUpData::OutputVolumeInfo(const std::string& fileName)
   fout.close();
 }
 
-
-void ActivationPickUpData::OutputSummary(const std::string& fileName,
+void ActivationPickUpData::OutputSummary(const std::string& filename,
                                          int numberOfRun)
 {
-  std::ofstream fout(fileName.c_str());
+  std::ofstream fout(filename.c_str());
   fout << "TotalEvent: " << numberOfRun << '\n' << std::endl;
   
   for (size_t i=0; i<m_RIMapVector.size(); i++) {
@@ -257,13 +241,16 @@ void ActivationPickUpData::OutputSummary(const std::string& fileName,
     for (data_map_t::iterator it=data.begin(); it!=data.end(); ++it) {
       int64_t isotopeID = (*it).first;
       IsotopeInfo isotope = (*it).second;
-      fout << std::setw(14) << isotopeID << " "
-           << std::setw(3) << isotope.Z() << " "
-           << std::setw(3) << isotope.A() << " "
-           << std::setw(9) << std::setprecision(3) << isotope.Energy()/keV << " "
-           << std::setw(12) << isotope.Count() << '\n';
+      fout << (boost::format("%14d %3d %3d %15.9e %15d\n")
+               % isotopeID
+               % isotope.Z()
+               % isotope.A()
+               % (isotope.Energy()/keV)
+               % isotope.Counts());
     }
     fout << std::endl;
   }
   fout.close();
 }
+
+} /* namespace comptonsoft */

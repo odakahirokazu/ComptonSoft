@@ -30,19 +30,14 @@
 #include <fstream>
 #include <string>
 
-
 namespace comptonsoft {
 
 class ReadDataFile_SpW2 : public ReadDataFile
 {
-  DEFINE_ANL_MODULE(ReadDataFile_SpW2, 3.0);
+  DEFINE_ANL_MODULE(ReadDataFile_SpW2, 3.2);
 public:
   ReadDataFile_SpW2();
-  ~ReadDataFile_SpW2() {}
-
-  std::string module_name() const { return "ReadDataFile_SpW2"; }
-  std::string module_version() const { return "3.0"; }
-  
+  ~ReadDataFile_SpW2() = default;
 
   anl::ANLStatus mod_startup();
   anl::ANLStatus mod_init();
@@ -61,6 +56,6 @@ private:
   int m_DeltaTime;
 };
 
-}
+} /* namespace comptonsoft */
 
 #endif /* COMPTONSOFT_ReadDataFile_SpW2_H */

@@ -23,7 +23,7 @@
 #include "TH1.h"
 #include "TRandom3.h"
 #include "TMath.h"
-#include "cs_globals.hh"
+#include "CSTypes.hh"
 #include "TwoHitComptonEvent.hh"
 
 using namespace comptonsoft;

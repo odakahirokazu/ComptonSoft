@@ -18,158 +18,93 @@
  *************************************************************************/
 
 #include "ReadHitTree.hh"
-
+#include "TChain.h"
 #include "DetectorHit.hh"
-#include "NextCLI.hh"
+#include "HitTreeIOWithInitialInfo.hh"
+#include "CSHitCollection.hh"
 
-using namespace comptonsoft;
 using namespace anl;
 
+namespace comptonsoft
+{
+
 ReadHitTree::ReadHitTree()
-  : anlgeant4::InitialInformation(false)
+  : anlgeant4::InitialInformation(false),
+    hitCollection_(nullptr),
+    treeIO_(new HitTreeIOWithInitialInfo)
 {
   add_alias("InitialInformation");
 }
 
+ReadHitTree::~ReadHitTree() = default;
 
 ANLStatus ReadHitTree::mod_startup()
 {
-  register_parameter(&inputfilename, "file_list", "seq", "hittree.root");
+  register_parameter(&fileList_, "file_list", "seq", "hittree.root");
   return AS_OK;
 }
-
-
-ANLStatus ReadHitTree::mod_his()
-{
-  hittree = new TChain("hittree");
-  
-  for(size_t i=0; i<inputfilename.size(); i++) {
-    hittree->Add(inputfilename[i].c_str());
-  }
-  
-  nevent = hittree->GetEntries();
-  std::cout << "Total event: " << nevent << std::endl;
-
-  hittree->SetBranchAddress("eventid",    &eventid);
-  hittree->SetBranchAddress("seqnum",     &seqnum);
-  hittree->SetBranchAddress("totalhit",   &totalhit);
-  if (hittree->GetBranch("ini_energy")) hittree->SetBranchAddress("ini_energy", &ini_energy);
-  if (hittree->GetBranch("ini_dirx")) {
-    setInitialInformationStored();
-    hittree->SetBranchAddress("ini_dirx", &ini_dirx);
-  }
-  if (hittree->GetBranch("ini_diry")) hittree->SetBranchAddress("ini_diry", &ini_diry);
-  if (hittree->GetBranch("ini_dirz")) hittree->SetBranchAddress("ini_dirz", &ini_dirz);
-  if (hittree->GetBranch("ini_time")) hittree->SetBranchAddress("ini_time", &ini_time);
-  if (hittree->GetBranch("ini_posx")) hittree->SetBranchAddress("ini_posx", &ini_posx);
-  if (hittree->GetBranch("ini_posy")) hittree->SetBranchAddress("ini_posy", &ini_posy);
-  if (hittree->GetBranch("ini_posz")) hittree->SetBranchAddress("ini_posz", &ini_posz);
-  if (hittree->GetBranch("ini_polarx")) hittree->SetBranchAddress("ini_polarx", &ini_polarx);
-  if (hittree->GetBranch("ini_polary")) hittree->SetBranchAddress("ini_polary", &ini_polary);
-  if (hittree->GetBranch("ini_polarz")) hittree->SetBranchAddress("ini_polarz", &ini_polarz);
-  if (hittree->GetBranch("weight")) {
-    setWeightStored();
-    hittree->SetBranchAddress("weight", &weight);
-  }
-  hittree->SetBranchAddress("realposx",   &realposx);
-  hittree->SetBranchAddress("realposy",   &realposy);
-  hittree->SetBranchAddress("realposz",   &realposz);
-  hittree->SetBranchAddress("localposx",  &localposx);
-  hittree->SetBranchAddress("localposy",  &localposy);
-  hittree->SetBranchAddress("localposz",  &localposz);
-  hittree->SetBranchAddress("posx",       &posx);
-  hittree->SetBranchAddress("posy",       &posy);
-  hittree->SetBranchAddress("posz",       &posz);
-  hittree->SetBranchAddress("edep",       &edep);
-  hittree->SetBranchAddress("e_pha",      &e_pha);
-  hittree->SetBranchAddress("e_pi",       &e_pi);
-  hittree->SetBranchAddress("time",       &time);
-  hittree->SetBranchAddress("process",    &process);
-  hittree->SetBranchAddress("grade",      &grade);
-  hittree->SetBranchAddress("detid",      &detid);
-  if (hittree->GetBranch("stripx")) {
-    hittree->SetBranchAddress("stripx",   &stripx);
-    hittree->SetBranchAddress("stripy",   &stripy);
-  }
-  else {
-    hittree->SetBranchAddress("xstrip",   &stripx);
-    hittree->SetBranchAddress("ystrip",   &stripy);
-  }
-  
-  if (hittree->GetBranch("chip")) hittree->SetBranchAddress("chip", &chip);
-  if (hittree->GetBranch("channel")) hittree->SetBranchAddress("channel", &channel);
-  hittree->SetBranchAddress("time_group", &time_group);
-  hittree->SetBranchAddress("flag",       &flag);
-
-  return AS_OK;
-}
-
 
 ANLStatus ReadHitTree::mod_init()
 {
-  GetANLModuleNC("CSHitCollection", &hit_collection);
+  VCSModule::mod_init();
+  
+  GetANLModuleNC("CSHitCollection", &hitCollection_);
 
-  id = 0;
-  process = 0;
+  hittree_ = new TChain("hittree");
+  for (const std::string& filename: fileList_) {
+    hittree_->Add(filename.c_str());
+  }
+
+  treeIO_->setTree(hittree_);
+  if (hittree_->GetBranch("ini_energy")) {
+    setInitialInformationStored();
+    treeIO_->enableInitialInfoRecord();
+  }
+  else {
+    treeIO_->disableInitialInfoRecord();
+  }
+  treeIO_->setBranchAddresses();
+
+  numEntries_ = hittree_->GetEntries();
+  std::cout << "Number of entries: " << numEntries_ << std::endl;
 
   return AS_OK;
 }
-
 
 ANLStatus ReadHitTree::mod_ana()
 {
-  if (id == nevent) {
+  if (entryIndex_ == numEntries_) {
     return AS_QUIT;
   }
-  
-  hittree->GetEntry(id);
-  const int EventID = eventid;
 
-  setEventID(eventid);
+  hittree_->GetEntry(entryIndex_);
+
+  const int64_t EventID = treeIO_->getEventID();
+  setEventID(EventID);
+
   if (InitialInformationStored()) {
-    setInitialEnergy(ini_energy);
-    setInitialDirection(ini_dirx, ini_diry, ini_dirz);
-    setInitialTime(ini_time);
-    setInitialPosition(ini_posx, ini_posy, ini_posz);
-    setInitialPolarization(ini_polarx, ini_polary, ini_polarz);
+    setInitialEnergy(treeIO_->getInitialEnergy());
+    setInitialDirection(treeIO_->getInitialDirection());
+    setInitialTime(treeIO_->getInitialTime());
+    setInitialPosition(treeIO_->getInitialPosition());
+    setInitialPolarization(treeIO_->getInitialPolarization());
   }
   
   if (WeightStored()) {
-    setWeight(weight);
+    setWeight(treeIO_->getWeight());
   }
-  
-  do {
-    DetectorHit_sptr hit(new DetectorHit);
-    hit->setRealPosX(realposx);
-    hit->setRealPosY(realposy);
-    hit->setRealPosZ(realposz);
-    hit->setLocalPosX(localposx);
-    hit->setLocalPosY(localposy);
-    hit->setLocalPosZ(localposz);
-    hit->setPosX(posx);
-    hit->setPosY(posy);
-    hit->setPosZ(posz);
-    hit->setEdep(edep);
-    hit->setPHA(e_pha);
-    hit->setPI(e_pi);
-    hit->setTime(time);
-    hit->setProcess(process);
-    hit->setGrade(grade);
-    hit->setDetectorID(detid);
-    hit->setStripX(stripx);
-    hit->setStripY(stripy);
-    hit->setChipID(chip);
-    hit->setChannel(channel);
-    hit->setTimeGroup(time_group);
-    hit->setFlag(flag);
 
-    hit_collection->InsertHit(hit);
-
-    id++;
-    if (id == nevent) { return AS_QUIT; }
-
-    hittree->GetEntry(id);    
-  } while (eventid == EventID);
+  std::vector<DetectorHit_sptr> hits = treeIO_->retrieveHits(entryIndex_, false);
+  for (auto& hit: hits) {
+    insertHit(hit);
+  }
   
   return AS_OK;
 }
+
+void ReadHitTree::insertHit(const DetectorHit_sptr& hit)
+{
+  hitCollection_->insertHit(hit);
+}
+
+} /* namespace comptonsoft */

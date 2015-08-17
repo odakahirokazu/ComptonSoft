@@ -27,17 +27,16 @@
 #include <string>
 #include <vector>
 #include "NucleusPrimaryGen.hh"
-#include "VolumeInsideSample.hh"
+#include "PositionSamplerInVolume.hh"
 
 namespace comptonsoft {
-
 
 class NucleusPrimaryGenInVolume : public NucleusPrimaryGen
 {
   DEFINE_ANL_MODULE(NucleusPrimaryGenInVolume, 1.2);
 public: 
   NucleusPrimaryGenInVolume();
-  virtual ~NucleusPrimaryGenInVolume(){}
+  virtual ~NucleusPrimaryGenInVolume() = default;
 
   anl::ANLStatus mod_startup();
   anl::ANLStatus mod_com();
@@ -45,10 +44,10 @@ public:
   anl::ANLStatus mod_ana();
 
 private:
-  VolumeInsideSample m_PositionSampler;
+  anlgeant4::PositionSamplerInVolume m_PositionSampler;
   std::vector<std::string> m_VolumeHierarchy;
 };
 
-}
+} /* namespace comptonsoft */
 
 #endif /* COMPTONSOFT_NucleusPrimaryGenInVolume_H */

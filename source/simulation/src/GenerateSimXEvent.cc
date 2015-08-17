@@ -19,7 +19,7 @@
 
 #include "GenerateSimXEvent.hh"
 
-#include "globals.hh"
+#include "G4SystemOfUnits.hh"
 #include "DetectorHit.hh"
 #include "CSHitCollection.hh"
 #include "SimXIF.hh"
@@ -61,7 +61,7 @@ ANLStatus GenerateSimXEvent::mod_init()
 ANLStatus GenerateSimXEvent::mod_ana()
 {
   const std::vector<DetectorHit_sptr>& hitVec 
-    = m_HitCollection->GetHits();
+    = m_HitCollection->getHits();
   int num = hitVec.size();
   seqnum = 0;
   totalhit = num;
@@ -73,34 +73,34 @@ ANLStatus GenerateSimXEvent::mod_ana()
   for (int i=0; i<num; i++) {
     flag = 0;
     
-    realposx = hitVec[i]->getRealPosX();
-    realposy = hitVec[i]->getRealPosY();
-    realposz = hitVec[i]->getRealPosZ();
-    localposx = hitVec[i]->getLocalPosX();
-    localposy = hitVec[i]->getLocalPosY();
-    localposz = hitVec[i]->getLocalPosZ();
-    posx = hitVec[i]->getPosX();
-    posy = hitVec[i]->getPosY();
-    posz = hitVec[i]->getPosZ();
+    realposx = hitVec[i]->RealPositionX();
+    realposy = hitVec[i]->RealPositionY();
+    realposz = hitVec[i]->RealPositionZ();
+    localposx = hitVec[i]->LocalPositionX();
+    localposy = hitVec[i]->LocalPositionY();
+    localposz = hitVec[i]->LocalPositionZ();
+    posx = hitVec[i]->PositionX();
+    posy = hitVec[i]->PositionY();
+    posz = hitVec[i]->PositionZ();
 
-    edep  = hitVec[i]->getEdep();
-    e_pha = hitVec[i]->getPHA();
-    e_pi  = hitVec[i]->getPI();
+    edep  = hitVec[i]->EnergyDeposit();
+    e_pha = hitVec[i]->PHA();
+    e_pi  = hitVec[i]->EPI();
 
-    time1 = hitVec[i]->getTime();
+    time1 = hitVec[i]->Time();
 
-    process = hitVec[i]->getProcess();
-    grade = hitVec[i]->getGrade();
+    process = hitVec[i]->Process();
+    grade = hitVec[i]->Grade();
 
-    detid = hitVec[i]->getDetectorID();
-    stripx = hitVec[i]->getStripX();
-    stripy = hitVec[i]->getStripY();
-    chip = hitVec[i]->getChipID();
-    channel = hitVec[i]->getChannel();
+    detid = hitVec[i]->DetectorID();
+    stripx = hitVec[i]->PixelX();
+    stripy = hitVec[i]->PixelY();
+    chip = hitVec[i]->ReadoutChannelSection();
+    channel = hitVec[i]->ReadoutChannelIndex();
 
-    time_group = hitVec[i]->getTimeGroup();
+    time_group = hitVec[i]->TimeGroup();
     
-    flag |= hitVec[i]->getFlag();
+    flag |= hitVec[i]->Flags();
      
     m_SimXIF->addEvent(time1, e_pi, stripx, stripy, detid);
 

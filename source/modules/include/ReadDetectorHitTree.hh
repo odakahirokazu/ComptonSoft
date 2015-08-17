@@ -22,22 +22,23 @@
 
 #include "ReadRawHitTree.hh"
 
-
 namespace comptonsoft {
 
+/**
+ * @author Hitokazu Odaka
+ * @date 2014-11-30
+ */
 class ReadDetectorHitTree : public ReadRawHitTree
 {
-  DEFINE_ANL_MODULE(ReadDetectorHitTree, 1.1);
+  DEFINE_ANL_MODULE(ReadDetectorHitTree, 2.0);
 public:
-  ReadDetectorHitTree() {}
-  ~ReadDetectorHitTree() {}
-
-  anl::ANLStatus mod_ana();
+  ReadDetectorHitTree() = default;
+  ~ReadDetectorHitTree() = default;
   
 protected:
-  virtual void insertHit(int detid, comptonsoft::DetectorHit_sptr hit);
+  virtual void insertHit(const DetectorHit_sptr& hit);
 };
 
-}
+} /* namespace comptonsoft */
 
 #endif /* COMPTONSOFT_ReadDetectorHitTree_H */

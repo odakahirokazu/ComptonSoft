@@ -21,6 +21,7 @@
 #include "globals.hh"
 #include "G4Track.hh"
 #include "G4VProcess.hh"
+#include "TDirectory.h"
 #include "SaveData.hh"
 
 using namespace anl;

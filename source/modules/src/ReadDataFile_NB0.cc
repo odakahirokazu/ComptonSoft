@@ -17,30 +17,24 @@
  *                                                                       *
  *************************************************************************/
 
-// 2011-06-06 Hirokazu Odaka 
-// based on rawdata2root_vata461 by S. Watanabe
-//
-
 #include "ReadDataFile_NB0.hh"
 
 #include <iostream>
 #include <iomanip>
 
-#include "DetectorReadModule.hh"
-#include "OneASICData.hh"
-
-
-using namespace comptonsoft;
-
+#include "DetectorReadoutModule.hh"
+#include "MultiChannelData.hh"
 
 using namespace anl;
+
+namespace comptonsoft
+{
 
 ReadDataFile_NB0::ReadDataFile_NB0()
   : m_NewFrame(true),
     m_EventLength(1024)
 {
 }
-
 
 ANLStatus ReadDataFile_NB0::mod_startup()
 {
@@ -49,42 +43,34 @@ ANLStatus ReadDataFile_NB0::mod_startup()
   return ReadDataFile::mod_startup();
 }
 
-
 ANLStatus ReadDataFile_NB0::mod_init()
 {
   ReadDataFile::mod_init();
 
   // check file open
-  std::list<std::string>::iterator itFileName;
-  for (itFileName = m_FileNameList.begin(); itFileName != m_FileNameList.end(); itFileName++) {
-    std::ifstream fin;
-    fin.open( itFileName->c_str() );
-    if (!fin) {
-      std::cout << "ReadDataFile: cannot open " << *itFileName << std::endl;
-      return AS_QUIT;
-    }
-    fin.close();
-  }
+  bool check = checkFiles();
+  if (!check) return AS_QUIT_ERR;
 
   EvsDef("ReadDataFile:ReadHK");
 
   return AS_OK;
 }
 
-
 ANLStatus ReadDataFile_NB0::mod_bgnrun()
 {
-  m_fin.open(m_FileNameList.front().c_str(), std::ios::in|std::ios::binary);
-  if (!m_fin) {
-    std::cout << "ReadDataFile: cannot open " << m_FileNameList.front() << std::endl;
+  if (wasLastFile()) {
+    std::cout << "The file list seems empty." << std::endl;
     return AS_QUIT;
   }
-
-  m_FileNameList.pop_front();
-
+  
+  std::string filename = nextFile();
+  m_fin.open(filename.c_str());
+  if (!m_fin) {
+    std::cout << "ReadDataFile: cannot open " << filename << std::endl;
+    return AS_QUIT;
+  }
   return AS_OK;
 }
-
 
 ANLStatus ReadDataFile_NB0::mod_ana()
 {
@@ -93,26 +79,26 @@ ANLStatus ReadDataFile_NB0::mod_ana()
  read_start:
   if (m_NewFrame) {
     m_NewFrame = false;
-    
     m_fin.read((char*)&tmp, sizeof(int));
+
     if (m_fin.eof()) {
       std::cout << "ReadDataFile: reach end of file" << std::endl;
       m_fin.close();
       m_NewFrame = true;
-      
-      if (!m_FileNameList.empty()) {
-        m_fin.open( m_FileNameList.front().c_str() );
-        if (!m_fin) {
-          std::cout << "ReadDataFile: cannot open " << m_FileNameList.front() << std::endl;
-          return AS_QUIT;
-        }
-        std::cout << "ReadDataFile: open next file " << std::endl;
-        m_FileNameList.pop_front();
-        goto read_start;
+
+      if (wasLastFile()) {
+        std::cout << "ReadDataFile: the last file was processed." << std::endl;
+        return AS_QUIT;
       }
       else {
-        std::cout << "ReadDataFile: data file queue is empty" << std::endl;
-        return AS_QUIT;
+        std::string filename = nextFile();
+        m_fin.open(filename.c_str());
+        if (!m_fin) {
+          std::cout << "ReadDataFile: cannot open " << filename << std::endl;
+          return AS_QUIT;
+        }
+        std::cout << "ReadDataFile: open next file." << std::endl;
+        goto read_start;
       }
     }
 
@@ -151,7 +137,6 @@ ANLStatus ReadDataFile_NB0::mod_ana()
   return ReadDataFile::mod_ana();
 }
 
-
 bool ReadDataFile_NB0::readHK()
 {
   m_fin.read((char*)m_HKBuf, HK_LENGTH*sizeof(int));
@@ -165,7 +150,6 @@ bool ReadDataFile_NB0::readHK()
 
   return true;
 }
-
 
 bool ReadDataFile_NB0::readFrame()
 {
@@ -181,11 +165,10 @@ bool ReadDataFile_NB0::readFrame()
   return true;
 }
 
-
-unsigned int* ReadDataFile_NB0::readEvent(unsigned int* pEvent)
+uint32_t* ReadDataFile_NB0::readEvent(uint32_t* pEvent)
 {
   const size_t EventLength = m_EventLength;
-  unsigned int* p = pEvent;
+  uint32_t* p = pEvent;
   
   size_t j = 0;
   while ((*p & 0xFFFF0000)!=0x3c3c0000 && j<FRAME_LENGTH) {
@@ -233,24 +216,21 @@ unsigned int* ReadDataFile_NB0::readEvent(unsigned int* pEvent)
   return p;
 }
 
-
 void ReadDataFile_NB0::decodeASICData()
 {
-  const unsigned int* p = m_DataBitBuf;
+  const uint32_t* p = m_DataBitBuf;
   
-  std::vector<DetectorReadModule*>::iterator itModule = GetDetectorManager()->getReadModuleVector().begin();
-  std::vector<DetectorReadModule*>::iterator itModuleEnd = GetDetectorManager()->getReadModuleVector().end();
-  while ( itModule != itModuleEnd ) {
-    std::vector<OneASICData*>::iterator itChip = (*itModule)->ASICDataBegin();
-    std::vector<OneASICData*>::iterator itChipEnd = (*itModule)->ASICDataEnd();
-    while ( itChip != itChipEnd ) {
-      (*itChip)->resetRawADC();
+  DetectorSystem* detectorManager = getDetectorManager();
+  for (auto& readoutModule: detectorManager->getReadoutModules()) {
+    for (auto& section: readoutModule->getReadoutSections()) {
+      MultiChannelData* mcd = detectorManager->getMultiChannelData(section);
+      const int nCh = mcd->NumberOfChannels();
+      mcd->resetRawADC();
       
-      const int nCh = (*itChip)->NumChannel();
       std::vector<unsigned int> indexVec;
       p += 5;
       for (int l=0; l<nCh; l++) {
-        unsigned int flag = *(p++);
+        uint32_t flag = *(p++);
         if (flag) {
           indexVec.push_back(l);
         }
@@ -258,32 +238,30 @@ void ReadDataFile_NB0::decodeASICData()
       ++p;
       
       const int ADCRes = 10;
-      unsigned short int ref = 0;
+      uint16_t ref = 0;
       for (int b=0; b<ADCRes; b++) {
         ref += *(p++) << b;
       }
-      (*itChip)->setReference(ref);
+      mcd->setReferenceLevel(ref);
       
       const int hitnum = indexVec.size();
       for (int i=0; i<hitnum; i++) {
-        unsigned int adc = 0;
+        uint16_t adc = 0;
         for (int b=0; b<ADCRes; b++) {
           adc += *(p++) << b;
         }
-        (*itChip)->setRawADC(indexVec[i], adc);
+        mcd->setRawADC(indexVec[i], adc);
       }
       
-      unsigned short int cmn = 0;
+      uint16_t cmn = 0;
       for (int b=0; b<ADCRes; b++) {
         cmn += *(p++) << b;
       }
-      (*itChip)->setCommonModeNoise(cmn);
+      mcd->setCommonModeNoise(cmn);
       
       ++p;
-
-      itChip++;
     }
-    
-    itModule++;
   }
 }
+
+} /* namespace comptonsoft */

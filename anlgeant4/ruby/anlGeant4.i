@@ -14,6 +14,7 @@
 #include "BasicPrimaryGen.hh"
 #include "PlaneWavePrimaryGen.hh"
 #include "PointSourcePrimaryGen.hh"
+#include "PrimaryGenUniformSourceInVolume.hh"
 #include "VPickUpData.hh"
 #include "StandardPickUpData.hh"
 #ifdef USE_VIS
@@ -104,6 +105,14 @@ class PointSourcePrimaryGen : public BasicPrimaryGen
 {
 public:
   PointSourcePrimaryGen();
+};
+
+
+class PrimaryGenUniformSourceInVolume : public PointSourcePrimaryGen
+{
+public:
+  PrimaryGenUniformSourceInVolume();
+  ~PrimaryGenUniformSourceInVolume() = default;
 };
 
 

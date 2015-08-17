@@ -17,87 +17,160 @@
  *                                                                       *
  *************************************************************************/
 
-// 2009-06-22 Hirokazu Odaka
-// 2007-12-xx Hirokazu Odaka
-
 #include "CorrectPHA.hh"
+#include <memory>
+#include <utility>
+#include <boost/format.hpp>
 #include "TFile.h"
 #include "TH1.h"
-#include "OneASICData.hh"
+#include "TSpline.h"
+#include "DetectorReadoutModule.hh"
+#include "MultiChannelData.hh"
+#include "GainFunctionSpline.hh"
 
-using namespace comptonsoft;
 using namespace anl;
 
+namespace comptonsoft
+{
 
 CorrectPHA::CorrectPHA()
-  : m_PedestalFileName("pedestal.root"),
-    m_CMNByMedian(true)
+  : m_PedestalCorrection(false),
+    m_CMNSubtraction(CMNSubtractionMode::Given),
+    m_GainCorrection(true),
+    m_PedestalFileName("pedestal.root"),
+    m_CMNSubtractionInteger(static_cast<int>(CMNSubtractionMode::Given)),
+    m_GainFileName("gaincurve.root"),
+    m_GainFile(nullptr)
 {
 }
 
+CorrectPHA::~CorrectPHA() = default;
 
 ANLStatus CorrectPHA::mod_startup()
 {
-  register_parameter(&m_PedestalFileName, "pedestal_data");
-  set_parameter_description("ROOT file of pedestal levels.");
-  register_parameter(&m_CMNByMedian, "median_CMN_estimation");
-  set_parameter_description("Calculation method of common mode noise values. Median (1) or mean (0).");
+  register_parameter(&m_PedestalFileName, "pedestal_level");
+  set_parameter_description("ROOT file of pedestal levels. '0' for disabling the pedestal level correction.");
+
+  register_parameter(&m_CMNSubtractionInteger, "CMN_estimation");
+  set_parameter_description("Calculation method of common mode noise values. 0: no correction, 1: use given value in data, 2: calculate by median, 3: calculate by mean.");
+  
+  register_parameter(&m_GainFileName, "gain_function");
+  set_parameter_description("ROOT file of calibrated energy gain file. '0' for disabling the gain correction.");
   
   return AS_OK;
 }
-
 
 ANLStatus CorrectPHA::mod_init()
 {
   VCSModule::mod_init();
 
-  TFile* pedestalFile = new TFile(m_PedestalFileName.c_str());
-  char name[256];
-  
-  std::vector<RealDetectorUnit*>::iterator itDet = GetDetectorVector().begin();
-  std::vector<RealDetectorUnit*>::iterator itDetEnd = GetDetectorVector().end();
-  while ( itDet != itDetEnd ) {
-    std::vector<OneASICData*>::iterator itChip = (*itDet)->ASICDataBegin();
-    std::vector<OneASICData*>::iterator itChipEnd = (*itDet)->ASICDataEnd();
-    int j=0;
-    while ( itChip != itChipEnd ) {
-      sprintf(name, "pedestal/pedestal_%02d_%d", (*itDet)->getID(), j);
-      TH1D* pedestal = dynamic_cast<TH1D*>( pedestalFile->Get(name) );
-      int nCh = (*itChip)->NumChannel();
-      for (int k=0; k<nCh; k++) {
-	(*itChip)->setPedestal(k, pedestal->GetBinContent(k+1));
-      }
-      j++;
-      itChip++;
-    }
-    itDet++;
+  std::unique_ptr<TFile> pedestalFile;
+  if (m_PedestalFileName=="0") {
+    m_PedestalCorrection = false;
+  }
+  else {
+    m_PedestalCorrection = true;
+    pedestalFile.reset( new TFile(m_PedestalFileName.c_str()) );
   }
 
-  pedestalFile->Close();
-  delete pedestalFile;
+  m_CMNSubtraction = static_cast<CMNSubtractionMode>(m_CMNSubtractionInteger);
+
+  if (m_GainFileName=="0") {
+    m_GainCorrection = false;
+  }
+  else if (m_GainFileName=="1") {
+    m_GainCorrection = true;
+  }
+  else {
+    m_GainCorrection = true;
+    m_GainFile.reset( new TFile(m_GainFileName.c_str()) );
+  }
+
+  DetectorSystem* detectorManager = getDetectorManager();
+  const int NumROM = detectorManager->NumberOfReadoutModules();
+  for (int i=0; i<NumROM; i++) {
+    DetectorReadoutModule* ROM = detectorManager->getReadoutModuleByIndex(i);
+    const int ROMID = ROM->ID();
+    const int NumSections = ROM->NumberOfReadoutSections();
+    for (int j=0; j<NumSections; j++) {
+      const DetectorChannelID section = ROM->ReadoutSection(j);
+      MultiChannelData* mcd = detectorManager->getMultiChannelData(section);
+      int NumChannels = mcd->NumberOfChannels();
+      if (m_PedestalCorrection) {
+        std::string pedestalName = (boost::format("pedestal/pedestal_r%03d_%03d") % ROMID % j).str();
+        TH1D* pedestal = static_cast<TH1D*>( pedestalFile->Get(pedestalName.c_str()) );
+        for (int k=0; k<NumChannels; k++) {
+          mcd->setPedestal(k, pedestal->GetBinContent(k+1));
+        }
+      }
+
+      if (m_GainCorrection && m_GainFile.get()) {
+        std::unique_ptr<GainFunctionSpline> gainFunction(new GainFunctionSpline(NumChannels));
+        for (int k=0; k<NumChannels; k++) {
+          std::string gainName = (boost::format("gain_func_r%03d_%03d_%03d") % i % j % k).str();
+          const TSpline* spline = static_cast<const TSpline*>( m_GainFile->Get(gainName.c_str()) );
+          if (spline == nullptr) {
+            std::cout << "CorrectPHA: gain function is not found: " << gainName << std::endl;
+          }
+          else {
+            gainFunction->set(k, spline);
+          }
+        }
+        mcd->registerGainFunction(std::move(gainFunction));
+      }
+    }
+  }
+
+  if (m_PedestalCorrection) {
+    pedestalFile->Close();
+  }
 
   return AS_OK;
 }
-
 
 ANLStatus CorrectPHA::mod_ana()
 {
-  std::vector<RealDetectorUnit*>::iterator itDet = GetDetectorVector().begin();
-  std::vector<RealDetectorUnit*>::iterator itDetEnd = GetDetectorVector().end();
-  while ( itDet != itDetEnd ) {
-    std::vector<OneASICData*>::iterator itChip = (*itDet)->ASICDataBegin();
-    std::vector<OneASICData*>::iterator itChipEnd = (*itDet)->ASICDataEnd();
-    while ( itChip != itChipEnd ) {
-      if (m_CMNByMedian) {
-        (*itChip)->calculateCommonModeNoiseByMedian();
+  DetectorSystem* detectorManager = getDetectorManager();
+  for (auto& detector: detectorManager->getDetectors()) {
+    const int NumSections = detector->NumberOfMultiChannelData();
+    for (int j=0; j<NumSections; j++) {
+      MultiChannelData* mcd = detector->getMultiChannelData(j);
+      mcd->copyToPHA();
+
+      if (m_PedestalCorrection) {
+        mcd->correctPedestalLevel();
       }
-      else {
-        (*itChip)->calculateCommonModeNoiseByMean();
+      
+      if (m_CMNSubtraction==CMNSubtractionMode::Median) {
+        mcd->calculateCommonModeNoiseByMedian();
       }
-      itChip++;
+      else if (m_CMNSubtraction==CMNSubtractionMode::Mean) {
+        mcd->calculateCommonModeNoiseByMean();
+      }
+
+      if (m_CMNSubtraction!=CMNSubtractionMode::No) {
+        mcd->subtractCommonModeNoise();
+      }
+
+      if (m_GainCorrection) {
+        bool ret = mcd->convertPHA2EPI();
+        if (ret == false) {
+          std::cout << "MakePI: calibration return status : false" << std::endl;
+          return AS_QUIT;
+        }
+      }
     }
-    itDet++;
   }
 
   return AS_OK;
 }
+
+ANLStatus CorrectPHA::mod_exit()
+{
+  if (m_GainFile.get()) {
+    m_GainFile->Close();
+  }
+  return AS_OK;
+}
+
+} /* namespace comptonsoft */
