@@ -1,0 +1,42 @@
+<?xml version="1.0" ?>
+<?xml-stylesheet type="text/xsl" href="http://www.astro.isas.jaxa.jp/~odaka/xmlstyle/simulation_param_v3.xsl" ?>
+
+<simulation>
+  <name>CC</name>
+  <comment>H. Odaka | 2013-04-22</comment>
+  
+  <sd_check />
+
+  <sensitive_detectors>
+    <sensitive_detector>
+      <name>SiDetector_log</name>
+      <type>Detector2DPad</type>
+      <id_method>key</id_method>
+      <simulation_param_common>
+        <upside_anode set="0" />
+        <upside_pad set="1" />
+        <sim_pha mode="0" />
+        <sim_diffusion mode="0"/>
+      </simulation_param_common>
+      <detector_list>
+        <detector id="100" key="SiDetector"><simulation_param></simulation_param></detector>
+      </detector_list>
+    </sensitive_detector>
+
+    <sensitive_detector>
+      <name>CdTeDetector_log</name>
+      <type>Detector2DPad</type>
+      <id_method>key</id_method>
+      <simulation_param_common>
+        <upside_anode set="0" />
+        <upside_pad set="1" />
+        <sim_pha mode="0"/>
+        <sim_diffusion mode="0"/>
+      </simulation_param_common>
+      <detector_list>
+        <detector id="200" key="CdTeDetector"><simulation_param></simulation_param></detector>
+      </detector_list>
+    </sensitive_detector>
+
+  </sensitive_detectors>
+</simulation>

@@ -54,16 +54,16 @@ ANLStatus SetChannelsInfo::mod_startup()
   register_parameter(&m_Filename, "filename");
   register_parameter_map(&m_Map, "channels_info_map",
                          "detector_name_prefix", "Si");
-  add_map_value(&m_DetectorType, "detector_type", "",
+  add_value_element(&m_DetectorType, "detector_type", "",
                 "Detector type (1: single, 2: double)");
-  add_map_value(&m_Side1NoiseParam0, "side1_noise_param_0");
-  add_map_value(&m_Side1NoiseParam1, "side1_noise_param_1");
-  add_map_value(&m_Side1NoiseParam2, "side1_noise_param_2");
-  add_map_value(&m_Side1CompensationFactor, "side1_compensation_factor");
-  add_map_value(&m_Side2NoiseParam0, "side2_noise_param_0");
-  add_map_value(&m_Side2NoiseParam1, "side2_noise_param_1");
-  add_map_value(&m_Side2NoiseParam2, "side2_noise_param_2");
-  add_map_value(&m_Side2CompensationFactor, "side2_compensation_factor");
+  add_value_element(&m_Side1NoiseParam0, "side1_noise_param_0");
+  add_value_element(&m_Side1NoiseParam1, "side1_noise_param_1");
+  add_value_element(&m_Side1NoiseParam2, "side1_noise_param_2");
+  add_value_element(&m_Side1CompensationFactor, "side1_compensation_factor");
+  add_value_element(&m_Side2NoiseParam0, "side2_noise_param_0");
+  add_value_element(&m_Side2NoiseParam1, "side2_noise_param_1");
+  add_value_element(&m_Side2NoiseParam2, "side2_noise_param_2");
+  add_value_element(&m_Side2CompensationFactor, "side2_compensation_factor");
   
   return AS_OK;
 }

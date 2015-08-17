@@ -1,5 +1,6 @@
 ########################################################
 set(TARGET_EXT_LIBRARY comptonSoft)
+set(EXT_LIB_INSTALL_DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/ruby/comptonsoft)
 set(SWIG_IF_FILE ${TARGET_EXT_LIBRARY}.i)
 set(CLASS_LIST_FILE class_list_${TARGET_EXT_LIBRARY}.hh)
 set(RUBY_EXT_INCLUDE_DIRS
@@ -13,7 +14,7 @@ set(RUBY_EXT_INCLUDE_DIRS
   ${G4_INC_DIR}
   ${SIMX_INC_DIR}
   ${BOOST_INC_DIR}
-  ${ANLG4_DIR}/ruby
+  ${ANLG4_DIR}/rubyext
   ${ANLNEXT_INC_DIR}/ruby
   .
   )

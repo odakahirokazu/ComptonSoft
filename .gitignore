@@ -6,4 +6,6 @@ documentation/doxygen/tag/
 *.root
 *_seed_I.txt
 *_seed_F.txt
+*_summary.txt
+*_volume.txt
 *.log

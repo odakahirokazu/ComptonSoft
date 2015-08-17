@@ -48,14 +48,14 @@ ANLStatus ApplyEPICompensation::mod_startup()
   register_parameter(&m_FileName, "filename");
   register_parameter_map(&m_Map, "epi_compensation_map",
                          "detector_name_prefix", "Si");
-  add_map_value(&m_Type, "detector_type", "",
+  add_value_element(&m_Type, "detector_type", "",
                 "Type of detector (1: single, 2:double)");
-  add_map_value(&m_Factor0, "factor0");
-  add_map_value(&m_Factor1, "factor1");
-  std::vector<int> enable1(1); enable1[0] = 1;
-  std::vector<int> enable2(2); enable2[0] = 1; enable2[1]= 2;
-  enable_map_value(1, enable1);
-  enable_map_value(2, enable2);
+  add_value_element(&m_Factor0, "factor0");
+  add_value_element(&m_Factor1, "factor1");
+  std::vector<std::size_t> enable1(1); enable1[0] = 1;
+  std::vector<std::size_t> enable2(2); enable2[0] = 1; enable2[1]= 2;
+  enable_value_elements(1, enable1);
+  enable_value_elements(2, enable2);
   
   return AS_OK;
 }

@@ -1,14 +1,14 @@
 #! /usr/bin/env ruby
 
-def run_simulation(num, random, output, activation_output)
-  require 'ComptonSoftLib'
+require 'comptonsoft/basic'
 
+def run_simulation(num, random, output, activation_output)
   energy = 150000.0 # keV
 
   sim = ComptonSoft::Simulation.new
   sim.output = output
   sim.random_seed = random
-  sim.verbose = 1
+  sim.verbose = 0
 
   sim.detector_config = "database/detector_configuration.xml"
   sim.simulation_param = "database/simulation_parameters.xml"
@@ -36,16 +36,15 @@ def run_simulation(num, random, output, activation_output)
 end
 
 ### Main
-require "run_parallel"
 
 # sleep 4
 
 num = 1000000
 runs = (1..32).to_a
 
-a = RunParallel.new
-a.num_proc = 4
-a.set_log{|run_id| "simulation_%03d.log" % run_id }
+a = ANL::ParallelRun.new
+a.num_processes = 4
+a.set_log "simulation_%03d.log"
 a.run1(runs) do |run_id|
   output = "simulation_%03d.root" % run_id
   activation_output = "activation_%03d" % run_id

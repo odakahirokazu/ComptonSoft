@@ -1,9 +1,10 @@
 Compton Soft
 ================================================================
 
-- Version: 4.15
+- Version: 5.0.0
 - Maintenance by Hirokazu Odaka
 
+----
 
  1. Introduction
 ----------------------------------------------------------------
@@ -19,6 +20,19 @@ This software package can be used for wide-range applications of radiation
 measurements: X-/gamma-ray astrophysics, nuclear medicine, and imaging search
 for radioactive sources.
 
+### Changes from version 4
+- All software design has been reviewed for C++11 and ANL Next 1.7.
+- We modify contents of the hit tree (hittree).
+- We adopt new database schema.
+
+To migrate to version 5 from version 4, please check an example script for
+simulation. Please feel free to contact us if you have any question about
+the migration.
+
+If you like to use the old version, we recommend using version 4.15.0
+(tagged in the git repository), the latest version of the version 4
+series, together with ANL Next 1.6.2. The version 4 series are not
+compatible with ANL Next 1.7 or later.
 
  2. Information
 ----------------------------------------------------------------
@@ -46,12 +60,13 @@ for radioactive sources.
 <https://github.com/odakahirokazu/ComptonSoft/>
 
 
- 3. Supported System
+ 3. Platforms
 ----------------------------------------------------------------
 
-- Mac OS X: the author's standard environment
-- (Linux): possible to run on Linux
+- Mac: the author's standard environment
+- Linux
 
+----
 
  4. Required software
 ----------------------------------------------------------------
@@ -59,16 +74,16 @@ for radioactive sources.
 ### (1) C++ compliler
 
 ### (2) [CMake](http://www.cmake.org/) (Cross platform make)
-*version 2.8.11 or later*
+*version 3.0 or later*
 
 For easy installation, this package uses CMake to generate building tools such
 as Makefile.
 
 ### (3) [Boost C++ library](http://www.boost.org/)
-*version 1.55.0 or later*
+*version 1.56.0 or later*
 
 ### (4) [ANL Next framework](http://www.astro.isas.jaxa.jp/~odaka/anlnext/)
-*version 1.6.0 or later*
+*version 1.7.0 or later*
 
 Compton Soft uses the ANL Next framework. ANL Next is a framework for
 constructing software that performs event-by-event analysis, which usually
@@ -98,13 +113,13 @@ Following building options are required:
 Example of running cmake:
 
     unix> cmake \
-      -DCMAKE_INSTALL_PREFIX=../geant4.9.6.p02-install \
+      -DCMAKE_INSTALL_PREFIX=../geant4.10.01.p02-install \
       -DGEANT4_USE_GDML=ON \
       -DGEANT4_USE_QT=ON \
       -DGEANT4_USE_OPENGL_X11=ON \
       -DGEANT4_USE_RAYTRACER_X11=ON \
       -DGEANT4_USE_NETWORKDAWN=ON \
-      ../geant4.9.6.p02
+      ../geant4.10.01.p02
 
 ### (6) [ROOT](http://root.cern.ch/)
 *version 5.34.05 or later*
@@ -117,7 +132,7 @@ A data analysis framework.
 
 ### (1) Obtain Compton Soft via GitHub.
 
-    unix> git clone git://github.com/odakahirokazu/ComptonSoft.git
+    unix> git clone https://github.com/odakahirokazu/ComptonSoft.git
 
 ### (2) Perform CMake.
 
@@ -142,7 +157,7 @@ There are several options:
 - `CS_USE_GDML`    (Default=OFF): enable GDML.
 - `CS_USE_SIMX`    (Default=OFF): enable SimX interface.
 - `CS_USE_VIS`     (Default=OFF): enable OpenGL visualization of Geant4.
-- `CS_USE_VIS_QT` (Default=OFF): enable Qt visualization of Geant4.
+- `CS_USE_VIS_QT`  (Default=OFF): enable Qt visualization of Geant4.
 
 #### install options
 - `CS_INSTALL_HEADERS` (Default=ON): install all header files.

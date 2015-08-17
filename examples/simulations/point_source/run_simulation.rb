@@ -18,14 +18,15 @@ def run_simulation(num, random, output)
 
   sim.set_physics(hadron_hp: false, cut_value: 0.001)
 
-  sim.set_primary_generator :PlaneWavePrimaryGen, {
+  sim.set_primary_generator :PointSourcePrimaryGen, {
     particle: "gamma",
     photon_index: 0.0,
     energy_min: energy,
     energy_max: energy,
-    position: vec(0.0, 0.0, 10.0),
+    position: vec(0.0, 0.0, 25.0),
     direction: vec(0.0, 0.0, -1.0),
-    radius: 10.0
+    theta_min: 0.0,
+    theta_max: 180.0*Math::PI/180.0,
   }
 
   sim.run(num)

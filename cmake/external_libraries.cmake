@@ -1,16 +1,11 @@
 ### BOOST ###
-find_package(Boost 1.53.0 COMPONENTS system filesystem REQUIRED)
+find_package(Boost 1.56.0 REQUIRED COMPONENTS system filesystem)
 set(BOOST_INC_DIR ${Boost_INCLUDE_DIRS})
 set(BOOST_LIB_DIR ${Boost_LIBRARY_DIRS})
-if(Boost_system_LIBRARY)
-  set(BOOST_LIB ${Boost_system_LIBRARY})
-else(Boost_system_LIBRARY)
-  if(Boost_USE_MULTITHREADED)
-    set(BOOST_LIB boost_system-mt boost_filesystem-mt)
-  else()
-    set(BOOST_LIB boost_system boost_filesystem)
-  endif()
-endif(Boost_system_LIBRARY)
+set(BOOST_LIB ${Boost_LIBRARIES})
+message("-- BOOST_INC_DIR: ${BOOST_INC_DIR}")
+message("-- BOOST_LIB_DIR: ${BOOST_LIB_DIR}")
+message("-- BOOST_LIB: ${BOOST_LIB}")
 
 ### ANL ###
 if(NOT DEFINED ANLNEXT_INSTALL)
@@ -53,7 +48,7 @@ endif()
 # include(${Geant4_USE_FILE})
 set(G4_INC_DIR ${Geant4_INCLUDE_DIRS})
 set(G4_LIB ${Geant4_LIBRARIES})
-# message("${G4_LIB}")
+message("-- Geant4 libraries: ${G4_LIB}")
 
 ### CLHEP ###
 if(CS_USE_SYSTEM_CLHEP)

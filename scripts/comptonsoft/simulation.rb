@@ -1,9 +1,9 @@
-# ComptonSoftLib.rb
+# comptonsoft/simulation.rb
 #
 # @author Hirokazu Odaka, Yuto Ichinohe
 #
 
-require 'comptonSoft'
+require 'comptonsoft/comptonSoft'
 require 'anlGeant4'
 require 'ANLLib'
 
@@ -266,7 +266,7 @@ module ComptonSoft
             end
           end
           set_parameters :SetNoiseLevels
-          insert_map "noise_level_map", name, {
+          insert_to_map "noise_level_map", name, {
             detector_type: type,
             noise_coefficient_00: get_noise_level.("param00"),
             noise_coefficient_01: get_noise_level.("param01"),
@@ -288,7 +288,7 @@ module ComptonSoft
           if n = analysis.elements["threshold_anode"]; m1["threshold_anode"] = n.text.to_f; end
 
           set_parameters :MakeDetectorHits
-          insert_map "analysis_map", name, m1
+          insert_to_map "analysis_map", name, m1
         end
       end
     end

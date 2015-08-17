@@ -50,14 +50,14 @@ ANLStatus SetNoiseLevels::mod_startup()
   register_parameter(&m_FileName, "filename");
   register_parameter_map(&m_NoiseLevelMap, "noise_level_map",
                          "detector_name_prefix", "Si");
-  add_map_value(&m_DetectorType, "detector_type", "",
+  add_value_element(&m_DetectorType, "detector_type", "",
                 "Detector type (1: single, 2: double)");
-  add_map_value(&m_Noise00, "noise_coefficient_00");
-  add_map_value(&m_Noise01, "noise_coefficient_01");
-  add_map_value(&m_Noise02, "noise_coefficient_02");
-  add_map_value(&m_Noise10, "noise_coefficient_10");
-  add_map_value(&m_Noise11, "noise_coefficient_11");
-  add_map_value(&m_Noise12, "noise_coefficient_12");
+  add_value_element(&m_Noise00, "noise_coefficient_00");
+  add_value_element(&m_Noise01, "noise_coefficient_01");
+  add_value_element(&m_Noise02, "noise_coefficient_02");
+  add_value_element(&m_Noise10, "noise_coefficient_10");
+  add_value_element(&m_Noise11, "noise_coefficient_11");
+  add_value_element(&m_Noise12, "noise_coefficient_12");
   
   return AS_OK;
 }

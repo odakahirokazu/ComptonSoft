@@ -80,5 +80,5 @@ if(INSTALL_HEADERS)
 endif(INSTALL_HEADERS)
 
 if(USE_RUBY)
-  add_subdirectory(ruby)
+  add_subdirectory(rubyext)
 endif(USE_RUBY)

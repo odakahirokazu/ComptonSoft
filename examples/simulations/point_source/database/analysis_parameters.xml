@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="./xsl/analysisparam.xsl" ?>
+<analysis>
+  <name>CC</name>
+  <comment>H. Odaka | 2013-04-22</comment>
+
+  <detectors>
+    <detector>
+      <name>SiPad</name>
+      <type>1</type>
+      <noiselevel>
+        <param00>2.0</param00>
+        <param01>0.0</param01>
+        <param02>0.0</param02>
+      </noiselevel>
+      <analysis>
+        <mode>1</mode>
+        <threshold>5.0</threshold>
+      </analysis>
+    </detector>
+    <detector>
+      <name>CdTePad</name>
+      <type>1</type>
+      <noiselevel>
+        <param00>2.0</param00>
+        <param01>0.0</param01>
+        <param02>0.0</param02>
+      </noiselevel>
+      <analysis>
+        <mode>1</mode>
+        <threshold>10.0</threshold>
+      </analysis>
+    </detector>
+  </detectors>
+</analysis>
