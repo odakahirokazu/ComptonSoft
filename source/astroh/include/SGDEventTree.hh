@@ -16,6 +16,7 @@
 #include <cstdint>
 #include <cstddef>
 #include <array>
+#include <memory>
 #include "TTree.h"
 #include "SGDEvent.hh"
 
