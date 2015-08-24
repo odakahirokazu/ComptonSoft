@@ -74,7 +74,7 @@ compatible with ANL Next 1.7 or later.
 ### (1) C++ compliler
 
 ### (2) [CMake](http://www.cmake.org/) (Cross platform make)
-*version 3.0 or later*
+*version 3.0.7 or later*
 
 For easy installation, this package uses CMake to generate building tools such
 as Makefile.
