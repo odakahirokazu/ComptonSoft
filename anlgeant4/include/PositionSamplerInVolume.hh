@@ -41,7 +41,7 @@ namespace anlgeant4
 class PositionSamplerInVolume
 {
 public:
-  enum class VolumeType_t { Box, Sphere, Tube, EllipticalTube, Any };
+  enum class VolumeType_t { Box, Sphere, Tube, EllipticalTube, Ellipsoid, Any };
   
 public:
   PositionSamplerInVolume();

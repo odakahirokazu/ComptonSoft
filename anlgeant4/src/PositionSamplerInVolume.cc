@@ -29,6 +29,7 @@
 #include "G4Sphere.hh"
 #include "G4Tubs.hh"
 #include "G4EllipticalTube.hh"
+#include "G4Ellipsoid.hh"
 
 namespace anlgeant4
 {
@@ -87,6 +88,21 @@ void PositionSamplerInVolume::defineVolumeSize()
     boxHSizeX_ = tube->GetDx();
     boxHSizeY_ = tube->GetDy();
     boxHSizeZ_ = tube->GetDz();
+  }
+  else if (solid->GetEntityType() == "G4Ellipsoid") {
+    volumeType_ = VolumeType_t::Ellipsoid;
+    G4Ellipsoid* ellipsoid = static_cast<G4Ellipsoid*>(solid);
+    boxHSizeX_ = ellipsoid->GetSemiAxisMax(0);
+    boxHSizeY_ = ellipsoid->GetSemiAxisMax(1);
+    boxHSizeZ_ = ellipsoid->GetSemiAxisMax(2);
+    const double zTop = ellipsoid->GetZTopCut();
+    const double zBottom = ellipsoid->GetZBottomCut();
+    if (std::abs(zBottom) > std::abs(zTop)) {
+      boxHSizeZ_ = std::abs(zBottom);
+    }
+    else {
+      boxHSizeZ_ = std::abs(zTop);
+    }
   }
   else {
     volumeType_ = VolumeType_t::Any;

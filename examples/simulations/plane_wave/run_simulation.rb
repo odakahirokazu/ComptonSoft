@@ -16,7 +16,8 @@ def run_simulation(num, random, output)
   sim.analysis_param = "database/analysis_parameters.xml"
   sim.use_gdml "database/mass_model.gdml"
 
-  sim.set_physics(hadron_hp: false, cut_value: 0.001)
+  # sim.set_physics(hadron_hp: false, cut_value: 0.001)
+  sim.set_physics(hadron_hp: false, cut_value: 0.001, polarization: true)
 
   sim.set_primary_generator :PlaneWavePrimaryGen, {
     particle: "gamma",
