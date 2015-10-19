@@ -29,19 +29,17 @@ namespace comptonsoft {
 
 class ConstructDetectorForSimulation : public ConstructDetector
 {
-  DEFINE_ANL_MODULE(ConstructDetectorForSimulation, 3.0);
+  DEFINE_ANL_MODULE(ConstructDetectorForSimulation, 3.1);
 public:
   ConstructDetectorForSimulation();
   ~ConstructDetectorForSimulation();
 
   anl::ANLStatus mod_startup();
-  anl::ANLStatus mod_prepare();
   anl::ANLStatus mod_init();
   anl::ANLStatus mod_bgnrun();
 
 private:
   std::string simulationParamsFile_;
-  bool printParameters_;
 };
 
 } /* namespace comptonsoft */

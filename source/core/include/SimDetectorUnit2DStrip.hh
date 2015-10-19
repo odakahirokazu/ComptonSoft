@@ -42,7 +42,6 @@ public:
   SimDetectorUnit2DStrip();
   ~SimDetectorUnit2DStrip();
 
-  std::string Type() { return std::string("SimDetector2DStrip"); }
   void initializeEvent();
   
   void setUsingSymmetry(bool val) { usingSymmetry_ = val; }

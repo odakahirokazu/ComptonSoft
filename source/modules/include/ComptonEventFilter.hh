@@ -24,11 +24,11 @@
 
 #include <functional>
 #include "HitPattern.hh"
+#include "VCSModule.hh"
 
 namespace comptonsoft {
 
 class BasicComptonEvent;
-class DetectorGroupManager;
 class EventReconstruction;
 
 /**
@@ -36,10 +36,11 @@ class EventReconstruction;
  * @author Hirokazu Odaka
  * @date 2011-xx-xx
  * @date 2014-11-26
+ * @date 2015-10-10 | derived from VCSModule
  */
-class ComptonEventFilter : public anl::BasicModule
+class ComptonEventFilter : public VCSModule
 {
-  DEFINE_ANL_MODULE(ComptonEventFilter, 3.2);
+  DEFINE_ANL_MODULE(ComptonEventFilter, 3.3);
 public:
   ComptonEventFilter();
   ~ComptonEventFilter() = default;
@@ -55,8 +56,7 @@ public:
                      double maxValue);
     
 private:
-  const DetectorGroupManager* m_DetectorGroupManager;
-  const EventReconstruction* m_EventReconstruction;
+  EventReconstruction* m_EventReconstruction;
   std::vector<std::string> m_HitPatternNames;
   std::vector<HitPattern> m_HitPatterns;
   std::vector<std::vector<std::function<bool (const BasicComptonEvent&)>>> m_ConditionsVector;

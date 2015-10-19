@@ -11,9 +11,8 @@ class MyApp < ANL::ANLApp
   def setup()
     add_namespace ComptonSoft
 
-    chain :CSHitCollection
-    chain :DetectorGroupManager
-    with_parameters(filename: "database/detector_group.txt")
+    chain :ConstructDetector
+    with_parameters(detector_configuration: "database/detector_configuration.xml")
     chain :ReadComptonEventTree
     with_parameters(file_list: inputs)
     chain :ComptonEventFilter

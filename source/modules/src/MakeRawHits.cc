@@ -49,7 +49,7 @@ bool MakeRawHits::setAnalysisParam()
 {
   DetectorSystem* detectorManager = getDetectorManager();
   for (auto& detector: detectorManager->getDetectors()) {
-    detector->setAnalysisMode(0);
+    detector->setReconstructionMode(0);
   }
   for (auto ds: detectorManager->getDeviceSimulationVector()) {
     ds->resetThresholdVector(0.0);

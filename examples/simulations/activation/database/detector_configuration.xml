@@ -4,22 +4,23 @@
 <configuration>
   <name>CdTe pad detector</name>
   <comment>H. Odaka | 2015-06-01</comment>
+  <length_unit>cm</length_unit>
   <detectors>
     <detector id="1">
-      <type>Detector2DPad</type>
+      <type>2DPixel</type>
       <name>CdTePad:0</name>
       <geometry>
-        <widthx>26.75</widthx><widthy>26.75</widthy><thickness>0.75</thickness>
-        <offsetx>0.575</offsetx><offsety>0.575</offsety>
+        <widthx>2.675</widthx><widthy>2.675</widthy><thickness>0.075</thickness>
+        <offsetx>0.0575</offsetx><offsety>0.0575</offsety>
       </geometry>
       <pixel>
         <numx>8</numx><numy>8</numy>
-        <pitchx>3.2</pitchx><pitchy>3.2</pitchy>
+        <pitchx>0.32</pitchx><pitchy>0.32</pitchy>
       </pixel>
       <position><x>0.0</x><y>0.0</y><z>0.0</z></position>
       <direction_xaxis><x>+1.0</x><y>0.0</y><z>0.0</z></direction_xaxis>
       <direction_yaxis><x>0.0</x><y>+1.0</y><z>0.0</z></direction_yaxis>
-      <energy_priority>Al-side</energy_priority> 
+      <energy_priority>anode</energy_priority> 
     </detector>
   </detectors>
   

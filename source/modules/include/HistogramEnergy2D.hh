@@ -26,12 +26,11 @@ class TH2;
 
 namespace comptonsoft {
 
-class DetectorGroupManager;
 class EventReconstruction;
 
 class HistogramEnergy2D : public VCSModule
 {
-  DEFINE_ANL_MODULE(HistogramEnergy2D, 3.0)
+  DEFINE_ANL_MODULE(HistogramEnergy2D, 3.1)
 public:
   HistogramEnergy2D();
   ~HistogramEnergy2D() = default;
@@ -41,7 +40,6 @@ public:
   anl::ANLStatus mod_ana();
   
 private:
-  const DetectorGroupManager* detectorGroupManager_;
   const EventReconstruction* eventReconstruction_;
 
   TH2* hist_all_;

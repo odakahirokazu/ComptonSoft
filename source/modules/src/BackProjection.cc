@@ -19,13 +19,16 @@
 
 #include "BackProjection.hh"
 
+#include "G4SystemOfUnits.hh"
 #include "TDirectory.h"
 #include "TRandom3.h"
 #include "TMath.h"
+#include "BasicComptonEvent.hh"
 
 using namespace anl;
-using namespace comptonsoft;
 
+namespace comptonsoft
+{
 
 BackProjection::BackProjection()
   : m_EventReconstruction(0),
@@ -38,6 +41,7 @@ BackProjection::BackProjection()
 {
 }
 
+BackProjection::~BackProjection() = default;
 
 ANLStatus BackProjection::mod_startup()
 {
@@ -53,17 +57,18 @@ ANLStatus BackProjection::mod_startup()
   return AS_OK;
 }
 
-
 ANLStatus BackProjection::mod_his()
 {
   VCSModule::mod_his();
-  mkdir_module();
+
+  GetANLModuleNC("EventReconstruction", &m_EventReconstruction);
+  
+  mkdir();
   
   m_hist_bp_All  = new TH2D("h_bp_All","Back Projection (All)", m_NumPixelX, m_RangeX1, m_RangeX2, m_NumPixelY, m_RangeY1, m_RangeY2);
   m_hist_bp_All_nf  = new TH2D("h_bp_All_nf","Back Projection (All, Fl Cut)", m_NumPixelX, m_RangeX1, m_RangeX2, m_NumPixelY, m_RangeY1, m_RangeY2);
 
-  GetANLModuleNC("EventReconstruction", &m_EventReconstruction);
-  std::vector<HitPattern>& hitpat_vec = m_EventReconstruction->GetHitPatternVector();
+  const std::vector<HitPattern>& hitpat_vec = getDetectorManager()->getHitPatterns();
   m_hist_vec.resize(hitpat_vec.size());
   m_hist_nf_vec.resize(hitpat_vec.size());
   
@@ -87,10 +92,9 @@ ANLStatus BackProjection::mod_his()
   return AS_OK;
 }
 
-
 ANLStatus BackProjection::mod_ana()
 {
-  const TwoHitComptonEvent& compton_event = GetComptonEvent();
+  const BasicComptonEvent& compton_event = getComptonEvent();
 
   static TRandom3 randgen;
   const int Times = 1000;
@@ -113,26 +117,24 @@ ANLStatus BackProjection::mod_ana()
     coneSample = cone1;
     phi = randgen.Uniform(0.0, TMath::TwoPi());
     coneSample.rotate(phi, coneAxis);
-    bool bPositive = SectionConeAndPlane(coneVertex, coneSample, coneProjected);
+    bool bPositive = sectionConeAndPlane(coneVertex, coneSample, coneProjected);
   
     if (bPositive == false) {
       continue;
     }
 
-    FillImage(coneProjected.x()/m_PixelUnit, coneProjected.y()/m_PixelUnit, FillWeight);
+    fillImage(coneProjected.x()/m_PixelUnit, coneProjected.y()/m_PixelUnit, FillWeight);
   }
   
   return AS_OK;
 }
 
-
-const TwoHitComptonEvent& BackProjection::GetComptonEvent()
+const BasicComptonEvent& BackProjection::getComptonEvent()
 {
-  return m_EventReconstruction->GetTwoHitData();
+  return m_EventReconstruction->getComptonEvent();
 }
 
-
-void BackProjection::FillImage(double x, double y, double weight)
+void BackProjection::fillImage(double x, double y, double weight)
 {
   // Filling histograms 
   // All
@@ -151,8 +153,7 @@ void BackProjection::FillImage(double x, double y, double weight)
   }
 }
 
-
-bool BackProjection::SectionConeAndPlane(const vector3_t& vertex, const vector3_t& cone, vector3_t& coneProjected)
+bool BackProjection::sectionConeAndPlane(const vector3_t& vertex, const vector3_t& cone, vector3_t& coneProjected)
 {
   double t;
   t = (m_PlaneNormal*(m_PlanePoint-vertex)) / (m_PlaneNormal*cone);
@@ -160,3 +161,5 @@ bool BackProjection::SectionConeAndPlane(const vector3_t& vertex, const vector3_
   if (t < 0.) { return false; }
   return true;
 }
+
+} /* namespace comptonsoft */

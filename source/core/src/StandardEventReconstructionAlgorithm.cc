@@ -124,7 +124,6 @@ reconstruct(const std::vector<DetectorHit_sptr>& hits,
     // to be implemented
     return false;
   }
-  std::cout << "DEBUG 10 ===> " << std::endl;
 
   return false;
 }
@@ -136,6 +135,7 @@ reconstruct2HitsSiCdTe(const std::vector<DetectorHit_sptr>& hits,
   eventReconstructed.setHit1(0, hits[0]);
   eventReconstructed.setHit2(1, hits[1]);
   fluorescenceCut_ = checkFluorescence(hits[0], hits[1]);
+  eventReconstructed.setNumberOfHits(2);
   return true;
 }
 
@@ -170,6 +170,7 @@ reconstruct2HitsSameMaterial(const std::vector<DetectorHit_sptr>& hits,
     fluorescenceCut_ = false;
   }
 
+  eventReconstructed.setNumberOfHits(2);
   return true;
 }
 
@@ -208,6 +209,7 @@ reconstruct3HitsSiSiCdTe(const std::vector<DetectorHit_sptr>& hits,
     }
   }
 
+  eventReconstructed.setNumberOfHits(3);
   return true;
 }
 
@@ -246,6 +248,7 @@ reconstruct3HitsSiCdTeCdTe(const std::vector<DetectorHit_sptr>& hits,
     }
   }
 
+  eventReconstructed.setNumberOfHits(3);
   return true;
 }
 
@@ -294,6 +297,7 @@ reconstruct3HitsSiCdTeCdTeByFOM(const std::vector<DetectorHit_sptr>& hits,
     }
   }
 
+  eventReconstructed.setNumberOfHits(3);
   return true;
 }
 

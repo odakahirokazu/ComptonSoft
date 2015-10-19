@@ -26,11 +26,11 @@
 namespace comptonsoft {
 
 DeviceSimulation::DeviceSimulation()
-  : simPHAMode_(0),
+  : chargeCollectionMode_(0),
     CCEMapName_("cce"),
     EField_(new EFieldModel),
     numPixelsInWPCalculation_(5.0),
-    simDiffusionMode_(0),
+    diffusionMode_(0),
     diffusionDivisionNumber_(64),
     diffusionSigmaConstantAnode_(0.0),
     diffusionSigmaConstantCathode_(0.0),
@@ -56,11 +56,11 @@ calculateEnergyCharge(const PixelID& pixel,
 {
   double energyCharge = energyDeposit;
 
-  if (SimPHAMode() == 0) {;}
-  else if (SimPHAMode() == 1) {
+  if (ChargeCollectionMode() == 0) {;}
+  else if (ChargeCollectionMode() == 1) {
     energyCharge *= ChargeCollectionEfficiencyByHecht(z);
   }
-  else if (SimPHAMode() >= 2) {
+  else if (ChargeCollectionMode() >= 2) {
     energyCharge *= ChargeCollectionEfficiency(pixel, x, y ,z);
   }
 
@@ -71,10 +71,10 @@ double DeviceSimulation::DiffusionSigmaAnode(double z)
 {
   // electron diffusion
   double sigma = 0.;
-  if (SimDiffusionMode()==0) {
+  if (DiffusionMode()==0) {
     ;
   }
-  else if (SimDiffusionMode()==1) {
+  else if (DiffusionMode()==1) {
     const double KTOverQe = ( k_Boltzmann * Temperature() ) / eplus;
     
     double zAnode;
@@ -87,7 +87,7 @@ double DeviceSimulation::DiffusionSigmaAnode(double z)
     double mut = EField_->DriftTimeMobility(zAnode, z);
     sigma = std::sqrt(2.0 * KTOverQe * mut) * DiffusionSpreadFactorAnode();
   }
-  else if (SimDiffusionMode()==2) {
+  else if (DiffusionMode()==2) {
     sigma = DiffusionSigmaConstantAnode();
   }
 
@@ -99,10 +99,10 @@ double DeviceSimulation::DiffusionSigmaCathode(double z)
   // hole diffusion
   double sigma = 0.;
 
-  if (SimDiffusionMode()==0) {
+  if (DiffusionMode()==0) {
     ;
   }
-  else if (SimDiffusionMode()==1) {
+  else if (DiffusionMode()==1) {
     const double KTOverQe = ( k_Boltzmann * Temperature() ) / eplus;
     
     double zCathode;
@@ -115,7 +115,7 @@ double DeviceSimulation::DiffusionSigmaCathode(double z)
     double mut = EField_->DriftTimeMobility(zCathode, z);
     sigma = std::sqrt(2. * KTOverQe * mut) * DiffusionSpreadFactorCathode();
   }
-  else if (SimDiffusionMode()==2) {
+  else if (DiffusionMode()==2) {
     sigma = DiffusionSigmaConstantCathode();
   }
 
@@ -145,7 +145,7 @@ calculateEPI(double energyCharge, const PixelID& pixel) const
 
 void DeviceSimulation::printSimulationParameters()
 {
-  std::cout << "Sim PHA mode : " << SimPHAMode() << '\n'
+  std::cout << "Charge collection mode : " << ChargeCollectionMode() << '\n'
             << " upside anode   : " << isUpSideAnode() << '\n'
             << " thickness      : " << EField_->Thickness()/mm << " mm" << '\n';
   if (CCEMapName()=="") {
@@ -164,7 +164,7 @@ void DeviceSimulation::printSimulationParameters()
   }
   
   std::cout << '\n'
-            << "Sim Diffusion mode : " << SimDiffusionMode() << '\n'
+            << "Diffusion mode : " << DiffusionMode() << '\n'
             << " Constant Anode        : " << DiffusionSigmaConstantAnode()/um << " um\n"
             << " Constant Cathode      : " << DiffusionSigmaConstantCathode()/um << " um\n"
             << " Spread factor Anode   : " << DiffusionSpreadFactorAnode() << '\n'

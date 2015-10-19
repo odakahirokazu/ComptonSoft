@@ -27,12 +27,11 @@ class TH1;
 
 namespace comptonsoft {
 
-class DetectorGroupManager;
 class EventReconstruction;
 
 class HistogramAzimuthAngle : public VCSModule
 {
-  DEFINE_ANL_MODULE(HistogramAzimuthAngle, 2.0);
+  DEFINE_ANL_MODULE(HistogramAzimuthAngle, 2.1);
 public:
   HistogramAzimuthAngle();
   ~HistogramAzimuthAngle() = default;
@@ -42,7 +41,6 @@ public:
   anl::ANLStatus mod_ana();
   
 private:
-  const DetectorGroupManager* detectorGroupManager_;
   const EventReconstruction* eventReconstruction_;
 
   TH1* hist_all_;
@@ -51,6 +49,7 @@ private:
   int numBins_;
   double theta_min_;
   double theta_max_;
+  double phi_origin_;
 };
 
 } /* namespace comptonsoft */

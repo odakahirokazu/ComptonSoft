@@ -38,6 +38,7 @@ class MultiChannelData;
  * @date 2008-08-25
  * @date 2009-07-09
  * @date 2014-10-02 | VDetectorUnit as a virtual base class.
+ * @date 2015-10-11 | DetectorType as an enum class. AnalysisMode => ReconstructionMode
  */
 class VRealDetectorUnit : virtual public VDetectorUnit
 {
@@ -45,7 +46,9 @@ public:
   VRealDetectorUnit();
   virtual ~VRealDetectorUnit();
 
-  virtual std::string Type() = 0;
+  virtual DetectorType Type() const = 0;
+  bool checkType(DetectorType type) const { return (type==Type()); }
+  bool checkType(int type) const { return checkType(static_cast<DetectorType>(type)); }
 
   void setName(const std::string& name) { name_ = name; };
   std::string getName() const { return name_; }
@@ -178,8 +181,12 @@ public:
   bool isUpSideCathode() const
   { return isBottomSideAnode(); }
 
-  void setAnalysisMode(int v) { analysisMode_ = v; }
-  int AnalysisMode() const { return analysisMode_; }
+  bool setReconstructionMode(int mode)
+  {
+    reconstructionMode_ = mode;
+    return setReconstructionDetails(mode);
+  }
+  int ReconstructionMode() const { return reconstructionMode_; }
   void setClusteringOn(bool v=true) { clusteringOn_ = v; }
   bool isClusteringOn() const { return clusteringOn_; }
 
@@ -202,6 +209,7 @@ public:
   DetectorHit_sptr getReconstructedHit(int i) { return reconstructedHits_[i]; };
 
 protected:
+  virtual bool setReconstructionDetails(int /* mode */) { return true; }
   virtual void reconstruct(const DetectorHitVector& hitSignals,
                            DetectorHitVector& hitsReconstructed) = 0;
   virtual void cluster(DetectorHitVector& hits) const;
@@ -224,7 +232,7 @@ private:
   
   ElectrodeSide bottomSideElectrode_;
 
-  int analysisMode_;
+  int reconstructionMode_;
   bool clusteringOn_;
 
   std::vector<std::unique_ptr<MultiChannelData>> MCDVector_;

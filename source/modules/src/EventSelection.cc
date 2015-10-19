@@ -24,7 +24,6 @@
 #include "FlagDefinition.hh"
 #include "DetectorHit.hh"
 #include "CSHitCollection.hh"
-#include "DetectorGroupManager.hh"
 
 using namespace anl;
 
@@ -33,8 +32,7 @@ namespace comptonsoft
 
 EventSelection::EventSelection()
   : m_VetoEnabled(true),
-    m_HitCollection(nullptr),
-    m_DetectorGroupManager(nullptr)
+    m_HitCollection(nullptr)
 {
 }
 
@@ -46,21 +44,22 @@ ANLStatus EventSelection::mod_startup()
 
 ANLStatus EventSelection::mod_init()
 {
+  VCSModule::mod_init();
   GetANLModuleNC("CSHitCollection", &m_HitCollection);
-  GetANLModule("DetectorGroupManager", &m_DetectorGroupManager);
   EvsDef("EventSelection:Veto");
   return AS_OK;
 }
 
 ANLStatus EventSelection::mod_ana()
 {
+  DetectorSystem* detectorManager = getDetectorManager();
   const int NumTimeGroups = m_HitCollection->NumberOfTimeGroups();
   const DetectorGroup& AntiDetectorGroup
-    = m_DetectorGroupManager->getDetectorGroup("Anti");
+    = detectorManager->getDetectorGroup("Anti");
   const DetectorGroup& LowZDetectorGroup
-    = m_DetectorGroupManager->getDetectorGroup("LowZ");
+    = detectorManager->getDetectorGroup("LowZ");
   const DetectorGroup& HighZDetectorGroup
-    = m_DetectorGroupManager->getDetectorGroup("HighZ");
+    = detectorManager->getDetectorGroup("HighZ");
   
   for (int timeGroup=0; timeGroup<NumTimeGroups; timeGroup++) {
     std::vector<DetectorHit_sptr>& hits = m_HitCollection->getHits(timeGroup);

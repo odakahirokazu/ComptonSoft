@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 3.0)
 
 include_directories(include
   ${ANLG4_INC_DIR}
@@ -37,7 +37,7 @@ set(CS_CORE_CLASSES
   ### detector units
   src/VDetectorUnit.cc
   src/VRealDetectorUnit.cc
-  src/RealDetectorUnit2DPad.cc
+  src/RealDetectorUnit2DPixel.cc
   src/RealDetectorUnit2DStrip.cc
   src/RealDetectorUnitScintillator.cc
   ### device simulation
@@ -46,7 +46,7 @@ set(CS_CORE_CLASSES
   src/CalcWPStrip.cc
   src/VDeviceSimulation.cc
   src/DeviceSimulation.cc
-  src/SimDetectorUnit2DPad.cc
+  src/SimDetectorUnit2DPixel.cc
   src/SimDetectorUnit2DStrip.cc
   src/SimDetectorUnitScintillator.cc
   ### detector unit factory
@@ -57,6 +57,8 @@ set(CS_CORE_CLASSES
   src/BasicComptonEvent.cc
   src/VEventReconstructionAlgorithm.cc
   src/StandardEventReconstructionAlgorithm.cc
+  src/PhotoAbsorptionEventReconstructionAlgorithm.cc
+  src/FocalPlaneEventReconstructionAlgorithm.cc
   src/SGDEventReconstructionAlgorithm.cc
   ### sensitive detector
   src/VCSSensitiveDetector.cc
@@ -64,10 +66,12 @@ set(CS_CORE_CLASSES
   src/DetectorSystem.cc
   ### tree IO
   src/HitTreeIO.cc
-  src/InitialInfoTreeIO.cc
   src/ComptonEventTreeIO.cc
+  src/EventTreeIO.cc
+  src/InitialInfoTreeIO.cc
   src/HitTreeIOWithInitialInfo.cc
   src/ComptonEventTreeIOWithInitialInfo.cc
+  src/EventTreeIOWithInitialInfo.cc
 )
 
 add_library(CSCore SHARED

@@ -19,20 +19,25 @@
 
 #include "BackProjectionSky.hh"
 
+#include "G4SystemOfUnits.hh"
+#include "G4PhysicalConstants.hh"
 #include "TDirectory.h"
 #include "TRandom3.h"
 #include "TMath.h"
+#include "BasicComptonEvent.hh"
 
 using namespace anl;
-using namespace comptonsoft;
 
+namespace comptonsoft
+{
 
 BackProjectionSky::BackProjectionSky()
   : m_Rotation(0.0)
 {
-  SetUnit(degree, "degree");
+  setUnit(degree, "degree");
 }
 
+BackProjectionSky::~BackProjectionSky() = default;
 
 ANLStatus BackProjectionSky::mod_startup()
 {
@@ -45,20 +50,19 @@ ANLStatus BackProjectionSky::mod_startup()
   return AS_OK;
 }
 
-
 ANLStatus BackProjectionSky::mod_init()
 {
   BackProjection::mod_init();
   m_XAxis.set(std::cos(m_Rotation), std::sin(m_Rotation), 0.0);
   m_YAxis.set(-m_XAxis.y(), m_XAxis.x(), 0.0);
   m_ZAxis.set(0.0, 0.0, 1.0);
+
   return AS_OK;
 }
 
-
 ANLStatus BackProjectionSky::mod_ana()
 {
-  const TwoHitComptonEvent& compton_event = GetComptonEvent();
+  const BasicComptonEvent& compton_event = getComptonEvent();
 
   static TRandom3 randgen;
   const int Times = 1000;
@@ -86,8 +90,10 @@ ANLStatus BackProjectionSky::mod_ana()
     double x = std::atan2(ux, uz);
     double y = 0.5*pi - std::acos(uy);
 
-    FillImage(x/PixelUnit(), y/PixelUnit(), FillWeight);
+    fillImage(x/PixelUnit(), y/PixelUnit(), FillWeight);
   }
   
   return AS_OK;
 }
+
+} /* namespace comptonsoft */

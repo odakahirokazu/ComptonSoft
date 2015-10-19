@@ -22,7 +22,6 @@
 #include "AstroUnits.hh"
 #include "EventReconstruction.hh"
 #include "BasicComptonEvent.hh"
-#include "DetectorGroupManager.hh"
 
 using namespace anl;
 
@@ -30,7 +29,7 @@ namespace comptonsoft
 {
 
 HistogramEnergy2D::HistogramEnergy2D()
-  : detectorGroupManager_(nullptr), eventReconstruction_(nullptr),
+  : eventReconstruction_(nullptr),
     hist_all_(nullptr),
     numBins_(720), energy0_(0.0), energy1_(720.0)
 {
@@ -47,7 +46,6 @@ ANLStatus HistogramEnergy2D::mod_startup()
 
 ANLStatus HistogramEnergy2D::mod_his()
 {
-  GetANLModule("DetectorGroupManager", &detectorGroupManager_);
   GetANLModule("EventReconstruction", &eventReconstruction_);
   
   VCSModule::mod_his();
@@ -58,7 +56,7 @@ ANLStatus HistogramEnergy2D::mod_his()
                        numBins_, energy0_, energy1_);
 
   const std::vector<HitPattern>& hitPatterns
-    = detectorGroupManager_->getHitPatterns();
+    = getDetectorManager()->getHitPatterns();
   const std::size_t numHitPatterns = hitPatterns.size();
   hist_vec_.resize(numHitPatterns);
   for (std::size_t i=0; i<numHitPatterns; i++) {

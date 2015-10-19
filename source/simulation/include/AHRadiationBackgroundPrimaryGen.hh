@@ -33,7 +33,7 @@ namespace comptonsoft {
  * @date 2013-04-11 | Tamotsu Sato | ver 1.0: based on IsotropicPrimaryGen
  * @date 2013-05-03 | Tamotsu Sato & Hirokazu Odaka | ver 1.1 bug fix: unit conversion
  */
-class AHRadiationBackgroundPrimaryGen : public IsotropicPrimaryGen
+class AHRadiationBackgroundPrimaryGen : public anlgeant4::IsotropicPrimaryGen
 {
   DEFINE_ANL_MODULE(AHRadiationBackgroundPrimaryGen, 1.1);
 public:
@@ -50,6 +50,6 @@ private:
   TH1D* m_Hist;
 };
 
-}
+} /* namespace comptonsoft */
 
 #endif /* COMPTONSOFT_AHRadiationBackgroundPrimaryGen_H */

@@ -44,13 +44,14 @@ bool MakeDetectorHits::setThresholdEnergy(VRealDetectorUnit* detector,
                                          double thresholdAnode)
 {
   const int detid = detector->getID();
-  if (detector->Type().find("SimDetector2DStrip") == 0) {
+  if (detector->checkType(DetectorType::DoubleSidedStripDetector)) {
     SimDetectorUnit2DStrip* ds
       = dynamic_cast<SimDetectorUnit2DStrip*>(detector);
-    if (ds == 0) {
-      std::cout << "Detector type is not 2D strip. Detector ID: " << detid << std::endl;
+    if (ds == nullptr) {
+      std::cout << "The detector object can not be converted into SimDetector2DStrip. Detector ID: " << detid << std::endl;
       return false;
     }
+
     auto xStripSelector = std::mem_fn(&PixelID::isXStrip);
     auto yStripSelector = std::mem_fn(&PixelID::isYStrip);
     if (ds->isXStripSideCathode()) {
@@ -69,8 +70,8 @@ bool MakeDetectorHits::setThresholdEnergy(VRealDetectorUnit* detector,
   else {
     VDeviceSimulation* ds
       = dynamic_cast<VDeviceSimulation*>(detector);
-    if (ds == 0) {
-      std::cout << "Detector type is not DeviceSimulation. Detector ID: " << detid << std::endl;
+    if (ds == nullptr) {
+      std::cout << "The detector object can not be converted into VDeviceSimulation. Detector ID: " << detid << std::endl;
       return false;
     }
     ds->resetThresholdVector(threshold);

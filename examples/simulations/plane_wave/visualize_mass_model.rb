@@ -16,7 +16,7 @@ def run_simulation(num, random, output)
     energy_max: energy,
     position: vec(0.0, 0.0, 10.0),
     direction: vec(0.0, 0.0, -1.0),
-    radius: 10.0
+    radius: 1.0
   }
 
   sim.visualize(mode: 'OGLSQt')

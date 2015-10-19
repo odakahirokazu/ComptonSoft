@@ -27,12 +27,11 @@ class TH1;
 
 namespace comptonsoft {
 
-class DetectorGroupManager;
 class EventReconstruction;
 
 class HistogramARM : public VCSModule
 {
-  DEFINE_ANL_MODULE(HistogramARM, 3.0);
+  DEFINE_ANL_MODULE(HistogramARM, 3.1);
 public:
   HistogramARM();
   ~HistogramARM() = default;
@@ -42,7 +41,6 @@ public:
   anl::ANLStatus mod_ana();
   
 protected:
-  const DetectorGroupManager* detectorGroupManager_;
   const EventReconstruction* eventReconstruction_;
 
   TH1* hist_all_;

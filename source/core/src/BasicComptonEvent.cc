@@ -26,13 +26,14 @@
 namespace comptonsoft {
 
 BasicComptonEvent::BasicComptonEvent()
-  : hit1ID_(0), hit1Process_(0),
+  : eventID_(0), numHits_(0),
+    hit1ID_(0), hit1Process_(0),
     hit1Pixel_(0, 0), hit1Time_(0.0), hit1Position_(0.0, 0.0, 0.0),
     hit1Energy_(0.0),
     hit2ID_(0), hit2Process_(0),
     hit2Pixel_(0, 0), hit2Time_(0.0), hit2Position_(0.0, 0.0, 0.0),
     hit2Energy_(0.0),
-    flags_(0u),
+    flags_(0ul), hitpattern_(0ul),
     grade_(0), likelihood_(1.0),
     bCalc_(false),
     cosThetaE_(1.0), thetaE_(0.0), thetaG_(0.0), deltaTheta_(0.0),

@@ -25,7 +25,9 @@
 #include "AstroUnits.hh"
 
 using namespace anl;
-using namespace anlgeant4;
+
+namespace anlgeant4
+{
 
 PointSourcePrimaryGen::PointSourcePrimaryGen()
   : m_SourcePosition(0.0, 0.0, 0.0),
@@ -36,6 +38,7 @@ PointSourcePrimaryGen::PointSourcePrimaryGen()
   add_alias("PointSourcePrimaryGen");
 }
 
+PointSourcePrimaryGen::~PointSourcePrimaryGen() = default;
 
 ANLStatus PointSourcePrimaryGen::mod_startup()
 {
@@ -56,7 +59,6 @@ ANLStatus PointSourcePrimaryGen::mod_startup()
 
   return AS_OK;
 }
-
 
 ANLStatus PointSourcePrimaryGen::mod_init()
 {
@@ -90,7 +92,6 @@ ANLStatus PointSourcePrimaryGen::mod_init()
   return AS_OK;
 }
 
-
 ANLStatus PointSourcePrimaryGen::mod_ana()
 {
   const G4ThreeVector position = samplePosition();
@@ -106,7 +107,6 @@ ANLStatus PointSourcePrimaryGen::mod_ana()
   return BasicPrimaryGen::mod_ana();
 }
 
-
 G4ThreeVector PointSourcePrimaryGen::sampleDirection()
 {
   G4double phi = twopi * G4UniformRand();
@@ -117,12 +117,10 @@ G4ThreeVector PointSourcePrimaryGen::sampleDirection()
   return direction;
 }
 
-
 G4ThreeVector PointSourcePrimaryGen::samplePosition()
 {
   return m_SourcePosition;
 }
-
 
 ANLStatus PointSourcePrimaryGen::mod_endrun()
 {
@@ -147,3 +145,5 @@ ANLStatus PointSourcePrimaryGen::mod_endrun()
 
   return AS_OK;
 }
+
+} /* namespace anlgeant4 */

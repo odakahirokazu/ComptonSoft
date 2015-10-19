@@ -19,11 +19,11 @@
 
 #include "HistogramAzimuthAngle.hh"
 
+#include <cmath>
 #include "TH1.h"
 #include "AstroUnits.hh"
 #include "EventReconstruction.hh"
 #include "BasicComptonEvent.hh"
-#include "DetectorGroupManager.hh"
 
 using namespace anl;
 
@@ -31,10 +31,10 @@ namespace comptonsoft
 {
 
 HistogramAzimuthAngle::HistogramAzimuthAngle()
-  : detectorGroupManager_(nullptr),
-    eventReconstruction_(nullptr),
-    numBins_(72),
-    theta_min_(-1.0*degree), theta_max_(181.0*degree)
+  : eventReconstruction_(nullptr),
+    numBins_(64),
+    theta_min_(-1.0*degree), theta_max_(181.0*degree),
+    phi_origin_(0.0)
 {
 }
 
@@ -43,13 +43,13 @@ ANLStatus HistogramAzimuthAngle::mod_startup()
   register_parameter(&numBins_, "number_of_bins");
   register_parameter(&theta_min_, "theta_min", degree, "degree");
   register_parameter(&theta_max_, "theta_max", degree, "degree");
+  register_parameter(&phi_origin_, "phi_origin", 1.0, "degree");
   
   return AS_OK;
 }
 
 ANLStatus HistogramAzimuthAngle::mod_his()
 {
-  GetANLModule("DetectorGroupManager", &detectorGroupManager_);
   GetANLModule("EventReconstruction", &eventReconstruction_);
   
   VCSModule::mod_his();
@@ -61,7 +61,7 @@ ANLStatus HistogramAzimuthAngle::mod_his()
                        numBins_, phi_min, phi_max);
   
   const std::vector<HitPattern>& hitPatterns
-    = detectorGroupManager_->getHitPatterns();
+    = getDetectorManager()->getHitPatterns();
   const std::size_t numHitPatterns = hitPatterns.size();
   hist_vec_.resize(numHitPatterns);
   for (std::size_t i=0; i<numHitPatterns; i++) {
@@ -94,13 +94,15 @@ ANLStatus HistogramAzimuthAngle::mod_ana()
     return AS_OK;
   }
 
-  const double phi = event.PhiG() / degree;
+  const double phi0 = (event.PhiG()/degree) - phi_origin_;
+  const int n_phi = std::floor((phi0+180.0)/360.0);
+  const double phi1 = phi0 - n_phi*360.0;
 
-  hist_all_->Fill(phi);
+  hist_all_->Fill(phi1);
 
   for (std::size_t i=0; i<hist_vec_.size(); i++) {
     if (eventReconstruction_->HitPatternFlag(i)) {
-      hist_vec_[i]->Fill(phi);
+      hist_vec_[i]->Fill(phi1);
     }
   }
 

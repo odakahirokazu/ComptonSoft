@@ -40,7 +40,7 @@ class ComptonEventTreeIOWithInitialInfo;
  */
 class ReadComptonEventTree : public EventReconstruction, public anlgeant4::InitialInformation
 {
-  DEFINE_ANL_MODULE(ReadComptonEventTree, 3.0);
+  DEFINE_ANL_MODULE(ReadComptonEventTree, 3.1);
 public:
   ReadComptonEventTree();
   ~ReadComptonEventTree() = default;

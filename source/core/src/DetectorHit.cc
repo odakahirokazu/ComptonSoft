@@ -47,7 +47,6 @@ DetectorHit& DetectorHit::merge(const DetectorHit& r)
   setEnergyDeposit(EnergyDeposit()+r.EnergyDeposit());
   setEnergyCharge(EnergyCharge()+r.EnergyCharge());
   setEnergy(Energy()+r.Energy());
-  setPHA(PHA()+r.PHA());
   setEPI(EPI()+r.EPI());
 
   if (Time() > r.Time()) { setTime(r.Time()); }

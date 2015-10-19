@@ -36,7 +36,7 @@ public:
   RealDetectorUnitScintillator();
   ~RealDetectorUnitScintillator();
 
-  std::string Type() { return std::string("DetectorScintillator"); }
+  DetectorType Type() const { return DetectorType::Scintillator; }
 
   void setSize(double x, double y, double z)
   {

@@ -5,4 +5,6 @@
 <anl_list>
   <category>Compton Soft modules</category>
   <anl_module href="cs_modules_detail.xml" />
+	<title>Compton Soft/ANL Modules</title>
+	<css href="design_top.css" />
 </anl_list>

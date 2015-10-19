@@ -56,6 +56,8 @@ BasicPrimaryGen::BasicPrimaryGen()
   add_alias("InitialInformation");
 }
 
+BasicPrimaryGen::~BasicPrimaryGen() = default;
+
 ANLStatus BasicPrimaryGen::mod_startup()
 {
   VANLPrimaryGen::mod_startup();

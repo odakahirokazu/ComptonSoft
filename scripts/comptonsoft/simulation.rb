@@ -28,6 +28,11 @@ module ComptonSoft
     Normal = 2
   end
 
+  module DetectorType
+    Pad = 1
+    DoubleSidedStrip = 2
+    Scintillator = 3
+  end
 
   # Simulation application class inherited from ANLApp
   #
@@ -38,8 +43,9 @@ module ComptonSoft
     attr_accessor :mode
 
     ### Input files
-    attr_writer :detector_config, :channel_map, :detector_group
-    attr_writer :simulation_param, :noise_levels
+    attr_writer :detector_configuration, :channel_map
+    attr_writer :simulation_parameters, :noise_levels, :bad_channels
+    attr_writer :detector_info_verbose_level
 
     ### Output files
     attr_accessor :output
@@ -48,7 +54,7 @@ module ComptonSoft
     attr_writer :random_seed, :verbose
 
     ### Analysis parameters
-    attr_writer :analysis_param
+    attr_writer :analysis_parameters
     attr_writer :enable_veto, :fluorescence_range
 
     ### SimX parameters
@@ -68,11 +74,13 @@ module ComptonSoft
       @simx = nil
 
       ### Input files
-      @detector_config = "detector_config.xml"
+      @detector_configuration = "detector_configuration.xml"
       @channel_map = nil # "channel_map.xml"
-      @simulation_param = "simulation_param.xml"
-      @detector_group = '0' # "detector_group.txt"
+      @simulation_parameters = "simulation_parameters.xml"
       @noise_levels = nil
+      @bad_channels = nil
+      @detector_info_verbose_level = 0
+      @event_tree_enabled = false
 
       ### Output files
       @output = "output.root"
@@ -82,7 +90,7 @@ module ComptonSoft
       @verbose = 0
 
       ### analysis settings
-      @analysis_param = nil # "analysis_param.xml"
+      @analysis_parameters = nil # "analysis_parameters.xml"
       @enable_veto = true
       @fluorescence_range = 1.5 # keV
       @compton_mode = false
@@ -112,6 +120,21 @@ module ComptonSoft
     define_setup_module("primary_generator", take_parameters: true)
     define_setup_module("pickup_data", take_parameters: true)
     define_setup_module("visualization", :VisualizeG4Geom)
+
+    # alias methods
+    alias :detector_config= :"detector_configuration="
+    alias :simulation_param= :"simulation_parameters="
+    alias :analysis_param= :"analysis_parameters="
+
+    # Enable detector info print
+    def print_detector_info(level=1)
+      @detector_info_verbose_level = level
+    end
+
+    # Enable detector info print
+    def use_event_tree(v=true)
+      @event_tree_enabled = v
+    end
 
     # Enable visualization.
     #
@@ -186,8 +209,9 @@ module ComptonSoft
       if mode >= SimulationMode::Basic
         chain :CSHitCollection
         chain :ConstructDetectorForSimulation
-        with_parameters(detector_configuration: @detector_config,
-                        simulation_parameters: @simulation_param)
+        with_parameters(detector_configuration: @detector_configuration,
+                        verbose_level: @detector_info_verbose_level,
+                        simulation_parameters: @simulation_parameters)
         if @channel_map
           chain :ConstructChannelMap
           with_parameters(filename: @channel_map)
@@ -195,6 +219,10 @@ module ComptonSoft
         chain :SetNoiseLevels
         if @noise_levels
           with_parameters(filename: @noise_levels)
+        end
+        if @bad_channels
+          chain :SetBadChannels
+          with_parameters(filename: @bad_channels)
         end
       end
 
@@ -217,8 +245,6 @@ module ComptonSoft
 
       if mode >= SimulationMode::Basic
         chain :MakeDetectorHits
-        chain :DetectorGroupManager
-        with_parameters(filename: @detector_group)
         chain :EventSelection
         with_parameters(enable_veto: @enable_veto)
         if @compton_mode
@@ -234,7 +260,11 @@ module ComptonSoft
                           source_direction_z: 1.0)
         end
         if mode >= SimulationMode::Normal
-          chain :WriteHitTree
+          if @event_tree_enabled
+            chain :WriteEventTree
+          else
+            chain :WriteHitTree
+          end
         end
       end
       chain_with_parameters module_of_pickup_data
@@ -244,51 +274,75 @@ module ComptonSoft
       end
 
       if mode >= SimulationMode::Normal
-        if @analysis_param
-          load_analysis_param(@analysis_param)
+        if @analysis_parameters
+          load_analysis_parameters(@analysis_parameters)
         end
       end
     end
 
-    def load_analysis_param(file)
+    def load_analysis_parameters(file)
       xmldoc = REXML::Document.new(File.open(file))
       xmldoc.elements.each("analysis/detectors/detector") do |elem|
-        name = elem.elements["name"].text
+        prefix = elem.elements["prefix"].text
         type = elem.elements["type"].text.to_i
 
         noise_level = elem.elements["noiselevel"]
         if noise_level
-          get_noise_level = lambda do |key|
-            if n = noise_level.elements[key]
-              n.text.to_f
-            else
-              0.0
-            end
-          end
-          set_parameters :SetNoiseLevels
-          insert_to_map "noise_level_map", name, {
-            detector_type: type,
-            noise_coefficient_00: get_noise_level.("param00"),
-            noise_coefficient_01: get_noise_level.("param01"),
-            noise_coefficient_02: get_noise_level.("param02"),
-            noise_coefficient_10: get_noise_level.("param10"),
-            noise_coefficient_11: get_noise_level.("param11"),
-            noise_coefficient_12: get_noise_level.("param12")
+          parameters = {
+            detector_type: type
           }
+          if type == DetectorType::DoubleSidedStrip
+            parameters.merge!({
+              cathode_noise_coefficient0: noise_level.elements["cathode_param0"].text.to_f,
+              cathode_noise_coefficient1: noise_level.elements["cathode_param1"].text.to_f,
+              cathode_noise_coefficient2: noise_level.elements["cathode_param2"].text.to_f,
+              anode_noise_coefficient0: noise_level.elements["anode_param0"].text.to_f,
+              anode_noise_coefficient1: noise_level.elements["anode_param1"].text.to_f,
+              anode_noise_coefficient2: noise_level.elements["anode_param2"].text.to_f
+            })
+          else
+            parameters.merge!({
+              noise_coefficient0: noise_level.elements["param0"].text.to_f,
+              noise_coefficient1: noise_level.elements["param1"].text.to_f,
+              noise_coefficient2: noise_level.elements["param2"].text.to_f
+            })
+          end
+
+          set_parameters :SetNoiseLevels
+          insert_to_map "noise_level_map", prefix, parameters
         end
 
-        analysis = elem.elements["analysis"]
-        if analysis
-          m1 = {
+        reconstruction = elem.elements["reconstruction"]
+        if reconstruction
+          parameters = {
             detector_type: type,
-            analysis_mode: analysis.elements["mode"].text.to_i,
+            reconstruction_mode: reconstruction.elements["mode"].text.to_i,
           }
-          if n = analysis.elements["threshold"]; m1["threshold"] = n.text.to_f; end
-          if n = analysis.elements["threshold_cathode"]; m1["threshold_cathode"] = n.text.to_f; end
-          if n = analysis.elements["threshold_anode"]; m1["threshold_anode"] = n.text.to_f; end
+          if x = reconstruction.elements["threshold"]
+            parameters[:threshold] = x.text.to_f
+          end
+          if x = reconstruction.elements["threshold_cathode"]
+            parameters[:threshold_cathode] = x.text.to_f
+          end
+          if x = reconstruction.elements["threshold_anode"]
+            parameters[:threshold_anode] = x.text.to_f
+          end
 
+          energy_consistency_check = reconstruction.elements["energy_consistency_check"]
+          if energy_consistency_check
+            lc0 = energy_consistency_check.elements["lower_function_c0"].text.to_f
+            lc1 = energy_consistency_check.elements["lower_function_c1"].text.to_f
+            uc0 = energy_consistency_check.elements["upper_function_c0"].text.to_f
+            uc1 = energy_consistency_check.elements["upper_function_c1"].text.to_f
+            parameters.merge!({
+              lower_energy_consistency_check_function_c0: lc0,
+              lower_energy_consistency_check_function_c1: lc1,
+              upper_energy_consistency_check_function_c0: uc0,
+              upper_energy_consistency_check_function_c1: uc1
+            })
+          end
           set_parameters :MakeDetectorHits
-          insert_to_map "analysis_map", name, m1
+          insert_to_map "analysis_map", prefix, parameters
         end
       end
     end

@@ -23,8 +23,9 @@
 #include "AstroUnits.hh"
 #include "MultiChannelData.hh"
 #include "FlagDefinition.hh"
+#include "RealDetectorUnit2DStrip.hh"
 
-#include "NextCLI.hh"
+// #include "NextCLI.hh"
 
 using namespace anl;
 
@@ -32,8 +33,10 @@ namespace comptonsoft
 {
 
 SelectHits::SelectHits()
-  : m_DetectorType(1), m_AnalysisMode(0),
-    m_Threshold(1.0*keV), m_ThresholdCathode(1.0*keV), m_ThresholdAnode(1.0*keV)
+  : m_DetectorType(1), m_ReconstructionMode(0),
+    m_Threshold(1.0*keV), m_ThresholdCathode(1.0*keV), m_ThresholdAnode(1.0*keV),
+    m_LowerECheckFuncC0(0.0), m_LowerECheckFuncC1(0.9),
+    m_UpperECheckFuncC0(0.0), m_UpperECheckFuncC1(1.1)
 {
 }
 
@@ -44,70 +47,27 @@ ANLStatus SelectHits::mod_startup()
   register_parameter_map(&m_AnalysisMap, "analysis_map",
                          "detector_name_prefix", "Si");
   add_value_element(&m_DetectorType, "detector_type", "",
-                "Detector type (1: pad, 2: DSD, 3: scintillator)");
-  add_value_element(&m_AnalysisMode, "analysis_mode");
+                    "Detector type (1: pad, 2: DSD, 3: scintillator)");
+  add_value_element(&m_ReconstructionMode, "reconstruction_mode");
   add_value_element(&m_Threshold, "threshold", keV, "keV");
   add_value_element(&m_ThresholdCathode, "threshold_cathode", keV, "keV");
   add_value_element(&m_ThresholdAnode, "threshold_anode", keV, "keV");
-  std::vector<std::size_t> enable1(2); enable1[0] = 1; enable1[1]= 2;
-  std::vector<std::size_t> enable2(3); enable2[0] = 1; enable2[1]= 3; enable2[2] = 4;
-  std::vector<std::size_t> enable3(2); enable3[0] = 1; enable3[1]= 2;
-  enable_value_elements(1, enable1);
-  enable_value_elements(2, enable2);
-  enable_value_elements(3, enable3);
+  add_value_element(&m_LowerECheckFuncC0, "lower_energy_consistency_check_function_c0", keV, "keV");
+  add_value_element(&m_LowerECheckFuncC1, "lower_energy_consistency_check_function_c1");
+  add_value_element(&m_UpperECheckFuncC0, "upper_energy_consistency_check_function_c0", keV, "keV");
+  add_value_element(&m_UpperECheckFuncC1, "upper_energy_consistency_check_function_c1");
+  enable_value_elements(1, {1, 2});
+  enable_value_elements(2, {1, 3, 4, 5, 6, 7, 8});
+  enable_value_elements(3, {1, 2});
   
   return AS_OK;
 }
-
-#if 0
-ANLStatus SelectHits::mod_com()
-{
-  std::string name("DSSD");
-  std::cout << "Definition of analysis methods : " << std::endl;
-
-  while (1) {
-    CLread("Detector name prefix (OK for exit)", &name);
-    if (name == "OK" or name == "ok") { break; }
-
-    int type = 1;
-    CLread("Detector type (1:pad, 2:double-sided strip, 3:scintillator)", &type);
-    
-    if (type == 1) {
-      int analysis_mode = 0;
-      CLread("Analysis Mode (0:simple, 1:normal, 2:clustering)", &analysis_mode);
-      double threshold = 10.0*keV;
-      CLread("Threshold energy", &threshold, keV, "keV");
-      m_AnalysisMap.insert(std::make_pair(name, boost::make_tuple(analysis_mode, threshold, 0.0)));
-    }
-    else if (type == 2) {
-      int analysis_mode = 0;
-      CLread("Analysis Mode (0:simple, 1:max-height, 2:single-hit, 3:clustering+max-height, 4:clustering+single-hit", &analysis_mode);
-      double threshold1 = 10.0*keV;
-      CLread("Threshold energy (anode)", &threshold1, keV, "keV");
-      double threshold2 = threshold1;
-      CLread("Threshold energy (cathode)", &threshold2, keV, "keV");
-      m_AnalysisMap.insert(std::make_pair(name, boost::make_tuple(analysis_mode, threshold1, threshold2)));
-    }
-    else if (type == 3) {
-      int analysis_mode = 0;
-      CLread("Analysis Mode (0:simple, 1:normal)", &analysis_mode);
-      double threshold = 10.0*keV;
-      CLread("Threshold energy", &threshold, keV, "keV");
-      m_AnalysisMap.insert(std::make_pair(name, boost::make_tuple(analysis_mode, threshold, 0.0)));
-    }
-    
-    name = "OK";
-  }
-
-  return AS_OK;
-}
-#endif /* 0 */
 
 ANLStatus SelectHits::mod_init()
 {
   VCSModule::mod_init();
 
-  if (!setAnalysisParam()) {
+  if (!setAnalysisParameters()) {
     return AS_QUIT;
   }
 
@@ -124,37 +84,60 @@ ANLStatus SelectHits::mod_ana()
   return AS_OK;
 }
 
-bool SelectHits::setAnalysisParam()
+bool SelectHits::setAnalysisParameters()
 {
   DetectorSystem* detectorManager = getDetectorManager();
   for (auto& detector: detectorManager->getDetectors()) {
-    std::string prefix = detector->getNamePrefix();
+    const std::string prefix = detector->getNamePrefix();
     if (m_AnalysisMap.count(prefix) == 0) {
       std::cout << "No detector name prefix is found in Threshold Map. "
                 << detector->getName() << std::endl;
       return false;
     }
 
-    // int type = m_AnalysisMap[prefix].get<0>();
-    int mode = m_AnalysisMap[prefix].get<1>();
-    detector->setAnalysisMode(mode);
+    auto analysisParameters = m_AnalysisMap[prefix];
+    const int type = std::get<0>(analysisParameters);
+    if (!detector->checkType(type)) {
+      std::cout << "Detector type given in the analysis parameters is inconsistent.\n"
+                << "  prefix: " << prefix << "\n"
+                << "  type: " << type << " => should be " << static_cast<int>(detector->Type())
+                << std::endl;
+      return false;
+    }
+    
+    const int mode = std::get<1>(analysisParameters);
+    detector->setReconstructionMode(mode);
+    
+    const double threshold = std::get<2>(analysisParameters);
+    const double thresholdCathode = std::get<3>(analysisParameters);
+    const double thresholdAnode = std::get<4>(analysisParameters);
+    if (!setThresholdEnergy(detector.get(),
+                            threshold, thresholdCathode, thresholdAnode)) {
+      std::cout << "SelectHits: setThresholdEnergy() failed." << std::endl;
+      return false;
+    }
 
-    double threshold = m_AnalysisMap[prefix].get<2>();
-    double thresholdCathode = m_AnalysisMap[prefix].get<3>();
-    double thresholdAnode = m_AnalysisMap[prefix].get<4>();
-    bool rval = setThresholdEnergy(detector.get(),
-                                   threshold, thresholdCathode, thresholdAnode);
-    if (!rval) return rval;
+    if (detector->checkType(DetectorType::DoubleSidedStripDetector)) {
+      // coefficients of energy consistency check functions
+      const double lowerFuncC0 = std::get<5>(analysisParameters);
+      const double lowerFuncC1 = std::get<6>(analysisParameters);
+      const double upperFuncC0 = std::get<7>(analysisParameters);
+      const double upperFuncC1 = std::get<8>(analysisParameters);
+      setEnergyConsistencyCheckFunctions(detector.get(),
+                                         lowerFuncC0, lowerFuncC1,
+                                         upperFuncC0, upperFuncC1);
+    }
   }
+
   return true;
 }
 
 bool SelectHits::setThresholdEnergy(VRealDetectorUnit* detector,
-                                   double threshold,
-                                   double thresholdCathode,
-                                   double thresholdAnode)
+                                    double threshold,
+                                    double thresholdCathode,
+                                    double thresholdAnode)
 {
-  if (detector->Type().find("Detector2DStrip") == 0) {
+  if (detector->checkType(DetectorType::DoubleSidedStripDetector)) {
     const int NSections = detector->NumberOfMultiChannelData();
     for (int section=0; section<NSections; section++) {
       MultiChannelData* mcd = detector->getMultiChannelData(section);
@@ -171,6 +154,23 @@ bool SelectHits::setThresholdEnergy(VRealDetectorUnit* detector,
     for (int section=0; section<NSections; section++) {
       MultiChannelData* mcd = detector->getMultiChannelData(section);
       mcd->setThresholdEnergy(threshold);
+    }
+  }
+  return true;
+}
+
+bool SelectHits::setEnergyConsistencyCheckFunctions(VRealDetectorUnit* detector,
+                                                    double lowerC0,
+                                                    double lowerC1,
+                                                    double upperC0,
+                                                    double upperC1)
+{
+  if (detector->checkType(DetectorType::DoubleSidedStripDetector)) {
+    RealDetectorUnit2DStrip* dsd = dynamic_cast<RealDetectorUnit2DStrip*>(detector);
+    if (dsd) {
+      if (dsd->isEnergyConsistencyRequired()) {
+        dsd->setEnergyConsistencyCheckFunctions(lowerC0, lowerC1, upperC0, upperC1);
+      }
     }
   }
   return true;

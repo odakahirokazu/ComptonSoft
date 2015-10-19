@@ -23,7 +23,7 @@
 #include <functional>
 #include <boost/property_tree/xml_parser.hpp>
 
-#include "SimDetectorUnit2DPad.hh"
+#include "SimDetectorUnit2DPixel.hh"
 #include "SimDetectorUnit2DStrip.hh"
 #include "SimDetectorUnitScintillator.hh"
 
@@ -55,7 +55,7 @@ ANLStatus SetChannelsInfo::mod_startup()
   register_parameter_map(&m_Map, "channels_info_map",
                          "detector_name_prefix", "Si");
   add_value_element(&m_DetectorType, "detector_type", "",
-                "Detector type (1: single, 2: double)");
+                    "Detector type (1: pad, 2: DSD, 3: scintillator)");
   add_value_element(&m_Side1NoiseParam0, "side1_noise_param_0");
   add_value_element(&m_Side1NoiseParam1, "side1_noise_param_1");
   add_value_element(&m_Side1NoiseParam2, "side1_noise_param_2");
@@ -103,6 +103,15 @@ bool SetChannelsInfo::set_by_map()
     }
 
     const auto parameters = m_Map[prefix];
+    const int type = std::get<0>(parameters);
+    if (!detector->checkType(type)) {
+      std::cout << "Detector type given in the analysis parameters is inconsistent.\n"
+                << "  prefix: " << prefix << "\n"
+                << "  type: " << type << " => should be " << static_cast<int>(detector->Type())
+                << std::endl;
+      return false;
+    }
+    
     const double side1NoiseParam0 = std::get<1>(parameters);
     const double side1NoiseParam1 = std::get<2>(parameters);
     const double side1NoiseParam2 = std::get<3>(parameters);
@@ -113,11 +122,11 @@ bool SetChannelsInfo::set_by_map()
     const double side2CompensationFactor = std::get<8>(parameters);
     
     const int detid = detector->getID();
-    if (detector->Type().find("SimDetector2DStrip") == 0) {
+    if (detector->Type()==DetectorType::DoubleSidedStripDetector) {
       SimDetectorUnit2DStrip* ds
         = dynamic_cast<SimDetectorUnit2DStrip*>(detector.get());
-      if (ds == 0) {
-        std::cout << "Detector type is not 2D strip. Detector ID: " << detid << std::endl;
+      if (ds == nullptr) {
+        std::cout << "The detector object can not be converted into SimDetector2DStrip. Detector ID: " << detid << std::endl;
         return false;
       }
       auto xStripSelector = std::mem_fn(&PixelID::isXStrip);
@@ -158,10 +167,11 @@ bool SetChannelsInfo::set_by_map()
     else {
       DeviceSimulation* ds
         = dynamic_cast<DeviceSimulation*>(detector.get());
-      if (ds == 0) {
-        std::cout << "Detector type is not DeviceSimulation. Detector ID: " << detid << std::endl;
+      if (ds == nullptr) {
+        std::cout << "The detector object can not be converted into VDeviceSimulation. Detector ID: " << detid << std::endl;
         return false;
       }
+
       ds->resetNoiseParamVector(NoiseParam_t(side1NoiseParam0,
                                              side1NoiseParam1,
                                              side1NoiseParam2));
@@ -191,11 +201,10 @@ bool SetChannelsInfo::set_by_file()
       const ptree& detectorNode = v.second;
       const int detectorID = detectorNode.get<int>("<xmlattr>.id");
       DeviceSimulation* ds = dynamic_cast<DeviceSimulation*>(getDetectorManager()->getDeviceSimulationByID(detectorID));
-      if (ds == 0) {
-        std::cout << "Could not get DeviceSimulation. Detector ID: " << detectorID << std::endl;
+      if (ds == nullptr) {
+        std::cout << "The detector object can not be converted into DeviceSimulation. Detector ID: " << detectorID << std::endl;
         return false;
       }
-
       
       for (const ptree::value_type& vv: detectorNode.get_child("")) {
         if (vv.first == "section") {
@@ -226,7 +235,7 @@ bool SetChannelsInfo::set_by_file()
           const int det_section = channelID.Section();
           
           DeviceSimulation* ds = dynamic_cast<DeviceSimulation*>(getDetectorManager()->getDeviceSimulationByID(detectorID));
-          if (ds == 0) {
+          if (ds == nullptr) {
             std::cout << "Could not get DeviceSimulation. Detector ID: " << detectorID << std::endl;
             return false;
           }

@@ -47,8 +47,8 @@ public:
   virtual ~DeviceSimulation();
 
 public:
-  void setSimPHAMode(int val) { simPHAMode_ = val; }
-  int SimPHAMode() const { return simPHAMode_; }
+  void setChargeCollectionMode(int val) { chargeCollectionMode_ = val; }
+  int ChargeCollectionMode() const { return chargeCollectionMode_; }
 
   void setCCEMapName(std::string val) { CCEMapName_ = val; }
   std::string CCEMapName() const { return CCEMapName_; }
@@ -75,8 +75,8 @@ public:
   double NumPixelsInWPCalculation() const
   { return numPixelsInWPCalculation_; }
 
-  void setSimDiffusionMode(int val) { simDiffusionMode_ = val; }
-  int SimDiffusionMode() const { return simDiffusionMode_; }
+  void setDiffusionMode(int val) { diffusionMode_ = val; }
+  int DiffusionMode() const { return diffusionMode_; }
 
   void setDiffusionDivisionNumber(int val)
   { diffusionDivisionNumber_ = val; }
@@ -190,12 +190,12 @@ protected:
   { return EField_->CCE(z); }
 
 private:
-  int simPHAMode_;
+  int chargeCollectionMode_;
   std::string CCEMapName_;
   std::unique_ptr<EFieldModel> EField_;
   double numPixelsInWPCalculation_;
 
-  int simDiffusionMode_;
+  int diffusionMode_;
   int diffusionDivisionNumber_;
   double diffusionSigmaConstantAnode_;
   double diffusionSigmaConstantCathode_;

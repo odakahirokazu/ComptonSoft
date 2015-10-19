@@ -19,27 +19,28 @@
 
 #include "EfficiencyMapSky.hh"
 
-#include "globals.hh"
+#include "G4SystemOfUnits.hh"
 #include "InitialInformation.hh"
 
 using namespace anl;
-using namespace comptonsoft;
 
+namespace comptonsoft
+{
 
 EfficiencyMapSky::EfficiencyMapSky()
   : m_Scale(1.0)
 {
 }
 
+EfficiencyMapSky::~EfficiencyMapSky() = default;
 
 ANLStatus EfficiencyMapSky::mod_startup()
 {
-  SetUnit(degree, "degree");
+  setUnit(degree, "degree");
   register_parameter(&m_Scale, "scale");
 
   return BackProjection::mod_startup();
 }
-
 
 ANLStatus EfficiencyMapSky::mod_init()
 {
@@ -47,7 +48,6 @@ ANLStatus EfficiencyMapSky::mod_init()
   
   return BackProjection::mod_init();
 }
-
 
 ANLStatus EfficiencyMapSky::mod_ana()
 {
@@ -60,8 +60,10 @@ ANLStatus EfficiencyMapSky::mod_ana()
   if (coneXZ.x()<0.0) {
     x = -x;
   }
-  FillImage(x, y, m_Scale);
+  fillImage(x, y, m_Scale);
   // std::cout << x << "  " << y << std::endl;
   
   return AS_OK;
 }
+
+} /* namespace comptonsoft */

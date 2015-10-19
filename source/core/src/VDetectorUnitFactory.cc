@@ -26,13 +26,13 @@ VDetectorUnitFactory::~VDetectorUnitFactory() = default;
 VRealDetectorUnit* VDetectorUnitFactory::createDetectorUnit(const std::string& type)
 {
   VRealDetectorUnit* detector = nullptr;
-  if (type=="Detector2DPad") {
+  if (type=="2DPixel") {
     detector = createDetectorUnit2DPixel();
   }
-  else if (type=="Detector2DStrip") {
+  else if (type=="2DStrip") {
     detector = createDetectorUnit2DStrip();
   }
-  else if (type=="DetectorScintillator") {
+  else if (type=="Scintillator") {
     detector = createDetectorUnitScintillator();
   }
 

@@ -34,13 +34,13 @@ namespace comptonsoft {
 class RealDetectorUnit2DStrip : public VRealDetectorUnit
 {
 public:
-  enum class HitSelectionMode_t { MaxEPI, OneByOne };
+  enum class HitSelectionMethod_t { OneByOne, MaxPulseHeight };
 
 public:
   RealDetectorUnit2DStrip();
   ~RealDetectorUnit2DStrip();
 
-  std::string Type() { return std::string("Detector2DStrip"); }
+  DetectorType Type() const { return DetectorType::DoubleSidedStripDetector; }
 
   void initializeEvent();
 
@@ -83,16 +83,16 @@ public:
   int NumberOfAnodeSideHits() const { return anodeSideHits_.size(); }
   DetectorHit_sptr getAnodeSideHit(int i) { return anodeSideHits_[i]; }
 
-  void setHitSelectionMode(HitSelectionMode_t v)
-  { hitSelectionMode_ = v; }
-  HitSelectionMode_t HitSelectionMode() const
-  { return hitSelectionMode_; }
+  void setHitSelectionMethod(HitSelectionMethod_t v)
+  { hitSelectionMethod_ = v; }
+  HitSelectionMethod_t HitSelectionMethod() const
+  { return hitSelectionMethod_; }
 
   void requireEnergyConsistency(bool v=true)
-  { energyConsistencyRequired = v; }
+  { energyConsistencyRequired_ = v; }
   
   bool isEnergyConsistencyRequired() const
-  { return energyConsistencyRequired; }
+  { return energyConsistencyRequired_; }
 
   void setEnergyConsistencyCheckFunctions(double lower_c0,
                                           double lower_c1,
@@ -114,20 +114,21 @@ public:
   double UpperEnergyConsistencyCheckFunctionC1() const
   { return upperEnergyConsistencyCheckFunctionC1_; }
 
-  bool checkEnergyConsistency(double energyCathode, double energyAnode);
+  bool checkEnergyConsistency(double energy_x, double energy_y);
   
 protected:
+  virtual bool setReconstructionDetails(int mode);
   virtual void reconstruct(const DetectorHitVector& hitSignals,
                            DetectorHitVector& hitReconstructed);
   virtual void reconstructDoubleSides(const DetectorHitVector& hitsCathode,
                                       const DetectorHitVector& hitsAnode,
                                       DetectorHitVector& hitReconstructed);
-  void reconstructWithMaxEPIMode(const DetectorHitVector& hitsCathode,
-                                 const DetectorHitVector& hitsAnode,
-                                 DetectorHitVector& hitReconstructed);
-  void reconstructWithOneByOneMode(const DetectorHitVector& hitsCathode,
-                                   const DetectorHitVector& hitsAnode,
-                                   DetectorHitVector& hitReconstructed);
+  void reconstructWithMaxPulseHeightMethod(const DetectorHitVector& hitsCathode,
+                                           const DetectorHitVector& hitsAnode,
+                                           DetectorHitVector& hitReconstructed);
+  void reconstructWithOneByOneMethod(const DetectorHitVector& hitsCathode,
+                                     const DetectorHitVector& hitsAnode,
+                                     DetectorHitVector& hitReconstructed);
   
   virtual void cluster1Dimension(DetectorHitVector& hits) const;
   DetectorHit_sptr selectMaxEPI(const DetectorHitVector& hits) const;
@@ -137,13 +138,13 @@ protected:
 private:
   ElectrodeSide prioritySide_;
   ElectrodeSide xStripSideElectrode_;
-  HitSelectionMode_t hitSelectionMode_;
+  HitSelectionMethod_t hitSelectionMethod_;
 
   DetectorHitVector cathodeSideHits_;
   DetectorHitVector anodeSideHits_;
 
   // consistency check between energies (EPI) of cathode and anode
-  bool energyConsistencyRequired;
+  bool energyConsistencyRequired_;
   double lowerEnergyConsistencyCheckFunctionC0_;
   double lowerEnergyConsistencyCheckFunctionC1_;
   double upperEnergyConsistencyCheckFunctionC0_;

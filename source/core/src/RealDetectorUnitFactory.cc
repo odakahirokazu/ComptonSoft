@@ -18,7 +18,7 @@
  *************************************************************************/
 
 #include "RealDetectorUnitFactory.hh"
-#include "RealDetectorUnit2DPad.hh"
+#include "RealDetectorUnit2DPixel.hh"
 #include "RealDetectorUnit2DStrip.hh"
 #include "RealDetectorUnitScintillator.hh"
 #include "MultiChannelData.hh"
@@ -27,7 +27,7 @@ namespace comptonsoft {
 
 VRealDetectorUnit* RealDetectorUnitFactory::createDetectorUnit2DPixel()
 {
-  return new RealDetectorUnit2DPad;
+  return new RealDetectorUnit2DPixel;
 }
 
 VRealDetectorUnit* RealDetectorUnitFactory::createDetectorUnit2DStrip()

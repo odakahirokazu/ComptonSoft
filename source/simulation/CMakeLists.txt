@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 3.0)
 
 add_definitions(-DANL_USE_TVECTOR -DANL_USE_HEPVECTOR)
 
@@ -29,10 +29,6 @@ link_directories(
 
 set(CS_SIMULATION_CLASSES_BASIC
   # primary geneator
-  src/PlaneWaveRectanglePrimaryGen.cc
-  src/IsotropicPrimaryGen.cc
-  src/NucleusPrimaryGen.cc
-  src/NucleusPrimaryGenInVolume.cc
   src/AHRadiationBackgroundPrimaryGen.cc
   # pick up data
   src/RDPickUpData.cc

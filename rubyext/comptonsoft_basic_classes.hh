@@ -1,6 +1,7 @@
 #include "BasicComptonEvent.hh"
 #include "VEventReconstructionAlgorithm.hh"
 #include "HitTreeIOWithInitialInfo.hh"
+#include "EventTreeIOWithInitialInfo.hh"
 #include "ComptonEventTreeIOWithInitialInfo.hh"
 
 namespace comptonsoft {
@@ -9,14 +10,15 @@ class ConstructDetectorForSimulation;
 class VCSModule;
 class CSHitCollection;
 class ConstructChannelMap;
-class DefineBadChannel;
-class SetNoiseLevel;
-class SelectHit;
-class AnalyzeHit;
-class MakeDetectorHit;
-class MakeRawHit;
-class MakeDetectorHitTR;
-class DetectorGroupManager;
+class SetNoiseLevels;
+class SetBadChannels;
+class SetChannelsInfo;
+class SelectHits;
+class AnalyzeHits;
+class MakeDetectorHits;
+class MakeRawHits;
+class MakeDetectorHitsTR;
+class ApplyEPICompensation;
 class EventSelection;
 class EventReconstruction;
 class HXIEventSelection;
@@ -28,7 +30,7 @@ class ReadDataFile_NT;
 class ReadDataFile_NB0;
 class CorrectPHA;
 class RecalculateEPI;
-class CalculatePedestal;
+class CalculatePedestalLevels;
 class InitialConditionFilter;
 class RecalculateSimulationNoise;
 class ComptonModeFilter;
@@ -39,13 +41,17 @@ class WriteHitTree;
 class ReadHitTree;
 class ReadRawHitTree;
 class ReadDetectorHitTree;
+class WriteEventTree;
+class ReadEventTree;
 class WriteComptonEventTree;
 class ReadComptonEventTree;
-class HistPHA;
-class EnergySpectrum;
+class HistogramPHA;
+class HistogramEnergySpectrum;
+class HistogramEnergy2D;
+class HistogramARM;
+class HistogramAzimuthAngle;
 class PlaneWaveRectanglePrimaryGen;
 class IsotropicPrimaryGen;
-class PrimaryGenInVolume;
 class NucleusPrimaryGen;
 class NucleusPrimaryGenInVolume;
 class AHRayTracingPrimaryGen;
@@ -57,7 +63,7 @@ class AHStandardPickUpData;
 class KillStepPickUpData;
 class MaterialSamplePickUpData;
 class ScatteringPickUpData;
-class AHStandardANLPhysicsList;
+class PhysicsListManager;
 class SimXIF;
 class GenerateSimXEvent;
 class OutputSimXPrimaries;

@@ -53,8 +53,12 @@ add_library(${TARGET_LIBRARY} SHARED
   src/BasicPrimaryGen.cc
   src/PointSourcePrimaryGen.cc
   src/PlaneWavePrimaryGen.cc
+  src/PlaneWaveRectanglePrimaryGen.cc
+  src/IsotropicPrimaryGen.cc
   src/PrimaryGenUniformSourceInVolume.cc
   src/PositionSamplerInVolume.cc
+  src/NucleusPrimaryGen.cc
+  src/NucleusPrimaryGenInVolume.cc
   src/PickUpDataRunAction.cc
   src/PickUpDataEventAction.cc
   src/PickUpDataTrackingAction.cc

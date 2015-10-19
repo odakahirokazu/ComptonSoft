@@ -38,9 +38,10 @@ namespace anlgeant4 {
  */
 class PointSourcePrimaryGen : public BasicPrimaryGen
 {
-  DEFINE_ANL_MODULE(PointSourcePrimaryGen, 1.6);
+  DEFINE_ANL_MODULE(PointSourcePrimaryGen, 4.0);
 public:
   PointSourcePrimaryGen();
+  ~PointSourcePrimaryGen();
 
   anl::ANLStatus mod_startup();
   anl::ANLStatus mod_init();
@@ -70,6 +71,6 @@ private:
   G4double m_Luminosity;
 };
 
-}
+} /* namespace anlgeant4 */
 
 #endif /* ANLGEANT4_PointSourcePrimaryGen_H */

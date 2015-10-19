@@ -27,14 +27,18 @@ namespace anlgeant4 { class InitialInformation; }
 
 namespace comptonsoft {
 
-class CSHitCollection;
+class EventReconstruction;
 
+/**
+ * @author Hirokazu Odaka
+ * @date 2015-10-15 | update
+ */
 class ResponseMatrix : public VCSModule
 {
-  DEFINE_ANL_MODULE(ResponseMatrix, 1.0);
+  DEFINE_ANL_MODULE(ResponseMatrix, 2.0);
 public:
   ResponseMatrix();
-  ~ResponseMatrix() {}
+  ~ResponseMatrix();
 
   anl::ANLStatus mod_startup();
   anl::ANLStatus mod_init();
@@ -42,7 +46,7 @@ public:
   anl::ANLStatus mod_ana();
   
 private:
-  CSHitCollection* m_HitCollection;
+  const EventReconstruction* m_EventReconstruction;
   const anlgeant4::InitialInformation* m_InitialInfo;
   int m_NumBinEnergy;
   double m_RangeEnergy1;
@@ -51,6 +55,6 @@ private:
   std::vector<std::string> m_Selections;
 };
 
-}
+} /* namespace comptonsoft */
 
 #endif /* COMPTONSOFT_ResponseMatrix_H */

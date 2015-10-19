@@ -24,8 +24,9 @@
 #include "AstroUnits.hh"
 
 using namespace anl;
-using namespace anlgeant4;
 
+namespace anlgeant4
+{
 
 PlaneWavePrimaryGen::PlaneWavePrimaryGen()
   : m_CenterPosition(0.0, 0.0, 0.0),
@@ -39,6 +40,7 @@ PlaneWavePrimaryGen::PlaneWavePrimaryGen()
   add_alias("PlaneWavePrimaryGen");
 }
 
+PlaneWavePrimaryGen::~PlaneWavePrimaryGen() = default;
 
 ANLStatus PlaneWavePrimaryGen::mod_startup()
 {
@@ -63,7 +65,6 @@ ANLStatus PlaneWavePrimaryGen::mod_startup()
   return AS_OK;
 }
 
-
 ANLStatus PlaneWavePrimaryGen::mod_com()
 {
   if (PolarizationMode() < 1) {
@@ -72,7 +73,6 @@ ANLStatus PlaneWavePrimaryGen::mod_com()
   
   return BasicPrimaryGen::mod_com();
 }
-
 
 ANLStatus PlaneWavePrimaryGen::mod_init()
 {
@@ -97,7 +97,6 @@ ANLStatus PlaneWavePrimaryGen::mod_init()
   
   return AS_OK;
 }
-
 
 ANLStatus PlaneWavePrimaryGen::mod_ana()
 {
@@ -127,7 +126,6 @@ ANLStatus PlaneWavePrimaryGen::mod_ana()
   return BasicPrimaryGen::mod_ana();
 }
 
-
 G4ThreeVector PlaneWavePrimaryGen::samplePosition()
 {
   using std::sqrt;
@@ -139,7 +137,6 @@ G4ThreeVector PlaneWavePrimaryGen::samplePosition()
   position = m_CenterPosition + r * position;
   return position;
 }
-
 
 ANLStatus PlaneWavePrimaryGen::mod_endrun()
 {
@@ -162,8 +159,9 @@ ANLStatus PlaneWavePrimaryGen::mod_endrun()
   return AS_OK;
 }
 
-
 G4double PlaneWavePrimaryGen::GenerationArea()
 {
   return pi*m_Radius*m_Radius;
 }
+
+} /* namespace anlgeant4 */

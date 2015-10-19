@@ -33,9 +33,9 @@
 #include "AstroUnits.hh"
 #include "RealDetectorUnitFactory.hh"
 #include "SimDetectorUnitFactory.hh"
-#include "RealDetectorUnit2DPad.hh"
+#include "RealDetectorUnit2DPixel.hh"
 #include "RealDetectorUnit2DStrip.hh"
-#include "SimDetectorUnit2DPad.hh"
+#include "SimDetectorUnit2DPixel.hh"
 #include "SimDetectorUnit2DStrip.hh"
 #include "MultiChannelData.hh"
 #include "DeviceSimulation.hh"
@@ -52,6 +52,11 @@ DetectorSystem::DetectorSystem()
     detectorConstructed_(false),
     CCEMapFile_(nullptr)
 {
+  std::vector<std::string> defaultGroups = {"Anti", "LowZ", "HighZ"};
+  for (auto& groupName: defaultGroups) {
+    detectorGroupMap_[groupName]
+      = std::unique_ptr<DetectorGroup>(new DetectorGroup(groupName));
+  }
 }
 
 DetectorSystem::~DetectorSystem()
@@ -112,20 +117,51 @@ bool DetectorSystem::loadDetectorConfiguration(const std::string& filename)
   std::cout << "Detector Name: " << pt.get<std::string>("configuration.name") << std::endl;
 
   const ptree& rootNode = pt.find("configuration")->second;
-  detectorConstructed_ = constructDetectors(rootNode.find("detectors")->second);
+  const boost::optional<std::string> lengthUnitName
+    = rootNode.get_optional<std::string>("length_unit");
+  double lengthUnit = 1.0;
+  if (lengthUnitName) {
+    if (*lengthUnitName == "cm") {
+      lengthUnit = cm;
+    }
+    else if (*lengthUnitName == "mm") {
+      lengthUnit = mm;
+    }
+    else {
+      std::cout << "Unknown length unit is given. Use cm or mm." << std::endl;
+      return false;
+    }
+  }
+  else {
+    std::cout << "length_unit is not given in the detector configuration." << std::endl;
+    std::cout << "Set <length_unit>cm</length_unit> or <length_unit>mm</length_unit>." << std::endl;
+    return false;
+  }
+  
+  detectorConstructed_ = constructDetectors(rootNode.find("detectors")->second, lengthUnit);
   if (!detectorConstructed_) {
     return false;
   }
   
-  bool readoutModuleConstructed = constructReadoutModules(rootNode.find("readout")->second);
+  const bool readoutModuleConstructed =
+    constructReadoutModules(rootNode.find("readout")->second);
   if (!readoutModuleConstructed) {
     return false;
+  }
+
+  boost::optional<const ptree&> groupsNode_o = rootNode.get_child_optional("groups");
+  if (groupsNode_o) {
+    const bool rval = registerDetectorGroups(*groupsNode_o);
+    if (!rval) {
+      return false;
+    }
   }
 
   return true;
 }
 
-bool DetectorSystem::constructDetectors(const ptree& DetectorsNode)
+bool DetectorSystem::constructDetectors(const ptree& DetectorsNode,
+                                        const double LengthUnit)
 {
   std::unique_ptr<VDetectorUnitFactory> factory;
   if (isMCSimulation()) {
@@ -143,18 +179,18 @@ bool DetectorSystem::constructDetectors(const ptree& DetectorsNode)
       const int detectorID = detNode.get<int>("<xmlattr>.id");
       const std::string type = detNode.get<std::string>("type");
       const std::string name = detNode.get<std::string>("name");
-      const double widthx = detNode.get<double>("geometry.widthx") * mm;
-      const double widthy = detNode.get<double>("geometry.widthy") * mm;
-      const double thickness = detNode.get<double>("geometry.thickness") * mm;
-      const double offsetx = detNode.get<double>("geometry.offsetx") * mm;
-      const double offsety = detNode.get<double>("geometry.offsety") * mm;
+      const double widthx = detNode.get<double>("geometry.widthx") * LengthUnit;
+      const double widthy = detNode.get<double>("geometry.widthy") * LengthUnit;
+      const double thickness = detNode.get<double>("geometry.thickness") * LengthUnit;
+      const double offsetx = detNode.get<double>("geometry.offsetx") * LengthUnit;
+      const double offsety = detNode.get<double>("geometry.offsety") * LengthUnit;
       const int npx = detNode.get<int>("pixel.numx");
       const int npy = detNode.get<int>("pixel.numy");
-      const double pitchx = detNode.get<double>("pixel.pitchx") * mm;
-      const double pitchy = detNode.get<double>("pixel.pitchy") * mm;
-      const double posx = detNode.get<double>("position.x") * mm;
-      const double posy = detNode.get<double>("position.y") * mm;
-      const double posz = detNode.get<double>("position.z") * mm;
+      const double pitchx = detNode.get<double>("pixel.pitchx") * LengthUnit;
+      const double pitchy = detNode.get<double>("pixel.pitchy") * LengthUnit;
+      const double posx = detNode.get<double>("position.x") * LengthUnit;
+      const double posy = detNode.get<double>("position.y") * LengthUnit;
+      const double posz = detNode.get<double>("position.z") * LengthUnit;
       const double dirxx = detNode.get<double>("direction_xaxis.x");
       const double dirxy = detNode.get<double>("direction_xaxis.y");
       const double dirxz = detNode.get<double>("direction_xaxis.z");
@@ -195,7 +231,7 @@ bool DetectorSystem::constructDetectors(const ptree& DetectorsNode)
       detectorUnit->setDirectionX(dirxx, dirxy, dirxz);
       detectorUnit->setDirectionY(diryx, diryy, diryz);
 
-      if (type == "Detector2DStrip"){
+      if (detectorUnit->checkType(DetectorType::DoubleSidedStripDetector)) {
         RealDetectorUnit2DStrip* detectorUnitStrip = 
           dynamic_cast<RealDetectorUnit2DStrip*>(detectorUnit);
         if (detectorUnitStrip==0) {
@@ -291,6 +327,55 @@ bool DetectorSystem::constructReadoutModules(const ptree& ReadoutNode)
   return true;
 }
 
+bool DetectorSystem::registerDetectorGroups(const boost::property_tree::ptree& GroupsNode)
+{
+  for (const ptree::value_type& v: GroupsNode.get_child("")) {
+    if (v.first == "group") {
+      const ptree& groupNode = v.second;
+      const std::string name = groupNode.get<std::string>("<xmlattr>.name");
+      DetectorGroup* group = new DetectorGroup(name);
+      detectorGroupMap_[name] = std::unique_ptr<DetectorGroup>(group);
+      for (const ptree::value_type& vv: groupNode.get_child("")) {
+        if (vv.first == "detector") {
+          const int detectorID = vv.second.get<int>("<xmlattr>.id");
+          group->add(detectorID);
+        }
+      }
+    }
+    else if (v.first=="hit_pattern") {
+      HitPattern hitpat;
+      const ptree& hitpatNode = v.second;
+      hitpat.setName(hitpatNode.get<std::string>("<xmlattr>.name"));
+      hitpat.setShortName(hitpatNode.get<std::string>("<xmlattr>.short_name"));
+      hitpat.setBit(hitpatNode.get<unsigned int>("<xmlattr>.bit"));
+      for (const ptree::value_type& vv: hitpatNode.get_child("")) {
+        if (vv.first == "group") {
+          const std::string group = vv.second.get<std::string>("<xmlattr>.name");
+          hitpat.add(getDetectorGroup(group));
+        }
+      }
+      hitPatterns_.push_back(std::move(hitpat));
+    }
+  }
+
+  return true;
+}
+
+void DetectorSystem::printDetectorGroups() const
+{
+  std::cout << "List of Detector groups:\n";
+  for (auto& pair: detectorGroupMap_) {
+    DetectorGroup& dg = *(pair.second);
+    dg.print();
+  }
+  std::cout << "\n"
+            << "List of Hit patterns:\n";
+  for (auto& hitpat: hitPatterns_) {
+    std::cout << hitpat.Name() << '\n';
+  }
+  std::cout << std::endl;
+}
+
 bool DetectorSystem::loadSimulationParameters(const std::string& filename)
 {
   std::cout << "Loading simulation parameters: " << filename << std::endl;
@@ -377,6 +462,11 @@ bool DetectorSystem::setupSD(const ptree& SDNode)
 
   SimDetectorUnitFactory factory;
   std::unique_ptr<VRealDetectorUnit> detector(factory.createDetectorUnit(type));
+  if (detector.get()==nullptr) {
+    std::cout << "Invalid detector type : " << type << std::endl;
+    return false;
+  }
+
   DeviceSimulation* dscom = dynamic_cast<DeviceSimulation*>(detector.get());
   ptree::const_assoc_iterator paramCommon = SDNode.find("simulation_param_common");
   if ( paramCommon != SDNode.not_found() ) {
@@ -389,21 +479,30 @@ bool DetectorSystem::setupSD(const ptree& SDNode)
   boost::optional<std::string> idMethod = SDNode.get_optional<std::string>("id_method");
   VCSSensitiveDetector* sd = nullptr;
   CSSensitiveDetector<int>* sdIDByCopyNo = nullptr;
-  CSSensitiveDetector<G4String>* sdIDByKey = nullptr;
+  CSSensitiveDetector<G4String>* sdIDByPath = nullptr;
   
   if (idMethod && *idMethod=="copyno") {
     sdIDByCopyNo = new CSSensitiveDetector<int>(name);
     sd = sdIDByCopyNo;
-    int layerOffset = SDNode.get<int>("layer_offset");
-    sd->SetLayerOffset(layerOffset);
+  }
+  else if (idMethod && *idMethod=="path") {
+    sdIDByPath = new CSSensitiveDetector<G4String>(name);
+    sd = sdIDByPath;
   }
   else if (idMethod && *idMethod=="key") {
-    sdIDByKey = new CSSensitiveDetector<G4String>(name);
-    sd = sdIDByKey;
+    std::cout << "Invalid volume identification method: " << *idMethod << "\n"
+              << "Use a new keywork \"path\" instead of \"key\"." << std::endl;
+    return false;
   }
-  else { // same as method is "key"
-    sdIDByKey = new CSSensitiveDetector<G4String>(name);
-    sd = sdIDByKey;
+  else {
+    std::cout << "Invalid volume identification method: " << *idMethod << "\n"
+              << "Use a new keywork \"path\" or \"copyno\"." << std::endl;
+    return false;
+  }
+
+  boost::optional<int> layerOffset = SDNode.get_optional<int>("layer_offset");
+  if (layerOffset) {
+    sd->SetLayerOffset(*layerOffset);
   }
   
   sensitiveDetectorVector_.push_back(sd);
@@ -418,14 +517,14 @@ bool DetectorSystem::setupSD(const ptree& SDNode)
 
       DeviceSimulation* simDevice = getDeviceSimulationByID(detid);
       if (simDevice) {
-        if (type == "Detector2DPad") {
-          SimDetectorUnit2DPad* simDevicePad = dynamic_cast<SimDetectorUnit2DPad*>(simDevice);
-          SimDetectorUnit2DPad* dscomPad = dynamic_cast<SimDetectorUnit2DPad*>(dscom);
+        if (type == "2DPixel") {
+          SimDetectorUnit2DPixel* simDevicePad = dynamic_cast<SimDetectorUnit2DPixel*>(simDevice);
+          SimDetectorUnit2DPixel* dscomPad = dynamic_cast<SimDetectorUnit2DPixel*>(dscom);
           simDevicePad->setBottomSideElectrode(dscom->BottomSideElectrode());
           simDevicePad->setReadoutElectrode(dscomPad->ReadoutElectrode());
           simDevicePad->setCCEMap(dscomPad->getCCEMap());
         }
-        if (type == "Detector2DStrip") {
+        if (type == "2DStrip") {
           SimDetectorUnit2DStrip* simDeviceStrip = dynamic_cast<SimDetectorUnit2DStrip*>(simDevice);
           SimDetectorUnit2DStrip* dscomStrip = dynamic_cast<SimDetectorUnit2DStrip*>(dscom);
           simDeviceStrip->setBottomSideElectrode(dscomStrip->BottomSideElectrode());
@@ -433,7 +532,7 @@ bool DetectorSystem::setupSD(const ptree& SDNode)
           simDeviceStrip->setCCEMapXStrip(dscomStrip->getCCEMapXStrip());
           simDeviceStrip->setCCEMapYStrip(dscomStrip->getCCEMapYStrip());
         }
-        simDevice->setSimPHAMode(dscom->SimPHAMode());
+        simDevice->setChargeCollectionMode(dscom->ChargeCollectionMode());
         simDevice->setMuTau(dscom->MuTauElectron(), dscom->MuTauHole());
         simDevice->setEField(dscom->BiasVoltage(),
                              dscom->EFieldMode(),
@@ -441,7 +540,7 @@ bool DetectorSystem::setupSD(const ptree& SDNode)
                              dscom->EFieldParam(1),
                              dscom->EFieldParam(2),
                              dscom->EFieldParam(3));
-        simDevice->setSimDiffusionMode(dscom->SimDiffusionMode());
+        simDevice->setDiffusionMode(dscom->DiffusionMode());
         simDevice->setDiffusionSigmaConstant(dscom->DiffusionSigmaConstantAnode(),
                                              dscom->DiffusionSigmaConstantCathode());
         simDevice->setDiffusionSpreadFactor(dscom->DiffusionSpreadFactorAnode(),
@@ -455,15 +554,15 @@ bool DetectorSystem::setupSD(const ptree& SDNode)
           }
         }
         
-        if (simDevice->SimPHAMode()>=2 && !simDevice->isCCEMapPrepared()) {
+        if (simDevice->ChargeCollectionMode()>=2 && !simDevice->isCCEMapPrepared()) {
           simDevice->buildWPMap();
           simDevice->buildCCEMap();
         }
       }
 
-      if (sdIDByKey) {
-        std::string key = aDetectorNode.get<std::string>("<xmlattr>.key");
-        sdIDByKey->RegisterDetectorID(detid, key);
+      if (sdIDByPath) {
+        std::string path = aDetectorNode.get<std::string>("<xmlattr>.path");
+        sdIDByPath->RegisterDetectorID(detid, path);
       }
 
       if (sdIDByCopyNo) {
@@ -476,7 +575,7 @@ bool DetectorSystem::setupSD(const ptree& SDNode)
   return true;
 }
 
-bool DetectorSystem::loadDeviceSimulationParam(std::string type,
+bool DetectorSystem::loadDeviceSimulationParam(const std::string& type,
                                                const ptree& ParamNode,
                                                DeviceSimulation& ds)
 {
@@ -490,12 +589,12 @@ bool DetectorSystem::loadDeviceSimulationParam(std::string type,
     }
   }
   
-  boost::optional<bool> upsidePad = ParamNode.get_optional<bool>("upside_pad.<xmlattr>.set");
-  if (upsidePad) {
-    if (type=="Detector2DPad") {
-      SimDetectorUnit2DPad& dstmp
-        = dynamic_cast<SimDetectorUnit2DPad&>(ds);
-      if (*upsidePad) {
+  boost::optional<bool> upsidePixel = ParamNode.get_optional<bool>("upside_pixel.<xmlattr>.set");
+  if (upsidePixel) {
+    if (type=="2DPixel") {
+      SimDetectorUnit2DPixel& dstmp
+        = dynamic_cast<SimDetectorUnit2DPixel&>(ds);
+      if (*upsidePixel) {
         dstmp.setReadoutElectrode(dstmp.UpSideElectrode());
       }
       else {
@@ -506,7 +605,7 @@ bool DetectorSystem::loadDeviceSimulationParam(std::string type,
   
   boost::optional<bool> upsideXStrip = ParamNode.get_optional<bool>("upside_xstrip.<xmlattr>.set");
   if (upsideXStrip) {
-    if (type=="Detector2DStrip") {
+    if (type=="2DStrip") {
       SimDetectorUnit2DStrip& dstmp
         = dynamic_cast<SimDetectorUnit2DStrip&>(ds);
       if (*upsideXStrip) {
@@ -518,18 +617,18 @@ bool DetectorSystem::loadDeviceSimulationParam(std::string type,
     }
   }
 
-  boost::optional<int> simPHA = ParamNode.get_optional<int>("sim_pha.<xmlattr>.mode");
-  if (simPHA) {
-    ds.setSimPHAMode(*simPHA);
-    boost::optional<std::string> mapName = ParamNode.get_optional<std::string>("sim_pha.<xmlattr>.map");
+  boost::optional<int> chargeCollectionMode = ParamNode.get_optional<int>("charge_collection.<xmlattr>.mode");
+  if (chargeCollectionMode) {
+    ds.setChargeCollectionMode(*chargeCollectionMode);
+    boost::optional<std::string> mapName = ParamNode.get_optional<std::string>("charge_collection.<xmlattr>.map");
     if ( mapName ) {
       ds.setCCEMapName(*mapName);
-      if (type=="Detector2DPad") {
-        SimDetectorUnit2DPad& dstmp = dynamic_cast<SimDetectorUnit2DPad&>(ds);
+      if (type=="Detector2DPixel") {
+        SimDetectorUnit2DPixel& dstmp = dynamic_cast<SimDetectorUnit2DPixel&>(ds);
         TH3D* cce_map = (TH3D*)(CCEMapFile_->Get(mapName->c_str()));
         dstmp.setCCEMap(cce_map);
       }
-      else if (type=="Detector2DStrip") {
+      else if (type=="2DStrip") {
         SimDetectorUnit2DStrip& dstmp
           = dynamic_cast<SimDetectorUnit2DStrip&>(ds);
         TH2D* cce_mapx = (TH2D*)(CCEMapFile_->Get((*mapName+"_x").c_str()));
@@ -542,16 +641,16 @@ bool DetectorSystem::loadDeviceSimulationParam(std::string type,
     double bias = 0.0;
     double p0 = 0.0, p1 = 0.0, p2 = 0.0, p3 = 0.0;
 
-    boost::optional<double> biasValue = ParamNode.get_optional<double>("sim_pha.bias");
+    boost::optional<double> biasValue = ParamNode.get_optional<double>("charge_collection.bias");
     if ( biasValue ) {
       bias = (*biasValue) * volt;
     }
 
-    boost::optional<int> emodeValue = ParamNode.get_optional<int>("sim_pha.efield.<xmlattr>.mode");
+    boost::optional<int> emodeValue = ParamNode.get_optional<int>("charge_collection.efield.<xmlattr>.mode");
     EFieldModel::FieldShape emode;
     if ( emodeValue ) {
       emode = static_cast<EFieldModel::FieldShape>(*emodeValue);
-      for (const ptree::value_type& v: ParamNode.get_child("sim_pha.efield")) {
+      for (const ptree::value_type& v: ParamNode.get_child("charge_collection.efield")) {
         if ( v.first == "param0") p0 = boost::lexical_cast<double>(v.second.data());
         if ( v.first == "param1") p1 = boost::lexical_cast<double>(v.second.data());
         if ( v.first == "param2") p2 = boost::lexical_cast<double>(v.second.data());
@@ -566,12 +665,12 @@ bool DetectorSystem::loadDeviceSimulationParam(std::string type,
       p3 = ds.EFieldParam(3);
     }
 
-    boost::optional<double> mutauElectronValue = ParamNode.get_optional<double>("sim_pha.mutau_electron");
+    boost::optional<double> mutauElectronValue = ParamNode.get_optional<double>("charge_collection.mutau_electron");
     if ( mutauElectronValue ) {
       ds.setMuTauElectron((*mutauElectronValue) * (cm2/volt));
     }
 
-    boost::optional<double> mutauHoleValue = ParamNode.get_optional<double>("sim_pha.mutau_hole");
+    boost::optional<double> mutauHoleValue = ParamNode.get_optional<double>("charge_collection.mutau_hole");
     if ( mutauHoleValue ) {
       ds.setMuTauHole((*mutauHoleValue) * (cm2/volt));
     }
@@ -579,19 +678,19 @@ bool DetectorSystem::loadDeviceSimulationParam(std::string type,
     ds.setEField(bias, emode, p0, p1, p2, p3);
   }
 
-  boost::optional<int> simDiffusion = ParamNode.get_optional<int>("sim_diffusion.<xmlattr>.mode");
-  if ( simDiffusion ) {
-    ds.setSimDiffusionMode(*simDiffusion);
+  boost::optional<int> diffusionMode = ParamNode.get_optional<int>("diffusion.<xmlattr>.mode");
+  if ( diffusionMode ) {
+    ds.setDiffusionMode(*diffusionMode);
 
-    boost::optional<double> spreadFactorAnode = ParamNode.get_optional<double>("sim_diffusion.spread_factor_anode");
-    boost::optional<double> spreadFactorCathode = ParamNode.get_optional<double>("sim_diffusion.spread_factor_cathode");
-    boost::optional<double> constantAnode = ParamNode.get_optional<double>("sim_diffusion.constant_anode");
-    boost::optional<double> constantCathode = ParamNode.get_optional<double>("sim_diffusion.constant_cathode");
+    boost::optional<double> spreadFactorAnode = ParamNode.get_optional<double>("diffusion.spread_factor_anode");
+    boost::optional<double> spreadFactorCathode = ParamNode.get_optional<double>("diffusion.spread_factor_cathode");
+    boost::optional<double> constantAnode = ParamNode.get_optional<double>("diffusion.constant_anode");
+    boost::optional<double> constantCathode = ParamNode.get_optional<double>("diffusion.constant_cathode");
     
     if ( spreadFactorAnode) ds.setDiffusionSpreadFactorAnode(*spreadFactorAnode);
     if ( spreadFactorCathode) ds.setDiffusionSpreadFactorCathode(*spreadFactorCathode);
-    if ( constantAnode ) ds.setDiffusionSigmaConstantAnode((*constantAnode)*um);
-    if ( constantCathode ) ds.setDiffusionSigmaConstantCathode((*constantCathode)*um);
+    if ( constantAnode ) ds.setDiffusionSigmaConstantAnode((*constantAnode)*cm);
+    if ( constantCathode ) ds.setDiffusionSigmaConstantCathode((*constantCathode)*cm);
   }
 
   return true;

@@ -22,7 +22,6 @@
 #include "NextCLI.hh"
 #include "AstroUnits.hh"
 #include "BasicComptonEvent.hh"
-#include "DetectorGroupManager.hh"
 #include "EventReconstruction.hh"
 
 using namespace anl;
@@ -31,7 +30,7 @@ namespace comptonsoft
 {
 
 ComptonEventFilter::ComptonEventFilter()
-  : m_DetectorGroupManager(nullptr), m_EventReconstruction(nullptr)
+  : m_EventReconstruction(nullptr)
 {
 }
 
@@ -43,13 +42,15 @@ ANLStatus ComptonEventFilter::mod_startup()
 
 ANLStatus ComptonEventFilter::mod_init()
 {
+  VCSModule::mod_init();
+  
+  EvsDef("ComptonEventFilter:Selected");
   EvsDef("ComptonEventFilter:RejectedByHitPattern");
   EvsDef("ComptonEventFilter:RejectedByConditions");
   
-  GetANLModule("DetectorGroupManager", &m_DetectorGroupManager);
-  GetANLModule("EventReconstruction", &m_EventReconstruction);
+  GetANLModuleNC("EventReconstruction", &m_EventReconstruction);
   
-  auto& hitPatterns = m_DetectorGroupManager->getHitPatterns();
+  auto& hitPatterns = getDetectorManager()->getHitPatterns();
   for (const std::string& hitpatName: m_HitPatternNames) {
     auto it = std::find_if(std::begin(hitPatterns), std::end(hitPatterns),
                            [&](const HitPattern hitpat) {
@@ -86,11 +87,13 @@ ANLStatus ComptonEventFilter::mod_ana()
     
     if (!matched) {
       EvsSet("ComptonEventFilter:RejectedByHitPattern");
+      m_EventReconstruction->clearAllHitPatternEVS();
       return AS_SKIP;
     }
   }
 
   if (m_ConditionsVector.empty()) {
+    EvsSet("ComptonEventFilter:Selected");
     return AS_OK;
   }
   
@@ -113,9 +116,11 @@ ANLStatus ComptonEventFilter::mod_ana()
   
   if (!selected) {
     EvsSet("ComptonEventFilter:RejectedByConditions");
+    m_EventReconstruction->clearAllHitPatternEVS();
     return AS_SKIP;
   }
-  
+
+  EvsSet("ComptonEventFilter:Selected");
   return AS_OK;
 }
 
@@ -209,8 +214,6 @@ void ComptonEventFilter::add_condition(const std::string& type,
 
 ANLStatus ComptonEventFilter::mod_com()
 {
-  GetANLModule("DetectorGroupManager", &m_DetectorGroupManager);
-
   std::cout << std::endl;
   std::cout << " ***** Hit Pattern List *****" << std::endl;
   for (auto& hitpatName: m_HitPatternNames) {

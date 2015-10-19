@@ -95,7 +95,7 @@ inline G4String VCSSensitiveDetector::
 HierarchyString(const G4VTouchable* touchable) const
 {
   G4String key;
-  for(G4int i=touchable->GetHistoryDepth()-1-layerOffset_; i>=0; --i) {
+  for(G4int i=touchable->GetHistoryDepth()-layerOffset_; i>=0; --i) {
     G4String volumeName = touchable->GetVolume(i)->GetName();
     key += volumeName + (i==0 ? "" : "/");
   }

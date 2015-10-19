@@ -25,7 +25,7 @@
 #include <boost/property_tree/xml_parser.hpp>
 
 #include "NextCLI.hh"
-#include "SimDetectorUnit2DPad.hh"
+#include "SimDetectorUnit2DPixel.hh"
 #include "SimDetectorUnit2DStrip.hh"
 #include "SimDetectorUnitScintillator.hh"
 
@@ -38,8 +38,9 @@ SetNoiseLevels::SetNoiseLevels()
   : m_ByFile(true),
     m_FileName(""),
     m_DetectorType(1),
-    m_Noise00(0.0), m_Noise01(0.0), m_Noise02(0.0),
-    m_Noise10(0.0), m_Noise11(0.0), m_Noise12(0.0)
+    m_Noise0(0.0), m_Noise1(0.0), m_Noise2(0.0),
+    m_CathodeNoise0(0.0), m_CathodeNoise1(0.0), m_CathodeNoise2(0.0),
+    m_AnodeNoise0(0.0), m_AnodeNoise1(0.0), m_AnodeNoise2(0.0)
 {
 }
 
@@ -51,74 +52,21 @@ ANLStatus SetNoiseLevels::mod_startup()
   register_parameter_map(&m_NoiseLevelMap, "noise_level_map",
                          "detector_name_prefix", "Si");
   add_value_element(&m_DetectorType, "detector_type", "",
-                "Detector type (1: single, 2: double)");
-  add_value_element(&m_Noise00, "noise_coefficient_00");
-  add_value_element(&m_Noise01, "noise_coefficient_01");
-  add_value_element(&m_Noise02, "noise_coefficient_02");
-  add_value_element(&m_Noise10, "noise_coefficient_10");
-  add_value_element(&m_Noise11, "noise_coefficient_11");
-  add_value_element(&m_Noise12, "noise_coefficient_12");
+                    "Detector type (1: single, 2: double)");
+  add_value_element(&m_Noise0, "noise_coefficient0");
+  add_value_element(&m_Noise1, "noise_coefficient1");
+  add_value_element(&m_Noise2, "noise_coefficient2");
+  add_value_element(&m_CathodeNoise0, "cathode_noise_coefficient0");
+  add_value_element(&m_CathodeNoise1, "cathode_noise_coefficient1");
+  add_value_element(&m_CathodeNoise2, "cathode_noise_coefficient2");
+  add_value_element(&m_AnodeNoise0, "anode_noise_coefficient0");
+  add_value_element(&m_AnodeNoise1, "anode_noise_coefficient1");
+  add_value_element(&m_AnodeNoise2, "anode_noise_coefficient2");
+
+  enable_value_elements(1, {1, 2, 3});
+  enable_value_elements(2, {4, 5, 6, 7, 8, 9});
+  enable_value_elements(3, {1, 2, 3});
   
-  return AS_OK;
-}
-
-ANLStatus SetNoiseLevels::mod_com()
-{
-  hide_parameter("noise_level_map");
-
-  CLread("Set by file (1:yes, 0:no)", &m_ByFile);
-
-  if (m_ByFile) {
-    m_FileName = "noiselevels.xml";
-    CLread("Filename", &m_FileName);
-  }
-  else {
-    std::string name("Si");    
-    int type = 1;
-    
-    std::cout << "Definition of noise levels: " << std::endl;
-    
-    while (1) {
-      CLread("Detector name prefix (OK for exit)", &name);
-      if (name == "OK" or name == "ok") { break; }
-      
-      CLread("Detector type (1:single-side, 2:double-side)", &type);
-      
-      if (type == 1) {
-        double noiseParam0 = 1.0; // keV
-        CLread("Noise level Param 0", &noiseParam0, 1.0, "keV");
-        double noiseParam1 = 0.044;
-        CLread("Noise level Param 1", &noiseParam1);
-        double noiseParam2 = 0.0;
-        CLread("Noise level Param 2", &noiseParam2);
-        
-        m_NoiseLevelMap.insert(std::make_pair(name, std::make_tuple(type, noiseParam0, noiseParam1, noiseParam2, 0., 0., 0.)));
-      }
-      else if (type == 2) {
-        double noiseParam00 = 1.0; // keV
-        CLread("Noise level Param 0 (cathode)", &noiseParam00, 1.0, "keV");
-        double noiseParam01 = 0.044;
-        CLread("Noise level Param 1 (cathode)", &noiseParam01);
-        double noiseParam02 = 0.0;
-        CLread("Noise level Param 2 (cathode)", &noiseParam02);
-        
-        double noiseParam10 = 1.0; // keV
-        CLread("Noise level Param 0 (anode)", &noiseParam10, 1.0, "keV");
-        double noiseParam11 = 0.044;
-        CLread("Noise level Param 1 (anode)", &noiseParam11);
-        double noiseParam12 = 0.0;
-        CLread("Noise level Param 2 (anode)", &noiseParam12);
-        
-        m_NoiseLevelMap.insert(std::make_pair(name, std::make_tuple(type, noiseParam00, noiseParam01, noiseParam02, noiseParam10, noiseParam11, noiseParam12)));
-      }
-      else {
-        std::cout << "Detector type is invalid." << std::endl;
-      }
-      
-      name = "OK";
-    }
-  }
-
   return AS_OK;
 }
 
@@ -153,49 +101,63 @@ bool SetNoiseLevels::set_by_map()
                 << detector->getName() << std::endl;
       continue;
     }
-    
-    const double noise00 = std::get<1>(m_NoiseLevelMap[prefix]);
-    const double noise01 = std::get<2>(m_NoiseLevelMap[prefix]);
-    const double noise02 = std::get<3>(m_NoiseLevelMap[prefix]);
-    const double noise10 = std::get<4>(m_NoiseLevelMap[prefix]);
-    const double noise11 = std::get<5>(m_NoiseLevelMap[prefix]);
-    const double noise12 = std::get<6>(m_NoiseLevelMap[prefix]);
+
+    const auto parameters = m_NoiseLevelMap[prefix];
+    const int type = std::get<0>(parameters);
+    if (!detector->checkType(type)) {
+      std::cout << "Detector type given in the analysis parameters is inconsistent.\n"
+                << "  prefix: " << prefix << "\n"
+                << "  type: " << type << " => should be " << static_cast<int>(detector->Type())
+                << std::endl;
+      return false;
+    }
     
     const int detid = detector->getID();
-    if (detector->Type().find("SimDetector2DStrip") == 0) {
+    if (detector->checkType(DetectorType::DoubleSidedStripDetector)) {
+      const double cathode_noise0 = std::get<4>(parameters);
+      const double cathode_noise1 = std::get<5>(parameters);
+      const double cathode_noise2 = std::get<6>(parameters);
+      const double anode_noise0 = std::get<7>(parameters);
+      const double anode_noise1 = std::get<8>(parameters);
+      const double anode_noise2 = std::get<9>(parameters);
+      
       SimDetectorUnit2DStrip* ds
         = dynamic_cast<SimDetectorUnit2DStrip*>(detector.get());
-      if (ds == 0) {
-        std::cout << "Detector type is not 2D strip. Detector ID: " << detid << std::endl;
+      if (ds == nullptr) {
+        std::cout << "The detector object can not be converted into SimDetector2DStrip. Detector ID: " << detid << std::endl;
         return false;
       }
       auto xStripSelector = std::mem_fn(&PixelID::isXStrip);
       auto yStripSelector = std::mem_fn(&PixelID::isYStrip);
       if (ds->isXStripSideCathode()) {
         // cathode
-        ds->setNoiseParamToSelected(NoiseParam_t(noise00, noise01, noise02),
+        ds->setNoiseParamToSelected(NoiseParam_t(cathode_noise0, cathode_noise1, cathode_noise2),
                                     xStripSelector);
         // anode
-        ds->setNoiseParamToSelected(NoiseParam_t(noise10, noise11, noise12),
+        ds->setNoiseParamToSelected(NoiseParam_t(anode_noise0, anode_noise1, anode_noise2),
                                     yStripSelector);
       }
       else if (ds->isXStripSideAnode()){
         // anode
-        ds->setNoiseParamToSelected(NoiseParam_t(noise10, noise11, noise12),
+        ds->setNoiseParamToSelected(NoiseParam_t(anode_noise0, anode_noise1, anode_noise2),
                                     xStripSelector);
         // cathode
-        ds->setNoiseParamToSelected(NoiseParam_t(noise00, noise01, noise02),
+        ds->setNoiseParamToSelected(NoiseParam_t(cathode_noise0, cathode_noise1, cathode_noise2),
                                     yStripSelector);
       }
     }
     else {
       VDeviceSimulation* ds
         = dynamic_cast<VDeviceSimulation*>(detector.get());
-      if (ds == 0) {
-        std::cout << "Detector type is not DeviceSimulation. Detector ID: " << detid << std::endl;
+      if (ds == nullptr) {
+        std::cout << "The detector object can not be converted into VDeviceSimulation. Detector ID: " << detid << std::endl;
         return false;
       }
-      ds->resetNoiseParamVector(NoiseParam_t(noise00, noise01, noise02));
+
+      const double noise0 = std::get<1>(parameters);
+      const double noise1 = std::get<2>(parameters);
+      const double noise2 = std::get<3>(parameters);
+      ds->resetNoiseParamVector(NoiseParam_t(noise0, noise1, noise2));
     }
   }
   

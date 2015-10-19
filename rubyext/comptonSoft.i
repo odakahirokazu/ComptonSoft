@@ -5,8 +5,8 @@
 #include "VCSModule.hh"
 #include "CSHitCollection.hh"
 #include "ConstructChannelMap.hh"
-#include "DefineBadChannels.hh"
 #include "SetNoiseLevels.hh"
+#include "SetBadChannels.hh"
 #include "SetChannelsInfo.hh"
 #include "SelectHits.hh"
 #include "AnalyzeHits.hh"
@@ -14,7 +14,6 @@
 #include "MakeRawHits.hh"
 #include "MakeDetectorHitsTR.hh"
 #include "ApplyEPICompensation.hh"
-#include "DetectorGroupManager.hh"
 #include "EventSelection.hh"
 #include "EventReconstruction.hh"
 #include "HXIEventSelection.hh"
@@ -35,19 +34,25 @@
 #include "SelectTime.hh"
 #include "WriteHitTree.hh"
 #include "ReadHitTree.hh"
-#include "ReadRawHitTree.hh"
-#include "ReadDetectorHitTree.hh"
+#include "ReadHitTreeAsRawHits.hh"
+#include "ReadHitTreeAsDetectorHits.hh"
+#include "WriteEventTree.hh"
+#include "ReadEventTree.hh"
+#include "ReadEventTreeAsRawHits.hh"
+#include "ReadEventTreeAsDetectorHits.hh"
 #include "WriteComptonEventTree.hh"
 #include "ReadComptonEventTree.hh"
 #include "HistogramPHA.hh"
 #include "HistogramEnergySpectrum.hh"
 #include "HistogramEnergy2D.hh"
 #include "HistogramARM.hh"
+#include "HistogramARMByPositionMeasurement.hh"
 #include "HistogramAzimuthAngle.hh"
-#include "PlaneWaveRectanglePrimaryGen.hh"
-#include "IsotropicPrimaryGen.hh"
-#include "NucleusPrimaryGen.hh"
-#include "NucleusPrimaryGenInVolume.hh"
+#include "ResponseMatrix.hh"
+#include "BackProjection.hh"
+#include "BackProjectionSky.hh"
+#include "EfficiencyMapSky.hh"
+#include "QuickAnalysisForDSD.hh"
 #ifdef USE_SIMX
 #include "AHRayTracingPrimaryGen.hh"
 #endif
@@ -128,19 +133,19 @@ public:
 };
 
 
-class DefineBadChannels : public VCSModule
-{
-public:
-  DefineBadChannels();
-  ~DefineBadChannels();
-};
-
-
 class SetNoiseLevels : public VCSModule
 {
 public:
   SetNoiseLevels();
   ~SetNoiseLevels();
+};
+
+
+class SetBadChannels : public VCSModule
+{
+public:
+  SetBadChannels();
+  ~SetBadChannels();
 };
 
 
@@ -200,14 +205,6 @@ public:
 };
 
 
-class DetectorGroupManager : public VCSModule
-{
-public:
-  DetectorGroupManager();
-  ~DetectorGroupManager() = default;
-};
-
-
 class EventSelection : public VCSModule
 {
 public:
@@ -216,7 +213,7 @@ public:
 };
 
 
-class EventReconstruction : public anl::BasicModule
+class EventReconstruction : public VCSModule
 {
 public:
   EventReconstruction();
@@ -370,19 +367,51 @@ public:
 };
 
 
-class ReadRawHitTree : public ReadHitTree
+class ReadHitTreeAsRawHits : public ReadHitTree
 {
 public:
-  ReadRawHitTree();
-  ~ReadRawHitTree() = default;
+  ReadHitTreeAsRawHits();
+  ~ReadHitTreeAsRawHits() = default;
 };
 
 
-class ReadDetectorHitTree : public ReadRawHitTree
+class ReadHitTreeAsDetectorHits : public ReadHitTreeAsRawHits
 {
 public:
-  ReadDetectorHitTree() = default;
-  ~ReadDetectorHitTree() = default;
+  ReadHitTreeAsDetectorHits() = default;
+  ~ReadHitTreeAsDetectorHits() = default;
+};
+
+
+class WriteEventTree : public VCSModule
+{
+public:
+  WriteEventTree();
+  ~WriteEventTree() = default;
+};
+
+
+class ReadEventTree : public VCSModule
+{
+public:
+  ReadEventTree();
+  ~ReadEventTree();
+};
+
+
+class ReadEventTreeAsRawHits : public ReadEventTree
+{
+public:
+  ReadEventTreeAsRawHits();
+  ~ReadEventTreeAsRawHits() = default;
+};
+
+
+class ReadEventTreeAsDetectorHits : public ReadEventTreeAsRawHits
+{
+public:
+  ReadEventTreeAsDetectorHits() = default;
+  ~ReadEventTreeAsDetectorHits() = default;
 };
 
 
@@ -434,6 +463,14 @@ public:
 };
 
 
+class HistogramARMByPositionMeasurement : public HistogramARM
+{
+public:
+  HistogramARMByPositionMeasurement();
+  ~HistogramARMByPositionMeasurement();
+};
+
+
 class HistogramAzimuthAngle : public VCSModule
 {
 public:
@@ -442,32 +479,43 @@ public:
 };
 
 
-class PlaneWaveRectanglePrimaryGen : public anlgeant4::PlaneWavePrimaryGen
+class ResponseMatrix : public VCSModule
 {
 public:
-  PlaneWaveRectanglePrimaryGen();
+  ResponseMatrix();
+  ~ResponseMatrix();
 };
 
 
-class IsotropicPrimaryGen : public anlgeant4::BasicPrimaryGen
+class BackProjection : public VCSModule
 {
 public:
-  IsotropicPrimaryGen();
+  BackProjection();
+  ~BackProjection();
 };
 
 
-class NucleusPrimaryGen : public anlgeant4::BasicPrimaryGen
+class BackProjectionSky : public BackProjection
 {
 public:
-  NucleusPrimaryGen();
+  BackProjectionSky();
+  ~BackProjectionSky();
 };
 
 
-class NucleusPrimaryGenInVolume : public NucleusPrimaryGen
+class EfficiencyMapSky : public BackProjection
 {
 public:
-  NucleusPrimaryGenInVolume();
-  virtual ~NucleusPrimaryGenInVolume() = default;
+  EfficiencyMapSky();
+  ~EfficiencyMapSky();
+};
+
+
+class QuickAnalysisForDSD : public VCSModule
+{
+public:
+  QuickAnalysisForDSD();
+  ~QuickAnalysisForDSD();
 };
 
 
@@ -490,7 +538,7 @@ public:
 
 #endif
 
-class AHRadiationBackgroundPrimaryGen : public IsotropicPrimaryGen
+class AHRadiationBackgroundPrimaryGen : public anlgeant4::IsotropicPrimaryGen
 {
 public:
   AHRadiationBackgroundPrimaryGen();

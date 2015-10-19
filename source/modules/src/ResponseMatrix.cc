@@ -23,49 +23,52 @@
 #include "TDirectory.h"
 #include "TH2.h"
 #include "AstroUnits.hh"
-#include "CSHitCollection.hh"
+#include "BasicComptonEvent.hh"
 #include "InitialInformation.hh"
+#include "EventReconstruction.hh"
 #include "DetectorHit.hh"
 
-using namespace comptonsoft;
 using namespace anl;
 
+namespace comptonsoft
+{
 
 ResponseMatrix::ResponseMatrix()
-  : m_HitCollection(0), m_InitialInfo(0),
+  : m_EventReconstruction(nullptr), m_InitialInfo(nullptr),
     m_NumBinEnergy(720), m_RangeEnergy1(0.0), m_RangeEnergy2(720.0)
 {
 }
 
+ResponseMatrix::~ResponseMatrix() = default;
 
 ANLStatus ResponseMatrix::mod_startup()
 {
   register_parameter(&m_NumBinEnergy, "number_of_bins");
-  register_parameter(&m_RangeEnergy1, "energy_min", 1, "keV");
-  register_parameter(&m_RangeEnergy2, "energy_max", 1, "keV");
+  register_parameter(&m_RangeEnergy1, "energy_min", 1.0, "keV");
+  register_parameter(&m_RangeEnergy2, "energy_max", 1.0, "keV");
   register_parameter(&m_Selections, "event_selections");
   
   return AS_OK;
 }
 
-
 ANLStatus ResponseMatrix::mod_init()
 {
-  GetANLModuleNC("CSHitCollection", &m_HitCollection);
+  GetANLModule("EventReconstruction", &m_EventReconstruction);
   GetANLModuleIFNC("InitialInformation", &m_InitialInfo);
   return AS_OK;
 }
 
-
 ANLStatus ResponseMatrix::mod_his()
 {
   VCSModule::mod_his();
-  mkdir_module();
+  mkdir();
 
   const size_t n = m_Selections.size();
   for (size_t i=0; i<n; i++) {
-    std::string name = (boost::format("hist_%04d") % i).str();
-    TH2F* hist = new TH2F(name.c_str(), "input energy : output energy",
+    const std::string name = (boost::format("hist_%04d") % i).str();
+    const std::string selection = m_Selections[i];
+    const std::string title = (boost::format("input energy : output energy (%s)") % selection).str();
+    TH2F* hist = new TH2F(name.c_str(), title.c_str(),
                           m_NumBinEnergy, m_RangeEnergy1, m_RangeEnergy2,
                           m_NumBinEnergy, m_RangeEnergy1, m_RangeEnergy2);
     m_Responses[m_Selections[i]] = hist;
@@ -74,23 +77,17 @@ ANLStatus ResponseMatrix::mod_his()
   return AS_OK;
 }
 
-
 ANLStatus ResponseMatrix::mod_ana()
 {
-  typedef std::vector<DetectorHit_sptr> HitVector;
-
   const double weight = m_InitialInfo->Weight();
   const double initialEnergy = m_InitialInfo->InitialEnergy();
+
+  const BasicComptonEvent& event = m_EventReconstruction->getComptonEvent();
+  const double energy = event.TotalEnergy();
   
-  double energy = 0.0;
-  HitVector& hitVec = m_HitCollection->GetHits(comptonsoft::NOTIMEGROUP);
-  for (HitVector::iterator it=hitVec.begin(); it!=hitVec.end(); ++it) {
-    energy += (*it)->getPI();
-  }
-  
-  for (std::map<std::string, TH2*>::iterator it=m_Responses.begin(); it!=m_Responses.end(); ++it) {
-    const std::string& evsName = (*it).first;
-    TH2* hist = (*it).second;
+  for (auto& pair: m_Responses) {
+    const std::string& evsName = pair.first;
+    TH2* hist = pair.second;
     if (Evs(evsName)) {
       hist->Fill(initialEnergy/keV, energy/keV, weight);
     }
@@ -98,3 +95,5 @@ ANLStatus ResponseMatrix::mod_ana()
 
   return AS_OK;
 }
+
+} /* namespace comptonsoft */

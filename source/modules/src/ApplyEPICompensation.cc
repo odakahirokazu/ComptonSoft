@@ -26,7 +26,7 @@
 #include "TSpline.h"
 
 #include "NextCLI.hh"
-#include "SimDetectorUnit2DPad.hh"
+#include "SimDetectorUnit2DPixel.hh"
 #include "SimDetectorUnit2DStrip.hh"
 #include "SimDetectorUnitScintillator.hh"
 
@@ -49,13 +49,11 @@ ANLStatus ApplyEPICompensation::mod_startup()
   register_parameter_map(&m_Map, "epi_compensation_map",
                          "detector_name_prefix", "Si");
   add_value_element(&m_Type, "detector_type", "",
-                "Type of detector (1: single, 2:double)");
+                    "Type of detector (1: pad, 2: DSD)");
   add_value_element(&m_Factor0, "factor0");
   add_value_element(&m_Factor1, "factor1");
-  std::vector<std::size_t> enable1(1); enable1[0] = 1;
-  std::vector<std::size_t> enable2(2); enable2[0] = 1; enable2[1]= 2;
-  enable_value_elements(1, enable1);
-  enable_value_elements(2, enable2);
+  enable_value_elements(1, {1});
+  enable_value_elements(2, {1, 2});
   
   return AS_OK;
 }
@@ -116,17 +114,28 @@ bool ApplyEPICompensation::set_by_map()
     const std::string prefix = detector->getNamePrefix();
     if (m_Map.count(prefix) == 0) { continue; }
     
-    const double factor0 = std::get<1>(m_Map[prefix]);
-    const double factor1 = std::get<2>(m_Map[prefix]);
+    const auto parameters = m_Map[prefix];
+    const int type = std::get<0>(parameters);
+    if (!detector->checkType(type)) {
+      std::cout << "Detector type given in the analysis parameters is inconsistent.\n"
+                << "  prefix: " << prefix << "\n"
+                << "  type: " << type << " => should be " << static_cast<int>(detector->Type())
+                << std::endl;
+      return false;
+    }
+
+    const double factor0 = std::get<1>(parameters);
+    const double factor1 = std::get<2>(parameters);
     
     const int detid = detector->getID();
-    if (detector->Type().find("SimDetector2DStrip") == 0) {
+    if (detector->checkType(DetectorType::DoubleSidedStripDetector)) {
       SimDetectorUnit2DStrip* ds
         = dynamic_cast<SimDetectorUnit2DStrip*>(detector.get());
-      if (ds == 0) {
-        std::cout << "Detector type is not 2D strip. Detector ID: " << detid << std::endl;
+      if (ds == nullptr) {
+        std::cout << "The detector object can not be converted into SimDetector2DStrip. Detector ID: " << detid << std::endl;
         return false;
       }
+
       auto xStripSelector = std::mem_fn(&PixelID::isXStrip);
       auto yStripSelector = std::mem_fn(&PixelID::isYStrip);
       if (ds->isXStripSideCathode()) {
@@ -145,10 +154,11 @@ bool ApplyEPICompensation::set_by_map()
     else {
       DeviceSimulation* ds
         = dynamic_cast<DeviceSimulation*>(detector.get());
-      if (ds == 0) {
-        std::cout << "Detector type is not DeviceSimulation. Detector ID: " << detid << std::endl;
+      if (ds == nullptr) {
+        std::cout << "The detector object can not be converted into VDeviceSimulation. Detector ID: " << detid << std::endl;
         return false;
       }
+
       ds->resetEPICompensationFactorVector(factor0);
     }
 

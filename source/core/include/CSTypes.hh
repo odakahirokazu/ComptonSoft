@@ -31,9 +31,9 @@ typedef CLHEP::Hep2Vector vector2_t;
 typedef CLHEP::Hep3Vector vector3_t;
 typedef CLHEP::HepLorentzVector vector4_t;
 
-enum class ElectrodeSide {
-  Undefined, Anode, Cathode
-};
+enum class ElectrodeSide { Undefined, Anode, Cathode };
+
+enum class DetectorType : int { PixelDetector=1, DoubleSidedStripDetector=2, Scintillator=3 };
 
 typedef std::tuple<double, double, double> NoiseParam_t;
 

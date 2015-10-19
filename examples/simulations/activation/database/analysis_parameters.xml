@@ -1,21 +1,22 @@
 <?xml version="1.0"?>
-<?xml-stylesheet type="text/xsl" href="./xsl/analysisparam.xsl" ?>
+<?xml-stylesheet type="text/xsl" href="http://www.astro.isas.jaxa.jp/~odaka/xmlstyle/analysis_param_v1.xsl" ?>
+
 <analysis>
   <name>CC</name>
   <comment>H. Odaka | 2015-06-01</comment>
   <detectors>
     <detector>
-      <name>CdTePad</name>
+      <prefix>CdTePad</prefix>
       <type>1</type>
       <noiselevel>
-        <param00>0.1</param00>
-        <param01>0.0</param01>
-        <param02>0.0</param02>
+        <param0>0.1</param0>
+        <param1>0.0</param1>
+        <param2>0.0</param2>
       </noiselevel>
-      <analysis>
+      <reconstruction>
         <mode>1</mode>
         <threshold>2.0</threshold>
-      </analysis>
+      </reconstruction>
     </detector>
   </detectors>
 </analysis>

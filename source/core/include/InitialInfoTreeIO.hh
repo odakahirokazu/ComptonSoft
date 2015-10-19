@@ -45,23 +45,28 @@ public:
   virtual void defineBranches();
   virtual void setBranchAddresses();
 
-  double getInitialEnergy() const
-  { return ini_energy_; }
+  double getInitialEnergy() const;
+  vector3_t getInitialDirection() const;
+  double getInitialTime() const;
+  vector3_t getInitialPosition() const;
+  vector3_t getInitialPolarization() const;
+  double getWeight() const;
 
-  vector3_t getInitialDirection() const
-  { return vector3_t(ini_dirx_, ini_diry_, ini_dirz_); }
+  void setInitialEnergy(double v);
+  void setInitialDirection(double x, double y, double z);
+  void setInitialTime(double v);
+  void setInitialPosition(double x, double y, double z);
+  void setInitialPolarization(double x, double y, double z);
+  void setWeight(double v);
 
-  double getInitialTime() const
-  { return ini_time_; }
-
-  vector3_t getInitialPosition() const
-  { return vector3_t(ini_posx_, ini_posy_, ini_posz_); }
+  void setInitialDirection(const vector3_t& v)
+  { setInitialDirection(v.x(), v.y(), v.z()); }
   
-  vector3_t getInitialPolarization() const
-  { return vector3_t(ini_polarx_, ini_polary_, ini_polarz_); }
-
-  double getWeight() const
-  { return weight_; }
+  void setInitialPosition(const vector3_t& v)
+  { setInitialPosition(v.x(), v.y(), v.z()); }
+  
+  void setInitialPolarization(const vector3_t& v)
+  { setInitialPolarization(v.x(), v.y(), v.z()); }
 
   void setInitialInfo(double energy,
                       const vector3_t& direction,
@@ -87,46 +92,7 @@ public:
     setInitialPosition(position);
     setInitialPolarization(vector3_t(0.0, 0.0, 0.0));
   }
-
-  void setWeight(double v)
-  { weight_ = v; }
-
-  void setInitialEnergy(double v)
-  { ini_energy_ = v; }
-
-  void setInitialDirection(double x, double y, double z)
-  {
-    ini_dirx_ = x;
-    ini_diry_ = y;
-    ini_dirz_ = z;
-  }
-
-  void setInitialDirection(const vector3_t& v)
-  { setInitialDirection(v.x(), v.y(), v.z()); }
   
-  void setInitialTime(double v)
-  { ini_time_ = v; }
-
-  void setInitialPosition(double x, double y, double z)
-  {
-    ini_posx_ = x;
-    ini_posy_ = y;
-    ini_posz_ = z;
-  }
-  
-  void setInitialPosition(const vector3_t& v)
-  { setInitialPosition(v.x(), v.y(), v.z()); }
-
-  void setInitialPolarization(double x, double y, double z)
-  {
-    ini_polarx_ = x;
-    ini_polary_ = y;
-    ini_polarz_ = z;
-  }
-  
-  void setInitialPolarization(const vector3_t& v)
-  { setInitialPolarization(v.x(), v.y(), v.z()); }
-
 private:
   TTree* tree_;
   bool enabled_;

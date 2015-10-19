@@ -76,8 +76,8 @@ private:
   int32_t rawpha_ = 0;
   float pha_ = 0.0;
   float epi_ = 0.0;
-  uint64_t flag_data_ = 0u;
-  uint64_t flags_ = 0u;
+  uint64_t flag_data_ = 0ul;
+  uint64_t flags_ = 0ul;
   // simulation
   float real_time_ = 0.0;
   int16_t time_group_ = 0;

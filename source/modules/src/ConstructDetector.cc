@@ -28,7 +28,8 @@ namespace comptonsoft {
 
 ConstructDetector::ConstructDetector()
   : detectorManager_(new DetectorSystem),
-    configurationFile_("detector_config.xml")
+    configurationFile_("detector_config.xml"),
+    verboseLevel_(0)
 {
   add_alias("ConstructDetector");
 }
@@ -42,24 +43,24 @@ ANLStatus ConstructDetector::mod_startup()
   register_parameter(&configurationFile_, "detector_configuration");
   set_parameter_description("XML data file describing a detector configuration.");
 
-  return AS_OK;
-}
+  register_parameter(&verboseLevel_, "verbose_level");
 
-ANLStatus ConstructDetector::mod_prepare()
-{
-  detectorManager_->loadDetectorConfiguration(configurationFile_.c_str());
   return AS_OK;
 }
 
 ANLStatus ConstructDetector::mod_init()
 {
-  if (detectorManager_->isConstructed()) {
-    return AS_OK;
-  }
-  else {
-    std::cout << "Detector construction is not completed." << std::endl;
+  bool complete = detectorManager_->loadDetectorConfiguration(configurationFile_.c_str());
+  if (!complete) {
+    std::cout << "Loading the detector configuration failed." << std::endl;
     return AS_QUIT;
   }
+  
+  if (VerboseLevel() > 0) {
+    detectorManager_->printDetectorGroups();
+  }
+  
+  return AS_OK;
 }
 
 ANLStatus ConstructDetector::mod_ana()

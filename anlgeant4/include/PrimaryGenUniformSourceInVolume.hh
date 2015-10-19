@@ -31,7 +31,7 @@ namespace anlgeant4
 
 class PrimaryGenUniformSourceInVolume : public PointSourcePrimaryGen
 {
-  DEFINE_ANL_MODULE(PrimaryGenUniformSourceInVolume, 1.3);
+  DEFINE_ANL_MODULE(PrimaryGenUniformSourceInVolume, 4.0);
 public: 
   PrimaryGenUniformSourceInVolume();
   ~PrimaryGenUniformSourceInVolume() = default;

@@ -33,6 +33,7 @@ class BasicComptonEvent;
  * 
  * @author Hirokazu Odaka
  * @date 2014-12-02
+ * @date 2015-10-10
  */
 class ComptonEventTreeIO
 {
@@ -63,6 +64,7 @@ private:
    * tree contents
    */
   uint64_t eventid_ = 0u;
+  int16_t num_hits_ = 0;
 
   int16_t hit1_id_ = 0;
   uint32_t hit1_process_ = 0;
@@ -92,13 +94,13 @@ private:
   float hit2_posz_ = 0.0;
   float hit2_energy_ = 0.0;
 
-  uint64_t flags_ = 0u;
+  uint64_t flags_ = 0ul;
 
   float costheta_ = 0.0;
   float dtheta_ = 0.0;
   float phi_ = 0.0;
 
-  uint64_t hitpattern_ = 0u;
+  uint64_t hitpattern_ = 0ul;
   int32_t grade_ = 0;
   float likelihood_ = 1.0;
 };

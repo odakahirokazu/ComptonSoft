@@ -45,6 +45,6 @@ public:
   virtual G4VUserPrimaryGeneratorAction* create() = 0;
 };
 
-}
+} /* namespace anlgeant4 */
 
 #endif /* ANLGEANT4_VANLPrimaryGen_H */

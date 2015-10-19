@@ -30,9 +30,13 @@ namespace comptonsoft {
 
 class VChannelMap;
 
+/**
+ *
+ * @author Hirokazu Odaka
+ */
 class ConstructChannelMap : public VCSModule
 {
-  DEFINE_ANL_MODULE(ConstructChannelMap, 1.1);
+  DEFINE_ANL_MODULE(ConstructChannelMap, 2.0);
 public:
   ConstructChannelMap();
   ~ConstructChannelMap();

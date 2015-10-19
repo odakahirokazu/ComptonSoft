@@ -31,8 +31,7 @@ namespace comptonsoft
 {
 
 ConstructDetectorForSimulation::ConstructDetectorForSimulation()
-  : simulationParamsFile_("simparam.xml"),
-    printParameters_(false)
+  : simulationParamsFile_("simparam.xml")
 {
 }
 
@@ -41,40 +40,36 @@ ConstructDetectorForSimulation::~ConstructDetectorForSimulation() = default;
 ANLStatus ConstructDetectorForSimulation::mod_startup()
 {
   ConstructDetector::mod_startup();
-  DetectorSystem* detectorManager = getDetectorManager();
-  detectorManager->setMCSimulation(true);
-
   register_parameter(&simulationParamsFile_, "simulation_parameters");
 
-  return AS_OK;
-}
-
-ANLStatus ConstructDetectorForSimulation::mod_prepare()
-{
-  ConstructDetector::mod_prepare();
   DetectorSystem* detectorManager = getDetectorManager();
-  detectorManager->loadSimulationParameters(simulationParamsFile_.c_str());
+  detectorManager->setMCSimulation(true);
 
   return AS_OK;
 }
 
 ANLStatus ConstructDetectorForSimulation::mod_init()
 {
+  ANLStatus status = ConstructDetector::mod_init();
+  if (status != AS_OK) { return status; }
+  
   DetectorSystem* detectorManager = getDetectorManager();
-  if (detectorManager->isConstructed()) {
-    if (printParameters_) {
-      std::cout << "\nSimulation parameters\n";
-      for (auto ds: detectorManager->getDeviceSimulationVector()) {
-        std::cout << "ID " << ds->getID() << '\n';
-        ds->printSimulationParameters();
-      }
-      std::cout << std::endl;
-    }
-    return AS_OK;
-  }
-  else {
+  bool complete = detectorManager->loadSimulationParameters(simulationParamsFile_.c_str());
+  if (!complete) {
+    std::cout << "Loading the simulation parameters failed." << std::endl;
     return AS_QUIT;
   }
+
+  if (VerboseLevel() > 0) {
+    std::cout << "\nSimulation parameters\n";
+    for (auto ds: detectorManager->getDeviceSimulationVector()) {
+      std::cout << "ID " << ds->getID() << '\n';
+      ds->printSimulationParameters();
+    }
+    std::cout << std::endl;
+  }
+
+  return AS_OK;
 }
 
 ANLStatus ConstructDetectorForSimulation::mod_bgnrun()

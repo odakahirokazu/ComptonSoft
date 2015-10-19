@@ -18,6 +18,7 @@
  *************************************************************************/
 
 #include "ComptonEventTreeIO.hh"
+#include "G4SystemOfUnits.hh"
 #include "TTree.h"
 #include "BasicComptonEvent.hh"
 
@@ -34,6 +35,7 @@ ComptonEventTreeIO::~ComptonEventTreeIO() = default;
 void ComptonEventTreeIO::defineBranches()
 {
   cetree_->Branch("eventid", &eventid_, "eventid/l");
+  cetree_->Branch("num_hits", &num_hits_, "num_hits/S");
 
   cetree_->Branch("hit1_id", &hit1_id_, "hit1_id/S");
   cetree_->Branch("hit1_process", &hit1_process_, "hit1_process/i");
@@ -78,6 +80,7 @@ void ComptonEventTreeIO::defineBranches()
 void ComptonEventTreeIO::setBranchAddresses()
 {
   cetree_->SetBranchAddress("eventid", &eventid_);
+  cetree_->SetBranchAddress("num_hits", &num_hits_);
 
   cetree_->SetBranchAddress("hit1_id", &hit1_id_);
   cetree_->SetBranchAddress("hit1_process", &hit1_process_);
@@ -123,6 +126,7 @@ void ComptonEventTreeIO::fillEvent(const int64_t eventID,
                                    const BasicComptonEvent& event)
 {
   eventid_ = (eventID >= 0) ? eventID : event.EventID();
+  num_hits_ = event.NumberOfHits();
 
   hit1_id_ = event.Hit1ID();
   hit1_process_ = event.Hit1Process();
@@ -135,12 +139,12 @@ void ComptonEventTreeIO::fillEvent(const int64_t eventID,
   hit1_pixelx_ = hit1Pixel.X();
   hit1_pixely_ = hit1Pixel.Y();
 
-  hit1_time_ = event.Hit1Time();
+  hit1_time_ = event.Hit1Time() / second;
   const vector3_t hit1Position = event.Hit1Position();
-  hit1_posx_ = hit1Position.x();
-  hit1_posy_ = hit1Position.y();
-  hit1_posz_ = hit1Position.z();
-  hit1_energy_ = event.Hit1Energy();
+  hit1_posx_ = hit1Position.x() / cm;
+  hit1_posy_ = hit1Position.y() / cm;
+  hit1_posz_ = hit1Position.z() / cm;
+  hit1_energy_ = event.Hit1Energy() / keV;
 
   hit2_id_ = event.Hit2ID();
   hit2_process_ = event.Hit2Process();
@@ -153,12 +157,12 @@ void ComptonEventTreeIO::fillEvent(const int64_t eventID,
   hit2_pixelx_ = hit2Pixel.X();
   hit2_pixely_ = hit2Pixel.Y();
 
-  hit2_time_ = event.Hit2Time();
+  hit2_time_ = event.Hit2Time() / second;
   const vector3_t hit2Position = event.Hit2Position();
-  hit2_posx_ = hit2Position.x();
-  hit2_posy_ = hit2Position.y();
-  hit2_posz_ = hit2Position.z();
-  hit2_energy_ = event.Hit2Energy();
+  hit2_posx_ = hit2Position.x() / cm;
+  hit2_posy_ = hit2Position.y() / cm;
+  hit2_posz_ = hit2Position.z() / cm;
+  hit2_energy_ = event.Hit2Energy() / keV;
 
   flags_ = event.Flags();
   costheta_ = event.CosThetaE();
@@ -180,6 +184,9 @@ BasicComptonEvent ComptonEventTreeIO::retrieveEvent() const
 
 void ComptonEventTreeIO::retrieveEvent(BasicComptonEvent& event) const
 {
+  event.setEventID(eventid_);
+  event.setNumberOfHits(num_hits_);
+  
   event.setHit1ID(hit1_id_);
   event.setHit1Process(hit1_process_);
   event.setHit1DetectorChannel(DetectorChannelID(hit1_detector_));
@@ -187,9 +194,9 @@ void ComptonEventTreeIO::retrieveEvent(BasicComptonEvent& event) const
                                                hit1_section_,
                                                hit1_channel_));
   event.setHit1Pixel(hit1_pixelx_, hit1_pixely_);
-  event.setHit1Time(hit1_time_);
-  event.setHit1Position(hit1_posx_, hit1_posy_, hit1_posz_);
-  event.setHit1Energy(hit1_energy_);
+  event.setHit1Time(hit1_time_ * second);
+  event.setHit1Position(hit1_posx_ * cm, hit1_posy_ * cm, hit1_posz_ * cm);
+  event.setHit1Energy(hit1_energy_ * keV);
 
   event.setHit2ID(hit2_id_);
   event.setHit2Process(hit2_process_);
@@ -198,9 +205,9 @@ void ComptonEventTreeIO::retrieveEvent(BasicComptonEvent& event) const
                                                hit2_section_,
                                                hit2_channel_));
   event.setHit2Pixel(hit2_pixelx_, hit2_pixely_);
-  event.setHit2Time(hit2_time_);
-  event.setHit2Position(hit2_posx_, hit2_posy_, hit2_posz_);
-  event.setHit2Energy(hit2_energy_);
+  event.setHit2Time(hit2_time_ * second);
+  event.setHit2Position(hit2_posx_ * cm, hit2_posy_ * cm, hit2_posz_ * cm);
+  event.setHit2Energy(hit2_energy_ * keV);
   
   event.setFlags(flags_);
   event.setHitPattern(hitpattern_);

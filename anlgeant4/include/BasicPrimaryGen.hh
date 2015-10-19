@@ -44,13 +44,14 @@ class VANLGeometry;
  */
 class BasicPrimaryGen : public VANLPrimaryGen, public InitialInformation
 {
-  DEFINE_ANL_MODULE(BasicPrimaryGen, 1.3);
+  DEFINE_ANL_MODULE(BasicPrimaryGen, 4.0);
 public:
   enum class SpectralShape {
     Undefined, Mono, PowerLaw, Gaussian, BlackBody, Histogram, User,
   };
 
   BasicPrimaryGen();
+  ~BasicPrimaryGen();
   
   virtual anl::ANLStatus mod_startup();
   virtual anl::ANLStatus mod_prepare();

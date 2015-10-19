@@ -34,13 +34,14 @@ namespace comptonsoft {
  * This module makes an efficiency image for Compton imaging reconstruction.
  * @author Hirokazu Odaka
  * @date 2012-03-13
+ * @date 2015-10-16 | for version 5
  */
 class EfficiencyMapSky : public BackProjection
 {
-  DEFINE_ANL_MODULE(EfficiencyMapSky, 1.0)
+  DEFINE_ANL_MODULE(EfficiencyMapSky, 2.0)
 public:
   EfficiencyMapSky();
-  ~EfficiencyMapSky() {}
+  ~EfficiencyMapSky();
 
   anl::ANLStatus mod_startup();
   anl::ANLStatus mod_init();
@@ -51,6 +52,6 @@ private:
   double m_Scale;
 };
 
-}
+} /* namespace comptonsoft */
 
 #endif /* COMPTONSOFT_EfficiencyMapSky_H */

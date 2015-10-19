@@ -32,8 +32,8 @@ ReadDataFile::ReadDataFile()
 
 ANLStatus ReadDataFile::mod_startup()
 {
-  register_parameter(&m_FileList, "file_list", "seq", "data");
-  return VCSModule::mod_startup();
+  register_parameter(&m_FileList, "file_list");
+  return AS_OK;
 }
 
 ANLStatus ReadDataFile::mod_init()

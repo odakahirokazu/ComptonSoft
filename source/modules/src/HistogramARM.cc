@@ -23,7 +23,6 @@
 #include "AstroUnits.hh"
 #include "EventReconstruction.hh"
 #include "BasicComptonEvent.hh"
-#include "DetectorGroupManager.hh"
 
 using namespace anl;
 
@@ -31,8 +30,7 @@ namespace comptonsoft
 {
 
 HistogramARM::HistogramARM()
-  : detectorGroupManager_(nullptr),
-    eventReconstruction_(nullptr),
+  : eventReconstruction_(nullptr),
     numBins_(500), range0_(-25.0), range1_(+25.0)
 {
 }
@@ -47,7 +45,6 @@ ANLStatus HistogramARM::mod_startup()
 
 ANLStatus HistogramARM::mod_his()
 {
-  GetANLModule("DetectorGroupManager", &detectorGroupManager_);
   GetANLModule("EventReconstruction", &eventReconstruction_);
   
   VCSModule::mod_his();
@@ -57,7 +54,7 @@ ANLStatus HistogramARM::mod_his()
                        numBins_, range0_, range1_);
 
   const std::vector<HitPattern>& hitPatterns
-    = detectorGroupManager_->getHitPatterns();
+    = getDetectorManager()->getHitPatterns();
   const std::size_t numHitPatterns = hitPatterns.size();
   hist_vec_.resize(numHitPatterns);
   for (std::size_t i=0; i<numHitPatterns; i++) {
@@ -85,13 +82,11 @@ ANLStatus HistogramARM::mod_ana()
     return AS_OK;
   }
 
-  const double arm = event.DeltaTheta()/degree;
-
-  hist_all_->Fill(arm);
-
+  const double ARMValue = event.DeltaTheta()/degree;
+  hist_all_->Fill(ARMValue);
   for (std::size_t i=0; i<hist_vec_.size(); i++) {
     if (eventReconstruction_->HitPatternFlag(i)) {
-      hist_vec_[i]->Fill(arm);
+      hist_vec_[i]->Fill(ARMValue);
     }
   }
 

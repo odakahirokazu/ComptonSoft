@@ -18,6 +18,7 @@
  *************************************************************************/
 
 #include "HitTreeIO.hh"
+#include "G4SystemOfUnits.hh"
 #include "TTree.h"
 #include "DetectorHit.hh"
 
@@ -128,7 +129,7 @@ void HitTreeIO::fillHits(const int64_t eventID,
     eventid_ = (eventID >= 0) ? eventID : hit->EventID();
     ihit_ = i;
 
-    time_ = hit->Time();
+    time_ = hit->Time() / second;
     instrument_ = hit->InstrumentID();
     detector_ = hit->DetectorID();
     det_section_ = hit->DetectorChannelSection();
@@ -139,24 +140,24 @@ void HitTreeIO::fillHits(const int64_t eventID,
     pixely_ = hit->PixelY();
     rawpha_ = hit->RawPHA();
     pha_ = hit->PHA();
-    epi_ = hit->EPI();
+    epi_ = hit->EPI() / keV;
     flag_data_ = hit->FlagData();
     flags_ = hit->Flags();
-    real_time_ = hit->RealTime();
+    real_time_ = hit->RealTime() / second;
     time_group_ = hit->TimeGroup();
-    real_posx_ = hit->RealPositionX();
-    real_posy_ = hit->RealPositionY();
-    real_posz_ = hit->RealPositionZ();
-    edep_ = hit->EnergyDeposit();
-    echarge_ = hit->EnergyCharge();
+    real_posx_ = hit->RealPositionX() / cm;
+    real_posy_ = hit->RealPositionY() / cm;
+    real_posz_ = hit->RealPositionZ() / cm;
+    edep_ = hit->EnergyDeposit() / keV;
+    echarge_ = hit->EnergyCharge() / keV;
     process_ = hit->Process();
-    energy_ = hit->Energy();
-    posx_ = hit->PositionX();
-    posy_ = hit->PositionY();
-    posz_ = hit->PositionZ();
-    local_posx_ = hit->LocalPositionX();
-    local_posy_ = hit->LocalPositionY();
-    local_posz_ = hit->LocalPositionZ();
+    energy_ = hit->Energy() / keV;
+    posx_ = hit->PositionX() / cm;
+    posy_ = hit->PositionY() / cm;
+    posz_ = hit->PositionZ() / cm;
+    local_posx_ = hit->LocalPositionX() / cm;
+    local_posy_ = hit->LocalPositionY() / cm;
+    local_posz_ = hit->LocalPositionZ() / cm;
     grade_ = hit->Grade();
     
     hittree_->Fill();
@@ -167,25 +168,25 @@ DetectorHit_sptr HitTreeIO::retrieveHit() const
 {
   DetectorHit_sptr hit(new DetectorHit);
   hit->setEventID(eventid_);
-  hit->setTime(time_);
+  hit->setTime(time_ * second);
   hit->setInstrumentID(instrument_);
   hit->setDetectorChannel(detector_, det_section_, channel_);
   hit->setReadoutChannel(readout_module_, section_, channel_);
   hit->setPixel(pixelx_, pixely_);
   hit->setRawPHA(rawpha_);
   hit->setPHA(pha_);
-  hit->setEPI(epi_);
+  hit->setEPI(epi_ * keV);
   hit->setFlagData(flag_data_);
   hit->setFlags(flags_);
-  hit->setRealTime(real_time_);
+  hit->setRealTime(real_time_ * second);
   hit->setTimeGroup(time_group_);
-  hit->setRealPosition(real_posx_, real_posy_, real_posz_);
-  hit->setEnergyDeposit(edep_);
-  hit->setEnergyCharge(echarge_);
+  hit->setRealPosition(real_posx_ * cm, real_posy_ * cm, real_posz_ * cm);
+  hit->setEnergyDeposit(edep_ * keV);
+  hit->setEnergyCharge(echarge_ * keV);
   hit->setProcess(process_);
-  hit->setEnergy(energy_);
-  hit->setPosition(posx_, posy_, posz_);
-  hit->setLocalPosition(local_posx_, local_posy_, local_posz_);
+  hit->setEnergy(energy_ * keV);
+  hit->setPosition(posx_ * cm, posy_ * cm, posz_ * cm);
+  hit->setLocalPosition(local_posx_ * cm, local_posy_ * cm, local_posz_ * cm);
   hit->setGrade(grade_);
 
   return std::move(hit);

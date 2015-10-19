@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="http://www.astro.isas.jaxa.jp/~odaka/xmlstyle/detector_config_v3.xsl" ?>
+
+<configuration>
+  <name>CC</name>
+  <comment>H. Odaka | 2015-10-11</comment>
+  <length_unit>cm</length_unit>
+  <detectors>
+    <detector id="100">
+      <type>2DStrip</type>
+      <name>SiStrip:0</name>
+      <geometry>
+        <widthx>3.4</widthx><widthy>3.4</widthy><thickness>0.1</thickness>
+        <offsetx>0.1</offsetx><offsety>0.1</offsety>
+      </geometry>
+      <pixel>
+        <numx>128</numx><numy>128</numy>
+        <pitchx>0.025</pitchx><pitchy>0.025</pitchy>
+      </pixel>
+      <position><x>0.0</x><y>0.0</y><z>0.0</z></position>
+      <direction_xaxis><x>+1.0</x><y>0.0</y><z>0.0</z></direction_xaxis>
+      <direction_yaxis><x>0.0</x><y>+1.0</y><z>0.0</z></direction_yaxis>
+      <energy_priority>cathode</energy_priority> 
+    </detector>
+    <detector id="101">
+      <type>2DStrip</type>
+      <name>SiStrip:1</name>
+      <geometry>
+        <widthx>3.4</widthx><widthy>3.4</widthy><thickness>0.1</thickness>
+        <offsetx>0.1</offsetx><offsety>0.1</offsety>
+      </geometry>
+      <pixel>
+        <numx>128</numx><numy>128</numy>
+        <pitchx>0.025</pitchx><pitchy>0.025</pitchy>
+      </pixel>
+      <position><x>0.0</x><y>0.0</y><z>-0.4</z></position>
+      <direction_xaxis><x>+1.0</x><y>0.0</y><z>0.0</z></direction_xaxis>
+      <direction_yaxis><x>0.0</x><y>+1.0</y><z>0.0</z></direction_yaxis>
+      <energy_priority>cathode</energy_priority> 
+    </detector>
+    <detector id="102">
+      <type>2DStrip</type>
+      <name>SiStrip:2</name>
+      <geometry>
+        <widthx>3.4</widthx><widthy>3.4</widthy><thickness>0.1</thickness>
+        <offsetx>0.1</offsetx><offsety>0.1</offsety>
+      </geometry>
+      <pixel>
+        <numx>128</numx><numy>128</numy>
+        <pitchx>0.025</pitchx><pitchy>0.025</pitchy>
+      </pixel>
+      <position><x>0.0</x><y>0.0</y><z>-0.8</z></position>
+      <direction_xaxis><x>+1.0</x><y>0.0</y><z>0.0</z></direction_xaxis>
+      <direction_yaxis><x>0.0</x><y>+1.0</y><z>0.0</z></direction_yaxis>
+      <energy_priority>cathode</energy_priority> 
+    </detector>
+    <detector id="103">
+      <type>2DStrip</type>
+      <name>SiStrip:3</name>
+      <geometry>
+        <widthx>3.4</widthx><widthy>3.4</widthy><thickness>0.1</thickness>
+        <offsetx>0.1</offsetx><offsety>0.1</offsety>
+      </geometry>
+      <pixel>
+        <numx>128</numx><numy>128</numy>
+        <pitchx>0.025</pitchx><pitchy>0.025</pitchy>
+      </pixel>
+      <position><x>0.0</x><y>0.0</y><z>-1.2</z></position>
+      <direction_xaxis><x>+1.0</x><y>0.0</y><z>0.0</z></direction_xaxis>
+      <direction_yaxis><x>0.0</x><y>+1.0</y><z>0.0</z></direction_yaxis>
+      <energy_priority>cathode</energy_priority> 
+    </detector>
+    <detector id="104">
+      <type>2DStrip</type>
+      <name>SiStrip:4</name>
+      <geometry>
+        <widthx>3.4</widthx><widthy>3.4</widthy><thickness>0.1</thickness>
+        <offsetx>0.1</offsetx><offsety>0.1</offsety>
+      </geometry>
+      <pixel>
+        <numx>128</numx><numy>128</numy>
+        <pitchx>0.025</pitchx><pitchy>0.025</pitchy>
+      </pixel>
+      <position><x>0.0</x><y>0.0</y><z>-1.6</z></position>
+      <direction_xaxis><x>+1.0</x><y>0.0</y><z>0.0</z></direction_xaxis>
+      <direction_yaxis><x>0.0</x><y>+1.0</y><z>0.0</z></direction_yaxis>
+      <energy_priority>cathode</energy_priority> 
+    </detector>
+    <detector id="200">
+      <type>2DStrip</type>
+      <name>CdTeStrip:0</name>
+      <geometry>
+        <widthx>3.4</widthx><widthy>3.4</widthy><thickness>0.1</thickness>
+        <offsetx>0.1</offsetx><offsety>0.1</offsety>
+      </geometry>
+      <pixel>
+        <numx>128</numx><numy>128</numy>
+        <pitchx>0.025</pitchx><pitchy>0.025</pitchy>
+      </pixel>
+      <position><x>0.0</x><y>0.0</y><z>-2.0</z></position>
+      <direction_xaxis><x>+1.0</x><y>0.0</y><z>0.0</z></direction_xaxis>
+      <direction_yaxis><x>0.0</x><y>+1.0</y><z>0.0</z></direction_yaxis>
+      <energy_priority>cathode</energy_priority> 
+    </detector>
+    <detector id="201">
+      <type>2DStrip</type>
+      <name>CdTeStrip:1</name>
+      <geometry>
+        <widthx>3.4</widthx><widthy>3.4</widthy><thickness>0.1</thickness>
+        <offsetx>0.1</offsetx><offsety>0.1</offsety>
+      </geometry>
+      <pixel>
+        <numx>128</numx><numy>128</numy>
+        <pitchx>0.025</pitchx><pitchy>0.025</pitchy>
+      </pixel>
+      <position><x>0.0</x><y>0.0</y><z>-2.0</z></position>
+      <direction_xaxis><x>+1.0</x><y>0.0</y><z>0.0</z></direction_xaxis>
+      <direction_yaxis><x>0.0</x><y>+1.0</y><z>0.0</z></direction_yaxis>
+      <energy_priority>cathode</energy_priority> 
+    </detector>
+    <detector id="202">
+      <type>2DStrip</type>
+      <name>CdTeStrip:2</name>
+      <geometry>
+        <widthx>3.4</widthx><widthy>3.4</widthy><thickness>0.1</thickness>
+        <offsetx>0.1</offsetx><offsety>0.1</offsety>
+      </geometry>
+      <pixel>
+        <numx>128</numx><numy>128</numy>
+        <pitchx>0.025</pitchx><pitchy>0.025</pitchy>
+      </pixel>
+      <position><x>0.0</x><y>0.0</y><z>-2.0</z></position>
+      <direction_xaxis><x>+1.0</x><y>0.0</y><z>0.0</z></direction_xaxis>
+      <direction_yaxis><x>0.0</x><y>+1.0</y><z>0.0</z></direction_yaxis>
+      <energy_priority>cathode</energy_priority> 
+    </detector>
+  </detectors>
+  
+  <readout />
+
+  <groups>
+    <group name="LowZ">
+      <detector id="100" />
+      <detector id="101" />
+      <detector id="102" />
+      <detector id="103" />
+      <detector id="104" />
+    </group>
+    <group name="HighZ">
+      <detector id="200" />
+      <detector id="201" />
+      <detector id="202" />
+    </group>
+    <group name="Si">
+      <detector id="100" />
+      <detector id="101" />
+      <detector id="102" />
+      <detector id="103" />
+      <detector id="104" />
+    </group>
+    <group name="CdTe">
+      <detector id="200" />
+      <detector id="201" />
+      <detector id="202" />
+    </group>
+    <hit_pattern name="Si-Si" short_name="SS" bit="0">
+      <group name="Si" /><group name="Si" />
+    </hit_pattern>
+    <hit_pattern name="Si-CdTe" short_name="SC" bit="1">
+      <group name="Si" /><group name="CdTe" />
+    </hit_pattern>
+    <hit_pattern name="CdTe-CdTe" short_name="CC" bit="2">
+      <group name="CdTe" /><group name="CdTe" />
+    </hit_pattern>
+  </groups>
+</configuration>

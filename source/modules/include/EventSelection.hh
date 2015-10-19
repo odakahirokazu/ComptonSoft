@@ -29,17 +29,17 @@
 namespace comptonsoft {
 
 class CSHitCollection;
-class DetectorGroupManager;
 
 /**
  * event selection
  * @author Hirokazu Odaka
  * @date 2008-08-28
  * @date 2014-11-25
+ * @date 2015-10-10
  */
 class EventSelection : public VCSModule
 {
-  DEFINE_ANL_MODULE(EventSelection, 2.0)
+  DEFINE_ANL_MODULE(EventSelection, 2.1)
 public:
   EventSelection();
   ~EventSelection() = default;
@@ -51,7 +51,6 @@ public:
 private:
   bool m_VetoEnabled;
   CSHitCollection* m_HitCollection;
-  const DetectorGroupManager* m_DetectorGroupManager;
   std::vector<std::pair<double, double>> m_FluoresenceRanges;
 };
 

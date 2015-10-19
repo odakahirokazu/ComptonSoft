@@ -23,7 +23,9 @@
 #include "TGraph.h"
 
 using namespace anl;
-using namespace comptonsoft;
+
+namespace comptonsoft
+{
 
 AHRadiationBackgroundPrimaryGen::AHRadiationBackgroundPrimaryGen()
   : m_Filename("trapped_proton_spectrum.root"),
@@ -32,20 +34,18 @@ AHRadiationBackgroundPrimaryGen::AHRadiationBackgroundPrimaryGen()
   add_alias("AHRadiationBackgroundPrimaryGen");
 }
 
-
 ANLStatus AHRadiationBackgroundPrimaryGen::mod_startup()
 {
-  IsotropicPrimaryGen::mod_startup();
+  anlgeant4::IsotropicPrimaryGen::mod_startup();
   disableDefaultEnergyInput();
   register_parameter(&m_Filename, "filename");
   set_parameter_description("ROOT file of background radiation spectrum.");
   return AS_OK;
 }
 
-
 ANLStatus AHRadiationBackgroundPrimaryGen::mod_init()
 {
-  IsotropicPrimaryGen::mod_init();
+  anlgeant4::IsotropicPrimaryGen::mod_init();
   
   m_File = new TFile(m_Filename.c_str());
   if ( m_File->IsZombie() ) {
@@ -83,8 +83,9 @@ ANLStatus AHRadiationBackgroundPrimaryGen::mod_init()
   return AS_OK;
 }
 
-
 G4double AHRadiationBackgroundPrimaryGen::sampleEnergy()
 {
   return m_Hist->GetRandom();
 }
+
+} /* namespace comptonsoft */

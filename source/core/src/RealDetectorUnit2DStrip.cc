@@ -29,8 +29,8 @@ namespace comptonsoft
 RealDetectorUnit2DStrip::RealDetectorUnit2DStrip()
   : prioritySide_(ElectrodeSide::Undefined),
     xStripSideElectrode_(ElectrodeSide::Undefined),
-    hitSelectionMode_(HitSelectionMode_t::OneByOne),
-    energyConsistencyRequired(false),
+    hitSelectionMethod_(HitSelectionMethod_t::OneByOne),
+    energyConsistencyRequired_(false),
     lowerEnergyConsistencyCheckFunctionC0_(0.0),
     lowerEnergyConsistencyCheckFunctionC1_(0.9),
     upperEnergyConsistencyCheckFunctionC0_(0.0),
@@ -45,6 +45,55 @@ void RealDetectorUnit2DStrip::initializeEvent()
   VRealDetectorUnit::initializeEvent();
   cathodeSideHits_.clear();
   anodeSideHits_.clear();
+}
+
+bool RealDetectorUnit2DStrip::setReconstructionDetails(int mode)
+{
+  if (mode == 1) {
+    hitSelectionMethod_ = HitSelectionMethod_t::OneByOne;
+    energyConsistencyRequired_ = false;
+    setClusteringOn(true);
+  }
+  else if (mode == 2) {
+    hitSelectionMethod_ = HitSelectionMethod_t::OneByOne;
+    energyConsistencyRequired_ = false;
+    setClusteringOn(false);
+  }
+  else if (mode == 11) {
+    hitSelectionMethod_ = HitSelectionMethod_t::OneByOne;
+    energyConsistencyRequired_ = true;
+    setClusteringOn(true);
+  }
+  else if (mode == 12) {
+    hitSelectionMethod_ = HitSelectionMethod_t::OneByOne;
+    energyConsistencyRequired_ = true;
+    setClusteringOn(false);
+  }
+  else if (mode == 21) {
+    hitSelectionMethod_ = HitSelectionMethod_t::MaxPulseHeight;
+    energyConsistencyRequired_ = false;
+    setClusteringOn(true);
+  }
+  else if (mode == 22) {
+    hitSelectionMethod_ = HitSelectionMethod_t::MaxPulseHeight;
+    energyConsistencyRequired_ = false;
+    setClusteringOn(false);
+  }
+  else if (mode == 31) {
+    hitSelectionMethod_ = HitSelectionMethod_t::MaxPulseHeight;
+    energyConsistencyRequired_ = true;
+    setClusteringOn(true);
+  }
+  else if (mode == 32) {
+    hitSelectionMethod_ = HitSelectionMethod_t::MaxPulseHeight;
+    energyConsistencyRequired_ = true;
+    setClusteringOn(false);
+  }
+  else {
+    std::cout << "Unknown reconstruction mode is given." << std::endl;
+    return false;
+  }
+  return true;
 }
 
 void RealDetectorUnit2DStrip::
@@ -108,18 +157,18 @@ reconstructDoubleSides(const DetectorHitVector& hitsCathode,
                        const DetectorHitVector& hitsAnode,
                        DetectorHitVector& hitReconstructed)
 {
-  if (HitSelectionMode()==HitSelectionMode_t::MaxEPI) {
-    reconstructWithMaxEPIMode(hitsCathode, hitsAnode, hitReconstructed);
+  if (HitSelectionMethod()==HitSelectionMethod_t::MaxPulseHeight) {
+    reconstructWithMaxPulseHeightMethod(hitsCathode, hitsAnode, hitReconstructed);
   }
-  else if (HitSelectionMode()==HitSelectionMode_t::OneByOne) {
-    reconstructWithOneByOneMode(hitsCathode, hitsAnode, hitReconstructed);
+  else if (HitSelectionMethod()==HitSelectionMethod_t::OneByOne) {
+    reconstructWithOneByOneMethod(hitsCathode, hitsAnode, hitReconstructed);
   }
 }
 
 void RealDetectorUnit2DStrip::
-reconstructWithMaxEPIMode(const DetectorHitVector& hitsCathode,
-                          const DetectorHitVector& hitsAnode,
-                          DetectorHitVector& hitReconstructed)
+reconstructWithMaxPulseHeightMethod(const DetectorHitVector& hitsCathode,
+                                    const DetectorHitVector& hitsAnode,
+                                    DetectorHitVector& hitReconstructed)
 {
   if (hitsCathode.size()==0 || hitsAnode.size()==0) {
     return;
@@ -127,44 +176,50 @@ reconstructWithMaxEPIMode(const DetectorHitVector& hitsCathode,
   
   DetectorHit_sptr hitCathode = selectMaxEPI(hitsCathode);
   DetectorHit_sptr hitAnode = selectMaxEPI(hitsAnode);
-
+  DetectorHit_sptr merged = mergeDoubleSides(hitCathode, hitAnode);
+  
   if (isEnergyConsistencyRequired()) {
-    if (!checkEnergyConsistency(hitCathode->EPI(), hitAnode->EPI())) {
+    if (!checkEnergyConsistency(merged->EPI(), hitCathode->EPI())) {
+      return;
+    }
+    if (!checkEnergyConsistency(merged->EPI(), hitAnode->EPI())) {
       return;
     }
   }
-
-  DetectorHit_sptr merged = mergeDoubleSides(hitCathode, hitAnode);
+  
   merged->setEnergy(merged->EPI());
   hitReconstructed.push_back(merged);
 }
 
 void RealDetectorUnit2DStrip::
-reconstructWithOneByOneMode(const DetectorHitVector& hitsCathode,
-                            const DetectorHitVector& hitsAnode,
-                            DetectorHitVector& hitReconstructed)
+reconstructWithOneByOneMethod(const DetectorHitVector& hitsCathode,
+                              const DetectorHitVector& hitsAnode,
+                              DetectorHitVector& hitReconstructed)
 {
   if (hitsCathode.size()==1 && hitsAnode.size()==1) {
     DetectorHit_sptr hitCathode = hitsCathode[0];
     DetectorHit_sptr hitAnode = hitsAnode[0];
+    DetectorHit_sptr merged = mergeDoubleSides(hitCathode, hitAnode);
 
     if (isEnergyConsistencyRequired()) {
-      if (!checkEnergyConsistency(hitCathode->EPI(), hitAnode->EPI())) {
+      if (!checkEnergyConsistency(merged->EPI(), hitCathode->EPI())) {
+        return;
+      }
+      if (!checkEnergyConsistency(merged->EPI(), hitAnode->EPI())) {
         return;
       }
     }
     
-    DetectorHit_sptr merged = mergeDoubleSides(hitCathode, hitAnode);
     merged->setEnergy(merged->EPI());
     hitReconstructed.push_back(merged);
   }
 }
 
 bool RealDetectorUnit2DStrip::
-checkEnergyConsistency(double energyCathode, double energyAnode)
+checkEnergyConsistency(double energy_x, double energy_y)
 {
-  const double x = energyCathode;
-  const double y = energyAnode;
+  const double x = energy_x;
+  const double y = energy_y;
   const double fl0 = LowerEnergyConsistencyCheckFunctionC0();
   const double fl1 = LowerEnergyConsistencyCheckFunctionC1();
   const double fu0 = UpperEnergyConsistencyCheckFunctionC0();

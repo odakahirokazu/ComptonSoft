@@ -47,7 +47,8 @@ public:
 
 protected:
   void mkdir(const std::string& name="");
-  DetectorSystem* getDetectorManager() { return detectorSystem_; } 
+  DetectorSystem* getDetectorManager() { return detectorSystem_; }
+  const DetectorSystem* getDetectorManager() const { return detectorSystem_; } 
 
 private:
   DetectorSystem* detectorSystem_;

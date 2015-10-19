@@ -18,7 +18,7 @@
  *************************************************************************/
 
 #include "SimDetectorUnitFactory.hh"
-#include "SimDetectorUnit2DPad.hh"
+#include "SimDetectorUnit2DPixel.hh"
 #include "SimDetectorUnit2DStrip.hh"
 #include "SimDetectorUnitScintillator.hh"
 #include "MultiChannelData.hh"
@@ -27,7 +27,7 @@ namespace comptonsoft {
 
 VRealDetectorUnit* SimDetectorUnitFactory::createDetectorUnit2DPixel()
 {
-  return new SimDetectorUnit2DPad;
+  return new SimDetectorUnit2DPixel;
 }
 
 VRealDetectorUnit* SimDetectorUnitFactory::createDetectorUnit2DStrip()

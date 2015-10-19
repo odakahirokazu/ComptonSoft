@@ -1,29 +1,55 @@
 Compton Soft
 ================================================================
 
-- Version: 5.0.1
-- Maintenance by Hirokazu Odaka
+- Version: 5.1.0
+- Author: Hirokazu Odaka
 
 ----
 
- 1. Introduction
+Introduction
 ----------------------------------------------------------------
 
-Compton Soft is an integrated analysis software package for Si/CdTe
-semiconductor Compton cameras. This software provides
+Compton Soft is an integrated simulation and analysis software package
+for semiconductor radiation detectors including Compton cameras.
+This software provides
 
-- processing data obtained with Si/CdTe detector systems,
+- processing data obtained with multi-layer semiconductor detector systems,
 - Monte Carlo simulations of the semiconductor detector systems, and
 - data reduction/analysis including Compton reconstruction.
 
 This software package can be used for wide-range applications of radiation
-measurements: X-/gamma-ray astrophysics, nuclear medicine, and imaging search
-for radioactive sources.
+measurements: X-/gamma-ray astrophysics, nuclear medicine, and imaging
+search for radioactive sources.
+
+### Important notes for version 5.0 users
+
+Version 5.1 is the first big minor update since we released version 5.
+This update includes many design changes, revision of input/output formats,
+and several bug fixes. If you are using version 5.0, we strongly recommend
+updating to version 5.1 or later versions as the older versions are not
+stable and use input/output fotmats which are no longer supported.
 
 ### Changes from version 4
-- All software design has been reviewed for C++11 and ANL Next 1.7.
-- We modify contents of the hit tree (hittree).
-- We adopt new database schema.
+
+When we move to version 5, all software design has been reviewed for C++11
+and ANL Next 1.7. We adopt new database schema:
+
+- detector configuration,
+- channel map,
+- simulation parameters,
+- analysis parameters.
+
+We also change data formats, which are used as simulation output:
+
+- hit tree,
+- event tree,
+- compton event tree (cetree).
+
+The event tree is a new data format that has the same information in the
+hit tree but it keeps information in a single row for an event in which
+multiple hits are filled into a variable length array. In the hit tree
+format, on the other hand, a row corresponds to a single hit. You can
+choose either hit tree or event tree as you like.
 
 To migrate to version 5 from version 4, please check an example script for
 simulation. Please feel free to contact us if you have any question about
@@ -34,16 +60,31 @@ If you like to use the old version, we recommend using version 4.15.0
 series, together with ANL Next 1.6.2. The version 4 series are not
 compatible with ANL Next 1.7 or later.
 
- 2. Information
+### Platforms
+
+- Mac: the author's standard environment
+- Linux
+
+----
+
+Documentation
 ----------------------------------------------------------------
 
-### (1) Contact
+- [Installation](documentation/installation.md)
+- [Data format](documentation/data_format.md)
+- [Class library references](http://www.astro.isas.jaxa.jp/~odaka/comptonsoft/doxygen/index.html)
+- [ANL module references](http://www.astro.isas.jaxa.jp/~odaka/comptonsoft/cs_modules.xml)
+
+Information
+----------------------------------------------------------------
+
+### Contact
 
 - Hirokazu Odaka 
 - ISAS/JAXA
 - odaka(AT)astro.isas.jaxa.jp
 
-### (2) Authors
+### Contributions
 
 - Hirokazu Odaka
 - Shin Watanabe
@@ -51,141 +92,30 @@ compatible with ANL Next 1.7 or later.
 - Tamotsu Sato
 - Yuto Ichinohe
 
-### (3) Documentation
-
-<http://www.astro.isas.jaxa.jp/~odaka/comptonsoft/>
-
-### (4) GitHub
+### GitHub
 
 <https://github.com/odakahirokazu/ComptonSoft/>
 
+### References (academic)
 
- 3. Platforms
-----------------------------------------------------------------
+- Odaka et al. (2010) NIM A, 624, 303
 
-- Mac: the author's standard environment
-- Linux
+### History
 
-----
-
- 4. Required software
-----------------------------------------------------------------
-
-### (1) C++ compliler
-
-### (2) [CMake](http://www.cmake.org/) (Cross platform make)
-*version 3.0.7 or later*
-
-For easy installation, this package uses CMake to generate building tools such
-as Makefile.
-
-### (3) [Boost C++ library](http://www.boost.org/)
-*version 1.56.0 or later*
-
-### (4) [ANL Next framework](http://www.astro.isas.jaxa.jp/~odaka/anlnext/)
-*version 1.7.0 or later*
-
-Compton Soft uses the ANL Next framework. ANL Next is a framework for
-constructing software that performs event-by-event analysis, which usually
-appears in data processing or analysis of radiation detectors.
-
-ANL Next requires following libraries:
-
-- Boost C++ library
-- Ruby
-- SWIG
-
-You can find
-[installation guide](https://github.com/odakahirokazu/ANLNext#readme)
-of ANL Next.
-
-### (5) [Geant4](http://geant4.cern.ch/)
-*version 10.0 or later*
-
-A toolkit library for Monte Carlo simulations.
-Following building options are required:
-
-- "global" libraries
-- shared libraries
-- install all header files in one directory
-- GDML and visualization options are recommended.
-
-Example of running cmake:
-
-    unix> cmake \
-      -DCMAKE_INSTALL_PREFIX=../geant4.10.01.p02-install \
-      -DGEANT4_USE_GDML=ON \
-      -DGEANT4_USE_QT=ON \
-      -DGEANT4_USE_OPENGL_X11=ON \
-      -DGEANT4_USE_RAYTRACER_X11=ON \
-      -DGEANT4_USE_NETWORKDAWN=ON \
-      ../geant4.10.01.p02
-
-### (6) [ROOT](http://root.cern.ch/)
-*version 5.34.05 or later*
-
-A data analysis framework.
-
-
- 5. Installation
-----------------------------------------------------------------
-
-### (1) Obtain Compton Soft via GitHub.
-
-    unix> git clone https://github.com/odakahirokazu/ComptonSoft.git
-
-### (2) Perform CMake.
-
-Make a directory for building the software, and then move to the directory.
-
-    unix> cd ComptonSoft
-    unix> mkdir build
-    unix> cd build
-
-Perform cmake to generate Makefiles. Give the directory of the source tree to
-`cmake` command.
-
-    unix> cmake .. [options] -DCMAKE_INSTALL_PREFIX=/path/to/install
-
-There are several options:
-
-#### User interface options
-- `CS_USE_RUBY`    (Default=ON):  enable Ruby binding.
-- `CS_USE_EXE`     (Default=OFF): create standalone executables.
-
-#### library options
-- `CS_USE_GDML`    (Default=OFF): enable GDML.
-- `CS_USE_SIMX`    (Default=OFF): enable SimX interface.
-- `CS_USE_VIS`     (Default=OFF): enable OpenGL visualization of Geant4.
-- `CS_USE_VIS_QT`  (Default=OFF): enable Qt visualization of Geant4.
-
-#### install options
-- `CS_INSTALL_HEADERS` (Default=ON): install all header files.
-- `CS_INSTALL_CMAKE_FILES` (Default=ON): install all cmake files.
-
-By default, the install destination is set to `${HOME}`. So `make install` will
-install headers and libraries into the user's home directory, such as
-`${HOME}/include` or `${HOME}/lib`. You can change it by setting
-`CMAKE_INSTALL_PREFIX`.
-
-This is an example to turn on GDML and Qt-visualization for Geant4:
-
-    unix> cmake .. \
-      -DCS_USE_GDML=ON \
-      -DCS_USE_VIS_QT=ON \
-      -DCMAKE_INSTALL_PREFIX=/path/to/install
-
-### (3) Make and install
-
-    unix> make
-    unix> make install
-
-NOTE: you can use `make -jN` (N: number of parallel complilation processes)
-instead of `make` for faster build.
-
- 6. Getting Started
-----------------------------------------------------------------
-
-See [documentation](http://www.astro.isas.jaxa.jp/~odaka/comptonsoft/).
+- 5.1 | 2015-10-19 | H. Odaka | Stable version. A big minor update since 5.0.
+- 5.0 | 2015-08-17 | H. Odaka | For C++11 and ANL Next 1.7.
+- 4.9.0 | 2013-05-21 | H. Odaka |  Beta version for version 5
+- 4.8.0 | 2011-11-15 | H. Odaka |
+- 4.7.0 | 2011-07-29 | H. Odaka | Ruby binding, parallel geometry
+- 4.6.0 | 2011-07-21 | H. Odaka | ANL Next 1.0
+- 4.5.6 | 2011-07-13 | H. Odaka | analysis for CCMk5, event: NDIP2011
+- 4.5.5 | 2011-06-xx | H. Odaka | analysis for CCMk5/development
+- 4.5.4 | 2011-06-08 | H. Odaka | CMake
+- 4.5 | 2011-04-26 H. Odaka | ANL Next
+- 4.4 | 2011-04-04 H. Odaka | introduce sensitive detector
+- Version 4 (2009) H. Odaka | General treatment of the detector response (Sugimoto's Master thesis)
+- Version 3 (2008) H. Odaka | Treatment of activation background (Odaka), detector response of semiconductor detectors (Takeda's PhD thesis, Aono's Master thesis)
+- Version 2 (2007) H. Odaka | Monte Carlo simulation (Odaka's Master Thesis)
+- Version 1 (2007) H. Odaka | Data reduction of Si/CdTe Compton cameras (Odaka's Master Thesis)
 
 ****************************************************************

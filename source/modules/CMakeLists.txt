@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 3.0)
 
 add_definitions(-DANL_USE_TVECTOR -DANL_USE_HEPVECTOR)
 
@@ -32,8 +32,8 @@ set(CS_MODULES
   src/VCSModule.cc
   src/CSHitCollection.cc
   src/ConstructChannelMap.cc
-  src/DefineBadChannels.cc
   src/SetNoiseLevels.cc
+  src/SetBadChannels.cc
   src/SetChannelsInfo.cc
   src/SelectHits.cc
   src/AnalyzeHits.cc
@@ -41,7 +41,6 @@ set(CS_MODULES
   src/MakeRawHits.cc
   src/MakeDetectorHitsTR.cc
   src/ApplyEPICompensation.cc
-  src/DetectorGroupManager.cc
   src/EventSelection.cc
   src/EventReconstruction.cc
   src/HXIEventSelection.cc
@@ -52,8 +51,6 @@ set(CS_MODULES
   src/ReadDataFile_SpW2.cc
   src/ReadDataFile_NT.cc
   src/ReadDataFile_NB0.cc
-  # src/ReadHXIEventTree.cc
-  # src/ReadSGDEventTree.cc
   ### processing analysis
   src/CorrectPHA.cc
   src/RecalculateEPI.cc
@@ -67,27 +64,26 @@ set(CS_MODULES
   ### analysis ROOT trees & histograms
   src/WriteHitTree.cc
   src/ReadHitTree.cc
-  src/ReadRawHitTree.cc
-  src/ReadDetectorHitTree.cc
+  src/ReadHitTreeAsRawHits.cc
+  src/ReadHitTreeAsDetectorHits.cc
+  src/WriteEventTree.cc
+  src/ReadEventTree.cc
+  src/ReadEventTreeAsRawHits.cc
+  src/ReadEventTreeAsDetectorHits.cc
   src/WriteComptonEventTree.cc
   src/ReadComptonEventTree.cc
   src/HistogramPHA.cc
   src/HistogramEnergySpectrum.cc
   src/HistogramEnergy2D.cc
-  # src/Resp2DSpec.cc
-  # src/ResponseMatrix.cc
   src/HistogramARM.cc
-  # src/CalcARMEne.cc
-  # src/CalcARMPos.cc
-  # src/CalcARM_PS.cc
-  # src/VAnalyzeHitList.cc
-  # src/BackProjection.cc
-  # src/BackProjectionSky.cc
+  src/HistogramARMByPositionMeasurement.cc
   src/HistogramAzimuthAngle.cc
-  # src/AnalyzeDSD.cc
+  src/ResponseMatrix.cc
+  src/BackProjection.cc
+  src/BackProjectionSky.cc
+  src/EfficiencyMapSky.cc
   ### others
-  # src/GainCorrection.cc
-  # src/EfficiencyMapSky.cc
+  src/QuickAnalysisForDSD.cc
   )
 
 add_library(CSModules SHARED

@@ -30,7 +30,7 @@ find_path(ROOT_LIB_DIR
   NAMES libHist.so libTree.so
   PATHS ${ROOTSYS}/lib/root ${ROOTSYS}/lib)
 set(ROOT_LIB
-  Core Cint RIO Net Hist Graf Graf3d Gpad Tree
+  Core RIO Net Hist Graf Graf3d Gpad Tree
   Rint Postscript Matrix Physics MathCore Thread)
 message("-- ROOTSYS = ${ROOTSYS}")
 message("-- ROOT_INC_DIR = ${ROOT_INC_DIR}")
@@ -73,9 +73,9 @@ endif(CS_USE_FITSIO)
 if(CS_USE_SIMX)
   set(SIMX_TOP $ENV{SIMX})
   set(SIMX_INC_DIR
-    ${SIMX_TOP}/src 
-    ${SIMX_TOP}/libsrc/cfitsio/include
-    ${SIMX_TOP}/libsrc/ape/include)
+    ${SIMX_TOP}/include
+    ${SIMX_TOP}/src
+    )
   set(SIMX_LIB_DIR
     ${SIMX_TOP}/lib
     )

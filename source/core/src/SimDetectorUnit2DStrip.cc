@@ -89,7 +89,7 @@ void SimDetectorUnit2DStrip::simulatePulseHeights()
       continue;
     }
 
-    if (SimDiffusionMode()==0) {
+    if (DiffusionMode()==0) {
       PixelID xsp(sp.X(), PixelID::Undefined);
       PixelID ysp(PixelID::Undefined, sp.Y());
       DetectorHit_sptr xhit = generateHit(*rawhit, xsp);
@@ -189,7 +189,7 @@ void SimDetectorUnit2DStrip::simulatePulseHeights()
     }
       
     // near strips
-    if (SimPHAMode()==3) {
+    if (ChargeCollectionMode()==3) {
       DetectorHit_sptr hit;
       PixelID nearStrip;
      
@@ -339,10 +339,10 @@ bool SimDetectorUnit2DStrip::isCCEMapPrepared()
 
 void SimDetectorUnit2DStrip::buildWPMap()
 {
-  if (SimPHAMode() == 2) {
+  if (ChargeCollectionMode() == 2) {
     buildWPMap(19, 19, 128, 1.0);
   }
-  else if (SimPHAMode() == 3) {
+  else if (ChargeCollectionMode() == 3) {
     buildWPMap(95, 95, 128, 5.0);
   }
   else {
@@ -362,12 +362,12 @@ void SimDetectorUnit2DStrip::buildWPMap(int nx, int ny, int nz, double pixel_fac
   const double MapSizeY = getPixelPitchY()*pixel_factor;
   const double MapSizeZ = getThickness()*static_cast<double>(nz)/static_cast<double>(nz-1);
 
-  if (SimPHAMode() == 2) {
+  if (ChargeCollectionMode() == 2) {
     if (MapSizeX<getPixelPitchX()*0.999 || MapSizeY<getPixelPitchY()*0.999) {
       std::cout << "Warning: map size is smaller than required in sim mode 2.";
     }
   }
-  else if (SimPHAMode() == 3) {
+  else if (ChargeCollectionMode() == 3) {
     if (MapSizeX<getPixelPitchX()*4.999 || MapSizeY<getPixelPitchY()*4.999) {
       std::cout << "Warning: map size is smaller than required in sim mode 3.";
     }
@@ -487,10 +487,10 @@ void SimDetectorUnit2DStrip::buildWPMap(int nx, int ny, int nz, double pixel_fac
 
 void SimDetectorUnit2DStrip::buildCCEMap()
 {
-  if (SimPHAMode() == 2) {
+  if (ChargeCollectionMode() == 2) {
     buildCCEMap(19, 19, 127, 1.0);
   }
-  else if (SimPHAMode() == 3) {
+  else if (ChargeCollectionMode() == 3) {
     buildCCEMap(95, 95, 127, 5.0);
   }
   else {
@@ -510,12 +510,12 @@ void SimDetectorUnit2DStrip::buildCCEMap(int nx, int ny, int nz, double pixel_fa
   const double MapSizeY = getPixelPitchY()*pixel_factor;
   const double MapSizeZ = getThickness();
 
-  if (SimPHAMode() == 2) {
+  if (ChargeCollectionMode() == 2) {
     if (MapSizeX<getPixelPitchX()*0.999 || MapSizeY<getPixelPitchY()*0.999) {
       std::cout << "Warning: map size is smaller than required in sim mode 2.";
     }
   }
-  else if (SimPHAMode() == 3) {
+  else if (ChargeCollectionMode() == 3) {
     if (MapSizeX<getPixelPitchX()*2.999 || MapSizeY<getPixelPitchY()*2.999) {
       std::cout << "Warning: map size is smaller than required in sim mode 3.";
     }

@@ -5,7 +5,7 @@
     <html xmlns="http://www.w3.org/1999/xhtml">
       <head>
         <title>Detector Configuration</title>
-	      <style type="text/css">
+        <style type="text/css">
           html {background-color: #FFFFDD; color: #000000;}
 	        body {padding: 1.5%;}
 	        h1 {text-align: center;}
@@ -20,6 +20,7 @@
           table#physical-config tr td:nth-of-type(21) { text-align: left; }
           table#physical-config tr td:nth-of-type(23) { text-align: left; }
           table#readout-config tr td:nth-of-type(3) { text-align: left; }
+          table#detector-groups tbody { text-align: left }
         </style>
       </head>
       <body>
@@ -31,11 +32,14 @@
   <xsl:template match="name">
     <h2>Instrument: <xsl:value-of select="." /></h2>
   </xsl:template>
+  <xsl:template match="length_unit">
+    <p>Length unit: <xsl:value-of select="." /></p>
+  </xsl:template>
   <xsl:template match="comment">
     <p>Comment: <span class="comment"><xsl:value-of select="." /></span></p>
   </xsl:template>
   <xsl:template match="detectors">
-    <h2>Physical configuration</h2>
+    <h2>Physical Configuration</h2>
     <p>Number of detectors = <span class="total-num"><xsl:value-of select="count(detector)" /></span></p>
     <table id="physical-config">
       <thead>
@@ -118,7 +122,7 @@
     <span><xsl:number value="position()-1"/>:(<xsl:value-of select="./@num_channels" />, <xsl:value-of select="./@electrode_side" />) </span>
   </xsl:template>
   <xsl:template match="readout">
-    <h2>Readout configuration</h2>
+    <h2>Readout Configuration</h2>
     <p>Number of readout modules = <span class="total-num"><xsl:value-of select="count(module)" /></span></p>
     <table id="readout-config">
       <thead>
@@ -142,5 +146,48 @@
   </xsl:template>
   <xsl:template match="module/section">
     <span>(<xsl:value-of select="./detector/@id" />, <xsl:value-of select="./detector/@section" />) </span>
+  </xsl:template>
+  <xsl:template match="groups">
+    <h2>Detector Groups and Hit Patterns</h2>
+    <table id="detector-groups">
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Name</th>
+          <th>Short name</th>
+          <th>Bit</th>
+	        <th>Definition (IDs/groups)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <xsl:apply-templates select="group" />
+        <xsl:apply-templates select="hit_pattern" />
+      </tbody>
+    </table>
+  </xsl:template>
+  <xsl:template match="group">
+    <tr>
+      <td>Group</td>
+      <td><xsl:value-of select="./@name" /></td>
+      <td></td>
+      <td></td>
+      <td><xsl:apply-templates select="./detector" /></td>
+    </tr>
+    <xsl:variable name="period" select="./@period" />
+  </xsl:template>
+  <xsl:template match="group/detector">
+    <span><xsl:value-of select="./@id" /><xsl:if test="position()!=last()">, </xsl:if></span>
+  </xsl:template>
+  <xsl:template match="hit_pattern">
+    <tr>
+      <td>Hit Pattern</td>
+      <td><xsl:value-of select="./@name" /></td>
+      <td><xsl:value-of select="./@short_name" /></td>
+      <td><xsl:value-of select="./@bit" /></td>
+      <td><xsl:apply-templates select="./group" /></td>
+    </tr>
+  </xsl:template>
+  <xsl:template match="hit_pattern/group">
+    <span><xsl:value-of select="./@name" /><xsl:if test="position()!=last()">, </xsl:if></span>
   </xsl:template>
 </xsl:stylesheet>

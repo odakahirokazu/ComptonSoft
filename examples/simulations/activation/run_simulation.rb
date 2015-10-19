@@ -12,7 +12,6 @@ def run_simulation(num, random, output, activation_output)
 
   sim.detector_config = "database/detector_configuration.xml"
   sim.simulation_param = "database/simulation_parameters.xml"
-  sim.detector_group = "database/detector_group.txt"
   sim.analysis_param = "database/analysis_parameters.xml"
   sim.use_gdml "database/mass_model.gdml"
 

@@ -1,0 +1,55 @@
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="http://www.astro.isas.jaxa.jp/~odaka/xmlstyle/analysis_param_v1.xsl" ?>
+
+<analysis>
+  <name>CC</name>
+  <comment>H. Odaka | 2015-10-11</comment>
+  <detectors>
+    <detector>
+      <prefix>SiStrip</prefix>
+      <type>2</type>
+      <noiselevel>
+        <cathode_param0>0.5</cathode_param0>
+        <cathode_param1>0.0</cathode_param1>
+        <cathode_param2>0.0</cathode_param2>
+        <anode_param0>1.0</anode_param0>
+        <anode_param1>0.0</anode_param1>
+        <anode_param2>0.0</anode_param2>
+      </noiselevel>
+      <reconstruction>
+        <mode>11</mode>
+        <threshold_cathode>5.0</threshold_cathode>
+        <threshold_anode>5.0</threshold_anode>
+        <energy_consistency_check>
+          <lower_function_c0>-3.0</lower_function_c0>
+          <lower_function_c1>0.9</lower_function_c1>
+          <upper_function_c0>+3.0</upper_function_c0>
+          <upper_function_c1>1.1</upper_function_c1>
+        </energy_consistency_check>
+      </reconstruction>
+    </detector>
+    <detector>
+      <prefix>CdTeStrip</prefix>
+      <type>2</type>
+      <noiselevel>
+        <cathode_param0>0.5</cathode_param0>
+        <cathode_param1>0.0</cathode_param1>
+        <cathode_param2>0.01</cathode_param2>
+        <anode_param0>1.0</anode_param0>
+        <anode_param1>0.0</anode_param1>
+        <anode_param2>0.008</anode_param2>
+      </noiselevel>
+      <reconstruction>
+        <mode>11</mode>
+        <threshold_cathode>5.0</threshold_cathode>
+        <threshold_anode>5.0</threshold_anode>
+        <energy_consistency_check>
+          <lower_function_c0>-3.0</lower_function_c0>
+          <lower_function_c1>0.9</lower_function_c1>
+          <upper_function_c0>+3.0</upper_function_c0>
+          <upper_function_c1>1.1</upper_function_c1>
+        </energy_consistency_check>
+      </reconstruction>
+    </detector>
+  </detectors>
+</analysis>

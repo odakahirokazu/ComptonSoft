@@ -34,7 +34,8 @@ namespace comptonsoft
 
 ConstructChannelMap::ConstructChannelMap()
   : filename_("channel_map.xml")
-{}
+{
+}
 
 ConstructChannelMap::~ConstructChannelMap() = default;
 
@@ -52,7 +53,7 @@ ANLStatus ConstructChannelMap::mod_init()
 
   VCSModule::mod_init();
 
-  std::map<std::string, int> detPrefixMap;
+  std::map<std::string, int> detectorPrefixMap;
 
   ptree pt;
   try {
@@ -67,14 +68,14 @@ ANLStatus ConstructChannelMap::mod_init()
     return AS_QUIT_ERR;
   }
 
-  int detIndex = 0;
+  int detectorIndex = 0;
   for (ptree::value_type& v: pt.get_child("channel_map")) {
     if (v.first == "detector" || v.first=="detector_2dstrip") {
       const ptree detNode = v.second;
       const optional<std::string> type_opt = detNode.get_optional<std::string>("<xmlattr>.type");
       const std::string type = type_opt ? (*type_opt) : "";
-      const std::string name = detNode.get<std::string>("<xmlattr>.name");
-      detPrefixMap.insert( std::make_pair(name, detIndex) );
+      const std::string prefix = detNode.get<std::string>("<xmlattr>.prefix");
+      detectorPrefixMap.insert( std::make_pair(prefix, detectorIndex) );
       const int numSections = detNode.get<int>("<xmlattr>.num_sections");
       const int numChannels = detNode.get<int>("<xmlattr>.num_channels");
       const int numX = detNode.get<int>("<xmlattr>.num_x");
@@ -105,18 +106,18 @@ ANLStatus ConstructChannelMap::mod_init()
           }
         }
       }
-      detIndex++;
+      detectorIndex++;
     }
   }
   
   DetectorSystem* detectorManager = getDetectorManager();
   for (auto& detector: detectorManager->getDetectors()) {
-    std::string prefix = detector->getNamePrefix();
-    if (detPrefixMap.count(prefix) == 0) {
-      std::cout << "ConstructChannelMap: Not found: " << prefix << std::endl;
+    const std::string prefix = detector->getNamePrefix();
+    if (detectorPrefixMap.count(prefix) == 0) {
+      std::cout << "ConstructChannelMap: not found: " << prefix << std::endl;
       return AS_QUIT;
     }
-    detector->setChannelMap(channelMaps_[detPrefixMap[prefix]]);
+    detector->setChannelMap(channelMaps_[detectorPrefixMap[prefix]]);
   }
   
   return AS_OK;

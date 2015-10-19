@@ -28,7 +28,6 @@
 
 namespace comptonsoft {
 
-
 /**
  * make back projection image
  * @author Hirokazu Odaka
@@ -37,17 +36,17 @@ namespace comptonsoft {
  */
 class BackProjection : public VCSModule
 {
-  DEFINE_ANL_MODULE(BackProjection, 2.1);
+  DEFINE_ANL_MODULE(BackProjection, 2.2);
 public:
   BackProjection();
-  ~BackProjection() {}
+  ~BackProjection();
 
   anl::ANLStatus mod_startup();
   anl::ANLStatus mod_his();
   anl::ANLStatus mod_ana();
 
 protected:
-  void SetUnit(double unit, std::string name)
+  void setUnit(double unit, std::string name)
   {
     m_PixelUnit = unit;
     m_PixelUnitName = name;
@@ -55,9 +54,9 @@ protected:
 
   double PixelUnit() { return m_PixelUnit; }
 
-  const comptonsoft::TwoHitComptonEvent& GetComptonEvent();
-  void FillImage(double x, double y, double weight);
-  bool SectionConeAndPlane(const vector3_t& vertex, const vector3_t& cone, vector3_t& coneProjected);
+  const comptonsoft::BasicComptonEvent& getComptonEvent();
+  void fillImage(double x, double y, double weight);
+  bool sectionConeAndPlane(const vector3_t& vertex, const vector3_t& cone, vector3_t& coneProjected);
   
 private:
   EventReconstruction* m_EventReconstruction;
@@ -82,7 +81,6 @@ private:
   std::string m_PixelUnitName;
 };
 
-}
+} /* namespace comptonsoft */
 
 #endif /* COMPTONSOFT_BackProjection_H */
-

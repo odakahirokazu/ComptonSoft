@@ -1,5 +1,5 @@
 ####### CMakeLists.txt for Compton Soft
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 3.0)
 
 ### Initial definition of cmake variables
 set(CMAKE_INSTALL_PREFIX $ENV{HOME} CACHE PATH "install prefix")
@@ -27,7 +27,7 @@ option(CS_USE_GDML "enable GDML" ON)
 option(CS_USE_FITSIO "enable FITS IO" OFF)
 option(CS_USE_SIMX "enable SimX compatible simulation" OFF)
 option(CS_USE_VIS "enable visualization with OpenGL" OFF)
-option(CS_USE_VIS_QT "enable visualization with Qt" OFF)
+option(CS_USE_VIS_QT "enable visualization with Qt" ON)
 option(CS_USE_SYSTEM_CLHEP "use system-clhep" OFF)
 ## install options
 option(CS_INSTALL_HEADERS "install all header files" ON)

@@ -28,6 +28,8 @@
 #include "ChannelID.hh"
 #include "VRealDetectorUnit.hh"
 #include "DetectorReadoutModule.hh"
+#include "DetectorGroup.hh"
+#include "HitPattern.hh"
 
 class TFile;
 
@@ -128,21 +130,31 @@ public:
   void registerGeant4SensitiveDetectors();
 
   void initializeEvent();
-  
+
+  // Detector groups and hit patterns
+  const DetectorGroup& getDetectorGroup(const std::string& name) const
+  { return *(detectorGroupMap_.at(name)); }
+
+  const std::vector<HitPattern>& getHitPatterns() const
+  { return hitPatterns_; }
+
+  void printDetectorGroups() const;
+
 private:
-  bool constructDetectors(const boost::property_tree::ptree& DetectorsNode);
+  bool constructDetectors(const boost::property_tree::ptree& DetectorsNode, double LengthUnit);
   bool constructMultiChannelData(const boost::property_tree::ptree& readoutNode,
                                  VRealDetectorUnit* detector,
                                  ElectrodeSide priority_side);
   bool constructReadoutModules(const boost::property_tree::ptree& ReadoutNode);
+  bool registerDetectorGroups(const boost::property_tree::ptree& GroupsNode);
 
   // for MC simulation
   bool setupSimulation(const boost::property_tree::ptree& DetectorsNode);
   bool setupSD(const boost::property_tree::ptree& SDNode);
-  bool loadDeviceSimulationParam(std::string type,
+  bool loadDeviceSimulationParam(const std::string& type,
                                  const boost::property_tree::ptree& ParamNode,
                                  DeviceSimulation& ds);
-
+  
 private:
   bool MCSimulation_;
   bool simAutoPosition_;
@@ -157,6 +169,9 @@ private:
   std::vector<DeviceSimulation*> deviceSimulationVector_;
   std::vector<VCSSensitiveDetector*> sensitiveDetectorVector_;
   TFile* CCEMapFile_;
+
+  std::map<std::string, std::unique_ptr<DetectorGroup>> detectorGroupMap_;
+  std::vector<HitPattern> hitPatterns_;
   
 private:
   DetectorSystem(const DetectorSystem&) = delete;

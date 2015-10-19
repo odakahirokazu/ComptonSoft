@@ -38,7 +38,6 @@ public:
   SimDetectorUnitScintillator();
   ~SimDetectorUnitScintillator();
 
-  std::string Type() { return std::string("SimDetectorScintillator"); }
   void initializeEvent();
 
   double ChargeCollectionEfficiency(const PixelID& ,

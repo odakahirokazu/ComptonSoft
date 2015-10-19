@@ -23,6 +23,8 @@
 
 namespace comptonsoft {
 
+HitPattern::~HitPattern() = default;
+
 bool HitPattern::match(const std::vector<DetectorHit_sptr>& hits) const
 {
   std::vector<int> ids(hits.size());

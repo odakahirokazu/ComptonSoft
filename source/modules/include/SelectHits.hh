@@ -23,7 +23,7 @@
 #include "VCSModule.hh"
 
 #include <map>
-#include <boost/tuple/tuple.hpp>
+#include <tuple>
 #include "CSHitCollection.hh"
 
 namespace comptonsoft {
@@ -44,7 +44,7 @@ protected:
   { m_HitCollection->insertHit(hit); }
   
 private:
-  virtual bool setAnalysisParam();
+  virtual bool setAnalysisParameters();
   virtual void doProcessing();
   virtual void collectHits();
 
@@ -53,16 +53,28 @@ private:
                                   double thresholdCathode,
                                   double thresholdAnode);
 
+  bool setEnergyConsistencyCheckFunctions(VRealDetectorUnit* detector,
+                                          double lowerC0,
+                                          double lowerC1,
+                                          double upperC0,
+                                          double upperC1);
+
 private:
   CSHitCollection* m_HitCollection = nullptr;
 
   int m_DetectorType;
-  int m_AnalysisMode;
+  int m_ReconstructionMode;
   double m_Threshold;
   double m_ThresholdCathode;
   double m_ThresholdAnode;
+  double m_LowerECheckFuncC0;
+  double m_LowerECheckFuncC1;
+  double m_UpperECheckFuncC0;
+  double m_UpperECheckFuncC1;
   std::map<std::string,
-           boost::tuple<int, int, double, double, double>> m_AnalysisMap;  
+           std::tuple<int, int,
+                      double, double, double,
+                      double, double, double, double>> m_AnalysisMap;
 };
 
 } /* namespace comptonsoft */

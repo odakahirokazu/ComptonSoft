@@ -30,24 +30,28 @@ class DetectorSystem;
  * construct detector system
  * @author Hirokazu Odaka
  * @date 2008-08-27
+ * @date 2015-10-11
  */
 class ConstructDetector : public anl::BasicModule
 {
-  DEFINE_ANL_MODULE(ConstructDetector, 3.0);
+  DEFINE_ANL_MODULE(ConstructDetector, 3.1);
 public:
   ConstructDetector();
   ~ConstructDetector();
 
   anl::ANLStatus mod_startup();
-  anl::ANLStatus mod_prepare();
   anl::ANLStatus mod_init();
   anl::ANLStatus mod_ana();
 
   DetectorSystem* getDetectorManager() { return detectorManager_.get(); }
 
+protected:
+  int VerboseLevel() const { return verboseLevel_; }
+
 private:
   std::unique_ptr<DetectorSystem> detectorManager_;
   std::string configurationFile_;
+  int verboseLevel_;
 };
 
 } /* namespace comptonsoft */

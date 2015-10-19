@@ -32,6 +32,7 @@ namespace comptonsoft {
  * A class of a reconstructed Compton event which contains information on one Compton scattering and one hit associated with the recoil electron.
  * @author Hirokazu Odaka
  * @date 2014-11-15
+ * @date 2015-11-14
  */
 class BasicComptonEvent
 {
@@ -45,6 +46,9 @@ public:
 
   int64_t EventID() const { return eventID_; }
   void setEventID(int64_t v) { eventID_ = v; }
+  
+  int NumberOfHits() const { return numHits_; }
+  void setNumberOfHits(int v) { numHits_ = v; }
   
   int Hit1ID() const { return hit1ID_; }
   uint32_t Hit1Process() const { return hit1Process_; }
@@ -108,10 +112,10 @@ public:
   void clearFlags(uint64_t f) { flags_ &= ~f; }
   bool isFlags(uint64_t f) const { return (flags_&f)==f; }
 
-  void setHitPattern(int v) { hitpattern_ = v; }
-  int HitPattern() const { return hitpattern_; }
-  void setGrade(int v) { grade_ = v; }
-  int Grade() const { return grade_; }
+  void setHitPattern(uint64_t v) { hitpattern_ = v; }
+  uint64_t HitPattern() const { return hitpattern_; }
+  void setGrade(int32_t v) { grade_ = v; }
+  int32_t Grade() const { return grade_; }
   void setLikelihood(double v) { likelihood_ = v; }
   double Likelihood() const { return likelihood_; }
 
@@ -156,6 +160,7 @@ private:
 
 private:
   int64_t eventID_;
+  int numHits_;
   
   int hit1ID_;
   uint32_t hit1Process_;
@@ -177,8 +182,8 @@ private:
 
   uint64_t flags_;
 
-  int hitpattern_;
-  int grade_;
+  uint64_t hitpattern_;
+  int32_t grade_;
   double likelihood_;
 
   mutable bool bCalc_;

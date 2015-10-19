@@ -40,9 +40,10 @@ namespace anlgeant4 {
  */
 class PlaneWavePrimaryGen : public anlgeant4::BasicPrimaryGen
 {
-  DEFINE_ANL_MODULE(PlaneWavePrimaryGen, 1.4);
+  DEFINE_ANL_MODULE(PlaneWavePrimaryGen, 4.0);
 public:
   PlaneWavePrimaryGen();
+  ~PlaneWavePrimaryGen();
 
   virtual anl::ANLStatus mod_startup();
   virtual anl::ANLStatus mod_com();
@@ -70,6 +71,6 @@ private:
   G4double m_Flux;
 };
 
-}
+} /* namespace anlgeant4 */
 
 #endif /* ANLGEANT4_PlaneWavePrimaryGen_H */

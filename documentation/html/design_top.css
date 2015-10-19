@@ -85,14 +85,14 @@ a:hover {
     color: #910;
 }
 
-.map_type_map {
+.container_type_map {
     background-color: #AAA;
 }
 
-.map_type_key {
+.container_type_key {
     background-color: #DDD;
 }
 
-.map_type_value {
+.container_type_value {
     background-color: #EEE;
 }

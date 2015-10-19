@@ -4,9 +4,10 @@
 <configuration>
   <name>CC</name>
   <comment>H. Odaka | 2013-04-22</comment>
+  <length_unit>mm</length_unit>
   <detectors>
     <detector id="100">
-      <type>Detector2DPad</type>
+      <type>2DPixel</type>
       <name>SiPad:0</name>
       <geometry>
         <widthx>64.0</widthx><widthy>64.0</widthy><thickness>2.0</thickness>
@@ -19,10 +20,10 @@
       <position><x>0.0</x><y>0.0</y><z>0.0</z></position>
       <direction_xaxis><x>+1.0</x><y>0.0</y><z>0.0</z></direction_xaxis>
       <direction_yaxis><x>0.0</x><y>+1.0</y><z>0.0</z></direction_yaxis>
-      <energy_priority>P-side</energy_priority> 
+      <energy_priority>cathode</energy_priority> 
     </detector>
     <detector id="200">
-      <type>Detector2DPad</type>
+      <type>2DPixel</type>
       <name>CdTePad:0</name>
       <geometry>
         <widthx>64.0</widthx><widthy>64.0</widthy><thickness>2.0</thickness>
@@ -35,9 +36,33 @@
       <position><x>0.0</x><y>0.0</y><z>-20.0</z></position>
       <direction_xaxis><x>+1.0</x><y>0.0</y><z>0.0</z></direction_xaxis>
       <direction_yaxis><x>0.0</x><y>+1.0</y><z>0.0</z></direction_yaxis>
-      <energy_priority>Al-side</energy_priority> 
+      <energy_priority>cathode</energy_priority> 
     </detector>
   </detectors>
   
   <readout />
+
+  <groups>
+    <group name="LowZ">
+      <detector id="100" />
+    </group>
+    <group name="HighZ">
+      <detector id="200" />
+    </group>
+    <group name="Si">
+      <detector id="100" />
+    </group>
+    <group name="CdTe">
+      <detector id="200" />
+    </group>
+    <hit_pattern name="Si-Si" short_name="SS" bit="0">
+      <group name="Si" /><group name="Si" />
+    </hit_pattern>
+    <hit_pattern name="Si-CdTe" short_name="SC" bit="1">
+      <group name="Si" /><group name="CdTe" />
+    </hit_pattern>
+    <hit_pattern name="CdTe-CdTe" short_name="CC" bit="2">
+      <group name="CdTe" /><group name="CdTe" />
+    </hit_pattern>
+  </groups>
 </configuration>

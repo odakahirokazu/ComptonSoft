@@ -55,7 +55,7 @@ VRealDetectorUnit::VRealDetectorUnit()
     directionX_(1.0, 0.0, 0.0),
     directionY_(0.0, 1.0, 0.0),
     bottomSideElectrode_(ElectrodeSide::Undefined),
-    analysisMode_(1), clusteringOn_(true),
+    reconstructionMode_(1), clusteringOn_(true),
     channelMap_(nullptr)
 {
 }
@@ -89,8 +89,8 @@ vector3_t VRealDetectorUnit::LocalPosition(int pixelX, int pixelY) const
 {
   const vector3_t dirx(1.0, 0.0, 0.0);
   const vector3_t diry(0.0, 1.0, 0.0);
-  const vector3_t pos = centerPosition_
-    + (-0.5*sizeX_ + (offsetX_+(0.5+pixelX)*pixelPitchX_)) * dirx
+  const vector3_t pos =
+    (-0.5*sizeX_ + (offsetX_+(0.5+pixelX)*pixelPitchX_)) * dirx
     + (-0.5*sizeY_ + (offsetY_+(0.5+pixelY)*pixelPitchY_)) * diry;
   return pos;
 }
@@ -198,6 +198,11 @@ void VRealDetectorUnit::discriminateHits()
   auto it = detectorHits_.begin();
   while (it != detectorHits_.end()) {
     const int section = (*it)->DetectorChannelSection();
+    if (section==ChannelID::Undefined) {
+      ++it;
+      continue;
+    }
+
     const double energy = (*it)->EPI();
     const MultiChannelData* mcd = getMultiChannelData(section);
     const bool selected = mcd->discriminate(energy);
@@ -212,7 +217,7 @@ void VRealDetectorUnit::discriminateHits()
 
 void VRealDetectorUnit::reconstructHits()
 {
-  if (AnalysisMode() == 0) {
+  if (ReconstructionMode() == 0) {
     reconstructedHits_ = detectorHits_;
   }
   else {

@@ -12,9 +12,13 @@
 #endif
 #include "VANLPrimaryGen.hh"
 #include "BasicPrimaryGen.hh"
-#include "PlaneWavePrimaryGen.hh"
 #include "PointSourcePrimaryGen.hh"
+#include "PlaneWavePrimaryGen.hh"
+#include "PlaneWaveRectanglePrimaryGen.hh"
+#include "IsotropicPrimaryGen.hh"
 #include "PrimaryGenUniformSourceInVolume.hh"
+#include "NucleusPrimaryGen.hh"
+#include "NucleusPrimaryGenInVolume.hh"
 #include "VPickUpData.hh"
 #include "StandardPickUpData.hh"
 #ifdef USE_VIS
@@ -94,6 +98,13 @@ public:
   };
 
 
+class PointSourcePrimaryGen : public BasicPrimaryGen
+{
+public:
+  PointSourcePrimaryGen();
+};
+
+
 class PlaneWavePrimaryGen : public anlgeant4::BasicPrimaryGen
 {
 public:
@@ -101,10 +112,17 @@ public:
 };
 
 
-class PointSourcePrimaryGen : public BasicPrimaryGen
+class PlaneWaveRectanglePrimaryGen : public anlgeant4::PlaneWavePrimaryGen
 {
 public:
-  PointSourcePrimaryGen();
+  PlaneWaveRectanglePrimaryGen();
+};
+
+
+class IsotropicPrimaryGen : public anlgeant4::BasicPrimaryGen
+{
+public:
+  IsotropicPrimaryGen();
 };
 
 
@@ -113,6 +131,21 @@ class PrimaryGenUniformSourceInVolume : public PointSourcePrimaryGen
 public:
   PrimaryGenUniformSourceInVolume();
   ~PrimaryGenUniformSourceInVolume() = default;
+};
+
+
+class NucleusPrimaryGen : public anlgeant4::BasicPrimaryGen
+{
+public:
+  NucleusPrimaryGen();
+};
+
+
+class NucleusPrimaryGenInVolume : public NucleusPrimaryGen
+{
+public:
+  NucleusPrimaryGenInVolume();
+  virtual ~NucleusPrimaryGenInVolume() = default;
 };
 
 

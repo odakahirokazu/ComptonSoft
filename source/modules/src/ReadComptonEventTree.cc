@@ -45,6 +45,7 @@ ANLStatus ReadComptonEventTree::mod_startup()
 
 ANLStatus ReadComptonEventTree::mod_init()
 {
+  VCSModule::mod_init();
   EvsDef("EventReconstruction:OK");
   EvsDef("EventReconstruction:NG");
   initializeHitPatternData();
@@ -80,7 +81,7 @@ ANLStatus ReadComptonEventTree::mod_ana()
   if (entryIndex_ == numEntries_) {
     return AS_QUIT;
   }
-  
+
   cetree_->GetEntry(entryIndex_);
   
   const int64_t EventID = treeIO_->getEventID();
@@ -101,6 +102,8 @@ ANLStatus ReadComptonEventTree::mod_ana()
   BasicComptonEvent* event = new BasicComptonEvent;
   treeIO_->retrieveEvent(*event);
   resetComptonEvent(event);
+  resetHitPatternFlags();
+  retrieveHitPatterns();
   EvsSet("EventReconstruction:OK");
 
   ++entryIndex_;

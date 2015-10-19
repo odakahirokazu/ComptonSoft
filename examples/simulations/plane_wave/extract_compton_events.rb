@@ -9,10 +9,11 @@ class MyApp < ANL::ANLApp
     add_namespace ComptonSoft
 
     chain :CSHitCollection
+    chain :ConstructDetector
+    with_parameters(detector_configuration: "database/detector_configuration.xml",
+                    verbose_level: 1)
     chain :ReadHitTree
     with_parameters(file_list: @inputs)
-    chain :DetectorGroupManager
-    with_parameters(filename: "database/detector_group.txt")
     chain :EventReconstruction
     with_parameters(max_hits: 2,
                     source_distant: true,

@@ -28,13 +28,12 @@ namespace comptonsoft {
 
 class SetNoiseLevels : public VCSModule
 {
-  DEFINE_ANL_MODULE(SetNoiseLevels, 2.4);
+  DEFINE_ANL_MODULE(SetNoiseLevels, 2.5);
 public:
   SetNoiseLevels();
   ~SetNoiseLevels();
 
   anl::ANLStatus mod_startup();
-  anl::ANLStatus mod_com();
   anl::ANLStatus mod_init();
 
 private:
@@ -44,14 +43,20 @@ private:
   bool m_ByFile;
   std::string m_FileName;
   
-  std::map<std::string, std::tuple<int, double, double, double, double, double, double>> m_NoiseLevelMap;
+  std::map<std::string, std::tuple<int,
+                                   double, double, double,
+                                   double, double, double,
+                                   double, double, double>> m_NoiseLevelMap;
   int m_DetectorType;
-  double m_Noise00;
-  double m_Noise01;
-  double m_Noise02;
-  double m_Noise10;
-  double m_Noise11;
-  double m_Noise12;
+  double m_Noise0;
+  double m_Noise1;
+  double m_Noise2;
+  double m_CathodeNoise0;
+  double m_CathodeNoise1;
+  double m_CathodeNoise2;
+  double m_AnodeNoise0;
+  double m_AnodeNoise1;
+  double m_AnodeNoise2;
 };
 
 } /* namespace comptonsoft */

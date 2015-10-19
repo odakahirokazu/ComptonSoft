@@ -22,7 +22,7 @@
 
 #include "VCSModule.hh"
 #include <string>
-#include <list>
+#include <vector>
 
 namespace comptonsoft {
 
@@ -56,8 +56,8 @@ protected:
 private:
   int m_EventID;
   int m_Time;
-  std::list<std::string> m_FileList;
-  std::list<std::string>::const_iterator m_FileIterator;
+  std::vector<std::string> m_FileList;
+  std::vector<std::string>::const_iterator m_FileIterator;
 };
 
 } /* namespace comptonsoft */

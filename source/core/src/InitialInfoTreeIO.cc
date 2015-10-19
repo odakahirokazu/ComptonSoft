@@ -18,6 +18,7 @@
  *************************************************************************/
 
 #include "InitialInfoTreeIO.hh"
+#include "G4SystemOfUnits.hh"
 #include "TTree.h"
 #include "DetectorHit.hh"
 
@@ -65,6 +66,72 @@ void InitialInfoTreeIO::setBranchAddresses()
     tree_->SetBranchAddress("ini_polarz", &ini_polarz_);
     tree_->SetBranchAddress("weight",     &weight_);
   }
+}
+
+double InitialInfoTreeIO::getInitialEnergy() const
+{
+  return ini_energy_ * keV;
+}
+
+vector3_t InitialInfoTreeIO::getInitialDirection() const
+{
+  return vector3_t(ini_dirx_, ini_diry_, ini_dirz_);
+}
+
+double InitialInfoTreeIO::getInitialTime() const
+{
+  return ini_time_ * second;
+}
+
+vector3_t InitialInfoTreeIO::getInitialPosition() const
+{
+  return vector3_t(ini_posx_ * cm, ini_posy_ * cm, ini_posz_ * cm);
+}
+  
+vector3_t InitialInfoTreeIO::getInitialPolarization() const
+{
+  return vector3_t(ini_polarx_, ini_polary_, ini_polarz_);
+}
+
+double InitialInfoTreeIO::getWeight() const
+{
+  return weight_;
+}
+
+void InitialInfoTreeIO::setInitialEnergy(double v)
+{
+  ini_energy_ = v / keV;
+}
+
+void InitialInfoTreeIO::setInitialDirection(double x, double y, double z)
+{
+  ini_dirx_ = x;
+  ini_diry_ = y;
+  ini_dirz_ = z;
+}
+
+void InitialInfoTreeIO::setInitialTime(double v)
+{
+  ini_time_ = v / second;
+}
+
+void InitialInfoTreeIO::setInitialPosition(double x, double y, double z)
+{
+  ini_posx_ = x / cm;
+  ini_posy_ = y / cm;
+  ini_posz_ = z / cm;
+}
+  
+void InitialInfoTreeIO::setInitialPolarization(double x, double y, double z)
+{
+  ini_polarx_ = x;
+  ini_polary_ = y;
+  ini_polarz_ = z;
+}
+
+void InitialInfoTreeIO::setWeight(double v)
+{
+  weight_ = v;
 }
 
 } /* namespace comptonsoft */

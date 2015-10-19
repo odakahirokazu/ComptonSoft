@@ -37,10 +37,16 @@ namespace comptonsoft {
 class HitPattern
 {
 public:
+  HitPattern() = default;
+  ~HitPattern();
+  
   const std::string& Name() const { return name_; }
   const std::string& ShortName() const { return shortName_; }
   void setName(const std::string& v) { name_ = v; }
   void setShortName(const std::string& v) { shortName_ = v; }
+
+  unsigned int Bit() const { return bit_; }
+  void setBit(unsigned int bit) { bit_ = bit; }
   
   /**
    * add a detector group to this hit pattern.
@@ -68,6 +74,7 @@ public:
 private:
   std::string name_;
   std::string shortName_;
+  unsigned int bit_ = 0u;
   std::vector<DetectorGroup> groups_;
 };
 
