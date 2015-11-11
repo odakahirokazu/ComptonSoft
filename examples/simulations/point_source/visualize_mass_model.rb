@@ -17,7 +17,7 @@ def run_simulation(num, random, output)
     position: vec(0.0, 0.0, 10.0),
     direction: vec(0.0, 0.0, -1.0),
     theta_min: 0.0,
-    theta_max: 180.0*Math::PI/180.0,
+    theta_max: 10.0*Math::PI/180.0,
   }
 
   sim.visualize(mode: 'OGLSQt')

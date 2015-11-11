@@ -81,6 +81,12 @@
 #include "AssignG4CopyNumber.hh"
 #include "InitialParticleTree.hh"
 #include "DumpMass.hh"
+#ifdef USE_FITSIO
+#include "ReadSGDEventFITS.hh"
+#endif
+#ifdef USE_FITSIO
+#include "WriteSGDEventFITS.hh"
+#endif
 
 #include "class_list_anlGeant4.hh"
 #include "comptonsoft_basic_classes.hh"
@@ -652,5 +658,25 @@ public:
   ~DumpMass();
 };
 
+
+#ifdef USE_FITSIO
+class ReadSGDEventFITS : public VCSModule
+{
+public:
+  ReadSGDEventFITS();
+  ~ReadSGDEventFITS();
+};
+
+#endif
+
+#ifdef USE_FITSIO
+class WriteSGDEventFITS : public VCSModule
+{
+public:
+  WriteSGDEventFITS();
+  ~WriteSGDEventFITS();
+};
+
+#endif
 
 }

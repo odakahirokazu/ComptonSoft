@@ -44,11 +44,11 @@ public:
   EventFITSIOHelper();
   ~EventFITSIOHelper();
 
-  void createFITSFile(const std::string& filename);
+  bool createFITSFile(const std::string& filename);
   void initializeFITSTable(long int numberOfRows=0l);
   void fillEvent(const sgd::Event& event);
   
-  void openFITSFile(const std::string& filename);
+  bool openFITSFile(const std::string& filename);
   long int NumberOfRows();
   void restoreEvent(long int row, sgd::Event& event);
   std::shared_ptr<sgd::Event> getEvent(long int row);
@@ -66,7 +66,7 @@ private:
   std::array<uint32_t, 1> L32TI_;
   std::array<int32_t, 1> OCCURRENCE_ID_;
   std::array<uint32_t, 1> LOCAL_TIME_;
-  std::array<uint8_t, 1> Category_;
+  std::array<uint8_t, 1> CATEGORY_;
   std::array<uint8_t, 64> FLAGS_;
   std::array<uint8_t, 1> FLAG_LCHKMIO_;
   std::array<uint8_t, 3> FLAG_CCBUSY_;
@@ -90,15 +90,15 @@ private:
   std::array<uint8_t, TotalNumberOfASICs> ASIC_CHIP_;
   std::array<uint8_t, TotalNumberOfASICs> ASIC_TRIG_;
   std::array<uint8_t, TotalNumberOfASICs> ASIC_SEU_;
-  std::array<uint64_t, TotalNumberOfASICs> Readout_FLAG_;
-  std::array<int16_t, TotalNumberOfASICs> NUM_Readout_;
+  std::array<uint64_t, TotalNumberOfASICs> READOUT_FLAG_;
+  std::array<int16_t, TotalNumberOfASICs> NUM_READOUT_;
   std::array<int16_t, TotalNumberOfASICs> ASIC_REF_;
   std::array<int16_t, TotalNumberOfASICs> ASIC_CMN_;
 
   // SFF contents (readout channels)
-  std::array<int16_t, TotalNumberOfChannelsInCC> Readout_ASIC_ID_;
-  std::array<uint8_t, TotalNumberOfChannelsInCC> Readout_ID_;
-  std::array<int16_t, TotalNumberOfChannelsInCC> Readout_ID_RMAP_;
+  std::array<int16_t, TotalNumberOfChannelsInCC> READOUT_ASIC_ID_;
+  std::array<uint8_t, TotalNumberOfChannelsInCC> READOUT_ID_;
+  std::array<int16_t, TotalNumberOfChannelsInCC> READOUT_ID_RMAP_;
   std::array<int16_t, TotalNumberOfChannelsInCC> PHA_;
   std::array<float, TotalNumberOfChannelsInCC> EPI_;
 };
@@ -110,7 +110,7 @@ public:
   EventFITSWriter();
   ~EventFITSWriter();
 
-  void open(const std::string& filename);
+  bool open(const std::string& filename);
   void fillEvent(const sgd::Event& event);
   void close();
 
@@ -125,7 +125,7 @@ public:
   EventFITSReader();
   ~EventFITSReader();
 
-  void open(const std::string& filename);
+  bool open(const std::string& filename);
   long int NumberOfRows();
   void restoreEvent(long int row, sgd::Event& event);
   std::shared_ptr<sgd::Event> getEvent(long int row);

@@ -120,6 +120,7 @@ module ComptonSoft
     define_setup_module("primary_generator", take_parameters: true)
     define_setup_module("pickup_data", take_parameters: true)
     define_setup_module("visualization", :VisualizeG4Geom)
+    define_setup_module("fits_output", take_parameters: true)
 
     # alias methods
     alias :detector_config= :"detector_configuration="
@@ -268,6 +269,10 @@ module ComptonSoft
         end
       end
       chain_with_parameters module_of_pickup_data
+
+      if fits_output = module_of_fits_output
+        chain_with_parameters fits_output
+      end
 
       if vis = module_of_visualization
         chain_with_parameters vis

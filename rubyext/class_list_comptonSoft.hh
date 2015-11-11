@@ -68,4 +68,6 @@ class OutputSimXPrimaries;
 class AssignG4CopyNumber;
 class InitialParticleTree;
 class DumpMass;
+class ReadSGDEventFITS;
+class WriteSGDEventFITS;
 }

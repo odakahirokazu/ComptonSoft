@@ -43,7 +43,7 @@ void EventFITSIOHelper::fillEvent(const sgd::Event& event)
   L32TI_[0] = event.getL32TI();
   OCCURRENCE_ID_[0] = event.getOccurrenceID();
   LOCAL_TIME_[0] = event.getLocalTime();
-  Category_[0] = event.getCategory();
+  CATEGORY_[0] = event.getCategory();
   const uint64_t flags = event.getFlags().get();
   fillFlagArray(flags,  0, 64, FLAGS_.data());
   fillFlagArray(flags, 63,  1, FLAG_LCHKMIO_.data());
@@ -67,14 +67,14 @@ void EventFITSIOHelper::fillEvent(const sgd::Event& event)
   copyVectorToArray(event.getChipDataBitVector(), ASIC_CHIP_);
   copyVectorToArray(event.getTriggerVector(), ASIC_TRIG_);
   copyVectorToArray(event.getSEUVector(), ASIC_SEU_);
-  copyVectorToArray(event.getChannelDataBitVector(), Readout_FLAG_);
-  copyVectorToArray(event.getNumberOfHitChannelsVector(), NUM_Readout_);
+  copyVectorToArray(event.getChannelDataBitVector(), READOUT_FLAG_);
+  copyVectorToArray(event.getNumberOfHitChannelsVector(), NUM_READOUT_);
   copyVectorToArray(event.getReferenceLevelVector(), ASIC_REF_);
   copyVectorToArray(event.getCommonModeNoiseVector(), ASIC_CMN_);
   
-  copyVectorToArray(event.getReadoutASICIDVector(), Readout_ASIC_ID_);
-  copyVectorToArray(event.getReadoutChannelIDVector(), Readout_ID_);
-  copyVectorToArray(event.getReadoutChannelIDRemappedVector(), Readout_ID_RMAP_);
+  copyVectorToArray(event.getReadoutASICIDVector(), READOUT_ASIC_ID_);
+  copyVectorToArray(event.getReadoutChannelIDVector(), READOUT_ID_);
+  copyVectorToArray(event.getReadoutChannelIDRemappedVector(), READOUT_ID_RMAP_);
   copyVectorToArray(event.getPHAVector(), PHA_);
   copyVectorToArray(event.getEPIVector(), EPI_);
 
@@ -88,7 +88,7 @@ void EventFITSIOHelper::fillEvent(const sgd::Event& event)
   fits_write_col(fits, TUINT,     4, row, elem,  1, L32TI_.data(),          &status);
   fits_write_col(fits, TINT32BIT, 5, row, elem,  1, OCCURRENCE_ID_.data(),  &status);
   fits_write_col(fits, TUINT,     6, row, elem,  1, LOCAL_TIME_.data(),     &status);
-  fits_write_col(fits, TBYTE,     7, row, elem,  1, Category_.data(),       &status);
+  fits_write_col(fits, TBYTE,     7, row, elem,  1, CATEGORY_.data(),       &status);
   fits_write_col(fits, TBIT,      8, row, elem, 64, FLAGS_.data(),          &status);
   fits_write_col(fits, TBIT,      9, row, elem,  1, FLAG_LCHKMIO_.data(),   &status);
   fits_write_col(fits, TBIT,     10, row, elem,  3, FLAG_CCBUSY_.data(),    &status);
@@ -115,15 +115,15 @@ void EventFITSIOHelper::fillEvent(const sgd::Event& event)
   fits_write_col(fits, TBYTE,     26, row, elem, ASICDataLength, ASIC_CHIP_.data(),    &status);
   fits_write_col(fits, TBYTE,     27, row, elem, ASICDataLength, ASIC_TRIG_.data(),    &status);
   fits_write_col(fits, TBYTE,     28, row, elem, ASICDataLength, ASIC_SEU_.data(),     &status);
-  fits_write_col(fits, TLONGLONG, 29, row, elem, ASICDataLength, Readout_FLAG_.data(), &status);
-  fits_write_col(fits, TSHORT,    30, row, elem, ASICDataLength, NUM_Readout_.data(),  &status);
+  fits_write_col(fits, TLONGLONG, 29, row, elem, ASICDataLength, READOUT_FLAG_.data(), &status);
+  fits_write_col(fits, TSHORT,    30, row, elem, ASICDataLength, NUM_READOUT_.data(),  &status);
   fits_write_col(fits, TSHORT,    31, row, elem, ASICDataLength, ASIC_REF_.data(),     &status);
   fits_write_col(fits, TSHORT,    32, row, elem, ASICDataLength, ASIC_CMN_.data(),     &status);
 
   const std::size_t ReadoutDataLength = event.LengthOfReadoutData();
-  fits_write_col(fits, TSHORT,   33, row, elem, ReadoutDataLength, Readout_ASIC_ID_.data(), &status);
-  fits_write_col(fits, TBYTE,    34, row, elem, ReadoutDataLength, Readout_ID_.data(),      &status);
-  fits_write_col(fits, TSHORT,   35, row, elem, ReadoutDataLength, Readout_ID_RMAP_.data(), &status);
+  fits_write_col(fits, TSHORT,   33, row, elem, ReadoutDataLength, READOUT_ASIC_ID_.data(), &status);
+  fits_write_col(fits, TBYTE,    34, row, elem, ReadoutDataLength, READOUT_ID_.data(),      &status);
+  fits_write_col(fits, TSHORT,   35, row, elem, ReadoutDataLength, READOUT_ID_RMAP_.data(), &status);
   fits_write_col(fits, TSHORT,   36, row, elem, ReadoutDataLength, PHA_.data(),             &status);
   fits_write_col(fits, TFLOAT,   37, row, elem, ReadoutDataLength, EPI_.data(),             &status);
 
@@ -143,7 +143,7 @@ void EventFITSIOHelper::restoreEvent(long int row, sgd::Event& event)
   fits_read_col(fits, TUINT,     4, row, elem,  1, NULL, L32TI_.data(),         &anynul, &status);
   fits_read_col(fits, TINT32BIT, 5, row, elem,  1, NULL, OCCURRENCE_ID_.data(), &anynul, &status);
   fits_read_col(fits, TUINT,     6, row, elem,  1, NULL, LOCAL_TIME_.data(),    &anynul, &status);
-  fits_read_col(fits, TBYTE,     7, row, elem,  1, NULL, Category_.data(),      &anynul, &status);
+  fits_read_col(fits, TBYTE,     7, row, elem,  1, NULL, CATEGORY_.data(),      &anynul, &status);
   fits_read_col(fits, TBIT,      8, row, elem, 64, NULL, FLAGS_.data(),         &anynul, &status);
   fits_read_col(fits, TUINT,    19, row, elem,  1, NULL, LIVETIME_.data(),      &anynul, &status);
   fits_read_col(fits, TBYTE,    20, row, elem,  1, NULL, NUM_ASIC_.data(),      &anynul, &status);
@@ -162,16 +162,16 @@ void EventFITSIOHelper::restoreEvent(long int row, sgd::Event& event)
   fits_read_col(fits, TBYTE,     26, row, elem, ASICDataLength, NULL, ASIC_CHIP_.data(),    &anynul, &status);
   fits_read_col(fits, TBYTE,     27, row, elem, ASICDataLength, NULL, ASIC_TRIG_.data(),    &anynul, &status);
   fits_read_col(fits, TBYTE,     28, row, elem, ASICDataLength, NULL, ASIC_SEU_.data(),     &anynul, &status);
-  fits_read_col(fits, TLONGLONG, 29, row, elem, ASICDataLength, NULL, Readout_FLAG_.data(), &anynul, &status);
-  fits_read_col(fits, TSHORT,    30, row, elem, ASICDataLength, NULL, NUM_Readout_.data(),  &anynul, &status);
+  fits_read_col(fits, TLONGLONG, 29, row, elem, ASICDataLength, NULL, READOUT_FLAG_.data(), &anynul, &status);
+  fits_read_col(fits, TSHORT,    30, row, elem, ASICDataLength, NULL, NUM_READOUT_.data(),  &anynul, &status);
   fits_read_col(fits, TSHORT,    31, row, elem, ASICDataLength, NULL, ASIC_REF_.data(),     &anynul, &status);
   fits_read_col(fits, TSHORT,    32, row, elem, ASICDataLength, NULL, ASIC_CMN_.data(),     &anynul, &status);
   
   long int ReadoutDataLength(0), ReadoutDataOffset(0);
   fits_read_descript(fits, 33, row, &ReadoutDataLength, &ReadoutDataOffset, &status);
-  fits_read_col(fits, TSHORT,   33, row, elem, ReadoutDataLength, NULL, Readout_ASIC_ID_.data(), &anynul, &status);
-  fits_read_col(fits, TBYTE,    34, row, elem, ReadoutDataLength, NULL, Readout_ID_.data(),       &anynul, &status);
-  fits_read_col(fits, TSHORT,   35, row, elem, ReadoutDataLength, NULL, Readout_ID_RMAP_.data(), &anynul, &status);
+  fits_read_col(fits, TSHORT,   33, row, elem, ReadoutDataLength, NULL, READOUT_ASIC_ID_.data(), &anynul, &status);
+  fits_read_col(fits, TBYTE,    34, row, elem, ReadoutDataLength, NULL, READOUT_ID_.data(),       &anynul, &status);
+  fits_read_col(fits, TSHORT,   35, row, elem, ReadoutDataLength, NULL, READOUT_ID_RMAP_.data(), &anynul, &status);
   fits_read_col(fits, TSHORT,   36, row, elem, ReadoutDataLength, NULL, PHA_.data(),             &anynul, &status);
   fits_read_col(fits, TFLOAT,   37, row, elem, ReadoutDataLength, NULL, EPI_.data(),             &anynul, &status);
   
@@ -181,7 +181,7 @@ void EventFITSIOHelper::restoreEvent(long int row, sgd::Event& event)
   event.setL32TI(L32TI_[0]);
   event.setOccurrenceID(OCCURRENCE_ID_[0]);
   event.setLocalTime(LOCAL_TIME_[0]);
-  event.setCategory(Category_[0]);
+  event.setCategory(CATEGORY_[0]);
   event.setFlags(convertFlags(FLAGS_.data()));
   event.setLiveTime(LIVETIME_[0]);
   event.setNumberOfHitASICs(NUM_ASIC_[0]);
@@ -198,8 +198,8 @@ void EventFITSIOHelper::restoreEvent(long int row, sgd::Event& event)
     const uint8_t chipDataBit = ASIC_CHIP_[i];
     const uint8_t trigger = ASIC_TRIG_[i];
     const uint8_t SEU = ASIC_SEU_[i];
-    const uint64_t channelDataBit = Readout_FLAG_[i];
-    const int16_t numberOfHitChannels = NUM_Readout_[i];
+    const uint64_t channelDataBit = READOUT_FLAG_[i];
+    const int16_t numberOfHitChannels = NUM_READOUT_[i];
     const int16_t referenceLevel = ASIC_REF_[i];
     const int16_t commonModeNoise = ASIC_CMN_[i];
     event.pushASICData(ASIC_ID,
@@ -216,9 +216,9 @@ void EventFITSIOHelper::restoreEvent(long int row, sgd::Event& event)
   const int NumReadouts = ReadoutDataLength;
   event.reserveReadoutData(NumReadouts);
   for (int i=0; i<NumReadouts; i++) {
-    const int16_t ASIC_ID = Readout_ASIC_ID_[i];
-    const uint8_t channelID = Readout_ID_[i];
-    const int16_t channelID_remapped = Readout_ID_RMAP_[i];
+    const int16_t ASIC_ID = READOUT_ASIC_ID_[i];
+    const uint8_t channelID = READOUT_ID_[i];
+    const int16_t channelID_remapped = READOUT_ID_RMAP_[i];
     const int16_t PHA = PHA_[i];
     const float EPI = EPI_[i];
     event.pushReadoutData(ASIC_ID,
@@ -236,11 +236,13 @@ std::shared_ptr<sgd::Event> EventFITSIOHelper::getEvent(long int row)
   return event;
 }
 
-void EventFITSIOHelper::createFITSFile(const std::string& filename)
+bool EventFITSIOHelper::createFITSFile(const std::string& filename)
 {
   int fitsStatus = 0;
   fits_create_file(&fitsFile_, filename.c_str(), &fitsStatus);
-  // fits_report_error(stderr, fitsStatus);
+  fits_report_error(stderr, fitsStatus);
+  if (fitsStatus != 0) { return false; }
+  return true;
 }
 
 void EventFITSIOHelper::initializeFITSTable(long int numberOfRows)
@@ -250,7 +252,7 @@ void EventFITSIOHelper::initializeFITSTable(long int numberOfRows)
   long naxis = 1;
   long naxes[1] = { 0 };
   fits_create_img(fitsFile_, USHORT_IMG, naxis, naxes, &fitsStatus);
-  // fits_report_error(stderr, fitsStatus);
+  fits_report_error(stderr, fitsStatus);
   
   const int NumColumns = 37;
   const int TableType = BINARY_TBL;
@@ -263,7 +265,7 @@ void EventFITSIOHelper::initializeFITSTable(long int numberOfRows)
     (char*) "L32TI",           //  4
     (char*) "OCCURRENCE_ID",   //  5
     (char*) "LOCAL_TIME",      //  6
-    (char*) "Category",        //  7
+    (char*) "CATEGORY",        //  7
     (char*) "FLAGS",           //  8
     (char*) "FLAG_LCHKMIO",    //  9
     (char*) "FLAG_CCBUSY",     // 10
@@ -285,13 +287,13 @@ void EventFITSIOHelper::initializeFITSTable(long int numberOfRows)
     (char*) "ASIC_CHIP",       // 26
     (char*) "ASIC_TRIG",       // 27
     (char*) "ASIC_SEU",        // 28
-    (char*) "Readout_FLAG",    // 29
-    (char*) "NUM_Readout",     // 30
+    (char*) "READOUT_FLAG",    // 29
+    (char*) "NUM_READOUT",     // 30
     (char*) "ASIC_REF",        // 31
     (char*) "ASIC_CMN",        // 32
-    (char*) "Readout_ASIC_ID", // 33
-    (char*) "Readout_ID",      // 34
-    (char*) "Readout_ID_RMAP", // 35
+    (char*) "READOUT_ASIC_ID", // 33
+    (char*) "READOUT_ID",      // 34
+    (char*) "READOUT_ID_RMAP", // 35
     (char*) "PHA",             // 36
     (char*) "EPI",             // 37
   };
@@ -303,7 +305,7 @@ void EventFITSIOHelper::initializeFITSTable(long int numberOfRows)
     (char*) "1V", /* L32TI */
     (char*) "1J", /* OCCURRENCE_ID */
     (char*) "1V", /* LOCAL_TIME */
-    (char*) "1B", /* Category */
+    (char*) "1B", /* CATEGORY */
     (char*) "64X", /* FLAGS */
     (char*) "1X", /* FLAG_LCHKMIO */
     (char*) "3X", /* FLAG_CCBUSY */
@@ -325,13 +327,13 @@ void EventFITSIOHelper::initializeFITSTable(long int numberOfRows)
     (char*) "1PX(208)", /* ASIC_CHIP */
     (char*) "1PX(208)", /* ASIC_TRIG */
     (char*) "1PX(208)", /* ASIC_SEU */
-    (char*) "1PK(208)", /* Readout_FLAG */
-    (char*) "1PI(208)", /* NUM_Readout */
+    (char*) "1PK(208)", /* READOUT_FLAG */
+    (char*) "1PI(208)", /* NUM_READOUT */
     (char*) "1PI(208)", /* ASIC_REF */
     (char*) "1PI(208)", /* ASIC_CMN */
-    (char*) "1PI(13312)", /* Readout_ASIC_ID */
-    (char*) "1PB(13312)", /* Readout_ID */
-    (char*) "1PI(13312)", /* Readout_ID_RMAP */
+    (char*) "1PI(13312)", /* READOUT_ASIC_ID */
+    (char*) "1PB(13312)", /* READOUT_ID */
+    (char*) "1PI(13312)", /* READOUT_ID_RMAP */
     (char*) "1PI(13312)", /* PHA */
     (char*) "1PE(13312)", /* EPI */
   };
@@ -378,11 +380,11 @@ void EventFITSIOHelper::initializeFITSTable(long int numberOfRows)
   
   char extname[] = "EVENTS";
   fits_create_tbl(fitsFile_, TableType, numberOfRows, tfields, ttype, tform, tunit, extname, &fitsStatus);
-  // fits_report_error(stderr, fitsStatus);
+  fits_report_error(stderr, fitsStatus);
 
   // Move to the table HDU.
   fits_movabs_hdu(fitsFile_, 2, NULL, &fitsStatus);
-  // fits_report_error(stderr, fitsStatus);
+  fits_report_error(stderr, fitsStatus);
   
 #define FILL_FITS_HEADER_ 0
 #if FILL_FITS_HEADER_
@@ -408,18 +410,20 @@ void EventFITSIOHelper::initializeFITSTable(long int numberOfRows)
 #endif /* FILL_FITS_HEADER_ */
 }
 
-void EventFITSIOHelper::openFITSFile(const std::string& filename)
+bool EventFITSIOHelper::openFITSFile(const std::string& filename)
 {
   int fitsStatus = 0;
   fits_open_table(&fitsFile_, filename.c_str(), READONLY, &fitsStatus);
-  // fits_report_error(stderr, fitsStatus);
+  fits_report_error(stderr, fitsStatus);
+  if (fitsStatus != 0) { return false; }
+  return true;
 }
 
 long int EventFITSIOHelper::NumberOfRows()
 {
   long nrows = 0;
-  int status = 0;
-  fits_get_num_rows(fitsFile_, &nrows, &status);
+  int fitsStatus = 0;
+  fits_get_num_rows(fitsFile_, &nrows, &fitsStatus);
   return nrows;
 }
 
@@ -427,7 +431,7 @@ void EventFITSIOHelper::closeFITSFile()
 {
   int status = 0;
   fits_close_file(fitsFile_, &status);
-  // fits_report_error(stderr, fitsStatus);
+  fits_report_error(stderr, status);
 }
 
 /********************************
@@ -440,10 +444,13 @@ EventFITSWriter::EventFITSWriter()
   
 EventFITSWriter::~EventFITSWriter() = default;
 
-void EventFITSWriter::open(const std::string& filename)
+bool EventFITSWriter::open(const std::string& filename)
 {
-  io_->createFITSFile(filename);
+  bool status = true;
+  status = io_->createFITSFile(filename);
+  if (!status) { return status; }
   io_->initializeFITSTable();
+  return status;
 }
 
 void EventFITSWriter::fillEvent(const sgd::Event& event)
@@ -468,9 +475,9 @@ EventFITSReader::EventFITSReader()
 
 EventFITSReader::~EventFITSReader() = default;
 
-void EventFITSReader::open(const std::string& filename)
+bool EventFITSReader::open(const std::string& filename)
 {
-  io_->openFITSFile(filename);
+  return io_->openFITSFile(filename);
 }
 
 long int EventFITSReader::NumberOfRows()

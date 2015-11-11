@@ -623,7 +623,7 @@ bool DetectorSystem::loadDeviceSimulationParam(const std::string& type,
     boost::optional<std::string> mapName = ParamNode.get_optional<std::string>("charge_collection.<xmlattr>.map");
     if ( mapName ) {
       ds.setCCEMapName(*mapName);
-      if (type=="Detector2DPixel") {
+      if (type=="2DPixel") {
         SimDetectorUnit2DPixel& dstmp = dynamic_cast<SimDetectorUnit2DPixel&>(ds);
         TH3D* cce_map = (TH3D*)(CCEMapFile_->Get(mapName->c_str()));
         dstmp.setCCEMap(cce_map);

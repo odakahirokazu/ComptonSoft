@@ -7,6 +7,7 @@ set(RUBY_EXT_INCLUDE_DIRS
   ../source/core/include
   ../source/modules/include
   ../source/simulation/include
+  ../source/astroh/include
   ${ANLG4_INC_DIR}
   ${ANLNEXT_INC_DIR}
   ${ROOT_INC_DIR}
@@ -31,6 +32,7 @@ set(RUBY_EXT_LIBRARIES
   CSSimulation
   CSModules
   CSCore
+  CSAstroH
   ${ANLG4_LIB}
   ${ANLNEXT_LIB}
   ${ROOT_LIB}
@@ -42,6 +44,9 @@ set(RUBY_EXT_LIBRARIES
 set(cxx_definitions )
 if(CS_USE_SIMX)
   list(APPEND cxx_definitions -DUSE_SIMX)
+endif()
+if(CS_USE_FITSIO)
+  list(APPEND cxx_definitions -DUSE_FITSIO)
 endif()
 
 set(SWIG_FLAGS ${cxx_definitions})

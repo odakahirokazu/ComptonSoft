@@ -7,6 +7,7 @@
  * @date 2013-09-xx | K. Hayashi, S. Sakurai | create
  * @date 2014-09-03 | H. Odaka | Modify. Add setters taking rvalue references.
  * @date 2015-07-07 | H. Odaka | Review and all methods are redefined.
+ * @date 2015-10-28 | H. Odaka | All column names are capitalized.
  *
  */
 
@@ -111,7 +112,7 @@ public:
     L32TI_ = 0;
     OCCURRENCE_ID_ = 0;
     LOCAL_TIME_ = 0;
-    Category_ = 0;
+    CATEGORY_ = 0;
     FLAGS_.set(0ul);
     LIVETIME_ = 0;
     NUM_ASIC_ = 0;
@@ -145,8 +146,8 @@ public:
   void setLocalTime(uint32_t v) { LOCAL_TIME_ = v; }
   uint32_t getLocalTime() const { return LOCAL_TIME_; }
 
-  void setCategory(uint8_t v) { Category_ = v; }
-  uint8_t getCategory() const { return Category_; }
+  void setCategory(uint8_t v) { CATEGORY_ = v; }
+  uint8_t getCategory() const { return CATEGORY_; }
 
   void setFlags(EventFlags v) { FLAGS_ = v; }
   void setFlags(uint64_t v) { FLAGS_.set(v); }
@@ -187,8 +188,8 @@ public:
     ASIC_CHIP_.push_back(chipDataBit);
     ASIC_TRIG_.push_back(trigger);
     ASIC_SEU_.push_back(SEU);
-    Readout_FLAG_.push_back(channelDataBit);
-    NUM_Readout_.push_back(numberOfHitChannels);
+    READOUT_FLAG_.push_back(channelDataBit);
+    NUM_READOUT_.push_back(numberOfHitChannels);
     ASIC_REF_.push_back(referenceLevel);
     ASIC_CMN_.push_back(commonModeNoise);
   }
@@ -200,8 +201,8 @@ public:
     ASIC_CHIP_.clear();
     ASIC_TRIG_.clear();
     ASIC_SEU_.clear();
-    Readout_FLAG_.clear();
-    NUM_Readout_.clear();
+    READOUT_FLAG_.clear();
+    NUM_READOUT_.clear();
     ASIC_REF_.clear();
     ASIC_CMN_.clear();
   }
@@ -213,8 +214,8 @@ public:
     ASIC_CHIP_.reserve(size);
     ASIC_TRIG_.reserve(size);
     ASIC_SEU_.reserve(size);
-    Readout_FLAG_.reserve(size);
-    NUM_Readout_.reserve(size);
+    READOUT_FLAG_.reserve(size);
+    NUM_READOUT_.reserve(size);
     ASIC_REF_.reserve(size);
     ASIC_CMN_.reserve(size);
   }
@@ -240,10 +241,10 @@ public:
   { return ASIC_SEU_; }
 
   const std::vector<uint64_t>& getChannelDataBitVector() const
-  { return Readout_FLAG_; }
+  { return READOUT_FLAG_; }
 
   const std::vector<int16_t>& getNumberOfHitChannelsVector() const
-  { return NUM_Readout_; }
+  { return NUM_READOUT_; }
   
   const std::vector<int16_t>& getReferenceLevelVector() const
   { return ASIC_REF_; }
@@ -258,44 +259,44 @@ public:
                        int16_t PHA,
                        float EPI)
   {
-    Readout_ASIC_ID_.push_back(ASIC_ID);
-    Readout_ID_.push_back(channelID);
-    Readout_ID_RMAP_.push_back(channelID_remapped);
+    READOUT_ASIC_ID_.push_back(ASIC_ID);
+    READOUT_ID_.push_back(channelID);
+    READOUT_ID_RMAP_.push_back(channelID_remapped);
     PHA_.push_back(PHA);
     EPI_.push_back(EPI); 
   }
     
   void clearReadoutData()
   {
-    Readout_ASIC_ID_.clear();
-    Readout_ID_.clear();
-    Readout_ID_RMAP_.clear();
+    READOUT_ASIC_ID_.clear();
+    READOUT_ID_.clear();
+    READOUT_ID_RMAP_.clear();
     PHA_.clear();
     EPI_.clear();
   }
     
   void reserveReadoutData(std::size_t size)
   {
-    Readout_ASIC_ID_.reserve(size);
-    Readout_ID_.reserve(size);
-    Readout_ID_RMAP_.reserve(size);
+    READOUT_ASIC_ID_.reserve(size);
+    READOUT_ID_.reserve(size);
+    READOUT_ID_RMAP_.reserve(size);
     PHA_.reserve(size);
     EPI_.reserve(size);
   }
 
   std::size_t LengthOfReadoutData() const
   {
-    return Readout_ASIC_ID_.size();
+    return READOUT_ASIC_ID_.size();
   }
 
   const std::vector<int16_t>& getReadoutASICIDVector() const
-  { return Readout_ASIC_ID_; }
+  { return READOUT_ASIC_ID_; }
   
   const std::vector<uint8_t>& getReadoutChannelIDVector() const
-  { return Readout_ID_; }
+  { return READOUT_ID_; }
   
   const std::vector<int16_t>& getReadoutChannelIDRemappedVector() const
-  { return Readout_ID_RMAP_; }
+  { return READOUT_ID_RMAP_; }
 
   const std::vector<int16_t>& getPHAVector() const
   { return PHA_; }
@@ -321,7 +322,7 @@ public:
     os << "LOCAL_TIME :      " << LOCAL_TIME_ << '\n';
     
     os << std::hex;
-    os << "Category :        " << static_cast<int>(Category_) << '\n';
+    os << "CATEGORY :        " << static_cast<int>(CATEGORY_) << '\n';
     os << "FLAGS :           " << FLAGS_.get() << '\n';
     os << "FLAG_LCHKMIO :    " << static_cast<int>(FLAGS_.getLengthCheckMIO()) << '\n';
     os << "FLAG_CCBUSY :     " << static_cast<int>(FLAGS_.getCCBusy()) << '\n';
@@ -357,19 +358,19 @@ public:
     os << "ASIC_SEU :        " ;
     for (auto a: ASIC_SEU_) os << static_cast<int>(a) << " ";
     os << '\n';
-    os << "Readout_FLAG :    " ;
+    os << "READOUT_FLAG :    " ;
     if (displayReadoutFlagSigned_) {
-      for (auto a: Readout_FLAG_) os << static_cast<int64_t>(a) << " ";
+      for (auto a: READOUT_FLAG_) os << static_cast<int64_t>(a) << " ";
     }
     else {
       os << std::hex;
-      for (auto a: Readout_FLAG_) os << a << " ";
+      for (auto a: READOUT_FLAG_) os << a << " ";
     }
     os << '\n';
 
     os << std::dec;
-    os << "NUM_Readout :     " ;
-    for (auto a: NUM_Readout_) os << static_cast<int>(a) << " ";
+    os << "NUM_READOUT :     " ;
+    for (auto a: NUM_READOUT_) os << static_cast<int>(a) << " ";
     os << '\n';
     os << "ASIC_REF :        " ;
     for (auto a: ASIC_REF_) os << static_cast<int>(a) << " ";
@@ -377,14 +378,14 @@ public:
     os << "ASIC_CMN :        " ;
     for (auto a: ASIC_CMN_) os << static_cast<int>(a) << " ";
     os << '\n';
-    os << "Readout_ASIC_ID : " ;
-    for (auto a: Readout_ASIC_ID_) os << static_cast<int>(a) << " ";
+    os << "READOUT_ASIC_ID : " ;
+    for (auto a: READOUT_ASIC_ID_) os << static_cast<int>(a) << " ";
     os << '\n';
-    os << "Readout_ID :      " ;
-    for (auto a: Readout_ID_) os << static_cast<int>(a) << " ";
+    os << "READOUT_ID :      " ;
+    for (auto a: READOUT_ID_) os << static_cast<int>(a) << " ";
     os << '\n';
-    os << "Readout_ID_RMAP : " ;
-    for (auto a: Readout_ID_RMAP_) os << static_cast<int>(a) << " ";
+    os << "READOUT_ID_RMAP : " ;
+    for (auto a: READOUT_ID_RMAP_) os << static_cast<int>(a) << " ";
     os << '\n';
     os << "PHA :             " ;
     for (auto a: PHA_) os << a << " ";
@@ -404,7 +405,7 @@ private:
   uint32_t L32TI_ = 0;
   int32_t OCCURRENCE_ID_ = 0;
   uint32_t LOCAL_TIME_ = 0;
-  uint8_t Category_ = 0;
+  uint8_t CATEGORY_ = 0;
   EventFlags FLAGS_;
   uint32_t LIVETIME_ = 0;
   uint8_t NUM_ASIC_ = 0;
@@ -418,15 +419,15 @@ private:
   std::vector<uint8_t> ASIC_CHIP_;
   std::vector<uint8_t> ASIC_TRIG_;
   std::vector<uint8_t> ASIC_SEU_;
-  std::vector<uint64_t> Readout_FLAG_;
-  std::vector<int16_t> NUM_Readout_;
+  std::vector<uint64_t> READOUT_FLAG_;
+  std::vector<int16_t> NUM_READOUT_;
   std::vector<int16_t> ASIC_REF_;
   std::vector<int16_t> ASIC_CMN_;
 
   // SFF contents (readout channels)
-  std::vector<int16_t> Readout_ASIC_ID_;
-  std::vector<uint8_t> Readout_ID_;
-  std::vector<int16_t> Readout_ID_RMAP_;
+  std::vector<int16_t> READOUT_ASIC_ID_;
+  std::vector<uint8_t> READOUT_ID_;
+  std::vector<int16_t> READOUT_ID_RMAP_;
   std::vector<int16_t> PHA_;
   std::vector<float> EPI_;
 

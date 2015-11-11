@@ -31,7 +31,7 @@ end
 
 ### main ###
 
-num = 1000000
+num = 100000
 run_id = 0
 output = "simulation_%03d.root" % run_id
 random = run_id

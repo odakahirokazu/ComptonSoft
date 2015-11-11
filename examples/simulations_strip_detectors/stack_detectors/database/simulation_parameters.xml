@@ -39,7 +39,7 @@
       <simulation_param_common>
         <upside_anode set="0" />
         <upside_xstrip set="1" />
-        <charge_collection mode="2">
+        <charge_collection mode="3">
           <bias>500.0</bias>
           <efield mode="1" />
           <mutau_electron>1.0e-2</mutau_electron>
@@ -55,7 +55,7 @@
         <detector id="201" path="CdTeDetector1"><simulation_param></simulation_param></detector>
         <detector id="202" path="CdTeDetector2">
           <simulation_param>
-            <charge_collection mode="2">
+            <charge_collection mode="3">
               <bias>250.0</bias>
             </charge_collection>
           </simulation_param>

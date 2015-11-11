@@ -38,6 +38,7 @@ if(CS_USE_FITSIO)
   set(CS_ASTROH_FITSIO_CLASSES
     src/SGDEventFITS.cc
     src/ReadSGDEventFITS.cc
+    src/WriteSGDEventFITS.cc
     )
 endif()
 

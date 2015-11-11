@@ -17,41 +17,42 @@
  *                                                                       *
  *************************************************************************/
 
-#ifndef COMPTONSOFT_ReadSGDEventFITS_H
-#define COMPTONSOFT_ReadSGDEventFITS_H 1
+#ifndef COMPTONSOFT_WriteSGDEventFITS_H
+#define COMPTONSOFT_WriteSGDEventFITS_H 1
 
 #include "VCSModule.hh"
-#include "InitialInformation.hh"
 #include <memory>
 #include "SGDEventFITS.hh"
 
 namespace comptonsoft {
 
+class CSHitCollection;
+
 /**
  * ANL module to read SGD event ROOT files.
  *
  * @author Hirokazu Odaka
- * @date 2014-09-05
+ * @date 2015-10-28
  */
-class ReadSGDEventFITS : public VCSModule, public anlgeant4::InitialInformation
+class WriteSGDEventFITS : public VCSModule
 {
-  DEFINE_ANL_MODULE(ReadSGDEventFITS, 0.0);
+  DEFINE_ANL_MODULE(WriteSGDEventFITS, 0.0);
 public:
-  ReadSGDEventFITS();
-  ~ReadSGDEventFITS();
+  WriteSGDEventFITS();
+  ~WriteSGDEventFITS();
   
   anl::ANLStatus mod_startup();
   anl::ANLStatus mod_init();
   anl::ANLStatus mod_ana();
+  anl::ANLStatus mod_exit();
   
 private:
   std::string m_Filename;
 
-  std::unique_ptr<astroh::sgd::EventFITSReader> m_EventReader;
-  Long64_t m_NumEvents;
-  Long64_t m_Index;
+  const CSHitCollection* m_HitCollection;
+  std::unique_ptr<astroh::sgd::EventFITSWriter> m_EventWriter;
 };
 
 } /* namespace comptonsoft */
 
-#endif /* COMPTONSOFT_ReadSGDEventFITS_H */
+#endif /* COMPTONSOFT_WriteSGDEventFITS_H */

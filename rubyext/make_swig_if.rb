@@ -83,10 +83,17 @@ clSim = [# primary generator
   ANL::SWIGClass.new("DumpMass"),
 ]
 
-classList = clMod + clSim
+clAH = [
+  ANL::SWIGClass.new("ReadSGDEventFITS", false, 'USE_FITSIO'),
+  ANL::SWIGClass.new("WriteSGDEventFITS", false, 'USE_FITSIO'),
+]
+
+classList = clMod + clSim + clAH
 classList.each{|s|
   s.include_path = ["../source/modules/include",
-                    "../source/simulation/include"]
+    "../source/simulation/include",
+    "../source/astroh/include",
+  ]
 }
 
 m = ANL::SWIGModule.new(name, classList, namespace)
