@@ -132,7 +132,7 @@ module ComptonSoft
       @detector_info_verbose_level = level
     end
 
-    # Enable detector info print
+    # Enable event tree output instead of hit tree
     def use_event_tree(v=true)
       @event_tree_enabled = v
     end

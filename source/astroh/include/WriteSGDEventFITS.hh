@@ -24,6 +24,10 @@
 #include <memory>
 #include "SGDEventFITS.hh"
 
+namespace anlgeant4 {
+class InitialInformation;
+}
+
 namespace comptonsoft {
 
 class CSHitCollection;
@@ -50,6 +54,7 @@ private:
   std::string m_Filename;
 
   const CSHitCollection* m_HitCollection;
+  const anlgeant4::InitialInformation* m_InitialInfo;
   std::unique_ptr<astroh::sgd::EventFITSWriter> m_EventWriter;
 };
 

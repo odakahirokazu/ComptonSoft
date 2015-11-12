@@ -67,9 +67,10 @@ ANLStatus WriteEventTree::mod_init()
 
 ANLStatus WriteEventTree::mod_ana()
 {
-  const int64_t eventID = hitCollection_->EventID();
-
+  int64_t eventID = -1;
+  
   if (initialInfo_) {
+    eventID = initialInfo_->EventID();
     treeIO_->setInitialInfo(initialInfo_->InitialEnergy(),
                             initialInfo_->InitialDirection(),
                             initialInfo_->InitialTime(),
@@ -77,7 +78,10 @@ ANLStatus WriteEventTree::mod_ana()
                             initialInfo_->InitialPolarization());
     treeIO_->setWeight(initialInfo_->Weight());
   }
-  
+  else {
+    eventID = get_event_loop_index();
+  }
+
   const int NumTimeGroups = hitCollection_->NumberOfTimeGroups();
   for (int timeGroup=0; timeGroup<NumTimeGroups; timeGroup++) {
     const std::vector<DetectorHit_sptr>& hits

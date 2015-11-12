@@ -18,18 +18,17 @@
  *************************************************************************/
 
 #include "InitialInformation.hh"
-
 #include "BasicModule.hh"
 
 anlgeant4::
-InitialInformation::InitialInformation(bool s, anl::BasicModule* amod)
-  : stored(s), weight_stored(s),
-    energy(0.0), direction(0.0, 0.0, -1.0),
-    time0(0.0), position(0.0, 0.0, 0.0),
-    polarization(0.0, 0.0, 0.0),
-    event_id(0), weight(1.0)
+InitialInformation::InitialInformation(bool stored, anl::BasicModule* mod)
+  : stored_(stored), weight_stored_(stored),
+    energy_(0.0), direction_(0.0, 0.0, -1.0),
+    time_(0.0), position_(0.0, 0.0, 0.0),
+    polarization_(0.0, 0.0, 0.0),
+    event_id_(-1), weight_(1.0)
 {
-  if (amod) {
-    amod->add_alias("InitialInformation");
+  if (mod) {
+    mod->add_alias("InitialInformation");
   }
 }

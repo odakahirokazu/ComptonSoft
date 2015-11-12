@@ -24,7 +24,9 @@
 #include "InitialInformation.hh"
 
 using namespace anl;
-using namespace anlgeant4;
+
+namespace anlgeant4
+{
 
 StandardPickUpData::StandardPickUpData()
   : m_StartTime(0.0), m_InitialInfo(0)
@@ -33,16 +35,16 @@ StandardPickUpData::StandardPickUpData()
   SetStepActOn(false);
 }
 
-
 ANLStatus StandardPickUpData::mod_init()
 {
   GetANLModuleIFNC("InitialInformation", &m_InitialInfo);
   return AS_OK;
 }
 
-
 void StandardPickUpData::EventAct_begin(const G4Event* aEvent)
 {
   m_InitialInfo->setEventID(aEvent->GetEventID());
   SetStartTime(0.0);
 }
+
+} /* namespace anlgeant4 */

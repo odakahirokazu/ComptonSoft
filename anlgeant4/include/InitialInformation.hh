@@ -20,6 +20,7 @@
 #ifndef ANLGEANT4_InitialInformation_H
 #define ANLGEANT4_InitialInformation_H 1
 
+#include <cstdint>
 #include "G4ThreeVector.hh"
 
 namespace anl {
@@ -35,57 +36,57 @@ namespace anlgeant4 {
 class InitialInformation
 {
 public:
-  explicit InitialInformation(bool s, anl::BasicModule* amod=0);
+  explicit InitialInformation(bool stored, anl::BasicModule* mod=nullptr);
 
-  bool InitialInformationStored() const { return stored; }
-  void setInitialInformationStored(bool v=true) { stored = v; }
-  bool WeightStored() const { return weight_stored; }
-  void setWeightStored(bool v=true) { weight_stored = v; }
+  bool InitialInformationStored() const { return stored_; }
+  void setInitialInformationStored(bool v=true) { stored_ = v; }
+  bool WeightStored() const { return weight_stored_; }
+  void setWeightStored(bool v=true) { weight_stored_ = v; }
 
-  double InitialEnergy() const              { return energy; }
-  G4ThreeVector InitialDirection() const    { return direction; }
-  double InitialTime() const                { return time0; }
-  G4ThreeVector InitialPosition() const     { return position; }
-  G4ThreeVector InitialPolarization() const { return polarization; }
+  double InitialEnergy() const              { return energy_; }
+  G4ThreeVector InitialDirection() const    { return direction_; }
+  double InitialTime() const                { return time_; }
+  G4ThreeVector InitialPosition() const     { return position_; }
+  G4ThreeVector InitialPolarization() const { return polarization_; }
   
-  int EventID() const { return event_id; }
-  double Weight() const { return weight; }
+  int64_t EventID() const { return event_id_; }
+  double Weight() const { return weight_; }
 
-  void setEventID(int i) { event_id = i; }
+  void setEventID(int64_t i) { event_id_ = i; }
 
 protected:
   void setInitialEnergy(double v)
-  { energy = v; }
+  { energy_ = v; }
   void setInitialDirection(G4ThreeVector v)
-  { direction = v;    }
+  { direction_ = v;    }
   void setInitialDirection(double x, double y, double z)
-  { direction.set(x, y, z); }
+  { direction_.set(x, y, z); }
   void setInitialTime(double v)
-  { time0 = v; }
+  { time_ = v; }
   void setInitialPosition(G4ThreeVector v)
-  { position = v; }
+  { position_ = v; }
   void setInitialPosition(double x, double y, double z)
-  { position.set(x, y, z); }
+  { position_.set(x, y, z); }
   void setInitialPolarization(G4ThreeVector v)
-  { polarization = v; }
+  { polarization_ = v; }
   void setInitialPolarization(double x, double y, double z)
-  { polarization.set(x, y, z); }
+  { polarization_.set(x, y, z); }
   
-  void setWeight(double v) { weight = v; }
+  void setWeight(double v) { weight_ = v; }
 
 private:
-  bool stored;
-  bool weight_stored;
+  bool stored_;
+  bool weight_stored_;
 
-  double energy;
-  G4ThreeVector direction;
-  double time0;
-  G4ThreeVector position;
-  G4ThreeVector polarization;
-  int event_id;
-  double weight;
+  double energy_;
+  G4ThreeVector direction_;
+  double time_;
+  G4ThreeVector position_;
+  G4ThreeVector polarization_;
+  int64_t event_id_;
+  double weight_;
 };
 
-}
+} /* namespace anlgeant4 */
 
 #endif /* ANLGEANT4_InitialInformation_H */

@@ -72,7 +72,10 @@ ANLStatus WriteComptonEventTree::mod_init()
 
 ANLStatus WriteComptonEventTree::mod_ana()
 {
+  int64_t eventID = -1;
+  
   if (initialInfo_) {
+    eventID = initialInfo_->EventID();
     treeIO_->setInitialInfo(initialInfo_->InitialEnergy(),
                                  initialInfo_->InitialDirection(),
                                  initialInfo_->InitialTime(),
@@ -80,10 +83,13 @@ ANLStatus WriteComptonEventTree::mod_ana()
                                  initialInfo_->InitialPolarization());
     treeIO_->setWeight(initialInfo_->Weight());
   }
+  else {
+    eventID = get_event_loop_index();
+  }
   
   const BasicComptonEvent& event
     = eventReconstruction_->getComptonEvent();
-  treeIO_->fillEvent(event);
+  treeIO_->fillEvent(eventID, event);
 
   return AS_OK;
 }

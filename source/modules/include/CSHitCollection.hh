@@ -30,16 +30,14 @@ namespace comptonsoft {
  * @author Hirokazu Odaka
  * @date 2008-08-28
  * @date 2014-11-22
+ * @date 2015-11-12
  */
 class CSHitCollection : public anl::BasicModule
 {
-  DEFINE_ANL_MODULE(CSHitCollection, 1.1);
+  DEFINE_ANL_MODULE(CSHitCollection, 1.2);
 public:
   CSHitCollection();
   ~CSHitCollection();
-
-  void setEventID(int64_t v) { eventID_ = v; }
-  int64_t EventID() const { return eventID_; }
 
   std::vector<DetectorHit_sptr>& getHits(int timeGroup=0)
   { return hitsVector_[timeGroup]; }
@@ -57,7 +55,6 @@ public:
   anl::ANLStatus mod_endrun();
 
 private:
-  int64_t eventID_;
   std::vector<std::vector<comptonsoft::DetectorHit_sptr>> hitsVector_;
 };
 

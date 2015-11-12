@@ -26,7 +26,6 @@ namespace comptonsoft
 {
 
 CSHitCollection::CSHitCollection()
-  : eventID_(-1)
 {
 }
 
@@ -41,8 +40,6 @@ ANLStatus CSHitCollection::mod_bgnrun()
 ANLStatus CSHitCollection::mod_ana()
 {
   initializeEvent();
-  ++eventID_;
-
   return AS_OK;
 }
 

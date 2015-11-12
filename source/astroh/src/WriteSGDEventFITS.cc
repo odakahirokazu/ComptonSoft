@@ -18,6 +18,7 @@
  *************************************************************************/
 
 #include "WriteSGDEventFITS.hh"
+#include "InitialInformation.hh"
 #include "ChannelID.hh"
 #include "SGDEvent.hh"
 #include "SGDEventFITS.hh"
@@ -86,6 +87,7 @@ namespace comptonsoft
 WriteSGDEventFITS::WriteSGDEventFITS()
   : m_Filename("event.fits"),
     m_HitCollection(nullptr),
+    m_InitialInfo(nullptr),
     m_EventWriter(new astroh::sgd::EventFITSWriter)
 {
 }
@@ -104,6 +106,10 @@ ANLStatus WriteSGDEventFITS::mod_init()
   VCSModule::mod_init();
 
   GetANLModule("CSHitCollection", &m_HitCollection);
+  if (ModuleExist("InitialInformation")) {
+    GetANLModuleIF("InitialInformation", &m_InitialInfo);
+  }
+
   EvsDef("WriteSGDEventFITS:Fill");
 
   if (!(m_EventWriter->open(m_Filename))) {
@@ -115,7 +121,13 @@ ANLStatus WriteSGDEventFITS::mod_init()
 
 ANLStatus WriteSGDEventFITS::mod_ana()
 {
-  const int64_t eventID = m_HitCollection->EventID();
+  int64_t eventID = -1;
+  if (m_InitialInfo) {
+    eventID = m_InitialInfo->EventID();
+  }
+  else {
+    eventID = get_event_loop_index();
+  }
 
   const int NumTimeGroups = m_HitCollection->NumberOfTimeGroups();
   for (int timeGroup=0; timeGroup<NumTimeGroups; timeGroup++) {

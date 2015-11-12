@@ -67,15 +67,19 @@ ANLStatus WriteHitTree::mod_init()
 
 ANLStatus WriteHitTree::mod_ana()
 {
-  const int64_t eventID = hitCollection_->EventID();
-
+  int64_t eventID = -1;
+  
   if (initialInfo_) {
+    eventID = initialInfo_->EventID();
     treeIO_->setInitialInfo(initialInfo_->InitialEnergy(),
                             initialInfo_->InitialDirection(),
                             initialInfo_->InitialTime(),
                             initialInfo_->InitialPosition(),
                             initialInfo_->InitialPolarization());
     treeIO_->setWeight(initialInfo_->Weight());
+  }
+  else {
+    eventID = get_event_loop_index();
   }
   
   const int NumTimeGroups = hitCollection_->NumberOfTimeGroups();

@@ -41,7 +41,6 @@ public:
   void EventAct_begin(const G4Event* aEvent);
 
   double StartTime() const { return m_StartTime; }
-  // int EventID() const { return m_EventID; }
   
 protected:
   void SetStartTime(double v) { m_StartTime = v; }
@@ -51,6 +50,6 @@ private:
   InitialInformation* m_InitialInfo;
 };
 
-}
+} /* namespace anlgeant4 */
 
 #endif /* ANLGEANT4_StandardPickUpData_H */
