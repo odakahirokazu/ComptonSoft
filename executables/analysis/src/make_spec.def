@@ -1,8 +1,0 @@
-comptonsoft::CSHitCollection
-comptonsoft::ReadHitTree
-comptonsoft::EventReconstruction
-comptonsoft::CompModeFilter
-comptonsoft::PhAbsModeSpectrum
-comptonsoft::CompModeSpectrum
-comptonsoft::Edep2DMap
-comptonsoft::SaveData

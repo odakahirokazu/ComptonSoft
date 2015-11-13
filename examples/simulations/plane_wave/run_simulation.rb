@@ -2,7 +2,6 @@
 require 'comptonsoft/basic'
 
 def run_simulation(num, random, output)
-
   energy = 661.7 # keV
 
   sim = ComptonSoft::Simulation.new

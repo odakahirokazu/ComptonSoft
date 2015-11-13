@@ -1,6 +1,0 @@
-comptonsoft::ConstructDetector
-comptonsoft::DefineBadChannel
-comptonsoft::ReadDataFile_VME2
-comptonsoft::CorrectPHA
-comptonsoft::HistPHA
-comptonsoft::SaveData

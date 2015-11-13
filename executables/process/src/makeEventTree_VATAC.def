@@ -1,6 +1,0 @@
-comptonsoft::ConstructDetector
-comptonsoft::DefineBadChannel
-comptonsoft::ReadDataFile_VATAC
-comptonsoft::CorrectPHA
-comptonsoft::EventTree
-comptonsoft::SaveData

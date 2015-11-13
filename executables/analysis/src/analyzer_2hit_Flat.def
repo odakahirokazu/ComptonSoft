@@ -1,7 +1,0 @@
-comptonsoft::CSHitCollection
-comptonsoft::ConstructDetector
-comptonsoft::ReadComptonTree
-comptonsoft::CalcARM
-comptonsoft::CalcARMPos
-comptonsoft::CalcARMEne
-comptonsoft::SaveData
