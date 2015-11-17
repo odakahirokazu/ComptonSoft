@@ -16,7 +16,10 @@
       <simulation_param_common>
         <upside_anode set="0" />
         <upside_xstrip set="1" />
-        <charge_collection mode="0" />
+        <charge_collection mode="0">
+          <bias>300.0</bias>
+          <efield mode="1" />
+        </charge_collection>
         <diffusion mode="1">
           <spread_factor_cathode>2.0</spread_factor_cathode>
           <spread_factor_anode>2.0</spread_factor_anode>
