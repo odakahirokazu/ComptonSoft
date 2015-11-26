@@ -57,7 +57,7 @@ public:
   
 private:
   cfitsio::fitsfile* fitsFile_ = nullptr;
-  long int rowIndex_ = 0; // starts from 1.
+  long int rowIndex_ = 1; // starts from 1.
 
   // FFF contents
   std::array<double, 1> TIME_;

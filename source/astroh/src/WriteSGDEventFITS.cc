@@ -19,6 +19,7 @@
 
 #include "WriteSGDEventFITS.hh"
 #include "InitialInformation.hh"
+#include "AstroUnits.hh"
 #include "ChannelID.hh"
 #include "SGDEvent.hh"
 #include "SGDEventFITS.hh"
@@ -74,7 +75,7 @@ void fillHits(int64_t occurrenceID,
                            channelID,
                            channelID_remapped,
                            hit->PHA(),
-                           hit->EPI());
+                           hit->EPI()/keV);
   }
 }
 

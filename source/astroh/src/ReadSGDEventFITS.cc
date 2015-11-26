@@ -108,7 +108,7 @@ ANLStatus ReadSGDEventFITS::mod_ana()
       
     const int ChannelID = event.getReadoutChannelIDVector()[i];
     const uint16_t ADCValue = event.getPHAVector()[i];
-    const uint16_t EPI = event.getEPIVector()[i];
+    const float EPI = event.getEPIVector()[i];
 
     MultiChannelData* ASICData = detectorManager->getMultiChannelData(ReadoutID);
     ASICData->setDataValid(ChannelID, 1);
