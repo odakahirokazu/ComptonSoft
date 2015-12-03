@@ -86,6 +86,7 @@ clSim = [# primary generator
 clAH = [
   ANL::SWIGClass.new("ReadSGDEventFITS", false, 'USE_FITSIO'),
   ANL::SWIGClass.new("WriteSGDEventFITS", false, 'USE_FITSIO'),
+  ANL::SWIGClass.new("WriteHXIEventFITS", false, 'USE_FITSIO'),
 ]
 
 classList = clMod + clSim + clAH

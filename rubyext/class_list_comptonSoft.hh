@@ -70,4 +70,5 @@ class InitialParticleTree;
 class DumpMass;
 class ReadSGDEventFITS;
 class WriteSGDEventFITS;
+class WriteHXIEventFITS;
 }

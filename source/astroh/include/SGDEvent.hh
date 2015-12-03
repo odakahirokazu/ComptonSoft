@@ -23,17 +23,18 @@
 namespace astroh {
 namespace sgd {
 
-constexpr std::size_t TotalNumberOfASICs = 208;
-constexpr std::size_t TotalNumberOfChannelsInCC = TotalNumberOfASICs*64;
-constexpr std::size_t MaxSizeOfRawASICDATA = 94*TotalNumberOfASICs;
+constexpr std::size_t NumberOfASICs = 208;
+constexpr std::size_t NumberOfChannelsInASIC = 64;
+constexpr std::size_t NumberOfChannelsInCC = NumberOfASICs * NumberOfChannelsInASIC;
+constexpr std::size_t MaxSizeOfRawASICDATA = 94 * NumberOfASICs;
 
 
 class EventFlags
 {
 public:
   explicit EventFlags(uint64_t flags=0)
+    : flags_(flags)
   {
-    this->flags_ = flags;
   }
 
   ~EventFlags() = default;
@@ -95,6 +96,45 @@ private:
     
 class Event
 {
+public:
+  static uint16_t makeASICID(uint16_t ADBNo, uint16_t TrayNo, uint16_t ASICNo)
+  {
+    return (ADBNo<<8) + (TrayNo<<4) + ASICNo;
+  }
+
+  static uint16_t getADBNo(uint16_t ASIC_ID)
+  {
+    return (ASIC_ID>>8) & 0xFu;
+  }
+
+  static uint16_t getTrayNo(uint16_t ASIC_ID)
+  {
+    return (ASIC_ID>>4) & 0xFu;
+  }
+
+  static uint16_t getASICNo(uint16_t ASIC_ID)
+  {
+    return ASIC_ID & 0xFu;
+  }
+
+  static uint16_t convertToRemapedASICID(uint16_t ASIC_ID)
+  {
+    constexpr uint16_t NumTrayInADB = 7;
+    constexpr uint16_t NumASICsInADB = 52;
+    constexpr uint16_t ASICIndexMap[NumTrayInADB] = {0, 8, 16, 24, 32, 40, 46};
+    const uint16_t ADBNo = getADBNo(ASIC_ID);
+    const uint16_t TrayNo = getTrayNo(ASIC_ID);
+    const uint16_t ASICNo = getASICNo(ASIC_ID);
+    const uint16_t index = ADBNo * NumASICsInADB + ASICIndexMap[TrayNo] + ASICNo;
+    const uint16_t remappedID = index + 1;
+    return remappedID;
+  }
+
+  static int makeRemappedReadoutID(int remappedASICID, int readoutID)
+  {
+    return (remappedASICID-1)*NumberOfChannelsInASIC + readoutID + 1;
+  }
+  
 public:
   Event() = default;
   ~Event() = default;
@@ -166,10 +206,10 @@ public:
   const std::vector<uint8_t>& getRawASICData() const
   { return RAW_ASIC_DATA_; }
 
-  void setProcessStatus(uint32_t v) { PROC_STATUS_ = v; }  
+  void setProcessStatus(uint32_t v) { PROC_STATUS_ = v; }
   uint32_t getProcessStatus() const { return PROC_STATUS_; }
 
-  void setStatus(uint8_t v) { STATUS_ = v; }  
+  void setStatus(uint8_t v) { STATUS_ = v; }
   uint8_t getStatus() const { return STATUS_; }
 
   // SFF contents (ASICs)
@@ -263,7 +303,7 @@ public:
     READOUT_ID_.push_back(channelID);
     READOUT_ID_RMAP_.push_back(channelID_remapped);
     PHA_.push_back(PHA);
-    EPI_.push_back(EPI); 
+    EPI_.push_back(EPI);
   }
     
   void clearReadoutData()
@@ -445,6 +485,5 @@ std::ostream& operator<<(std::ostream& os, const astroh::sgd::Event& event)
   event.output(os);
   return os;
 }
-
 
 #endif /* ASTROH_SGD_EVENT_H */

@@ -65,22 +65,22 @@ private:
   std::array<uint8_t, MaxSizeOfRawASICDATA> RAW_ASIC_DATA_;
   uint32_t PROC_STATUS_ = 0;
 
-  std::array<uint16_t, TotalNumberOfASICs> ASIC_ID_;
-  std::array<uint8_t, TotalNumberOfASICs> ASIC_ID_RMAP_;
-  std::array<uint8_t, TotalNumberOfASICs> ASIC_CHIP_;
-  std::array<uint8_t, TotalNumberOfASICs> ASIC_TRIG_;
-  std::array<uint8_t, TotalNumberOfASICs> ASIC_SEU_;
-  std::array<uint64_t, TotalNumberOfASICs> READOUT_FLAG_;
-  std::array<uint16_t, TotalNumberOfASICs> NUM_READOUT_;
-  std::array<uint16_t, TotalNumberOfASICs> ASIC_REF_;
-  std::array<uint16_t, TotalNumberOfASICs> ASIC_CMN_;
+  std::array<uint16_t, NumberOfASICs> ASIC_ID_;
+  std::array<uint8_t, NumberOfASICs> ASIC_ID_RMAP_;
+  std::array<uint8_t, NumberOfASICs> ASIC_CHIP_;
+  std::array<uint8_t, NumberOfASICs> ASIC_TRIG_;
+  std::array<uint8_t, NumberOfASICs> ASIC_SEU_;
+  std::array<uint64_t, NumberOfASICs> READOUT_FLAG_;
+  std::array<uint16_t, NumberOfASICs> NUM_READOUT_;
+  std::array<uint16_t, NumberOfASICs> ASIC_REF_;
+  std::array<uint16_t, NumberOfASICs> ASIC_CMN_;
 
   uint16_t NumberOfAllHitChannels_;
-  std::array<uint16_t, TotalNumberOfChannelsInCC> READOUT_ASIC_ID_;
-  std::array<uint8_t, TotalNumberOfChannelsInCC> READOUT_ID_;
-  std::array<uint16_t, TotalNumberOfChannelsInCC> READOUT_ID_RMAP_;
-  std::array<uint16_t, TotalNumberOfChannelsInCC> PHA_;
-  std::array<uint16_t, TotalNumberOfChannelsInCC> EPI_;
+  std::array<uint16_t, NumberOfChannelsInCC> READOUT_ASIC_ID_;
+  std::array<uint8_t, NumberOfChannelsInCC> READOUT_ID_;
+  std::array<uint16_t, NumberOfChannelsInCC> READOUT_ID_RMAP_;
+  std::array<uint16_t, NumberOfChannelsInCC> PHA_;
+  std::array<uint16_t, NumberOfChannelsInCC> EPI_;
 };
 
 

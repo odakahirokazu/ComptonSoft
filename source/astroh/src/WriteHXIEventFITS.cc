@@ -17,12 +17,12 @@
  *                                                                       *
  *************************************************************************/
 
-#include "WriteSGDEventFITS.hh"
+#include "WriteHXIEventFITS.hh"
 #include "InitialInformation.hh"
 #include "AstroUnits.hh"
 #include "ChannelID.hh"
-#include "SGDEvent.hh"
-#include "SGDEventFITS.hh"
+#include "HXIEvent.hh"
+#include "HXIEventFITS.hh"
 #include "DetectorReadoutModule.hh"
 #include "DetectorHit.hh"
 #include "CSHitCollection.hh"
@@ -32,27 +32,17 @@ using namespace anl;
 namespace
 {
 
-int16_t getASICID(int readoutModuleID, int section)
-{
-  constexpr uint16_t NumTrayInADB = 7;
-  const uint16_t ADBNo = readoutModuleID/NumTrayInADB;
-  const uint16_t TrayNo = readoutModuleID%NumTrayInADB;
-  const uint16_t ASICIndex = section;
-  return astroh::sgd::Event::makeASICID(ADBNo, TrayNo, ASICIndex);
-}
-
 void fillHits(int64_t occurrenceID,
               const std::vector<comptonsoft::DetectorHit_sptr>& hits,
-              astroh::sgd::Event* event)
+              astroh::hxi::Event* event)
 {
   event->setOccurrenceID(occurrenceID);
   for (auto& hit: hits) {
     const int readoutModuleID = hit->ReadoutModuleID();
     const int section = hit->ReadoutChannelSection();
     const int channelID = hit->ReadoutChannelIndex();
-    const int16_t ASIC_ID = getASICID(readoutModuleID, section);
-    const int16_t ASIC_ID_remapped = astroh::sgd::Event::convertToRemapedASICID(ASIC_ID);
-    const int16_t channelID_remapped = astroh::sgd::Event::makeRemappedReadoutID(ASIC_ID_remapped, channelID);
+    const int16_t ASIC_ID = astroh::hxi::Event::makeASICID(readoutModuleID, section);
+    const int16_t channelID_remapped = astroh::hxi::Event::makeRemappedReadoutID(ASIC_ID, channelID);
     event->pushReadoutData(ASIC_ID,
                            channelID,
                            channelID_remapped,
@@ -67,24 +57,24 @@ void fillHits(int64_t occurrenceID,
 namespace comptonsoft
 {
 
-WriteSGDEventFITS::WriteSGDEventFITS()
+WriteHXIEventFITS::WriteHXIEventFITS()
   : m_Filename("event.fits"),
     m_HitCollection(nullptr),
     m_InitialInfo(nullptr),
-    m_EventWriter(new astroh::sgd::EventFITSWriter)
+    m_EventWriter(new astroh::hxi::EventFITSWriter)
 {
 }
 
-WriteSGDEventFITS::~WriteSGDEventFITS() = default;
+WriteHXIEventFITS::~WriteHXIEventFITS() = default;
 
-ANLStatus WriteSGDEventFITS::mod_startup()
+ANLStatus WriteHXIEventFITS::mod_startup()
 {
   register_parameter(&m_Filename, "filename");
 
   return AS_OK;
 }
 
-ANLStatus WriteSGDEventFITS::mod_init()
+ANLStatus WriteHXIEventFITS::mod_init()
 {
   VCSModule::mod_init();
 
@@ -93,7 +83,7 @@ ANLStatus WriteSGDEventFITS::mod_init()
     GetANLModuleIF("InitialInformation", &m_InitialInfo);
   }
 
-  EvsDef("WriteSGDEventFITS:Fill");
+  EvsDef("WriteHXIEventFITS:Fill");
 
   if (!(m_EventWriter->open(m_Filename))) {
     return AS_QUIT_ERR;
@@ -102,7 +92,7 @@ ANLStatus WriteSGDEventFITS::mod_init()
   return AS_OK;
 }
 
-ANLStatus WriteSGDEventFITS::mod_ana()
+ANLStatus WriteHXIEventFITS::mod_ana()
 {
   int64_t eventID = -1;
   if (m_InitialInfo) {
@@ -117,7 +107,7 @@ ANLStatus WriteSGDEventFITS::mod_ana()
     const std::vector<DetectorHit_sptr>& hits
       = m_HitCollection->getHits(timeGroup);
     if (hits.size() > 0) {
-      astroh::sgd::Event event;
+      astroh::hxi::Event event;
       int32_t occurrenceID = eventID + 1;
       if (timeGroup>0) {
         occurrenceID = -1*timeGroup;
@@ -125,14 +115,14 @@ ANLStatus WriteSGDEventFITS::mod_ana()
       
       fillHits(occurrenceID, hits, &event);
       m_EventWriter->fillEvent(event);
-      EvsSet("WriteSGDEventFITS:Fill");
+      EvsSet("WriteHXIEventFITS:Fill");
     }
   }
 
   return AS_OK;
 }
 
-ANLStatus WriteSGDEventFITS::mod_exit()
+ANLStatus WriteHXIEventFITS::mod_exit()
 {
   m_EventWriter->close();
   return AS_OK;
