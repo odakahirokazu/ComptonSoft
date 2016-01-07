@@ -17,41 +17,44 @@
  *                                                                       *
  *************************************************************************/
 
-#ifndef ANLGEANT4_PlaneWaveRectanglePrimaryGen_H
-#define ANLGEANT4_PlaneWaveRectanglePrimaryGen_H 1
+#include "GaussianBeamPrimaryGen.hh"
+#include "Randomize.hh"
+#include "AstroUnits.hh"
 
-#include "PlaneWavePrimaryGen.hh"
-#include "G4ThreeVector.hh"
+using namespace anl;
 
-namespace anlgeant4 {
-
-/**
- * ANLGeant4 PrimaryGen module.
- * Primary particles are generated like a plane wave and from a fixed rectangle.
- * @author Hirokazu Odaka
- * @date 2011-06-15 | Hirokazu Odaka | based on PlaneWavePrimaryGen
- * @date 2011-07-10 | Hirokazu Odaka | derived from PlaneWavePrimaryGen
- * @date 2016-01-07 | Hirokazu Odaka | introduce roll angle
- */
-class PlaneWaveRectanglePrimaryGen : public anlgeant4::PlaneWavePrimaryGen
+namespace anlgeant4
 {
-  DEFINE_ANL_MODULE(PlaneWaveRectanglePrimaryGen, 4.1);
-public:
-  PlaneWaveRectanglePrimaryGen();
-  ~PlaneWaveRectanglePrimaryGen();
 
-  virtual anl::ANLStatus mod_startup();
+GaussianBeamPrimaryGen::GaussianBeamPrimaryGen()
+  : m_RSigma(1.0*cm)
+{
+  add_alias("GaussianBeamPrimaryGen");
+}
 
-protected:
-  G4ThreeVector samplePosition();
-  double GenerationArea();
+GaussianBeamPrimaryGen::~GaussianBeamPrimaryGen() = default;
+
+ANLStatus GaussianBeamPrimaryGen::mod_startup()
+{
+  PlaneWavePrimaryGen::mod_startup();
+
+  unregister_parameter("radius");
   
-private:
-  double m_SizeX;
-  double m_SizeY;
-  double m_RollAngle;
-};
+  register_parameter(&m_RSigma, "radial_sigma", LengthUnit(), LengthUnitName());
+  set_parameter_description("Radial sigma of the beam size.");
+  
+  return AS_OK;
+}
+
+G4ThreeVector GaussianBeamPrimaryGen::samplePosition()
+{
+  const G4ThreeVector xaxis(DirectionOrthogonal());
+  G4ThreeVector yaxis = xaxis;
+  yaxis.rotate(0.5*pi, Direction());
+  const double x = m_RSigma * CLHEP::RandGauss::shoot(CLHEP::HepRandom::getTheEngine());
+  const double y = m_RSigma * CLHEP::RandGauss::shoot(CLHEP::HepRandom::getTheEngine());
+  const G4ThreeVector position = CenterPosition() + x * xaxis + y * yaxis;
+  return position;
+}
 
 } /* namespace anlgeant4 */
-
-#endif /* ANLGEANT4_PlaneWaveRectanglePrimaryGen_H */

@@ -27,7 +27,7 @@ namespace anlgeant4
 {
 
 PlaneWaveRectanglePrimaryGen::PlaneWaveRectanglePrimaryGen()
-  : m_SizeX(100.0*cm), m_SizeY(100.0*cm)
+  : m_SizeX(100.0*cm), m_SizeY(100.0*cm), m_RollAngle(0.0)
 {
   add_alias("PlaneWaveRectanglePrimaryGen");
 }
@@ -43,7 +43,9 @@ ANLStatus PlaneWaveRectanglePrimaryGen::mod_startup()
   register_parameter(&m_SizeX, "size_x", LengthUnit(), LengthUnitName());
   set_parameter_description("Size x of the rectangle where parimary particles are generated.");  
   register_parameter(&m_SizeY, "size_y", LengthUnit(), LengthUnitName());
-  set_parameter_description("Size y of the rectangle where parimary particles are generated.");   
+  set_parameter_description("Size y of the rectangle where parimary particles are generated.");
+  register_parameter(&m_RollAngle, "roll_angle", 1.0, "radian");
+  set_parameter_description("Roll angle of the rectangle where parimary particles are generated.");
   
   return AS_OK;
 }
@@ -51,18 +53,21 @@ ANLStatus PlaneWaveRectanglePrimaryGen::mod_startup()
 G4ThreeVector PlaneWaveRectanglePrimaryGen::samplePosition()
 {
   // set position
-  G4ThreeVector xAxis(1.0, 0.0, 0.0);
-  G4ThreeVector yAxis(0.0, 1.0, 0.0);
-  G4double x = (-0.5+G4UniformRand())*m_SizeX;
-  G4double y = (-0.5+G4UniformRand())*m_SizeY;
-  G4ThreeVector position = CenterPosition() + x*xAxis + y*yAxis;
+  const double theta = m_RollAngle;
+  const double cosTheta = std::cos(theta);
+  const double sinTheta = std::sin(theta);
+  const G4ThreeVector xAxis(cosTheta, sinTheta, 0.0);
+  const G4ThreeVector yAxis(-sinTheta, cosTheta, 0.0);
+  const double x = (-0.5+G4UniformRand())*m_SizeX;
+  const double y = (-0.5+G4UniformRand())*m_SizeY;
+  const G4ThreeVector position = CenterPosition() + x*xAxis + y*yAxis;
   return position;
 }
 
-G4double PlaneWaveRectanglePrimaryGen::GenerationArea()
+double PlaneWaveRectanglePrimaryGen::GenerationArea()
 {
-  G4double cosTheta = Direction().cosTheta();
-  G4double area = m_SizeX * m_SizeY * std::abs(cosTheta);
+  const double cosTheta = Direction().cosTheta();
+  const double area = m_SizeX * m_SizeY * std::abs(cosTheta);
   return area;
 }
 

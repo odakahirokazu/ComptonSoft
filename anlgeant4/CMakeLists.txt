@@ -54,6 +54,7 @@ add_library(${TARGET_LIBRARY} SHARED
   src/PointSourcePrimaryGen.cc
   src/PlaneWavePrimaryGen.cc
   src/PlaneWaveRectanglePrimaryGen.cc
+  src/GaussianBeamPrimaryGen.cc
   src/IsotropicPrimaryGen.cc
   src/PrimaryGenUniformSourceInVolume.cc
   src/PositionSamplerInVolume.cc

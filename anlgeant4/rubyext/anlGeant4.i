@@ -15,6 +15,7 @@
 #include "PointSourcePrimaryGen.hh"
 #include "PlaneWavePrimaryGen.hh"
 #include "PlaneWaveRectanglePrimaryGen.hh"
+#include "GaussianBeamPrimaryGen.hh"
 #include "IsotropicPrimaryGen.hh"
 #include "PrimaryGenUniformSourceInVolume.hh"
 #include "NucleusPrimaryGen.hh"
@@ -102,6 +103,7 @@ class PointSourcePrimaryGen : public BasicPrimaryGen
 {
 public:
   PointSourcePrimaryGen();
+  ~PointSourcePrimaryGen();
 };
 
 
@@ -109,6 +111,7 @@ class PlaneWavePrimaryGen : public anlgeant4::BasicPrimaryGen
 {
 public:
   PlaneWavePrimaryGen();
+  ~PlaneWavePrimaryGen();
 };
 
 
@@ -116,6 +119,15 @@ class PlaneWaveRectanglePrimaryGen : public anlgeant4::PlaneWavePrimaryGen
 {
 public:
   PlaneWaveRectanglePrimaryGen();
+  ~PlaneWaveRectanglePrimaryGen();
+};
+
+
+class GaussianBeamPrimaryGen : public anlgeant4::PlaneWavePrimaryGen
+{
+public:
+  GaussianBeamPrimaryGen();
+  ~GaussianBeamPrimaryGen();
 };
 
 
@@ -123,6 +135,7 @@ class IsotropicPrimaryGen : public anlgeant4::BasicPrimaryGen
 {
 public:
   IsotropicPrimaryGen();
+  ~IsotropicPrimaryGen();
 };
 
 
@@ -134,10 +147,11 @@ public:
 };
 
 
-class NucleusPrimaryGen : public anlgeant4::BasicPrimaryGen
+class NucleusPrimaryGen : public BasicPrimaryGen
 {
 public:
   NucleusPrimaryGen();
+  ~NucleusPrimaryGen();
 };
 
 
@@ -145,7 +159,7 @@ class NucleusPrimaryGenInVolume : public NucleusPrimaryGen
 {
 public:
   NucleusPrimaryGenInVolume();
-  virtual ~NucleusPrimaryGenInVolume() = default;
+  ~NucleusPrimaryGenInVolume();
 };
 
 

@@ -10,6 +10,7 @@ class BasicPrimaryGen;
 class PointSourcePrimaryGen;
 class PlaneWavePrimaryGen;
 class PlaneWaveRectanglePrimaryGen;
+class GaussianBeamPrimaryGen;
 class IsotropicPrimaryGen;
 class PrimaryGenUniformSourceInVolume;
 class NucleusPrimaryGen;

@@ -17,61 +17,36 @@
  *                                                                       *
  *************************************************************************/
 
-#ifndef ANLGEANT4_PlaneWavePrimaryGen_H
-#define ANLGEANT4_PlaneWavePrimaryGen_H 1
+#ifndef ANLGEANT4_GaussianBeamPrimaryGen_H
+#define ANLGEANT4_GaussianBeamPrimaryGen_H 1
 
-#include "BasicPrimaryGen.hh"
+#include "PlaneWavePrimaryGen.hh"
 #include "G4ThreeVector.hh"
 
 namespace anlgeant4 {
 
-
 /**
  * ANLGeant4 PrimaryGen module.
- * The primary particles are generated like a plane wave.
- *
+ * Primary particles are generated like a beam that has Gaussian radial profile.
  * @author Hirokazu Odaka
- * @date 2010-02-17
- * @date 2010-04-08 | Hirokazu Odaka | ANLLite
- * @date 2011-04-08 | Hirokazu Odaka | particle name
- * @date 2011-04-11 | Hirokazu Odaka | derived from AHPrimaryGen (BasicPrimaryGen)
- * @date 2012-07-10 | Hirokazu Odaka | add degree of polarization
- * @date 2013-08-18 | Hirokazu Odaka | v1.4: be moved to anlgeant4
+ * @date 2016-01-07 | Hirokazu Odaka | based on PlaneWavePrimaryGen
  */
-class PlaneWavePrimaryGen : public anlgeant4::BasicPrimaryGen
+class GaussianBeamPrimaryGen : public anlgeant4::PlaneWavePrimaryGen
 {
-  DEFINE_ANL_MODULE(PlaneWavePrimaryGen, 4.0);
+  DEFINE_ANL_MODULE(GaussianBeamPrimaryGen, 4.0);
 public:
-  PlaneWavePrimaryGen();
-  ~PlaneWavePrimaryGen();
+  GaussianBeamPrimaryGen();
+  ~GaussianBeamPrimaryGen();
 
   virtual anl::ANLStatus mod_startup();
-  virtual anl::ANLStatus mod_com();
-  virtual anl::ANLStatus mod_init();
-  virtual anl::ANLStatus mod_ana();
-  virtual anl::ANLStatus mod_endrun();
-  
-protected:
-  G4ThreeVector CenterPosition() const { return m_CenterPosition; }
-  G4ThreeVector Direction() const { return m_Direction0; }
-  G4ThreeVector DirectionOrthogonal() const { return m_DirectionOrthogonal; }
 
-  virtual G4ThreeVector samplePosition();
-  virtual G4double GenerationArea();
+protected:
+  G4ThreeVector samplePosition();
   
 private:
-  G4ThreeVector m_CenterPosition;
-  
-  G4ThreeVector m_Direction0;
-  G4ThreeVector m_DirectionOrthogonal;
-  G4double m_Radius;
-
-  G4ThreeVector m_Polarization0;
-  G4double m_PolarizationDegree;
-  
-  G4double m_Flux;
+  double m_RSigma;
 };
 
 } /* namespace anlgeant4 */
 
-#endif /* ANLGEANT4_PlaneWavePrimaryGen_H */
+#endif /* ANLGEANT4_GaussianBeamPrimaryGen_H */

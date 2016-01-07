@@ -131,8 +131,8 @@ G4ThreeVector PlaneWavePrimaryGen::samplePosition()
   using std::sqrt;
 
   G4ThreeVector position(m_DirectionOrthogonal);
-  G4double r = m_Radius * sqrt(G4UniformRand());
-  G4double t = twopi * G4UniformRand();
+  const double r = m_Radius * sqrt(G4UniformRand());
+  const double t = twopi * G4UniformRand();
   position.rotate(t, m_Direction0);
   position = m_CenterPosition + r * position;
   return position;
@@ -140,9 +140,9 @@ G4ThreeVector PlaneWavePrimaryGen::samplePosition()
 
 ANLStatus PlaneWavePrimaryGen::mod_endrun()
 {
-  G4double area = GenerationArea();
-  G4double realTime = TotalEnergy()/(m_Flux*area);
-  G4double pflux = Number()/area/realTime;
+  const double area = GenerationArea();
+  const double realTime = TotalEnergy()/(m_Flux*area);
+  const double pflux = Number()/area/realTime;
   
   G4cout.setf(std::ios::scientific);
   G4cout << "PWPrimaryGen::mod_endrun \n"
