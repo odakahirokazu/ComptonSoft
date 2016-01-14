@@ -1,4 +1,5 @@
 #! /usr/bin/env ruby
+
 require 'comptonsoft/basic'
 
 def run_simulation(num, random, output)

@@ -77,10 +77,10 @@ ANLStatus WriteComptonEventTree::mod_ana()
   if (initialInfo_) {
     eventID = initialInfo_->EventID();
     treeIO_->setInitialInfo(initialInfo_->InitialEnergy(),
-                                 initialInfo_->InitialDirection(),
-                                 initialInfo_->InitialTime(),
-                                 initialInfo_->InitialPosition(),
-                                 initialInfo_->InitialPolarization());
+                            initialInfo_->InitialDirection(),
+                            initialInfo_->InitialTime(),
+                            initialInfo_->InitialPosition(),
+                            initialInfo_->InitialPolarization());
     treeIO_->setWeight(initialInfo_->Weight());
   }
   else {

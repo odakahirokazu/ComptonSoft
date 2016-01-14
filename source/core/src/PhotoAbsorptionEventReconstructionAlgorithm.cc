@@ -49,7 +49,7 @@ reconstruct(const std::vector<DetectorHit_sptr>& hits,
   eventReconstructed.setHit1(0, mergedHit);
   eventReconstructed.setNumberOfHits(NumHits);
 
-  return false;
+  return true;
 }
 
 } /* namespace comptonsoft */

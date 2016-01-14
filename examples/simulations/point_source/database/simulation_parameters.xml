@@ -15,7 +15,7 @@
       <layer_offset>1</layer_offset>
       <simulation_param_common>
         <upside_anode set="0" />
-        <upside_pad set="1" />
+        <upside_pixel set="1" />
         <sim_pha mode="0" />
         <sim_diffusion mode="0"/>
       </simulation_param_common>
@@ -31,7 +31,7 @@
       <layer_offset>1</layer_offset>
       <simulation_param_common>
         <upside_anode set="0" />
-        <upside_pad set="1" />
+        <upside_pixel set="1" />
         <sim_pha mode="0"/>
         <sim_diffusion mode="0"/>
       </simulation_param_common>
