@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="http://www.astro.isas.jaxa.jp/~odaka/xmlstyle/detector_config_v3.xsl" ?>
+
+<configuration>
+  <name>Detector</name>
+  <comment>H. Odaka | 2016-01-19</comment>
+  <length_unit>cm</length_unit>
+  <detectors>
+    <detector id="1">
+      <type>Scintillator</type>
+      <name>CsI:0</name>
+      <geometry>
+        <widthx>5.0</widthx><widthy>5.0</widthy><thickness>5.0</thickness>
+        <offsetx>0.0</offsetx><offsety>0.0</offsety>
+      </geometry>
+      <pixel>
+        <numx>1</numx><numy>1</numy>
+        <pitchx>5.0</pitchx><pitchy>5.0</pitchy>
+      </pixel>
+      <position><x>0.0</x><y>0.0</y><z>0.0</z></position>
+      <direction_xaxis><x>+1.0</x><y>0.0</y><z>0.0</z></direction_xaxis>
+      <direction_yaxis><x>0.0</x><y>+1.0</y><z>0.0</z></direction_yaxis>
+      <energy_priority></energy_priority>
+    </detector>
+  </detectors>
+  
+  <readout />
+
+  <groups>
+    <group name="CsI">
+      <detector id="1" />
+    </group>
+    <hit_pattern name="1hit" short_name="1hit" bit="0">
+      <group name="CsI" />
+    </hit_pattern>
+  </groups>
+</configuration>

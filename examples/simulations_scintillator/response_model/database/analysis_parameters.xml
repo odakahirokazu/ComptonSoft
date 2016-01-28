@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="http://www.astro.isas.jaxa.jp/~odaka/xmlstyle/analysis_param_v1.xsl" ?>
+
+<analysis>
+  <name>Detector</name>
+  <comment>H. Odaka | 2016-01-19</comment>
+  <detectors>
+    <detector>
+      <prefix>CsI</prefix>
+      <type>3</type>
+      <noiselevel>
+        <param0>0.0</param0>
+        <param1>5.145</param1>
+        <param2>0.0</param2>
+      </noiselevel>
+      <reconstruction>
+        <mode>1</mode>
+        <threshold>100.0</threshold>
+      </reconstruction>
+    </detector>
+  </detectors>
+</analysis>

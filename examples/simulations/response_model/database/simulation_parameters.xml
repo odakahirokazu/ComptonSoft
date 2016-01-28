@@ -16,8 +16,8 @@
       <simulation_param_common>
         <upside_anode set="0" />
         <upside_pixel set="1" />
-        <sim_pha mode="0" />
-        <sim_diffusion mode="0"/>
+        <charge_collection mode="0" />
+        <diffusion mode="0"/>
       </simulation_param_common>
       <detector_list>
         <detector id="100" path="SiDetector"><simulation_param></simulation_param></detector>
@@ -32,8 +32,8 @@
       <simulation_param_common>
         <upside_anode set="0" />
         <upside_pixel set="1" />
-        <sim_pha mode="0"/>
-        <sim_diffusion mode="0"/>
+        <charge_collection mode="0"/>
+        <diffusion mode="0"/>
       </simulation_param_common>
       <detector_list>
         <detector id="200" path="CdTeDetector"><simulation_param></simulation_param></detector>
