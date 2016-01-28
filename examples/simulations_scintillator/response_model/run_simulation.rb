@@ -37,7 +37,7 @@ end
 ### main ###
 
 num = 10000000
-runs = [0]#(1..12).to_a
+runs = (1..12).to_a
 a = ANL::ParallelRun.new
 a.num_processes = 4
 a.set_log "simulation_%03d.log"

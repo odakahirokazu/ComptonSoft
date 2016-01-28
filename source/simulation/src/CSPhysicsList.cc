@@ -130,14 +130,22 @@ CSPhysicsList::CSPhysicsList(CSPhysicsOption option)
   }
 }
 
+void CSPhysicsList::ConstructProcess()
+{
+  G4VModularPhysicsList::ConstructProcess();
+  if (isParallelWorldEnabled()) {
+    AddParallelWorldProcess();
+  }
+}
+
 void CSPhysicsList::AddParallelWorldProcess()
 {
   const G4VUserDetectorConstruction* userDetectorConstruction
     = G4RunManager::GetRunManager()->GetUserDetectorConstruction();
-  const G4int numParallelWorld
+  const G4int numParallelWorlds
     = userDetectorConstruction->GetNumberOfParallelWorld();
 
-  for (int i=0; i<numParallelWorld; ++i) {
+  for (int i=0; i<numParallelWorlds; ++i) {
     G4String parallelWorldName
       = userDetectorConstruction->GetParallelWorld(i)->GetName();
 

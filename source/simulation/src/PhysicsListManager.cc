@@ -31,6 +31,7 @@ PhysicsListManager::PhysicsListManager()
     m_HadronHP(false),
     m_HadronModel("BIC"),
     m_RDEnabled(false),
+    m_ParallelWorldEnabled(true),
     m_DefaultCut(0.0001*cm)
 {
   add_alias(module_name());
@@ -45,6 +46,7 @@ ANLStatus PhysicsListManager::mod_startup()
   register_parameter(&m_HadronHP, "hadron_hp");
   register_parameter(&m_HadronModel, "hadron_model");
   register_parameter(&m_RDEnabled, "radioactive_decay");
+  register_parameter(&m_ParallelWorldEnabled, "parallel_world");
   
   return AS_OK;
 }
@@ -98,7 +100,8 @@ ANLStatus PhysicsListManager::mod_init()
 
 G4VUserPhysicsList* PhysicsListManager::create()
 {
-  G4VUserPhysicsList* physicsList = new CSPhysicsList(m_PhysicsOption);
+  CSPhysicsList* physicsList = new CSPhysicsList(m_PhysicsOption);
+  physicsList->enableParallelWorld(m_ParallelWorldEnabled);
   physicsList->SetDefaultCutValue(m_DefaultCut);
   return physicsList;
 }

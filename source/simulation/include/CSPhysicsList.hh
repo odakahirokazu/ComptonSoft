@@ -42,11 +42,11 @@ public:
   HadronModel getHadronPhysicsModel() const { return hadronModel_; }
 
   void setHadronPhysicsHighPrecision(bool v=true) { hadronHP_ = v; }
-  bool getHadronPhysicsHighPrecision() { return hadronHP_; }
+  bool getHadronPhysicsHighPrecision() const { return hadronHP_; }
 
   void enableRadioactiveDecay(bool v=true) { RDEnabled_ = v; }
-  bool isRadioactiveDecayEnabled() { return RDEnabled_; }
-  
+  bool isRadioactiveDecayEnabled() const { return RDEnabled_; }
+
 private:
   EMModel EMModel_ = EMModel::Livermore;
   HadronModel hadronModel_ = HadronModel::BIC;
@@ -61,6 +61,7 @@ private:
  * @author Tamotsu Sato, Hirokazu Odaka
  * @date 2011-xx-xx
  * @date 2015-06-10 | Hirokazu Odaka | reviewd
+ * @date 2016-01-28 | Hirokazu Odaka | enable parallel world
  */
 class CSPhysicsList : public G4VModularPhysicsList
 {
@@ -68,7 +69,15 @@ public:
   CSPhysicsList(CSPhysicsOption option);
   ~CSPhysicsList() = default;
 
+  void ConstructProcess();
   void AddParallelWorldProcess();
+
+  void enableParallelWorld(bool v=true) { parallelWorld_ = v; }
+  void disableParallelWorld() { enableParallelWorld(false); }
+  bool isParallelWorldEnabled() const { return parallelWorld_; }
+
+private:
+  bool parallelWorld_ = true;
 };
 
 } /* namespace comptonsoft */

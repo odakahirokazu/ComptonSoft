@@ -54,6 +54,7 @@ private:
   bool m_HadronHP;
   std::string m_HadronModel;
   bool m_RDEnabled;
+  bool m_ParallelWorldEnabled;
   double m_DefaultCut;
   CSPhysicsOption m_PhysicsOption;
 };
