@@ -31,6 +31,7 @@ namespace comptonsoft {
  * @date 2007-12-xx 
  * @date 2009-06-22
  * @date 2014-09-09
+ * @date 2016-05-02 | PHA randomization
  */
 class CorrectPHA : public VCSModule
 {
@@ -50,6 +51,7 @@ public:
   anl::ANLStatus mod_exit();
 
 private:
+  bool m_PHARandomization;
   bool m_PedestalCorrection;
   CMNSubtractionMode m_CMNSubtraction;
   bool m_GainCorrection;

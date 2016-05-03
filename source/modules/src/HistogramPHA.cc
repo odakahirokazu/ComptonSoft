@@ -38,6 +38,7 @@ ANLStatus HistogramPHA::mod_startup()
 {
   register_parameter(&m_ReadoutOrder, "readout_order");
   register_parameter(&m_GroupingInSection, "group");
+  register_parameter(&m_HistogramType, "category");
   register_parameter(&m_NumBins, "num_bins");
   register_parameter(&m_RangeMin, "range_min");
   register_parameter(&m_RangeMax, "range_max");
@@ -56,7 +57,7 @@ ANLStatus HistogramPHA::mod_his()
         if (m_GroupingInSection) {
           std::string name = "spectrum_"+channel.toString();
           TH1* h = new TH1I(name.c_str(), name.c_str(),
-                            m_NumBins, m_RangeMin, m_RangeMin);
+                            m_NumBins, m_RangeMin, m_RangeMax);
           m_Histograms.push_back(h);
         }
         else {
@@ -67,7 +68,7 @@ ANLStatus HistogramPHA::mod_his()
                                       k);
             std::string name = "spectrum_"+channel2.toString();
             TH1* h = new TH1I(name.c_str(), name.c_str(),
-                              m_NumBins, m_RangeMin, m_RangeMin);
+                              m_NumBins, m_RangeMin, m_RangeMax);
             m_Histograms.push_back(h);
           }
         }
@@ -80,7 +81,7 @@ ANLStatus HistogramPHA::mod_his()
         if (m_GroupingInSection) {
           std::string name = "spectrum_"+channel.toString();
           TH1* h = new TH1I(name.c_str(), name.c_str(),
-                            m_NumBins, m_RangeMin, m_RangeMin);
+                            m_NumBins, m_RangeMin, m_RangeMax);
           m_Histograms.push_back(h);
         }
         else {
@@ -91,7 +92,7 @@ ANLStatus HistogramPHA::mod_his()
                                       k);
             std::string name = "spectrum_"+channel2.toString();
             TH1* h = new TH1I(name.c_str(), name.c_str(),
-                              m_NumBins, m_RangeMin, m_RangeMin);
+                              m_NumBins, m_RangeMin, m_RangeMax);
             m_Histograms.push_back(h);
           }
         }

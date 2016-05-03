@@ -29,14 +29,14 @@ set(RUBY_EXT_LIBRARY_DIRS
   ${ADD_LIB_DIR}
   )
 set(RUBY_EXT_LIBRARIES
+  CSAstroH
   CSSimulation
   CSModules
   CSCore
-  CSAstroH
   ${ANLG4_LIB}
   ${ANLNEXT_LIB}
-  ${ROOT_LIB}
   ${G4_LIB}
+  ${ROOT_LIB}
   ${SIMX_LIB}
   )
 

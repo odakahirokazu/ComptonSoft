@@ -179,7 +179,7 @@ BasicComptonEvent ComptonEventTreeIO::retrieveEvent() const
 {
   BasicComptonEvent event;
   retrieveEvent(event);
-  return std::move(event);
+  return event;
 }
 
 void ComptonEventTreeIO::retrieveEvent(BasicComptonEvent& event) const

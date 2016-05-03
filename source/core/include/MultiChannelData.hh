@@ -37,6 +37,7 @@ namespace comptonsoft {
  * @date 2009-05-20 | change convertPHA2PI(), extrapolation calibration range
  * @date 2012-06-29 | simplification
  * @date 2014-09-07 | switch from array to vectors, introduce ElectrodeSide, change API.
+ * @date 2016-05-02 | PHA randomization
  */
 class MultiChannelData
 {
@@ -198,6 +199,11 @@ public:
    */
   void copyToPHA()
   { std::copy(rawADCs_.begin(), rawADCs_.end(), PHAs_.begin()); }
+
+  /**
+   * randomize each PHA value in its bin to prevent discreteness.
+   */
+  void randomizePHAValues();
 
   /**
    * correct pedestal levels on the PHA array.

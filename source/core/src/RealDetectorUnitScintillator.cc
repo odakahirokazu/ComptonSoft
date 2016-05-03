@@ -37,7 +37,7 @@ reconstruct(const DetectorHitVector& hitSignals,
                  [](const DetectorHit_sptr& hit) {
                    auto hit2 = hit->clone();
                    hit2->setEnergy(hit->EPI());
-                   return std::move(hit2);
+                   return hit2;
                  });
   determinePosition(hitsReconstructed);
 }

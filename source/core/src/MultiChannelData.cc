@@ -18,6 +18,7 @@
  *************************************************************************/
 
 #include "MultiChannelData.hh"
+#include "TRandom3.h"
 #include "AstroUnits.hh"
 #include "GainFunctionLinear.hh"
 
@@ -44,6 +45,16 @@ MultiChannelData::MultiChannelData(std::size_t n, ElectrodeSide eside)
 }
 
 MultiChannelData::~MultiChannelData() = default;
+
+void MultiChannelData::randomizePHAValues()
+{
+  const std::size_t N = NumChannels_;
+  for (std::size_t i=0; i<N; i++) {
+    if (getDataValid(i) && getChannelEnable(i)) {
+      PHAs_[i] += gRandom->Uniform(-0.5, 0.5);
+    }
+  }
+}
 
 void MultiChannelData::correctPedestalLevel()
 {

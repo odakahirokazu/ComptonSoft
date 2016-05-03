@@ -34,7 +34,8 @@ namespace comptonsoft
 {
 
 CorrectPHA::CorrectPHA()
-  : m_PedestalCorrection(false),
+  : m_PHARandomization(false),
+    m_PedestalCorrection(false),
     m_CMNSubtraction(CMNSubtractionMode::Given),
     m_GainCorrection(true),
     m_PedestalFileName("pedestal.root"),
@@ -48,6 +49,9 @@ CorrectPHA::~CorrectPHA() = default;
 
 ANLStatus CorrectPHA::mod_startup()
 {
+  register_parameter(&m_PHARandomization, "pha_randomization");
+  set_parameter_description("Randomize PHA values if true");
+  
   register_parameter(&m_PedestalFileName, "pedestal_level");
   set_parameter_description("ROOT file of pedestal levels. '0' for disabling the pedestal level correction.");
 
@@ -136,6 +140,10 @@ ANLStatus CorrectPHA::mod_ana()
     for (int j=0; j<NumSections; j++) {
       MultiChannelData* mcd = detector->getMultiChannelData(j);
       mcd->copyToPHA();
+
+      if (m_PHARandomization) {
+        mcd->randomizePHAValues();
+      }
 
       if (m_PedestalCorrection) {
         mcd->correctPedestalLevel();

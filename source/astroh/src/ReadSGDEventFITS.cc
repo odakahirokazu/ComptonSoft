@@ -18,6 +18,7 @@
  *************************************************************************/
 
 #include "ReadSGDEventFITS.hh"
+#include "G4SystemOfUnits.hh"
 #include "TChain.h"
 #include "ChannelID.hh"
 #include "SGDEvent.hh"
@@ -108,7 +109,7 @@ ANLStatus ReadSGDEventFITS::mod_ana()
       
     const int ChannelID = event.getReadoutChannelIDVector()[i];
     const uint16_t ADCValue = event.getPHAVector()[i];
-    const float EPI = event.getEPIVector()[i];
+    const float EPI = event.getEPIVector()[i] * keV;
 
     MultiChannelData* ASICData = detectorManager->getMultiChannelData(ReadoutID);
     ASICData->setDataValid(ChannelID, 1);

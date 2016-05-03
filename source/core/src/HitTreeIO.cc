@@ -189,7 +189,7 @@ DetectorHit_sptr HitTreeIO::retrieveHit() const
   hit->setLocalPosition(local_posx_ * cm, local_posy_ * cm, local_posz_ * cm);
   hit->setGrade(grade_);
 
-  return std::move(hit);
+  return hit;
 }
 
 std::vector<DetectorHit_sptr> HitTreeIO::retrieveHits(int64_t& entry,
@@ -211,7 +211,7 @@ std::vector<DetectorHit_sptr> HitTreeIO::retrieveHits(int64_t& entry,
     hits.push_back(std::move(hit));
   }
   entry += numHits;
-  return std::move(hits);
+  return hits;
 }
 
 } /* namespace comptonsoft */

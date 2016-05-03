@@ -136,7 +136,7 @@ DetectorHit_sptr HXIEventTreeIO::retrieveHit(int64_t entry)
   hit->setLocalPosition(local_posx_, local_posy_, local_posz_);
   hit->setGrade(grade_);
 
-  return std::move(hit);
+  return hit;
 }
 
 } /* namespace comptonsoft */

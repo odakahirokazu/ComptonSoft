@@ -32,9 +32,16 @@ find_path(ROOT_LIB_DIR
 set(ROOT_LIB
   Core RIO Net Hist Graf Graf3d Gpad Tree
   Rint Postscript Matrix Physics MathCore Thread)
+
+# find_package(ROOT REQUIRED)
+# set(ROOT_INC_DIR ${ROOT_INCLUDE_DIRS})
+# set(ROOT_LIB_DIR )
+# set(ROOT_LIB ${ROOT_LIBRARIES})
+
 message("-- ROOTSYS = ${ROOTSYS}")
 message("-- ROOT_INC_DIR = ${ROOT_INC_DIR}")
 message("-- ROOT_LIB_DIR = ${ROOT_LIB_DIR}")
+message("-- ROOT libraries = ${ROOT_LIB}")
 add_definitions(-DUSE_ROOT)
 add_definitions(-DCS_BASIC2)
 
