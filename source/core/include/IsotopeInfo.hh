@@ -20,6 +20,8 @@
 #ifndef COMPTONSOFT_IsotopeInfo_H
 #define COMPTONSOFT_IsotopeInfo_H 1
 
+#include <cstdint>
+
 namespace comptonsoft {
 
 /**
@@ -27,11 +29,16 @@ namespace comptonsoft {
  *
  * @author Hirokazu Odaka
  * @date 2012-02-06
+ * @date 2016-05-08
  */
 class IsotopeInfo
 {
 public:
+  static int64_t makeID(int z, int a, double energy);
+  
+public:
   IsotopeInfo();
+  explicit IsotopeInfo(int64_t isotopeID);
   IsotopeInfo(int z, int a, double energy=0.0);
   ~IsotopeInfo();
   
@@ -50,6 +57,8 @@ public:
   void add1() { counts_++; }
 
   void setRate(double v) { rate_ = v; }
+
+  int64_t IsotopeID() const;
 
 private:
   int Z_;

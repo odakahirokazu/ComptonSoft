@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="http://www.astro.isas.jaxa.jp/~odaka/xmlstyle/detector_config_v3.xsl" ?>
+
+<configuration>
+  <name>CdTe</name>
+  <comment>H. Odaka | 2016-05-09</comment>
+  <length_unit>cm</length_unit>
+  <detectors>
+    <detector id="0">
+      <type>2DPixel</type>
+      <name>CdTePad:0</name>
+      <geometry>
+        <widthx>2.675</widthx><widthy>2.675</widthy><thickness>0.075</thickness>
+        <offsetx>0.0575</offsetx><offsety>0.0575</offsety>
+      </geometry>
+      <pixel>
+        <numx>8</numx><numy>8</numy>
+        <pitchx>0.32</pitchx><pitchy>0.32</pitchy>
+      </pixel>
+      <position><x>0.0</x><y>0.0</y><z>0.0</z></position>
+      <direction_xaxis><x>+1.0</x><y>0.0</y><z>0.0</z></direction_xaxis>
+      <direction_yaxis><x>0.0</x><y>+1.0</y><z>0.0</z></direction_yaxis>
+      <energy_priority>cathode</energy_priority>
+    </detector>
+  </detectors>
+  
+  <readout />
+
+  <groups>
+    <group name="Any">
+      <detector id="0" />
+    </group>
+    <hit_pattern name="1hit" short_name="1hit" bit="0">
+      <group name="Any" />
+    </hit_pattern>
+    <hit_pattern name="2hit" short_name="2hit" bit="1">
+      <group name="Any" /><group name="Any" />
+    </hit_pattern>
+  </groups>
+</configuration>

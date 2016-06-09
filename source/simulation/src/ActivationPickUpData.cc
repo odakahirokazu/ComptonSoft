@@ -35,26 +35,6 @@
 
 #include "ActivationStackingAction.hh"
 
-namespace {
-  
-int64_t IsotopeID(int z, int a, double energy)
-{
-  int64_t id = 0;
-  id += static_cast<int64_t>(z) * 1000000000 * 1000;
-  id += static_cast<int64_t>(a) * 1000000000;
-  id += static_cast<int64_t>(energy/eV) % 1000000000;
-  
-  /* Isotope ID :xxyyyzzzzzzzzz *
-   * Z = xx		        *
-   * A = yyy                    * 
-   * E = zzz zzz zzz [eV]       */
-  
-  return id;
-}
-
-} /* anonymous namespace */
-
-
 using namespace anl;
 
 namespace comptonsoft
@@ -206,7 +186,7 @@ void ActivationPickUpData::Fill(const G4Ions* nucleus,
   
   // fill data map
   data_map_t& data = m_RIMapVector[volumeIndex];
-  int64_t isotopeID = IsotopeID(Z, A, Energy);
+  int64_t isotopeID = IsotopeInfo::makeID(Z, A, Energy);
   data_map_t::iterator it = data.find(isotopeID);
   if (it != data.end()) {
     (*it).second.add1();
@@ -232,7 +212,7 @@ void ActivationPickUpData::OutputSummary(const std::string& filename,
                                          int numberOfRun)
 {
   std::ofstream fout(filename.c_str());
-  fout << "TotalEvent: " << numberOfRun << '\n' << std::endl;
+  fout << "NumberOfEvents " << numberOfRun << '\n' << std::endl;
   
   for (size_t i=0; i<m_RIMapVector.size(); i++) {
     fout << "Volume[" << i << "] " << VolumeName(i) << std::endl;
@@ -241,7 +221,7 @@ void ActivationPickUpData::OutputSummary(const std::string& filename,
     for (data_map_t::iterator it=data.begin(); it!=data.end(); ++it) {
       int64_t isotopeID = (*it).first;
       IsotopeInfo isotope = (*it).second;
-      fout << (boost::format("%14d %3d %3d %15.9e %15d\n")
+      fout << (boost::format("Isotope %14d %3d %3d %15.9e %15d\n")
                % isotopeID
                % isotope.Z()
                % isotope.A()

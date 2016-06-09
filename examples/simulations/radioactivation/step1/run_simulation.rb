@@ -13,9 +13,11 @@ def run_simulation(num, random, output, activation_output)
   sim.detector_config = "database/detector_configuration.xml"
   sim.simulation_param = "database/simulation_parameters.xml"
   sim.analysis_param = "database/analysis_parameters.xml"
-  sim.use_gdml "database/mass_model.gdml"
+  sim.use_gdml "database/mass_model.gdml", false
 
-  sim.set_physics(hadron_model: "BIC", radioactive_decay: true)
+  sim.set_physics(hadron_model: "BIC",
+                  hadron_hp: true,
+                  radioactive_decay: true)
 
   sim.set_primary_generator :PlaneWavePrimaryGen, {
     particle: "proton",
@@ -39,12 +41,12 @@ end
 # sleep 4
 
 num = 1000000
-runs = (1..32).to_a
+runs = (1..16).to_a
 
 a = ANL::ParallelRun.new
 a.num_processes = 4
 a.set_log "simulation_%03d.log"
-a.run1(runs) do |run_id|
+a.run(runs) do |run_id|
   output = "simulation_%03d.root" % run_id
   activation_output = "activation_%03d" % run_id
   random = run_id
