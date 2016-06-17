@@ -55,11 +55,11 @@ end
 decay_rates_file = "../step2/decay_rates.txt"
 volume = 'CdTeWafer'
 volume_path = '/World_log_PV/CdTeDetector'
-time = 100000.0 # s
-number_threshold = 1.0
+time = 10000.0 # s
+number_threshold = 100.0
 
 as = ComptonSoft::ActivationSummary.new
-as.load(decay_rates_file, as_rate: true)
+as.read(decay_rates_file, as_rate: true)
 ri_list = as.get_list(volume_path)
 ri_list.each{|ri| ri.value = (ri.value*time).round }
 ri_list.reject!{|ri| ri.value <= number_threshold }

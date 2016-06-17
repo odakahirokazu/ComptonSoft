@@ -58,7 +58,7 @@ module ComptonSoft
       @current_volume.values
     end
 
-    def load(filename, as_rate: false)
+    def read(filename, as_rate: false)
       File::open(filename) do |fin|
         fin.each_line do |line|
           if line =~ /^NumberOfEvents\s+(\w+)/
@@ -99,7 +99,7 @@ module ComptonSoft
       end
     end
 
-    def load_for_cosima(filename)
+    def read_for_cosima(filename)
       File::open(filename) do |fin|
         fin.each_line do |line|
           if line =~ /^VN\s+(\S+)/

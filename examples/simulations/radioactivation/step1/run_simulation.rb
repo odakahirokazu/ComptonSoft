@@ -40,7 +40,7 @@ end
 
 # sleep 4
 
-num = 1000000
+num = 100000
 runs = (1..16).to_a
 
 a = ANL::ParallelRun.new
