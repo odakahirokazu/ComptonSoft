@@ -17,42 +17,55 @@
  *                                                                       *
  *************************************************************************/
 
-#ifndef COMPTONSOFT_RDPickUpData_H
-#define COMPTONSOFT_RDPickUpData_H 1
+#include "RadioactiveDecayPickUpData.hh"
+#include "G4SystemOfUnits.hh"
+#include "G4PhysicalConstants.hh"
+#include "G4Track.hh"
+#include "G4VProcess.hh"
 
-#include "StandardPickUpData.hh"
+using namespace anl;
 
-namespace comptonsoft {
-
-
-/**
- * PickUpData for radioactive decay.
- *
- * @author Hirokazu Odaka
- * @date 2008-08-27
- * @date 2011-04-08
- */
-class RDPickUpData : public anlgeant4::StandardPickUpData
+namespace comptonsoft
 {
-  DEFINE_ANL_MODULE(RDPickUpData, 2.0);
-public:
-  RDPickUpData();
-  
-  virtual anl::ANLStatus mod_startup();
 
-  virtual void EventAct_end(const G4Event*);
-  virtual void StepAct(const G4Step* aStep, G4Track* aTrack);
-
-  void SetTerminationTime(double v) { m_TerminationTime = v; }
-  double TerminationTime() const { return m_TerminationTime; }
-
-  double FirstDecayTime() const { return m_FirstDecayTime; }
-
-private:
-  double m_TerminationTime;
-  double m_FirstDecayTime;
-};
-
+RadioactiveDecayPickUpData::RadioactiveDecayPickUpData()
+  : m_TerminationTime(1.0*ms), m_FirstDecayTime(0.0)
+{
+  SetStepActOn(true);
 }
 
-#endif /* COMPTONSOFT_RDPickUpData_H */
+ANLStatus RadioactiveDecayPickUpData::mod_startup()
+{
+  register_parameter(&m_TerminationTime, "termination_time", s, "s");
+
+  return AS_OK;
+}
+
+void RadioactiveDecayPickUpData::EventAct_end(const G4Event*)
+{
+  SetStartTime(FirstDecayTime());
+}
+
+void RadioactiveDecayPickUpData::StepAct(const G4Step* aStep, G4Track* aTrack)
+{
+  const double globalTime = aTrack->GetGlobalTime();
+  
+  if (aTrack->GetTrackID()==1 && aTrack->GetCurrentStepNumber()==1) {
+    const G4String processName
+      = aStep->GetPostStepPoint()->GetProcessDefinedStep()->GetProcessName();
+    if (processName == "RadioactiveDecay") {
+      m_FirstDecayTime = globalTime;
+    }
+    else {
+      throw ANLException("RadioactiveDecayPickUpData:Error---First step is not radioactive decay.");
+    }
+  }
+
+  const double timeFromFirstDecay = globalTime - m_FirstDecayTime;
+  if (timeFromFirstDecay > m_TerminationTime) {
+    aTrack->SetTrackStatus(fStopAndKill);
+    return;
+  }
+}
+
+} /* namespace comptonsoft */

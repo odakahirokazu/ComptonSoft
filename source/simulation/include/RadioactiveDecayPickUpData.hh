@@ -17,55 +17,43 @@
  *                                                                       *
  *************************************************************************/
 
-#include "RDPickUpData.hh"
-#include "G4SystemOfUnits.hh"
-#include "G4PhysicalConstants.hh"
-#include "G4Track.hh"
-#include "G4VProcess.hh"
+#ifndef COMPTONSOFT_RadioactiveDecayPickUpData_H
+#define COMPTONSOFT_RadioactiveDecayPickUpData_H 1
 
-using namespace anl;
-using namespace comptonsoft;
+#include "StandardPickUpData.hh"
+
+namespace comptonsoft {
 
 
-RDPickUpData::RDPickUpData()
-  : m_TerminationTime(1.0*ms), m_FirstDecayTime(0.0)
+/**
+ * PickUpData for radioactive decay.
+ *
+ * @author Hirokazu Odaka
+ * @date 2008-08-27
+ * @date 2011-04-08
+ * @date 2016-06-29 | rename the module name.
+ */
+class RadioactiveDecayPickUpData : public anlgeant4::StandardPickUpData
 {
-  SetStepActOn(true);
-}
-
-
-ANLStatus RDPickUpData::mod_startup()
-{
-  register_parameter(&m_TerminationTime, "termination_time", s, "s");
-
-  return AS_OK;
-}
-
-
-void RDPickUpData::EventAct_end(const G4Event*)
-{
-  SetStartTime(FirstDecayTime());
-}
-
-
-void RDPickUpData::StepAct(const G4Step* aStep, G4Track* aTrack)
-{
-  const double globalTime = aTrack->GetGlobalTime();
+  DEFINE_ANL_MODULE(RadioactiveDecayPickUpData, 2.0);
+public:
+  RadioactiveDecayPickUpData();
   
-  if (aTrack->GetTrackID()==1 && aTrack->GetCurrentStepNumber()==1) {
-    G4String processName
-      = aStep->GetPostStepPoint()->GetProcessDefinedStep()->GetProcessName();
-    if (processName=="RadioactiveDecay") {
-      m_FirstDecayTime = globalTime;
-    }
-    else {
-      throw ANLException("RDPickUpData:Error -> First step is not radioactive decay.");
-    }
-  }
+  virtual anl::ANLStatus mod_startup();
 
-  double timeFromFirstDecay = globalTime - m_FirstDecayTime;
-  if (timeFromFirstDecay > m_TerminationTime) {
-    aTrack->SetTrackStatus(fStopAndKill);
-    return;
-  }
-}
+  virtual void EventAct_end(const G4Event*);
+  virtual void StepAct(const G4Step* aStep, G4Track* aTrack);
+
+  void SetTerminationTime(double v) { m_TerminationTime = v; }
+  double TerminationTime() const { return m_TerminationTime; }
+
+  double FirstDecayTime() const { return m_FirstDecayTime; }
+
+private:
+  double m_TerminationTime;
+  double m_FirstDecayTime;
+};
+
+} /* namespace comptonsoft */
+
+#endif /* COMPTONSOFT_RadioactiveDecayPickUpData_H */

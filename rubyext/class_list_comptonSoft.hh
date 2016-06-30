@@ -55,7 +55,7 @@ class QuickAnalysisForDSD;
 class AHRayTracingPrimaryGen;
 class SimXPrimaryGen;
 class AHRadiationBackgroundPrimaryGen;
-class RDPickUpData;
+class RadioactiveDecayPickUpData;
 class ActivationPickUpData;
 class AHStandardPickUpData;
 class KillStepPickUpData;

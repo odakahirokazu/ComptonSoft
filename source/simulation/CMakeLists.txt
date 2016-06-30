@@ -31,7 +31,7 @@ set(CS_SIMULATION_CLASSES_BASIC
   # primary geneator
   src/AHRadiationBackgroundPrimaryGen.cc
   # pick up data
-  src/RDPickUpData.cc
+  src/RadioactiveDecayPickUpData.cc
   src/ActivationStackingAction.cc
   src/ActivationPickUpData.cc
   src/KillStepPickUpData.cc

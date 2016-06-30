@@ -66,7 +66,7 @@ clSim = [# primary generator
   ANL::SWIGClass.new("SimXPrimaryGen", false, 'USE_SIMX'),
   ANL::SWIGClass.new("AHRadiationBackgroundPrimaryGen"),
   # pick up data
-  ANL::SWIGClass.new("RDPickUpData"),
+  ANL::SWIGClass.new("RadioactiveDecayPickUpData"),
   ANL::SWIGClass.new("ActivationPickUpData"),
   ANL::SWIGClass.new("AHStandardPickUpData", false, 'USE_SIMX'),
   ANL::SWIGClass.new("KillStepPickUpData"),

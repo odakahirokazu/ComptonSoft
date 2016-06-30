@@ -8,4 +8,6 @@ documentation/doxygen/tag/
 *_seed_F.txt
 *_summary.txt
 *_volume.txt
+run_list.txt
+decay_rates.txt
 *.log

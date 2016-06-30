@@ -24,6 +24,10 @@ def run_simulation(num, random, output, ri, volume_path)
     volume_hierarchy: volume_path.split('/').drop(1),
   }
 
+  sim.set_pickup_data :RadioactiveDecayPickUpData, {
+    termination_time: 1.0e-6
+  }
+
   sim.thread_mode = false
   sim.run(num)
 end

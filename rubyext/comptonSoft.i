@@ -60,7 +60,7 @@
 #include "SimXPrimaryGen.hh"
 #endif
 #include "AHRadiationBackgroundPrimaryGen.hh"
-#include "RDPickUpData.hh"
+#include "RadioactiveDecayPickUpData.hh"
 #include "ActivationPickUpData.hh"
 #ifdef USE_SIMX
 #include "AHStandardPickUpData.hh"
@@ -554,10 +554,10 @@ public:
 };
 
 
-class RDPickUpData : public anlgeant4::StandardPickUpData
+class RadioactiveDecayPickUpData : public anlgeant4::StandardPickUpData
 {
 public:
-  RDPickUpData();
+  RadioactiveDecayPickUpData();
 };
 
 
