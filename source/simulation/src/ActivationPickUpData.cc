@@ -20,6 +20,8 @@
 #include "ActivationPickUpData.hh"
 
 #include <fstream>
+#include <iterator>
+#include <algorithm>
 #include <boost/format.hpp>
 
 #include "G4SystemOfUnits.hh"
@@ -43,6 +45,7 @@ namespace comptonsoft
 ActivationPickUpData::ActivationPickUpData()
   : m_AnalysisManager(G4RootAnalysisManager::Instance()),
     m_FilenameBase("activation"),
+    m_ProcessesToDetect{"protonInelastic"},
     m_InitialEnergy(0.0)
 {
   add_alias("ActivationPickUpData");
@@ -54,6 +57,7 @@ ActivationPickUpData::~ActivationPickUpData() = default;
 ANLStatus ActivationPickUpData::mod_startup()
 {
   register_parameter(&m_FilenameBase, "output_filename_base");
+  register_parameter(&m_ProcessesToDetect, "processes_to_detect");
   return AS_OK;
 }
 
@@ -91,48 +95,35 @@ void ActivationPickUpData::RunAct_end(const G4Run* aRun)
 void ActivationPickUpData::TrackAct_begin(const G4Track* aTrack)
 {
   StandardPickUpData::TrackAct_begin(aTrack);
+
   if (aTrack->GetTrackID() == 1) {
     SetInitialEnergy(aTrack->GetKineticEnergy());
   }
 }
 
-void ActivationPickUpData::StepAct(const G4Step* aStep, G4Track* aTrack)
+void ActivationPickUpData::StepAct(const G4Step* aStep, G4Track*)
 {
-  G4ParticleDefinition* particleType = aTrack->GetDefinition();
-  static const G4VProcess* processRD = 0;
-  if (!processRD) {
-    const G4ProcessVector* vec =
-    G4GenericIon::GenericIonDefinition()->GetProcessManager()->GetProcessList();
-    for (int i=0; i<vec->size(); i++) {
-      const G4VProcess* p = (*vec)[i];
-      if (p->GetProcessName() == "RadioactiveDecay") {
-        processRD = p;
-        break;
+  const G4VProcess* process = aStep->GetPostStepPoint()->GetProcessDefinedStep();
+  const G4String processName = process->GetProcessName();
+
+  if (std::find(std::begin(m_ProcessesToDetect),
+                std::end(m_ProcessesToDetect),
+                processName) != std::end(m_ProcessesToDetect)) {
+    const G4VTouchable* hist = aStep->GetPreStepPoint()->GetTouchable();
+    const G4ThreeVector position = aStep->GetPreStepPoint()->GetPosition();
+
+    const std::vector<const G4Track*>* secondaries
+      = aStep->GetSecondaryInCurrentStep();
+    for (const G4Track* secondaryTrack: *secondaries) {
+      G4ParticleDefinition* particle = secondaryTrack->GetDefinition();
+      const int massNumber = particle->GetAtomicMass();
+      if (massNumber > 4) { // heavier than He4 (alpha)
+        G4Ions* nucleus = dynamic_cast<G4Ions*>(particle);
+        if (nucleus) {
+          Fill(nucleus, hist, position.x(), position.y(), position.z());
+        }
       }
     }
-    if (!processRD) {
-      G4Exception("Activation", "Active0000", FatalException,
-                  "GenericIon does not have RadioActiveDecay process.");
-    }
-  }
-  
-  const G4VProcess* proc = aStep->GetPostStepPoint()->GetProcessDefinedStep();
-  if ( proc == processRD ) {
-    G4Ions* nucleus = dynamic_cast<G4Ions*>(particleType);
-    if (!nucleus) return; // Disregard triton
-    
-    const G4VTouchable* hist = aStep->GetPreStepPoint()->GetTouchable();
-    if (hist->GetHistoryDepth() == 0) return; // if in the World
-    
-    G4ThreeVector position = aStep->GetPreStepPoint()->GetPosition();
-    Fill(nucleus, hist, position.x(), position.y(), position.z());
-    aTrack->SetTrackStatus(fKillTrackAndSecondaries);
-
-#if 0
-    double time = aStep->GetPostStepPoint()->GetGlobalTime();
-    G4cout << "### Isotope: " << nucleus->GetParticleName();
-    G4cout << "  ### Time: " << time/second << " [sec] ###" << G4endl;
-#endif
   }
 }
 

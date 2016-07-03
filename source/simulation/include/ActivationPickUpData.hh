@@ -44,10 +44,11 @@ namespace comptonsoft {
  * @date 2012-02-06 | H. Odaka | code cleanup
  * @date 2012-06-13 | T. Sato & H. Odaka
  * @date 2015-06-01 | Hiro Odaka
+ * @date 2016-06-29 | Hiro Odaka | modify detection methods
  */
 class ActivationPickUpData : public anlgeant4::StandardPickUpData
 {
-  DEFINE_ANL_MODULE(ActivationPickUpData, 1.3);
+  DEFINE_ANL_MODULE(ActivationPickUpData, 2.0);
 
   typedef std::map<std::string, int> volume_map_t;
   typedef std::map<int64_t, IsotopeInfo> data_map_t;
@@ -78,6 +79,7 @@ protected:
 private:
   std::unique_ptr<G4VAnalysisManager> m_AnalysisManager;
   std::string m_FilenameBase;
+  std::vector<std::string> m_ProcessesToDetect;
   
   double m_InitialEnergy;
       

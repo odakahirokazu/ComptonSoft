@@ -15,9 +15,7 @@ def run_simulation(num, random, output, activation_output)
   sim.analysis_param = "database/analysis_parameters.xml"
   sim.use_gdml "database/mass_model.gdml", false
 
-  sim.set_physics(hadron_model: "BIC",
-                  hadron_hp: true,
-                  radioactive_decay: true)
+  sim.set_physics(physics_list: "FTFP_INCLXX_HP")
 
   sim.set_primary_generator :PlaneWavePrimaryGen, {
     particle: "proton",
@@ -40,7 +38,7 @@ end
 
 # sleep 4
 
-num = 100000
+num = 25000
 runs = (1..16).to_a
 
 a = ANL::ParallelRun.new
