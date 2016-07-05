@@ -44,6 +44,7 @@ public:
   ~PhysicsListManager() = default;
   
   anl::ANLStatus mod_startup();
+  anl::ANLStatus mod_prepare();
   anl::ANLStatus mod_init(); 
 
   G4VUserPhysicsList* create();

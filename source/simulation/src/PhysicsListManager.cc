@@ -59,6 +59,20 @@ ANLStatus PhysicsListManager::mod_startup()
   return AS_OK;
 }
 
+ANLStatus PhysicsListManager::mod_prepare()
+{
+  if (m_PhysicsListName != "CSPhysicsList") {
+    hide_parameter("polarization");
+    hide_parameter("customized_em");
+    hide_parameter("hadron_hp");
+    hide_parameter("hadron_model");
+    hide_parameter("radioactive_decay");
+    hide_parameter("parallel_world");
+  }
+  
+  return AS_OK;
+}
+
 ANLStatus PhysicsListManager::mod_init()
 {
   CSPhysicsOption option;
