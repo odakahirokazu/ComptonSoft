@@ -50,6 +50,8 @@ public:
 
 private:
   bool m_VetoEnabled;
+  bool m_DiscardTimeGroupZero;
+  bool m_DiscardTimeGroupNonZero;
   CSHitCollection* m_HitCollection;
   std::vector<std::pair<double, double>> m_FluoresenceRanges;
 };

@@ -19,6 +19,9 @@
 
 #include "VDeviceSimulation.hh"
 
+#include <algorithm>
+#include <iterator>
+#include <cmath>
 #include "CLHEP/Random/RandGauss.h"
 #include "AstroUnits.hh"
 #include "CSTypes.hh"
@@ -58,10 +61,20 @@ void VDeviceSimulation::initializeTables()
 
 void VDeviceSimulation::makeDetectorHits()
 {
-  simulateDetectorHits();
+  simulatePulseHeights();
+  removeHitsOutOfPixelRange(SimulatedHits_);
+  mergeHits(SimulatedHits_);
+  removeHitsAtBrokenChannels(SimulatedHits_);
+
+  for (auto& hit: SimulatedHits_) {
+    hit->setEPI( calculateEPI(hit->EnergyCharge(), hit->Pixel()) );
+  }
+  removeHitsBelowThresholds(SimulatedHits_);
+  
   for (auto& hit: SimulatedHits_) {
     insertDetectorHit(hit);
   }
+  SimulatedHits_.clear();
 }
 
 void VDeviceSimulation::makeRawDetectorHits()
@@ -71,52 +84,37 @@ void VDeviceSimulation::makeRawDetectorHits()
   }
 }
 
-void VDeviceSimulation::simulateDetectorHits()
+void VDeviceSimulation::removeHitsOutOfPixelRange(std::list<DetectorHit_sptr>& hits)
 {
-  simulatePulseHeights();
-  removeHitsOutOfPixelRange();
-  mergeSimulatedHits();
-  
-  auto it = SimulatedHits_.begin();
-  while (it != SimulatedHits_.end()) {
-    (*it)->setEPI( calculateEPI((*it)->EnergyCharge(), (*it)->Pixel()) );
-    if ( getBrokenChannel((*it)->Pixel()) ) {
-      it = SimulatedHits_.erase(it);
-      continue;
-    }
-    
-    const double threshold = getThreshold((*it)->Pixel());
-    if ( (*it)->EPI() < threshold ) {
-      it = SimulatedHits_.erase(it);
-      continue;
-    }
-
-    ++it;
-  }
+  hits.remove_if([this](DetectorHit_sptr hit) {
+      return !checkRange(hit->Pixel());
+    });
 }
 
-void VDeviceSimulation::removeHitsOutOfPixelRange()
+void VDeviceSimulation::removeHitsAtBrokenChannels(std::list<DetectorHit_sptr>& hits)
 {
-  auto it = SimulatedHits_.begin();
-  while (it != SimulatedHits_.end()) {
-    if ( checkRange((*it)->Pixel()) ) {
-      ++it;
-    }
-    else {
-      it = SimulatedHits_.erase(it);
-    }
-  }
+  hits.remove_if([this](DetectorHit_sptr hit) {
+      return getBrokenChannel(hit->Pixel());
+    });
 }
 
-void VDeviceSimulation::mergeSimulatedHits()
+void VDeviceSimulation::removeHitsBelowThresholds(std::list<DetectorHit_sptr>& hits)
 {
-  for (auto it1=SimulatedHits_.begin(); it1!=SimulatedHits_.end(); ++it1) {
+  hits.remove_if([this](DetectorHit_sptr hit) {
+      const double threshold = getThreshold(hit->Pixel());
+      return (hit->EPI() < threshold);
+    });
+}
+
+void VDeviceSimulation::mergeHits(std::list<DetectorHit_sptr>& hits)
+{
+  for (auto it1=hits.begin(); it1!=hits.end(); ++it1) {
     auto it2 = it1;
     ++it2;
-    while ( it2 != SimulatedHits_.end() ) {
+    while ( it2 != hits.end() ) {
       if ( (*it1)->isInSamePixel(**it2) ) {
         (*it1)->merge(**it2);
-        it2 = SimulatedHits_.erase(it2);
+        it2 = hits.erase(it2);
       }
       else {
         ++it2;
@@ -125,17 +123,18 @@ void VDeviceSimulation::mergeSimulatedHits()
   }
 }
 
-void VDeviceSimulation::mergeSimulatedHitsIfCoincident(double time_width)
+void VDeviceSimulation::mergeHitsIfCoincident(double time_width,
+                                              std::list<DetectorHit_sptr>& hits)
 {
-  for (auto it1 = SimulatedHits_.begin(); it1!=SimulatedHits_.end(); ++it1) {
+  for (auto it1=hits.begin(); it1!=hits.end(); ++it1) {
     auto it2 = it1;
     ++it2;
-    while ( it2 != SimulatedHits_.end() ) {
-      double hit1Time = (*it1)->RealTime();
-      double hit2Time = (*it2)->RealTime();
-      if ( (*it2)->isInSamePixel(**it1) && std::abs(hit1Time-hit2Time)<=time_width ) {
+    while ( it2 != hits.end() ) {
+      const double hit1Time = (*it1)->RealTime();
+      const double hit2Time = (*it2)->RealTime();
+      if ( (*it1)->isInSamePixel(**it2) && std::abs(hit1Time-hit2Time)<=time_width ) {
         (*it1)->merge(**it2);
-        it2 = SimulatedHits_.erase(it2);
+        it2 = hits.erase(it2);
       }
       else {
         ++it2;
@@ -178,23 +177,34 @@ void VDeviceSimulation::fillPixel(DetectorHit_sptr hit) const
   hit->setPixel(pixel);
 }
 
-void VDeviceSimulation::initializeTimingProcess()
+void VDeviceSimulation::prepareForTimingProcess()
 {
   simulatePulseHeights();
-  removeHitsOutOfPixelRange();
+  removeHitsOutOfPixelRange(SimulatedHits_);
 
   const double SMALL_TIME = 1.0e-15 * second;
-  mergeSimulatedHitsIfCoincident(SMALL_TIME);
-  sortSimulatedHitsInTimeOrder();
-  mergeSimulatedHitsIfCoincident(TimeResolutionFast_);
+  mergeHitsIfCoincident(SMALL_TIME, SimulatedHits_);
+  sortHitsInTimeOrder(SimulatedHits_);
+  mergeHitsIfCoincident(TimeResolutionFast_, SimulatedHits_);
 }
 
-void VDeviceSimulation::sortSimulatedHitsInTimeOrder()
+void VDeviceSimulation::sortHitsInTimeOrder(std::list<DetectorHit_sptr>& hits)
 {
-  typedef DetectorHit_sptr HitType;
-  SimulatedHits_.sort([](HitType h1, HitType h2)-> bool {
+  using HitType = DetectorHit_sptr;
+  hits.sort([](HitType h1, HitType h2)-> bool {
       return h1->RealTime() < h2->RealTime();
     });
+}
+
+bool VDeviceSimulation::isSelfTriggered() const
+{
+  // tentative implementation
+  
+  bool triggered = false;
+  if (!SimulatedHits_.empty()) {
+    triggered = true;
+  }
+  return triggered;
 }
 
 double VDeviceSimulation::FirstEventTime() const
@@ -205,69 +215,37 @@ double VDeviceSimulation::FirstEventTime() const
 
 void VDeviceSimulation::makeDetectorHitsAtTime(double time_start, int time_group)
 {
-  const double time_end = time_start + TimeResolutionSlow_;
-
-  auto it1 = SimulatedHits_.begin();
-  auto itStart = SimulatedHits_.begin();
-  auto itEnd = SimulatedHits_.end();
-
-  while (it1 != SimulatedHits_.end()) {
-    const double hitTime = (*it1)->RealTime();
-    if (hitTime < time_start) {
-      ++it1;
-      continue;
-    }
-    else {
-      itStart = it1;
-      break;
-    }
-  }
-
-  while (it1 != SimulatedHits_.end()) {
-    const double hitTime = (*it1)->RealTime();
-    if (hitTime <= time_end) {
-      (*it1)->setTimeGroup(time_group);
-      ++it1;
-      continue;
-    }
-    else {
-      itEnd = it1;
-      break;
-    }
-  }
-
-  for (it1 = itStart; it1 != itEnd; ++it1) {
-    auto it2 = it1;
-    ++it2;
-    while ( it2 != itEnd ) {
-      if ( (*it2)->isInSamePixel(**it1) ) {
-        **it1 += **it2;
-        it2 = SimulatedHits_.erase(it2);
-      }
-      else {
-        ++it2;
-      }
-    }
-  }
+  using HitType = DetectorHit_sptr;
   
-  it1 = itStart;
-  while (it1 != itEnd) {
-    (*it1)->setTimeGroup(time_group);
-    (*it1)->setEPI( calculateEPI((*it1)->EnergyCharge(), (*it1)->Pixel()) );
-    
-    if ( getBrokenChannel((*it1)->Pixel()) ) {
-      it1 = SimulatedHits_.erase(it1);
-      continue;
-    }
-    
-    double threshold = getThreshold((*it1)->Pixel());
-    if ( (*it1)->EPI() < threshold ) {
-      it1 = SimulatedHits_.erase(it1);
-      continue;
-    }
-    
-    insertDetectorHit(*it1);
-    it1 = SimulatedHits_.erase(it1);
+  const double time_end = time_start + TimeResolutionSlow_;
+  const auto itStart = std::find_if(std::begin(SimulatedHits_),
+                                    std::end(SimulatedHits_),
+                                    [=](HitType hit)-> bool {
+                                      const double hitTime = hit->RealTime();
+                                      return (hitTime >= time_start);
+                                    });
+  const auto itEnd = std::find_if(std::begin(SimulatedHits_),
+                                  std::end(SimulatedHits_),
+                                  [=](HitType hit)-> bool {
+                                    const double hitTime = hit->RealTime();
+                                    return (hitTime > time_end);
+                                  });
+
+  // move hits in this time group to a new list
+  std::list<HitType> hits(itStart, itEnd);
+  SimulatedHits_.erase(itStart, itEnd);
+
+  mergeHits(hits);
+  removeHitsAtBrokenChannels(hits);
+
+  for (auto& hit: hits) {
+    hit->setTimeGroup(time_group);
+    hit->setEPI( calculateEPI(hit->EnergyCharge(), hit->Pixel()) );
+  }
+  removeHitsBelowThresholds(hits);
+  
+  for (auto& hit: hits) {
+    insertDetectorHit(hit);
   }
 }
 

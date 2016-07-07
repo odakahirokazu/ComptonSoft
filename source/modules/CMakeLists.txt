@@ -39,7 +39,7 @@ set(CS_MODULES
   src/AnalyzeHits.cc
   src/MakeDetectorHits.cc
   src/MakeRawHits.cc
-  src/MakeDetectorHitsTR.cc
+  src/MakeDetectorHitsWithTimingProcess.cc
   src/ApplyEPICompensation.cc
   src/EventSelection.cc
   src/EventReconstruction.cc

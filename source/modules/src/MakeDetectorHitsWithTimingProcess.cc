@@ -17,7 +17,7 @@
  *                                                                       *
  *************************************************************************/
 
-#include "MakeDetectorHitsTR.hh"
+#include "MakeDetectorHitsWithTimingProcess.hh"
 
 #include <iostream>
 #include <algorithm>
@@ -27,34 +27,32 @@
 namespace comptonsoft
 {
 
-void MakeDetectorHitsTR::doProcessing()
+void MakeDetectorHitsWithTimingProcess::doProcessing()
 {
   DetectorSystem* detectorManager = getDetectorManager();
   auto dsVector = detectorManager->getDeviceSimulationVector();
   for (auto ds: dsVector) {
-    ds->initializeTimingProcess();
+    ds->prepareForTimingProcess();
   }
- 
-  int maxTimeGroup = 0;
-  for (int timeGroup = 0; ; timeGroup++) {
-    m_TriggerTimes.clear();
-    
+
+  for (int timeGroup=0; ; timeGroup++) {
+    std::vector<double> triggerTimes;
+
     for (auto ds: dsVector) {
-      if (!(ds->isEmptySimulatedHits())) {
-        m_TriggerTimes.push_back(ds->FirstEventTime());
+      if (ds->isSelfTriggered()) {
+        triggerTimes.push_back(ds->FirstEventTime());
       }
     }
 
-    if (m_TriggerTimes.empty()) break;
+    if (triggerTimes.empty()) {
+      break;
+    }
 
-    const double triggerTime = *std::min_element(m_TriggerTimes.begin(),
-                                                 m_TriggerTimes.end());
-    
+    const double triggerTime = *std::min_element(triggerTimes.begin(),
+                                                 triggerTimes.end());
     for (auto ds: dsVector) {
       ds->makeDetectorHitsAtTime(triggerTime, timeGroup);
     }
-
-    maxTimeGroup = timeGroup;
   }
 
   for (auto& detector: detectorManager->getDetectors()) {

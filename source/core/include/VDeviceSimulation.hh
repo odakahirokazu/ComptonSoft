@@ -124,9 +124,8 @@ public:
   void makeDetectorHits();
   void makeRawDetectorHits();
 
-  bool isEmptySimulatedHits() const { return SimulatedHits_.empty(); }
-
-  void initializeTimingProcess();
+  void prepareForTimingProcess();
+  bool isSelfTriggered() const;
   double FirstEventTime() const;
   void makeDetectorHitsAtTime(double time_start, int time_group);
 
@@ -159,15 +158,17 @@ protected:
   void insertSimulatedHit(DetectorHit_sptr hit)
   { SimulatedHits_.push_back(hit); }
 
-  void sortSimulatedHitsInTimeOrder();
-
 private:
-  void simulateDetectorHits();
-
   virtual void simulatePulseHeights() = 0;
-  void removeHitsOutOfPixelRange();
-  void mergeSimulatedHits();
-  void mergeSimulatedHitsIfCoincident(double time_width);
+  
+  void sortHitsInTimeOrder(std::list<DetectorHit_sptr>& hits);
+
+  void removeHitsOutOfPixelRange(std::list<DetectorHit_sptr>& hits);
+  void removeHitsAtBrokenChannels(std::list<DetectorHit_sptr>& hits);
+  void removeHitsBelowThresholds(std::list<DetectorHit_sptr>& hits);
+  void mergeHits(std::list<DetectorHit_sptr>& hits);
+  void mergeHitsIfCoincident(double time_width,
+                             std::list<DetectorHit_sptr>& hits);
   
 protected:
   template <typename ObjectType, typename ValueType, typename IndexType>

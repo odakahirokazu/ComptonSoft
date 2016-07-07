@@ -56,6 +56,7 @@ module ComptonSoft
     ### Analysis parameters
     attr_writer :analysis_parameters
     attr_writer :enable_veto, :fluorescence_range
+    attr_writer :discard_time_group_zero, :discard_time_group_nonzero
 
     ### SimX parameters
     attr_accessor :pointing_ra, :pointing_dec, :exposure
@@ -72,6 +73,7 @@ module ComptonSoft
 
       ### Modules
       @simx = nil
+      @make_detector_hits_module = :MakeDetectorHits
 
       ### Input files
       @detector_configuration = "detector_configuration.xml"
@@ -92,6 +94,8 @@ module ComptonSoft
       ### analysis settings
       @analysis_parameters = nil # "analysis_parameters.xml"
       @enable_veto = true
+      @discard_time_group_zero = false
+      @discard_time_group_nonzero = false
       @fluorescence_range = 1.5 # keV
       @compton_mode = false
 
@@ -133,8 +137,8 @@ module ComptonSoft
     end
 
     # Enable event tree output instead of hit tree
-    def use_event_tree(v=true)
-      @event_tree_enabled = v
+    def use_event_tree(b=true)
+      @event_tree_enabled = b
     end
 
     # Enable visualization.
@@ -155,6 +159,14 @@ module ComptonSoft
       with(file: gdml_file, validate: validate)
     end
 
+    def enable_timing_process(b=true)
+      if b
+        @make_detector_hits_module = :MakeDetectorHitsWithTimingProcess
+      else
+        @make_detector_hits_module = :MakeDetectorHits
+      end
+    end
+
     def simx_on(simx=nil)
       if simx
         @simx = simx
@@ -166,8 +178,8 @@ module ComptonSoft
 
     def get_simx_module() @simx end
 
-    def compton_mode_on()
-      @compton_mode = true
+    def compton_mode_on(b=true)
+      @compton_mode = b
     end
 
     def setup_simx()
@@ -245,9 +257,11 @@ module ComptonSoft
                       verbose: @verbose)
 
       if mode >= SimulationMode::Basic
-        chain :MakeDetectorHits
+        chain @make_detector_hits_module
         chain :EventSelection
-        with_parameters(enable_veto: @enable_veto)
+        with_parameters(enable_veto: @enable_veto,
+                        discard_time_group_zero: @discard_time_group_zero,
+                        discard_time_group_nonzero: @discard_time_group_nonzero)
         if @compton_mode
           chain :EventReconstruction
           with_parameters(detector_group: @detector_group,
@@ -346,7 +360,7 @@ module ComptonSoft
               upper_energy_consistency_check_function_c1: uc1
             })
           end
-          set_parameters :MakeDetectorHits
+          set_parameters @make_detector_hits_module
           insert_to_map "analysis_map", prefix, parameters
         end
       end

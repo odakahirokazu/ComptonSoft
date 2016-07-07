@@ -17,8 +17,8 @@
  *                                                                       *
  *************************************************************************/
 
-#ifndef COMPTONSOFT_MakeDetectorHitsTR_H
-#define COMPTONSOFT_MakeDetectorHitsTR_H 1
+#ifndef COMPTONSOFT_MakeDetectorHitsWithTimingProcess_H
+#define COMPTONSOFT_MakeDetectorHitsWithTimingProcess_H 1
 
 #include <vector>
 
@@ -26,20 +26,17 @@
 
 namespace comptonsoft {
 
-class MakeDetectorHitsTR : public MakeDetectorHits
+class MakeDetectorHitsWithTimingProcess : public MakeDetectorHits
 {
-  DEFINE_ANL_MODULE(MakeDetectorHitsTR, 2.1);
+  DEFINE_ANL_MODULE(MakeDetectorHitsWithTimingProcess, 3.0);
 public:
-  MakeDetectorHitsTR() = default;
-  ~MakeDetectorHitsTR() = default;
+  MakeDetectorHitsWithTimingProcess() = default;
+  ~MakeDetectorHitsWithTimingProcess() = default;
   
 private:
   void doProcessing();
-
-private:
-  std::vector<double> m_TriggerTimes;
 };
 
 } /* namespace comptonsoft */
 
-#endif /* COMPTONSOFT_MakeDetectorHitsTR_H */
+#endif /* COMPTONSOFT_MakeDetectorHitsWithTimingProcess_H */

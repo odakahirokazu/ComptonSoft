@@ -12,7 +12,7 @@
 #include "AnalyzeHits.hh"
 #include "MakeDetectorHits.hh"
 #include "MakeRawHits.hh"
-#include "MakeDetectorHitsTR.hh"
+#include "MakeDetectorHitsWithTimingProcess.hh"
 #include "ApplyEPICompensation.hh"
 #include "EventSelection.hh"
 #include "EventReconstruction.hh"
@@ -198,11 +198,11 @@ public:
 };
 
 
-class MakeDetectorHitsTR : public MakeDetectorHits
+class MakeDetectorHitsWithTimingProcess : public MakeDetectorHits
 {
 public:
-  MakeDetectorHitsTR() = default;
-  ~MakeDetectorHitsTR() = default;
+  MakeDetectorHitsWithTimingProcess() = default;
+  ~MakeDetectorHitsWithTimingProcess() = default;
 };
 
 

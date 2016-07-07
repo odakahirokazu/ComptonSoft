@@ -18,7 +18,7 @@ clMod = [
   ANL::SWIGClass.new("AnalyzeHits"),
   ANL::SWIGClass.new("MakeDetectorHits"),
   ANL::SWIGClass.new("MakeRawHits"),
-  ANL::SWIGClass.new("MakeDetectorHitsTR"),
+  ANL::SWIGClass.new("MakeDetectorHitsWithTimingProcess"),
   ANL::SWIGClass.new("ApplyEPICompensation"),
   ANL::SWIGClass.new("EventSelection"),
   ANL::SWIGClass.new("EventReconstruction"),

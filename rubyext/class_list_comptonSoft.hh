@@ -11,7 +11,7 @@ class SelectHits;
 class AnalyzeHits;
 class MakeDetectorHits;
 class MakeRawHits;
-class MakeDetectorHitsTR;
+class MakeDetectorHitsWithTimingProcess;
 class ApplyEPICompensation;
 class EventSelection;
 class EventReconstruction;

@@ -32,6 +32,8 @@ namespace comptonsoft
 
 EventSelection::EventSelection()
   : m_VetoEnabled(true),
+    m_DiscardTimeGroupZero(false),
+    m_DiscardTimeGroupNonZero(false),
     m_HitCollection(nullptr)
 {
 }
@@ -39,6 +41,8 @@ EventSelection::EventSelection()
 ANLStatus EventSelection::mod_startup()
 {
   register_parameter(&m_VetoEnabled, "enable_veto");
+  register_parameter(&m_DiscardTimeGroupZero, "discard_time_group_zero");
+  register_parameter(&m_DiscardTimeGroupNonZero, "discard_time_group_nonzero");
   return AS_OK;
 }
 
@@ -53,16 +57,30 @@ ANLStatus EventSelection::mod_init()
 ANLStatus EventSelection::mod_ana()
 {
   DetectorSystem* detectorManager = getDetectorManager();
-  const int NumTimeGroups = m_HitCollection->NumberOfTimeGroups();
   const DetectorGroup& AntiDetectorGroup
     = detectorManager->getDetectorGroup("Anti");
   const DetectorGroup& LowZDetectorGroup
     = detectorManager->getDetectorGroup("LowZ");
   const DetectorGroup& HighZDetectorGroup
     = detectorManager->getDetectorGroup("HighZ");
-  
+
+  const int NumTimeGroups = m_HitCollection->NumberOfTimeGroups();
   for (int timeGroup=0; timeGroup<NumTimeGroups; timeGroup++) {
     std::vector<DetectorHit_sptr>& hits = m_HitCollection->getHits(timeGroup);
+
+    if (timeGroup==0) {
+      if (m_DiscardTimeGroupZero) {
+        hits.clear();
+        continue;
+      }
+    }
+    else {
+      if (m_DiscardTimeGroupNonZero) {
+        hits.clear();
+        continue;
+      }
+    }
+    
     bool veto = false;
     for (DetectorHit_sptr& hit: hits) {
       hit->clearFlags(flag::AntiCoincidence|flag::LowZHit|flag::HighZHit);
