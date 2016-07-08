@@ -8,15 +8,15 @@
     <html xmlns="http://www.w3.org/1999/xhtml">
       <head>
         <title>Bad channels</title>
-	      <style type="text/css">
+	<style type="text/css">
           html {background-color: #DDDDEE; color: #000000;}
-	        body {padding: 3%;}
-	        h1 {text-align: center;}
-	        table {margin:1em; border-collapse: collapse; border: 2px solid #000000;}
-	        thead {border: 2px solid #000000; text-align: center;}
-	        tbody {border: 2px solid #000000; text-align: right;}
-	        th, td {border: 1px solid #000000;}
-	      </style>
+          body {padding: 3%;}
+          h1 {text-align: center;}
+          table {margin:1em; border-collapse: collapse; border: 2px solid #000000;}
+          thead {border: 2px solid #000000; text-align: center;}
+          tbody {border: 2px solid #000000; text-align: right;}
+          th, td {border: 1px solid #000000;}
+	</style>
       </head>
 
       <body>

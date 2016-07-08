@@ -5,17 +5,17 @@
     <html xmlns="http://www.w3.org/1999/xhtml">
       <head>
         <title>Detector Channel Map</title>
-	      <style type="text/css">
+	<style type="text/css">
           html {background-color: #FFDDFF; color: #000000;}
-	        body {padding: 1.5%;}
-	        h1 {text-align: center;}
+          body {padding: 1.5%;}
+          h1 {text-align: center;}
           .comment {color: #663300;}
-	        .total-num {color: #009933;}
+          .total-num {color: #009933;}
           table {border-collapse: collapse; border: 2px solid #000000;}
-	        thead {border: 2px solid #000000; text-align: center;}
-	        tbody {border: 2px solid #000000; text-align: right;}
-	        th, td {border: 1px solid #000000;}
-	      </style>
+          thead {border: 2px solid #000000; text-align: center;}
+          tbody {border: 2px solid #000000; text-align: right;}
+          th, td {border: 1px solid #000000;}
+	</style>
       </head>
       <body>
         <h1>Detector Channel Map</h1>
@@ -48,7 +48,7 @@
         <tr>
           <th>Channel</th>
           <th>Pixel X</th>
-	        <th>Pixel Y</th>
+          <th>Pixel Y</th>
         </tr>
       </thead>
       <tbody>
