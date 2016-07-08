@@ -41,11 +41,6 @@ ANLStatus RadioactiveDecayPickUpData::mod_startup()
   return AS_OK;
 }
 
-void RadioactiveDecayPickUpData::EventAct_end(const G4Event*)
-{
-  SetStartTime(FirstDecayTime());
-}
-
 void RadioactiveDecayPickUpData::StepAct(const G4Step* aStep, G4Track* aTrack)
 {
   const double globalTime = aTrack->GetGlobalTime();
@@ -55,6 +50,7 @@ void RadioactiveDecayPickUpData::StepAct(const G4Step* aStep, G4Track* aTrack)
       = aStep->GetPostStepPoint()->GetProcessDefinedStep()->GetProcessName();
     if (processName == "RadioactiveDecay") {
       m_FirstDecayTime = globalTime;
+      setInitialTime(m_FirstDecayTime);
     }
     else {
       throw ANLException("RadioactiveDecayPickUpData:Error---First step is not radioactive decay.");

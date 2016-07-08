@@ -29,7 +29,7 @@ namespace anlgeant4
 {
 
 StandardPickUpData::StandardPickUpData()
-  : m_StartTime(0.0), m_InitialInfo(0)
+  : m_InitialInfo(0)
 {
   add_alias("StandardPickUpData");
   SetStepActOn(false);
@@ -44,7 +44,16 @@ ANLStatus StandardPickUpData::mod_init()
 void StandardPickUpData::EventAct_begin(const G4Event* aEvent)
 {
   m_InitialInfo->setEventID(aEvent->GetEventID());
-  SetStartTime(0.0);
+}
+
+void StandardPickUpData::setInitialTime(double v)
+{
+  m_InitialInfo->setInitialTime(v);
+}
+
+double StandardPickUpData::getInitialTime() const
+{
+  return m_InitialInfo->InitialTime();
 }
 
 } /* namespace anlgeant4 */

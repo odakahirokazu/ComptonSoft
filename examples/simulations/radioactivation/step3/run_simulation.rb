@@ -28,6 +28,9 @@ def run_simulation(num, random, output, ri, volume_path)
     termination_time: 1.0e-6
   }
 
+  sim.enable_timing_process()
+  sim.discard_time_group_nonzero = true
+
   sim.thread_mode = false
   sim.run(num)
 end

@@ -41,7 +41,6 @@ public:
   
   virtual anl::ANLStatus mod_startup();
 
-  virtual void EventAct_end(const G4Event*);
   virtual void StepAct(const G4Step* aStep, G4Track* aTrack);
 
   void SetTerminationTime(double v) { m_TerminationTime = v; }

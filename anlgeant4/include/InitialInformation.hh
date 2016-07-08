@@ -54,7 +54,6 @@ public:
 
   void setEventID(int64_t i) { event_id_ = i; }
 
-protected:
   void setInitialEnergy(double v)
   { energy_ = v; }
   void setInitialDirection(G4ThreeVector v)

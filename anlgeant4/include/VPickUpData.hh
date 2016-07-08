@@ -67,6 +67,6 @@ private:
   G4UserStackingAction* m_StackingAction;
 };
 
-}
+} /* namespace anlgeant4 */
 
 #endif /* ANLGEANT4_VPickUpData_H */

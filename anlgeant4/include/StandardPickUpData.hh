@@ -29,6 +29,7 @@ class InitialInformation;
 /**
  * @author Hirokazu Odaka
  * @date 2011-04-11
+ * @date 2016-07-08 | setInitialTime()
  */
 class StandardPickUpData : public VPickUpData
 {
@@ -40,13 +41,11 @@ public:
 
   void EventAct_begin(const G4Event* aEvent);
 
-  double StartTime() const { return m_StartTime; }
-  
 protected:
-  void SetStartTime(double v) { m_StartTime = v; }
+  double getInitialTime() const;
+  void setInitialTime(double v);
 
 private:
-  double m_StartTime;
   InitialInformation* m_InitialInfo;
 };
 
