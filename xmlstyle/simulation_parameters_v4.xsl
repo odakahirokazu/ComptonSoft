@@ -290,6 +290,7 @@
     <xsl:param name="upside_xstrip" select="''" />
     <xsl:if test="$upside_anode=1">anode</xsl:if><xsl:if test="$upside_anode=0">cathode</xsl:if>
     <xsl:if test="$upside_pixel=1">pixel</xsl:if><xsl:if test="$upside_pixel=0">common</xsl:if>
+    <xsl:text>/</xsl:text>
     <xsl:if test="$upside_xstrip=1">x-strip</xsl:if><xsl:if test="$upside_xstrip=0">y-strip</xsl:if>
   </xsl:template>
 
