@@ -1,6 +1,7 @@
 *~
 .DS_Store
 build/
+install/
 documentation/html/doxygen/
 documentation/doxygen/tag/
 *.root

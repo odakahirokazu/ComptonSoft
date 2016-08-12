@@ -1,7 +1,7 @@
 Compton Soft
 ================================================================
 
-- Version: 5.1.10
+- Version: 5.1.11
 - Author: Hirokazu Odaka
 
 ----
@@ -81,8 +81,8 @@ Information
 ### Contact
 
 - Hirokazu Odaka 
-- ISAS/JAXA
-- odaka(AT)astro.isas.jaxa.jp
+- KIPAC, Stanford University
+- hodaka(AT)stanford.edu
 
 ### Contributions
 
