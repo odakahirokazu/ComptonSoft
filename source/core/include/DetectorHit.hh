@@ -21,6 +21,7 @@
 #define COMPTONSOFT_DetectorHit_H 1
 
 #include <cstdint>
+#include <memory>
 
 // If you use boost::pool library for fast memory allocation,
 // set DetectorHit_BoostPool as 1; otherwise 0.

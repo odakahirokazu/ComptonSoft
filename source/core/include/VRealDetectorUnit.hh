@@ -22,6 +22,7 @@
 
 #include "VDetectorUnit.hh"
 #include <vector>
+#include <memory>
 #include "DetectorHit_sptr.hh"
 
 namespace comptonsoft {
