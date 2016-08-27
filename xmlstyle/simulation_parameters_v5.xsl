@@ -140,6 +140,28 @@
         </xsl:if>
       </colgroup>
       <tr>
+        <th colspan="3"></th>
+        <th></th>
+        <th colspan="18">Sensor device simulation</th>
+        <xsl:choose>
+          <xsl:when test="$detector_type='2DStrip'">
+            <th colspan="8">Channels information (cathode)</th>
+            <th colspan="8">Channels information (anode)</th>
+          </xsl:when>
+          <xsl:otherwise>
+            <th colspan="8">Channels information</th>
+          </xsl:otherwise>
+        </xsl:choose>
+        <xsl:choose>
+          <xsl:when test="$detector_type='2DStrip'">
+            <th colspan="5">Reconstruction</th>
+          </xsl:when>
+          <xsl:otherwise>
+            <th colspan="1">Reconstruction</th>
+          </xsl:otherwise>
+        </xsl:choose>
+      </tr>
+      <tr>
         <th colspan="3">Detector ID</th>
         <th>Upside</th>
         <th>Quenching</th>
@@ -452,7 +474,9 @@
                 <xsl:attribute name="class">special_param</xsl:attribute>
               </xsl:if>
               <xsl:value-of select="$final_diffusion_mode" />
-              <xsl:text>: unknown</xsl:text>
+              <xsl:if test="string-length($final_diffusion_mode)&gt;0">
+                <xsl:text>: unknown</xsl:text>
+              </xsl:if>  
             </span>
           </td>
           <td />
