@@ -64,17 +64,18 @@
   </xsl:template>
   <xsl:template match="sensitive_detector">
     <h2 class="detectors"><xsl:value-of select="@name" /> (sensitive detector)</h2>
+    <p class="setting"><xsl:text>Type: </xsl:text><xsl:value-of select="@type" /></p>
     <p class="setting"><xsl:text>Identification method: </xsl:text><xsl:value-of select="detector_list/@id_method" /></p>
     <p class="setting"><xsl:text>Layer offset: </xsl:text><xsl:value-of select="detector_list/@layer_offset" /></p>
     <xsl:call-template name="detectors" />
   </xsl:template>
   <xsl:template match="detector_set">
     <h2 class="detectors"><xsl:value-of select="@prefix" /> (prefix)</h2>
+    <p class="setting"><xsl:text>Type: </xsl:text><xsl:value-of select="@type" /></p>
     <xsl:call-template name="detectors" />
   </xsl:template>
   <xsl:template name="detectors">
     <xsl:variable name="detector_type" select="@type" />
-    <p class="setting"><xsl:text>Type: </xsl:text><xsl:value-of select="$detector_type" /></p>
     <table>
       <colgroup class="col_detector_id">
         <col />
@@ -163,11 +164,11 @@
         <th colspan="18">Sensor device simulation</th>
         <xsl:choose>
           <xsl:when test="$detector_type='2DStrip'">
-            <th colspan="8">Channels information (cathode)</th>
-            <th colspan="8">Channels information (anode)</th>
+            <th colspan="8">Channel properties (cathode)</th>
+            <th colspan="8">Channel properties (anode)</th>
           </xsl:when>
           <xsl:otherwise>
-            <th colspan="8">Channels information</th>
+            <th colspan="8">Channel properties</th>
           </xsl:otherwise>
         </xsl:choose>
         <xsl:choose>
@@ -521,19 +522,19 @@
       </td>
       <xsl:choose>
         <xsl:when test="$detector_type='2DStrip'">
-          <xsl:call-template name="display_channels_info">
-            <xsl:with-param name="common_parameters" select="$common_parameters/channels_info[@side='cathode']" />
-            <xsl:with-param name="parameters" select="$parameters/channels_info[@side='cathode']" />
+          <xsl:call-template name="display_channel_properties">
+            <xsl:with-param name="common_parameters" select="$common_parameters/channel_properties[@side='cathode']" />
+            <xsl:with-param name="parameters" select="$parameters/channel_properties[@side='cathode']" />
           </xsl:call-template>
-          <xsl:call-template name="display_channels_info">
-            <xsl:with-param name="common_parameters" select="$common_parameters/channels_info[@side='anode']" />
-            <xsl:with-param name="parameters" select="$parameters/channels_info[@side='anode']" />
+          <xsl:call-template name="display_channel_properties">
+            <xsl:with-param name="common_parameters" select="$common_parameters/channel_properties[@side='anode']" />
+            <xsl:with-param name="parameters" select="$parameters/channel_properties[@side='anode']" />
           </xsl:call-template>
         </xsl:when>
         <xsl:otherwise>
-          <xsl:call-template name="display_channels_info">
-            <xsl:with-param name="common_parameters" select="$common_parameters/channels_info" />
-            <xsl:with-param name="parameters" select="$parameters/channels_info" />
+          <xsl:call-template name="display_channel_properties">
+            <xsl:with-param name="common_parameters" select="$common_parameters/channel_properties" />
+            <xsl:with-param name="parameters" select="$parameters/channel_properties" />
           </xsl:call-template>
         </xsl:otherwise>
       </xsl:choose>
@@ -583,12 +584,15 @@
     <xsl:param name="upside_anode" select="''" />
     <xsl:param name="upside_pixel" select="''" />
     <xsl:param name="upside_xstrip" select="''" />
-    <xsl:if test="$upside_anode=1">anode</xsl:if><xsl:if test="$upside_anode=0">cathode</xsl:if>
+    <xsl:if test="$upside_anode=1">anode</xsl:if>
+    <xsl:if test="$upside_anode=0">cathode</xsl:if>
     <xsl:text>/</xsl:text>
-    <xsl:if test="$upside_pixel=1">pixel</xsl:if><xsl:if test="$upside_pixel=0">common</xsl:if>
-    <xsl:if test="$upside_xstrip=1">x-strip</xsl:if><xsl:if test="$upside_xstrip=0">y-strip</xsl:if>
+    <xsl:if test="$upside_pixel=1">pixel</xsl:if>
+    <xsl:if test="$upside_pixel=0">common</xsl:if>
+    <xsl:if test="$upside_xstrip=1">x-strip</xsl:if>
+    <xsl:if test="$upside_xstrip=0">y-strip</xsl:if>
   </xsl:template>
-  <xsl:template name="display_channels_info">
+  <xsl:template name="display_channel_properties">
     <xsl:param name="common_parameters" />
     <xsl:param name="parameters" />
     <td>
