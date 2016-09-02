@@ -55,6 +55,7 @@ protected:
   
 private:
   std::vector<std::string> fileList_;
+  bool trustNumHits_;
 
   TChain* hittree_;
   int64_t numEntries_ = 0;

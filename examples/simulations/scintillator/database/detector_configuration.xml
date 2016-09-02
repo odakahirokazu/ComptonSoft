@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="https://raw.githubusercontent.com/odakahirokazu/ComptonSoft/master/xmlstyle/detector_configuration_v4.xsl" ?>
+
+<configuration>
+  <name>Detector</name>
+  <comment>H. Odaka | 2016-01-19</comment>
+  <length_unit>cm</length_unit>
+  <detectors>
+    <detector id="1" type="Scintillator" name="CsI:0" />
+  </detectors>
+  <readout />
+  <groups>
+    <group name="CsI">
+      <detector id="1" />
+    </group>
+    <hit_pattern name="1hit" short_name="1hit" bit="0">
+      <group name="CsI" />
+    </hit_pattern>
+  </groups>
+</configuration>

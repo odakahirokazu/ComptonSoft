@@ -1,0 +1,24 @@
+<?xml version="1.0" ?>
+<?xml-stylesheet type="text/xsl" href="https://raw.githubusercontent.com/odakahirokazu/ComptonSoft/master/xmlstyle/detector_parameters_v1.xsl" ?>
+
+<detector_parameters>
+  <name>Detector</name>
+  <comment>H. Odaka | 2016-01-19</comment>
+  <auto_position flag="0" />
+  <sensitive_detector_not_found_warning flag="1" />
+  <data>
+    <sensitive_detector type="Scintillator" name="CsIDetector.log">
+      <detector_list id_method="path" layer_offset="1">
+        <detector id="1" path="CsIDetector">
+          <parameters>
+            <channel_properties>
+              <noise_level param0="0.0" param1="5.145" param2="0.0" />
+              <threshold value="100.0" />
+            </channel_properties>
+            <reconstruction mode="1" />
+          </parameters>
+        </detector>
+      </detector_list>
+    </sensitive_detector>
+  </data>
+</detector_parameters>

@@ -36,8 +36,9 @@
 #include "VPickUpData.hh"
 
 using namespace anl;
-using namespace anlgeant4;
 
+namespace anlgeant4
+{
 
 Geant4Body::Geant4Body()
   : m_G4RunManager(0),
@@ -45,8 +46,9 @@ Geant4Body::Geant4Body()
     m_RandomEngine("MTwistEngine"),
     m_RandomInitMode(1),
     m_RandomSeed1(0),
-    m_RandomInitialStatusFileName("RandomSeed_I.txt"),
-    m_RandomFinalStatusFileName("RandomSeed_F.txt"),
+    m_OutputRandomStatus(true),
+    m_RandomInitialStatusFileName("RandomSeed_i.dat"),
+    m_RandomFinalStatusFileName("RandomSeed_f.dat"),
     m_VerboseLevel(0)
 {
   m_G4RunManager = new ANLG4RunManager;
@@ -60,13 +62,11 @@ Geant4Body::Geant4Body()
   require_module_access("VANLPrimaryGen");
 }
 
-
 Geant4Body::~Geant4Body()
 {
   if (m_G4RunManager) delete m_G4RunManager;
   if (m_RandomEnginePtr) delete m_RandomEnginePtr;
 }
-
 
 ANLStatus Geant4Body::mod_startup()
 {
@@ -74,6 +74,7 @@ ANLStatus Geant4Body::mod_startup()
   register_parameter(&m_RandomInitMode, "random_initialization_mode");
   set_parameter_question("Random initialization mode (0: auto, 1: interger, 2: state file)");
   register_parameter(&m_RandomSeed1, "random_seed");
+  register_parameter(&m_OutputRandomStatus, "output_random_status");
   register_parameter(&m_RandomInitialStatusFileName,
                      "random_initial_status_file");
   register_parameter(&m_RandomFinalStatusFileName,
@@ -84,7 +85,6 @@ ANLStatus Geant4Body::mod_startup()
   return AS_OK;
 }
 
-
 ANLStatus Geant4Body::mod_com()
 {
   ask_parameter("random_initialization_mode");
@@ -94,7 +94,6 @@ ANLStatus Geant4Body::mod_com()
   }
   return BasicModule::mod_com();
 }
-
 
 ANLStatus Geant4Body::mod_init()
 {
@@ -117,12 +116,18 @@ ANLStatus Geant4Body::mod_init()
     m_RandomSeed1 = std::time(0);
     HepRandom::setTheSeed(m_RandomSeed1);
     std::cout << "Random seed: " << m_RandomSeed1 << std::endl;
-    HepRandom::saveEngineStatus(m_RandomInitialStatusFileName.c_str());
+
+    if (m_OutputRandomStatus) {
+      HepRandom::saveEngineStatus(m_RandomInitialStatusFileName.c_str());
+    }
   }
   else if (m_RandomInitMode==1) {
     HepRandom::setTheSeed(m_RandomSeed1);
     std::cout << "Random seed: " << m_RandomSeed1 << std::endl;
-    HepRandom::saveEngineStatus(m_RandomInitialStatusFileName.c_str());
+
+    if (m_OutputRandomStatus) {
+      HepRandom::saveEngineStatus(m_RandomInitialStatusFileName.c_str());
+    }
   }
   else if (m_RandomInitMode==2) {
     HepRandom::restoreEngineStatus(m_RandomInitialStatusFileName.c_str());
@@ -143,7 +148,6 @@ ANLStatus Geant4Body::mod_init()
   return AS_OK;
 }
 
-
 void Geant4Body::set_user_initializations()
 {
   VANLGeometry* geometry;
@@ -157,7 +161,6 @@ void Geant4Body::set_user_initializations()
   m_G4RunManager->SetUserInitialization(userPhysicsList);
 }
 
-
 void Geant4Body::set_user_primarygen_action()
 {
   VANLPrimaryGen* primarygen;
@@ -167,14 +170,12 @@ void Geant4Body::set_user_primarygen_action()
   m_G4RunManager->SetUserAction(userPrimaryGeneratorAction);
 }
 
-
 void Geant4Body::set_user_std_actions()
 {
   VPickUpData* pickupdata;
   GetANLModuleNC("VPickUpData", &pickupdata);
   pickupdata->RegisterUserActions(m_G4RunManager);
 }
-
 
 void Geant4Body::apply_commands()
 {
@@ -195,13 +196,11 @@ void Geant4Body::apply_commands()
   UI->ApplyCommand(trackingverbose);
 }
 
-
 ANLStatus Geant4Body::mod_bgnrun()
 {
   m_G4RunManager->ANLbgnrunfunc();
   return AS_OK;
 }
-
 
 ANLStatus Geant4Body::mod_ana()
 {
@@ -209,20 +208,22 @@ ANLStatus Geant4Body::mod_ana()
   return AS_OK;
 }
 
-
 ANLStatus Geant4Body::mod_endrun()
 {
   m_G4RunManager->ANLendrunfunc();
   return AS_OK;
 }
 
-
 ANLStatus Geant4Body::mod_exit()
 {
-  CLHEP::HepRandom::saveEngineStatus(m_RandomFinalStatusFileName.c_str());
+  if (m_OutputRandomStatus) {
+    CLHEP::HepRandom::saveEngineStatus(m_RandomFinalStatusFileName.c_str());
+  }
 
   delete m_G4RunManager;
   m_G4RunManager = 0;
 
   return AS_OK;
 }
+
+} /* namespace anlgeant4 */

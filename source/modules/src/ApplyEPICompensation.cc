@@ -202,14 +202,14 @@ bool ApplyEPICompensation::set_by_file()
               optional<double> factor =
                 channelNode.get_optional<double>("factor");
               if (factor) {
-                ds->setEPICompensationFactor(ChannelID(section, channel), *factor);
+                ds->setEPICompensationFactor(SectionChannelPair(section, channel), *factor);
               }
               optional<std::string> functionName =
                 channelNode.get_optional<std::string>("function");
               if (functionName) {
                 TSpline* func = nullptr;
                 m_FunctionFile->GetObject(functionName->c_str(), func);
-                ds->setEPICompensationFunction(ChannelID(section, channel), func);
+                ds->setEPICompensationFunction(SectionChannelPair(section, channel), func);
               }
             }
           }
@@ -219,15 +219,15 @@ bool ApplyEPICompensation::set_by_file()
     else if (v.first == "readout_module") {
       const ptree moduleNode = v.second;
       const int moduleID = moduleNode.get<int>("<xmlattr>.id");
-      const DetectorReadoutModule* readoutModule
+      const ReadoutModule* readoutModule
         = getDetectorManager()->getReadoutModuleByID(moduleID);
 
       for (const ptree::value_type& vv: moduleNode.get_child("")) {
         if (vv.first == "section") {
           const ptree sectionNode = vv.second;
           const int mod_section = sectionNode.get<int>("<xmlattr>.id");
-          DetectorChannelID channelID
-            = readoutModule->ReadoutSection(mod_section);
+          DetectorBasedChannelID channelID
+            = readoutModule->getSection(mod_section);
           const int detectorID = channelID.Detector();
           const int det_section = channelID.Section();
           
@@ -241,14 +241,14 @@ bool ApplyEPICompensation::set_by_file()
               optional<double> factor =
                 channelNode.get_optional<double>("factor");
               if (factor) {
-                ds->setEPICompensationFactor(ChannelID(det_section, channel), *factor);
+                ds->setEPICompensationFactor(SectionChannelPair(det_section, channel), *factor);
               }
               optional<std::string> functionName =
                 channelNode.get_optional<std::string>("function");
               if (functionName) {
                 TSpline* func = nullptr;
                 m_FunctionFile->GetObject(functionName->c_str(), func);
-                ds->setEPICompensationFunction(ChannelID(det_section, channel), func);
+                ds->setEPICompensationFunction(SectionChannelPair(det_section, channel), func);
               }
             }
           }

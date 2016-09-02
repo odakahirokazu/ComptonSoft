@@ -23,6 +23,7 @@
 #include "VDetectorUnit.hh"
 #include <vector>
 #include <memory>
+#include <iostream>
 #include "DetectorHit_sptr.hh"
 
 namespace comptonsoft {
@@ -48,8 +49,6 @@ public:
   virtual ~VRealDetectorUnit();
 
   virtual DetectorType Type() const = 0;
-  bool checkType(DetectorType type) const { return (type==Type()); }
-  bool checkType(int type) const { return checkType(static_cast<DetectorType>(type)); }
 
   void setName(const std::string& name) { name_ = name; };
   std::string getName() const { return name_; }
@@ -58,6 +57,9 @@ public:
   void setID(int i) { ID_ = i; }
   int getID() const { return ID_; }
   
+  void setInstrumentID(int i) { instrumentID_ = i; };
+  int getInstrumentID() const { return instrumentID_; };
+
   void setSize(double x, double y, double z)
   { sizeX_ = x; sizeY_ = y; sizeZ_ = z; }
   double getSizeX() const { return sizeX_; }
@@ -94,27 +96,27 @@ public:
   double getCenterPositionY() const { return centerPosition_.y(); }
   double getCenterPositionZ() const { return centerPosition_.z(); }
   
-  void setDirectionX(double x, double y, double z) 
+  void setXAxisDirection(double x, double y, double z) 
   {
     directionX_.set(x, y, z);
     directionX_ = directionX_.unit();
   }
-  void setDirectionX(const vector3_t& v) { directionX_ = v.unit(); } 
-  vector3_t getDirectionX() const { return directionX_; }
-  double getDirectionXX() const { return directionX_.x(); }
-  double getDirectionXY() const { return directionX_.y(); }
-  double getDirectionXZ() const { return directionX_.z(); }
+  void setXAxisDirection(const vector3_t& v) { directionX_ = v.unit(); } 
+  vector3_t getXAxisDirection() const { return directionX_; }
+  double getXAxisDirectionX() const { return directionX_.x(); }
+  double getXAxisDirectionY() const { return directionX_.y(); }
+  double getXAxisDirectionZ() const { return directionX_.z(); }
   
-  void setDirectionY(double x, double y, double z) 
+  void setYAxisDirection(double x, double y, double z) 
   { 
     directionY_.set(x, y, z);
     directionY_ = directionY_.unit();
   } 
-  void setDirectionY(const vector3_t& v) { directionY_ = v.unit(); } 
-  vector3_t getDirectionY() const { return directionY_; }
-  double getDirectionYX() const { return directionY_.x(); }
-  double getDirectionYY() const { return directionY_.y(); }
-  double getDirectionYZ() const { return directionY_.z(); }
+  void setYAxisDirection(const vector3_t& v) { directionY_ = v.unit(); } 
+  vector3_t getYAxisDirection() const { return directionY_; }
+  double getYAxisDirectionX() const { return directionY_.x(); }
+  double getYAxisDirectionY() const { return directionY_.y(); }
+  double getYAxisDirectionZ() const { return directionY_.z(); }
 
   /**
    * register multi channel data.
@@ -126,6 +128,8 @@ public:
    */
   void setChannelMap(const std::shared_ptr<const VChannelMap>& v)
   { channelMap_ = v; }
+  std::shared_ptr<const VChannelMap> getChannelMap() const
+  { return channelMap_; }
   
   vector3_t Position(int pixelX, int pixelY) const;
   void Position(int pixelX, int pixelY,
@@ -147,20 +151,20 @@ public:
   MultiChannelData* getMultiChannelData(int i) { return MCDVector_[i].get(); }
   
   PixelID ChannelToPixel(int section, int channel) const;
-  PixelID ChannelToPixel(const ChannelID& channel) const
+  PixelID ChannelToPixel(const SectionChannelPair& sectionChannel) const
   {
-    return ChannelToPixel(channel.Section(), channel.Index());
+    return ChannelToPixel(sectionChannel.Section(), sectionChannel.Channel());
   }
-  PixelID ChannelToStripPair(int hit1Group, int hit1Channel,
-                             int hit2Group, int hit2Channel) const;
-  PixelID ChannelToStripPair(const ChannelID& hit1Channel,
-                             const ChannelID& hit2Channel) const
+  PixelID ChannelToStripPair(int hit1Section, int hit1Channel,
+                             int hit2Section, int hit2Channel) const;
+  PixelID ChannelToStripPair(const SectionChannelPair& hit1Channel,
+                             const SectionChannelPair& hit2Channel) const
   {
-    return ChannelToStripPair(hit1Channel.Section(), hit1Channel.Index(),
-                              hit2Channel.Section(), hit2Channel.Index());
+    return ChannelToStripPair(hit1Channel.Section(), hit1Channel.Channel(),
+                              hit2Channel.Section(), hit2Channel.Channel());
   }
 
-  ChannelID PixelToChanelID(const PixelID& pixel) const;
+  SectionChannelPair PixelToChanelID(const PixelID& pixel) const;
 
   void setBottomSideElectrode(ElectrodeSide v)
   { bottomSideElectrode_ = v; }
@@ -209,6 +213,8 @@ public:
   int NumberOfReconstructedHits() const { return reconstructedHits_.size(); }
   DetectorHit_sptr getReconstructedHit(int i) { return reconstructedHits_[i]; };
 
+  virtual void printDetectorParameters(std::ostream& os) const;
+
 protected:
   virtual bool setReconstructionDetails(int /* mode */) { return true; }
   virtual void reconstruct(const DetectorHitVector& hitSignals,
@@ -218,6 +224,7 @@ protected:
 private:
   std::string name_;
   int ID_;
+  int instrumentID_;
   double sizeX_;
   double sizeY_;
   double sizeZ_;

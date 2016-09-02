@@ -20,7 +20,7 @@
 #include "CalculatePedestalLevels.hh"
 #include <boost/format.hpp>
 #include "MultiChannelData.hh"
-#include "DetectorReadoutModule.hh"
+#include "ReadoutModule.hh"
 
 using namespace anl;
 
@@ -61,11 +61,11 @@ ANLStatus CalculatePedestalLevels::mod_his()
   DetectorSystem* detectorManager = getDetectorManager();
   const int NumROM = detectorManager->NumberOfReadoutModules();
   for (int i=0; i<NumROM; i++) {
-    DetectorReadoutModule* ROM = detectorManager->getReadoutModuleByIndex(i);
+    ReadoutModule* ROM = detectorManager->getReadoutModuleByIndex(i);
     const int ROMID = ROM->ID();
-    const int NumSections = ROM->NumberOfReadoutSections();
+    const int NumSections = ROM->NumberOfSections();
     for (int j=0; j<NumSections; j++) {
-      const DetectorChannelID section = ROM->ReadoutSection(j);
+      const DetectorBasedChannelID section = ROM->getSection(j);
       MultiChannelData* mcd = detectorManager->getMultiChannelData(section);
       const int NumChannels = mcd->NumberOfChannels();
       std::string name;
@@ -98,11 +98,11 @@ ANLStatus CalculatePedestalLevels::mod_ana()
   DetectorSystem* detectorManager = getDetectorManager();
   const int NumROM = detectorManager->NumberOfReadoutModules();
   for (int i=0; i<NumROM; i++) {
-    const DetectorReadoutModule* ROM
+    const ReadoutModule* ROM
       = detectorManager->getReadoutModuleByIndex(i);
-    const int NumSections = ROM->NumberOfReadoutSections();
+    const int NumSections = ROM->NumberOfSections();
     for (int j=0; j<NumSections; j++) {
-      const DetectorChannelID section = ROM->ReadoutSection(j);
+      const DetectorBasedChannelID section = ROM->getSection(j);
       const MultiChannelData* mcd = detectorManager->getMultiChannelData(section);
       const int NumChannels = mcd->NumberOfChannels();
       for (int k=0; k<NumChannels; k++) {
@@ -131,11 +131,11 @@ ANLStatus CalculatePedestalLevels::mod_endrun()
   DetectorSystem* detectorManager = getDetectorManager();
   const int NumROM = detectorManager->NumberOfReadoutModules();
   for (int i=0; i<NumROM; i++) {
-    const DetectorReadoutModule* ROM
+    const ReadoutModule* ROM
       = detectorManager->getReadoutModuleByIndex(i);
-    const int NumSections = ROM->NumberOfReadoutSections();
+    const int NumSections = ROM->NumberOfSections();
     for (int j=0; j<NumSections; j++) {
-      const DetectorChannelID section = ROM->ReadoutSection(j);
+      const DetectorBasedChannelID section = ROM->getSection(j);
       const MultiChannelData* mcd = detectorManager->getMultiChannelData(section);
       const int NumChannels = mcd->NumberOfChannels();
       for (int k=0; k<NumChannels; k++) {

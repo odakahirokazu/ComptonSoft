@@ -18,8 +18,10 @@
  *************************************************************************/
 
 #include "HitTreeIO.hh"
+#include <sstream>
 #include "G4SystemOfUnits.hh"
 #include "TTree.h"
+#include "CSException.hh"
 #include "DetectorHit.hh"
 
 namespace comptonsoft
@@ -132,10 +134,10 @@ void HitTreeIO::fillHits(const int64_t eventID,
     time_ = hit->Time() / second;
     instrument_ = hit->InstrumentID();
     detector_ = hit->DetectorID();
-    det_section_ = hit->DetectorChannelSection();
+    det_section_ = hit->DetectorSection();
     readout_module_ = hit->ReadoutModuleID();
-    section_ = hit->ReadoutChannelSection();
-    channel_ = hit->ReadoutChannelIndex();
+    section_ = hit->ReadoutSection();
+    channel_ = hit->ReadoutChannel();
     pixelx_ = hit->PixelX();
     pixely_ = hit->PixelY();
     rawpha_ = hit->RawPHA();
@@ -170,8 +172,8 @@ DetectorHit_sptr HitTreeIO::retrieveHit() const
   hit->setEventID(eventid_);
   hit->setTime(time_ * second);
   hit->setInstrumentID(instrument_);
-  hit->setDetectorChannel(detector_, det_section_, channel_);
-  hit->setReadoutChannel(readout_module_, section_, channel_);
+  hit->setDetectorChannelID(detector_, det_section_, channel_);
+  hit->setReadoutChannelID(readout_module_, section_, channel_);
   hit->setPixel(pixelx_, pixely_);
   hit->setRawPHA(rawpha_);
   hit->setPHA(pha_);
@@ -200,13 +202,21 @@ std::vector<DetectorHit_sptr> HitTreeIO::retrieveHits(int64_t& entry,
   if (get_first_entry) {
     hittree_->GetEntry(entry);
   }
-  
+
+  const int64_t ThisEventID = eventid_;
   const int numHits = getNumberOfHits();
   for (int i=0; i<numHits; i++) {
-    if (i!=0) {
+    if (i != 0) {
       hittree_->GetEntry(entry+i);
-    }
 
+      if (eventid_ != ThisEventID) {
+        std::ostringstream message;
+        message << "Error: inconsistent Event ID at "
+                << ThisEventID << '\n';
+        BOOST_THROW_EXCEPTION( CSException(message.str()) );
+      }
+    }
+    
     DetectorHit_sptr hit = retrieveHit();
     hits.push_back(std::move(hit));
   }

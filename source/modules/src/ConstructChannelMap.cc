@@ -53,11 +53,10 @@ ANLStatus ConstructChannelMap::mod_init()
 
   VCSModule::mod_init();
 
-  std::map<std::string, int> detectorPrefixMap;
-
   ptree pt;
   try {
     read_xml(filename_, pt);
+    loadChannelMap(pt);
   }
   catch (boost::property_tree::xml_parser_error& ex) {
     std::cout << "Cannot parse: " << filename_ << std::endl;
@@ -68,59 +67,57 @@ ANLStatus ConstructChannelMap::mod_init()
     return AS_QUIT_ERR;
   }
 
-  int detectorIndex = 0;
-  for (ptree::value_type& v: pt.get_child("channel_map")) {
-    if (v.first == "detector" || v.first=="detector_2dstrip") {
-      const ptree detNode = v.second;
-      const optional<std::string> type_opt = detNode.get_optional<std::string>("<xmlattr>.type");
-      const std::string type = type_opt ? (*type_opt) : "";
-      const std::string prefix = detNode.get<std::string>("<xmlattr>.prefix");
-      detectorPrefixMap.insert( std::make_pair(prefix, detectorIndex) );
-      const int numSections = detNode.get<int>("<xmlattr>.num_sections");
-      const int numChannels = detNode.get<int>("<xmlattr>.num_channels");
-      const int numX = detNode.get<int>("<xmlattr>.num_x");
-      const int numY = detNode.get<int>("<xmlattr>.num_y");
+  return AS_OK;
+}
+
+void ConstructChannelMap::loadChannelMap(const boost::property_tree::ptree& pt)
+{
+  using boost::property_tree::ptree;
+  
+  for (const ptree::value_type& v: pt.get_child("channel_map")) {
+    if (v.first == "detector") {
+      const ptree& detectorNode = v.second;
+      const std::string type = detectorNode.get<std::string>("<xmlattr>.type");
+      const std::string prefix = detectorNode.get<std::string>("<xmlattr>.prefix");
+      const int numSections = detectorNode.get<int>("<xmlattr>.num_sections");
+      const int numChannels = detectorNode.get<int>("<xmlattr>.num_channels");
+      const int numX = detectorNode.get<int>("<xmlattr>.num_x");
+      const int numY = detectorNode.get<int>("<xmlattr>.num_y");
+      const bool isDSD = (type == "2DStrip");
 
       std::shared_ptr<VChannelMap> channelMap;
-      const bool isDSD = (type == "2DStrip");
       if (isDSD) {
         channelMap.reset(new ChannelMapDSD(numSections, numChannels, numX, numY));
       }
       else {
         channelMap.reset(new ChannelMap(numSections, numChannels, numX, numY));
       }
-      channelMaps_.push_back(channelMap);
 
-      for (const ptree::value_type& vv: detNode.get_child("")) {
-        if (vv.first == "section") {
-          const ptree sectionNode = vv.second;
-          const int section = sectionNode.get<int>("<xmlattr>.id");
-          for (const ptree::value_type& vvv: sectionNode.get_child("")) {
-            if (vvv.first == "channel") {
-              const ptree channelNode = vvv.second;
-              const int channel = channelNode.get<int>("<xmlattr>.id");
-              const int x = channelNode.get<int>("x");
-              const int y = channelNode.get<int>("y");
-              channelMap->set(section, channel, x, y);
-            }
-          }
+      for (const ptree::value_type& vv: detectorNode.get_child("")) {
+        if (vv.first == "channel") {
+          const ptree& channelNode = vv.second;
+          const int section = channelNode.get<int>("<xmlattr>.section");
+          const int channel = channelNode.get<int>("<xmlattr>.index");
+          const int x = channelNode.get<int>("<xmlattr>.x");
+          const int y = channelNode.get<int>("<xmlattr>.y");
+          channelMap->set(section, channel, x, y);
         }
       }
-      detectorIndex++;
+
+      channelMaps_[prefix] = channelMap;
     }
   }
   
   DetectorSystem* detectorManager = getDetectorManager();
   for (auto& detector: detectorManager->getDetectors()) {
     const std::string prefix = detector->getNamePrefix();
-    if (detectorPrefixMap.count(prefix) == 0) {
-      std::cout << "ConstructChannelMap: not found: " << prefix << std::endl;
-      return AS_QUIT;
+    if (channelMaps_.count(prefix) == 0) {
+      std::ostringstream message;
+      message << "Channel map is not found for Detector prefix: " << prefix << std::endl;
+      BOOST_THROW_EXCEPTION(ANLException(this, message.str()));
     }
-    detector->setChannelMap(channelMaps_[detectorPrefixMap[prefix]]);
+    detector->setChannelMap(channelMaps_[prefix]);
   }
-  
-  return AS_OK;
 }
 
 } /* namespace comptonsoft */

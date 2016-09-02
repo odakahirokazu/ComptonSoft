@@ -34,7 +34,7 @@ set(CS_MODULES
   src/ConstructChannelMap.cc
   src/SetNoiseLevels.cc
   src/SetBadChannels.cc
-  src/SetChannelsInfo.cc
+  src/SetChannelProperties.cc
   src/SelectHits.cc
   src/AnalyzeHits.cc
   src/MakeDetectorHits.cc

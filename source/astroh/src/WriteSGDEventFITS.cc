@@ -23,7 +23,7 @@
 #include "ChannelID.hh"
 #include "SGDEvent.hh"
 #include "SGDEventFITS.hh"
-#include "DetectorReadoutModule.hh"
+#include "ReadoutModule.hh"
 #include "DetectorHit.hh"
 #include "CSHitCollection.hh"
 
@@ -48,8 +48,8 @@ void fillHits(int64_t occurrenceID,
   event->setOccurrenceID(occurrenceID);
   for (auto& hit: hits) {
     const int readoutModuleID = hit->ReadoutModuleID();
-    const int section = hit->ReadoutChannelSection();
-    const int channelID = hit->ReadoutChannelIndex();
+    const int section = hit->ReadoutSection();
+    const int channelID = hit->ReadoutChannel();
     const int16_t ASIC_ID = getASICID(readoutModuleID, section);
     const int16_t ASIC_ID_remapped = astroh::sgd::Event::convertToRemapedASICID(ASIC_ID);
     const int16_t channelID_remapped = astroh::sgd::Event::makeRemappedReadoutID(ASIC_ID_remapped, channelID);

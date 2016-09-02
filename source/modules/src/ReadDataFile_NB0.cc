@@ -22,7 +22,7 @@
 #include <iostream>
 #include <iomanip>
 
-#include "DetectorReadoutModule.hh"
+#include "ReadoutModule.hh"
 #include "MultiChannelData.hh"
 
 using namespace anl;
@@ -222,10 +222,10 @@ void ReadDataFile_NB0::decodeASICData()
   
   DetectorSystem* detectorManager = getDetectorManager();
   for (auto& readoutModule: detectorManager->getReadoutModules()) {
-    for (auto& section: readoutModule->getReadoutSections()) {
+    for (auto& section: readoutModule->Sections()) {
       MultiChannelData* mcd = detectorManager->getMultiChannelData(section);
       const int nCh = mcd->NumberOfChannels();
-      mcd->resetRawADC();
+      mcd->resetRawADCVector();
       
       std::vector<unsigned int> indexVec;
       p += 5;

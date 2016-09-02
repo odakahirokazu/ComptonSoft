@@ -62,7 +62,7 @@ public:
 
   bool isCCEMapPrepared();
 
-  void printSimulationParameters();
+  void printSimulationParameters(std::ostream& os) const;
 
 protected:
   virtual DetectorHit_sptr generateHit(const DetectorHit& rawhit,

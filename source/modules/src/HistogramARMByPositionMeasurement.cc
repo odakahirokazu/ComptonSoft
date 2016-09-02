@@ -65,8 +65,8 @@ ANLStatus HistogramARMByPositionMeasurement::mod_ana()
   const double hit1HalfWidthX = hit1Detector->getPixelPitchX() * 0.5;
   const double hit1HalfWidthY = hit1Detector->getPixelPitchY() * 0.5;
   const double hit1HalfWidthZ = hit1Detector->getThickness() * 0.5;
-  const vector3_t hit1DetectorDirX = hit1Detector->getDirectionX();
-  const vector3_t hit1DetectorDirY = hit1Detector->getDirectionY();
+  const vector3_t hit1DetectorDirX = hit1Detector->getXAxisDirection();
+  const vector3_t hit1DetectorDirY = hit1Detector->getYAxisDirection();
   const vector3_t hit1DetectorDirZ = hit1DetectorDirX.cross(hit1DetectorDirY);
 
   const int hit2DetectorID = event.Hit2DetectorID();
@@ -75,8 +75,8 @@ ANLStatus HistogramARMByPositionMeasurement::mod_ana()
   const double hit2HalfWidthX = hit2Detector->getPixelPitchX() * 0.5;
   const double hit2HalfWidthY = hit2Detector->getPixelPitchY() * 0.5;
   const double hit2HalfWidthZ = hit2Detector->getThickness() * 0.5;
-  const vector3_t hit2DetectorDirX = hit2Detector->getDirectionX();
-  const vector3_t hit2DetectorDirY = hit2Detector->getDirectionY();
+  const vector3_t hit2DetectorDirX = hit2Detector->getXAxisDirection();
+  const vector3_t hit2DetectorDirY = hit2Detector->getYAxisDirection();
   const vector3_t hit2DetectorDirZ = hit2DetectorDirX.cross(hit2DetectorDirY);
 
   const vector3_t sourceDirection = eventReconstruction_->SourceDirection();

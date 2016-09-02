@@ -29,6 +29,7 @@ namespace comptonsoft {
 ConstructDetector::ConstructDetector()
   : detectorManager_(new DetectorSystem),
     configurationFile_("detector_config.xml"),
+    parametersFile_(""),
     verboseLevel_(0)
 {
   add_alias("ConstructDetector");
@@ -43,6 +44,9 @@ ANLStatus ConstructDetector::mod_startup()
   register_parameter(&configurationFile_, "detector_configuration");
   set_parameter_description("XML data file describing a detector configuration.");
 
+  register_parameter(&parametersFile_, "detector_parameters");
+  set_parameter_description("XML data file of information on detectors.");
+
   register_parameter(&verboseLevel_, "verbose_level");
 
   return AS_OK;
@@ -50,14 +54,41 @@ ANLStatus ConstructDetector::mod_startup()
 
 ANLStatus ConstructDetector::mod_init()
 {
-  bool complete = detectorManager_->loadDetectorConfiguration(configurationFile_.c_str());
-  if (!complete) {
-    std::cout << "Loading the detector configuration failed." << std::endl;
+  if (detectorManager_->isMCSimulation() && parametersFile_=="") {
+    std::cout << "Error: detector parameters file should be given." << std::endl;
+    return AS_QUIT;
+  }
+  
+  try {
+    detectorManager_->readDetectorConfiguration(configurationFile_);
+
+    if (parametersFile_ != "") {
+      detectorManager_->readDetectorParameters(parametersFile_);
+    }
+  }
+  catch (CSException& e) {
+    std::cout << "Error in ConstructDetector::mod_init()\n"
+              << "Loading the XML data files failed." << std::endl;
+    std::cout << "CSException ===> \n"
+              << e.toString()
+              << std::endl;
     return AS_QUIT;
   }
   
   if (VerboseLevel() > 0) {
+    std::cout << "\n\n";
+    std::cout << "######  Detector parameters  ######\n\n";
+    for (const auto& detector: detectorManager_->getDetectors()) {
+      std::cout << "****************************************\n\n";
+      std::cout << "Detector ID: " << detector->getID() << '\n';
+      std::cout << "Name: " << detector->getName() << "\n\n";
+      detector->printDetectorParameters(std::cout);
+      std::cout << '\n';
+      std::cout << "****************************************\n\n"
+                << std::endl;
+    }
     detectorManager_->printDetectorGroups();
+    std::cout << "\n\n";
   }
   
   return AS_OK;

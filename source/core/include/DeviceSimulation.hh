@@ -177,7 +177,7 @@ public:
   virtual void buildCCEMap(int /* nx */, int /* ny */, int /* nz */,
                            double /* num_px */) {}
 
-  virtual void printSimulationParameters();
+  virtual void printSimulationParameters(std::ostream& os) const;
 
 protected:
   void setWeightingPotential(bool upside_electrode, boost::shared_array<double> wp, int num_point)

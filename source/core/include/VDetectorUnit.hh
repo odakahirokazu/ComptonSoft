@@ -44,12 +44,22 @@ public:
   virtual ~VDetectorUnit();
 
 public:
+  virtual DetectorType Type() const = 0;
+  bool checkType(DetectorType type) const { return (type==Type()); }
+  bool checkType(int type) const { return checkType(static_cast<DetectorType>(type)); }
+
   virtual void setName(const std::string& name) = 0;
   virtual std::string getName() const = 0;
   virtual std::string getNamePrefix() const = 0;
   
   virtual void setID(int i) = 0;
   virtual int getID() const = 0;
+
+  void setDetectorID(int i) { setID(i); }
+  int getDetectorID() const { return getID(); }
+
+  virtual void setInstrumentID(int i) = 0;
+  virtual int getInstrumentID() const = 0;
   
   virtual void setSize(double x, double y, double z) = 0;
   virtual double getSizeX() const = 0;
@@ -82,19 +92,19 @@ public:
   virtual double getCenterPositionY() const = 0;
   virtual double getCenterPositionZ() const = 0;
   
-  virtual void setDirectionX(double x, double y, double z) = 0;
-  virtual void setDirectionX(const vector3_t& v) = 0;
-  virtual vector3_t getDirectionX() const = 0;
-  virtual double getDirectionXX() const = 0;
-  virtual double getDirectionXY() const = 0;
-  virtual double getDirectionXZ() const = 0;
+  virtual void setXAxisDirection(double x, double y, double z) = 0;
+  virtual void setXAxisDirection(const vector3_t& v) = 0;
+  virtual vector3_t getXAxisDirection() const = 0;
+  virtual double getXAxisDirectionX() const = 0;
+  virtual double getXAxisDirectionY() const = 0;
+  virtual double getXAxisDirectionZ() const = 0;
   
-  virtual void setDirectionY(double x, double y, double z) = 0;
-  virtual void setDirectionY(const vector3_t& v) = 0;
-  virtual vector3_t getDirectionY() const = 0;
-  virtual double getDirectionYX() const = 0;
-  virtual double getDirectionYY() const = 0;
-  virtual double getDirectionYZ() const = 0;
+  virtual void setYAxisDirection(double x, double y, double z) = 0;
+  virtual void setYAxisDirection(const vector3_t& v) = 0;
+  virtual vector3_t getYAxisDirection() const = 0;
+  virtual double getYAxisDirectionX() const = 0;
+  virtual double getYAxisDirectionY() const = 0;
+  virtual double getYAxisDirectionZ() const = 0;
   
   /** 
    * calculate global position of the pixel center.
@@ -141,17 +151,17 @@ public:
   virtual PixelID findPixel(double localx, double localy) const = 0;
 
   /**
-   * convert a readout channel into a pixel ID.
+   * convert a section and channel into a pixel ID.
    * @param section section index of the hit.
    * @param channel channel index of the hit.
    */
   virtual PixelID ChannelToPixel(int section, int channel) const = 0;
 
   /**
-   * convert a readout channel into a pixel ID.
-   * @param channel channel ID of the hit.
+   * convert a section-channel pair into a pixel ID.
+   * @param sectionChannel section-channel pair of the hit.
    */
-  virtual PixelID ChannelToPixel(const ChannelID& channel) const = 0;
+  virtual PixelID ChannelToPixel(const SectionChannelPair& sectionChannel) const = 0;
 
   /**
    * convert a readout channel into a stirp ID pair.
@@ -163,16 +173,15 @@ public:
    */
   virtual PixelID ChannelToStripPair(int hit1Section, int hit1Channel,
                                      int hit2Section, int hit2Channel) const = 0;
-  virtual PixelID ChannelToStripPair(const ChannelID& hit1Channel,
-                                     const ChannelID& hit2Channel) const = 0;
+  virtual PixelID ChannelToStripPair(const SectionChannelPair& hit1Channel,
+                                     const SectionChannelPair& hit2Channel) const = 0;
   
   /**
-   * convert a pixel ID into readout channel ID.
+   * convert a pixel ID into section-channel pair.
    * @param pixel pixel ID.
-   * @return detector channel.
-   * @return pixel ID.
+   * @return detector section-channel pair.
    */
-  virtual ChannelID PixelToChanelID(const PixelID& pixel) const = 0;
+  virtual SectionChannelPair PixelToChanelID(const PixelID& pixel) const = 0;
 
   virtual void setBottomSideElectrode(ElectrodeSide v) = 0;
   virtual ElectrodeSide BottomSideElectrode() const = 0;

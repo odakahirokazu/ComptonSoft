@@ -39,9 +39,9 @@ void MakeDetectorHits::doProcessing()
 }
 
 bool MakeDetectorHits::setThresholdEnergy(VRealDetectorUnit* detector,
-                                         double threshold,
-                                         double thresholdCathode,
-                                         double thresholdAnode)
+                                          double threshold,
+                                          double thresholdCathode,
+                                          double thresholdAnode)
 {
   const int detid = detector->getID();
   if (detector->checkType(DetectorType::DoubleSidedStripDetector)) {

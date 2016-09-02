@@ -23,47 +23,47 @@
 namespace comptonsoft
 {
 
-ChannelID::ChannelID(int section, int index)
-  : section_(section), index_(index)
+SectionChannelPair::SectionChannelPair(int section, int channel)
+  : section_(section), channel_(channel)
 {
 }
 
-ChannelID::~ChannelID() = default;
+SectionChannelPair::~SectionChannelPair() = default;
 
-DetectorChannelID::DetectorChannelID(int detector, int section, int index)
-  : detector_(detector), channel_(section, index)
+DetectorBasedChannelID::DetectorBasedChannelID(int detector, int section, int channel)
+  : detector_(detector), sc_(section, channel)
 {
 }
 
-DetectorChannelID::~DetectorChannelID() = default;
+DetectorBasedChannelID::~DetectorBasedChannelID() = default;
 
-std::string DetectorChannelID::toString() const
+std::string DetectorBasedChannelID::toString() const
 {
-  if (Index()==ChannelID::Undefined) {
+  if (Channel()==ChannelID::Undefined) {
     return (boost::format("d%04d_%04d")%Detector()%Section()).str();
     if (Section()==ChannelID::Undefined) {
       return (boost::format("d%04d")%Detector()).str();
     }
   }
-  return (boost::format("d%04d_%04d_%04d")%Detector()%Section()%Index()).str();
+  return (boost::format("d%04d_%04d_%04d")%Detector()%Section()%Channel()).str();
 }
 
-ReadoutChannelID::ReadoutChannelID(int readoutModule, int section, int index)
-  : readoutModule_(readoutModule), channel_(section, index)
+ReadoutBasedChannelID::ReadoutBasedChannelID(int readoutModule, int section, int channel)
+  : readoutModule_(readoutModule), sc_(section, channel)
 {
 }
 
-ReadoutChannelID::~ReadoutChannelID() = default;
+ReadoutBasedChannelID::~ReadoutBasedChannelID() = default;
 
-std::string ReadoutChannelID::toString() const
+std::string ReadoutBasedChannelID::toString() const
 {
-  if (Index()==ChannelID::Undefined) {
+  if (Channel()==ChannelID::Undefined) {
     return (boost::format("r%04d_%04d")%ReadoutModule()%Section()).str();
     if (Section()==ChannelID::Undefined) {
       return (boost::format("r%04d")%ReadoutModule()).str();
     }
   }
-  return (boost::format("r%04d_%04d_%04d")%ReadoutModule()%Section()%Index()).str();
+  return (boost::format("r%04d_%04d_%04d")%ReadoutModule()%Section()%Channel()).str();
 }
 
 } /* nemespace comptonsoft */

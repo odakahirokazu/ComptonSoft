@@ -23,7 +23,7 @@
 #include "ChannelID.hh"
 #include "SGDEvent.hh"
 #include "SGDEventFITS.hh"
-#include "DetectorReadoutModule.hh"
+#include "ReadoutModule.hh"
 #include "MultiChannelData.hh"
 
 using namespace anl;
@@ -31,14 +31,14 @@ using namespace anl;
 namespace
 {
 
-comptonsoft::ReadoutChannelID getReadoutID(uint16_t ASIC_ID)
+comptonsoft::ReadoutBasedChannelID getReadoutID(uint16_t ASIC_ID)
 {
   const uint16_t ADBNo = ASIC_ID>>8;
   const uint16_t TrayNo = (ASIC_ID & 0xf0)>>4;
   const uint16_t ASICIndex = ASIC_ID & 0xf;
   constexpr size_t NumTrayInADB = 7;
   const size_t TrayIndex = NumTrayInADB*ADBNo + TrayNo;
-  return comptonsoft::ReadoutChannelID(TrayIndex, ASICIndex);
+  return comptonsoft::ReadoutBasedChannelID(TrayIndex, ASICIndex);
 }
 
 }
@@ -94,7 +94,7 @@ ANLStatus ReadSGDEventFITS::mod_ana()
   const size_t NumHitASICs = event.LengthOfASICData();
   for (size_t i=0; i<NumHitASICs; i++) {
     const uint16_t ASICID = event.getASICIDVector()[i];
-    const ReadoutChannelID ReadoutID = getReadoutID(ASICID);
+    const ReadoutBasedChannelID ReadoutID = getReadoutID(ASICID);
     const uint16_t CommonModeNoise = event.getCommonModeNoiseVector()[i];
     const uint16_t Reference = event.getReferenceLevelVector()[i];
     MultiChannelData* ASICData = detectorManager->getMultiChannelData(ReadoutID);
@@ -105,7 +105,7 @@ ANLStatus ReadSGDEventFITS::mod_ana()
   const size_t NumHits = event.LengthOfReadoutData();
   for (size_t i=0; i<NumHits; i++) {
     const int ASICID = event.getReadoutASICIDVector()[i];
-    const ReadoutChannelID ReadoutID = getReadoutID(ASICID);
+    const ReadoutBasedChannelID ReadoutID = getReadoutID(ASICID);
       
     const int ChannelID = event.getReadoutChannelIDVector()[i];
     const uint16_t ADCValue = event.getPHAVector()[i];

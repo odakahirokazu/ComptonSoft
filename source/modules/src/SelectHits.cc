@@ -25,8 +25,6 @@
 #include "FlagDefinition.hh"
 #include "RealDetectorUnit2DStrip.hh"
 
-// #include "NextCLI.hh"
-
 using namespace anl;
 
 namespace comptonsoft
@@ -66,13 +64,7 @@ ANLStatus SelectHits::mod_startup()
 ANLStatus SelectHits::mod_init()
 {
   VCSModule::mod_init();
-
-  if (!setAnalysisParameters()) {
-    return AS_QUIT;
-  }
-
   GetANLModuleNC("CSHitCollection", &m_HitCollection);
-
   return AS_OK;
 }
 
@@ -80,7 +72,6 @@ ANLStatus SelectHits::mod_ana()
 {
   doProcessing();
   collectHits();
-
   return AS_OK;
 }
 
@@ -142,10 +133,10 @@ bool SelectHits::setThresholdEnergy(VRealDetectorUnit* detector,
     for (int section=0; section<NSections; section++) {
       MultiChannelData* mcd = detector->getMultiChannelData(section);
       if (mcd->isAnodeSide()) {
-        mcd->setThresholdEnergy(thresholdAnode);
+        mcd->resetThresholdEnergyVector(thresholdAnode);
       }
       else if (mcd->isCathodeSide()) {
-        mcd->setThresholdEnergy(thresholdCathode);
+        mcd->resetThresholdEnergyVector(thresholdCathode);
       }
     }
   }
@@ -153,7 +144,7 @@ bool SelectHits::setThresholdEnergy(VRealDetectorUnit* detector,
     const int NSections = detector->NumberOfMultiChannelData();
     for (int section=0; section<NSections; section++) {
       MultiChannelData* mcd = detector->getMultiChannelData(section);
-      mcd->setThresholdEnergy(threshold);
+      mcd->resetThresholdEnergyVector(threshold);
     }
   }
   return true;

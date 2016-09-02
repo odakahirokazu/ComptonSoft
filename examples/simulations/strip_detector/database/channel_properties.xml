@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<?xml-stylesheet type="text/xsl" href="https://raw.githubusercontent.com/odakahirokazu/ComptonSoft/master/xmlstyle/channel_properties_v1.xsl" ?>
+
+<channel_properties>
+  <name>CdTe strip detector</name>
+  <comment>2016-08-26 | Hirokazu Odaka</comment>
+  <data>
+    <readout_module id="0">
+      <section id="0" all="1">
+        <common>
+          <trigger_discrimination center="7.5" sigma="1.0" />
+          <threshold value="6.0" />
+        </common>
+        <channel id="13">
+          <noise_level param0="20.0" />
+          <threshold value="120.0" />
+        </channel>
+        <channel id="27">
+          <disable status="1" />
+        </channel>
+      </section>
+      <section id="3">
+        <channel id="30">
+          <disable status="1" />
+        </channel>
+      </section>
+    </readout_module>
+  </data>
+</channel_properties>

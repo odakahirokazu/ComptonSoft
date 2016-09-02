@@ -69,12 +69,12 @@ public:
    */
   void set(int section, int index, int x, int y);
 
-  ChannelID getChannel(int x, int y) const;
-  ChannelID getChannel(const PixelID& pixel) const;
+  SectionChannelPair getSectionChannel(int x, int y) const;
+  SectionChannelPair getSectionChannel(const PixelID& pixel) const;
 
 private:
-  std::vector<ChannelID> tableToChannelX_;
-  std::vector<ChannelID> tableToChannelY_;
+  std::vector<SectionChannelPair> tableToChannelX_;
+  std::vector<SectionChannelPair> tableToChannelY_;
 };
 
 } /* namespace comptonsoft */

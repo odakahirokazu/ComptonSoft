@@ -53,7 +53,7 @@ ANLStatus HistogramPHA::mod_his()
   if (m_ReadoutOrder) {
     DetectorSystem* detectorManager = getDetectorManager();
     detectorManager->doForEachMultiChannelDataInReadoutOrder(
-      [&](MultiChannelData* mcd, const ReadoutChannelID& channel) {
+      [&](MultiChannelData* mcd, const ReadoutBasedChannelID& channel) {
         if (m_GroupingInSection) {
           std::string name = "spectrum_"+channel.toString();
           TH1* h = new TH1I(name.c_str(), name.c_str(),
@@ -63,7 +63,7 @@ ANLStatus HistogramPHA::mod_his()
         else {
           const int NumChannels = mcd->NumberOfChannels();
           for (int k=0; k<NumChannels; k++) {
-            ReadoutChannelID channel2(channel.ReadoutModule(),
+            ReadoutBasedChannelID channel2(channel.ReadoutModule(),
                                       channel.Section(),
                                       k);
             std::string name = "spectrum_"+channel2.toString();
@@ -77,7 +77,7 @@ ANLStatus HistogramPHA::mod_his()
   else {
     DetectorSystem* detectorManager = getDetectorManager();
     detectorManager->doForEachMultiChannelDataInDetectorOrder(
-      [&](MultiChannelData* mcd, const DetectorChannelID& channel) {
+      [&](MultiChannelData* mcd, const DetectorBasedChannelID& channel) {
         if (m_GroupingInSection) {
           std::string name = "spectrum_"+channel.toString();
           TH1* h = new TH1I(name.c_str(), name.c_str(),
@@ -87,9 +87,9 @@ ANLStatus HistogramPHA::mod_his()
         else {
           const int NumChannels = mcd->NumberOfChannels();
           for (int k=0; k<NumChannels; k++) {
-            ReadoutChannelID channel2(channel.Detector(),
-                                      channel.Section(),
-                                      k);
+            ReadoutBasedChannelID channel2(channel.Detector(),
+                                           channel.Section(),
+                                           k);
             std::string name = "spectrum_"+channel2.toString();
             TH1* h = new TH1I(name.c_str(), name.c_str(),
                               m_NumBins, m_RangeMin, m_RangeMax);
@@ -125,7 +125,7 @@ ANLStatus HistogramPHA::mod_ana()
   DetectorSystem* detectorManager = getDetectorManager();
   if (m_ReadoutOrder) {
     detectorManager->doForEachMultiChannelDataInReadoutOrder(
-      [&](MultiChannelData* mcd, const ReadoutChannelID&) {
+      [&](MultiChannelData* mcd, const ReadoutBasedChannelID&) {
         if (m_GroupingInSection) {
           TH1* h = *itHist;
           const int NumChannels = mcd->NumberOfChannels();
@@ -148,7 +148,7 @@ ANLStatus HistogramPHA::mod_ana()
   }
   else {
     detectorManager->doForEachMultiChannelDataInDetectorOrder(
-      [&](MultiChannelData* mcd, const DetectorChannelID&) {
+      [&](MultiChannelData* mcd, const DetectorBasedChannelID&) {
         if (m_GroupingInSection) {
           TH1* h = *itHist;
           const int NumChannels = mcd->NumberOfChannels();

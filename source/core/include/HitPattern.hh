@@ -33,7 +33,6 @@ namespace comptonsoft {
  * @author Hirokazu Odaka
  * @date 2008-10-22
  */
-
 class HitPattern
 {
 public:

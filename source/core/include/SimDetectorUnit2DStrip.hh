@@ -67,7 +67,7 @@ public:
   void buildCCEMap();
   void buildCCEMap(int nx, int ny, int nz, double pixel_factor=1.0);
 
-  void printSimulationParameters();
+  void printSimulationParameters(std::ostream& os) const;
   
 protected:
   virtual DetectorHit_sptr generateHit(const DetectorHit& rawhit,

@@ -31,7 +31,6 @@ namespace comptonsoft
 {
 
 ConstructDetectorForSimulation::ConstructDetectorForSimulation()
-  : simulationParamsFile_("simparam.xml")
 {
 }
 
@@ -40,7 +39,6 @@ ConstructDetectorForSimulation::~ConstructDetectorForSimulation() = default;
 ANLStatus ConstructDetectorForSimulation::mod_startup()
 {
   ConstructDetector::mod_startup();
-  register_parameter(&simulationParamsFile_, "simulation_parameters");
 
   DetectorSystem* detectorManager = getDetectorManager();
   detectorManager->setMCSimulation(true);
@@ -51,22 +49,24 @@ ANLStatus ConstructDetectorForSimulation::mod_startup()
 ANLStatus ConstructDetectorForSimulation::mod_init()
 {
   ANLStatus status = ConstructDetector::mod_init();
-  if (status != AS_OK) { return status; }
-  
-  DetectorSystem* detectorManager = getDetectorManager();
-  bool complete = detectorManager->loadSimulationParameters(simulationParamsFile_.c_str());
-  if (!complete) {
-    std::cout << "Loading the simulation parameters failed." << std::endl;
-    return AS_QUIT;
+  if (status != AS_OK) {
+    return status;
   }
 
+  DetectorSystem* detectorManager = getDetectorManager();
+  
   if (VerboseLevel() > 0) {
-    std::cout << "\nSimulation parameters\n";
-    for (auto ds: detectorManager->getDeviceSimulationVector()) {
-      std::cout << "ID " << ds->getID() << '\n';
-      ds->printSimulationParameters();
+    std::cout << "\n\n";
+    std::cout << "######  Simulation parameters  ######\n\n";
+    for (const auto& ds: detectorManager->getDeviceSimulationVector()) {
+      std::cout << "****************************************\n\n";
+      std::cout << "Detector ID: " << ds->getID() << '\n';
+      std::cout << "Name: " << ds->getName() << "\n\n";
+      ds->printSimulationParameters(std::cout);
+      std::cout << '\n';
+      std::cout << "****************************************\n\n"
+                << std::endl;
     }
-    std::cout << std::endl;
   }
 
   return AS_OK;
@@ -74,11 +74,12 @@ ANLStatus ConstructDetectorForSimulation::mod_init()
 
 ANLStatus ConstructDetectorForSimulation::mod_bgnrun()
 {
-  if (!ModuleExist("Geant4Body")) return AS_OK;
+  if (!ModuleExist("Geant4Body")) {
+    return AS_OK;
+  }
 
   DetectorSystem* detectorManager = getDetectorManager();
   detectorManager->registerGeant4SensitiveDetectors();
-
   return AS_OK;
 }
 

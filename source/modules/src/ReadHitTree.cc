@@ -30,6 +30,7 @@ namespace comptonsoft
 
 ReadHitTree::ReadHitTree()
   : anlgeant4::InitialInformation(false),
+    trustNumHits_(true),
     hitCollection_(nullptr),
     treeIO_(new HitTreeIOWithInitialInfo)
 {
@@ -41,6 +42,7 @@ ReadHitTree::~ReadHitTree() = default;
 ANLStatus ReadHitTree::mod_startup()
 {
   register_parameter(&fileList_, "file_list", "seq", "hittree.root");
+  register_parameter(&trustNumHits_, "trust_num_hits");
   return AS_OK;
 }
 
@@ -94,9 +96,19 @@ ANLStatus ReadHitTree::mod_ana()
     setWeight(treeIO_->getWeight());
   }
 
-  std::vector<DetectorHit_sptr> hits = treeIO_->retrieveHits(entryIndex_, false);
-  for (auto& hit: hits) {
-    insertHit(hit);
+  if (trustNumHits_) {
+    std::vector<DetectorHit_sptr> hits = treeIO_->retrieveHits(entryIndex_, false);
+    for (auto& hit: hits) {
+      insertHit(hit);
+    }
+  }
+  else {
+    do {
+      DetectorHit_sptr hit = treeIO_->retrieveHit();
+      insertHit(hit);
+      entryIndex_++;
+      hittree_->GetEntry(entryIndex_);
+    } while (treeIO_->getEventID() == EventID);
   }
   
   return AS_OK;

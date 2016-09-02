@@ -22,7 +22,7 @@
 #include <iostream>
 #include <iomanip>
 
-#include "DetectorReadoutModule.hh"
+#include "ReadoutModule.hh"
 #include "MultiChannelData.hh"
 
 using namespace anl;
@@ -54,7 +54,7 @@ ANLStatus ReadDataFile_VME3::mod_init()
   DetectorSystem* detectorManager = getDetectorManager();
   for (auto& readoutModule: detectorManager->getReadoutModules()) {
     readPacketSize += (DATA_HEADER_LENGTH * sizeof(short));
-    for (auto& section: readoutModule->getReadoutSections()) {
+    for (auto& section: readoutModule->Sections()) {
       MultiChannelData* mcd = detectorManager->getMultiChannelData(section);
       readPacketSize += ( mcd->NumberOfChannels() * sizeof(short) );
     }
@@ -155,7 +155,7 @@ ANLStatus ReadDataFile_VME3::mod_ana()
       p+=2;
     }
 
-    for (auto& section: readoutModule->getReadoutSections()) {
+    for (auto& section: readoutModule->Sections()) {
       MultiChannelData* mcd = detectorManager->getMultiChannelData(section);
       int nCh = mcd->NumberOfChannels();
       for (int i=0; i<nCh; i++) {

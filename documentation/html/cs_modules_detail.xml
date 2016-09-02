@@ -28,17 +28,24 @@
         <description></description>
       </param>
       <param container_type=''>
+        <name>output_random_status</name>
+        <type>bool</type>
+        <unit></unit>
+        <default_value>1</default_value>
+        <description></description>
+      </param>
+      <param container_type=''>
         <name>random_initial_status_file</name>
         <type>string</type>
         <unit></unit>
-        <default_value>RandomSeed_I.txt</default_value>
+        <default_value>RandomSeed_i.dat</default_value>
         <description></description>
       </param>
       <param container_type=''>
         <name>random_final_status_file</name>
         <type>string</type>
         <unit></unit>
-        <default_value>RandomSeed_F.txt</default_value>
+        <default_value>RandomSeed_f.dat</default_value>
         <description></description>
       </param>
       <param container_type=''>
@@ -437,7 +444,7 @@
   </module>
   <module>
     <name>PlaneWaveRectanglePrimaryGen</name>
-    <version>4.0</version>
+    <version>4.1</version>
     <text>
       Primary generator of MC simulations. Primaries are generated as a plane
       wave inside a rectangle.
@@ -574,6 +581,13 @@
         <unit>cm</unit>
         <default_value>100</default_value>
         <description>Size y of the rectangle where parimary particles are generated.</description>
+      </param>
+      <param container_type=''>
+        <name>roll_angle</name>
+        <type>double</type>
+        <unit>radian</unit>
+        <default_value>0</default_value>
+        <description>Roll angle of the rectangle where parimary particles are generated.</description>
       </param>
     </parameters>
   </module>
@@ -1189,7 +1203,7 @@
   </module>
   <module>
     <name>ConstructDetector</name>
-    <version>3.1</version>
+    <version>3.2</version>
     <text>Construct a detector system, loading a detector configuration file.</text>
     <parameters>
       <param container_type=''>
@@ -1198,6 +1212,13 @@
         <unit></unit>
         <default_value>detector_config.xml</default_value>
         <description>XML data file describing a detector configuration.</description>
+      </param>
+      <param container_type=''>
+        <name>detectors_information</name>
+        <type>string</type>
+        <unit></unit>
+        <default_value></default_value>
+        <description>XML data file of information on detectors.</description>
       </param>
       <param container_type=''>
         <name>verbose_level</name>
@@ -1210,7 +1231,7 @@
   </module>
   <module>
     <name>ConstructDetectorForSimulation</name>
-    <version>3.1</version>
+    <version>3.2</version>
     <text></text>
     <parameters>
       <param container_type=''>
@@ -1219,6 +1240,13 @@
         <unit></unit>
         <default_value>detector_config.xml</default_value>
         <description>XML data file describing a detector configuration.</description>
+      </param>
+      <param container_type=''>
+        <name>detectors_information</name>
+        <type>string</type>
+        <unit></unit>
+        <default_value></default_value>
+        <description>XML data file of information on detectors.</description>
       </param>
       <param container_type=''>
         <name>verbose_level</name>
@@ -1238,19 +1266,19 @@
   </module>
   <module>
     <name>VCSModule</name>
-    <version>1.1</version>
+    <version>1.2</version>
     <text></text>
     <parameters/>
   </module>
   <module>
     <name>CSHitCollection</name>
-    <version>1.1</version>
+    <version>1.2</version>
     <text>A hit collection module.</text>
     <parameters/>
   </module>
   <module>
     <name>ConstructChannelMap</name>
-    <version>2.0</version>
+    <version>4.0</version>
     <text></text>
     <parameters>
       <param container_type=''>
@@ -1263,118 +1291,6 @@
     </parameters>
   </module>
   <module>
-    <name>SetNoiseLevels</name>
-    <version>2.5</version>
-    <text></text>
-    <parameters>
-      <param container_type=''>
-        <name>filename</name>
-        <type>string</type>
-        <unit></unit>
-        <default_value></default_value>
-        <description></description>
-      </param>
-      <param container_type='map'>
-        <name>noise_level_map</name>
-        <type>map</type>
-        <unit></unit>
-        <default_value> </default_value>
-        <description></description>
-      </param>
-      <param container_type='key'>
-        <name>detector_name_prefix</name>
-        <type>string</type>
-        <unit></unit>
-        <default_value>Si</default_value>
-        <description></description>
-      </param>
-      <param container_type='value'>
-        <name>detector_type</name>
-        <type>int</type>
-        <unit></unit>
-        <default_value>1</default_value>
-        <description></description>
-      </param>
-      <param container_type='value'>
-        <name>noise_coefficient0</name>
-        <type>double</type>
-        <unit></unit>
-        <default_value>0</default_value>
-        <description></description>
-      </param>
-      <param container_type='value'>
-        <name>noise_coefficient1</name>
-        <type>double</type>
-        <unit></unit>
-        <default_value>0</default_value>
-        <description></description>
-      </param>
-      <param container_type='value'>
-        <name>noise_coefficient2</name>
-        <type>double</type>
-        <unit></unit>
-        <default_value>0</default_value>
-        <description></description>
-      </param>
-      <param container_type='value'>
-        <name>cathode_noise_coefficient0</name>
-        <type>double</type>
-        <unit></unit>
-        <default_value>0</default_value>
-        <description></description>
-      </param>
-      <param container_type='value'>
-        <name>cathode_noise_coefficient1</name>
-        <type>double</type>
-        <unit></unit>
-        <default_value>0</default_value>
-        <description></description>
-      </param>
-      <param container_type='value'>
-        <name>cathode_noise_coefficient2</name>
-        <type>double</type>
-        <unit></unit>
-        <default_value>0</default_value>
-        <description></description>
-      </param>
-      <param container_type='value'>
-        <name>anode_noise_coefficient0</name>
-        <type>double</type>
-        <unit></unit>
-        <default_value>0</default_value>
-        <description></description>
-      </param>
-      <param container_type='value'>
-        <name>anode_noise_coefficient1</name>
-        <type>double</type>
-        <unit></unit>
-        <default_value>0</default_value>
-        <description></description>
-      </param>
-      <param container_type='value'>
-        <name>anode_noise_coefficient2</name>
-        <type>double</type>
-        <unit></unit>
-        <default_value>0</default_value>
-        <description></description>
-      </param>
-    </parameters>
-  </module>
-  <module>
-    <name>SetBadChannels</name>
-    <version>1.0</version>
-    <text></text>
-    <parameters>
-      <param container_type=''>
-        <name>filename</name>
-        <type>string</type>
-        <unit></unit>
-        <default_value></default_value>
-        <description></description>
-      </param>
-    </parameters>
-  </module>
-  <module>
     <name>SetChannelsInfo</name>
     <version>3.0</version>
     <text></text>
@@ -1383,91 +1299,14 @@
         <name>filename</name>
         <type>string</type>
         <unit></unit>
-        <default_value></default_value>
-        <description></description>
-      </param>
-      <param container_type='map'>
-        <name>channels_info_map</name>
-        <type>map</type>
-        <unit></unit>
-        <default_value> </default_value>
-        <description></description>
-      </param>
-      <param container_type='key'>
-        <name>detector_name_prefix</name>
-        <type>string</type>
-        <unit></unit>
-        <default_value>Si</default_value>
-        <description></description>
-      </param>
-      <param container_type='value'>
-        <name>detector_type</name>
-        <type>int</type>
-        <unit></unit>
-        <default_value>1</default_value>
-        <description></description>
-      </param>
-      <param container_type='value'>
-        <name>side1_noise_param_0</name>
-        <type>double</type>
-        <unit></unit>
-        <default_value>0</default_value>
-        <description></description>
-      </param>
-      <param container_type='value'>
-        <name>side1_noise_param_1</name>
-        <type>double</type>
-        <unit></unit>
-        <default_value>0</default_value>
-        <description></description>
-      </param>
-      <param container_type='value'>
-        <name>side1_noise_param_2</name>
-        <type>double</type>
-        <unit></unit>
-        <default_value>0</default_value>
-        <description></description>
-      </param>
-      <param container_type='value'>
-        <name>side1_compensation_factor</name>
-        <type>double</type>
-        <unit></unit>
-        <default_value>1</default_value>
-        <description></description>
-      </param>
-      <param container_type='value'>
-        <name>side2_noise_param_0</name>
-        <type>double</type>
-        <unit></unit>
-        <default_value>0</default_value>
-        <description></description>
-      </param>
-      <param container_type='value'>
-        <name>side2_noise_param_1</name>
-        <type>double</type>
-        <unit></unit>
-        <default_value>0</default_value>
-        <description></description>
-      </param>
-      <param container_type='value'>
-        <name>side2_noise_param_2</name>
-        <type>double</type>
-        <unit></unit>
-        <default_value>0</default_value>
-        <description></description>
-      </param>
-      <param container_type='value'>
-        <name>side2_compensation_factor</name>
-        <type>double</type>
-        <unit></unit>
-        <default_value>1</default_value>
+        <default_value>channels_info.xml</default_value>
         <description></description>
       </param>
     </parameters>
   </module>
   <module>
     <name>SelectHits</name>
-    <version>2.2</version>
+    <version>3.0</version>
     <text></text>
     <parameters>
       <param container_type='map'>
@@ -1635,7 +1474,91 @@
   </module>
   <module>
     <name>MakeDetectorHits</name>
-    <version>2.2</version>
+    <version>3.0</version>
+    <text></text>
+    <parameters>
+      <param container_type='map'>
+        <name>analysis_map</name>
+        <type>map</type>
+        <unit></unit>
+        <default_value> </default_value>
+        <description></description>
+      </param>
+      <param container_type='key'>
+        <name>detector_name_prefix</name>
+        <type>string</type>
+        <unit></unit>
+        <default_value>Si</default_value>
+        <description></description>
+      </param>
+      <param container_type='value'>
+        <name>detector_type</name>
+        <type>int</type>
+        <unit></unit>
+        <default_value>1</default_value>
+        <description></description>
+      </param>
+      <param container_type='value'>
+        <name>reconstruction_mode</name>
+        <type>int</type>
+        <unit></unit>
+        <default_value>0</default_value>
+        <description></description>
+      </param>
+      <param container_type='value'>
+        <name>threshold</name>
+        <type>double</type>
+        <unit>keV</unit>
+        <default_value>1</default_value>
+        <description></description>
+      </param>
+      <param container_type='value'>
+        <name>threshold_cathode</name>
+        <type>double</type>
+        <unit>keV</unit>
+        <default_value>1</default_value>
+        <description></description>
+      </param>
+      <param container_type='value'>
+        <name>threshold_anode</name>
+        <type>double</type>
+        <unit>keV</unit>
+        <default_value>1</default_value>
+        <description></description>
+      </param>
+      <param container_type='value'>
+        <name>lower_energy_consistency_check_function_c0</name>
+        <type>double</type>
+        <unit>keV</unit>
+        <default_value>0</default_value>
+        <description></description>
+      </param>
+      <param container_type='value'>
+        <name>lower_energy_consistency_check_function_c1</name>
+        <type>double</type>
+        <unit></unit>
+        <default_value>0.9</default_value>
+        <description></description>
+      </param>
+      <param container_type='value'>
+        <name>upper_energy_consistency_check_function_c0</name>
+        <type>double</type>
+        <unit>keV</unit>
+        <default_value>0</default_value>
+        <description></description>
+      </param>
+      <param container_type='value'>
+        <name>upper_energy_consistency_check_function_c1</name>
+        <type>double</type>
+        <unit></unit>
+        <default_value>1.1</default_value>
+        <description></description>
+      </param>
+    </parameters>
+  </module>
+  <module>
+    <name>MakeDetectorHitsWithTimingProcess</name>
+    <version>3.0</version>
     <text></text>
     <parameters>
       <param container_type='map'>
@@ -1802,90 +1725,6 @@
     </parameters>
   </module>
   <module>
-    <name>MakeDetectorHitsTR</name>
-    <version>2.1</version>
-    <text></text>
-    <parameters>
-      <param container_type='map'>
-        <name>analysis_map</name>
-        <type>map</type>
-        <unit></unit>
-        <default_value> </default_value>
-        <description></description>
-      </param>
-      <param container_type='key'>
-        <name>detector_name_prefix</name>
-        <type>string</type>
-        <unit></unit>
-        <default_value>Si</default_value>
-        <description></description>
-      </param>
-      <param container_type='value'>
-        <name>detector_type</name>
-        <type>int</type>
-        <unit></unit>
-        <default_value>1</default_value>
-        <description></description>
-      </param>
-      <param container_type='value'>
-        <name>reconstruction_mode</name>
-        <type>int</type>
-        <unit></unit>
-        <default_value>0</default_value>
-        <description></description>
-      </param>
-      <param container_type='value'>
-        <name>threshold</name>
-        <type>double</type>
-        <unit>keV</unit>
-        <default_value>1</default_value>
-        <description></description>
-      </param>
-      <param container_type='value'>
-        <name>threshold_cathode</name>
-        <type>double</type>
-        <unit>keV</unit>
-        <default_value>1</default_value>
-        <description></description>
-      </param>
-      <param container_type='value'>
-        <name>threshold_anode</name>
-        <type>double</type>
-        <unit>keV</unit>
-        <default_value>1</default_value>
-        <description></description>
-      </param>
-      <param container_type='value'>
-        <name>lower_energy_consistency_check_function_c0</name>
-        <type>double</type>
-        <unit>keV</unit>
-        <default_value>0</default_value>
-        <description></description>
-      </param>
-      <param container_type='value'>
-        <name>lower_energy_consistency_check_function_c1</name>
-        <type>double</type>
-        <unit></unit>
-        <default_value>0.9</default_value>
-        <description></description>
-      </param>
-      <param container_type='value'>
-        <name>upper_energy_consistency_check_function_c0</name>
-        <type>double</type>
-        <unit>keV</unit>
-        <default_value>0</default_value>
-        <description></description>
-      </param>
-      <param container_type='value'>
-        <name>upper_energy_consistency_check_function_c1</name>
-        <type>double</type>
-        <unit></unit>
-        <default_value>1.1</default_value>
-        <description></description>
-      </param>
-    </parameters>
-  </module>
-  <module>
     <name>ApplyEPICompensation</name>
     <version>2.0</version>
     <text></text>
@@ -1944,6 +1783,20 @@
         <type>bool</type>
         <unit></unit>
         <default_value>1</default_value>
+        <description></description>
+      </param>
+      <param container_type=''>
+        <name>discard_time_group_zero</name>
+        <type>bool</type>
+        <unit></unit>
+        <default_value>0</default_value>
+        <description></description>
+      </param>
+      <param container_type=''>
+        <name>discard_time_group_nonzero</name>
+        <type>bool</type>
+        <unit></unit>
+        <default_value>0</default_value>
         <description></description>
       </param>
     </parameters>
@@ -2096,6 +1949,13 @@
     </text>
     <parameters>
       <param container_type=''>
+        <name>pha_randomization</name>
+        <type>bool</type>
+        <unit></unit>
+        <default_value>0</default_value>
+        <description>Randomize PHA values if true</description>
+      </param>
+      <param container_type=''>
         <name>pedestal_level</name>
         <type>string</type>
         <unit></unit>
@@ -2132,6 +1992,13 @@
     <version>1.1</version>
     <text></text>
     <parameters>
+      <param container_type=''>
+        <name>pha_randomization</name>
+        <type>bool</type>
+        <unit></unit>
+        <default_value>0</default_value>
+        <description>Randomize PHA values if true</description>
+      </param>
       <param container_type=''>
         <name>pedestal_level</name>
         <type>string</type>
@@ -2413,6 +2280,13 @@
         <type>bool</type>
         <unit></unit>
         <default_value>1</default_value>
+        <description></description>
+      </param>
+      <param container_type=''>
+        <name>category</name>
+        <type>string</type>
+        <unit></unit>
+        <default_value>PHA</default_value>
         <description></description>
       </param>
       <param container_type=''>
@@ -2859,183 +2733,6 @@
     </parameters>
   </module>
   <module>
-    <name>AHRayTracingPrimaryGen</name>
-    <version>1.1</version>
-    <text></text>
-    <parameters>
-      <param container_type=''>
-        <name>spectral_distribution</name>
-        <type>string</type>
-        <unit></unit>
-        <default_value>power law</default_value>
-        <description></description>
-      </param>
-      <param container_type=''>
-        <name>energy_mean</name>
-        <type>double</type>
-        <unit>keV</unit>
-        <default_value>511</default_value>
-        <description>Mean energy of the Gaussian distribution</description>
-      </param>
-      <param container_type=''>
-        <name>energy_sigma</name>
-        <type>double</type>
-        <unit>keV</unit>
-        <default_value>2</default_value>
-        <description>Standard deviation of the Gaussian distribution</description>
-      </param>
-      <param container_type=''>
-        <name>radiation_temperature</name>
-        <type>double</type>
-        <unit>keV</unit>
-        <default_value>10</default_value>
-        <description>Radiation temperature in units of keV</description>
-      </param>
-      <param container_type=''>
-        <name>energy_array</name>
-        <type>vector&lt;double&gt;</type>
-        <unit>keV</unit>
-        <default_value></default_value>
-        <description>Energy array of spectral histogram</description>
-      </param>
-      <param container_type=''>
-        <name>photons_array</name>
-        <type>vector&lt;double&gt;</type>
-        <unit></unit>
-        <default_value></default_value>
-        <description>Photons array of spectral histogram</description>
-      </param>
-      <param container_type=''>
-        <name>polarization_mode</name>
-        <type>int</type>
-        <unit></unit>
-        <default_value>-1</default_value>
-        <description>
-          Polarization mode. -1: polarization disable, 0: unpolarized, 1:
-          linearly polarized (100%), 2: partially linearly polarized
-        </description>
-      </param>
-      <param container_type=''>
-        <name>filename</name>
-        <type>string</type>
-        <unit></unit>
-        <default_value>raytracing.fits</default_value>
-        <description></description>
-      </param>
-      <param container_type=''>
-        <name>position_offset</name>
-        <type>3-vector</type>
-        <unit>mm</unit>
-        <default_value>0 0 0</default_value>
-        <description></description>
-      </param>
-    </parameters>
-  </module>
-  <module>
-    <name>SimXPrimaryGen</name>
-    <version>1.1</version>
-    <text></text>
-    <parameters>
-      <param container_type=''>
-        <name>particle</name>
-        <type>string</type>
-        <unit></unit>
-        <default_value>gamma</default_value>
-        <description>Particle name (gamma, e-, e+, proton, neutron, geantino...)</description>
-      </param>
-      <param container_type=''>
-        <name>spectral_distribution</name>
-        <type>string</type>
-        <unit></unit>
-        <default_value>power law</default_value>
-        <description></description>
-      </param>
-      <param container_type=''>
-        <name>energy_mean</name>
-        <type>double</type>
-        <unit>keV</unit>
-        <default_value>511</default_value>
-        <description>Mean energy of the Gaussian distribution</description>
-      </param>
-      <param container_type=''>
-        <name>energy_sigma</name>
-        <type>double</type>
-        <unit>keV</unit>
-        <default_value>2</default_value>
-        <description>Standard deviation of the Gaussian distribution</description>
-      </param>
-      <param container_type=''>
-        <name>radiation_temperature</name>
-        <type>double</type>
-        <unit>keV</unit>
-        <default_value>10</default_value>
-        <description>Radiation temperature in units of keV</description>
-      </param>
-      <param container_type=''>
-        <name>energy_array</name>
-        <type>vector&lt;double&gt;</type>
-        <unit>keV</unit>
-        <default_value></default_value>
-        <description>Energy array of spectral histogram</description>
-      </param>
-      <param container_type=''>
-        <name>photons_array</name>
-        <type>vector&lt;double&gt;</type>
-        <unit></unit>
-        <default_value></default_value>
-        <description>Photons array of spectral histogram</description>
-      </param>
-      <param container_type=''>
-        <name>polarization_mode</name>
-        <type>int</type>
-        <unit></unit>
-        <default_value>-1</default_value>
-        <description>
-          Polarization mode. -1: polarization disable, 0: unpolarized, 1:
-          linearly polarized (100%), 2: partially linearly polarized
-        </description>
-      </param>
-      <param container_type=''>
-        <name>center_position</name>
-        <type>3-vector</type>
-        <unit>cm</unit>
-        <default_value>0 0 0</default_value>
-        <description>Position of the sphere.</description>
-      </param>
-      <param container_type=''>
-        <name>radius</name>
-        <type>double</type>
-        <unit>cm</unit>
-        <default_value>100</default_value>
-        <description>Radius of the sphere.</description>
-      </param>
-      <param container_type=''>
-        <name>polarization_vector</name>
-        <type>3-vector</type>
-        <unit></unit>
-        <default_value>1 0 0</default_value>
-        <description>Polarization vector (if polarization is enable).</description>
-      </param>
-      <param container_type=''>
-        <name>degree_of_polarization</name>
-        <type>double</type>
-        <unit></unit>
-        <default_value>0</default_value>
-        <description>Degree of polarization (if polarization is enable).</description>
-      </param>
-      <param container_type=''>
-        <name>flux</name>
-        <type>double</type>
-        <unit>erg/cm2/s/sr</unit>
-        <default_value>1e-09</default_value>
-        <description>
-          Energy flux of the primaries. This parameter is used only for
-          calculating real time correspoing to a simulation.
-        </description>
-      </param>
-    </parameters>
-  </module>
-  <module>
     <name>AHRadiationBackgroundPrimaryGen</name>
     <version>1.1</version>
     <text></text>
@@ -3186,7 +2883,7 @@
     </parameters>
   </module>
   <module>
-    <name>RDPickUpData</name>
+    <name>RadioactiveDecayPickUpData</name>
     <version>2.0</version>
     <text></text>
     <parameters>
@@ -3201,7 +2898,7 @@
   </module>
   <module>
     <name>ActivationPickUpData</name>
-    <version>1.3</version>
+    <version>2.0</version>
     <text></text>
     <parameters>
       <param container_type=''>
@@ -3209,6 +2906,13 @@
         <type>string</type>
         <unit></unit>
         <default_value>activation</default_value>
+        <description></description>
+      </param>
+      <param container_type=''>
+        <name>processes_to_detect</name>
+        <type>vector&lt;string&gt;</type>
+        <unit></unit>
+        <default_value></default_value>
         <description></description>
       </param>
     </parameters>
@@ -3267,6 +2971,13 @@
         <description></description>
       </param>
       <param container_type=''>
+        <name>physics_list</name>
+        <type>string</type>
+        <unit></unit>
+        <default_value>CSPhysicsList</default_value>
+        <description></description>
+      </param>
+      <param container_type=''>
         <name>polarization</name>
         <type>bool</type>
         <unit></unit>
@@ -3301,37 +3012,11 @@
         <default_value>0</default_value>
         <description></description>
       </param>
-    </parameters>
-  </module>
-  <module>
-    <name>SimXIF</name>
-    <version>2.0</version>
-    <text></text>
-    <parameters/>
-  </module>
-  <module>
-    <name>GenerateSimXEvent</name>
-    <version>0.0</version>
-    <text></text>
-    <parameters/>
-  </module>
-  <module>
-    <name>OutputSimXPrimaries</name>
-    <version>0.1</version>
-    <text></text>
-    <parameters>
       <param container_type=''>
-        <name>filename</name>
-        <type>string</type>
+        <name>parallel_world</name>
+        <type>bool</type>
         <unit></unit>
-        <default_value>incident_photons.fits</default_value>
-        <description></description>
-      </param>
-      <param container_type=''>
-        <name>area</name>
-        <type>double</type>
-        <unit>cm2</unit>
-        <default_value>300</default_value>
+        <default_value>1</default_value>
         <description></description>
       </param>
     </parameters>

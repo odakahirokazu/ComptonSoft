@@ -59,10 +59,10 @@ public:
    * @param channel channel index.
    * @param pixel mapped pixel or strip pair.
    */
-  void set(int section, int index, const PixelID& pixel)
+  void set(int section, int channel, const PixelID& pixel)
   {
-    VChannelMap::set(section, index, pixel);
-    tableToChannel_[pixel.X()][pixel.Y()] = ChannelID{section, index};
+    VChannelMap::set(section, channel, pixel);
+    tableToChannel_[pixel.X()][pixel.Y()] = SectionChannelPair{section, channel};
   }
 
   /** 
@@ -72,20 +72,20 @@ public:
    * @param x mapped pixel/strip index along x-axis.
    * @param y mapped pixel/strip index along y-axis.
    */
-  void set(int section, int index, int x, int y)
+  void set(int section, int channel, int x, int y)
   {
-    VChannelMap::set(section, index, x, y);
-    tableToChannel_[x][y] = ChannelID{section, index};
+    VChannelMap::set(section, channel, x, y);
+    tableToChannel_[x][y] = SectionChannelPair{section, channel};
   }
 
-  ChannelID getChannel(int x, int y) const
+  SectionChannelPair getSectionChannel(int x, int y) const
   { return tableToChannel_[x][y]; }
 
-  ChannelID getChannel(const PixelID& pixel) const
+  SectionChannelPair getSectionChannel(const PixelID& pixel) const
   { return tableToChannel_[pixel.X()][pixel.Y()]; }
 
 private:
-  std::vector<std::vector<ChannelID>> tableToChannel_;
+  std::vector<std::vector<SectionChannelPair>> tableToChannel_;
 };
 
 } /* namespace comptonsoft */

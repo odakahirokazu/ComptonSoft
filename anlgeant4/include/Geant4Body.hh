@@ -68,12 +68,13 @@ private:
   std::string m_RandomEngine;
   int m_RandomInitMode;
   int m_RandomSeed1;
+  bool m_OutputRandomStatus;
   std::string m_RandomInitialStatusFileName;
   std::string m_RandomFinalStatusFileName;
 
   int m_VerboseLevel;
 };
 
-}
+} /* namespace anlgeant4 */
 
 #endif /* ANLGEANT4_Geant4Body_H */

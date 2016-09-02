@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<gdml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://service-spi.web.cern.ch/service-spi/app/releases/GDML/schema/gdml.xsd">
+  <define />
+  <materials>
+    <material Z="1" name="Vacuum" state="gas">
+      <D unit="g/cm3" value="1e-12" />
+      <atom unit="g/mole" value="1"/>
+    </material>
+    <element name="Caesium" formula="Cs" Z="55.">
+      <atom unit="g/mole" value="132.905" />
+    </element>
+    <element name="Iodine" formula="I" Z="53.">
+      <atom unit="g/mole" value="126.904" />
+    </element>
+    <material name="CsI" state="solid">
+      <D unit="g/cm3" value="4.51" />
+      <fraction n="0.5" ref="Caesium" />
+      <fraction n="0.5" ref="Iodine" />
+    </material>
+  </materials>
+  <solids>
+    <box lunit="mm" name="CsI.box" x="50.0" y="50.0" z="50.0" />
+    <box lunit="mm" name="World.box" x="1000.0" y="1000.0" z="1000.0" />
+  </solids>
+  <structure>
+    <volume name="CsIDetector.log">
+      <materialref ref="CsI" />
+      <solidref ref="CsI.box" />
+    </volume>
+    <volume name="World.log">
+      <materialref ref="Vacuum" />
+      <solidref ref="World.box" />
+      <physvol name="CsIDetector">
+        <volumeref ref="CsIDetector.log" />
+        <position name="CsIDetector.pos" unit="mm" x="0.0" y="0.0" z="0.0" />
+      </physvol>
+    </volume>
+  </structure>
+  <setup name="Default" version="1.0">
+    <world ref="World.log" />
+  </setup>
+</gdml>

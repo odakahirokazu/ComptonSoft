@@ -23,7 +23,7 @@
 #include "ChannelID.hh"
 #include "HXIEvent.hh"
 #include "HXIEventFITS.hh"
-#include "DetectorReadoutModule.hh"
+#include "ReadoutModule.hh"
 #include "DetectorHit.hh"
 #include "CSHitCollection.hh"
 
@@ -39,8 +39,8 @@ void fillHits(int64_t occurrenceID,
   event->setOccurrenceID(occurrenceID);
   for (auto& hit: hits) {
     const int readoutModuleID = hit->ReadoutModuleID();
-    const int section = hit->ReadoutChannelSection();
-    const int channelID = hit->ReadoutChannelIndex();
+    const int section = hit->ReadoutSection();
+    const int channelID = hit->ReadoutChannel();
     const int16_t ASIC_ID = astroh::hxi::Event::makeASICID(readoutModuleID, section);
     const int16_t channelID_remapped = astroh::hxi::Event::makeRemappedReadoutID(ASIC_ID, channelID);
     event->pushReadoutData(ASIC_ID,

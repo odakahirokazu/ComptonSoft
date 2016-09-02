@@ -24,96 +24,112 @@
 
 namespace comptonsoft {
 
+namespace ChannelID
+{
+constexpr static int Undefined = -1;
+}
+
+
 /**
- * A class of a readout channel ID
+ * A class of section-channel pair
  * @author Hirokazu Odaka
  * @date 2014-11-11
+ * @date 2016-08-18
  */
-class ChannelID
+class SectionChannelPair
 {
 public:
-  constexpr static int Undefined = -1;
+  SectionChannelPair(int section=ChannelID::Undefined, int channel=ChannelID::Undefined);
+  ~SectionChannelPair();
+  SectionChannelPair(const SectionChannelPair&) = default;
+  SectionChannelPair(SectionChannelPair&&) = default;
+  SectionChannelPair& operator=(const SectionChannelPair&) = default;
+  SectionChannelPair& operator=(SectionChannelPair&&) = default;
 
-public:
-  ChannelID(int section=Undefined, int index=Undefined);
-  ~ChannelID();
-  ChannelID(const ChannelID&) = default;
-  ChannelID(ChannelID&&) = default;
-  ChannelID& operator=(const ChannelID&) = default;
-  ChannelID& operator=(ChannelID&&) = default;
-
-  void set(int section, int index)
+  void set(int section, int channel)
   {
     section_ = section;
-    index_ = index;
+    channel_ = channel;
   }
 
   int Section() const { return section_; }
-  int Index() const { return index_; }
+  int Channel() const { return channel_; }
 
 private:
-  int section_ = Undefined;
-  int index_ = Undefined;
+  int section_ = ChannelID::Undefined;
+  int channel_ = ChannelID::Undefined;
 };
 
-class DetectorChannelID
+/**
+ * A class of detector-scoped channel ID
+ * @author Hirokazu Odaka
+ * @date 2014-11-11
+ * @date 2016-08-18
+ */
+class DetectorBasedChannelID
 {
 public:
-  DetectorChannelID(int detector=ChannelID::Undefined,
-                    int section=ChannelID::Undefined,
-                    int index=ChannelID::Undefined);
-  ~DetectorChannelID();
-  DetectorChannelID(const DetectorChannelID&) = default;
-  DetectorChannelID(DetectorChannelID&&) = default;
-  DetectorChannelID& operator=(const DetectorChannelID&) = default;
-  DetectorChannelID& operator=(DetectorChannelID&&) = default;
+  DetectorBasedChannelID(int detector=ChannelID::Undefined,
+                         int section=ChannelID::Undefined,
+                         int channel=ChannelID::Undefined);
+  ~DetectorBasedChannelID();
+  DetectorBasedChannelID(const DetectorBasedChannelID&) = default;
+  DetectorBasedChannelID(DetectorBasedChannelID&&) = default;
+  DetectorBasedChannelID& operator=(const DetectorBasedChannelID&) = default;
+  DetectorBasedChannelID& operator=(DetectorBasedChannelID&&) = default;
 
-  void set(int detector, int section, int index)
+  void set(int detector, int section, int channel)
   {
     detector_ = detector;
-    channel_.set(section, index);
+    sc_.set(section, channel);
   }
 
   int Detector() const { return detector_; }
-  int Section() const { return channel_.Section(); }
-  int Index() const { return channel_.Index(); }
-  ChannelID Channel() const { return channel_; }
+  int Section() const { return sc_.Section(); }
+  int Channel() const { return sc_.Channel(); }
+  SectionChannelPair SectionChannel() const { return sc_; }
 
   std::string toString() const;
 
 private:
   int detector_ = ChannelID::Undefined;
-  ChannelID channel_;
+  SectionChannelPair sc_;
 };
 
-class ReadoutChannelID
+/**
+ * A class of readout-scoped channel ID
+ * @author Hirokazu Odaka
+ * @date 2014-11-11
+ * @date 2016-08-18
+ */
+class ReadoutBasedChannelID
 {
 public:
-  ReadoutChannelID(int readoutModule=ChannelID::Undefined,
-                   int section=ChannelID::Undefined,
-                   int index=ChannelID::Undefined);
-  ~ReadoutChannelID();
-  ReadoutChannelID(const ReadoutChannelID&) = default;
-  ReadoutChannelID(ReadoutChannelID&&) = default;
-  ReadoutChannelID& operator=(const ReadoutChannelID&) = default;
-  ReadoutChannelID& operator=(ReadoutChannelID&&) = default;
+  ReadoutBasedChannelID(int readoutModule=ChannelID::Undefined,
+                        int section=ChannelID::Undefined,
+                        int channel=ChannelID::Undefined);
+  ~ReadoutBasedChannelID();
+  ReadoutBasedChannelID(const ReadoutBasedChannelID&) = default;
+  ReadoutBasedChannelID(ReadoutBasedChannelID&&) = default;
+  ReadoutBasedChannelID& operator=(const ReadoutBasedChannelID&) = default;
+  ReadoutBasedChannelID& operator=(ReadoutBasedChannelID&&) = default;
 
-  void set(int readoutModule, int section, int index)
+  void set(int readoutModule, int section, int channel)
   {
     readoutModule_ = readoutModule;
-    channel_.set(section, index);
+    sc_.set(section, channel);
   }
 
   int ReadoutModule() const { return readoutModule_; }
-  int Section() const { return channel_.Section(); }
-  int Index() const { return channel_.Index(); }
-  ChannelID Channel() const { return channel_; }
+  int Section() const { return sc_.Section(); }
+  int Channel() const { return sc_.Channel(); }
+  SectionChannelPair SectionChannel() const { return sc_; }
 
   std::string toString() const;
 
 private:
   int readoutModule_ = ChannelID::Undefined;
-  ChannelID channel_;
+  SectionChannelPair sc_;
 };
 
 } /* namespace comptonsoft */

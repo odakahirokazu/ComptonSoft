@@ -37,17 +37,14 @@ void MakeDetectorHitsWithTimingProcess::doProcessing()
 
   for (int timeGroup=0; ; timeGroup++) {
     std::vector<double> triggerTimes;
-
     for (auto ds: dsVector) {
       if (ds->isSelfTriggered()) {
-        triggerTimes.push_back(ds->FirstEventTime());
+        triggerTimes.push_back(ds->FirstTriggerTime());
       }
     }
-
     if (triggerTimes.empty()) {
       break;
     }
-
     const double triggerTime = *std::min_element(triggerTimes.begin(),
                                                  triggerTimes.end());
     for (auto ds: dsVector) {

@@ -20,10 +20,10 @@
 #ifndef COMPTONSOFT_ConstructChannelMap_H
 #define COMPTONSOFT_ConstructChannelMap_H 1
 
-#include <vector>
+#include <map>
 #include <string>
 #include <memory>
-
+#include <boost/property_tree/ptree.hpp>
 #include "VCSModule.hh"
 
 namespace comptonsoft {
@@ -33,10 +33,11 @@ class VChannelMap;
 /**
  *
  * @author Hirokazu Odaka
+ * @date 2016-08-25
  */
 class ConstructChannelMap : public VCSModule
 {
-  DEFINE_ANL_MODULE(ConstructChannelMap, 2.0);
+  DEFINE_ANL_MODULE(ConstructChannelMap, 4.0);
 public:
   ConstructChannelMap();
   ~ConstructChannelMap();
@@ -45,7 +46,10 @@ public:
   anl::ANLStatus mod_init();
 
 private:
-  std::vector<std::shared_ptr<const VChannelMap>> channelMaps_;
+  void loadChannelMap(const boost::property_tree::ptree& pt);
+
+private:
+  std::map<std::string, std::shared_ptr<const VChannelMap>> channelMaps_;
   std::string filename_;
 };
 

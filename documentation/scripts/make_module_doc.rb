@@ -70,10 +70,6 @@ a.text "A hit collection module."
 
 a.push ComptonSoft::ConstructChannelMap.new
 
-a.push ComptonSoft::SetNoiseLevels.new
-
-a.push ComptonSoft::SetBadChannels.new
-
 a.push ComptonSoft::SetChannelsInfo.new
 
 a.push ComptonSoft::SelectHits.new
@@ -82,9 +78,9 @@ a.push ComptonSoft::AnalyzeHits.new
 
 a.push ComptonSoft::MakeDetectorHits.new
 
-a.push ComptonSoft::MakeRawHits.new
+a.push ComptonSoft::MakeDetectorHitsWithTimingProcess.new
 
-a.push ComptonSoft::MakeDetectorHitsTR.new
+a.push ComptonSoft::MakeRawHits.new
 
 a.push ComptonSoft::ApplyEPICompensation.new
 
@@ -170,13 +166,13 @@ a.push ComptonSoft::QuickAnalysisForDSD.new
 
 ### ComotonSoft/simulation
 
-a.push ComptonSoft::AHRayTracingPrimaryGen.new
+# a.push ComptonSoft::AHRayTracingPrimaryGen.new
 
-a.push ComptonSoft::SimXPrimaryGen.new
+# a.push ComptonSoft::SimXPrimaryGen.new
 
 a.push ComptonSoft::AHRadiationBackgroundPrimaryGen.new
 
-a.push ComptonSoft::RDPickUpData.new
+a.push ComptonSoft::RadioactiveDecayPickUpData.new
 
 a.push ComptonSoft::ActivationPickUpData.new
 
@@ -190,11 +186,11 @@ a.push ComptonSoft::ScatteringPickUpData.new
 
 a.push ComptonSoft::PhysicsListManager.new
 
-a.push ComptonSoft::SimXIF.new
+# a.push ComptonSoft::SimXIF.new
 
-a.push ComptonSoft::GenerateSimXEvent.new
+# a.push ComptonSoft::GenerateSimXEvent.new
 
-a.push ComptonSoft::OutputSimXPrimaries.new
+# a.push ComptonSoft::OutputSimXPrimaries.new
 
 a.push ComptonSoft::AssignG4CopyNumber.new
 

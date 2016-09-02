@@ -22,6 +22,7 @@
 #include <list>
 #include <algorithm>
 #include <iterator>
+#include "G4SystemOfUnits.hh"
 #include "FlagDefinition.hh"
 #include "MultiChannelData.hh"
 #include "VChannelMap.hh"
@@ -47,7 +48,7 @@ bool is_group_adjacent(const HitList& group0, const HitList& group1) {
 namespace comptonsoft {
 
 VRealDetectorUnit::VRealDetectorUnit()
-  : name_(""), ID_(0), 
+  : name_(""), ID_(0), instrumentID_(0),
     sizeX_(0.0), sizeY_(0.0), sizeZ_(0.0),
     offsetX_(0.0), offsetY_(0.0), pixelPitchX_(0.0), pixelPitchY_(0.0),
     numPixelX_(1), numPixelY_(1),
@@ -145,16 +146,16 @@ PixelID VRealDetectorUnit::ChannelToPixel(int hitSection, int hitChannel) const
   return channelMap_->getPixel(hitSection, hitChannel);
 }
 
-ChannelID VRealDetectorUnit::PixelToChanelID(const PixelID& pixel) const
+SectionChannelPair VRealDetectorUnit::PixelToChanelID(const PixelID& pixel) const
 {
-  return channelMap_->getChannel(pixel.X(), pixel.Y());
+  return channelMap_->getSectionChannel(pixel.X(), pixel.Y());
 }
 
 void VRealDetectorUnit::initializeEvent()
 {
   for (auto& mcd: MCDVector_) {
     mcd->resetEventData();
-    mcd->resetDataValid(0);
+    mcd->resetDataValidVector(0);
   }
   
   detectorHits_.clear();
@@ -166,23 +167,23 @@ void VRealDetectorUnit::selectHits()
   const int NumMCD = NumberOfMultiChannelData();
   for (int section=0; section<NumMCD; section++) {
     MultiChannelData* mcd = getMultiChannelData(section);
-    mcd->selectHit();
+    mcd->selectHits();
     const bool anode = mcd->isAnodeSide();
     const bool cathode = mcd->isCathodeSide();
     const bool prioritySide = mcd->isPrioritySide();
     const std::size_t NumChannels = mcd->NumberOfChannels();
     for (std::size_t channel=0; channel<NumChannels; channel++) {
-      if (mcd->getHitChannel(channel)) {
+      if (mcd->getChannelHit(channel)) {
         DetectorHit_sptr hit(new DetectorHit);
         PixelID pixel = ChannelToPixel(section, channel);
         hit->setPHA( mcd->getPHA(channel) );
         hit->setEPI( mcd->getEPI(channel) );
-        hit->setDetectorChannel(this->getID(), section, channel);
+        hit->setDetectorChannelID(this->getID(), section, channel);
         hit->setPixel(pixel);
-        ReadoutChannelID readout = mcd->ReadoutSection();
-        hit->setReadoutChannel(readout.ReadoutModule(),
-                               readout.Section(),
-                               channel);
+        ReadoutBasedChannelID readout = mcd->ReadoutID();
+        hit->setReadoutChannelID(readout.ReadoutModule(),
+                                 readout.Section(),
+                                 channel);
         if (anode) { hit->addFlags(flag::AnodeSide); }
         if (cathode) { hit->addFlags(flag::CathodeSide); }
         if (prioritySide) { hit->addFlags(flag::PrioritySide); }
@@ -197,7 +198,8 @@ void VRealDetectorUnit::discriminateHits()
 {
   auto it = detectorHits_.begin();
   while (it != detectorHits_.end()) {
-    const int section = (*it)->DetectorChannelSection();
+    const int section = (*it)->DetectorSection();
+    const int channel = (*it)->DetectorChannel();
     if (section==ChannelID::Undefined) {
       ++it;
       continue;
@@ -205,7 +207,7 @@ void VRealDetectorUnit::discriminateHits()
 
     const double energy = (*it)->EPI();
     const MultiChannelData* mcd = getMultiChannelData(section);
-    const bool selected = mcd->discriminate(energy);
+    const bool selected = mcd->discriminate(channel, energy);
     if (selected) {
       ++it;
     }
@@ -228,8 +230,8 @@ void VRealDetectorUnit::reconstructHits()
 void VRealDetectorUnit::recalculateEPI()
 {
   for (DetectorHit_sptr& hit: detectorHits_) {
-    const int section = hit->DetectorChannelSection();
-    const int channel = hit->DetectorChannelIndex();
+    const int section = hit->DetectorSection();
+    const int channel = hit->DetectorChannel();
     const double vPHA = hit->PHA();
     const MultiChannelData* mcd = getMultiChannelData(section);
     const double vEPI = mcd->PHA2EPI(channel, vPHA);
@@ -243,16 +245,16 @@ void VRealDetectorUnit::assignReadoutInfo()
   
   for (DetectorHit_sptr& hit: detectorHits_) {
     const PixelID pixel = hit->Pixel();
-    const ChannelID detectorChannel = PixelToChanelID(pixel);
+    const SectionChannelPair detectorChannel = PixelToChanelID(pixel);
     const int section = detectorChannel.Section();
-    const int channel = detectorChannel.Index();
-    hit->setDetectorChannel(this->getID(), section, channel);
+    const int channel = detectorChannel.Channel();
+    hit->setDetectorChannelID(this->getID(), section, channel);
     const MultiChannelData* mcd = getMultiChannelData(section);
     if (mcd) {
-      ReadoutChannelID readout = mcd->ReadoutSection();
-      hit->setReadoutChannel(readout.ReadoutModule(),
-                             readout.Section(),
-                             channel);
+      ReadoutBasedChannelID readout = mcd->ReadoutID();
+      hit->setReadoutChannelID(readout.ReadoutModule(),
+                               readout.Section(),
+                               channel);
       if (mcd->isAnodeSide()) { hit->addFlags(flag::AnodeSide); }
       if (mcd->isCathodeSide()) { hit->addFlags(flag::CathodeSide); }
       if (mcd->isPrioritySide()) { hit->addFlags(flag::PrioritySide); }
@@ -306,6 +308,37 @@ void VRealDetectorUnit::cluster(DetectorHitVector& hits) const
     }
   }
   hits = std::move(clusteredHits);
+}
+
+void VRealDetectorUnit::
+printDetectorParameters(std::ostream& os) const
+{
+  os << "Geometry\n"
+     << "  x: " << getSizeX()/cm << " cm\n"
+     << "  y: " << getSizeY()/cm << " cm\n"
+     << "  z: " << getSizeZ()/cm << " cm\n"
+     << "Offset\n"
+     << "  x: " << getOffsetX()/cm << " cm\n"
+     << "  y: " << getOffsetY()/cm << " cm\n"
+     << "Pixel\n"
+     << "  number: (" << getNumPixelX() << ", " << getNumPixelY() << ")\n"
+     << "  size: (" << getPixelPitchX()/cm << " cm, " << getPixelPitchY()/cm << " cm)\n"
+     << "Position\n"
+     << "  x: " << getCenterPositionX()/cm << " cm\n"
+     << "  y: " << getCenterPositionY()/cm << " cm\n"
+     << "  z: " << getCenterPositionZ()/cm << " cm\n"
+     << "X-axis direction\n"
+     << "  x: " << getXAxisDirectionX() << "\n"
+     << "  y: " << getXAxisDirectionY() << "\n"
+     << "  z: " << getXAxisDirectionZ() << "\n"
+     << "Y-axis direction\n"
+     << "  x: " << getYAxisDirectionX() << "\n"
+     << "  y: " << getYAxisDirectionY() << "\n"
+     << "  z: " << getYAxisDirectionZ() << "\n";
+  os << "Number of MCD : " << NumberOfMultiChannelData() << '\n';
+  os << "Reconstruction\n"
+     << "  Mode : " << ReconstructionMode() << '\n'
+     << "  Clustering : " << isClusteringOn() << '\n';
 }
 
 } /* namespace comptonsoft */

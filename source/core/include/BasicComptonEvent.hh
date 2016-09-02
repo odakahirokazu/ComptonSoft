@@ -52,9 +52,9 @@ public:
   
   int Hit1ID() const { return hit1ID_; }
   uint32_t Hit1Process() const { return hit1Process_; }
-  DetectorChannelID Hit1DetectorChannel() const { return hit1DetectorChannel_; }
-  int32_t Hit1DetectorID() const { return hit1DetectorChannel_.Detector(); }
-  ReadoutChannelID Hit1ReadoutChannel() const { return hit1ReadoutChannel_; }
+  DetectorBasedChannelID Hit1DetectorChannelID() const { return hit1DetectorChannelID_; }
+  int32_t Hit1DetectorID() const { return hit1DetectorChannelID_.Detector(); }
+  ReadoutBasedChannelID Hit1ReadoutChannelID() const { return hit1ReadoutChannelID_; }
   PixelID Hit1Pixel() const { return hit1Pixel_; }
   double Hit1Time() const { return hit1Time_; }
   vector3_t Hit1Position() const { return hit1Position_; }
@@ -65,9 +65,9 @@ public:
 
   int Hit2ID() const { return hit2ID_; }
   uint32_t Hit2Process() const { return hit2Process_; }
-  DetectorChannelID Hit2DetectorChannel() const { return hit2DetectorChannel_; }
-  int32_t Hit2DetectorID() const { return hit2DetectorChannel_.Detector(); }
-  ReadoutChannelID Hit2ReadoutChannel() const { return hit2ReadoutChannel_; }
+  DetectorBasedChannelID Hit2DetectorChannelID() const { return hit2DetectorChannelID_; }
+  int32_t Hit2DetectorID() const { return hit2DetectorChannelID_.Detector(); }
+  ReadoutBasedChannelID Hit2ReadoutChannelID() const { return hit2ReadoutChannelID_; }
   PixelID Hit2Pixel() const { return hit2Pixel_; }
   double Hit2Time() const { return hit2Time_; }
   vector3_t Hit2Position() const { return hit2Position_; }
@@ -79,10 +79,10 @@ public:
   void setHit1(int hitID, const DetectorHit_sptr& hit);
   void setHit1ID(int v) { hit1ID_ = v; bCalc_ = false; }
   void setHit1Process(uint32_t v) { hit1Process_ = v; bCalc_ = false; }
-  void setHit1DetectorChannel(const DetectorChannelID& v)
-  { hit1DetectorChannel_ = v; bCalc_ = false; }
-  void setHit1ReadoutChannel(const ReadoutChannelID& v)
-  { hit1ReadoutChannel_ = v; bCalc_ = false; }
+  void setHit1DetectorChannelID(const DetectorBasedChannelID& v)
+  { hit1DetectorChannelID_ = v; bCalc_ = false; }
+  void setHit1ReadoutChannelID(const ReadoutBasedChannelID& v)
+  { hit1ReadoutChannelID_ = v; bCalc_ = false; }
   void setHit1Pixel(const PixelID& v) { hit1Pixel_ = v; bCalc_ = false; }
   void setHit1Pixel(int x, int y) { hit1Pixel_.set(x, y); bCalc_ = false; }
   void setHit1Time(double v) { hit1Time_ = v; bCalc_ = false; }
@@ -94,10 +94,10 @@ public:
   void setHit2(int hitID, const DetectorHit_sptr& hit);
   void setHit2ID(int v) { hit2ID_ = v; bCalc_ = false; }
   void setHit2Process(uint32_t v) { hit2Process_ = v; bCalc_ = false; }
-  void setHit2DetectorChannel(const DetectorChannelID& v)
-  { hit2DetectorChannel_ = v; bCalc_ = false; }
-  void setHit2ReadoutChannel(const ReadoutChannelID& v)
-  { hit2ReadoutChannel_ = v; bCalc_ = false; }
+  void setHit2DetectorChannelID(const DetectorBasedChannelID& v)
+  { hit2DetectorChannelID_ = v; bCalc_ = false; }
+  void setHit2ReadoutChannelID(const ReadoutBasedChannelID& v)
+  { hit2ReadoutChannelID_ = v; bCalc_ = false; }
   void setHit2Pixel(const PixelID& v) { hit2Pixel_ = v; bCalc_ = false; }
   void setHit2Pixel(int x, int y) { hit2Pixel_.set(x, y); bCalc_ = false; }
   void setHit2Time(double v) { hit2Time_ = v; bCalc_ = false; }
@@ -164,8 +164,8 @@ private:
   
   int hit1ID_;
   uint32_t hit1Process_;
-  DetectorChannelID hit1DetectorChannel_;
-  ReadoutChannelID hit1ReadoutChannel_;
+  DetectorBasedChannelID hit1DetectorChannelID_;
+  ReadoutBasedChannelID hit1ReadoutChannelID_;
   PixelID hit1Pixel_;
   double hit1Time_;
   vector3_t hit1Position_;
@@ -173,8 +173,8 @@ private:
 
   int hit2ID_;
   uint32_t hit2Process_;
-  DetectorChannelID hit2DetectorChannel_;
-  ReadoutChannelID hit2ReadoutChannel_;
+  DetectorBasedChannelID hit2DetectorChannelID_;
+  ReadoutBasedChannelID hit2ReadoutChannelID_;
   PixelID hit2Pixel_;
   double hit2Time_;
   vector3_t hit2Position_;

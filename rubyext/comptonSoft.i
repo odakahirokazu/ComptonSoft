@@ -7,7 +7,7 @@
 #include "ConstructChannelMap.hh"
 #include "SetNoiseLevels.hh"
 #include "SetBadChannels.hh"
-#include "SetChannelsInfo.hh"
+#include "SetChannelProperties.hh"
 #include "SelectHits.hh"
 #include "AnalyzeHits.hh"
 #include "MakeDetectorHits.hh"
@@ -158,11 +158,11 @@ public:
 };
 
 
-class SetChannelsInfo : public VCSModule
+class SetChannelProperties : public VCSModule
 {
 public:
-  SetChannelsInfo();
-  ~SetChannelsInfo();
+  SetChannelProperties();
+  ~SetChannelProperties();
 };
 
 

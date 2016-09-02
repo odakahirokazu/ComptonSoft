@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="https://raw.githubusercontent.com/odakahirokazu/ComptonSoft/master/xmlstyle/detector_configuration_v4.xsl" ?>
+
+<configuration>
+  <name>Compton Camera</name>
+  <comment>2016-08-22 | Hirokazu Odaka</comment>
+  <length_unit>cm</length_unit>
+  <detectors>
+    <detector id="1" type="2DPixel" name="SiPad:1">
+      <geometry x="1.6" y="1.6" z="0.05" />
+      <offset x="0.0" y="0.0" />
+      <pixel number_x="16" number_y="16" size_x="0.1" size_y="0.1" />
+      <position x="0.0" y="0.0" z="0.00" />
+      <xaxis_direction x="+1.0" y="0.0"  z="0.0" />
+      <yaxis_direction x="0.0"  y="+1.0" z="0.0" />
+      <energy_priority electrode_side="cathode" />
+      <sections>
+        <section num_channels="64" electrode_side="cathode" />
+        <section num_channels="64" electrode_side="cathode" />
+        <section num_channels="64" electrode_side="cathode" />
+        <section num_channels="64" electrode_side="cathode" />
+      </sections>
+    </detector>
+    <detector id="2" type="2DPixel" name="SiPad:2">
+      <geometry x="1.6" y="1.6" z="0.05" />
+      <offset x="0.0" y="0.0" />
+      <pixel number_x="16" number_y="16" size_x="0.1" size_y="0.1" />
+      <position x="0.0" y="0.0" z="-0.25" />
+      <xaxis_direction x="+1.0" y="0.0"  z="0.0" />
+      <yaxis_direction x="0.0"  y="+1.0" z="0.0" />
+      <energy_priority electrode_side="cathode" />
+      <sections>
+        <section num_channels="64" electrode_side="cathode" />
+        <section num_channels="64" electrode_side="cathode" />
+        <section num_channels="64" electrode_side="cathode" />
+        <section num_channels="64" electrode_side="cathode" />
+      </sections>
+    </detector>
+    <detector id="3" type="2DPixel" name="SiPad:3">
+      <geometry x="1.6" y="1.6" z="0.05" />
+      <offset x="0.0" y="0.0" />
+      <pixel number_x="16" number_y="16" size_x="0.1" size_y="0.1" />
+      <position x="0.0" y="0.0" z="-0.50" />
+      <xaxis_direction x="+1.0" y="0.0"  z="0.0" />
+      <yaxis_direction x="0.0"  y="+1.0" z="0.0" />
+      <energy_priority electrode_side="cathode" />
+      <sections>
+        <section num_channels="64" electrode_side="cathode" />
+        <section num_channels="64" electrode_side="cathode" />
+        <section num_channels="64" electrode_side="cathode" />
+        <section num_channels="64" electrode_side="cathode" />
+      </sections>
+    </detector>
+    <detector id="4" type="2DPixel" name="SiPad:4">
+      <geometry x="1.6" y="1.6" z="0.05" />
+      <offset x="0.0" y="0.0" />
+      <pixel number_x="16" number_y="16" size_x="0.1" size_y="0.1" />
+      <position x="0.0" y="0.0" z="-0.75" />
+      <xaxis_direction x="+1.0" y="0.0"  z="0.0" />
+      <yaxis_direction x="0.0"  y="+1.0" z="0.0" />
+      <energy_priority electrode_side="cathode" />
+      <sections>
+        <section num_channels="64" electrode_side="cathode" />
+        <section num_channels="64" electrode_side="cathode" />
+        <section num_channels="64" electrode_side="cathode" />
+        <section num_channels="64" electrode_side="cathode" />
+      </sections>
+    </detector>
+    <detector id="11" type="2DPixel" name="CdTePad:11">
+      <geometry x="1.6" y="1.6" z="0.05" />
+      <offset x="0.0" y="0.0" />
+      <pixel number_x="16" number_y="16" size_x="0.1" size_y="0.1" />
+      <position x="0.0" y="0.0" z="-1.00" />
+      <xaxis_direction x="+1.0" y="0.0"  z="0.0" />
+      <yaxis_direction x="0.0"  y="+1.0" z="0.0" />
+      <energy_priority electrode_side="cathode" />
+      <sections>
+        <section num_channels="64" electrode_side="cathode" />
+        <section num_channels="64" electrode_side="cathode" />
+        <section num_channels="64" electrode_side="cathode" />
+        <section num_channels="64" electrode_side="cathode" />
+      </sections>
+    </detector>
+    <detector id="12" type="2DPixel" name="CdTePad:12">
+      <geometry x="1.6" y="1.6" z="0.05" />
+      <offset x="0.0" y="0.0" />
+      <pixel number_x="16" number_y="16" size_x="0.1" size_y="0.1" />
+      <position x="0.0" y="0.0" z="-1.25" />
+      <xaxis_direction x="+1.0" y="0.0"  z="0.0" />
+      <yaxis_direction x="0.0"  y="+1.0" z="0.0" />
+      <energy_priority electrode_side="cathode" />
+      <sections>
+        <section num_channels="64" electrode_side="cathode" />
+        <section num_channels="64" electrode_side="cathode" />
+        <section num_channels="64" electrode_side="cathode" />
+        <section num_channels="64" electrode_side="cathode" />
+      </sections>
+    </detector>
+  </detectors>
+  <readout>
+    <module id="0">
+      <section detector_id="1" section="0" />
+      <section detector_id="1" section="1" />
+      <section detector_id="1" section="2" />
+      <section detector_id="1" section="3" />
+    </module>
+    <module id="1">
+      <section detector_id="2" section="0" />
+      <section detector_id="2" section="1" />
+      <section detector_id="2" section="2" />
+      <section detector_id="2" section="3" />
+    </module>
+    <module id="2">
+      <section detector_id="3" section="0" />
+      <section detector_id="3" section="1" />
+      <section detector_id="3" section="2" />
+      <section detector_id="3" section="3" />
+    </module>
+    <module id="3">
+      <section detector_id="4" section="0" />
+      <section detector_id="4" section="1" />
+      <section detector_id="4" section="2" />
+      <section detector_id="4" section="3" />
+    </module>
+    <module id="4">
+      <section detector_id="11" section="0" />
+      <section detector_id="11" section="1" />
+      <section detector_id="11" section="2" />
+      <section detector_id="11" section="3" />
+    </module>
+    <module id="5">
+      <section detector_id="12" section="0" />
+      <section detector_id="12" section="1" />
+      <section detector_id="12" section="2" />
+      <section detector_id="12" section="3" />
+    </module>
+  </readout>
+  <groups>
+    <group name="LowZ">
+      <detector id="1" />
+      <detector id="2" />
+      <detector id="3" />
+      <detector id="4" />
+    </group>
+    <group name="HighZ">
+      <detector id="11" />
+      <detector id="12" />
+    </group>
+    <group name="Si">
+      <detector id="1" />
+      <detector id="2" />
+      <detector id="3" />
+      <detector id="4" />
+    </group>
+    <group name="CdTe">
+      <detector id="11" />
+      <detector id="12" />
+    </group>
+    <group name="Any">
+      <detector id="1" />
+      <detector id="2" />
+      <detector id="3" />
+      <detector id="4" />
+      <detector id="11" />
+      <detector id="12" />
+    </group>
+    <hit_pattern name="1hit" short_name="1hit" bit="0">
+      <group name="Any" />
+    </hit_pattern>
+    <hit_pattern name="2hit" short_name="2hit" bit="1">
+      <group name="Any" /><group name="Any" />
+    </hit_pattern>
+    <hit_pattern name="Si" short_name="S" bit="2">
+      <group name="Si" />
+    </hit_pattern>
+    <hit_pattern name="CdTe" short_name="C" bit="3">
+      <group name="CdTe" />
+    </hit_pattern>
+    <hit_pattern name="Si-Si" short_name="SS" bit="4">
+      <group name="Si" /><group name="Si" />
+    </hit_pattern>
+    <hit_pattern name="Si-CdTe" short_name="SC" bit="5">
+      <group name="Si" /><group name="CdTe" />
+    </hit_pattern>
+    <hit_pattern name="CdTe-CdTe" short_name="CC" bit="6">
+      <group name="CdTe" /><group name="CdTe" />
+    </hit_pattern>
+  </groups>
+</configuration>

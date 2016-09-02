@@ -194,17 +194,17 @@ DetectorHit_sptr SimDetectorUnit2DPixel::generateHit(const DetectorHit& rawhit,
     return hit;
   }
 
-  double edep = hit->EnergyDeposit();
-  double localposx = hit->LocalPositionX();
-  double localposy = hit->LocalPositionY();
-  double localposz = hit->LocalPositionZ();
+  applyQuenching(hit);
 
-  if (hit->isProcess(process::NucleusHit)) {
-    edep *= QuenchingFactor();
-  }
-
-  double energyCharge = calculateEnergyCharge(pixel, edep,
-                                              localposx, localposy, localposz);
+  const double edep = hit->EnergyDeposit();
+  const double localposx = hit->LocalPositionX();
+  const double localposy = hit->LocalPositionY();
+  const double localposz = hit->LocalPositionZ();
+  const double energyCharge = calculateEnergyCharge(pixel,
+                                                    edep,
+                                                    localposx,
+                                                    localposy,
+                                                    localposz);
   hit->setEnergyCharge(energyCharge);
 
   return hit;
@@ -449,12 +449,13 @@ void SimDetectorUnit2DPixel::buildCCEMap(int nx, int ny, int nz,
   std::cout << "Charge collection efficiency map is built." << std::endl;
 }
 
-void SimDetectorUnit2DPixel::printSimulationParameters()
+void SimDetectorUnit2DPixel::printSimulationParameters(std::ostream& os) const
 {
-  std::cout << "SimDetectorUnit2DPixel:" << '\n'
-            << " upside pad : " << isUpSideReadout() << '\n'
-            << std::endl;
-  DeviceSimulation::printSimulationParameters();
+  os << "<SimDetectorUnit2DPixel>" << '\n'
+     << "Upside anode   : " << isUpSideAnode() << '\n'
+     << "Upside pixel   : " << isUpSideReadout() << '\n'
+     << std::endl;
+  DeviceSimulation::printSimulationParameters(os);
 }
   
 } /* namespace comptonsoft */

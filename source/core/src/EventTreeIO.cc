@@ -135,10 +135,10 @@ void EventTreeIO::fillHits(const int64_t eventID,
   for (int i=0; i<NumHits; i++) {
     const DetectorHit_sptr& hit = hits[i];
     detector_[i] = hit->DetectorID();
-    det_section_[i] = hit->DetectorChannelSection();
+    det_section_[i] = hit->DetectorSection();
     readout_module_[i] = hit->ReadoutModuleID();
-    section_[i] = hit->ReadoutChannelSection();
-    channel_[i] = hit->ReadoutChannelIndex();
+    section_[i] = hit->ReadoutSection();
+    channel_[i] = hit->ReadoutChannel();
     pixelx_[i] = hit->PixelX();
     pixely_[i] = hit->PixelY();
     rawpha_[i] = hit->RawPHA();
@@ -170,8 +170,8 @@ DetectorHit_sptr EventTreeIO::retrieveHit(std::size_t i) const
   hit->setEventID(eventid_);
   hit->setTime(time_ * second);
   hit->setInstrumentID(instrument_);
-  hit->setDetectorChannel(detector_[i], det_section_[i], channel_[i]);
-  hit->setReadoutChannel(readout_module_[i], section_[i], channel_[i]);
+  hit->setDetectorChannelID(detector_[i], det_section_[i], channel_[i]);
+  hit->setReadoutChannelID(readout_module_[i], section_[i], channel_[i]);
   hit->setPixel(pixelx_[i], pixely_[i]);
   hit->setRawPHA(rawpha_[i]);
   hit->setPHA(pha_[i]);

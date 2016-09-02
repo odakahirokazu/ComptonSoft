@@ -49,8 +49,34 @@ DetectorHit& DetectorHit::merge(const DetectorHit& r)
   setEnergy(Energy()+r.Energy());
   setEPI(EPI()+r.EPI());
 
-  if (Time() > r.Time()) { setTime(r.Time()); }
-  
+  if (Time() > r.Time()) {
+    setTime(r.Time());
+  }
+
+  if (SelfTriggered()) {
+    if (r.SelfTriggered() && (SelfTriggeredTime() > r.SelfTriggeredTime())) {
+      setSelfTriggeredTime(r.SelfTriggeredTime());
+    }
+  }
+  else {
+    if (r.SelfTriggered()) {
+      setSelfTriggered(true);
+      setSelfTriggeredTime(r.SelfTriggeredTime());
+    }
+  }
+
+  if (Triggered()) {
+    if (r.Triggered() && (TriggeredTime() > r.TriggeredTime())) {
+      setTriggeredTime(r.TriggeredTime());
+    }
+  }
+  else {
+    if (r.Triggered()) {
+      setTriggered(true);
+      setTriggeredTime(r.SelfTriggeredTime());
+    }
+  }
+
   addProcess(r.Process());
   addFlags(r.Flags());
   
@@ -122,6 +148,30 @@ DetectorHit& DetectorHit::mergeAdjacentSignal(const DetectorHit& r,
   setEPI(EPI()+r.EPI());
 
   if (Time() > r.Time()) { setTime(r.Time()); }
+
+  if (SelfTriggered()) {
+    if (r.SelfTriggered() && (SelfTriggeredTime() > r.SelfTriggeredTime())) {
+      setSelfTriggeredTime(r.SelfTriggeredTime());
+    }
+  }
+  else {
+    if (r.SelfTriggered()) {
+      setSelfTriggered(true);
+      setSelfTriggeredTime(r.SelfTriggeredTime());
+    }
+  }
+
+  if (Triggered()) {
+    if (r.Triggered() && (TriggeredTime() > r.TriggeredTime())) {
+      setTriggeredTime(r.TriggeredTime());
+    }
+  }
+  else {
+    if (r.Triggered()) {
+      setTriggered(true);
+      setTriggeredTime(r.SelfTriggeredTime());
+    }
+  }
 
   addProcess(r.Process());
   addFlags(r.Flags());

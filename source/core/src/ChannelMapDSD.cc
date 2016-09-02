@@ -35,10 +35,10 @@ void ChannelMapDSD::set(int section, int index, const PixelID& pixel)
 {
   VChannelMap::set(section, index, pixel);
   if (pixel.isXStrip()) {
-    tableToChannelX_[pixel.X()] = ChannelID{section, index};
+    tableToChannelX_[pixel.X()] = SectionChannelPair{section, index};
   }
   else if (pixel.isYStrip()) {
-    tableToChannelY_[pixel.Y()] = ChannelID{section, index};
+    tableToChannelY_[pixel.Y()] = SectionChannelPair{section, index};
   }
 }
 
@@ -46,14 +46,14 @@ void ChannelMapDSD::set(int section, int index, int x, int y)
 {
   VChannelMap::set(section, index, x, y);
   if (x >= 0) {
-    tableToChannelX_[x] = ChannelID{section, index};
+    tableToChannelX_[x] = SectionChannelPair{section, index};
   }
   else if (y >= 0) {
-    tableToChannelY_[y] = ChannelID{section, index};
+    tableToChannelY_[y] = SectionChannelPair{section, index};
   }
 }
 
-ChannelID ChannelMapDSD::getChannel(int x, int y) const
+SectionChannelPair ChannelMapDSD::getSectionChannel(int x, int y) const
 {
   if (x >= 0) {
     return tableToChannelX_[x];
@@ -61,10 +61,10 @@ ChannelID ChannelMapDSD::getChannel(int x, int y) const
   else if (y >= 0) {
     return tableToChannelY_[y];
   }
-  return ChannelID();
+  return SectionChannelPair();
 }
 
-ChannelID ChannelMapDSD::getChannel(const PixelID& pixel) const
+SectionChannelPair ChannelMapDSD::getSectionChannel(const PixelID& pixel) const
 {
   if (pixel.isXStrip()) {
     return tableToChannelX_[pixel.X()];
@@ -72,7 +72,7 @@ ChannelID ChannelMapDSD::getChannel(const PixelID& pixel) const
   else if (pixel.isYStrip()) {
     return tableToChannelY_[pixel.Y()];
   }
-  return ChannelID();
+  return SectionChannelPair();
 }
 
 } /* namespace comptonsoft */

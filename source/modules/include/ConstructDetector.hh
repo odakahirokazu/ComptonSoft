@@ -31,10 +31,11 @@ class DetectorSystem;
  * @author Hirokazu Odaka
  * @date 2008-08-27
  * @date 2015-10-11
+ * @date 2016-08-31
  */
 class ConstructDetector : public anl::BasicModule
 {
-  DEFINE_ANL_MODULE(ConstructDetector, 3.1);
+  DEFINE_ANL_MODULE(ConstructDetector, 3.3);
 public:
   ConstructDetector();
   ~ConstructDetector();
@@ -51,6 +52,7 @@ protected:
 private:
   std::unique_ptr<DetectorSystem> detectorManager_;
   std::string configurationFile_;
+  std::string parametersFile_;
   int verboseLevel_;
 };
 

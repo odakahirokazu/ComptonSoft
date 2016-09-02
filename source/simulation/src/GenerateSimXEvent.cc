@@ -95,8 +95,8 @@ ANLStatus GenerateSimXEvent::mod_ana()
     detid = hitVec[i]->DetectorID();
     stripx = hitVec[i]->PixelX();
     stripy = hitVec[i]->PixelY();
-    chip = hitVec[i]->ReadoutChannelSection();
-    channel = hitVec[i]->ReadoutChannelIndex();
+    chip = hitVec[i]->ReadoutSection();
+    channel = hitVec[i]->ReadoutChannel();
 
     time_group = hitVec[i]->TimeGroup();
     

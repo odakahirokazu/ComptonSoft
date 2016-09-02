@@ -6,7 +6,7 @@ class CSHitCollection;
 class ConstructChannelMap;
 class SetNoiseLevels;
 class SetBadChannels;
-class SetChannelsInfo;
+class SetChannelProperties;
 class SelectHits;
 class AnalyzeHits;
 class MakeDetectorHits;

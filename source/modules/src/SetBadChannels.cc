@@ -91,12 +91,12 @@ bool SetBadChannels::set_by_file()
               const int status = channelNode.get<int>("<xmlattr>.status");
               if (isSimulation) {
                 detectorManager->getDeviceSimulationByID(detectorID)
-                  ->setBrokenChannel(ChannelID(section, channel), status);
+                  ->setChannelDisabled(SectionChannelPair(section, channel), status);
               }
               else {
                 detectorManager->getDetectorByID(detectorID)
                   ->getMultiChannelData(section)
-                  ->setBadChannel(channel, status);
+                  ->setChannelDisabled(channel, status);
               }
             }
           }
@@ -106,15 +106,15 @@ bool SetBadChannels::set_by_file()
     else if (v.first == "readout_module") {
       const ptree moduleNode = v.second;
       const int moduleID = moduleNode.get<int>("<xmlattr>.id");
-      const DetectorReadoutModule* readoutModule
+      const ReadoutModule* readoutModule
         = getDetectorManager()->getReadoutModuleByID(moduleID);
 
       for (const ptree::value_type& vv: moduleNode.get_child("")) {
         if (vv.first == "section") {
           const ptree sectionNode = vv.second;
           const int mod_section = sectionNode.get<int>("<xmlattr>.id");
-          DetectorChannelID channelID
-            = readoutModule->ReadoutSection(mod_section);
+          DetectorBasedChannelID channelID
+            = readoutModule->getSection(mod_section);
           const int detectorID = channelID.Detector();
           const int det_section = channelID.Section();
           
@@ -125,12 +125,12 @@ bool SetBadChannels::set_by_file()
               const int status = channelNode.get<int>("<xmlattr>.status");
               if (isSimulation) {
                 detectorManager->getDeviceSimulationByID(detectorID)
-                  ->setBrokenChannel(ChannelID(det_section, channel), status);
+                  ->setChannelDisabled(SectionChannelPair(det_section, channel), status);
               }
               else {
                 detectorManager->getDetectorByID(detectorID)
                   ->getMultiChannelData(det_section)
-                  ->setBadChannel(channel, status);
+                  ->setChannelDisabled(channel, status);
               }
             }
           }

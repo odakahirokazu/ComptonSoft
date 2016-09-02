@@ -35,8 +35,6 @@ enum class ElectrodeSide { Undefined, Anode, Cathode };
 
 enum class DetectorType : int { PixelDetector=1, DoubleSidedStripDetector=2, Scintillator=3 };
 
-typedef std::tuple<double, double, double> NoiseParam_t;
-
 } /* namespace comptonsoft */
 
 #endif /* COMPTONSOFT_CSTypes_H */

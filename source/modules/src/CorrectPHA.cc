@@ -24,7 +24,7 @@
 #include "TFile.h"
 #include "TH1.h"
 #include "TSpline.h"
-#include "DetectorReadoutModule.hh"
+#include "ReadoutModule.hh"
 #include "MultiChannelData.hh"
 #include "GainFunctionSpline.hh"
 
@@ -93,11 +93,11 @@ ANLStatus CorrectPHA::mod_init()
   DetectorSystem* detectorManager = getDetectorManager();
   const int NumROM = detectorManager->NumberOfReadoutModules();
   for (int i=0; i<NumROM; i++) {
-    DetectorReadoutModule* ROM = detectorManager->getReadoutModuleByIndex(i);
+    ReadoutModule* ROM = detectorManager->getReadoutModuleByIndex(i);
     const int ROMID = ROM->ID();
-    const int NumSections = ROM->NumberOfReadoutSections();
+    const int NumSections = ROM->NumberOfSections();
     for (int j=0; j<NumSections; j++) {
-      const DetectorChannelID section = ROM->ReadoutSection(j);
+      const DetectorBasedChannelID section = ROM->getSection(j);
       MultiChannelData* mcd = detectorManager->getMultiChannelData(section);
       int NumChannels = mcd->NumberOfChannels();
       if (m_PedestalCorrection) {

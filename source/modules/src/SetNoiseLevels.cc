@@ -24,7 +24,6 @@
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/xml_parser.hpp>
 
-#include "NextCLI.hh"
 #include "SimDetectorUnit2DPixel.hh"
 #include "SimDetectorUnit2DStrip.hh"
 #include "SimDetectorUnitScintillator.hh"
@@ -131,19 +130,23 @@ bool SetNoiseLevels::set_by_map()
       auto yStripSelector = std::mem_fn(&PixelID::isYStrip);
       if (ds->isXStripSideCathode()) {
         // cathode
-        ds->setNoiseParamToSelected(NoiseParam_t(cathode_noise0, cathode_noise1, cathode_noise2),
-                                    xStripSelector);
+        ds->setNoiseParam0ToSelected(cathode_noise0, xStripSelector);
+        ds->setNoiseParam1ToSelected(cathode_noise1, xStripSelector);
+        ds->setNoiseParam2ToSelected(cathode_noise2, xStripSelector);
         // anode
-        ds->setNoiseParamToSelected(NoiseParam_t(anode_noise0, anode_noise1, anode_noise2),
-                                    yStripSelector);
+        ds->setNoiseParam0ToSelected(anode_noise0, yStripSelector);
+        ds->setNoiseParam1ToSelected(anode_noise1, yStripSelector);
+        ds->setNoiseParam2ToSelected(anode_noise2, yStripSelector);
       }
       else if (ds->isXStripSideAnode()){
         // anode
-        ds->setNoiseParamToSelected(NoiseParam_t(anode_noise0, anode_noise1, anode_noise2),
-                                    xStripSelector);
+        ds->setNoiseParam0ToSelected(anode_noise0, xStripSelector);
+        ds->setNoiseParam1ToSelected(anode_noise1, xStripSelector);
+        ds->setNoiseParam2ToSelected(anode_noise2, xStripSelector);
         // cathode
-        ds->setNoiseParamToSelected(NoiseParam_t(cathode_noise0, cathode_noise1, cathode_noise2),
-                                    yStripSelector);
+        ds->setNoiseParam0ToSelected(cathode_noise0, yStripSelector);
+        ds->setNoiseParam1ToSelected(cathode_noise1, yStripSelector);
+        ds->setNoiseParam2ToSelected(cathode_noise2, yStripSelector);
       }
     }
     else {
@@ -157,7 +160,9 @@ bool SetNoiseLevels::set_by_map()
       const double noise0 = std::get<1>(parameters);
       const double noise1 = std::get<2>(parameters);
       const double noise2 = std::get<3>(parameters);
-      ds->resetNoiseParamVector(NoiseParam_t(noise0, noise1, noise2));
+      ds->resetNoiseParam0Vector(noise0);
+      ds->resetNoiseParam1Vector(noise1);
+      ds->resetNoiseParam2Vector(noise2);
     }
   }
   
@@ -194,7 +199,9 @@ bool SetNoiseLevels::set_by_file()
               const double param0 = channelNode.get<double>("param0");
               const double param1 = channelNode.get<double>("param1");
               const double param2 = channelNode.get<double>("param2");
-              ds->setNoiseParam(ChannelID(section, channel), NoiseParam_t(param0, param1, param2));
+              ds->setNoiseParam0(SectionChannelPair(section, channel), param0);
+              ds->setNoiseParam1(SectionChannelPair(section, channel), param1);
+              ds->setNoiseParam2(SectionChannelPair(section, channel), param2);
             }
           }
         }
@@ -203,15 +210,15 @@ bool SetNoiseLevels::set_by_file()
     else if (v.first == "readout_module") {
       const ptree moduleNode = v.second;
       const int moduleID = moduleNode.get<int>("<xmlattr>.id");
-      const DetectorReadoutModule* readoutModule
+      const ReadoutModule* readoutModule
         = getDetectorManager()->getReadoutModuleByID(moduleID);
 
       for (const ptree::value_type& vv: moduleNode.get_child("")) {
         if (vv.first == "section") {
           const ptree sectionNode = vv.second;
           const int mod_section = sectionNode.get<int>("<xmlattr>.id");
-          DetectorChannelID channelID
-            = readoutModule->ReadoutSection(mod_section);
+          DetectorBasedChannelID channelID
+            = readoutModule->getSection(mod_section);
           const int detectorID = channelID.Detector();
           const int det_section = channelID.Section();
           
@@ -225,7 +232,9 @@ bool SetNoiseLevels::set_by_file()
               const double param0 = channelNode.get<double>("param0");
               const double param1 = channelNode.get<double>("param1");
               const double param2 = channelNode.get<double>("param2");
-              ds->setNoiseParam(ChannelID(det_section, channel), NoiseParam_t(param0, param1, param2));
+              ds->setNoiseParam0(SectionChannelPair(det_section, channel), param0);
+              ds->setNoiseParam1(SectionChannelPair(det_section, channel), param1);
+              ds->setNoiseParam2(SectionChannelPair(det_section, channel), param2);
             }
           }
         }

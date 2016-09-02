@@ -29,16 +29,16 @@ MultiChannelData::MultiChannelData(std::size_t n, ElectrodeSide eside)
     ElectrodeSide_(eside),
     prioritySide_(true),
     useNegativePulse_(false),
-    thresholdEnergy_(0.0),
-    negativeThresholdEnergy_(0.0),
-    badChannels_(n, 0),
-    pedestals_(n, 0.0),
+    thresholdEnergyVector_(n, 0.0),
+    negativeThresholdEnergyVector_(n, 0.0),
+    channelDisabledVector_(n, 0),
+    pedestalVector_(n, 0.0),
     gainFunction_(new GainFunctionLinear(n, 1000.0)),
-    dataValids_(n, 1),
-    rawADCs_(n, 0),
-    PHAs_(n, 0.0),
-    EPIs_(n, 0.0),
-    hitChannels_(n, 0),
+    dataValidVector_(n, 1),
+    rawADCVector_(n, 0),
+    PHAVector_(n, 0.0),
+    EPIVector_(n, 0.0),
+    channelHitVector_(n, 0),
     commonModeNoise_(0.0),
     referenceLevel_(0.0)
 {
@@ -50,8 +50,8 @@ void MultiChannelData::randomizePHAValues()
 {
   const std::size_t N = NumChannels_;
   for (std::size_t i=0; i<N; i++) {
-    if (getDataValid(i) && getChannelEnable(i)) {
-      PHAs_[i] += gRandom->Uniform(-0.5, 0.5);
+    if (getDataValid(i) && getChannelEnabled(i)) {
+      PHAVector_[i] += gRandom->Uniform(-0.5, 0.5);
     }
   }
 }
@@ -60,8 +60,8 @@ void MultiChannelData::correctPedestalLevel()
 {
   const std::size_t N = NumChannels_;
   for (std::size_t i=0; i<N; i++) {
-    if (getDataValid(i) && getChannelEnable(i)) {
-      PHAs_[i] -= pedestals_[i];
+    if (getDataValid(i) && getChannelEnabled(i)) {
+      PHAVector_[i] -= pedestalVector_[i];
     }
   }
 }
@@ -71,7 +71,7 @@ double MultiChannelData::calculateCommonModeNoiseByMedian()
   const std::size_t N = NumChannels_;
   std::vector<double> sortedPHA;
   for (std::size_t i=0; i<N; i++) {
-    if (getDataValid(i) && getChannelEnable(i)) {
+    if (getDataValid(i) && getChannelEnabled(i)) {
       sortedPHA.push_back(getPHA(i));
     }
   }
@@ -95,7 +95,7 @@ double MultiChannelData::calculateCommonModeNoiseByMean()
   int numGoodChannel = 0;
   
   for (std::size_t i=0; i<N; i++) {
-    if (getDataValid(i) && getChannelEnable(i)) {
+    if (getDataValid(i) && getChannelEnabled(i)) {
       double pha = getPHA(i);
       sum += pha;
       numGoodChannel++;
@@ -135,8 +135,8 @@ void MultiChannelData::subtractCommonModeNoise()
   const std::size_t N = NumChannels_;
   const double CMN = commonModeNoise_;
   for (std::size_t i=0; i<N; i++) {
-    if (getDataValid(i) && getChannelEnable(i)) {
-      PHAs_[i] -= CMN;
+    if (getDataValid(i) && getChannelEnabled(i)) {
+      PHAVector_[i] -= CMN;
     }
   }
 }
@@ -162,7 +162,7 @@ bool MultiChannelData::convertPHA2EPI()
 {
   const std::size_t N = NumChannels_;
   for (std::size_t i=0; i<N; i++) {
-    if (getDataValid(i) && getChannelEnable(i)) {
+    if (getDataValid(i) && getChannelEnabled(i)) {
       setEPI(i, PHA2EPI(i, getPHA(i)));
     }
     else {
@@ -172,26 +172,26 @@ bool MultiChannelData::convertPHA2EPI()
   return true;
 }
 
-bool MultiChannelData::discriminate(const double energy) const
+bool MultiChannelData::discriminate(std::size_t i, double energy) const
 {
-  if (energy > getThresholdEnergy()) {
+  if (energy >= getThresholdEnergy(i)) {
     return true;
   }
-  else if (getUseNegativePulse() && energy<getNegativeThresholdEnergy()) {
+  else if (getUseNegativePulse() && energy <= getNegativeThresholdEnergy(i)) {
     return true;
   }
   return false;
 }
 
-void MultiChannelData::selectHit()
+void MultiChannelData::selectHits()
 {
   const std::size_t N = NumChannels_;
   for (std::size_t i=0; i<N; i++) {
-    if (getDataValid(i) && getChannelEnable(i) && discriminate(EPIs_[i])) {
-      hitChannels_[i] = 1;
+    if (getDataValid(i) && getChannelEnabled(i) && discriminate(i, getEPI(i))) {
+      setChannelHit(i, 1);
     }
     else {
-      hitChannels_[i] = 0;
+      setChannelHit(i, 0);
     }
   }
 }

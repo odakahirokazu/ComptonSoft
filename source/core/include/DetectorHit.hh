@@ -45,6 +45,7 @@ namespace comptonsoft {
  * @date 2008-08-22
  * @date 2012-06-29 | rename DetectorID; add Instrument ID
  * @date 2014-09-18 | redesign.
+ * @date 2016-08-19 | add trigger information, change channel ID classes
  */
 class DetectorHit
 {
@@ -74,25 +75,25 @@ public:
   void setInstrumentID(int v) { instrumentID_ = v; }
   int InstrumentID() const { return instrumentID_; }
 
-  void setDetectorChannel(const DetectorChannelID& v)
-  { detectorChannel_ = v; }
-  void setDetectorChannel(int detectorID, int section, int index)
-  { detectorChannel_.set(detectorID, section, index); }
+  void setDetectorChannelID(const DetectorBasedChannelID& v)
+  { detectorChannelID_ = v; }
+  void setDetectorChannelID(int detectorID, int section, int index)
+  { detectorChannelID_.set(detectorID, section, index); }
   void setDetectorID(int detectorID)
-  { detectorChannel_.set(detectorID, ChannelID::Undefined, ChannelID::Undefined); }
-  DetectorChannelID DetectorChannel() const { return detectorChannel_; }
-  int DetectorID() const { return detectorChannel_.Detector(); }
-  int DetectorChannelSection() const { return detectorChannel_.Section(); }
-  int DetectorChannelIndex() const { return detectorChannel_.Index(); }
+  { detectorChannelID_.set(detectorID, ChannelID::Undefined, ChannelID::Undefined); }
+  DetectorBasedChannelID DetectorChannelID() const { return detectorChannelID_; }
+  int DetectorID() const { return detectorChannelID_.Detector(); }
+  int DetectorSection() const { return detectorChannelID_.Section(); }
+  int DetectorChannel() const { return detectorChannelID_.Channel(); }
 
-  void setReadoutChannel(const ReadoutChannelID& v)
-  { readoutChannel_ = v; }
-  void setReadoutChannel(int readoutModuleID, int section, int index)
-  { readoutChannel_.set(readoutModuleID, section, index); }
-  ReadoutChannelID ReadoutChannel() const { return readoutChannel_; }
-  int ReadoutModuleID() const { return readoutChannel_.ReadoutModule(); }
-  int ReadoutChannelSection() const { return readoutChannel_.Section(); }
-  int ReadoutChannelIndex() const { return readoutChannel_.Index(); }
+  void setReadoutChannelID(const ReadoutBasedChannelID& v)
+  { readoutChannelID_ = v; }
+  void setReadoutChannelID(int readoutModuleID, int section, int index)
+  { readoutChannelID_.set(readoutModuleID, section, index); }
+  ReadoutBasedChannelID ReadoutChannelID() const { return readoutChannelID_; }
+  int ReadoutModuleID() const { return readoutChannelID_.ReadoutModule(); }
+  int ReadoutSection() const { return readoutChannelID_.Section(); }
+  int ReadoutChannel() const { return readoutChannelID_.Channel(); }
  
   void setPixel(int x, int y) { pixel_.set(x, y); }
   void setPixel(const PixelID& v) { pixel_ = v; }
@@ -142,6 +143,18 @@ public:
   void addProcess(uint32_t f) { process_ |= f; }
   void clearProcess(uint32_t f) { process_ &= ~f; }
   bool isProcess(uint32_t f) const { return (process_&f)==f; }
+
+  void setSelfTriggered(bool v) { selfTriggered_ = v; }
+  bool SelfTriggered() const { return selfTriggered_; }
+
+  void setTriggered(bool v) { triggered_ = v; }
+  bool Triggered() const { return triggered_; }
+
+  void setSelfTriggeredTime(double v) { selfTriggeredTime_ = v; }
+  double SelfTriggeredTime() const { return selfTriggeredTime_; }
+
+  void setTriggeredTime(double v) { triggeredTime_ = v; }
+  double TriggeredTime() const { return triggeredTime_; }
 
   void setEnergy(double v) { energy_ = v; }
   double Energy() const { return energy_; }
@@ -226,8 +239,8 @@ private:
   // measured data
   int64_t time_ = 0u;
   int instrumentID_ = 0;
-  DetectorChannelID detectorChannel_;
-  ReadoutChannelID readoutChannel_;
+  DetectorBasedChannelID detectorChannelID_;
+  ReadoutBasedChannelID readoutChannelID_;
   PixelID pixel_;
   int32_t rawPHA_ = 0;
   double PHA_ = 0.0;
@@ -241,6 +254,11 @@ private:
   double energyDeposit_ = 0.0;
   double energyCharge_ = 0.0;
   uint32_t process_ = 0u;
+  // trigger information
+  bool selfTriggered_ = false;
+  bool triggered_ = false;
+  double selfTriggeredTime_ = 0.0;
+  double triggeredTime_ = 0.0;
   // reconstructed
   double energy_ = 0.0;
   vector3_t position_{0.0, 0.0, 0.0};

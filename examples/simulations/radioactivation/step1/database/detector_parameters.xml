@@ -1,0 +1,28 @@
+<?xml version="1.0" ?>
+<?xml-stylesheet type="text/xsl" href="https://raw.githubusercontent.com/odakahirokazu/ComptonSoft/master/xmlstyle/detector_parameters_v1.xsl" ?>
+
+<detector_parameters>
+  <name>CdTe pixel detector</name>
+  <comment>2016-08-24 | Hiro Odaka</comment>
+  <auto_position flag="0" />
+  <sensitive_detector_not_found_warning flag="1" />
+  <data>
+    <sensitive_detector type="2DPixel" name="CdTeDetector.log">
+      <common>
+        <parameters>
+          <charge_collection mode="0" />
+          <timing_resolution trigger="3.0e-7" energy_measurement="1.0e-6" />
+          <channel_properties>
+            <trigger_discrimination center="5.0" sigma="1.0" />
+            <noise_level param0="0.4" param1="0.0" param2="0.003" />
+            <threshold value="5.0" />
+          </channel_properties>
+          <reconstruction mode="1" />
+        </parameters>
+      </common>
+      <detector_list id_method="path" layer_offset="1">
+        <detector id="1" path="CdTeDetector" />
+      </detector_list>
+    </sensitive_detector>
+  </data>
+</detector_parameters>

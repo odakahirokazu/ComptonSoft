@@ -13,7 +13,7 @@ clMod = [
   ANL::SWIGClass.new("ConstructChannelMap"),
   ANL::SWIGClass.new("SetNoiseLevels"),
   ANL::SWIGClass.new("SetBadChannels"),
-  ANL::SWIGClass.new("SetChannelsInfo"),
+  ANL::SWIGClass.new("SetChannelProperties"),
   ANL::SWIGClass.new("SelectHits"),
   ANL::SWIGClass.new("AnalyzeHits"),
   ANL::SWIGClass.new("MakeDetectorHits"),

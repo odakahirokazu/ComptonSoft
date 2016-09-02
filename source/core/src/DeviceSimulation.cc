@@ -143,35 +143,38 @@ calculateEPI(double energyCharge, const PixelID& pixel) const
   return compensateEPI(pixel, ePI);
 }
 
-void DeviceSimulation::printSimulationParameters()
+void DeviceSimulation::printSimulationParameters(std::ostream& os) const
 {
-  std::cout << "Charge collection mode : " << ChargeCollectionMode() << '\n'
-            << " upside anode   : " << isUpSideAnode() << '\n'
-            << " thickness      : " << EField_->Thickness()/mm << " mm" << '\n';
+  os << "Quenching factor : " << QuenchingFactor() << '\n';
+  os << "Temperature : " << Temperature()/kelvin << " K\n";
+  os << "E-field\n"
+     << "  Bias voltage   : " << BiasVoltage()/volt << " V\n"
+     << "  E field mode   : " << static_cast<int>(EFieldMode()) << '\n'
+     << "  E field param0 : " << EFieldParam(0) << '\n'
+     << "  E field param1 : " << EFieldParam(1) << '\n'
+     << "  E field param2 : " << EFieldParam(2) << '\n'
+     << "  E field param3 : " << EFieldParam(3) << '\n'
+     << "  Thickness      : " << EField_->Thickness()/cm << " cm" << '\n';
+  os << "Charge collection\n"
+     << "  Mode: " << ChargeCollectionMode() << '\n';
   if (CCEMapName()=="") {
-    std::cout << " Bias voltage   : " << BiasVoltage()/volt << " V\n"
-              << " E field mode   : " << static_cast<int>(EFieldMode()) << '\n'
-              << " E field param0 : " << EFieldParam(0) << '\n'
-              << " E field param1 : " << EFieldParam(1) << '\n'
-              << " E field param2 : " << EFieldParam(2) << '\n'
-              << " E field param3 : " << EFieldParam(3) << '\n'
-              << " mutau e        : " << MuTauElectron()/(cm2/volt) << " cm2/V\n"
-              << " mutau h        : " << MuTauHole()/(cm2/volt) << " cm2/V\n"
-              << " num pixel for WP calculationE : " << NumPixelsInWPCalculation() << '\n';
+    os << "  mutau e : " << MuTauElectron()/(cm2/volt) << " cm2/V\n"
+       << "  mutau h : " << MuTauHole()/(cm2/volt) << " cm2/V\n"
+       << "  number of pixels for WP calculation : " << NumPixelsInWPCalculation() << '\n';
   }
   else {
-    std::cout << " CCE map name   : " << CCEMapName() << "\n";
+    os << "  CCE map name : " << CCEMapName() << "\n";
   }
-  
-  std::cout << '\n'
-            << "Diffusion mode : " << DiffusionMode() << '\n'
-            << " Constant Anode        : " << DiffusionSigmaConstantAnode()/um << " um\n"
-            << " Constant Cathode      : " << DiffusionSigmaConstantCathode()/um << " um\n"
-            << " Spread factor Anode   : " << DiffusionSpreadFactorAnode() << '\n'
-            << " Spread factor Cathode : " << DiffusionSpreadFactorCathode() << '\n'
-            << " Device temperature: " << Temperature()/kelvin << " K\n"
-            << '\n'
-            << "Quenching factor : " << QuenchingFactor() << std::endl;
+  os << "Diffusion\n"
+     << "  Mode: " << DiffusionMode() << '\n'
+     << "  Spread factor Anode   : " << DiffusionSpreadFactorAnode() << '\n'
+     << "  Spread factor Cathode : " << DiffusionSpreadFactorCathode() << '\n'
+     << "  Constant Anode        : " << DiffusionSigmaConstantAnode()/um << " um\n"
+     << "  Constant Cathode      : " << DiffusionSigmaConstantCathode()/um << " um\n";
+  os << "Timing resolution\n"
+     << "  for trigger            : " << TimingResolutionForTrigger()/nanosecond << " ns\n"
+     << "  for energy measurement : " << TimingResolutionForEnergyMeasurement()/nanosecond << " ns\n";
+  os << "Pedestal generation : " << isPedestalEnabled() << '\n';
 }
 
 } /* nemespace comptonsoft */

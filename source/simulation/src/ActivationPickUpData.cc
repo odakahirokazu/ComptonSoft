@@ -85,8 +85,8 @@ void ActivationPickUpData::RunAct_begin(const G4Run*)
 
 void ActivationPickUpData::RunAct_end(const G4Run* aRun)
 {
-  OutputVolumeInfo(m_FilenameBase+"_volume.txt");
-  OutputSummary(m_FilenameBase+"_summary.txt", aRun->GetNumberOfEvent());
+  OutputVolumeInfo(m_FilenameBase+".volume.dat");
+  OutputSummary(m_FilenameBase+".summary.dat", aRun->GetNumberOfEvent());
   
   m_AnalysisManager->Write();
   m_AnalysisManager->CloseFile();

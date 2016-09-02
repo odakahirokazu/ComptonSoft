@@ -2,8 +2,8 @@
 
 # require 'comptonsoft/radioactivation'
 
-production_file = "../step1/activation_summary.txt"
-time_profile_file = "time_profile.txt"
+production_file = "../step1/simulation.act.summary.dat"
+time_profile_file = "time_profile.dat"
 
 #####################################
 ## measurement
@@ -14,7 +14,7 @@ time_profile_file = "time_profile.txt"
 measurement_start_time = 199950.0 # second
 measurement_duration = 28911.0 # second
 
-output_file = "decay_rates.txt"
+output_file = "decay_rates.dat"
 
 com = "activation_step2 #{production_file} #{time_profile_file} #{measurement_start_time} #{measurement_duration} #{output_file}"
 system com

@@ -18,6 +18,7 @@ link_directories(
 
 set(CS_CORE_CLASSES
   ### basic types and classes
+  src/CSException.cc
   src/ChannelID.cc
   src/PixelID.cc
   src/DetectorGroup.cc
@@ -32,7 +33,7 @@ set(CS_CORE_CLASSES
   src/VChannelMap.cc
   src/ChannelMap.cc
   src/ChannelMapDSD.cc
-  src/DetectorReadoutModule.cc
+  src/ReadoutModule.cc
   src/DetectorHit.cc
   ### detector units
   src/VDetectorUnit.cc

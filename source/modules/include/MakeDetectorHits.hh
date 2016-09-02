@@ -26,7 +26,7 @@ namespace comptonsoft {
 
 class MakeDetectorHits : public SelectHits
 {
-  DEFINE_ANL_MODULE(MakeDetectorHits, 2.2);
+  DEFINE_ANL_MODULE(MakeDetectorHits, 3.0);
 public:
   MakeDetectorHits() = default;
   ~MakeDetectorHits() = default;

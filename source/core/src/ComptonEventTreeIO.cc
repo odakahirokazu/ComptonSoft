@@ -131,10 +131,10 @@ void ComptonEventTreeIO::fillEvent(const int64_t eventID,
   hit1_id_ = event.Hit1ID();
   hit1_process_ = event.Hit1Process();
   hit1_detector_ = event.Hit1DetectorID();
-  const ReadoutChannelID hit1ReadoutChannel = event.Hit1ReadoutChannel();
-  hit1_readout_module_ = hit1ReadoutChannel.ReadoutModule();
-  hit1_section_ = hit1ReadoutChannel.Section();
-  hit1_channel_ = hit1ReadoutChannel.Index();
+  const ReadoutBasedChannelID hit1ReadoutChannelID = event.Hit1ReadoutChannelID();
+  hit1_readout_module_ = hit1ReadoutChannelID.ReadoutModule();
+  hit1_section_ = hit1ReadoutChannelID.Section();
+  hit1_channel_ = hit1ReadoutChannelID.Channel();
   const PixelID hit1Pixel = event.Hit1Pixel();
   hit1_pixelx_ = hit1Pixel.X();
   hit1_pixely_ = hit1Pixel.Y();
@@ -149,10 +149,10 @@ void ComptonEventTreeIO::fillEvent(const int64_t eventID,
   hit2_id_ = event.Hit2ID();
   hit2_process_ = event.Hit2Process();
   hit2_detector_ = event.Hit2DetectorID();
-  const ReadoutChannelID hit2ReadoutChannel = event.Hit2ReadoutChannel();
-  hit2_readout_module_ = hit2ReadoutChannel.ReadoutModule();
-  hit2_section_ = hit2ReadoutChannel.Section();
-  hit2_channel_ = hit2ReadoutChannel.Index();
+  const ReadoutBasedChannelID hit2ReadoutChannelID = event.Hit2ReadoutChannelID();
+  hit2_readout_module_ = hit2ReadoutChannelID.ReadoutModule();
+  hit2_section_ = hit2ReadoutChannelID.Section();
+  hit2_channel_ = hit2ReadoutChannelID.Channel();
   const PixelID hit2Pixel = event.Hit2Pixel();
   hit2_pixelx_ = hit2Pixel.X();
   hit2_pixely_ = hit2Pixel.Y();
@@ -189,10 +189,10 @@ void ComptonEventTreeIO::retrieveEvent(BasicComptonEvent& event) const
   
   event.setHit1ID(hit1_id_);
   event.setHit1Process(hit1_process_);
-  event.setHit1DetectorChannel(DetectorChannelID(hit1_detector_));
-  event.setHit1ReadoutChannel(ReadoutChannelID(hit1_readout_module_,
-                                               hit1_section_,
-                                               hit1_channel_));
+  event.setHit1DetectorChannelID(DetectorBasedChannelID(hit1_detector_));
+  event.setHit1ReadoutChannelID(ReadoutBasedChannelID(hit1_readout_module_,
+                                                      hit1_section_,
+                                                      hit1_channel_));
   event.setHit1Pixel(hit1_pixelx_, hit1_pixely_);
   event.setHit1Time(hit1_time_ * second);
   event.setHit1Position(hit1_posx_ * cm, hit1_posy_ * cm, hit1_posz_ * cm);
@@ -200,10 +200,10 @@ void ComptonEventTreeIO::retrieveEvent(BasicComptonEvent& event) const
 
   event.setHit2ID(hit2_id_);
   event.setHit2Process(hit2_process_);
-  event.setHit2DetectorChannel(DetectorChannelID(hit2_detector_));
-  event.setHit2ReadoutChannel(ReadoutChannelID(hit2_readout_module_,
-                                               hit2_section_,
-                                               hit2_channel_));
+  event.setHit2DetectorChannelID(DetectorBasedChannelID(hit2_detector_));
+  event.setHit2ReadoutChannelID(ReadoutBasedChannelID(hit2_readout_module_,
+                                                      hit2_section_,
+                                                      hit2_channel_));
   event.setHit2Pixel(hit2_pixelx_, hit2_pixely_);
   event.setHit2Time(hit2_time_ * second);
   event.setHit2Position(hit2_posx_ * cm, hit2_posy_ * cm, hit2_posz_ * cm);

@@ -30,7 +30,7 @@ namespace comptonsoft {
 
 class SelectHits : public VCSModule
 {
-  DEFINE_ANL_MODULE(SelectHits, 2.2);
+  DEFINE_ANL_MODULE(SelectHits, 3.0);
 public:
   SelectHits();
   ~SelectHits();

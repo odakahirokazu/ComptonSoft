@@ -118,23 +118,23 @@ VCSSensitiveDetector::ProcessHits(G4Step* aStep, G4TouchableHistory* )
     
     if (it!=positionCalculationSet_.end()) {
       G4ThreeVector center(0, 0, 0);
-      G4ThreeVector dirx(1, 0, 0);
-      G4ThreeVector diry(0, 1, 0);
+      G4ThreeVector xdir(1, 0, 0);
+      G4ThreeVector ydir(0, 1, 0);
       
       for (G4int i = 0; i < touchable->GetHistoryDepth(); i++) {
         G4VPhysicalVolume* physicalVolume = touchable->GetVolume(i);
         if (physicalVolume->GetFrameRotation() != 0) {
           center = (*physicalVolume->GetObjectRotation()) * center;
-          dirx   = (*physicalVolume->GetObjectRotation()) * dirx;
-          diry   = (*physicalVolume->GetObjectRotation()) * diry;
+          xdir   = (*physicalVolume->GetObjectRotation()) * xdir;
+          ydir   = (*physicalVolume->GetObjectRotation()) * ydir;
         }
         center += physicalVolume->GetObjectTranslation();
       }
       
       VRealDetectorUnit* detector = detectorSystem_->getDetectorByID(DetectorID);
       detector->setCenterPosition(center);
-      detector->setDirectionX(dirx);
-      detector->setDirectionY(diry);
+      detector->setXAxisDirection(xdir);
+      detector->setYAxisDirection(ydir);
 
       positionCalculationSet_.erase(it);
     }

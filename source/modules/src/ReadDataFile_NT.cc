@@ -25,7 +25,7 @@
 
 #include "TChain.h"
 
-#include "DetectorReadoutModule.hh"
+#include "ReadoutModule.hh"
 #include "MultiChannelData.hh"
 
 using namespace anl;
@@ -48,14 +48,14 @@ ANLStatus ReadDataFile_NT::mod_init()
   int numASICs = 0;
   DetectorSystem* detectorManager = getDetectorManager();
   for (auto& readoutModule: detectorManager->getReadoutModules()) {
-    numASICs += readoutModule->NumberOfReadoutSections();
+    numASICs += readoutModule->NumberOfSections();
   }
   std::cout << "Total readout ASICs : " << numASICs << std::endl;
   m_ADC.reset(new std::unique_ptr<uint16_t[]>[numASICs]);
 
   int iASIC = 0;
   for (auto& readoutModule: detectorManager->getReadoutModules()) {
-    for (auto& section: readoutModule->getReadoutSections()) {
+    for (auto& section: readoutModule->Sections()) {
       MultiChannelData* mcd = detectorManager->getMultiChannelData(section);
       int numChannels = mcd->NumberOfChannels();
       m_ADC[iASIC].reset(new uint16_t[numChannels]);
@@ -88,7 +88,7 @@ ANLStatus ReadDataFile_NT::mod_ana()
   DetectorSystem* detectorManager = getDetectorManager();
   int iASIC = 0;
   for (auto& readoutModule: detectorManager->getReadoutModules()) {
-    for (auto& section: readoutModule->getReadoutSections()) {
+    for (auto& section: readoutModule->Sections()) {
       MultiChannelData* mcd = detectorManager->getMultiChannelData(section);
       int numChannels = mcd->NumberOfChannels();
       for (int i=0; i<numChannels; i++) {

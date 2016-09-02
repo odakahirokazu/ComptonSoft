@@ -59,9 +59,9 @@ public:
    * @param channel channel index.
    * @param pixel mapped pixel or strip pair.
    */
-  virtual void set(int section, int index, const PixelID& pixel)
+  virtual void set(int section, int channel, const PixelID& pixel)
   {
-    tableToPixel_[section][index] = pixel;
+    tableToPixel_[section][channel] = pixel;
   }
 
   /** 
@@ -71,9 +71,9 @@ public:
    * @param x mapped pixel/strip index along x-axis.
    * @param y mapped pixel/strip index along y-axis.
    */
-  virtual void set(int section, int index, int x, int y)
+  virtual void set(int section, int channel, int x, int y)
   {
-    tableToPixel_[section][index].set(x,y);
+    tableToPixel_[section][channel].set(x,y);
   }
 
   /**
@@ -82,14 +82,16 @@ public:
    * @param channel channel index
    * @return sp mapped strip ID pair
    */
-  PixelID getPixel(int section, int index) const
-  { return tableToPixel_[section][index]; }
+  PixelID getPixel(int section, int channel) const
+  { return tableToPixel_[section][channel]; }
 
-  PixelID getPixel(const ChannelID& channel) const
-  { return tableToPixel_[channel.Section()][channel.Index()]; }
+  PixelID getPixel(const SectionChannelPair& section_channel) const
+  {
+    return tableToPixel_[section_channel.Section()][section_channel.Channel()];
+  }
 
-  virtual ChannelID getChannel(int x, int y) const = 0;
-  virtual ChannelID getChannel(const PixelID& pixel) const = 0;
+  virtual SectionChannelPair getSectionChannel(int x, int y) const = 0;
+  virtual SectionChannelPair getSectionChannel(const PixelID& pixel) const = 0;
 
 private:
   std::vector<std::vector<PixelID>> tableToPixel_;

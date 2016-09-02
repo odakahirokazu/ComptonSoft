@@ -38,15 +38,10 @@ void SimDetectorUnitScintillator::simulatePulseHeights()
   const int N = NumberOfRawHits();
   for (int i=0; i<N; i++) {
     DetectorHit_sptr rawhit = getRawHit(i);
-    double edep = rawhit->EnergyDeposit();
-    if (rawhit->isProcess(process::NucleusHit)) {
-      edep *= QuenchingFactor();
-    }
-    
     DetectorHit_sptr hit(new DetectorHit(*rawhit));
+    applyQuenching(hit);
     hit->setPixel(0, 0);
-    hit->setEnergyCharge(edep);
-    
+    hit->setEnergyCharge(hit->EnergyDeposit());
     insertSimulatedHit(hit);
   }
 }

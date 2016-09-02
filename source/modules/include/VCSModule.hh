@@ -34,10 +34,11 @@ namespace comptonsoft {
  * @author Hirokazu Odaka
  * @date 2008-08-30
  * @date 2014-11-22
+ * @date 2016-08-19 | Add isMCSimulation()
  */
 class VCSModule : public anl::BasicModule
 {
-  DEFINE_ANL_MODULE(VCSModule, 1.1);
+  DEFINE_ANL_MODULE(VCSModule, 1.2);
 public:
   VCSModule();
   ~VCSModule();
@@ -48,7 +49,8 @@ public:
 protected:
   void mkdir(const std::string& name="");
   DetectorSystem* getDetectorManager() { return detectorSystem_; }
-  const DetectorSystem* getDetectorManager() const { return detectorSystem_; } 
+  const DetectorSystem* getDetectorManager() const { return detectorSystem_; }
+  bool isMCSimulation() const { return detectorSystem_->isMCSimulation(); }
 
 private:
   DetectorSystem* detectorSystem_;

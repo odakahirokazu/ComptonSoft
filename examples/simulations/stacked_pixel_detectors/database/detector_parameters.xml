@@ -1,0 +1,78 @@
+<?xml version="1.0" ?>
+<?xml-stylesheet type="text/xsl" href="https://raw.githubusercontent.com/odakahirokazu/ComptonSoft/master/xmlstyle/detector_parameters_v1.xsl" ?>
+
+<detector_parameters>
+  <name>Compton Camera</name>
+  <comment>H. Odaka | 2016-08-24</comment>
+  <auto_position flag="0" />
+  <sensitive_detector_not_found_warning flag="1" />
+  <data>
+    <sensitive_detector type="2DPixel" name="SiDetector_log">
+      <common>
+        <parameters>
+          <upside anode="0" pixel="1" />
+          <quenching factor="0.6" />
+          <temperature value="265.0" />
+          <efield bias="300.0" mode="1" />
+          <charge_collection mode="0" />
+          <diffusion mode="1">
+            <spread_factor cathode="1.5" anode="1.6" />
+          </diffusion>
+          <timing_resolution trigger="1.0e-7" energy_measurement="1.0e-6" />
+          <pedestal_generation flag="0" />
+          <channel_properties>
+            <disable status="0" />
+            <trigger_discrimination center="5.0" sigma="0.5" />
+            <noise_level param0="0.25" param1="0.019" param2="0.001" />
+            <compensation factor="1.0" />
+            <threshold value="5.0" />
+          </channel_properties>
+          <reconstruction mode="1" />
+        </parameters>
+      </common>
+      <detector_list id_method="path" layer_offset="1">
+        <detector id="1" path="SiDetector1" />
+        <detector id="2" path="SiDetector2" />
+        <detector id="3" path="SiDetector3" />
+        <detector id="4" path="SiDetector4">
+          <parameters>
+            <diffusion mode="2">
+              <constant cathode="0.001" anode="0.001" />
+            </diffusion>
+          </parameters>
+        </detector>
+      </detector_list>
+    </sensitive_detector>
+    <sensitive_detector type="2DPixel" name="CdTeDetector_log">
+      <common>
+        <parameters>
+          <upside anode="0" pixel="1" />
+          <temperature value="265.0" />
+          <efield bias="1000.0" mode="1" />
+          <charge_collection mode="1">
+            <mutau electron="1.0e-4" hole="2.0e-3" />
+          </charge_collection>
+          <diffusion mode="1">
+            <spread_factor cathode="2.5" anode="2.0" />
+          </diffusion>
+          <channel_properties>
+            <disable status="0" />
+            <trigger_discrimination center="5.0" sigma="0.5" />
+            <noise_level param0="0.25" param1="0.019" param2="0.0" />
+            <compensation factor="1.0" />
+            <threshold value="5.0" />
+          </channel_properties>
+          <reconstruction mode="1" />
+        </parameters>
+      </common>
+      <detector_list id_method="path" layer_offset="1">
+        <detector id="11" path="CdTeDetector1" />
+        <detector id="12" path="CdTeDetector2">
+          <parameters>
+            <efield bias="500.0" mode="1" />
+          </parameters>
+        </detector>
+      </detector_list>
+    </sensitive_detector>
+  </data>
+</detector_parameters>

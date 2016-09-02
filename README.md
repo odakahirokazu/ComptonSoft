@@ -1,7 +1,7 @@
 Compton Soft
 ================================================================
 
-- Version: 5.1.11
+- Version: 5.2.0
 - Author: Hirokazu Odaka
 
 ----
@@ -21,13 +21,19 @@ This software package can be used for wide-range applications of radiation
 measurements: X-/gamma-ray astrophysics, nuclear medicine, and imaging
 search for radioactive sources.
 
+### Migration to version 5.2
+
+Version 5.2 introduces new design of XML database since it supports new
+features. We will provide conversion scripts from version 5.1 formats.
+Please also check examples about new formts.
+
 ### Important notes for version 5.0 users
 
-Version 5.1 is the first big minor update since we released version 5.
-This update includes many design changes, revision of input/output formats,
+Version 5.1 was the first big minor update since we released version 5.
+This update included many design changes, revision of input/output formats,
 and several bug fixes. If you are using version 5.0, we strongly recommend
-updating to version 5.1 or later versions as the older versions are not
-stable and use input/output fotmats which are no longer supported.
+updating to version 5.2 as 5.0 versions are not stable and use input/output
+fotmats which are no longer supported.
 
 ### Changes from version 4
 
