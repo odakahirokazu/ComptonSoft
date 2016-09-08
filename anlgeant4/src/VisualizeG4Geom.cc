@@ -47,27 +47,24 @@
 
 
 using namespace anl;
-using namespace anlgeant4;
 using CLHEP::cm;
 
+namespace anlgeant4
+{
 
 VisualizeG4Geom::VisualizeG4Geom()
-  : m_VisManager(0), m_UIManager(0), m_UIExecutive(0),
+  : m_UIManager(nullptr),
     m_Mode("OGL"),
     m_TargetPoint(0.0, 0.0, 0.0),
-    m_ViewPoint(0.0, 1.0, 0.0), m_UpVector(0.0, 0.0, 1.0),
+    m_ViewPoint(0.0, 1.0, 0.0),
+    m_UpVector(0.0, 0.0, 1.0),
     m_Zoom(1.0),
-    m_AuxiliaryEdge(true)
+    m_AuxiliaryEdge(true),
+    m_MacroFile("")
 {
 }
 
-
-VisualizeG4Geom::~VisualizeG4Geom()
-{
-  if (m_UIExecutive) delete m_UIExecutive;
-  if (m_VisManager) delete m_VisManager;
-}
-
+VisualizeG4Geom::~VisualizeG4Geom() = default;
 
 ANLStatus VisualizeG4Geom::mod_startup()
 {
@@ -77,30 +74,53 @@ ANLStatus VisualizeG4Geom::mod_startup()
   register_parameter(&m_UpVector, "up_direction");
   register_parameter(&m_Zoom, "zoom");
   register_parameter(&m_AuxiliaryEdge, "auxiliary_edge");
+  register_parameter(&m_MacroFile, "macro_file");
   
   return AS_OK;
 }
 
-
 ANLStatus VisualizeG4Geom::mod_init()
 {
-  m_VisManager = new G4VisExecutive;
+  m_VisManager.reset(new G4VisExecutive);
   m_UIManager = G4UImanager::GetUIpointer();
   m_VisManager->Initialize();
 
-  char* argv[1];
-  char name[16] = "ANLGEANT4";
+  static char* argv[1];
+  static char name[16] = "ANLGeant4";
   argv[0] = name;
-  m_UIExecutive = new G4UIExecutive(1, argv);
+  m_UIExecutive.reset(new G4UIExecutive(1, argv));
 
+  if (m_MacroFile=="") {
+    applyDefaultCommands();
+  }
+  else {
+    std::ostringstream cmd;
+    cmd << "/control/execute " << m_MacroFile;
+    m_UIManager->ApplyCommand(cmd.str());
+  }
+
+  return AS_OK;
+}
+
+ANLStatus VisualizeG4Geom::mod_endrun()
+{
+  if (m_Mode.find("OGL") != std::string::npos) {
+    m_UIExecutive->SessionStart();
+  }
+  
+  return AS_OK;
+}
+
+void VisualizeG4Geom::applyDefaultCommands()
+{
   m_UIManager->ApplyCommand("/control/verbose 2");
-
+  
   std::ostringstream cmd;
   cmd.str("");
   cmd << "/vis/open " << m_Mode << " 600x600-0+0";
   m_UIManager->ApplyCommand(cmd.str());
   cmd.str("");
-  
+
   m_UIManager->ApplyCommand("/vis/viewer/set/autoRefresh false");
   m_UIManager->ApplyCommand("/vis/verbose errors");
   m_UIManager->ApplyCommand("/vis/drawVolume worlds");
@@ -157,48 +177,13 @@ ANLStatus VisualizeG4Geom::mod_init()
   m_UIManager->ApplyCommand("/vis/viewer/set/autoRefresh true");
   m_UIManager->ApplyCommand("/vis/verbose warnings");
   
-  // m_UIManager->ApplyCommand("/vis/viewer/flush");
+  m_UIManager->ApplyCommand("/vis/viewer/flush");
 
   if (m_UIExecutive->IsGUI()) {
-    m_UIManager->ApplyCommand("/gui/addMenu geant4 Geant4");
-    m_UIManager->ApplyCommand("/gui/addButton geant4 Exit \"exit\"");
-    
-    m_UIManager->ApplyCommand("/gui/addMenu run Run");
-    m_UIManager->ApplyCommand("/gui/addButton run \"beamOn    1\" \"/run/beamOn 1\"");
-    m_UIManager->ApplyCommand("/gui/addButton run \"beamOn   10\" \"/run/beamOn 10\"");
-    m_UIManager->ApplyCommand("/gui/addButton run \"beamOn  100\" \"/run/beamOn 100\"");
-    m_UIManager->ApplyCommand("/gui/addButton run \"beamOn 1000\" \"/run/beamOn 1000\"");
-    
     m_UIManager->ApplyCommand("/gui/addMenu viewer Viewer");
-    m_UIManager->ApplyCommand("/gui/addButton viewer \"Set style surface\" \"/vis/viewer/set/style surface\"");
-    m_UIManager->ApplyCommand("/gui/addButton viewer \"Set style wireframe\" \"/vis/viewer/set/style wire\"");
-    m_UIManager->ApplyCommand("/gui/addButton viewer \"Refresh viewer\" \"/vis/viewer/refresh\"");
-    m_UIManager->ApplyCommand("/gui/addButton viewer \"Update viewer (interaction or end-of-file)\" \"/vis/viewer/update\"");
-    m_UIManager->ApplyCommand("/gui/addButton viewer \"Flush viewer (= refresh + update)\" \"/vis/viewer/flush\"");
-    m_UIManager->ApplyCommand("/gui/addButton viewer \"Update scene\" \"/vis/scene/notifyHandlers\"");
+    m_UIManager->ApplyCommand("/gui/addButton viewer \"Set style surface\" \"/vis/viewer/set/style s\"");
+    m_UIManager->ApplyCommand("/gui/addButton viewer \"Set style wireframe\" \"/vis/viewer/set/style w\"");
   }
-  
-  return AS_OK;
 }
 
-
-ANLStatus VisualizeG4Geom::mod_endrun()
-{
-  if (m_Mode.find("OGL") != std::string::npos) {
-    m_UIExecutive->SessionStart();
-  }
-  
-  return AS_OK;
-}
-
-
-ANLStatus VisualizeG4Geom::mod_exit()
-{
-  delete m_VisManager;
-  m_VisManager = 0;
-  
-  delete m_UIExecutive;
-  m_UIExecutive = 0;
-  
-  return AS_OK;
-}
+} /* namespace anlgeant4 */

@@ -117,6 +117,8 @@ public:
   VRealDetectorUnit* getDetectorByID(int id);
   VRealDetectorUnit* getDetectorByIndex(int index)
   { return detectors_[index].get(); }
+  bool existDetector(int id) const
+  { return detectorIDMap_.count(id); }
 
   std::vector<std::unique_ptr<VRealDetectorUnit>>& getDetectors()
   { return detectors_; }

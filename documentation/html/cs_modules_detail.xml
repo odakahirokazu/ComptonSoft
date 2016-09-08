@@ -1154,7 +1154,7 @@
   </module>
   <module>
     <name>VisualizeG4Geom</name>
-    <version>1.2</version>
+    <version>1.3</version>
     <text>This module applies visualization for Geant4 simulation.</text>
     <parameters>
       <param container_type=''>
@@ -1199,11 +1199,18 @@
         <default_value>1</default_value>
         <description></description>
       </param>
+      <param container_type=''>
+        <name>macro_file</name>
+        <type>string</type>
+        <unit></unit>
+        <default_value></default_value>
+        <description></description>
+      </param>
     </parameters>
   </module>
   <module>
     <name>ConstructDetector</name>
-    <version>3.2</version>
+    <version>3.3</version>
     <text>Construct a detector system, loading a detector configuration file.</text>
     <parameters>
       <param container_type=''>
@@ -1214,7 +1221,7 @@
         <description>XML data file describing a detector configuration.</description>
       </param>
       <param container_type=''>
-        <name>detectors_information</name>
+        <name>detector_parameters</name>
         <type>string</type>
         <unit></unit>
         <default_value></default_value>
@@ -1231,7 +1238,7 @@
   </module>
   <module>
     <name>ConstructDetectorForSimulation</name>
-    <version>3.2</version>
+    <version>3.3</version>
     <text></text>
     <parameters>
       <param container_type=''>
@@ -1242,7 +1249,7 @@
         <description>XML data file describing a detector configuration.</description>
       </param>
       <param container_type=''>
-        <name>detectors_information</name>
+        <name>detector_parameters</name>
         <type>string</type>
         <unit></unit>
         <default_value></default_value>
@@ -1253,13 +1260,6 @@
         <type>int</type>
         <unit></unit>
         <default_value>0</default_value>
-        <description></description>
-      </param>
-      <param container_type=''>
-        <name>simulation_parameters</name>
-        <type>string</type>
-        <unit></unit>
-        <default_value>simparam.xml</default_value>
         <description></description>
       </param>
     </parameters>
@@ -1291,7 +1291,7 @@
     </parameters>
   </module>
   <module>
-    <name>SetChannelsInfo</name>
+    <name>SetChannelProperties</name>
     <version>3.0</version>
     <text></text>
     <parameters>
@@ -1299,7 +1299,7 @@
         <name>filename</name>
         <type>string</type>
         <unit></unit>
-        <default_value>channels_info.xml</default_value>
+        <default_value>channel_properties.xml</default_value>
         <description></description>
       </param>
     </parameters>
@@ -2165,6 +2165,13 @@
         <default_value>hittree.root</default_value>
         <description></description>
       </param>
+      <param container_type=''>
+        <name>trust_num_hits</name>
+        <type>bool</type>
+        <unit></unit>
+        <default_value>1</default_value>
+        <description></description>
+      </param>
     </parameters>
   </module>
   <module>
@@ -2179,6 +2186,13 @@
         <default_value>hittree.root</default_value>
         <description></description>
       </param>
+      <param container_type=''>
+        <name>trust_num_hits</name>
+        <type>bool</type>
+        <unit></unit>
+        <default_value>1</default_value>
+        <description></description>
+      </param>
     </parameters>
   </module>
   <module>
@@ -2191,6 +2205,13 @@
         <type>vector&lt;string&gt;</type>
         <unit></unit>
         <default_value>hittree.root</default_value>
+        <description></description>
+      </param>
+      <param container_type=''>
+        <name>trust_num_hits</name>
+        <type>bool</type>
+        <unit></unit>
+        <default_value>1</default_value>
         <description></description>
       </param>
     </parameters>

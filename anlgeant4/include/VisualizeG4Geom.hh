@@ -20,6 +20,7 @@
 #ifndef ANLGEANT4_VisualizeG4Geom_H
 #define ANLGEANT4_VisualizeG4Geom_H 1
 
+#include <memory>
 #include "BasicModule.hh"
 #include "G4ThreeVector.hh"
 
@@ -38,10 +39,11 @@ namespace anlgeant4 {
  * @date 2012-02-15
  * @date 2012-08-06
  * @date 2012-10-04
+ * @date 2016-09-06
  */
 class VisualizeG4Geom  : public anl::BasicModule
 {
-  DEFINE_ANL_MODULE(VisualizeG4Geom, 1.2);
+  DEFINE_ANL_MODULE(VisualizeG4Geom, 1.3);
 public: 
   VisualizeG4Geom();
   ~VisualizeG4Geom();
@@ -49,12 +51,14 @@ public:
   anl::ANLStatus mod_startup();
   anl::ANLStatus mod_init();
   anl::ANLStatus mod_endrun();
-  anl::ANLStatus mod_exit(); 
+
+private:
+  void applyDefaultCommands();
   
 private:
-  G4VisManager* m_VisManager;
+  std::unique_ptr<G4VisManager> m_VisManager;
+  std::unique_ptr<G4UIExecutive> m_UIExecutive;
   G4UImanager* m_UIManager;
-  G4UIExecutive* m_UIExecutive;
 
   std::string m_Mode;
   G4ThreeVector m_TargetPoint;
@@ -62,8 +66,9 @@ private:
   G4ThreeVector m_UpVector;
   double m_Zoom;
   bool m_AuxiliaryEdge;
+  std::string m_MacroFile;
 };
 
-}
+} /* namespace anlgeant4 */
 
 #endif /* ANLGEANT4_VisualizeG4Geom_H */

@@ -24,16 +24,16 @@ search for radioactive sources.
 ### Migration to version 5.2
 
 Version 5.2 introduces new design of XML database since it supports new
-features. We will provide conversion scripts from version 5.1 formats.
+features. We provide conversion scripts from version 5.1 formats.
 Please also check examples about new formts.
 
 ### Important notes for version 5.0 users
 
 Version 5.1 was the first big minor update since we released version 5.
-This update included many design changes, revision of input/output formats,
-and several bug fixes. If you are using version 5.0, we strongly recommend
-updating to version 5.2 as 5.0 versions are not stable and use input/output
-fotmats which are no longer supported.
+This update included many design changes, revision of input/output
+formats, and several bug fixes. If you are using version 5.0, we strongly
+recommend updating to version 5.2 as 5.0 versions are not stable and use
+input/output fotmats which are no longer supported.
 
 ### Changes from version 4
 
@@ -78,8 +78,8 @@ Documentation
 
 - [Installation](documentation/installation.md)
 - [Data format](documentation/data_format.md)
-- [Class library references](http://www.astro.isas.jaxa.jp/~odaka/comptonsoft/doxygen/index.html)
-- [ANL module references](http://www.astro.isas.jaxa.jp/~odaka/comptonsoft/cs_modules.xml)
+- [Class library references](http://web.stanford.edu/~hodaka/comptonsoft/doxygen/index.html)
+- [ANL module references](http://web.stanford.edu/~hodaka/comptonsoft/cs_modules.xml)
 
 Information
 ----------------------------------------------------------------
@@ -92,7 +92,6 @@ Information
 
 ### Contributions
 
-- Hirokazu Odaka
 - Shin Watanabe
 - Shin'ichiro Takeda
 - Tamotsu Sato
@@ -108,6 +107,7 @@ Information
 
 ### History
 
+- 5.2 | 2016-09-07 | H. Odaka | New design of XML database. Timing process.
 - 5.1 | 2015-10-19 | H. Odaka | Stable version. A big minor update since 5.0.
 - 5.0 | 2015-08-17 | H. Odaka | For C++11 and ANL Next 1.7.
 - 4.9.0 | 2013-05-21 | H. Odaka |  Beta version for version 5

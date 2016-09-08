@@ -136,7 +136,9 @@ void DetectorSystem::registerGeant4SensitiveDetectors()
       logicalVolume->SetSensitiveDetector(sd);
     }
     else {
-      std::cout << "Error: not found: Logical volume " << name << std::endl;
+      std::ostringstream message;
+      message << "Error: Logical volume = " << name << " is not found.\n";
+      BOOST_THROW_EXCEPTION( CSException(message.str()) );
     }
   }
 }
@@ -756,6 +758,12 @@ void DetectorSystem::loadDPDetectorSetNode(const boost::property_tree::ptree& Se
 
       if (isMCSimulation()) {
         DeviceSimulation* device = getDeviceSimulationByID(DetectorID);
+        if (device == nullptr) {
+          std::ostringstream message;
+          message << "Error: Detector ID = " << DetectorID << " is not registered.\n";
+          BOOST_THROW_EXCEPTION( CSException(message.str()) );
+        }
+
         setupDetectorParameters(parameters, device);
 
         if (isSensitiveDetector) {
@@ -771,6 +779,11 @@ void DetectorSystem::loadDPDetectorSetNode(const boost::property_tree::ptree& Se
       }
       else {
         VRealDetectorUnit* detector = getDetectorByID(DetectorID);
+        if (detector == nullptr) {
+          std::ostringstream message;
+          message << "Error: Detector ID = " << DetectorID << " is not registered.\n";
+          BOOST_THROW_EXCEPTION( CSException(message.str()) );
+        }
         setupDetectorParameters(parameters, detector);
       }
     }

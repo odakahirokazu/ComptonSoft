@@ -31,6 +31,7 @@ namespace comptonsoft {
  * 
  * @author Hirokazu Odaka
  * @date 2014-12-02
+ * @date 2016-09-07
  */
 class HitTreeIO
 {
@@ -64,7 +65,7 @@ private:
   int16_t ihit_ = 0;
   int32_t num_hits_ = 0;
   // measured data
-  int64_t time_ = 0;
+  int64_t ti_ = 0;
   int16_t instrument_ = 0;
   int16_t detector_ = -1;
   int16_t det_section_ = -1;
@@ -79,7 +80,8 @@ private:
   uint64_t flag_data_ = 0ul;
   uint64_t flags_ = 0ul;
   // simulation
-  float real_time_ = 0.0;
+  double real_time_ = 0.0;
+  double time_trig_ = 0.0;
   int16_t time_group_ = 0;
   float real_posx_ = 0.0;
   float real_posy_ = 0.0;
@@ -95,6 +97,7 @@ private:
   float local_posx_ = 0.0;
   float local_posy_ = 0.0;
   float local_posz_ = 0.0;
+  double time_ = 0.0;
   int32_t grade_ = 0;
 };
 

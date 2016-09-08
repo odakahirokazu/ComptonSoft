@@ -70,7 +70,7 @@ a.text "A hit collection module."
 
 a.push ComptonSoft::ConstructChannelMap.new
 
-a.push ComptonSoft::SetChannelsInfo.new
+a.push ComptonSoft::SetChannelProperties.new
 
 a.push ComptonSoft::SelectHits.new
 

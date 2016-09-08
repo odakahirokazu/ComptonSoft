@@ -69,8 +69,10 @@ public:
   void setEventID(int64_t v) { eventID_ = v; }
   int64_t EventID() const { return eventID_; }
 
-  void setTime(int64_t v) { time_ = v; }
-  int64_t Time() const { return time_; }
+  void setTimeIndicator(int64_t v) { ti_ = v; }
+  int64_t TimeIndicator() const { return ti_; }
+  void setTI(int64_t v) { ti_ = v; }
+  int64_t TI() const { return ti_; }
 
   void setInstrumentID(int v) { instrumentID_ = v; }
   int InstrumentID() const { return instrumentID_; }
@@ -175,6 +177,9 @@ public:
   double LocalPositionZ() const { return localPosition_.z(); }
   vector3_t LocalPosition() const { return localPosition_; }
 
+  void setTime(double v) { time_ = v; }
+  double Time() const { return time_; }
+
   void setGrade(int v) { grade_ = v; }
   int Grade() const { return grade_; }
   
@@ -235,9 +240,9 @@ public:
 
 private:
   // Event ID
-  int64_t eventID_ = 0;
+  int64_t eventID_ = 0l;
   // measured data
-  int64_t time_ = 0u;
+  int64_t ti_ = 0l;
   int instrumentID_ = 0;
   DetectorBasedChannelID detectorChannelID_;
   ReadoutBasedChannelID readoutChannelID_;
@@ -245,8 +250,8 @@ private:
   int32_t rawPHA_ = 0;
   double PHA_ = 0.0;
   double EPI_ = 0.0;
-  uint64_t flagData_ = 0u;
-  uint64_t flags_ = 0u;
+  uint64_t flagData_ = 0ul;
+  uint64_t flags_ = 0ul;
   // simulation
   double realTime_ = 0.0;
   int timeGroup_ = 0;
@@ -263,6 +268,7 @@ private:
   double energy_ = 0.0;
   vector3_t position_{0.0, 0.0, 0.0};
   vector3_t localPosition_{0.0, 0.0, 0.0};
+  double time_ = 0.0;
   int grade_ = 0;
 };
 

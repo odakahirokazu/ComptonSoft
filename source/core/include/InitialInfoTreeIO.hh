@@ -30,6 +30,7 @@ namespace comptonsoft {
  * 
  * @author Hirokazu Odaka
  * @date 2014-12-02
+ * @date 2016-09-07 | time_ is double.
  */
 class InitialInfoTreeIO
 {
@@ -104,7 +105,7 @@ private:
   float ini_dirx_ = 0.0;
   float ini_diry_ = 0.0;
   float ini_dirz_ = 0.0;
-  float ini_time_ = 0.0;
+  double ini_time_ = 0.0;
   float ini_posx_ = 0.0;
   float ini_posy_ = 0.0;
   float ini_posz_ = 0.0;

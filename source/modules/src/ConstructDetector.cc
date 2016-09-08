@@ -67,6 +67,7 @@ ANLStatus ConstructDetector::mod_init()
     }
   }
   catch (CSException& e) {
+    std::cout << "\n\n";
     std::cout << "Error in ConstructDetector::mod_init()\n"
               << "Loading the XML data files failed." << std::endl;
     std::cout << "CSException ===> \n"

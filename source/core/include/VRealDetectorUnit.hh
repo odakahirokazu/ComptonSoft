@@ -189,6 +189,7 @@ public:
   bool setReconstructionMode(int mode)
   {
     reconstructionMode_ = mode;
+    if (mode==0) { return true; }
     return setReconstructionDetails(mode);
   }
   int ReconstructionMode() const { return reconstructionMode_; }

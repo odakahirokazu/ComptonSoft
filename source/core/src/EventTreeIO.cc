@@ -38,7 +38,7 @@ void EventTreeIO::defineBranches()
   tree_->Branch("num_hits",       &num_hits_,             "num_hits/I");
   
   // measured data
-  tree_->Branch("time",           &time_,                 "time/L");
+  tree_->Branch("ti",             &ti_,                   "ti/L");
   tree_->Branch("instrument",     &instrument_,           "instrument/S");
   tree_->Branch("detector",       detector_.data(),       "detector[num_hits]/S");
   tree_->Branch("det_section",    det_section_.data(),    "det_section[num_hits]/S");
@@ -54,7 +54,8 @@ void EventTreeIO::defineBranches()
   tree_->Branch("flags",          &flags_,                "flags/l");
   
   // simulation
-  tree_->Branch("real_time",      real_time_.data(),      "real_time[num_hits]/F");
+  tree_->Branch("real_time",      real_time_.data(),      "real_time[num_hits]/D");
+  tree_->Branch("time_trig",      time_trig_.data(),      "time_trig[num_hits]/D");
   tree_->Branch("time_group",     time_group_.data(),     "time_group[num_hits]/S");
   tree_->Branch("real_posx",      real_posx_.data(),      "real_posx[num_hits]/F");
   tree_->Branch("real_posy",      real_posy_.data(),      "real_posy[num_hits]/F");
@@ -71,6 +72,7 @@ void EventTreeIO::defineBranches()
   tree_->Branch("local_posx",     local_posx_.data(),     "local_posx[num_hits]/F");
   tree_->Branch("local_posy",     local_posy_.data(),     "local_posy[num_hits]/F");
   tree_->Branch("local_posz",     local_posz_.data(),     "local_posz[num_hits]/F");
+  tree_->Branch("time",           time_.data(),           "time[num_hits]/D");
   tree_->Branch("grade",          &grade_,                "grade/I");
 }
 
@@ -80,7 +82,7 @@ void EventTreeIO::setBranchAddresses()
   tree_->SetBranchAddress("num_hits",       &num_hits_);
 
   // measured data
-  tree_->SetBranchAddress("time",           &time_);
+  tree_->SetBranchAddress("ti",             &ti_);
   tree_->SetBranchAddress("instrument",     &instrument_);
   tree_->SetBranchAddress("detector",       detector_.data());
   tree_->SetBranchAddress("det_section",    det_section_.data());
@@ -97,6 +99,7 @@ void EventTreeIO::setBranchAddresses()
 
   // simulation
   tree_->SetBranchAddress("real_time",      real_time_.data());
+  tree_->SetBranchAddress("time_trig",      time_trig_.data());
   tree_->SetBranchAddress("time_group",     time_group_.data());
   tree_->SetBranchAddress("real_posx",      real_posx_.data());
   tree_->SetBranchAddress("real_posy",      real_posy_.data());
@@ -113,6 +116,7 @@ void EventTreeIO::setBranchAddresses()
   tree_->SetBranchAddress("local_posx",     local_posx_.data());
   tree_->SetBranchAddress("local_posy",     local_posy_.data());
   tree_->SetBranchAddress("local_posz",     local_posz_.data());
+  tree_->SetBranchAddress("time",           time_.data());
   tree_->SetBranchAddress("grade",          &grade_);
 }
 
@@ -126,7 +130,7 @@ void EventTreeIO::fillHits(const int64_t eventID,
 
   const DetectorHit_sptr& hit = hits[0];
   eventid_ = (eventID >= 0) ? eventID : hit->EventID();
-  time_ = hit->Time() / second;
+  ti_ = hit->TI();
   instrument_ = hit->InstrumentID();
   flag_data_ = hit->FlagData();
   flags_ = hit->Flags();
@@ -145,6 +149,7 @@ void EventTreeIO::fillHits(const int64_t eventID,
     pha_[i] = hit->PHA();
     epi_[i] = hit->EPI() / keV;
     real_time_[i] = hit->RealTime() / second;
+    time_trig_[i] = hit->TriggeredTime() / second;
     time_group_[i] = hit->TimeGroup();
     real_posx_[i] = hit->RealPositionX() / cm;
     real_posy_[i] = hit->RealPositionY() / cm;
@@ -159,6 +164,7 @@ void EventTreeIO::fillHits(const int64_t eventID,
     local_posx_[i] = hit->LocalPositionX() / cm;
     local_posy_[i] = hit->LocalPositionY() / cm;
     local_posz_[i] = hit->LocalPositionZ() / cm;
+    time_[i] = hit->Time() / second;
   }
 
   tree_->Fill();
@@ -168,7 +174,7 @@ DetectorHit_sptr EventTreeIO::retrieveHit(std::size_t i) const
 {
   DetectorHit_sptr hit(new DetectorHit);
   hit->setEventID(eventid_);
-  hit->setTime(time_ * second);
+  hit->setTI(ti_);
   hit->setInstrumentID(instrument_);
   hit->setDetectorChannelID(detector_[i], det_section_[i], channel_[i]);
   hit->setReadoutChannelID(readout_module_[i], section_[i], channel_[i]);
@@ -179,6 +185,7 @@ DetectorHit_sptr EventTreeIO::retrieveHit(std::size_t i) const
   hit->setFlagData(flag_data_);
   hit->setFlags(flags_);
   hit->setRealTime(real_time_[i] * second);
+  hit->setTriggeredTime(time_trig_[i] * second);
   hit->setTimeGroup(time_group_[i]);
   hit->setRealPosition(real_posx_[i] * cm, real_posy_[i] * cm, real_posz_[i] * cm);
   hit->setEnergyDeposit(edep_[i] * keV);
@@ -187,6 +194,7 @@ DetectorHit_sptr EventTreeIO::retrieveHit(std::size_t i) const
   hit->setEnergy(energy_[i] * keV);
   hit->setPosition(posx_[i] * cm, posy_[i] * cm, posz_[i] * cm);
   hit->setLocalPosition(local_posx_[i] * cm, local_posy_[i] * cm, local_posz_[i] * cm);
+  hit->setTime(time_[i] * second);
   hit->setGrade(grade_);
 
   return hit;

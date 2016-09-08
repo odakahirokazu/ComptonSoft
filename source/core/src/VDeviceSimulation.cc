@@ -85,6 +85,11 @@ void VDeviceSimulation::makeDetectorHits()
   removeHitsBelowThresholds(SimulatedHits_);
   
   for (auto& hit: SimulatedHits_) {
+    hit->setTimeGroup(0);
+    hit->setSelfTriggered(true);
+    hit->setTriggered(true);
+    hit->setSelfTriggeredTime(hit->RealTime());
+    hit->setTriggeredTime(hit->RealTime());
     insertDetectorHit(hit);
   }
   SimulatedHits_.clear();
@@ -303,14 +308,14 @@ void VDeviceSimulation::makeDetectorHitsAtTime(double time_triggered, int time_g
   removeHitsAtChannelsDisabled(hits);
 
   for (auto& hit: hits) {
-    hit->setTimeGroup(time_group);
-    hit->setTriggered(true);
-    hit->setTriggeredTime(time_triggered);
     hit->setEPI( calculateEPI(hit->EnergyCharge(), hit->Pixel()) );
   }
   removeHitsBelowThresholds(hits);
   
   for (auto& hit: hits) {
+    hit->setTimeGroup(time_group);
+    hit->setTriggered(true);
+    hit->setTriggeredTime(time_triggered);
     insertDetectorHit(hit);
   }
 }
@@ -327,7 +332,7 @@ generatePedestalSignals(int time_group, double time_of_signal) const
     hit->setDetectorID(getDetectorID());
     hit->setTimeGroup(time_group);
     hit->setPixel(pixel);
-    hit->setTime(time_of_signal);
+    hit->setRealTime(time_of_signal);
     hits.push_back(hit);
   }
 

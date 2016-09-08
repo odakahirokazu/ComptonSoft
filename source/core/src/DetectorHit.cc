@@ -49,8 +49,8 @@ DetectorHit& DetectorHit::merge(const DetectorHit& r)
   setEnergy(Energy()+r.Energy());
   setEPI(EPI()+r.EPI());
 
-  if (Time() > r.Time()) {
-    setTime(r.Time());
+  if (RealTime() > r.RealTime()) {
+    setRealTime(r.RealTime());
   }
 
   if (SelfTriggered()) {
@@ -147,7 +147,7 @@ DetectorHit& DetectorHit::mergeAdjacentSignal(const DetectorHit& r,
   setPHA(PHA()+r.PHA());
   setEPI(EPI()+r.EPI());
 
-  if (Time() > r.Time()) { setTime(r.Time()); }
+  if (RealTime() > r.RealTime()) { setRealTime(r.RealTime()); }
 
   if (SelfTriggered()) {
     if (r.SelfTriggered() && (SelfTriggeredTime() > r.SelfTriggeredTime())) {

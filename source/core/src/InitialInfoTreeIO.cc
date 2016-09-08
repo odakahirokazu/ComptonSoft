@@ -39,7 +39,7 @@ void InitialInfoTreeIO::defineBranches()
     tree_->Branch("ini_dirx",   &ini_dirx_,   "ini_dirx/F");
     tree_->Branch("ini_diry",   &ini_diry_,   "ini_diry/F");
     tree_->Branch("ini_dirz",   &ini_dirz_,   "ini_dirz/F");
-    tree_->Branch("ini_time",   &ini_time_,   "ini_time/F");
+    tree_->Branch("ini_time",   &ini_time_,   "ini_time/D");
     tree_->Branch("ini_posx",   &ini_posx_,   "ini_posx/F");
     tree_->Branch("ini_posy",   &ini_posy_,   "ini_posy/F");
     tree_->Branch("ini_posz",   &ini_posz_,   "ini_posz/F");

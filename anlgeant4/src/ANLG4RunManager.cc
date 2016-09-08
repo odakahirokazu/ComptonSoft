@@ -27,54 +27,53 @@
 
 #include "ANLG4RunManager.hh"
 
-using namespace anlgeant4;
+namespace anlgeant4
+{
 
 void ANLG4RunManager::ANLbgnrunfunc()
 { 
   // line 122
   cond = ConfirmBeamOnCondition();
   if(cond)
+  {
+    RunInitialization();
+
+    // line 200 in DoEventLoop
+    ANLRunstatManager = G4StateManager::GetStateManager();
+    if( verboseLevel > 0 )
     {
-      RunInitialization();
-
-      // line 200 in DoEventLoop
-      ANLRunstatManager = G4StateManager::GetStateManager();
-      if( verboseLevel > 0 )
-	{
-	  timer->Start();
-	}
-      i_event = 0;
+      timer->Start();
     }
+    i_event = 0;
+  }
 }
-
 
 void ANLG4RunManager::ANLendrunfunc()
 {
   // line 226
   if(cond)
+  {
+    if( verboseLevel > 0 )
     {
-      if( verboseLevel > 0 )
-	{
-	  timer->Stop();
-	  G4cout << "Run terminated." << G4endl;
-	  G4cout << "Run Summary" << G4endl;
-	  if(runAborted)
-	    {
-	      G4cout << "  Run Aborted after " << i_event 
-		     << " events processed." << G4endl;
-	    }
-	  else
-	    {
-	      G4cout << " Number of events processed : " 
-		     << i_event << G4endl;
-	    }
-	  G4cout << "  " << *timer << G4endl;
-	}
-      // line 128
-      RunTermination();
+      timer->Stop();
+      G4cout << "Run terminated." << G4endl;
+      G4cout << "Run Summary" << G4endl;
+      if(runAborted)
+      {
+        G4cout << "  Run Aborted after " << i_event 
+               << " events processed." << G4endl;
+      }
+      else
+      {
+        G4cout << " Number of events processed : " 
+               << i_event << G4endl;
+      }
+      G4cout << "  " << *timer << G4endl;
     }
+    // line 128
+    RunTermination();
+  }
 }
-
 
 void ANLG4RunManager::ANLanafunc()
 {
@@ -86,3 +85,5 @@ void ANLG4RunManager::ANLanafunc()
   currentEvent = 0;
   i_event++;
 }
+
+} /* namespace anlgeant4 */
