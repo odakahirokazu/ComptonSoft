@@ -19,6 +19,8 @@
 
 #include "PhysicsListManager.hh"
 #include "G4SystemOfUnits.hh"
+#include "QGSP_BIC.hh"
+#include "QGSP_BIC_HP.hh"
 #include "FTFP_BERT.hh"
 #include "FTFP_BERT_HP.hh"
 #include "FTFP_INCLXX.hh"
@@ -128,6 +130,12 @@ G4VUserPhysicsList* PhysicsListManager::create()
     CSPhysicsList* pl = new CSPhysicsList(m_PhysicsOption);
     pl->enableParallelWorld(m_ParallelWorldEnabled);
     physicsList = pl;
+  }
+  else if (m_PhysicsListName == "QGSP_BIC") {
+    physicsList = new QGSP_BIC;
+  }
+  else if (m_PhysicsListName == "QGSP_BIC_HP") {
+    physicsList = new QGSP_BIC_HP;
   }
   else if (m_PhysicsListName == "FTFP_BERT") {
     physicsList = new FTFP_BERT;
