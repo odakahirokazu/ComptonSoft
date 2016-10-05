@@ -36,10 +36,11 @@ class CSHitCollection;
  * @date 2008-08-28
  * @date 2014-11-25
  * @date 2015-10-10
+ * @date 2016-09-20 | detectors off
  */
 class EventSelection : public VCSModule
 {
-  DEFINE_ANL_MODULE(EventSelection, 2.1)
+  DEFINE_ANL_MODULE(EventSelection, 2.2)
 public:
   EventSelection();
   ~EventSelection() = default;
@@ -49,11 +50,12 @@ public:
   anl::ANLStatus mod_ana();
 
 private:
-  bool m_VetoEnabled;
   bool m_DiscardTimeGroupZero;
   bool m_DiscardTimeGroupNonZero;
-  CSHitCollection* m_HitCollection;
+  bool m_OffEnabled;
+  bool m_VetoEnabled;
   std::vector<std::pair<double, double>> m_FluoresenceRanges;
+  CSHitCollection* m_HitCollection;
 };
 
 } /* namespace comptonsoft */

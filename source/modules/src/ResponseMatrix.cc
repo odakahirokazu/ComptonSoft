@@ -65,12 +65,13 @@ ANLStatus ResponseMatrix::mod_his()
 
   const size_t n = m_Selections.size();
   for (size_t i=0; i<n; i++) {
-    const std::string name = (boost::format("hist_%04d") % i).str();
+    const std::string name = (boost::format("response_%03d") % i).str();
     const std::string selection = m_Selections[i];
     const std::string title = (boost::format("input energy : output energy (%s)") % selection).str();
     TH2F* hist = new TH2F(name.c_str(), title.c_str(),
                           m_NumBinEnergy, m_RangeEnergy1, m_RangeEnergy2,
                           m_NumBinEnergy, m_RangeEnergy1, m_RangeEnergy2);
+    hist->Sumw2();
     m_Responses[m_Selections[i]] = hist;
   }
 

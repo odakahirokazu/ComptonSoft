@@ -44,6 +44,10 @@ module ComptonSoft
       end
     end
 
+    def select!(volume_ids)
+      @data.select!{|k, v| volume_ids.include?(k) }
+    end
+
     def fill(ri_id, data)
       ri = @current_volume[ri_id]
       if ri

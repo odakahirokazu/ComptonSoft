@@ -52,7 +52,7 @@ DetectorSystem::DetectorSystem()
     detectorConstructed_(false),
     CCEMapFile_(nullptr)
 {
-  std::vector<std::string> defaultGroups = {"Anti", "LowZ", "HighZ"};
+  std::vector<std::string> defaultGroups = {"Anti", "Off", "LowZ", "HighZ"};
   for (auto& groupName: defaultGroups) {
     detectorGroupMap_[groupName]
       = std::unique_ptr<DetectorGroup>(new DetectorGroup(groupName));
@@ -747,44 +747,46 @@ void DetectorSystem::loadDPDetectorSetNode(const boost::property_tree::ptree& Se
     if (simSDCheck_) sensitiveDetector->SetSDCheck();
   }
 
-  for (const ptree::value_type& v: SetNode.get_child("detector_list")) {
-    if (v.first == "detector") {
-      const ptree& DetectorNode = v.second;
-      const int DetectorID = DetectorNode.get<int>("<xmlattr>.id");
-      ParametersNodeContents parameters(commonParameters);
-      if (optional<const ptree&> parametersNode = DetectorNode.get_child_optional("parameters")) {
-        parameters.load(*parametersNode);
-      }
-
-      if (isMCSimulation()) {
-        DeviceSimulation* device = getDeviceSimulationByID(DetectorID);
-        if (device == nullptr) {
-          std::ostringstream message;
-          message << "Error: Detector ID = " << DetectorID << " is not registered.\n";
-          BOOST_THROW_EXCEPTION( CSException(message.str()) );
+  if (optional<const ptree&> detectorListNode = SetNode.get_child_optional("detector_list")) {
+    for (const ptree::value_type& v: *detectorListNode) {
+      if (v.first == "detector") {
+        const ptree& DetectorNode = v.second;
+        const int DetectorID = DetectorNode.get<int>("<xmlattr>.id");
+        ParametersNodeContents parameters(commonParameters);
+        if (optional<const ptree&> parametersNode = DetectorNode.get_child_optional("parameters")) {
+          parameters.load(*parametersNode);
         }
 
-        setupDetectorParameters(parameters, device);
-
-        if (isSensitiveDetector) {
-          if (sensitiveDetector_path) {
-            const std::string path = DetectorNode.get<std::string>("<xmlattr>.path");
-            sensitiveDetector_path->RegisterDetectorID(DetectorID, path);
+        if (isMCSimulation()) {
+          DeviceSimulation* device = getDeviceSimulationByID(DetectorID);
+          if (device == nullptr) {
+            std::ostringstream message;
+            message << "Error: Detector ID = " << DetectorID << " is not registered.\n";
+            BOOST_THROW_EXCEPTION( CSException(message.str()) );
           }
-          if (sensitiveDetector_copyno) {
-            const int copyNo = DetectorNode.get<int>("<xmlattr>.copyno");
-            sensitiveDetector_copyno->RegisterDetectorID(DetectorID, copyNo);
+
+          setupDetectorParameters(parameters, device);
+
+          if (isSensitiveDetector) {
+            if (sensitiveDetector_path) {
+              const std::string path = DetectorNode.get<std::string>("<xmlattr>.path");
+              sensitiveDetector_path->RegisterDetectorID(DetectorID, path);
+            }
+            if (sensitiveDetector_copyno) {
+              const int copyNo = DetectorNode.get<int>("<xmlattr>.copyno");
+              sensitiveDetector_copyno->RegisterDetectorID(DetectorID, copyNo);
+            }
           }
         }
-      }
-      else {
-        VRealDetectorUnit* detector = getDetectorByID(DetectorID);
-        if (detector == nullptr) {
-          std::ostringstream message;
-          message << "Error: Detector ID = " << DetectorID << " is not registered.\n";
-          BOOST_THROW_EXCEPTION( CSException(message.str()) );
+        else {
+          VRealDetectorUnit* detector = getDetectorByID(DetectorID);
+          if (detector == nullptr) {
+            std::ostringstream message;
+            message << "Error: Detector ID = " << DetectorID << " is not registered.\n";
+            BOOST_THROW_EXCEPTION( CSException(message.str()) );
+          }
+          setupDetectorParameters(parameters, detector);
         }
-        setupDetectorParameters(parameters, detector);
       }
     }
   }

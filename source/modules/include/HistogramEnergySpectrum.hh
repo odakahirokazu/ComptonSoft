@@ -48,7 +48,7 @@ private:
   int m_NumBinEnergy;
   double m_RangeEnergy1;
   double m_RangeEnergy2;
-  std::map<std::string, TH1*> m_Responses;
+  std::map<std::string, TH1*> m_Histograms;
   std::vector<std::string> m_Selections;
 };
 

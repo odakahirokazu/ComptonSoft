@@ -71,17 +71,20 @@ ANLStatus HistogramEnergySpectrum::mod_his()
 
   const size_t n = m_Selections.size();
   for (size_t i=0; i<n; i++) {
-    std::string name = (boost::format("hist_%04d") % i).str();
-    TH1F* hist = 0;
+    const std::string name = (boost::format("spectrum_%03d") % i).str();
+    const std::string selection = m_Selections[i];
+    const std::string title = (boost::format("Spectrum [%s]") % selection).str();
+    TH1F* hist = nullptr;
     if (m_EnergyBinType=="log") {
-      hist = new TH1F(name.c_str(), "energy spectrum", m_NumBinEnergy, &xs[0]);
+      hist = new TH1F(name.c_str(), title.c_str(),
+                      m_NumBinEnergy, &xs[0]);
     }
     else {
-      hist = new TH1F(name.c_str(), "energy spectrum",
+      hist = new TH1F(name.c_str(), title.c_str(),
                       m_NumBinEnergy, m_RangeEnergy1, m_RangeEnergy2);
     }
     hist->Sumw2();
-    m_Responses[m_Selections[i]] = hist;
+    m_Histograms[m_Selections[i]] = hist;
   }
 
   return AS_OK;
@@ -100,7 +103,7 @@ ANLStatus HistogramEnergySpectrum::mod_ana()
     energy += (*it)->Energy();
   }
   
-  for (std::map<std::string, TH1*>::iterator it=m_Responses.begin(); it!=m_Responses.end(); ++it) {
+  for (std::map<std::string, TH1*>::iterator it=m_Histograms.begin(); it!=m_Histograms.end(); ++it) {
     const std::string& evsName = (*it).first;
     TH1* hist = (*it).second;
     if (Evs(evsName)) {

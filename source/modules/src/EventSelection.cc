@@ -31,18 +31,21 @@ namespace comptonsoft
 {
 
 EventSelection::EventSelection()
-  : m_VetoEnabled(true),
-    m_DiscardTimeGroupZero(false),
+  : m_DiscardTimeGroupZero(false),
     m_DiscardTimeGroupNonZero(false),
+    m_OffEnabled(true),
+    m_VetoEnabled(true),
     m_HitCollection(nullptr)
 {
 }
 
 ANLStatus EventSelection::mod_startup()
 {
-  register_parameter(&m_VetoEnabled, "enable_veto");
   register_parameter(&m_DiscardTimeGroupZero, "discard_time_group_zero");
   register_parameter(&m_DiscardTimeGroupNonZero, "discard_time_group_nonzero");
+  register_parameter(&m_OffEnabled, "enable_off");
+  register_parameter(&m_VetoEnabled, "enable_veto");
+
   return AS_OK;
 }
 
@@ -59,6 +62,8 @@ ANLStatus EventSelection::mod_ana()
   DetectorSystem* detectorManager = getDetectorManager();
   const DetectorGroup& AntiDetectorGroup
     = detectorManager->getDetectorGroup("Anti");
+  const DetectorGroup& OffDetectorGroup
+    = detectorManager->getDetectorGroup("Off");
   const DetectorGroup& LowZDetectorGroup
     = detectorManager->getDetectorGroup("LowZ");
   const DetectorGroup& HighZDetectorGroup
@@ -78,6 +83,19 @@ ANLStatus EventSelection::mod_ana()
       if (m_DiscardTimeGroupNonZero) {
         hits.clear();
         continue;
+      }
+    }
+
+    if (m_OffEnabled) {
+      std::vector<DetectorHit_sptr>::iterator it = hits.begin();
+      while (it != hits.end()) {
+        const int detectorID = (*it)->DetectorID();
+        if (OffDetectorGroup.isMember(detectorID)) {
+          it = hits.erase(it);
+        }
+        else {
+          ++it;
+        }
       }
     }
     
