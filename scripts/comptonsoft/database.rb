@@ -667,7 +667,7 @@ module ComptonSoft
         @comments = []
         @auto_position_flag = nil
         @sensitive_detector_not_found_warning_flag = nil
-        @cce_file = nil
+        @root_file = nil
         @detector_sets = []
       end
       attr_accessor :name
@@ -681,7 +681,7 @@ module ComptonSoft
         root = xmldoc.elements["detector_parameters"]
         @name = root.elements["name"].text
         root.elements.each("comment"){|e| @comments << e.text }
-        @cce_file = root.elements["cce_file"]&.text
+        @root_file = root.elements["root_file"]&.text
         @auto_position_flag = root.elements["auto_position/@flag"]&.value
         @sensitive_detector_not_found_warning_flag = root.elements["sensitive_detector_not_found_warning/@flag"]&.value
         root.elements.each("data/sensitive_detector") do |e|
@@ -703,7 +703,7 @@ module ComptonSoft
         root = xmldoc.elements["simulation"]
         @name = root.elements["name"].text
         root.elements.each("comment"){|e| @comments << e.text }
-        @cce_file = root.elements["cce_file"]&.text
+        @root_file = root.elements["cce_file"]&.text
         @auto_position_flag = root.elements["auto_position"] ? "1" : "0"
         @sensitive_detector_not_found_warning_flag = root.elements["sd_check"] ? "1" : "0"
         root.elements.each("sensitive_detectors/sensitive_detector") do |e|
@@ -728,7 +728,7 @@ module ComptonSoft
         root = REXML::Element.new("detector_parameters")
         root.add_element("name").add_text(@name)
         @comments.each{|c| root.add_element("comment").add_text(c) }
-        if @cce_file; root.add_element("cce_file").add_text(@cce_file); end
+        if @root_file; root.add_element("root_file").add_text(@root_file); end
         if @auto_position_flag; root.add_element("auto_position").add_attribute("flag", @auto_position_flag); end
         if @sensitive_detector_not_found_warning_flag; root.add_element("sensitive_detector_not_found_warning").add_attribute("flag", @sensitive_detector_not_found_warning_flag); end
         data_node = root.add_element("data")
