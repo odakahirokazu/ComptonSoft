@@ -64,6 +64,7 @@ public:
     boost::optional<double> noise_level_param1 = boost::none;
     boost::optional<double> noise_level_param2 = boost::none;
     boost::optional<double> compensation_factor = boost::none;
+    boost::optional<std::string> compensation_function = boost::none;
     boost::optional<double> threshold_value = boost::none;
 
     void load(const boost::property_tree::ptree& node);
@@ -115,7 +116,10 @@ public:
 
   int NumberOfDetectors() const { return detectors_.size(); }
   VRealDetectorUnit* getDetectorByID(int id);
+  const VRealDetectorUnit* getDetectorByID(int id) const;
   VRealDetectorUnit* getDetectorByIndex(int index)
+  { return detectors_[index].get(); }
+  const VRealDetectorUnit* getDetectorByIndex(int index) const
   { return detectors_[index].get(); }
   bool existDetector(int id) const
   { return detectorIDMap_.count(id); }
@@ -133,7 +137,10 @@ public:
 
   int NumberOfReadoutModules() const { return readoutModules_.size(); }
   ReadoutModule* getReadoutModuleByID(int id);
+  const ReadoutModule* getReadoutModuleByID(int id) const;
   ReadoutModule* getReadoutModuleByIndex(int index)
+  { return readoutModules_[index].get(); }
+  const ReadoutModule* getReadoutModuleByIndex(int index) const
   { return readoutModules_[index].get(); }
 
   std::vector<std::unique_ptr<ReadoutModule>>& getReadoutModules()
@@ -191,7 +198,10 @@ public:
 
   // Device simulations
   DeviceSimulation* getDeviceSimulationByID(int id);
+  const DeviceSimulation* getDeviceSimulationByID(int id) const;
   DeviceSimulation* getDeviceSimulationByIndex(int index)
+  { return deviceSimulationVector_[index]; }
+  const DeviceSimulation* getDeviceSimulationByIndex(int index) const
   { return deviceSimulationVector_[index]; }
   std::vector<DeviceSimulation*>& getDeviceSimulationVector()
   { return deviceSimulationVector_; }
@@ -244,7 +254,7 @@ private:
 
   std::vector<DeviceSimulation*> deviceSimulationVector_;
   std::vector<VCSSensitiveDetector*> sensitiveDetectorVector_;
-  TFile* CCEMapFile_;
+  TFile* ROOTFile_;
 
   std::map<std::string, std::unique_ptr<DetectorGroup>> detectorGroupMap_;
   std::vector<HitPattern> hitPatterns_;
@@ -263,6 +273,13 @@ inline VRealDetectorUnit* DetectorSystem::getDetectorByID(int id)
   return getDetectorByIndex((*it).second);
 }
 
+inline const VRealDetectorUnit* DetectorSystem::getDetectorByID(int id) const
+{
+  auto it = detectorIDMap_.find(id);
+  if (it==detectorIDMap_.end()) { return nullptr; }
+  return getDetectorByIndex((*it).second);
+}
+
 inline ReadoutModule* DetectorSystem::getReadoutModuleByID(int id)
 {
   auto it = readoutModuleIDMap_.find(id);
@@ -270,7 +287,21 @@ inline ReadoutModule* DetectorSystem::getReadoutModuleByID(int id)
   return getReadoutModuleByIndex((*it).second);
 }
 
+inline const ReadoutModule* DetectorSystem::getReadoutModuleByID(int id) const
+{
+  auto it = readoutModuleIDMap_.find(id);
+  if (it==readoutModuleIDMap_.end()) { return nullptr; }
+  return getReadoutModuleByIndex((*it).second);
+}
+
 inline DeviceSimulation* DetectorSystem::getDeviceSimulationByID(int id)
+{
+  auto it = detectorIDMap_.find(id);
+  if (it==detectorIDMap_.end()) { return nullptr; }
+  return getDeviceSimulationByIndex((*it).second);
+}
+
+inline const DeviceSimulation* DetectorSystem::getDeviceSimulationByID(int id) const
 {
   auto it = detectorIDMap_.find(id);
   if (it==detectorIDMap_.end()) { return nullptr; }

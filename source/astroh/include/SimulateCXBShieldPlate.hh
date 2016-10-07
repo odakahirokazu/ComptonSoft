@@ -17,45 +17,50 @@
  *                                                                       *
  *************************************************************************/
 
-#include "ApplyEPICompensation.hh"
+#ifndef COMPTONSOFT_SimulateCXBShieldPlate_H
+#define COMPTONSOFT_SimulateCXBShieldPlate_H 1
 
-#include "DeviceSimulation.hh"
-#include "CSHitCollection.hh"
-#include "DetectorHit.hh"
+#include "VCSModule.hh"
+#include <memory>
 
-using namespace anl;
+class TH2;
+class TGraph;
+namespace anlgeant4 { class InitialInformation; }
 
-namespace comptonsoft
+namespace comptonsoft {
+
+class CSHitCollection;
+
+/**
+ *
+ * @author Hirokazu Odaka
+ * @date 2016-10-06
+ */
+class SimulateCXBShieldPlate : public VCSModule
 {
+  DEFINE_ANL_MODULE(SimulateCXBShieldPlate, 1.0);
+public:
+  SimulateCXBShieldPlate();  
+  ~SimulateCXBShieldPlate() = default;
 
-ApplyEPICompensation::ApplyEPICompensation()
-{
-}
-
-ApplyEPICompensation::~ApplyEPICompensation() = default;
-
-ANLStatus ApplyEPICompensation::mod_init()
-{
-  VCSModule::mod_init();
-  GetANLModuleNC("CSHitCollection", &m_HitCollection);
-  return AS_OK;
-}
-
-ANLStatus ApplyEPICompensation::mod_ana()
-{
-  const DetectorSystem* detectorManager = getDetectorManager();
-  const int NumTimeGroups = m_HitCollection->NumberOfTimeGroups();
-  for (int timeGroup=0; timeGroup<NumTimeGroups; timeGroup++) {
-    std::vector<DetectorHit_sptr>& hits = m_HitCollection->getHits(timeGroup);
-    for (DetectorHit_sptr hit: hits) {
-      const int detectorID = hit->DetectorID();
-      const DeviceSimulation* ds = detectorManager->getDeviceSimulationByID(detectorID);
-      const double EPICompensated = ds->compensateEPI(hit->Pixel(), hit->EPI());
-      hit->setEPI(EPICompensated);
-    }
-  }
-
-  return AS_OK;
-}
+  anl::ANLStatus mod_startup();
+  anl::ANLStatus mod_init();
+  anl::ANLStatus mod_ana();
+  anl::ANLStatus mod_exit();
+  
+private:
+  double m_ShieldDensity;
+  double m_ShieldThickness;
+  double m_ShieldHeight;
+  std::string m_CSFilename;
+  std::string m_PositionFilename;
+  
+  anlgeant4::InitialInformation* m_InitialInfo = nullptr;
+  std::unique_ptr<TFile> m_PositionFile;
+  std::unique_ptr<TGraph> m_CS;
+  TH2* m_ShieldDistribution = nullptr;
+};
 
 } /* namespace comptonsoft */
+
+#endif /* COMPTONSOFT_SimulateCXBShieldPlate_H */

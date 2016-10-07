@@ -31,6 +31,7 @@
 #include "ComptonModeFilter.hh"
 #include "SelectFullDeposit.hh"
 #include "ComptonEventFilter.hh"
+#include "IgnoreEventsOnFocalPlane.hh"
 #include "SelectTime.hh"
 #include "WriteHitTree.hh"
 #include "ReadHitTree.hh"
@@ -81,6 +82,7 @@
 #include "AssignG4CopyNumber.hh"
 #include "InitialParticleTree.hh"
 #include "DumpMass.hh"
+#include "SimulateCXBShieldPlate.hh"
 #ifdef USE_FITSIO
 #include "ReadSGDEventFITS.hh"
 #endif
@@ -289,7 +291,9 @@ public:
 class CorrectPHA : public VCSModule
 {
 public:
-  };
+  CorrectPHA();
+  ~CorrectPHA();
+};
 
 
 class RecalculateEPI : public CorrectPHA
@@ -349,6 +353,14 @@ public:
   void define_condition();
   void add_condition(const std::string& type,
                      double min_value, double max_value);
+};
+
+
+class IgnoreEventsOnFocalPlane : public VCSModule
+{
+public:
+  IgnoreEventsOnFocalPlane();
+  ~IgnoreEventsOnFocalPlane() = default;
 };
 
 
@@ -659,6 +671,14 @@ class DumpMass : public anl::BasicModule
 public:
   DumpMass();
   ~DumpMass();
+};
+
+
+class SimulateCXBShieldPlate : public VCSModule
+{
+public:
+  SimulateCXBShieldPlate();  
+  ~SimulateCXBShieldPlate() = default;
 };
 
 

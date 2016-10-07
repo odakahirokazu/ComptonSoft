@@ -22,42 +22,27 @@
 
 #include "VCSModule.hh"
 
-#include <map>
-#include <tuple>
-
-class TFile;
-
 namespace comptonsoft {
+
+class CSHitCollection;
 
 /**
  * @author Hirokazu Odaka
  * @date 2015-05-14 | rename from SetSimGainCorrection.
+ * @date 2016-10-07 | for version 5.2
  */
 class ApplyEPICompensation : public VCSModule
 {
-  DEFINE_ANL_MODULE(ApplyEPICompensation, 2.0);
+  DEFINE_ANL_MODULE(ApplyEPICompensation, 3.0);
 public:
   ApplyEPICompensation();
   ~ApplyEPICompensation();
 
-  anl::ANLStatus mod_startup();
-  anl::ANLStatus mod_com();
   anl::ANLStatus mod_init();
-  anl::ANLStatus mod_exit();
+  anl::ANLStatus mod_ana();
 
 private:
-  bool set_by_map();
-  bool set_by_file();
-
-  bool m_ByFile;
-  std::string m_FileName;
-  TFile* m_FunctionFile;
-
-  std::map<std::string,
-           std::tuple<int, double, double>> m_Map;
-  int m_Type;
-  double m_Factor0;
-  double m_Factor1;
+  CSHitCollection* m_HitCollection = nullptr;
 };
 
 } /* namespace comptonsoft */

@@ -28,6 +28,7 @@
 #include <boost/format.hpp>
 
 #include "TFile.h"
+#include "TSpline.h"
 
 #include "G4SDManager.hh"
 #include "G4LogicalVolumeStore.hh"
@@ -50,7 +51,7 @@ DetectorSystem::DetectorSystem()
     simAutoPosition_(false),
     simSDCheck_(false),
     detectorConstructed_(false),
-    CCEMapFile_(nullptr)
+    ROOTFile_(nullptr)
 {
   std::vector<std::string> defaultGroups = {"Anti", "Off", "LowZ", "HighZ"};
   for (auto& groupName: defaultGroups) {
@@ -61,10 +62,10 @@ DetectorSystem::DetectorSystem()
 
 DetectorSystem::~DetectorSystem()
 {
-  if (CCEMapFile_) {
-    CCEMapFile_->Close();
-    delete CCEMapFile_;
-    CCEMapFile_ = nullptr;
+  if (ROOTFile_) {
+    ROOTFile_->Close();
+    delete ROOTFile_;
+    ROOTFile_ = nullptr;
   }
 }
 
@@ -616,14 +617,13 @@ loadDetectorParametersRootNode(const boost::property_tree::ptree& RootNode,
 
   const ptree& mainNode = RootNode.find("detector_parameters")->second;
 
-  optional<std::string> cceFile = mainNode.get_optional<std::string>("cce_file");
-  if ( cceFile ) {
+  if (optional<std::string> rootFile = mainNode.get_optional<std::string>("root_file")) {
     boost::filesystem::path paramFilePath(filename);
     boost::filesystem::path dir = paramFilePath.branch_path();
-    boost::filesystem::path relativePath(*cceFile);
+    boost::filesystem::path relativePath(*rootFile);
     boost::filesystem::path fullPath = dir / relativePath;
-    std::cout << "CCE map file: " << fullPath << std::endl;
-    CCEMapFile_ = new TFile(fullPath.c_str());
+    std::cout << "ROOT file: " << fullPath << std::endl;
+    ROOTFile_ = new TFile(fullPath.c_str());
   }
 
   if (optional<int> autoPositionFlag = mainNode.get_optional<int>("auto_position.<xmlattr>.flag")) {
@@ -909,7 +909,7 @@ void DetectorSystem::setupDetectorParameters(const DetectorSystem::ParametersNod
         SimDetectorUnit2DPixel* ds1
           = dynamic_cast<SimDetectorUnit2DPixel*>(ds);
         if (ds1) {
-          TH3D* cce_map = (TH3D*)(CCEMapFile_->Get((*mapName).c_str()));
+          TH3D* cce_map = (TH3D*)(ROOTFile_->Get((*mapName).c_str()));
           ds1->setCCEMap(cce_map);
         }
       }
@@ -917,9 +917,9 @@ void DetectorSystem::setupDetectorParameters(const DetectorSystem::ParametersNod
         SimDetectorUnit2DStrip* ds1
           = dynamic_cast<SimDetectorUnit2DStrip*>(ds);
         if (ds1) {
-          TH2D* cce_mapx = (TH2D*)(CCEMapFile_->Get((*mapName+"_x").c_str()));
+          TH2D* cce_mapx = (TH2D*)(ROOTFile_->Get((*mapName+"_x").c_str()));
           ds1->setCCEMapXStrip(cce_mapx);
-          TH2D* cce_mapy = (TH2D*)(CCEMapFile_->Get((*mapName+"_y").c_str()));
+          TH2D* cce_mapy = (TH2D*)(ROOTFile_->Get((*mapName+"_y").c_str()));
           ds1->setCCEMapYStrip(cce_mapy);
         }
       }
@@ -1022,6 +1022,11 @@ void DetectorSystem::setupDetectorParameters(const DetectorSystem::ParametersNod
         if (auto o = strip_info.compensation_factor) {
           ds->setEPICompensationFactorToSelected(*o, selector);
         }
+        if (auto o = strip_info.compensation_function) {
+          const TSpline* func = nullptr;
+          ROOTFile_->GetObject(o->c_str(), func);
+          ds->setEPICompensationFunctionToSelected(func, selector);
+        }
         if (auto o = strip_info.threshold_value) {
           const double value = (*o)*keV;
           ds->setThresholdToSelected(value, selector);
@@ -1053,6 +1058,11 @@ void DetectorSystem::setupDetectorParameters(const DetectorSystem::ParametersNod
     }
     if (auto o = channel_properties.compensation_factor) {
       ds->resetEPICompensationFactorVector(*o);
+    }
+    if (auto o = channel_properties.compensation_function) {
+      const TSpline* func = nullptr;
+      ROOTFile_->GetObject(o->c_str(), func);
+      ds->resetEPICompensationFunctionVector(func);
     }
     if (auto o = channel_properties.threshold_value) {
       const double value = (*o)*keV;
@@ -1118,6 +1128,9 @@ load(const boost::property_tree::ptree& node)
   }
   if (auto o = node.get_optional<double>("compensation.<xmlattr>.factor")) {
     compensation_factor = o;
+  }
+  if (auto o = node.get_optional<std::string>("compensation.<xmlattr>.function")) {
+    compensation_function = o;
   }
   if (auto o = node.get_optional<double>("threshold.<xmlattr>.value")) {
     threshold_value = o;

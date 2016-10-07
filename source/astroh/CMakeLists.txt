@@ -32,6 +32,7 @@ set(CS_ASTROH_CLASSES
   ### Basic modules
   # src/ReadHXIEventTree.cc
   src/ReadSGDEventTree.cc
+  src/SimulateCXBShieldPlate.cc
   )
 
 if(CS_USE_FITSIO)

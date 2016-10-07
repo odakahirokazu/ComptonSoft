@@ -37,6 +37,7 @@ clMod = [
   ANL::SWIGClass.new("ComptonModeFilter"),
   ANL::SWIGClass.new("SelectFullDeposit"),
   ANL::SWIGClass.new("ComptonEventFilter", true),
+  ANL::SWIGClass.new("IgnoreEventsOnFocalPlane"),
   ANL::SWIGClass.new("SelectTime"),
   ANL::SWIGClass.new("WriteHitTree"),
   ANL::SWIGClass.new("ReadHitTree"),
@@ -84,6 +85,7 @@ clSim = [# primary generator
 ]
 
 clAH = [
+  ANL::SWIGClass.new("SimulateCXBShieldPlate"),
   ANL::SWIGClass.new("ReadSGDEventFITS", false, 'USE_FITSIO'),
   ANL::SWIGClass.new("WriteSGDEventFITS", false, 'USE_FITSIO'),
   ANL::SWIGClass.new("WriteHXIEventFITS", false, 'USE_FITSIO'),

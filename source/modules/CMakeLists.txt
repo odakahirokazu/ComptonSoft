@@ -60,6 +60,7 @@ set(CS_MODULES
   src/ComptonModeFilter.cc # for old SGD
   src/SelectFullDeposit.cc
   src/ComptonEventFilter.cc
+  src/IgnoreEventsOnFocalPlane.cc
   src/SelectTime.cc
   ### analysis ROOT trees & histograms
   src/WriteHitTree.cc

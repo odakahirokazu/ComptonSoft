@@ -60,6 +60,7 @@ ANLStatus ReadHitTree::mod_init()
   treeIO_->setTree(hittree_);
   if (hittree_->GetBranch("ini_energy")) {
     setInitialInformationStored();
+    setWeightStored();
     treeIO_->enableInitialInfoRecord();
   }
   else {

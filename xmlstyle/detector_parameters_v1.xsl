@@ -28,7 +28,7 @@
         <h1>Detector Parameters</h1>
         <p><xsl:text>Detector Name: </xsl:text><xsl:value-of select="detector_parameters/name" /></p>
         <xsl:apply-templates select="detector_parameters/comment" />
-        <xsl:apply-templates select="detector_parameters/cce_file" />
+        <xsl:apply-templates select="detector_parameters/root_file" />
         <xsl:apply-templates select="detector_parameters/auto_position" />
         <xsl:apply-templates select="detector_parameters/sensitive_detector_not_found_warning" />
         <xsl:apply-templates select="detector_parameters/data/sensitive_detector" />
@@ -39,8 +39,8 @@
   <xsl:template match="comment">
     <p>COMMENT: <span class="comment"><xsl:value-of select="." /></span></p>
   </xsl:template>
-  <xsl:template match="cce_file">
-    <p>CCE file: <xsl:value-of select="." /></p>
+  <xsl:template match="root_file">
+    <p>ROOT file: <xsl:value-of select="." /></p>
   </xsl:template>
   <xsl:template match="auto_position">
     <xsl:choose>
@@ -635,6 +635,10 @@
       <xsl:call-template name="display_parameter" >
         <xsl:with-param name="common" select="$common_parameters/compensation/@factor" />
         <xsl:with-param name="special" select="$parameters/compensation/@factor" />
+      </xsl:call-template>
+      <xsl:call-template name="display_parameter" >
+        <xsl:with-param name="common" select="$common_parameters/compensation/@function" />
+        <xsl:with-param name="special" select="$parameters/compensation/@function" />
       </xsl:call-template>
     </td>
     <td>

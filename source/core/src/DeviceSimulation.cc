@@ -139,8 +139,9 @@ compensateEPI(const PixelID& sp, double ePI) const
 double DeviceSimulation::
 calculateEPI(double energyCharge, const PixelID& pixel) const
 {
-  double ePI = VDeviceSimulation::calculateEPI(energyCharge, pixel);
-  return compensateEPI(pixel, ePI);
+  const double EPI = VDeviceSimulation::calculateEPI(energyCharge, pixel);
+  const double EPICompensated = compensateEPI(pixel, EPI);
+  return EPICompensated;
 }
 
 void DeviceSimulation::printSimulationParameters(std::ostream& os) const

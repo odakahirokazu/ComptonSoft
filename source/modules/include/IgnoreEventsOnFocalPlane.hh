@@ -17,45 +17,47 @@
  *                                                                       *
  *************************************************************************/
 
-#include "ApplyEPICompensation.hh"
+#ifndef COMPTONSOFT_IgnoreEventsOnFocalPlane_H
+#define COMPTONSOFT_IgnoreEventsOnFocalPlane_H 1
 
-#include "DeviceSimulation.hh"
-#include "CSHitCollection.hh"
-#include "DetectorHit.hh"
+#include "VCSModule.hh"
+#include "G4TwoVector.hh"
 
-using namespace anl;
+namespace comptonsoft {
 
-namespace comptonsoft
+class EventReconstruction;
+
+/**
+ *
+ * @author Hirokazu Odaka
+ * @date 2016-10-06
+ */
+class IgnoreEventsOnFocalPlane : public VCSModule
 {
+  DEFINE_ANL_MODULE(IgnoreEventsOnFocalPlane, 1.0);
+public:
+  enum class Region_t { Rectangle, Circle };
 
-ApplyEPICompensation::ApplyEPICompensation()
-{
-}
+public:
+  IgnoreEventsOnFocalPlane();
+  ~IgnoreEventsOnFocalPlane() = default;
 
-ApplyEPICompensation::~ApplyEPICompensation() = default;
+  anl::ANLStatus mod_startup();
+  anl::ANLStatus mod_init();
+  anl::ANLStatus mod_ana();
 
-ANLStatus ApplyEPICompensation::mod_init()
-{
-  VCSModule::mod_init();
-  GetANLModuleNC("CSHitCollection", &m_HitCollection);
-  return AS_OK;
-}
-
-ANLStatus ApplyEPICompensation::mod_ana()
-{
-  const DetectorSystem* detectorManager = getDetectorManager();
-  const int NumTimeGroups = m_HitCollection->NumberOfTimeGroups();
-  for (int timeGroup=0; timeGroup<NumTimeGroups; timeGroup++) {
-    std::vector<DetectorHit_sptr>& hits = m_HitCollection->getHits(timeGroup);
-    for (DetectorHit_sptr hit: hits) {
-      const int detectorID = hit->DetectorID();
-      const DeviceSimulation* ds = detectorManager->getDeviceSimulationByID(detectorID);
-      const double EPICompensated = ds->compensateEPI(hit->Pixel(), hit->EPI());
-      hit->setEPI(EPICompensated);
-    }
-  }
-
-  return AS_OK;
-}
+private:
+  const EventReconstruction* m_EventReconstruction = nullptr;
+  int m_DetectorID;
+  std::string m_RegionTypeString;
+  Region_t m_RegionType;
+  G4TwoVector m_Center;
+  double m_SizeX;
+  double m_SizeY;
+  double m_Radius;
+  double m_Radius2;
+};
 
 } /* namespace comptonsoft */
+
+#endif /* COMPTONSOFT_IgnoreEventsOnFocalPlane_H */
