@@ -97,10 +97,10 @@ ANLStatus EventReconstruction::mod_ana()
 {
   resetComptonEvent();
   resetHitPatternFlags();
-  
-  std::vector<DetectorHit_sptr> hits = m_HitCollection->getHits();
+
+  const std::vector<DetectorHit_sptr> hits = m_HitCollection->getHits();
   determineHitPatterns(hits);
-  bool result = m_Reconstruction->reconstruct(hits, *m_ComptonEvent);
+  const bool result = m_Reconstruction->reconstruct(hits, *m_ComptonEvent);
   if (result) {
     EvsSet("EventReconstruction:OK");
   }

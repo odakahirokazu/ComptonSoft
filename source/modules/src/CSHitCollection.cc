@@ -52,6 +52,7 @@ ANLStatus CSHitCollection::mod_endrun()
 void CSHitCollection::initializeEvent()
 {
   hitsVector_.clear();
+  hitsVector_.resize(1);
 }
 
 void CSHitCollection::insertHit(const DetectorHit_sptr& hit)
