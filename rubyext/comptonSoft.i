@@ -31,7 +31,7 @@
 #include "ComptonModeFilter.hh"
 #include "SelectFullDeposit.hh"
 #include "ComptonEventFilter.hh"
-#include "IgnoreEventsOnFocalPlane.hh"
+#include "SelectEventsOnFocalPlane.hh"
 #include "SelectTime.hh"
 #include "WriteHitTree.hh"
 #include "ReadHitTree.hh"
@@ -356,11 +356,11 @@ public:
 };
 
 
-class IgnoreEventsOnFocalPlane : public VCSModule
+class SelectEventsOnFocalPlane : public VCSModule
 {
 public:
-  IgnoreEventsOnFocalPlane();
-  ~IgnoreEventsOnFocalPlane() = default;
+  SelectEventsOnFocalPlane();
+  ~SelectEventsOnFocalPlane() = default;
 };
 
 

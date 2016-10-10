@@ -30,7 +30,7 @@ class RecalculateSimulationNoise;
 class ComptonModeFilter;
 class SelectFullDeposit;
 class ComptonEventFilter;
-class IgnoreEventsOnFocalPlane;
+class SelectEventsOnFocalPlane;
 class SelectTime;
 class WriteHitTree;
 class ReadHitTree;

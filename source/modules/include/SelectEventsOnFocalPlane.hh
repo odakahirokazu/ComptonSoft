@@ -17,8 +17,8 @@
  *                                                                       *
  *************************************************************************/
 
-#ifndef COMPTONSOFT_IgnoreEventsOnFocalPlane_H
-#define COMPTONSOFT_IgnoreEventsOnFocalPlane_H 1
+#ifndef COMPTONSOFT_SelectEventsOnFocalPlane_H
+#define COMPTONSOFT_SelectEventsOnFocalPlane_H 1
 
 #include "VCSModule.hh"
 #include "G4TwoVector.hh"
@@ -32,15 +32,15 @@ class EventReconstruction;
  * @author Hirokazu Odaka
  * @date 2016-10-06
  */
-class IgnoreEventsOnFocalPlane : public VCSModule
+class SelectEventsOnFocalPlane : public VCSModule
 {
-  DEFINE_ANL_MODULE(IgnoreEventsOnFocalPlane, 1.0);
+  DEFINE_ANL_MODULE(SelectEventsOnFocalPlane, 1.0);
 public:
   enum class Region_t { Rectangle, Circle };
 
 public:
-  IgnoreEventsOnFocalPlane();
-  ~IgnoreEventsOnFocalPlane() = default;
+  SelectEventsOnFocalPlane();
+  ~SelectEventsOnFocalPlane() = default;
 
   anl::ANLStatus mod_startup();
   anl::ANLStatus mod_init();
@@ -60,4 +60,4 @@ private:
 
 } /* namespace comptonsoft */
 
-#endif /* COMPTONSOFT_IgnoreEventsOnFocalPlane_H */
+#endif /* COMPTONSOFT_SelectEventsOnFocalPlane_H */

@@ -17,7 +17,7 @@
  *                                                                       *
  *************************************************************************/
 
-#include "IgnoreEventsOnFocalPlane.hh"
+#include "SelectEventsOnFocalPlane.hh"
 #include "AstroUnits.hh"
 #include "BasicComptonEvent.hh"
 #include "EventReconstruction.hh"
@@ -27,7 +27,7 @@ using namespace anl;
 namespace comptonsoft
 {
 
-IgnoreEventsOnFocalPlane::IgnoreEventsOnFocalPlane()
+SelectEventsOnFocalPlane::SelectEventsOnFocalPlane()
   : m_DetectorID(0),
     m_RegionTypeString("rectangle"),
     m_RegionType(Region_t::Rectangle),
@@ -39,7 +39,7 @@ IgnoreEventsOnFocalPlane::IgnoreEventsOnFocalPlane()
 {
 }
 
-ANLStatus IgnoreEventsOnFocalPlane::mod_startup()
+ANLStatus SelectEventsOnFocalPlane::mod_startup()
 {
   register_parameter(&m_DetectorID, "detector_id");
   register_parameter(&m_RegionTypeString, "region_type");
@@ -50,7 +50,7 @@ ANLStatus IgnoreEventsOnFocalPlane::mod_startup()
   return AS_OK;
 }
 
-ANLStatus IgnoreEventsOnFocalPlane::mod_init()
+ANLStatus SelectEventsOnFocalPlane::mod_init()
 {
   VCSModule::mod_init();
  
@@ -72,7 +72,7 @@ ANLStatus IgnoreEventsOnFocalPlane::mod_init()
   return AS_OK;
 }
 
-ANLStatus IgnoreEventsOnFocalPlane::mod_ana()
+ANLStatus SelectEventsOnFocalPlane::mod_ana()
 {
   const BasicComptonEvent& comptonEvent = m_EventReconstruction->getComptonEvent();
 
