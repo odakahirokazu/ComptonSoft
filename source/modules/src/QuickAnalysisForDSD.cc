@@ -31,7 +31,9 @@ namespace comptonsoft
 {
 
 QuickAnalysisForDSD::QuickAnalysisForDSD()
-  : m_DSD(nullptr), m_DetectorID(0), m_Energy0(0.0*keV), m_Energy1(2000.0*keV)
+  : m_DSD(nullptr), m_DetectorID(0),
+    m_NBins(2048), m_Energy0(0.0), m_Energy1(204.8),
+    m_CutEnergy0(0.0*keV), m_CutEnergy1(204.8*keV)
 {
 }
 
@@ -40,8 +42,11 @@ QuickAnalysisForDSD::~QuickAnalysisForDSD() = default;
 ANLStatus QuickAnalysisForDSD::mod_startup()
 {
   register_parameter(&m_DetectorID, "detector_id");
-  register_parameter(&m_Energy0, "energy_min", keV, "keV");
-  register_parameter(&m_Energy1, "energy_max", keV, "keV");
+  register_parameter(&m_NBins, "num_bins");
+  register_parameter(&m_Energy0, "energy_min", 1, "keV");
+  register_parameter(&m_Energy1, "energy_max", 1, "keV");
+  register_parameter(&m_CutEnergy0, "cut_energy_min", keV, "keV");
+  register_parameter(&m_CutEnergy1, "cut_energy_max", keV, "keV");
   return AS_OK;
 }
 
@@ -49,26 +54,28 @@ ANLStatus QuickAnalysisForDSD::mod_his()
 {
   VCSModule::mod_his();
 
-  const int NBin = 512;
-  const double EMin = 0.0;
-  const double EMax = 128.0;
+  const int NBin = m_NBins;
+  const double EMin = m_Energy0;
+  const double EMax = m_Energy1;
 
-  m_Spec1HitCathode = new TH1D("spec_1hit_cathode", "Spectrum (1-hit, cathode)",
-                               NBin, EMin, EMax);
-  m_Spec1HitAnode = new TH1D("spec_1hit_anode", "Spectrum (1-hit, anode)",
-                             NBin, EMin, EMax);
-  m_Spec2HitCathode = new TH1D("spec_2hit_cathode", "Spectrum (2-hit, cathode)",
-                               NBin, EMin, EMax);
-  m_Spec2HitAnode = new TH1D("spec_2hit_anode", "Spectrum (2-hit, anode)",
-                             NBin, EMin, EMax);
+  m_Spectrum1HitCathode = new TH1D("spectrum_1hit_cathode", "Spectrum (1-hit, cathode)",
+                                   NBin, EMin, EMax);
+  m_Spectrum1HitAnode = new TH1D("spectrum_1hit_anode", "Spectrum (1-hit, anode)",
+                                 NBin, EMin, EMax);
+  m_Spectrum2HitCathode = new TH1D("spectrum_2hit_cathode", "Spectrum (2-hit, cathode)",
+                                   NBin, EMin, EMax);
+  m_Spectrum2HitAnode = new TH1D("spectrum_2hit_anode", "Spectrum (2-hit, anode)",
+                                 NBin, EMin, EMax);
 
-  m_E2DCathode = new TH2D("e2D_2hit_cathode", "Energy 2D (2-hit, cathode)",
-                          NBin, EMin, EMax, NBin, EMin, EMax);
-  m_E2DAnode = new TH2D("e2D_2hit_anode", "Energy 2D (2-hit, anode)",
-                        NBin, EMin, EMax, NBin, EMin, EMax);
+  m_E2D2HitCathode = new TH2D("e2D_2hit_cathode", "Energy 2D (2-hit, cathode)",
+                              NBin, EMin, EMax, NBin, EMin, EMax);
+  m_E2D2HitAnode = new TH2D("e2D_2hit_anode", "Energy 2D (2-hit, anode)",
+                            NBin, EMin, EMax, NBin, EMin, EMax);
+  m_E2DDoubleSide = new TH2D("e2D_1hit_double", "Energy 2D (1-hit, cathode/anode)",
+                             NBin, EMin, EMax, NBin, EMin, EMax);
 
-  int NPixelX = m_DSD->getNumPixelX();
-  int NPixelY = m_DSD->getNumPixelY();
+  const int NPixelX = m_DSD->getNumPixelX();
+  const int NPixelY = m_DSD->getNumPixelY();
   m_Image = new TH2D("image", "Image",
                      NPixelX, -0.5, NPixelX-0.5,
                      NPixelY, -0.5, NPixelY-0.5);
@@ -102,7 +109,7 @@ ANLStatus QuickAnalysisForDSD::mod_ana()
   // cathode
   if (numCathode==1) {
     DetectorHit_sptr hit = m_DSD->getCathodeSideHit(0);
-    m_Spec1HitCathode->Fill(hit->EPI()/keV);
+    m_Spectrum1HitCathode->Fill(hit->EPI()/keV);
   }
   else if (numCathode==2) {
     DetectorHit_sptr hit0 = m_DSD->getCathodeSideHit(0);
@@ -123,12 +130,12 @@ ANLStatus QuickAnalysisForDSD::mod_ana()
 
     if (adjacent) {
       double sum = hit0->EPI() + hit1->EPI();
-      m_Spec2HitCathode->Fill(sum/keV);
+      m_Spectrum2HitCathode->Fill(sum/keV);
       if (strip0<strip1) {
-        m_E2DCathode->Fill(hit0->EPI()/keV, hit1->EPI()/keV);
+        m_E2D2HitCathode->Fill(hit0->EPI()/keV, hit1->EPI()/keV);
       }
       else {
-        m_E2DCathode->Fill(hit1->EPI()/keV, hit0->EPI()/keV);
+        m_E2D2HitCathode->Fill(hit1->EPI()/keV, hit0->EPI()/keV);
       }
     }
   }
@@ -136,7 +143,7 @@ ANLStatus QuickAnalysisForDSD::mod_ana()
   // anode
   if (numAnode==1) {
     DetectorHit_sptr hit = m_DSD->getAnodeSideHit(0);
-    m_Spec1HitAnode->Fill(hit->EPI()/keV);
+    m_Spectrum1HitAnode->Fill(hit->EPI()/keV);
   }
   else if (numAnode==2) {
     DetectorHit_sptr hit0 = m_DSD->getAnodeSideHit(0);
@@ -157,14 +164,21 @@ ANLStatus QuickAnalysisForDSD::mod_ana()
 
     if (adjacent) {
       double sum = hit0->EPI() + hit1->EPI();
-      m_Spec2HitAnode->Fill(sum/keV);
+      m_Spectrum2HitAnode->Fill(sum/keV);
       if (strip0<strip1) {
-        m_E2DAnode->Fill(hit0->EPI()/keV, hit1->EPI()/keV);
+        m_E2D2HitAnode->Fill(hit0->EPI()/keV, hit1->EPI()/keV);
       }
       else {
-        m_E2DAnode->Fill(hit1->EPI()/keV, hit0->EPI()/keV);
+        m_E2D2HitAnode->Fill(hit1->EPI()/keV, hit0->EPI()/keV);
       }
     }
+  }
+
+  // both side 1-hit
+  if (numCathode==1 && numAnode==1) {
+    DetectorHit_sptr hitAnode = m_DSD->getAnodeSideHit(0);
+    DetectorHit_sptr hitCathode = m_DSD->getCathodeSideHit(0);
+    m_E2DDoubleSide->Fill(hitAnode->EPI()/keV, hitCathode->EPI()/keV);
   }
 
   // image
@@ -190,7 +204,7 @@ ANLStatus QuickAnalysisForDSD::mod_ana()
       energy = hit1->EPI();
     }
 
-    if (m_Energy0 <= energy && energy <= m_Energy1) {
+    if (m_CutEnergy0 <= energy && energy <= m_CutEnergy1) {
       m_Image->Fill(stripX, stripY);
       m_Image1DX->Fill(stripX);
       m_Image1DY->Fill(stripY);

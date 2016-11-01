@@ -603,6 +603,7 @@ module ComptonSoft
             ee.add_attribute("id", s.id)
             if v=s.all; ee.add_attribute("all", v); end
             common_node = ee.add_element("common")
+            s.common.output(common_node)
             s.data.each do |c|
               unless c.empty?
                 eee =ee.add_element("channel", c.id)

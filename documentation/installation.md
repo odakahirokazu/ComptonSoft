@@ -68,8 +68,18 @@ Example of running cmake:
 
 A data analysis framework.
 
+### (7) [Parallel](https://github.com/grosser/parallel/)
 
- 3. Installation
+This is a useful library for broadcasting parallel processes.
+This library is not essential, just used for its convenience.
+You can run simulations without it, but several simulation
+scripts in the examples use it.
+To install *parallel*, just do this:
+
+    gem install parallel
+
+
+3. Installation
 ----------------------------------------------------------------
 
 ### (1) Obtain Compton Soft via GitHub.
