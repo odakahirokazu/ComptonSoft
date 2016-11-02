@@ -357,22 +357,22 @@ module ComptonSoft
           d.each_channel do |c|
             e.add_element("channel", {"section"=>c[0], "index"=>c[1], "x"=>c[2], "y"=>c[3]})
           end
-
-          set_double_quote = lambda do |e|
-            e.context ||= {}
-            e.context[:attribute_quote] = :quote
-            e.elements.each{|ee| set_double_quote.(ee) }
-          end
-          set_double_quote.(root)
-
-          output = File.open(filename, 'w')
-          output.puts '<?xml version="1.0" encoding="UTF-8"?>'
-          output.puts '<?xml-stylesheet type="text/xsl" href="https://raw.githubusercontent.com/odakahirokazu/ComptonSoft/master/xmlstyle/channel_map_v4.xsl" ?>'
-          output.puts ''
-          formatter = REXML::Formatters::Pretty.new
-          formatter.compact = true
-          formatter.write(root, output)
         end
+
+        set_double_quote = lambda do |e|
+          e.context ||= {}
+          e.context[:attribute_quote] = :quote
+          e.elements.each{|ee| set_double_quote.(ee) }
+        end
+        set_double_quote.(root)
+
+        output = File.open(filename, 'w')
+        output.puts '<?xml version="1.0" encoding="UTF-8"?>'
+        output.puts '<?xml-stylesheet type="text/xsl" href="https://raw.githubusercontent.com/odakahirokazu/ComptonSoft/master/xmlstyle/channel_map_v4.xsl" ?>'
+        output.puts ''
+        formatter = REXML::Formatters::Pretty.new
+        formatter.compact = true
+        formatter.write(root, output)
       end
     end
 
@@ -611,22 +611,22 @@ module ComptonSoft
               end
             end
           end
-
-          set_double_quote = lambda do |e|
-            e.context ||= {}
-            e.context[:attribute_quote] = :quote
-            e.elements.each{|ee| set_double_quote.(ee) }
-          end
-          set_double_quote.(root)
-
-          output = File.open(filename, 'w')
-          output.puts '<?xml version="1.0" encoding="UTF-8"?>'
-          output.puts '<?xml-stylesheet type="text/xsl" href="https://raw.githubusercontent.com/odakahirokazu/ComptonSoft/master/xmlstyle/channel_properties_v1.xsl" ?>'
-          output.puts ''
-          formatter = REXML::Formatters::Pretty.new
-          formatter.compact = true
-          formatter.write(root, output)
         end
+
+        set_double_quote = lambda do |e|
+          e.context ||= {}
+          e.context[:attribute_quote] = :quote
+          e.elements.each{|ee| set_double_quote.(ee) }
+        end
+        set_double_quote.(root)
+
+        output = File.open(filename, 'w')
+        output.puts '<?xml version="1.0" encoding="UTF-8"?>'
+        output.puts '<?xml-stylesheet type="text/xsl" href="https://raw.githubusercontent.com/odakahirokazu/ComptonSoft/master/xmlstyle/channel_properties_v1.xsl" ?>'
+        output.puts ''
+        formatter = REXML::Formatters::Pretty.new
+        formatter.compact = true
+        formatter.write(root, output)
       end
     end
 
