@@ -24,6 +24,7 @@
 #include <vector>
 #include <memory>
 #include <iostream>
+#include <cstdint>
 #include "DetectorHit_sptr.hh"
 
 namespace comptonsoft {

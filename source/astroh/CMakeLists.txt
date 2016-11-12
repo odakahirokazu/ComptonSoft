@@ -41,6 +41,7 @@ if(CS_USE_FITSIO)
     src/ReadSGDEventFITS.cc
     src/WriteSGDEventFITS.cc
     src/HXIEventFITS.cc
+    src/ReadHXIEventFITS.cc
     src/WriteHXIEventFITS.cc
     )
 endif()

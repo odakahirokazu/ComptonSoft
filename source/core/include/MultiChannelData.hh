@@ -20,6 +20,8 @@
 #ifndef COMPTONSOFT_MultiChannelData_H
 #define COMPTONSOFT_MultiChannelData_H 1
 
+#include <cstdint>
+#include <cstddef>
 #include <memory>
 #include <vector>
 #include <algorithm>
@@ -39,6 +41,7 @@ namespace comptonsoft {
  * @date 2014-09-07 | switch from array to vectors, introduce ElectrodeSide, change API.
  * @date 2016-05-02 | PHA randomization
  * @date 2016-08-19 | threshold: scalar value to vector
+ * @date 2016-11-11 | add time and flags
  */
 class MultiChannelData
 {
@@ -92,6 +95,12 @@ public:
     v.resize(NumChannels_);
     std::copy(negativeThresholdEnergyVector_.begin(), negativeThresholdEnergyVector_.end(), v.begin());
   }
+
+  void setTime(double v) { time_ = v; }
+  double Time() const { return time_; }
+
+  void setFlags(uint64_t v) { flags_ = v; }
+  uint64_t Flags() const { return flags_; }
 
   void resetChannelDisabledVector(int v=0)
   { std::fill(channelDisabledVector_.begin(), channelDisabledVector_.end(), v); }
@@ -199,6 +208,8 @@ public:
    */
   void resetEventData()
   {
+    time_ = 0.0;
+    flags_ = 0u;
     resetRawADCVector();
     resetPHAVector();
     resetEPIVector();
@@ -275,6 +286,9 @@ private:
   bool useNegativePulse_;
   std::vector<double> thresholdEnergyVector_;
   std::vector<double> negativeThresholdEnergyVector_;
+
+  double time_ = 0.0;
+  uint64_t flags_ = 0u;
 
   std::vector<int8_t> channelDisabledVector_;
   std::vector<double> pedestalVector_;

@@ -17,12 +17,12 @@
  *                                                                       *
  *************************************************************************/
 
-#include "ReadSGDEventFITS.hh"
+#include "ReadHXIEventFITS.hh"
 #include "G4SystemOfUnits.hh"
 #include "TChain.h"
 #include "ChannelID.hh"
-#include "SGDEvent.hh"
-#include "SGDEventFITS.hh"
+#include "HXIEvent.hh"
+#include "HXIEventFITS.hh"
 #include "ReadoutModule.hh"
 #include "MultiChannelData.hh"
 
@@ -31,14 +31,11 @@ using namespace anl;
 namespace
 {
 
-comptonsoft::ReadoutBasedChannelID getReadoutID(uint16_t ASIC_ID)
+comptonsoft::ReadoutBasedChannelID getReadoutID(uint8_t ASIC_ID)
 {
-  const uint16_t ADBNo = ASIC_ID>>8;
-  const uint16_t TrayNo = (ASIC_ID & 0xf0)>>4;
-  const uint16_t ASICIndex = ASIC_ID & 0xf;
-  constexpr size_t NumTrayInADB = 7;
-  const size_t TrayIndex = NumTrayInADB*ADBNo + TrayNo;
-  return comptonsoft::ReadoutBasedChannelID(TrayIndex, ASICIndex);
+  const uint8_t ASICNo = ASIC_ID >> 4;
+  const uint8_t TrayNo = ASIC_ID & 0xf;
+  return comptonsoft::ReadoutBasedChannelID(TrayNo, ASICNo);
 }
 
 }
@@ -46,27 +43,27 @@ comptonsoft::ReadoutBasedChannelID getReadoutID(uint16_t ASIC_ID)
 namespace comptonsoft
 {
 
-ReadSGDEventFITS::ReadSGDEventFITS()
+ReadHXIEventFITS::ReadHXIEventFITS()
   : anlgeant4::InitialInformation(false),
     m_NumEvents(0), m_Index(0)
 {
   add_alias("InitialInformation");
 }
 
-ReadSGDEventFITS::~ReadSGDEventFITS() = default;
+ReadHXIEventFITS::~ReadHXIEventFITS() = default;
 
-ANLStatus ReadSGDEventFITS::mod_startup()
+ANLStatus ReadHXIEventFITS::mod_startup()
 {
   register_parameter(&m_Filename, "filename");
 
   return AS_OK;
 }
 
-ANLStatus ReadSGDEventFITS::mod_init()
+ANLStatus ReadHXIEventFITS::mod_init()
 {
   VCSModule::mod_init();
 
-  m_EventReader.reset(new astroh::sgd::EventFITSReader);
+  m_EventReader.reset(new astroh::hxi::EventFITSReader);
   m_EventReader->open(m_Filename);
   m_NumEvents = m_EventReader->NumberOfRows();
   std::cout << "Total events: " << m_NumEvents << std::endl;
@@ -74,20 +71,19 @@ ANLStatus ReadSGDEventFITS::mod_init()
   return AS_OK;
 }
 
-ANLStatus ReadSGDEventFITS::mod_ana()
+ANLStatus ReadHXIEventFITS::mod_ana()
 {
   if (m_Index==m_NumEvents) {
     return AS_QUIT;
   }
 
-  astroh::sgd::Event event;
+  astroh::hxi::Event event;
   const long int row = m_Index + 1;
   m_EventReader->restoreEvent(row, event);
   setEventID(event.getOccurrenceID());
 
   const double eventTime = event.getTime() * second;
-  const astroh::sgd::EventFlags eventFlags = event.getFlags();
-
+  const astroh::hxi::EventFlags eventFlags = event.getFlags();
 #if 0
   const uint32_t localTime = event.getLocalTime();
   const uint32_t liveTime = event.getLiveTime();
@@ -97,7 +93,7 @@ ANLStatus ReadSGDEventFITS::mod_ana()
 
   const size_t NumHitASICs = event.LengthOfASICData();
   for (size_t i=0; i<NumHitASICs; i++) {
-    const uint16_t ASICID = event.getASICIDVector()[i];
+    const uint8_t ASICID = event.getASICIDVector()[i];
     const ReadoutBasedChannelID ReadoutID = getReadoutID(ASICID);
     const uint16_t CommonModeNoise = event.getCommonModeNoiseVector()[i];
     const uint16_t Reference = event.getReferenceLevelVector()[i];
@@ -110,7 +106,7 @@ ANLStatus ReadSGDEventFITS::mod_ana()
 
   const size_t NumHits = event.LengthOfReadoutData();
   for (size_t i=0; i<NumHits; i++) {
-    const uint16_t ASICID = event.getReadoutASICIDVector()[i];
+    const uint8_t ASICID = event.getReadoutASICIDVector()[i];
     const ReadoutBasedChannelID ReadoutID = getReadoutID(ASICID);
       
     const int ChannelID = event.getReadoutChannelIDVector()[i];

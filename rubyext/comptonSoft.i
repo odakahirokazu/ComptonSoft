@@ -90,6 +90,9 @@
 #include "WriteSGDEventFITS.hh"
 #endif
 #ifdef USE_FITSIO
+#include "ReadHXIEventFITS.hh"
+#endif
+#ifdef USE_FITSIO
 #include "WriteHXIEventFITS.hh"
 #endif
 
@@ -698,6 +701,16 @@ class WriteSGDEventFITS : public VCSModule
 public:
   WriteSGDEventFITS();
   ~WriteSGDEventFITS();
+};
+
+#endif
+
+#ifdef USE_FITSIO
+class ReadHXIEventFITS : public VCSModule
+{
+public:
+  ReadHXIEventFITS();
+  ~ReadHXIEventFITS();
 };
 
 #endif

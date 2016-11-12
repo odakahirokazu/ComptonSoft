@@ -151,7 +151,7 @@ public:
   }
 
   // FFF contents
-    void setTime(double v) { TIME_ = v; }
+  void setTime(double v) { TIME_ = v; }
   double getTime() const { return TIME_; }
 
   void setSTime(double v) { S_TIME_ = v; }

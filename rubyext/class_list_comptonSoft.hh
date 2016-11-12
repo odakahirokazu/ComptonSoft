@@ -72,5 +72,6 @@ class DumpMass;
 class SimulateCXBShieldPlate;
 class ReadSGDEventFITS;
 class WriteSGDEventFITS;
+class ReadHXIEventFITS;
 class WriteHXIEventFITS;
 }

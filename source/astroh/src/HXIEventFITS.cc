@@ -149,7 +149,7 @@ void EventFITSIOHelper::restoreEvent(long int row, hxi::Event& event)
 
   long int ASICDataLength(0), ASICDataOffset(0);
   fits_read_descript(fits, 20, row, &ASICDataLength, &ASICDataOffset, &status);
-  fits_read_col(fits, TSHORT,    20, row, elem, ASICDataLength, NULL, ASIC_ID_.data(),      &anynul, &status);
+  fits_read_col(fits, TBYTE,     20, row, elem, ASICDataLength, NULL, ASIC_ID_.data(),      &anynul, &status);
   fits_read_col(fits, TBYTE,     21, row, elem, ASICDataLength, NULL, ASIC_ID_RMAP_.data(), &anynul, &status);
   fits_read_col(fits, TBYTE,     22, row, elem, ASICDataLength, NULL, ASIC_CHIP_.data(),    &anynul, &status);
   fits_read_col(fits, TBYTE,     23, row, elem, ASICDataLength, NULL, ASIC_TRIG_.data(),    &anynul, &status);
@@ -161,12 +161,12 @@ void EventFITSIOHelper::restoreEvent(long int row, hxi::Event& event)
   
   long int ReadoutDataLength(0), ReadoutDataOffset(0);
   fits_read_descript(fits, 29, row, &ReadoutDataLength, &ReadoutDataOffset, &status);
-  fits_read_col(fits, TSHORT,   29, row, elem, ReadoutDataLength, NULL, READOUT_ASIC_ID_.data(), &anynul, &status);
+  fits_read_col(fits, TBYTE,    29, row, elem, ReadoutDataLength, NULL, READOUT_ASIC_ID_.data(), &anynul, &status);
   fits_read_col(fits, TBYTE,    30, row, elem, ReadoutDataLength, NULL, READOUT_ID_.data(),       &anynul, &status);
   fits_read_col(fits, TSHORT,   31, row, elem, ReadoutDataLength, NULL, READOUT_ID_RMAP_.data(), &anynul, &status);
   fits_read_col(fits, TSHORT,   32, row, elem, ReadoutDataLength, NULL, PHA_.data(),             &anynul, &status);
   fits_read_col(fits, TFLOAT,   33, row, elem, ReadoutDataLength, NULL, EPI_.data(),             &anynul, &status);
-  
+
   event.setTime(TIME_[0]);
   event.setSTime(S_TIME_[0]);
   event.setADUCount(ADU_CNT_[0]);
@@ -183,6 +183,7 @@ void EventFITSIOHelper::restoreEvent(long int row, hxi::Event& event)
   event.setStatus(STATUS_[0]);
   
   const int NumASICs = ASICDataLength;
+    
   event.reserveASICData(NumASICs);
   for (int i=0; i<NumASICs; i++) {
     const uint8_t ASIC_ID = ASIC_ID_[i];
