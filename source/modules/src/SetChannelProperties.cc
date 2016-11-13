@@ -226,8 +226,9 @@ void SetChannelProperties::setupChannelProperties(int section,
   if (optional<int> status = properties.disable_status) {
     mcd->setChannelDisabled(channel, *status);
   }
-  if (optional<double> value = properties.threshold_value) {
-    mcd->setThresholdEnergy(channel, *value);
+  if (optional<double> o = properties.threshold_value) {
+    const double value = (*o) * keV;
+    mcd->setThresholdEnergy(channel, value);
   }
 }
 
