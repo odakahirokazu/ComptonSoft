@@ -38,7 +38,20 @@ comptonsoft::ReadoutBasedChannelID getReadoutID(uint8_t ASIC_ID)
   return comptonsoft::ReadoutBasedChannelID(TrayNo, ASICNo);
 }
 
+bool is_pseudo_triggered(astroh::hxi::EventFlags f)
+{
+  return (f.getTriggerPattern() & (0x1u<<6));
 }
+
+bool is_pseudo_effective(astroh::hxi::EventFlags f)
+{
+  if (f.getFastBGO()!=0) { return false; }
+  if (f.getHitPattern()!=0) { return false; }
+  return is_pseudo_triggered(f);
+}
+
+} /* anonymous namespace */
+
 
 namespace comptonsoft
 {
@@ -67,6 +80,9 @@ ANLStatus ReadHXIEventFITS::mod_init()
   m_EventReader->open(m_Filename);
   m_NumEvents = m_EventReader->NumberOfRows();
   std::cout << "Total events: " << m_NumEvents << std::endl;
+
+  EvsDef("ReadHXIEventFITS:PseudoTrigger");
+  EvsDef("ReadHXIEventFITS:PseudoEffective");
   
   return AS_OK;
 }
@@ -84,6 +100,14 @@ ANLStatus ReadHXIEventFITS::mod_ana()
 
   const double eventTime = event.getTime() * second;
   const astroh::hxi::EventFlags eventFlags = event.getFlags();
+
+  if (is_pseudo_triggered(eventFlags)) {
+    EvsSet("ReadHXIEventFITS:PseudoTrigger");
+  }
+  if (is_pseudo_effective(eventFlags)) {
+    EvsSet("ReadHXIEventFITS:PseudoEffective");
+  }
+
 #if 0
   const uint32_t localTime = event.getLocalTime();
   const uint32_t liveTime = event.getLiveTime();

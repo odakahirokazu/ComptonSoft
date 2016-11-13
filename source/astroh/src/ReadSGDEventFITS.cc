@@ -41,14 +41,40 @@ comptonsoft::ReadoutBasedChannelID getReadoutID(uint16_t ASIC_ID)
   return comptonsoft::ReadoutBasedChannelID(TrayIndex, ASICIndex);
 }
 
+bool is_pseudo_triggered(astroh::sgd::EventFlags f)
+{
+  return (f.getTriggerPattern() & (0x1u<<29));
 }
+
+bool is_pseudo_effective(int cc_id,
+                         astroh::sgd::EventFlags f)
+{
+  if (cc_id==1) {
+    if (f.getCCHitPattern()!=0x1) { return false; }
+  }
+  else if (cc_id==2) {
+    if (f.getCCHitPattern()!=0x2) { return false; }
+  }
+  else if (cc_id==3) {
+    if (f.getCCHitPattern()!=0x4) { return false; }
+  }
+
+  if (f.getFastBGO()!=0) { return false; }
+  if (f.getHitPattern()!=0) { return false; }
+  return is_pseudo_triggered(f);
+}
+
+} /* anonymous namespace */
+
 
 namespace comptonsoft
 {
 
 ReadSGDEventFITS::ReadSGDEventFITS()
   : anlgeant4::InitialInformation(false),
-    m_NumEvents(0), m_Index(0)
+    m_CCID(0),
+    m_NumEvents(0),
+    m_Index(0)
 {
   add_alias("InitialInformation");
 }
@@ -58,6 +84,7 @@ ReadSGDEventFITS::~ReadSGDEventFITS() = default;
 ANLStatus ReadSGDEventFITS::mod_startup()
 {
   register_parameter(&m_Filename, "filename");
+  register_parameter(&m_CCID, "cc_id");
 
   return AS_OK;
 }
@@ -70,6 +97,9 @@ ANLStatus ReadSGDEventFITS::mod_init()
   m_EventReader->open(m_Filename);
   m_NumEvents = m_EventReader->NumberOfRows();
   std::cout << "Total events: " << m_NumEvents << std::endl;
+
+  EvsDef("ReadSGDEventFITS:PseudoTrigger");
+  EvsDef("ReadSGDEventFITS:PseudoEffective");
   
   return AS_OK;
 }
@@ -87,6 +117,13 @@ ANLStatus ReadSGDEventFITS::mod_ana()
 
   const double eventTime = event.getTime() * second;
   const astroh::sgd::EventFlags eventFlags = event.getFlags();
+
+  if (is_pseudo_triggered(eventFlags)) {
+    EvsSet("ReadSGDEventFITS:PseudoTrigger");
+  }
+  if (is_pseudo_effective(m_CCID, eventFlags)) {
+    EvsSet("ReadSGDEventFITS:PseudoEffective");
+  }
 
 #if 0
   const uint32_t localTime = event.getLocalTime();

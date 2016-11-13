@@ -46,6 +46,7 @@ public:
   
 private:
   std::string m_Filename;
+  int m_CCID;
 
   std::unique_ptr<astroh::sgd::EventFITSReader> m_EventReader;
   Long64_t m_NumEvents;
