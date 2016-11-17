@@ -72,9 +72,7 @@ namespace comptonsoft
 
 ReadSGDEventFITS::ReadSGDEventFITS()
   : anlgeant4::InitialInformation(false),
-    m_CCID(0),
-    m_NumEvents(0),
-    m_Index(0)
+    m_CCID(0), m_VetoEnable(true), m_NumEvents(0), m_Index(0)
 {
   add_alias("InitialInformation");
 }
@@ -100,6 +98,7 @@ ANLStatus ReadSGDEventFITS::mod_init()
 
   EvsDef("ReadSGDEventFITS:PseudoTrigger");
   EvsDef("ReadSGDEventFITS:PseudoEffective");
+  EvsDef("ReadSGDEventFITS:ShieldTrigger");
   
   return AS_OK;
 }
@@ -123,6 +122,14 @@ ANLStatus ReadSGDEventFITS::mod_ana()
   }
   if (is_pseudo_effective(m_CCID, eventFlags)) {
     EvsSet("ReadSGDEventFITS:PseudoEffective");
+  }
+
+  if (eventFlags.getHitPattern() || eventFlags.getFastBGO()) {
+    EvsSet("ReadSGDEventFITS:ShieldTrigger");
+    if (m_VetoEnable) {
+      m_Index++;
+      return AS_SKIP;
+    }
   }
 
 #if 0

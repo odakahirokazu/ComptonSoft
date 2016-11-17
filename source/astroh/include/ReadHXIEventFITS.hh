@@ -46,6 +46,7 @@ public:
   
 private:
   std::string m_Filename;
+  bool m_VetoEnable;
 
   std::unique_ptr<astroh::hxi::EventFITSReader> m_EventReader;
   Long64_t m_NumEvents;
