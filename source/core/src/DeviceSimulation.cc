@@ -27,7 +27,7 @@ namespace comptonsoft {
 
 DeviceSimulation::DeviceSimulation()
   : chargeCollectionMode_(0),
-    CCEMapName_("cce"),
+    CCEMapName_(""),
     EField_(new EFieldModel),
     numPixelsInWPCalculation_(5.0),
     diffusionMode_(0),
