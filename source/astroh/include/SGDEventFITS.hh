@@ -44,6 +44,12 @@ public:
   EventFITSIOHelper();
   ~EventFITSIOHelper();
 
+  void setSGDIDs(int unit, int cc)
+  {
+    unitID_ = unit;
+    ccID_ = cc;
+  }
+
   bool createFITSFile(const std::string& filename);
   void initializeFITSTable(long int numberOfRows=0l);
   void fillEvent(const sgd::Event& event);
@@ -54,8 +60,13 @@ public:
   std::shared_ptr<sgd::Event> getEvent(long int row);
 
   void closeFITSFile();
-  
+
 private:
+  void initializeFITSHeader();
+
+private:
+  int unitID_ = 0;
+  int ccID_ = 0;
   cfitsio::fitsfile* fitsFile_ = nullptr;
   long int rowIndex_ = 1; // starts from 1.
 
@@ -113,6 +124,9 @@ public:
   bool open(const std::string& filename);
   void fillEvent(const sgd::Event& event);
   void close();
+
+  void setSGDIDs(int unit, int cc)
+  { io_->setSGDIDs(unit, cc); }
 
 private:
   std::unique_ptr<EventFITSIOHelper> io_;

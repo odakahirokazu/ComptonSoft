@@ -52,6 +52,8 @@ public:
   
 private:
   std::string m_Filename;
+  int m_SGDID;
+  int m_CCID;
 
   const CSHitCollection* m_HitCollection;
   const anlgeant4::InitialInformation* m_InitialInfo;

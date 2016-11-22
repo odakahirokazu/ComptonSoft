@@ -1,4 +1,5 @@
 #include "SGDEventFITS.hh"
+#include <boost/format.hpp>
 
 namespace
 {
@@ -245,6 +246,19 @@ bool EventFITSIOHelper::createFITSFile(const std::string& filename)
   return true;
 }
 
+void EventFITSIOHelper::initializeFITSHeader()
+{
+  using boost::format;
+
+  int fitsStatus = 0;
+  fits_movabs_hdu(fitsFile_, 2, NULL, &fitsStatus);
+  fits_update_key_str(fitsFile_, "TELESCOP", "HITOMI", "", &fitsStatus);
+  fits_update_key_str(fitsFile_, "INSTRUME", (format("SGD%d")%unitID_).str().c_str(), "", &fitsStatus);
+  fits_update_key_str(fitsFile_, "DETNAM", (format("CC%d")%ccID_).str().c_str(), "", &fitsStatus);
+  fits_update_key_str(fitsFile_, "DATAMODE", (format("CC%d_NORMAL1")%ccID_).str().c_str(), "", &fitsStatus);
+  fits_update_key_str(fitsFile_, "DATE-OBS", "N/A", "", &fitsStatus);
+}
+
 void EventFITSIOHelper::initializeFITSTable(long int numberOfRows)
 {
   int fitsStatus = 0;
@@ -380,6 +394,9 @@ void EventFITSIOHelper::initializeFITSTable(long int numberOfRows)
   
   char extname[] = "EVENTS";
   fits_create_tbl(fitsFile_, TableType, numberOfRows, tfields, ttype, tform, tunit, extname, &fitsStatus);
+  fits_report_error(stderr, fitsStatus);
+
+  initializeFITSHeader();
   fits_report_error(stderr, fitsStatus);
 
   // Move to the table HDU.

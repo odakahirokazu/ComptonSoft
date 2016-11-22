@@ -69,6 +69,8 @@ namespace comptonsoft
 
 WriteSGDEventFITS::WriteSGDEventFITS()
   : m_Filename("event.fits"),
+    m_SGDID(0),
+    m_CCID(0),
     m_HitCollection(nullptr),
     m_InitialInfo(nullptr),
     m_EventWriter(new astroh::sgd::EventFITSWriter)
@@ -80,6 +82,8 @@ WriteSGDEventFITS::~WriteSGDEventFITS() = default;
 ANLStatus WriteSGDEventFITS::mod_startup()
 {
   register_parameter(&m_Filename, "filename");
+  register_parameter(&m_SGDID, "sgd");
+  register_parameter(&m_CCID, "cc");
 
   return AS_OK;
 }
@@ -95,6 +99,7 @@ ANLStatus WriteSGDEventFITS::mod_init()
 
   EvsDef("WriteSGDEventFITS:Fill");
 
+  m_EventWriter->setSGDIDs(m_SGDID, m_CCID);
   if (!(m_EventWriter->open(m_Filename))) {
     return AS_QUIT_ERR;
   }
