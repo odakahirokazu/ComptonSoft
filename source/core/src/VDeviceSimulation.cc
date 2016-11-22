@@ -112,7 +112,7 @@ void VDeviceSimulation::removeHitsOutOfPixelRange(std::list<DetectorHit_sptr>& h
 void VDeviceSimulation::removeHitsAtChannelsDisabled(std::list<DetectorHit_sptr>& hits)
 {
   hits.remove_if([this](DetectorHit_sptr hit) {
-      return (getChannelDisabled(hit->Pixel()) == 1);
+      return (getChannelDisabled(hit->Pixel()) == channel_status::readout_disable);
     });
 }
 
@@ -210,6 +210,11 @@ calculateEPI(double energyCharge, const PixelID& pixel) const
 bool VDeviceSimulation::
 checkTriggerDiscrimination(double energyCharge, const PixelID& pixel) const
 {
+  const int channelStatus = getChannelDisabled(pixel);
+  if (channelStatus==channel_status::readout_disable ||
+      channelStatus==channel_status::trigger_disable) {
+    return false;
+  }
   const double sigma = getTriggerDiscriminationSigma(pixel);
   const double energyForTrigger = CLHEP::RandGauss::shoot(energyCharge, sigma);
   const double threshold = getTriggerDiscriminationCenter(pixel);

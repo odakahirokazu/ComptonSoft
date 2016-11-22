@@ -26,6 +26,7 @@
 #include <vector>
 #include <algorithm>
 #include "CSTypes.hh"
+#include "FlagDefinition.hh"
 #include "ChannelID.hh"
 #include "VGainFunction.hh"
 
@@ -112,7 +113,11 @@ public:
     v.resize(NumChannels_);
     std::copy(channelDisabledVector_.begin(), channelDisabledVector_.end(), v.begin());
   }
-  bool getChannelEnabled(std::size_t i) const { return channelDisabledVector_[i]==0; }
+  bool getChannelEnabled(std::size_t i) const
+  {
+    const int status = channelDisabledVector_[i];
+    return (status==channel_status::normal) || (status==channel_status::trigger_disable);
+  }
 
   void resetPedestalVector()
   { std::fill(pedestalVector_.begin(), pedestalVector_.end(), 0.0); }

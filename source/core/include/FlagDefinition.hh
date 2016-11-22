@@ -51,6 +51,13 @@ constexpr uint64_t AntiCoincidence   = 0x0400u;
 constexpr uint64_t EnergyDepositQuenched = 0x1000u;
 }
 
+namespace channel_status {
+constexpr int normal = 0;
+constexpr int readout_disable  = 1;
+constexpr int trigger_disable  = 2;
+constexpr int analysis_disable = 3;
+}
+
 } /* namespace comptonsoft */
 
 #endif /* COMPTONSOFT_FlagDefinition_H */ 
