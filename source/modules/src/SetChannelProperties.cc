@@ -94,7 +94,7 @@ void SetChannelProperties::loadRootNode(const boost::property_tree::ptree& rootN
         }
       }
     }
-    else if (v.first == "detector" || v.first == "readout_module") {
+    else if (v.first == "readout_module") {
       const ptree& moduleNode = v.second;
       const int moduleID = moduleNode.get<int>("<xmlattr>.id");
       for (const ptree::value_type& vv: moduleNode.get_child("")) {

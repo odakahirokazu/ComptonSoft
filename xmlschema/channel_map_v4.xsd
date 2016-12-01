@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:element name="channel_map">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="name" type="xs:string" />
+        <xs:element name="comment" type="xs:string" minOccurs="0" maxOccurs="unbounded" />
+        <xs:element name="detector" type="detector_type" minOccurs="0" maxOccurs="unbounded" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:complexType name="detector_type">
+    <xs:group ref="detector_type_contents" />
+    <xs:attribute name="prefix" type="xs:string" use="required" />
+    <xs:attribute name="type" type="xs:string" use="required" />
+    <xs:attribute name="num_sections" type="xs:integer" use="required" />
+    <xs:attribute name="num_channels" type="xs:integer" use="required" />
+    <xs:attribute name="num_x" type="xs:integer" use="required" />
+    <xs:attribute name="num_y" type="xs:integer" use="required" />
+  </xs:complexType>
+  <xs:group name="detector_type_contents">
+    <xs:sequence>
+      <xs:element name="channel" minOccurs="0" maxOccurs="unbounded">
+        <xs:complexType>
+          <xs:attribute name="section" type="xs:integer" use="required" />
+          <xs:attribute name="index" type="xs:integer" use="required" />
+          <xs:attribute name="x" type="xs:integer" use="required" />
+          <xs:attribute name="y" type="xs:integer" use="required" />
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:group>
+</xs:schema>

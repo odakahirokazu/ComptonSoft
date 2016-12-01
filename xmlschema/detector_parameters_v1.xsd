@@ -1,0 +1,196 @@
+<?xml version="1.0"?>
+
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:element name="detector_parameters">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="name" type="xs:string" />
+        <xs:element name="comment" type="xs:string" minOccurs="0" maxOccurs="unbounded" />
+        <xs:element name="root_file" type="xs:string" minOccurs="0" maxOccurs="1" />
+        <xs:element name="auto_position" minOccurs="0" maxOccurs="1">
+          <xs:complexType>
+            <xs:attribute name="flag" type="xs:integer" />
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="sensitive_detector_not_found_warning" minOccurs="0" maxOccurs="1">
+          <xs:complexType>
+            <xs:attribute name="flag" type="xs:integer" />
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="data" type="data_type" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:complexType name="data_type">
+    <xs:sequence>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element name="sensitive_detector" type="sensitive_detector_type"/>
+        <xs:element name="detector_set" type="detector_set_type" />
+      </xs:choice>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="sensitive_detector_type">
+    <xs:group ref="detector_type_contents" />
+    <xs:attribute name="type" type="xs:string" use="required" />
+    <xs:attribute name="name" type="xs:string" use="required" />
+  </xs:complexType>
+  <xs:complexType name="detector_set_type">
+    <xs:group ref="detector_type_contents" />
+    <xs:attribute name="type" type="xs:string" use="required" />
+    <xs:attribute name="prefix" type="xs:string" use="required" />
+  </xs:complexType>
+  <xs:group name="detector_type_contents">
+    <xs:sequence>
+      <xs:element name="common" minOccurs="0" maxOccurs="1">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="parameters" type="parameters_type" minOccurs="0" maxOccurs="1" />
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="detector_list" minOccurs="0" maxOccurs="1">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="detector" minOccurs="0" maxOccurs="unbounded">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element name="parameters" type="parameters_type" minOccurs="0" maxOccurs="1" />
+                </xs:sequence>
+                <xs:attribute name="id" type="xs:string" use="required" />
+                <xs:attribute name="path" type="xs:string" use="optional" />
+                <xs:attribute name="copyno" type="xs:integer" use="optional" />  
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+          <xs:attribute name="id_method" type="xs:string" use="required" />
+          <xs:attribute name="layer_offset" type="xs:integer" use="required" />
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:group>
+  <xs:complexType name="parameters_type">
+    <xs:sequence>
+      <xs:element name="upside" minOccurs="0" maxOccurs="1">
+        <xs:complexType>
+          <xs:attribute name="anode" type="xs:integer" />
+          <xs:attribute name="pixel" type="xs:integer" />
+          <xs:attribute name="xstrip" type="xs:integer" />
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="quenching" minOccurs="0" maxOccurs="1">
+        <xs:complexType>
+          <xs:attribute name="factor" type="xs:double" use="required" />
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="temperature" minOccurs="0" maxOccurs="1">
+        <xs:complexType>
+          <xs:attribute name="value" type="xs:double" use="required" />
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="efield" minOccurs="0" maxOccurs="1">
+        <xs:complexType>
+          <xs:attribute name="bias" type="xs:double" use="required" />
+          <xs:attribute name="mode" type="xs:integer" use="required" />
+          <xs:attribute name="param0" type="xs:double" use="optional" />
+          <xs:attribute name="param1" type="xs:double" use="optional" />
+          <xs:attribute name="param2" type="xs:double" use="optional" />
+          <xs:attribute name="param3" type="xs:double" use="optional" />
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="charge_collection" minOccurs="0" maxOccurs="1">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="mutau" minOccurs="0" maxOccurs="1">
+              <xs:complexType>
+                <xs:attribute name="electron" type="xs:double" use="required" />
+                <xs:attribute name="hole" type="xs:double" use="required" />
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+          <xs:attribute name="mode" type="xs:integer" use="required" />
+          <xs:attribute name="cce_map" type="xs:string" use="optional" />
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="diffusion" minOccurs="0" maxOccurs="1">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:choice minOccurs="0" maxOccurs="1">
+              <xs:element name="spread_factor">
+                <xs:complexType>
+                  <xs:attribute name="cathode" type="xs:double" use="required" />
+                  <xs:attribute name="anode" type="xs:double" use="required" />
+                </xs:complexType>
+              </xs:element>
+              <xs:element name="constant">
+                <xs:complexType>
+                  <xs:attribute name="cathode" type="xs:double" use="required" />
+                  <xs:attribute name="anode" type="xs:double" use="required" />
+                </xs:complexType>
+              </xs:element>
+            </xs:choice>
+          </xs:sequence>
+          <xs:attribute name="mode" type="xs:integer" use="required" />
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="timing_resolution" minOccurs="0" maxOccurs="1">
+        <xs:complexType>
+          <xs:attribute name="trigger" type="xs:double" use="required" />
+          <xs:attribute name="energy_measurement" type="xs:double" use="required" />
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="pedestal_generation" minOccurs="0" maxOccurs="1">
+        <xs:complexType>
+          <xs:attribute name="flag" type="xs:integer" use="required" />
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="channel_properties" minOccurs="0" maxOccurs="2" type="channel_properties_type" />
+      <xs:element name="reconstruction" minOccurs="0" maxOccurs="1" type="reconstruction_type" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="channel_properties_type">
+    <xs:sequence>
+      <xs:element name="disable" minOccurs="0" maxOccurs="1">
+        <xs:complexType>
+          <xs:attribute name="status" type="xs:integer" use="required" />
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="trigger_discrimination" minOccurs="0" maxOccurs="1">
+        <xs:complexType>
+          <xs:attribute name="center" type="xs:double" use="required" />
+          <xs:attribute name="sigma" type="xs:double" use="required" />
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="noise_level" minOccurs="0" maxOccurs="1">
+        <xs:complexType>
+          <xs:attribute name="param0" type="xs:double" use="required" />
+          <xs:attribute name="param1" type="xs:double" use="optional" />
+          <xs:attribute name="param2" type="xs:double" use="optional" />
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="compensation" minOccurs="0" maxOccurs="1">
+        <xs:complexType>
+          <xs:attribute name="factor" type="xs:double" use="required" />
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="threshold" minOccurs="0" maxOccurs="1">
+        <xs:complexType>
+          <xs:attribute name="value" type="xs:double" use="required" />
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+    <xs:attribute name="side" type="xs:string" />
+  </xs:complexType>
+  <xs:complexType name="reconstruction_type">
+    <xs:sequence>
+      <xs:element name="energy_consistency_check" minOccurs="0" maxOccurs="1">
+        <xs:complexType>
+          <xs:attribute name="lower_function_c0" type="xs:double" use="required" />
+          <xs:attribute name="lower_function_c1" type="xs:double" use="required" />
+          <xs:attribute name="upper_function_c0" type="xs:double" use="required" />
+          <xs:attribute name="upper_function_c1" type="xs:double" use="required" />
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+    <xs:attribute name="mode" type="xs:integer" use="required" />
+  </xs:complexType>
+</xs:schema>
