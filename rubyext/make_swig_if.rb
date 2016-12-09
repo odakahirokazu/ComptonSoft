@@ -39,6 +39,7 @@ clMod = [
   ANL::SWIGClass.new("ComptonEventFilter", true),
   ANL::SWIGClass.new("SelectEventsOnFocalPlane"),
   ANL::SWIGClass.new("SelectTime"),
+  ANL::SWIGClass.new("FilterByGoodTimeIntervals"),
   ANL::SWIGClass.new("WriteHitTree"),
   ANL::SWIGClass.new("ReadHitTree"),
   ANL::SWIGClass.new("ReadHitTreeAsRawHits"),

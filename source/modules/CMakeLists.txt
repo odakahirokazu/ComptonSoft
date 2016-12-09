@@ -62,6 +62,7 @@ set(CS_MODULES
   src/ComptonEventFilter.cc
   src/SelectEventsOnFocalPlane.cc
   src/SelectTime.cc
+  src/FilterByGoodTimeIntervals.cc
   ### analysis ROOT trees & histograms
   src/WriteHitTree.cc
   src/ReadHitTree.cc

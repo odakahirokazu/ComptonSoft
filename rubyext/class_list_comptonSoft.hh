@@ -32,6 +32,7 @@ class SelectFullDeposit;
 class ComptonEventFilter;
 class SelectEventsOnFocalPlane;
 class SelectTime;
+class FilterByGoodTimeIntervals;
 class WriteHitTree;
 class ReadHitTree;
 class ReadHitTreeAsRawHits;

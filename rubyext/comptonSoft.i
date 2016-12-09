@@ -33,6 +33,7 @@
 #include "ComptonEventFilter.hh"
 #include "SelectEventsOnFocalPlane.hh"
 #include "SelectTime.hh"
+#include "FilterByGoodTimeIntervals.hh"
 #include "WriteHitTree.hh"
 #include "ReadHitTree.hh"
 #include "ReadHitTreeAsRawHits.hh"
@@ -372,6 +373,14 @@ class SelectTime : public anl::BasicModule
 public:
   SelectTime();
   ~SelectTime() = default;
+};
+
+
+class FilterByGoodTimeIntervals : public anl::BasicModule
+{
+public:
+  FilterByGoodTimeIntervals();
+  ~FilterByGoodTimeIntervals();
 };
 
 
