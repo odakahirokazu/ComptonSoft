@@ -178,6 +178,7 @@ void VRealDetectorUnit::selectHits()
         hit->setTime(mcd->Time());
         hit->setFlagData(mcd->Flags());
         PixelID pixel = ChannelToPixel(section, channel);
+        hit->setRawPHA( mcd->getRawADC(channel) );
         hit->setPHA( mcd->getPHA(channel) );
         hit->setEPI( mcd->getEPI(channel) );
         hit->setDetectorChannelID(this->getID(), section, channel);
