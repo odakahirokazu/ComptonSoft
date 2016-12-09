@@ -48,7 +48,7 @@ public:
   void ActivatePIXE(G4bool v) { m_PIXEOn = v; }
   
 private:
-  G4int  verbose;
+  G4int verbose;
 
   G4double m_ElectronFinalRange;
   G4bool m_AugerOn;

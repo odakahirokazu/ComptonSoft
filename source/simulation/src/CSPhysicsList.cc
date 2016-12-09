@@ -20,6 +20,7 @@
 #include "CSPhysicsList.hh"
 
 #include "globals.hh"
+#include "G4SystemOfUnits.hh"
 
 #include "G4EmLivermorePhysics.hh"
 #include "G4EmLivermorePolarizedPhysics.hh"
@@ -155,6 +156,7 @@ void CSPhysicsList::AddParallelWorldProcess()
     theParallelWorldProcess->SetParallelWorld(parallelWorldName);
     theParallelWorldProcess->SetLayeredMaterialFlag();
 
+    auto theParticleIterator = GetParticleIterator();
     theParticleIterator->reset();
     while( (*theParticleIterator)() ){
       G4ParticleDefinition* particle = theParticleIterator->value();

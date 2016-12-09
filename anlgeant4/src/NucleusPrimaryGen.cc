@@ -23,7 +23,7 @@
 #include "G4PhysicalConstants.hh"
 #include "G4Ions.hh"
 #include "G4IonTable.hh"
-#include "G4RIsotopeTable.hh"
+#include "G4VIsotopeTable.hh"
 
 using namespace anl;
 

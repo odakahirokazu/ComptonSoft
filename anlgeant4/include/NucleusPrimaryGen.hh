@@ -34,10 +34,11 @@ namespace anlgeant4 {
  *
  * @author Hirokazu Odaka
  * @date 2011-04-12
+ * @date 2016-12-09 | v4.1: migration to geant4 10.3
  */
 class NucleusPrimaryGen : public BasicPrimaryGen
 {
-  DEFINE_ANL_MODULE(NucleusPrimaryGen, 4.0);
+  DEFINE_ANL_MODULE(NucleusPrimaryGen, 4.1);
 public:
   NucleusPrimaryGen();
   ~NucleusPrimaryGen();

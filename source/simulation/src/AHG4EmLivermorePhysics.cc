@@ -169,6 +169,7 @@ void AHG4EmLivermorePhysics::ConstructProcess()
 {
   // Add Livermore EM Processes
 
+  auto aParticleIterator = GetParticleIterator();
   aParticleIterator->reset();
 
   while( (*aParticleIterator)() ){
