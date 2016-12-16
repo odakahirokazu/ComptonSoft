@@ -35,10 +35,11 @@ namespace comptonsoft
  * @date 2011-xx-xx
  * @date 2012-05-30
  * @date 2015-06-10 | version 2.0
+ * @date 2016-12-16 | version 2.1 | introduce parameter nuclear_lifetime_threshold.
  */
 class PhysicsListManager : public anlgeant4::VANLPhysicsList
 {
-  DEFINE_ANL_MODULE(PhysicsListManager, 2.0);
+  DEFINE_ANL_MODULE(PhysicsListManager, 2.1);
 public:
   PhysicsListManager();
   ~PhysicsListManager() = default;
@@ -55,6 +56,7 @@ private:
   bool m_EMCustomized;
   bool m_HadronHP;
   std::string m_HadronModel;
+  double m_NuclearLifeTimeThreshold;
   bool m_RDEnabled;
   bool m_ParallelWorldEnabled;
   double m_DefaultCut;

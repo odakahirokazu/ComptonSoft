@@ -26,6 +26,7 @@
 #include "FTFP_INCLXX.hh"
 #include "FTFP_INCLXX_HP.hh"
 #include "Shielding.hh"
+#include "G4NuclearLevelData.hh"
 #include "PhysicsListWithRadioactiveDecay.hh"
 
 using namespace anl;
@@ -39,9 +40,10 @@ PhysicsListManager::PhysicsListManager()
     m_EMCustomized(false),
     m_HadronHP(false),
     m_HadronModel("BIC"),
+    m_NuclearLifeTimeThreshold(1.0e-12*CLHEP::second),
     m_RDEnabled(false),
     m_ParallelWorldEnabled(true),
-    m_DefaultCut(0.0001*cm)
+    m_DefaultCut(0.0001*CLHEP::cm)
 {
   add_alias(module_name());
 }
@@ -49,12 +51,13 @@ PhysicsListManager::PhysicsListManager()
 ANLStatus PhysicsListManager::mod_startup()
 {
   anlgeant4::VANLPhysicsList::mod_startup();
-  register_parameter(&m_DefaultCut, "cut_value", cm, "cm");
+  register_parameter(&m_DefaultCut, "cut_value", CLHEP::cm, "cm");
   register_parameter(&m_PhysicsListName, "physics_list");
   register_parameter(&m_EMPolarization, "polarization");
   register_parameter(&m_EMCustomized, "customized_em");
   register_parameter(&m_HadronHP, "hadron_hp");
   register_parameter(&m_HadronModel, "hadron_model");
+  register_parameter(&m_NuclearLifeTimeThreshold, "nuclear_lifetime_threshold", CLHEP::second, "s");
   register_parameter(&m_RDEnabled, "radioactive_decay");
   register_parameter(&m_ParallelWorldEnabled, "parallel_world");
 
@@ -118,6 +121,9 @@ ANLStatus PhysicsListManager::mod_init()
 
   // radioactive decay
   m_PhysicsOption.enableRadioactiveDecay(m_RDEnabled);
+
+  // set geant4 parameters
+  G4NuclearLevelData::GetInstance()->GetParameters()->SetMaxLifeTime(m_NuclearLifeTimeThreshold);
 
   return AS_OK;
 }
