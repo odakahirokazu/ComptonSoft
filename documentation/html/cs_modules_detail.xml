@@ -891,7 +891,7 @@
   </module>
   <module>
     <name>NucleusPrimaryGen</name>
-    <version>4.0</version>
+    <version>4.1</version>
     <text>
       Primary generator of MC simulations. This module puts a nucleus
       (radioactive isotope) as a point source.
@@ -1726,65 +1726,15 @@
   </module>
   <module>
     <name>ApplyEPICompensation</name>
-    <version>2.0</version>
+    <version>3.0</version>
     <text></text>
-    <parameters>
-      <param container_type=''>
-        <name>filename</name>
-        <type>string</type>
-        <unit></unit>
-        <default_value></default_value>
-        <description></description>
-      </param>
-      <param container_type='map'>
-        <name>epi_compensation_map</name>
-        <type>map</type>
-        <unit></unit>
-        <default_value> </default_value>
-        <description></description>
-      </param>
-      <param container_type='key'>
-        <name>detector_name_prefix</name>
-        <type>string</type>
-        <unit></unit>
-        <default_value>Si</default_value>
-        <description></description>
-      </param>
-      <param container_type='value'>
-        <name>detector_type</name>
-        <type>int</type>
-        <unit></unit>
-        <default_value>1</default_value>
-        <description></description>
-      </param>
-      <param container_type='value'>
-        <name>factor0</name>
-        <type>double</type>
-        <unit></unit>
-        <default_value>1</default_value>
-        <description></description>
-      </param>
-      <param container_type='value'>
-        <name>factor1</name>
-        <type>double</type>
-        <unit></unit>
-        <default_value>1</default_value>
-        <description></description>
-      </param>
-    </parameters>
+    <parameters/>
   </module>
   <module>
     <name>EventSelection</name>
-    <version>2.1</version>
+    <version>2.2</version>
     <text></text>
     <parameters>
-      <param container_type=''>
-        <name>enable_veto</name>
-        <type>bool</type>
-        <unit></unit>
-        <default_value>1</default_value>
-        <description></description>
-      </param>
       <param container_type=''>
         <name>discard_time_group_zero</name>
         <type>bool</type>
@@ -1795,6 +1745,48 @@
       <param container_type=''>
         <name>discard_time_group_nonzero</name>
         <type>bool</type>
+        <unit></unit>
+        <default_value>0</default_value>
+        <description></description>
+      </param>
+      <param container_type=''>
+        <name>enable_off</name>
+        <type>bool</type>
+        <unit></unit>
+        <default_value>1</default_value>
+        <description></description>
+      </param>
+      <param container_type=''>
+        <name>enable_veto</name>
+        <type>bool</type>
+        <unit></unit>
+        <default_value>1</default_value>
+        <description></description>
+      </param>
+    </parameters>
+  </module>
+  <module>
+    <name>FilterByGoodTimeIntervals</name>
+    <version>1.0</version>
+    <text></text>
+    <parameters>
+      <param container_type='vector'>
+        <name>time_intervals</name>
+        <type>vector</type>
+        <unit></unit>
+        <default_value> </default_value>
+        <description></description>
+      </param>
+      <param container_type='value'>
+        <name>start</name>
+        <type>double</type>
+        <unit></unit>
+        <default_value>0</default_value>
+        <description></description>
+      </param>
+      <param container_type='value'>
+        <name>end</name>
+        <type>double</type>
         <unit></unit>
         <default_value>0</default_value>
         <description></description>
@@ -2727,7 +2719,7 @@
   </module>
   <module>
     <name>QuickAnalysisForDSD</name>
-    <version>1.1</version>
+    <version>1.2</version>
     <text></text>
     <parameters>
       <param container_type=''>
@@ -2735,6 +2727,13 @@
         <type>int</type>
         <unit></unit>
         <default_value>0</default_value>
+        <description></description>
+      </param>
+      <param container_type=''>
+        <name>num_bins</name>
+        <type>int</type>
+        <unit></unit>
+        <default_value>2048</default_value>
         <description></description>
       </param>
       <param container_type=''>
@@ -2748,7 +2747,21 @@
         <name>energy_max</name>
         <type>double</type>
         <unit>keV</unit>
-        <default_value>2000</default_value>
+        <default_value>204.8</default_value>
+        <description></description>
+      </param>
+      <param container_type=''>
+        <name>cut_energy_min</name>
+        <type>double</type>
+        <unit>keV</unit>
+        <default_value>0</default_value>
+        <description></description>
+      </param>
+      <param container_type=''>
+        <name>cut_energy_max</name>
+        <type>double</type>
+        <unit>keV</unit>
+        <default_value>204.8</default_value>
         <description></description>
       </param>
     </parameters>
@@ -2981,7 +2994,7 @@
   </module>
   <module>
     <name>PhysicsListManager</name>
-    <version>2.0</version>
+    <version>2.1</version>
     <text></text>
     <parameters>
       <param container_type=''>
@@ -3024,6 +3037,13 @@
         <type>string</type>
         <unit></unit>
         <default_value>BIC</default_value>
+        <description></description>
+      </param>
+      <param container_type=''>
+        <name>nuclear_lifetime_threshold</name>
+        <type>double</type>
+        <unit>s</unit>
+        <default_value>1e-12</default_value>
         <description></description>
       </param>
       <param container_type=''>

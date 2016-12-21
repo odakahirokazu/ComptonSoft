@@ -32,10 +32,11 @@ namespace comptonsoft {
  *
  * @author Hirokazu Odaka
  * @date 2014-09-05
+ * @date 2016-12-20
  */
 class ReadSGDEventFITS : public VCSModule, public anlgeant4::InitialInformation
 {
-  DEFINE_ANL_MODULE(ReadSGDEventFITS, 0.0);
+  DEFINE_ANL_MODULE(ReadSGDEventFITS, 1.0);
 public:
   ReadSGDEventFITS();
   ~ReadSGDEventFITS();
@@ -47,7 +48,9 @@ public:
 private:
   std::string m_Filename;
   int m_CCID;
-  bool m_VetoEnable;
+  bool m_PseudoPass;
+  bool m_VetoEnabled;
+  bool m_StandardSelectionEnabled;
 
   std::unique_ptr<astroh::sgd::EventFITSReader> m_EventReader;
   Long64_t m_NumEvents;

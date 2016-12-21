@@ -50,18 +50,36 @@ bool is_pseudo_effective(int cc_id,
                          astroh::sgd::EventFlags f)
 {
   if (cc_id==1) {
-    if (f.getCCHitPattern()!=0x1) { return false; }
+    if (f.getCCHitPattern()!=0x1u) { return false; }
   }
   else if (cc_id==2) {
-    if (f.getCCHitPattern()!=0x2) { return false; }
+    if (f.getCCHitPattern()!=0x2u) { return false; }
   }
   else if (cc_id==3) {
-    if (f.getCCHitPattern()!=0x4) { return false; }
+    if (f.getCCHitPattern()!=0x4u) { return false; }
   }
 
-  if (f.getFastBGO()!=0) { return false; }
-  if (f.getHitPattern()!=0) { return false; }
+  if (f.getFastBGO()!=0u) { return false; }
+  if (f.getHitPattern()!=0u) { return false; }
   return is_pseudo_triggered(f);
+}
+
+bool pass_shield_selection(astroh::sgd::EventFlags f)
+{
+  return (f.getHitPattern()==0u && f.getFastBGO()==0u);
+}
+
+bool pass_standard_selection(astroh::sgd::EventFlags f)
+{
+  const bool check = (f.getLengthCheckMIO()==0u &&
+                      f.getCCBusy()==0u &&
+                      f.getSEU()==0u &&
+                      f.getLengthCheck()==0u &&
+                      f.getCalibrationMode()==0u);
+  // trigger: force, pseudo, and cal-pulse
+  const uint32_t triggerRef = (1u<<28) + (1u<<29) + (1u<<30);
+  const bool trigger = ((f.getTriggerPattern()&triggerRef) == 0u);
+  return (check && trigger);
 }
 
 } /* anonymous namespace */
@@ -72,7 +90,9 @@ namespace comptonsoft
 
 ReadSGDEventFITS::ReadSGDEventFITS()
   : anlgeant4::InitialInformation(false),
-    m_CCID(0), m_VetoEnable(true), m_NumEvents(0), m_Index(0)
+    m_CCID(0),
+    m_PseudoPass(true), m_VetoEnabled(true), m_StandardSelectionEnabled(true),
+    m_NumEvents(0), m_Index(0)
 {
   add_alias("InitialInformation");
 }
@@ -83,6 +103,9 @@ ANLStatus ReadSGDEventFITS::mod_startup()
 {
   register_parameter(&m_Filename, "filename");
   register_parameter(&m_CCID, "cc_id");
+  register_parameter(&m_PseudoPass, "pseudo_pass");
+  register_parameter(&m_VetoEnabled, "veto");
+  register_parameter(&m_StandardSelectionEnabled, "standard_selection");
 
   return AS_OK;
 }
@@ -98,7 +121,10 @@ ANLStatus ReadSGDEventFITS::mod_init()
 
   EvsDef("ReadSGDEventFITS:PseudoTrigger");
   EvsDef("ReadSGDEventFITS:PseudoEffective");
-  EvsDef("ReadSGDEventFITS:ShieldTrigger");
+  EvsDef("ReadSGDEventFITS:ShieldSelection:OK");
+  EvsDef("ReadSGDEventFITS:ShieldSelection:NG");
+  EvsDef("ReadSGDEventFITS:StandardSelection:OK");
+  EvsDef("ReadSGDEventFITS:StandardSelection:NG");
   
   return AS_OK;
 }
@@ -120,13 +146,32 @@ ANLStatus ReadSGDEventFITS::mod_ana()
   if (is_pseudo_triggered(eventFlags)) {
     EvsSet("ReadSGDEventFITS:PseudoTrigger");
   }
+
   if (is_pseudo_effective(m_CCID, eventFlags)) {
     EvsSet("ReadSGDEventFITS:PseudoEffective");
+    if (m_PseudoPass) {
+      m_Index++;
+      return AS_OK;
+    }
   }
 
-  if (eventFlags.getHitPattern() || eventFlags.getFastBGO()) {
-    EvsSet("ReadSGDEventFITS:ShieldTrigger");
-    if (m_VetoEnable) {
+  if (pass_shield_selection(eventFlags)) {
+    EvsSet("ReadSGDEventFITS:ShieldSelection:OK");
+  }
+  else {
+    EvsSet("ReadSGDEventFITS:ShieldSelection:NG");
+    if (m_VetoEnabled) {
+      m_Index++;
+      return AS_SKIP;
+    }
+  }
+
+  if (pass_standard_selection(eventFlags)) {
+    EvsSet("ReadSGDEventFITS:StandardSelection:OK");
+  }
+  else {
+    EvsSet("ReadSGDEventFITS:StandardSelection:NG");
+    if (m_StandardSelectionEnabled) {
       m_Index++;
       return AS_SKIP;
     }

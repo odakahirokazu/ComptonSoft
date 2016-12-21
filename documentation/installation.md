@@ -42,7 +42,7 @@ You can find
 of ANL Next.
 
 ### (5) [Geant4](http://geant4.cern.ch/)
-*version 10.2.p02 or later*
+*version 10.3 or later*
 
 A toolkit library for Monte Carlo simulations.
 Following building options are required:

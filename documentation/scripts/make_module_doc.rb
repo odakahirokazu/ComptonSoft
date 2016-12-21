@@ -86,6 +86,8 @@ a.push ComptonSoft::ApplyEPICompensation.new
 
 a.push ComptonSoft::EventSelection.new
 
+a.push ComptonSoft::FilterByGoodTimeIntervals.new
+
 a.push ComptonSoft::EventReconstruction.new
 
 a.push ComptonSoft::HXIEventSelection.new
