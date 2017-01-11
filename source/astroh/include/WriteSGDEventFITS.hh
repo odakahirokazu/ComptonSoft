@@ -37,10 +37,11 @@ class CSHitCollection;
  *
  * @author Hirokazu Odaka
  * @date 2015-10-28
+ * @date 2017-01-10 | H. Odaka | 0.1 | record trigger pattern flags.
  */
 class WriteSGDEventFITS : public VCSModule
 {
-  DEFINE_ANL_MODULE(WriteSGDEventFITS, 0.0);
+  DEFINE_ANL_MODULE(WriteSGDEventFITS, 0.1);
 public:
   WriteSGDEventFITS();
   ~WriteSGDEventFITS();

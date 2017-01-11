@@ -1,4 +1,5 @@
-/** @file SGDEvent.hh
+/**
+ * @file SGDEvent.hh
  * contains definitions of SGD event classes.
  *
  * @author Katsuhiro Hayashi, Soki Sakurai
@@ -8,6 +9,7 @@
  * @date 2014-09-03 | H. Odaka | Modify. Add setters taking rvalue references.
  * @date 2015-07-07 | H. Odaka | Review and all methods are redefined.
  * @date 2015-10-28 | H. Odaka | All column names are capitalized.
+ * @date 2017-01-11 | H. Odaka | Add methods to class EventFlags.
  *
  */
 
@@ -45,49 +47,61 @@ public:
   
   void set(uint64_t flags)
   { this->flags_ = flags; }
+
+  void add(uint64_t flags)
+  { this->flags_ |= flags; }
+
+  void clear(uint64_t flags)
+  { this->flags_ &= flags; }
   
   uint64_t get() const
   { return flags_; }
     
   // FLAG_TRIG in FITS
   uint8_t getTrigger() const 
-  { return (flags_ & 0x3f); }
+  { return (flags_ & 0x3ful); }
 
   // FLAG_TRIGPAT in FITS
   uint32_t getTriggerPattern() const
-  { return ((flags_ >> 8) & 0x7fffffff); }
-    
+  { return ((flags_ >> 8) & 0x7ffffffful); }
+
+  void clearTriggerPattern()
+  { clear(0x7ffffffful << 8); }
+
+  void addTriggerPatternByIndex(int triggerPatternIndex)
+  { add(0x1ul << 8 << triggerPatternIndex); }
+
   // FLAG_CALMODE in FITS
   uint8_t getCalibrationMode() const
-  { return ((flags_ >> 40) & 0x1); }
+  { return ((flags_ >> 40) & 0x1ul); }
     
   // FLAG_LCHK in FITS
   uint8_t getLengthCheck() const
-  { return ((flags_ >> 41) & 0x1); }
+  { return ((flags_ >> 41) & 0x1ul); }
     
   // FLAG_SEU in FITS
   uint8_t getSEU() const
-  { return ((flags_ >> 42) & 0x1); }
+  { return ((flags_ >> 42) & 0x1ul); }
     
   // FLAG_FASTBGO in FITS
   uint8_t getFastBGO() const
-  { return ((flags_ >> 48) & 0xf); }
+  { return ((flags_ >> 48) & 0xful); }
     
   // FLAG_HITPAT in FITS
   uint8_t getHitPattern() const
-  { return ((flags_ >> 52) & 0xf); }
+  { return ((flags_ >> 52) & 0xful); }
     
   // FLAG_HITPAT_CC in FITS
   uint8_t getCCHitPattern() const
-  { return ((flags_ >> 56) & 0x7); }
+  { return ((flags_ >> 56) & 0x7ul); }
     
   // FLAG_CCBUSY in FITS
   uint8_t getCCBusy() const
-  { return ((flags_ >> 60) & 0x7); }
+  { return ((flags_ >> 60) & 0x7ul); }
 
   // FLAG_LCHCKMIO in FITS
   uint8_t getLengthCheckMIO() const
-  { return ((flags_ >> 63) & 0x1); }
+  { return ((flags_ >> 63) & 0x1ul); }
 
 private:
   uint64_t flags_;

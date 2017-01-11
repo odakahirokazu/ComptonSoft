@@ -46,6 +46,7 @@ void fillHits(int64_t occurrenceID,
               astroh::sgd::Event* event)
 {
   event->setOccurrenceID(occurrenceID);
+  astroh::sgd::EventFlags flags = event->getFlags();
   for (auto& hit: hits) {
     const int readoutModuleID = hit->ReadoutModuleID();
     const int section = hit->ReadoutSection();
@@ -58,7 +59,12 @@ void fillHits(int64_t occurrenceID,
                            channelID_remapped,
                            hit->PHA(),
                            hit->EPI()/keV);
+    if (hit->SelfTriggered()) {
+      const int triggerIndex = readoutModuleID;
+      flags.addTriggerPatternByIndex(triggerIndex);
+    }
   }
+  event->setFlags(flags);
 }
 
 } /* anonymous namespace */
