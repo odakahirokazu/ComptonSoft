@@ -18,6 +18,7 @@
  *************************************************************************/
 
 #include "FilterByGoodTimeIntervals.hh"
+#include "CLHEP/Units/SystemOfUnits.h"
 #include "CSHitCollection.hh"
 #include "DetectorHit.hh"
 
@@ -35,8 +36,8 @@ FilterByGoodTimeIntervals::~FilterByGoodTimeIntervals() = default;
 ANLStatus FilterByGoodTimeIntervals::mod_startup()
 {
   register_parameter(&m_GTIs, "time_intervals");
-  add_value_element(&m_TimeStart, "start");
-  add_value_element(&m_TimeEnd, "end");
+  add_value_element(&m_TimeStart, "start", CLHEP::second, "s");
+  add_value_element(&m_TimeEnd, "end", CLHEP::second, "s");
 
   return AS_OK;
 }
