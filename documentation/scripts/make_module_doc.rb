@@ -148,6 +148,8 @@ a.push ComptonSoft::HistogramPHA.new
 
 a.push ComptonSoft::HistogramEnergySpectrum.new
 
+a.push ComptonSoft::HistogramEnergy1D.new
+
 a.push ComptonSoft::HistogramEnergy2D.new
 
 a.push ComptonSoft::HistogramARM.new

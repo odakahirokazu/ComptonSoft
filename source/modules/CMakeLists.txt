@@ -76,6 +76,7 @@ set(CS_MODULES
   src/ReadComptonEventTree.cc
   src/HistogramPHA.cc
   src/HistogramEnergySpectrum.cc
+  src/HistogramEnergy1D.cc
   src/HistogramEnergy2D.cc
   src/HistogramARM.cc
   src/HistogramARMByPositionMeasurement.cc

@@ -1780,14 +1780,14 @@
       <param container_type='value'>
         <name>start</name>
         <type>double</type>
-        <unit></unit>
+        <unit>s</unit>
         <default_value>0</default_value>
         <description></description>
       </param>
       <param container_type='value'>
         <name>end</name>
         <type>double</type>
-        <unit></unit>
+        <unit>s</unit>
         <default_value>0</default_value>
         <description></description>
       </param>
@@ -2363,6 +2363,34 @@
         <type>vector&lt;string&gt;</type>
         <unit></unit>
         <default_value></default_value>
+        <description></description>
+      </param>
+    </parameters>
+  </module>
+  <module>
+    <name>HistogramEnergy1D</name>
+    <version>3.1</version>
+    <text></text>
+    <parameters>
+      <param container_type=''>
+        <name>number_of_bins</name>
+        <type>int</type>
+        <unit></unit>
+        <default_value>720</default_value>
+        <description></description>
+      </param>
+      <param container_type=''>
+        <name>energy_min</name>
+        <type>double</type>
+        <unit>keV</unit>
+        <default_value>0</default_value>
+        <description></description>
+      </param>
+      <param container_type=''>
+        <name>energy_max</name>
+        <type>double</type>
+        <unit>keV</unit>
+        <default_value>720</default_value>
         <description></description>
       </param>
     </parameters>

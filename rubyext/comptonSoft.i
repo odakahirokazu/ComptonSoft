@@ -46,6 +46,7 @@
 #include "ReadComptonEventTree.hh"
 #include "HistogramPHA.hh"
 #include "HistogramEnergySpectrum.hh"
+#include "HistogramEnergy1D.hh"
 #include "HistogramEnergy2D.hh"
 #include "HistogramARM.hh"
 #include "HistogramARMByPositionMeasurement.hh"
@@ -477,6 +478,14 @@ class HistogramEnergySpectrum : public VCSModule
 public:
   HistogramEnergySpectrum();  
   ~HistogramEnergySpectrum() = default;
+};
+
+
+class HistogramEnergy1D : public VCSModule
+{
+public:
+  HistogramEnergy1D();
+  ~HistogramEnergy1D() = default;
 };
 
 

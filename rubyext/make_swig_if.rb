@@ -52,6 +52,7 @@ clMod = [
   ANL::SWIGClass.new("ReadComptonEventTree"),
   ANL::SWIGClass.new("HistogramPHA"),
   ANL::SWIGClass.new("HistogramEnergySpectrum"),
+  ANL::SWIGClass.new("HistogramEnergy1D"),
   ANL::SWIGClass.new("HistogramEnergy2D"),
   ANL::SWIGClass.new("HistogramARM"),
   ANL::SWIGClass.new("HistogramARMByPositionMeasurement"),

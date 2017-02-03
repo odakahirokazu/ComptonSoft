@@ -45,6 +45,7 @@ class WriteComptonEventTree;
 class ReadComptonEventTree;
 class HistogramPHA;
 class HistogramEnergySpectrum;
+class HistogramEnergy1D;
 class HistogramEnergy2D;
 class HistogramARM;
 class HistogramARMByPositionMeasurement;
