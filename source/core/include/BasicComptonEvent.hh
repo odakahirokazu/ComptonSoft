@@ -119,13 +119,15 @@ public:
   void setLikelihood(double v) { likelihood_ = v; }
   double Likelihood() const { return likelihood_; }
 
+  vector3_t ConeVertex() const { return Hit1Position(); }
+  
   double CosThetaE() const { refresh(); return cosThetaE_; }
   double ThetaE() const { refresh(); return thetaE_; }
   vector3_t ConeAxis() const { refresh(); return coneAxis_; }
-  vector3_t ConeVertex() const { refresh(); return coneVertex_; }
   double ThetaG() const { refresh(); return thetaG_; }
   double DeltaTheta() const { refresh(); return deltaTheta_; }
   double PhiG() const { refresh(); return phiG_; }
+
   double TotalEnergy()  const { return Hit1Energy()+Hit2Energy(); }
   bool TimeOrder() const { return (Hit1Time() <= Hit2Time()); }
   bool EnergyOrder() const { return (Hit1Energy() <= Hit2Energy()); }
@@ -192,7 +194,6 @@ private:
   mutable double thetaG_;
   mutable double deltaTheta_;
   mutable double phiG_;
-  mutable vector3_t coneVertex_;
   mutable vector3_t coneAxis_;
 
   bool sourceDistant_;

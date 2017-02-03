@@ -38,7 +38,7 @@ BasicComptonEvent::BasicComptonEvent()
     bCalc_(false),
     cosThetaE_(1.0), thetaE_(0.0), thetaG_(0.0), deltaTheta_(0.0),
     phiG_(0.0),
-    coneVertex_(0.0, 0.0, 0.0), coneAxis_(0.0, 0.0, 1.0),
+    coneAxis_(0.0, 0.0, 1.0),
     sourceDistant_(true), sourceDirection_(0.0, 0.0, 1.0),
     sourcePosition_(0.0, 0.0, 0.0)
 {
@@ -108,7 +108,6 @@ void BasicComptonEvent::calc() const
   const double k = floor(cosThetaE_/2.0+0.5);
   thetaE_ = acos(cosThetaE_ - 2.0*k) - pi*k;
 
-  coneVertex_ = hit1Position_;
   const vector3_t scatteringVector = (hit2Position_-hit1Position_).unit();
   coneAxis_ = -scatteringVector;
 
