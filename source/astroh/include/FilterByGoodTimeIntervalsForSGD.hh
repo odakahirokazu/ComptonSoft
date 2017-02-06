@@ -17,53 +17,34 @@
  *                                                                       *
  *************************************************************************/
 
-#ifndef COMPTONSOFT_ComptonEventFilter_H
-#define COMPTONSOFT_ComptonEventFilter_H 1
+#ifndef COMPTONSOFT_FilterByGoodTimeIntervalsForSGD_H
+#define COMPTONSOFT_FilterByGoodTimeIntervalsForSGD_H 1
 
-#include "BasicModule.hh"
-
-#include <functional>
-#include "HitPattern.hh"
-#include "VCSModule.hh"
+#include "FilterByGoodTimeIntervals.hh"
 
 namespace comptonsoft {
 
-class BasicComptonEvent;
-class EventReconstruction;
+class ReadSGDEventFITS;
+
 
 /**
- *
  * @author Hirokazu Odaka
- * @date 2011-xx-xx
- * @date 2014-11-26
- * @date 2015-10-10 | derived from VCSModule
- * @date 2017-02-06 | 4.0 | do not determine hit patterns in this module.
+ * @date 2017-02-06
  */
-class ComptonEventFilter : public VCSModule
+class FilterByGoodTimeIntervalsForSGD : public FilterByGoodTimeIntervals
 {
-  DEFINE_ANL_MODULE(ComptonEventFilter, 4.0);
+  DEFINE_ANL_MODULE(FilterByGoodTimeIntervalsForSGD, 1.0);
 public:
-  ComptonEventFilter();
-  ~ComptonEventFilter() = default;
+  FilterByGoodTimeIntervalsForSGD();
+  ~FilterByGoodTimeIntervalsForSGD();
 
-  anl::ANLStatus mod_startup();
-  anl::ANLStatus mod_com();
   anl::ANLStatus mod_init();
   anl::ANLStatus mod_ana();
 
-  void define_condition();
-  void add_condition(const std::string& type,
-                     double minValue,
-                     double maxValue);
-    
 private:
-  EventReconstruction* m_EventReconstruction;
-  std::vector<std::string> m_HitPatternNames;
-  std::vector<HitPattern> m_HitPatterns;
-  std::vector<std::string> m_HitPatternEvsKeys;
-  std::vector<std::vector<std::function<bool (const BasicComptonEvent&)>>> m_ConditionsVector;
+  const ReadSGDEventFITS* m_EventReader = nullptr;
 };
 
 } /* namespace comptonsoft */
 
-#endif /* COMPTONSOFT_ComptonEventFilter_H */
+#endif /* COMPTONSOFT_FilterByGoodTimeIntervalsForSGD_H */

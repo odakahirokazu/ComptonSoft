@@ -42,9 +42,12 @@ public:
   anl::ANLStatus mod_init();
   anl::ANLStatus mod_ana();
 
+protected:
+  std::vector<std::tuple<double, double>> m_GTIs;
+
 private:
   const CSHitCollection* m_HitCollection = nullptr;
-  std::vector<std::tuple<double, double>> m_GTIs;
+
   double m_TimeStart = 0.0;
   double m_TimeEnd = 0.0;
 };

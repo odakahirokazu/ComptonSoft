@@ -33,10 +33,11 @@ namespace comptonsoft {
  * @author Hirokazu Odaka
  * @date 2014-09-05
  * @date 2016-12-20
+ * @date 2017-02-06 | access to event time
  */
 class ReadSGDEventFITS : public VCSModule, public anlgeant4::InitialInformation
 {
-  DEFINE_ANL_MODULE(ReadSGDEventFITS, 1.0);
+  DEFINE_ANL_MODULE(ReadSGDEventFITS, 1.1);
 public:
   ReadSGDEventFITS();
   ~ReadSGDEventFITS();
@@ -44,6 +45,8 @@ public:
   anl::ANLStatus mod_startup();
   anl::ANLStatus mod_init();
   anl::ANLStatus mod_ana();
+
+  double EventTime() const { return m_EventTime; }
   
 private:
   std::string m_Filename;
@@ -55,6 +58,8 @@ private:
   std::unique_ptr<astroh::sgd::EventFITSReader> m_EventReader;
   Long64_t m_NumEvents;
   Long64_t m_Index;
+
+  double m_EventTime;
 };
 
 } /* namespace comptonsoft */

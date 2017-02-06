@@ -97,6 +97,9 @@
 #ifdef USE_FITSIO
 #include "WriteHXIEventFITS.hh"
 #endif
+#ifdef USE_FITSIO
+#include "FilterByGoodTimeIntervalsForSGD.hh"
+#endif
 
 #include "class_list_anlGeant4.hh"
 #include "comptonsoft_basic_classes.hh"
@@ -739,6 +742,16 @@ class WriteHXIEventFITS : public VCSModule
 public:
   WriteHXIEventFITS();
   ~WriteHXIEventFITS();
+};
+
+#endif
+
+#ifdef USE_FITSIO
+class FilterByGoodTimeIntervalsForSGD : public FilterByGoodTimeIntervals
+{
+public:
+  FilterByGoodTimeIntervalsForSGD();
+  ~FilterByGoodTimeIntervalsForSGD();
 };
 
 #endif

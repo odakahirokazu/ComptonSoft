@@ -17,53 +17,50 @@
  *                                                                       *
  *************************************************************************/
 
-#ifndef COMPTONSOFT_ComptonEventFilter_H
-#define COMPTONSOFT_ComptonEventFilter_H 1
+#include "FilterByGoodTimeIntervalsForSGD.hh"
+#include "CLHEP/Units/SystemOfUnits.h"
+#include "ReadSGDEventFITS.hh"
 
-#include "BasicModule.hh"
 
-#include <functional>
-#include "HitPattern.hh"
-#include "VCSModule.hh"
+using namespace anl;
 
-namespace comptonsoft {
-
-class BasicComptonEvent;
-class EventReconstruction;
-
-/**
- *
- * @author Hirokazu Odaka
- * @date 2011-xx-xx
- * @date 2014-11-26
- * @date 2015-10-10 | derived from VCSModule
- * @date 2017-02-06 | 4.0 | do not determine hit patterns in this module.
- */
-class ComptonEventFilter : public VCSModule
+namespace comptonsoft
 {
-  DEFINE_ANL_MODULE(ComptonEventFilter, 4.0);
-public:
-  ComptonEventFilter();
-  ~ComptonEventFilter() = default;
 
-  anl::ANLStatus mod_startup();
-  anl::ANLStatus mod_com();
-  anl::ANLStatus mod_init();
-  anl::ANLStatus mod_ana();
+FilterByGoodTimeIntervalsForSGD::FilterByGoodTimeIntervalsForSGD() = default;
 
-  void define_condition();
-  void add_condition(const std::string& type,
-                     double minValue,
-                     double maxValue);
-    
-private:
-  EventReconstruction* m_EventReconstruction;
-  std::vector<std::string> m_HitPatternNames;
-  std::vector<HitPattern> m_HitPatterns;
-  std::vector<std::string> m_HitPatternEvsKeys;
-  std::vector<std::vector<std::function<bool (const BasicComptonEvent&)>>> m_ConditionsVector;
-};
+FilterByGoodTimeIntervalsForSGD::~FilterByGoodTimeIntervalsForSGD() = default;
+
+ANLStatus FilterByGoodTimeIntervalsForSGD::mod_init()
+{
+  GetANLModule("ReadSGDEventFITS", &m_EventReader);
+  EvsDef("FilterByGoodTimeIntervals:OK");
+
+  return AS_OK;
+}
+
+ANLStatus FilterByGoodTimeIntervalsForSGD::mod_ana()
+{
+  bool passed = false;
+
+  const double t = m_EventReader->EventTime();
+  for (const std::tuple<double, double>& interval: m_GTIs) {
+    const double time0 = std::get<0>(interval);
+    const double time1 = std::get<1>(interval);
+    if (time0<=t && t<time1) {
+      passed = true;
+      break;
+    }
+  }
+
+  if (passed) {
+    EvsSet("FilterByGoodTimeIntervals:OK");
+  }
+  else {
+    return AS_SKIP;
+  }
+
+  return AS_OK;
+}
 
 } /* namespace comptonsoft */
-
-#endif /* COMPTONSOFT_ComptonEventFilter_H */

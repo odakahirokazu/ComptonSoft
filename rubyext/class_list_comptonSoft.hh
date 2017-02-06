@@ -76,4 +76,5 @@ class ReadSGDEventFITS;
 class WriteSGDEventFITS;
 class ReadHXIEventFITS;
 class WriteHXIEventFITS;
+class FilterByGoodTimeIntervalsForSGD;
 }

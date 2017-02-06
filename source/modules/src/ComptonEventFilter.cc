@@ -59,6 +59,10 @@ ANLStatus ComptonEventFilter::mod_init()
     if (it!=std::end(hitPatterns)) {
       m_HitPatterns.push_back(*it);
       std::cout << "Hit pattern \"" << hitpatName << "\" is selected." << std::endl;
+
+      std::string evsKey = "HitPattern:";
+      evsKey += it->ShortName();
+      m_HitPatternEvsKeys.push_back(evsKey);
     }
     else {
       std::cout << "Hit pattern \"" << hitpatName << "\" is not found." << std::endl;
@@ -73,13 +77,9 @@ ANLStatus ComptonEventFilter::mod_ana()
   const BasicComptonEvent& comptonEvent = m_EventReconstruction->getComptonEvent();
 
   if (m_HitPatterns.size() != 0) {
-    std::vector<int> detids(2);
-    detids[0] = comptonEvent.Hit1DetectorID();
-    detids[1] = comptonEvent.Hit2DetectorID();
-    
     bool matched = false;
-    for (auto& hitpat: m_HitPatterns) {
-      if (hitpat.match(detids)) {
+    for (const std::string& hitpatKey: m_HitPatternEvsKeys) {
+      if (Evs(hitpatKey)) {
         matched = true;
         break;
       }
@@ -87,7 +87,6 @@ ANLStatus ComptonEventFilter::mod_ana()
     
     if (!matched) {
       EvsSet("ComptonEventFilter:RejectedByHitPattern");
-      m_EventReconstruction->clearAllHitPatternEVS();
       return AS_SKIP;
     }
   }

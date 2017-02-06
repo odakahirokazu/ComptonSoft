@@ -43,6 +43,7 @@ if(CS_USE_FITSIO)
     src/HXIEventFITS.cc
     src/ReadHXIEventFITS.cc
     src/WriteHXIEventFITS.cc
+    src/FilterByGoodTimeIntervalsForSGD.cc
     )
 endif()
 

@@ -92,7 +92,8 @@ ReadSGDEventFITS::ReadSGDEventFITS()
   : anlgeant4::InitialInformation(false),
     m_CCID(0),
     m_PseudoPass(true), m_VetoEnabled(true), m_StandardSelectionEnabled(true),
-    m_NumEvents(0), m_Index(0)
+    m_NumEvents(0), m_Index(0),
+    m_EventTime(0.0)
 {
   add_alias("InitialInformation");
 }
@@ -141,6 +142,8 @@ ANLStatus ReadSGDEventFITS::mod_ana()
   setEventID(event.getOccurrenceID());
 
   const double eventTime = event.getTime() * second;
+  m_EventTime = eventTime;
+
   const astroh::sgd::EventFlags eventFlags = event.getFlags();
 
   if (is_pseudo_triggered(eventFlags)) {
