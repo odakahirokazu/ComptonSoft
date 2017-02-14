@@ -31,7 +31,7 @@ class EventReconstruction;
 
 class HistogramAzimuthAngle : public VCSModule
 {
-  DEFINE_ANL_MODULE(HistogramAzimuthAngle, 2.1);
+  DEFINE_ANL_MODULE(HistogramAzimuthAngle, 2.2);
 public:
   HistogramAzimuthAngle();
   ~HistogramAzimuthAngle() = default;
@@ -39,12 +39,15 @@ public:
   anl::ANLStatus mod_startup();
   anl::ANLStatus mod_his();
   anl::ANLStatus mod_ana();
+  anl::ANLStatus mod_endrun();
   
 private:
   const EventReconstruction* eventReconstruction_;
 
   TH1* hist_all_;
   std::vector<TH1*> hist_vec_;
+  TH1* hist_delta_all_;
+  std::vector<TH1*> hist_delta_vec_;
 
   int numBins_;
   double theta_min_;

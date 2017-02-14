@@ -57,13 +57,18 @@ ANLStatus HistogramAzimuthAngle::mod_his()
 
   const double phi_min = -180.0;
   const double phi_max = +180.0;
-  hist_all_ = new TH1D("phi_all","Azimuth angle (All)",
+  hist_all_ = new TH1D("phi_all", "Azimuth angle (All)",
                        numBins_, phi_min, phi_max);
+  hist_delta_all_ = new TH1D("delta_all", "Difference of azimuth angle (All)",
+                             numBins_, phi_min, phi_max);
+  hist_delta_all_->Sumw2();
   
   const std::vector<HitPattern>& hitPatterns
     = getDetectorManager()->getHitPatterns();
   const std::size_t numHitPatterns = hitPatterns.size();
   hist_vec_.resize(numHitPatterns);
+  hist_delta_vec_.resize(numHitPatterns);
+
   for (std::size_t i=0; i<numHitPatterns; i++) {
     std::string histName = "phi_";
     std::string histTitle = "Azimuth angle (";
@@ -72,6 +77,15 @@ ANLStatus HistogramAzimuthAngle::mod_his()
     histTitle += ")";
     hist_vec_[i] = new TH1D(histName.c_str(), histTitle.c_str(),
                             numBins_, phi_min, phi_max);
+
+    histName = "delta_";
+    histTitle = "Difference of azimuth angle value (";
+    histName += hitPatterns[i].ShortName();
+    histTitle += hitPatterns[i].Name();
+    histTitle += ")";
+    hist_delta_vec_[i] = new TH1D(histName.c_str(), histTitle.c_str(),
+                                  numBins_, phi_min, phi_max);
+    hist_delta_vec_[i]->Sumw2();
   }
 
   return AS_OK;
@@ -100,12 +114,32 @@ ANLStatus HistogramAzimuthAngle::mod_ana()
 
   hist_all_->Fill(phi1);
 
+  const int bin = hist_delta_all_->FindBin(phi1);
+  const double binCenter = hist_delta_all_->GetBinCenter(bin);
+  const double delta = phi1 - binCenter;
+  hist_delta_all_->AddBinContent(bin, delta);
+
   for (std::size_t i=0; i<hist_vec_.size(); i++) {
     if (eventReconstruction_->HitPatternFlag(i)) {
       hist_vec_[i]->Fill(phi1);
+
+      const int bin = hist_delta_vec_[i]->FindBin(phi1);
+      const double binCenter = hist_delta_vec_[i]->GetBinCenter(bin);
+      const double delta = phi1 - binCenter;
+      hist_delta_vec_[i]->AddBinContent(bin, delta);
     }
   }
 
+  return AS_OK;
+}
+
+ANLStatus HistogramAzimuthAngle::mod_endrun()
+{
+  hist_delta_all_->Divide(hist_all_);
+  for (std::size_t i=0; i<hist_vec_.size(); i++) {
+    hist_delta_vec_[i]->Divide(hist_vec_[i]);
+  }
+  
   return AS_OK;
 }
 
