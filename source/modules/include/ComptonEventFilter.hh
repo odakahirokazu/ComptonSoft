@@ -31,6 +31,32 @@ namespace comptonsoft {
 class BasicComptonEvent;
 class EventReconstruction;
 
+class ComptonEventSelectionCondition
+{
+public:
+  ComptonEventSelectionCondition() = default;
+  ~ComptonEventSelectionCondition() = default;
+
+  void add_evs_key(const std::string& key)
+  { evsKeys_.push_back(key); }
+  void add_hit_pattern(const std::string& name)
+  { hitPatterns_.push_back(name); }
+  void add_condition(const std::function<bool (const BasicComptonEvent&)>& condition)
+  { conditions_.push_back(condition); }
+
+  std::vector<std::string>& get_evs_keys()
+  { return evsKeys_; }
+  std::vector<std::string>& get_hit_patterns()
+  { return hitPatterns_; }
+  std::vector<std::function<bool (const BasicComptonEvent&)>>& get_conditions()
+  { return conditions_; }
+
+private:
+  std::vector<std::string> evsKeys_;
+  std::vector<std::string> hitPatterns_;
+  std::vector<std::function<bool (const BasicComptonEvent&)>> conditions_;
+};
+
 /**
  *
  * @author Hirokazu Odaka
@@ -38,30 +64,29 @@ class EventReconstruction;
  * @date 2014-11-26
  * @date 2015-10-10 | derived from VCSModule
  * @date 2017-02-06 | 4.0 | do not determine hit patterns in this module.
+ * @date 2017-02-15 | 4.1 | can specify hit pattern in the condition phase
  */
 class ComptonEventFilter : public VCSModule
 {
-  DEFINE_ANL_MODULE(ComptonEventFilter, 4.0);
+  DEFINE_ANL_MODULE(ComptonEventFilter, 4.1);
 public:
   ComptonEventFilter();
   ~ComptonEventFilter() = default;
 
   anl::ANLStatus mod_startup();
-  anl::ANLStatus mod_com();
   anl::ANLStatus mod_init();
   anl::ANLStatus mod_ana();
 
   void define_condition();
+  void add_hit_pattern(const std::string& name);
+  void add_evs_key(const std::string& key);
   void add_condition(const std::string& type,
                      double minValue,
                      double maxValue);
     
 private:
   EventReconstruction* m_EventReconstruction;
-  std::vector<std::string> m_HitPatternNames;
-  std::vector<HitPattern> m_HitPatterns;
-  std::vector<std::string> m_HitPatternEvsKeys;
-  std::vector<std::vector<std::function<bool (const BasicComptonEvent&)>>> m_ConditionsVector;
+  std::vector<ComptonEventSelectionCondition> m_ConditionsVector;
 };
 
 } /* namespace comptonsoft */
