@@ -150,8 +150,6 @@ ANLStatus ReadDataFile_VME3::mod_ana()
   for (auto& readoutModule: detectorManager->getReadoutModules()) {
     // read Header of one module
     for (int i=0; i<DATA_HEADER_LENGTH; i++) {
-      unsigned short int tmp;
-      tmp = (static_cast<unsigned short int>(*(p+1))<<8) + *p;
       p+=2;
     }
 
@@ -170,8 +168,6 @@ ANLStatus ReadDataFile_VME3::mod_ana()
 
     // read Footer of one module
     for (int i=0; i<DATA_FOOTER_LENGTH; i++) {
-      unsigned short int tmp;
-      tmp = (static_cast<unsigned short int>(*(p+1))<<8) + *p;
       p+=2;
     }
   }
