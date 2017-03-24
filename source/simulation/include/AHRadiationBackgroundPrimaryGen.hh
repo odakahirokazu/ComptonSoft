@@ -21,8 +21,11 @@
 #define COMPTONSOFT_AHRadiationBackgroundPrimaryGen_H 1
 
 #include "IsotropicPrimaryGen.hh"
-#include "TFile.h"
-#include "TH1D.h"
+#include <memory>
+
+class TFile;
+class TH1D;
+
 
 namespace comptonsoft {
 
@@ -32,12 +35,14 @@ namespace comptonsoft {
  * @author Tamotsu Sato
  * @date 2013-04-11 | Tamotsu Sato | ver 1.0: based on IsotropicPrimaryGen
  * @date 2013-05-03 | Tamotsu Sato & Hirokazu Odaka | ver 1.1 bug fix: unit conversion
+ * @date 2017-03-23 | Hirokazu Odaka | use unique_ptr for root File.
  */
 class AHRadiationBackgroundPrimaryGen : public anlgeant4::IsotropicPrimaryGen
 {
-  DEFINE_ANL_MODULE(AHRadiationBackgroundPrimaryGen, 1.1);
+  DEFINE_ANL_MODULE(AHRadiationBackgroundPrimaryGen, 1.2);
 public:
   AHRadiationBackgroundPrimaryGen();
+  ~AHRadiationBackgroundPrimaryGen();
 
   anl::ANLStatus mod_startup();
   anl::ANLStatus mod_init();
@@ -46,7 +51,7 @@ public:
     
 private:
   std::string m_Filename;
-  TFile* m_File;
+  std::unique_ptr<TFile> m_File;
   TH1D* m_Hist;
 };
 

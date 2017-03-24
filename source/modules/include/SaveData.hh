@@ -21,6 +21,7 @@
 #define COMPTONSOFT_SaveData_H 1
 
 #include "BasicModule.hh"
+#include <memory>
 
 class TFile;
 
@@ -30,13 +31,14 @@ namespace comptonsoft {
  * Module to manage TFile for save histograms/trees.
  * @author Hirokazu Odaka
  * @date 2008-04-30
+ * @date 2017-03-23 | use unique_ptr for the root file.
  */
 class SaveData : public anl::BasicModule
 {
-  DEFINE_ANL_MODULE(SaveData, 2.1);
+  DEFINE_ANL_MODULE(SaveData, 2.2);
 public:
   SaveData();
-  ~SaveData() = default;
+  ~SaveData();
   
   anl::ANLStatus mod_startup();
   anl::ANLStatus mod_init();
@@ -49,7 +51,7 @@ public:
 
 private:
   std::string m_Filename;
-  TFile* m_RootFile;
+  std::unique_ptr<TFile> m_RootFile;
 };
 
 } /* namespace comptonsoft */

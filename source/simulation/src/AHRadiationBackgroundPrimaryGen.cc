@@ -20,6 +20,8 @@
 #include "AHRadiationBackgroundPrimaryGen.hh"
 #include "G4SystemOfUnits.hh"
 #include "G4PhysicalConstants.hh"
+#include "TFile.h"
+#include "TH1.h"
 #include "TGraph.h"
 
 using namespace anl;
@@ -29,10 +31,13 @@ namespace comptonsoft
 
 AHRadiationBackgroundPrimaryGen::AHRadiationBackgroundPrimaryGen()
   : m_Filename("trapped_proton_spectrum.root"),
-    m_File(0), m_Hist(0)
+    m_File(nullptr),
+    m_Hist(nullptr)
 {
   add_alias("AHRadiationBackgroundPrimaryGen");
 }
+
+AHRadiationBackgroundPrimaryGen::~AHRadiationBackgroundPrimaryGen() = default;
 
 ANLStatus AHRadiationBackgroundPrimaryGen::mod_startup()
 {
@@ -47,7 +52,7 @@ ANLStatus AHRadiationBackgroundPrimaryGen::mod_init()
 {
   anlgeant4::IsotropicPrimaryGen::mod_init();
   
-  m_File = new TFile(m_Filename.c_str());
+  m_File.reset(new TFile(m_Filename.c_str()));
   if ( m_File->IsZombie() ) {
     G4cout << "Cannot open " << m_Filename << " ! " << G4endl;
     return AS_QUIT_ERR;

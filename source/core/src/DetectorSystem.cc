@@ -60,14 +60,7 @@ DetectorSystem::DetectorSystem()
   }
 }
 
-DetectorSystem::~DetectorSystem()
-{
-  if (ROOTFile_) {
-    ROOTFile_->Close();
-    delete ROOTFile_;
-    ROOTFile_ = nullptr;
-  }
-}
+DetectorSystem::~DetectorSystem() = default;
 
 MultiChannelData* DetectorSystem::
 getMultiChannelData(const DetectorBasedChannelID& channelID)
@@ -623,7 +616,7 @@ loadDetectorParametersRootNode(const boost::property_tree::ptree& RootNode,
     boost::filesystem::path relativePath(*rootFile);
     boost::filesystem::path fullPath = dir / relativePath;
     std::cout << "ROOT file: " << fullPath << std::endl;
-    ROOTFile_ = new TFile(fullPath.c_str());
+    ROOTFile_.reset(new TFile(fullPath.c_str()));
   }
 
   if (optional<int> autoPositionFlag = mainNode.get_optional<int>("auto_position.<xmlattr>.flag")) {

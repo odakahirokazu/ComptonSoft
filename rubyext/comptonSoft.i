@@ -252,7 +252,7 @@ class SaveData : public anl::BasicModule
 {
 public:
   SaveData();
-  ~SaveData() = default;
+  ~SaveData();
 };
 
 
@@ -589,6 +589,7 @@ class AHRadiationBackgroundPrimaryGen : public anlgeant4::IsotropicPrimaryGen
 {
 public:
   AHRadiationBackgroundPrimaryGen();
+  ~AHRadiationBackgroundPrimaryGen();
 };
 
 

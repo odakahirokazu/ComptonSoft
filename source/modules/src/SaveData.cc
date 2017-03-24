@@ -33,6 +33,8 @@ SaveData::SaveData()
 {
 }
 
+SaveData::~SaveData() = default;
+
 ANLStatus SaveData::mod_startup()
 {
   register_parameter(&m_Filename, "output");
@@ -41,7 +43,7 @@ ANLStatus SaveData::mod_startup()
 
 ANLStatus SaveData::mod_init()
 {
-  m_RootFile = new TFile(m_Filename.c_str(), "recreate");
+  m_RootFile.reset(new TFile(m_Filename.c_str(), "recreate"));
   if ( !m_RootFile ) {
     std::cout << "SaveData: cannot create ROOT file" << std::endl;
     return AS_QUIT;

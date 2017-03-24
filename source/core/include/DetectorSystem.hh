@@ -254,7 +254,7 @@ private:
 
   std::vector<DeviceSimulation*> deviceSimulationVector_;
   std::vector<VCSSensitiveDetector*> sensitiveDetectorVector_;
-  TFile* ROOTFile_;
+  std::unique_ptr<TFile> ROOTFile_;
 
   std::map<std::string, std::unique_ptr<DetectorGroup>> detectorGroupMap_;
   std::vector<HitPattern> hitPatterns_;
