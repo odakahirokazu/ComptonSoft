@@ -28,6 +28,26 @@ boost::pool<> DetectorHitAllocator(sizeof(DetectorHit));
 
 DetectorHit::~DetectorHit() = default;
 
+void DetectorHit::setSelfTriggered(bool v)
+{
+  if (v) {
+    addFlags(flag::SelfTriggered);
+  }
+  else {
+    clearFlags(flag::SelfTriggered);
+  }
+}
+
+void DetectorHit::setTriggered(bool v)
+{
+  if (v) {
+    addFlags(flag::Triggered);
+  }
+  else {
+    clearFlags(flag::Triggered);
+  }
+}
+
 DetectorHit& DetectorHit::merge(const DetectorHit& r)
 {
   const double edep0 = EnergyDeposit();

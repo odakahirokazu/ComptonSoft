@@ -34,6 +34,7 @@
 #include "CSTypes.hh"
 #include "ChannelID.hh"
 #include "PixelID.hh"
+#include "FlagDefinition.hh"
 
 namespace comptonsoft {
 
@@ -146,11 +147,11 @@ public:
   void clearProcess(uint32_t f) { process_ &= ~f; }
   bool isProcess(uint32_t f) const { return (process_&f)==f; }
 
-  void setSelfTriggered(bool v) { selfTriggered_ = v; }
-  bool SelfTriggered() const { return selfTriggered_; }
+  void setSelfTriggered(bool v);
+  bool SelfTriggered() const { return isFlags(flag::SelfTriggered); }
 
-  void setTriggered(bool v) { triggered_ = v; }
-  bool Triggered() const { return triggered_; }
+  void setTriggered(bool v);
+  bool Triggered() const { return isFlags(flag::Triggered); }
 
   void setSelfTriggeredTime(double v) { selfTriggeredTime_ = v; }
   double SelfTriggeredTime() const { return selfTriggeredTime_; }
@@ -260,8 +261,6 @@ private:
   double energyCharge_ = 0.0;
   uint32_t process_ = 0u;
   // trigger information
-  bool selfTriggered_ = false;
-  bool triggered_ = false;
   double selfTriggeredTime_ = 0.0;
   double triggeredTime_ = 0.0;
   // reconstructed

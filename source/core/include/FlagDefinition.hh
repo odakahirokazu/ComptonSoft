@@ -49,6 +49,9 @@ constexpr uint64_t HighZHit          = 0x0200u;
 constexpr uint64_t AntiCoincidence   = 0x0400u;
 
 constexpr uint64_t EnergyDepositQuenched = 0x1000u;
+
+constexpr uint64_t SelfTriggered = 0x10000u;
+constexpr uint64_t Triggered     = 0x20000u;
 }
 
 namespace channel_status {
