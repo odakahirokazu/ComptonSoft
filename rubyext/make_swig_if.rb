@@ -88,6 +88,7 @@ clSim = [# primary generator
 
 clAH = [
   ANL::SWIGClass.new("SimulateCXBShieldPlate"),
+  ANL::SWIGClass.new("RescaleSimulationNoiseOfSGDSiUntriggered"),
   ANL::SWIGClass.new("ReadSGDEventFITS", false, 'USE_FITSIO'),
   ANL::SWIGClass.new("WriteSGDEventFITS", false, 'USE_FITSIO'),
   ANL::SWIGClass.new("ReadHXIEventFITS", false, 'USE_FITSIO'),

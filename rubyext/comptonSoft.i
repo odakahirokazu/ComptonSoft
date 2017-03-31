@@ -85,6 +85,7 @@
 #include "InitialParticleTree.hh"
 #include "DumpMass.hh"
 #include "SimulateCXBShieldPlate.hh"
+#include "RescaleSimulationNoiseOfSGDSiUntriggered.hh"
 #ifdef USE_FITSIO
 #include "ReadSGDEventFITS.hh"
 #endif
@@ -706,6 +707,14 @@ class SimulateCXBShieldPlate : public VCSModule
 public:
   SimulateCXBShieldPlate();  
   ~SimulateCXBShieldPlate() = default;
+};
+
+
+class RescaleSimulationNoiseOfSGDSiUntriggered : public VCSModule
+{
+public:
+  RescaleSimulationNoiseOfSGDSiUntriggered();
+  ~RescaleSimulationNoiseOfSGDSiUntriggered() = default;
 };
 
 

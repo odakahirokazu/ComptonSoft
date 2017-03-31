@@ -72,6 +72,7 @@ class AssignG4CopyNumber;
 class InitialParticleTree;
 class DumpMass;
 class SimulateCXBShieldPlate;
+class RescaleSimulationNoiseOfSGDSiUntriggered;
 class ReadSGDEventFITS;
 class WriteSGDEventFITS;
 class ReadHXIEventFITS;

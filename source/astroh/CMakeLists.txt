@@ -33,6 +33,7 @@ set(CS_ASTROH_CLASSES
   # src/ReadHXIEventTree.cc
   src/ReadSGDEventTree.cc
   src/SimulateCXBShieldPlate.cc
+  src/RescaleSimulationNoiseOfSGDSiUntriggered.cc
   )
 
 if(CS_USE_FITSIO)
