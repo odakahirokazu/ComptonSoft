@@ -18,7 +18,7 @@ def run_simulation(num, random, output)
 
   sim.set_primary_generator :PlaneWavePrimaryGen, {
     particle: "gamma",
-    photon_index: 1.5,
+    photon_index: 0.0,
     energy_min: 1.0,
     energy_max: 20.0,
     position: vec(0.0, 0.0, 10.0),
