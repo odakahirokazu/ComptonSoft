@@ -45,7 +45,9 @@ namespace comptonsoft
 ActivationPickUpData::ActivationPickUpData()
   : m_AnalysisManager(G4RootAnalysisManager::Instance()),
     m_FilenameBase("activation"),
+    m_DetectionByGeneration(true),
     m_ProcessesToDetect{"protonInelastic"},
+    m_LifetimeLimit(1.0e-3*second),
     m_InitialEnergy(0.0)
 {
   add_alias("ActivationPickUpData");
@@ -57,7 +59,9 @@ ActivationPickUpData::~ActivationPickUpData() = default;
 ANLStatus ActivationPickUpData::mod_startup()
 {
   register_parameter(&m_FilenameBase, "output_filename_base");
+  register_parameter(&m_DetectionByGeneration, "detection_by_generation");
   register_parameter(&m_ProcessesToDetect, "processes_to_detect");
+  register_parameter(&m_LifetimeLimit, "lifetime_limit", second, "s");
   return AS_OK;
 }
 
@@ -83,44 +87,59 @@ void ActivationPickUpData::RunAct_begin(const G4Run*)
   m_AnalysisManager->CreateNtupleDColumn("ini_energy");
 }
 
-void ActivationPickUpData::RunAct_end(const G4Run* aRun)
+void ActivationPickUpData::RunAct_end(const G4Run* run)
 {
   OutputVolumeInfo(m_FilenameBase+".volume.dat");
-  OutputSummary(m_FilenameBase+".summary.dat", aRun->GetNumberOfEvent());
+  OutputSummary(m_FilenameBase+".summary.dat", run->GetNumberOfEvent());
   
   m_AnalysisManager->Write();
   m_AnalysisManager->CloseFile();
 }
 
-void ActivationPickUpData::TrackAct_begin(const G4Track* aTrack)
+void ActivationPickUpData::TrackAct_begin(const G4Track* track)
 {
-  StandardPickUpData::TrackAct_begin(aTrack);
+  StandardPickUpData::TrackAct_begin(track);
 
-  if (aTrack->GetTrackID() == 1) {
-    SetInitialEnergy(aTrack->GetKineticEnergy());
+  if (track->GetTrackID() == 1) {
+    SetInitialEnergy(track->GetKineticEnergy());
   }
 }
 
-void ActivationPickUpData::StepAct(const G4Step* aStep, G4Track*)
+void ActivationPickUpData::StepAct(const G4Step* step, G4Track* track)
 {
-  const G4VProcess* process = aStep->GetPostStepPoint()->GetProcessDefinedStep();
+  const G4VProcess* process = step->GetPostStepPoint()->GetProcessDefinedStep();
   const G4String processName = process->GetProcessName();
 
   if (std::find(std::begin(m_ProcessesToDetect),
                 std::end(m_ProcessesToDetect),
                 processName) != std::end(m_ProcessesToDetect)) {
-    const G4VTouchable* hist = aStep->GetPreStepPoint()->GetTouchable();
-    const G4ThreeVector position = aStep->GetPreStepPoint()->GetPosition();
+    const G4VTouchable* hist = step->GetPreStepPoint()->GetTouchable();
+    const G4ThreeVector position = step->GetPreStepPoint()->GetPosition();
 
-    const std::vector<const G4Track*>* secondaries
-      = aStep->GetSecondaryInCurrentStep();
-    for (const G4Track* secondaryTrack: *secondaries) {
-      G4ParticleDefinition* particle = secondaryTrack->GetDefinition();
+    if (m_DetectionByGeneration) {
+      const std::vector<const G4Track*>* secondaries
+        = step->GetSecondaryInCurrentStep();
+      for (const G4Track* secondaryTrack: *secondaries) {
+        G4ParticleDefinition* particle = secondaryTrack->GetDefinition();
+        const int massNumber = particle->GetAtomicMass();
+        if (massNumber > 4) { // heavier than He4 (alpha)
+          G4Ions* nucleus = dynamic_cast<G4Ions*>(particle);
+          if (nucleus) {
+            Fill(nucleus, hist, position.x(), position.y(), position.z());
+          }
+        }
+      }
+    }
+    else { // detection by decay
+      G4ParticleDefinition* particle = track->GetDefinition();
       const int massNumber = particle->GetAtomicMass();
       if (massNumber > 4) { // heavier than He4 (alpha)
         G4Ions* nucleus = dynamic_cast<G4Ions*>(particle);
         if (nucleus) {
-          Fill(nucleus, hist, position.x(), position.y(), position.z());
+          if (nucleus->GetPDGLifeTime() >= m_LifetimeLimit) {
+            Fill(nucleus, hist, position.x(), position.y(), position.z());
+            track->SetTrackStatus(fKillTrackAndSecondaries);
+          }
         }
       }
     }

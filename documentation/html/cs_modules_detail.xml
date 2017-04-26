@@ -1843,7 +1843,7 @@
   </module>
   <module>
     <name>SaveData</name>
-    <version>2.1</version>
+    <version>2.2</version>
     <text></text>
     <parameters>
       <param container_type=''>
@@ -2106,17 +2106,9 @@
   </module>
   <module>
     <name>ComptonEventFilter</name>
-    <version>3.3</version>
+    <version>4.1</version>
     <text></text>
-    <parameters>
-      <param container_type=''>
-        <name>hit_patterns</name>
-        <type>vector&lt;string&gt;</type>
-        <unit></unit>
-        <default_value></default_value>
-        <description></description>
-      </param>
-    </parameters>
+    <parameters/>
   </module>
   <module>
     <name>SelectTime</name>
@@ -2488,7 +2480,7 @@
   </module>
   <module>
     <name>HistogramAzimuthAngle</name>
-    <version>2.1</version>
+    <version>2.2</version>
     <text></text>
     <parameters>
       <param container_type=''>
@@ -2796,7 +2788,7 @@
   </module>
   <module>
     <name>AHRadiationBackgroundPrimaryGen</name>
-    <version>1.1</version>
+    <version>1.2</version>
     <text></text>
     <parameters>
       <param container_type=''>
@@ -2960,7 +2952,7 @@
   </module>
   <module>
     <name>ActivationPickUpData</name>
-    <version>2.0</version>
+    <version>3.0</version>
     <text></text>
     <parameters>
       <param container_type=''>
@@ -2971,10 +2963,24 @@
         <description></description>
       </param>
       <param container_type=''>
+        <name>detection_by_generation</name>
+        <type>bool</type>
+        <unit></unit>
+        <default_value>1</default_value>
+        <description></description>
+      </param>
+      <param container_type=''>
         <name>processes_to_detect</name>
         <type>vector&lt;string&gt;</type>
         <unit></unit>
         <default_value></default_value>
+        <description></description>
+      </param>
+      <param container_type=''>
+        <name>lifetime_limit</name>
+        <type>double</type>
+        <unit>s</unit>
+        <default_value>0.001</default_value>
         <description></description>
       </param>
     </parameters>

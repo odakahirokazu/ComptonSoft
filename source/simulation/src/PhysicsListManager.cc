@@ -143,6 +143,9 @@ G4VUserPhysicsList* PhysicsListManager::create()
   else if (m_PhysicsListName == "QGSP_BIC_HP") {
     physicsList = new QGSP_BIC_HP;
   }
+  else if (m_PhysicsListName == "QGSP_BIC_HP_RD") {
+    physicsList = new PhysicsListWithRadioactiveDecay<QGSP_BIC_HP>;
+  }
   else if (m_PhysicsListName == "FTFP_BERT") {
     physicsList = new FTFP_BERT;
   }

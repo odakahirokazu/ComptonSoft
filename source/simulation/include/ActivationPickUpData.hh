@@ -45,10 +45,11 @@ namespace comptonsoft {
  * @date 2012-06-13 | T. Sato & H. Odaka
  * @date 2015-06-01 | Hiro Odaka
  * @date 2016-06-29 | Hiro Odaka | modify detection methods
+ * @date 2017-04-25 | Hiro Odaka | support both detection methods
  */
 class ActivationPickUpData : public anlgeant4::StandardPickUpData
 {
-  DEFINE_ANL_MODULE(ActivationPickUpData, 2.0);
+  DEFINE_ANL_MODULE(ActivationPickUpData, 3.0);
 
   typedef std::map<std::string, int> volume_map_t;
   typedef std::map<int64_t, IsotopeInfo> data_map_t;
@@ -59,9 +60,9 @@ public:
   virtual anl::ANLStatus mod_startup();
   
   virtual void RunAct_begin(const G4Run*);
-  virtual void RunAct_end(const G4Run* aRun);
-  virtual void TrackAct_begin(const G4Track* aTrack);
-  virtual void StepAct(const G4Step* aStep, G4Track* aTrack);
+  virtual void RunAct_end(const G4Run* run);
+  virtual void TrackAct_begin(const G4Track* track);
+  virtual void StepAct(const G4Step* step, G4Track* track);
 
   virtual void CreateUserActions();
   
@@ -79,7 +80,9 @@ protected:
 private:
   std::unique_ptr<G4VAnalysisManager> m_AnalysisManager;
   std::string m_FilenameBase;
+  bool m_DetectionByGeneration;
   std::vector<std::string> m_ProcessesToDetect;
+  double m_LifetimeLimit;
   
   double m_InitialEnergy;
       
