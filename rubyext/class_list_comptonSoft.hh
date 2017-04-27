@@ -26,6 +26,7 @@ class CorrectPHA;
 class RecalculateEPI;
 class CalculatePedestalLevels;
 class InitialConditionFilter;
+class WeightByInitialDirection;
 class RecalculateSimulationNoise;
 class ComptonModeFilter;
 class SelectFullDeposit;

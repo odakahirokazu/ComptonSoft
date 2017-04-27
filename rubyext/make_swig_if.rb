@@ -33,6 +33,7 @@ clMod = [
   ANL::SWIGClass.new("RecalculateEPI"),
   ANL::SWIGClass.new("CalculatePedestalLevels"),
   ANL::SWIGClass.new("InitialConditionFilter"),
+  ANL::SWIGClass.new("WeightByInitialDirection"),
   ANL::SWIGClass.new("RecalculateSimulationNoise"),
   ANL::SWIGClass.new("ComptonModeFilter"),
   ANL::SWIGClass.new("SelectFullDeposit"),

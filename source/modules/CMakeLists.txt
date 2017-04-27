@@ -56,6 +56,7 @@ set(CS_MODULES
   src/RecalculateEPI.cc
   src/CalculatePedestalLevels.cc
   src/InitialConditionFilter.cc
+  src/WeightByInitialDirection.cc
   src/RecalculateSimulationNoise.cc
   src/ComptonModeFilter.cc # for old SGD
   src/SelectFullDeposit.cc

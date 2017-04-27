@@ -114,6 +114,8 @@ a.push ComptonSoft::CalculatePedestalLevels.new
 
 a.push ComptonSoft::InitialConditionFilter.new
 
+a.push ComptonSoft::WeightByInitialDirection.new
+
 a.push ComptonSoft::RecalculateSimulationNoise.new
 
 a.push ComptonSoft::ComptonModeFilter.new

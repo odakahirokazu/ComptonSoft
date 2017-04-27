@@ -27,6 +27,7 @@
 #include "RecalculateEPI.hh"
 #include "CalculatePedestalLevels.hh"
 #include "InitialConditionFilter.hh"
+#include "WeightByInitialDirection.hh"
 #include "RecalculateSimulationNoise.hh"
 #include "ComptonModeFilter.hh"
 #include "SelectFullDeposit.hh"
@@ -326,6 +327,14 @@ class InitialConditionFilter : public anl::BasicModule
 public:
   InitialConditionFilter();
   ~InitialConditionFilter() = default;
+};
+
+
+class WeightByInitialDirection : public anl::BasicModule
+{
+public:
+  WeightByInitialDirection();
+  ~WeightByInitialDirection() = default;
 };
 
 

@@ -2087,6 +2087,27 @@
     </parameters>
   </module>
   <module>
+    <name>WeightByInitialDirection</name>
+    <version>1.0</version>
+    <text></text>
+    <parameters>
+      <param container_type=''>
+        <name>dirz_vector</name>
+        <type>vector&lt;double&gt;</type>
+        <unit></unit>
+        <default_value></default_value>
+        <description></description>
+      </param>
+      <param container_type=''>
+        <name>weight_vector</name>
+        <type>vector&lt;double&gt;</type>
+        <unit></unit>
+        <default_value></default_value>
+        <description></description>
+      </param>
+    </parameters>
+  </module>
+  <module>
     <name>RecalculateSimulationNoise</name>
     <version>2.1</version>
     <text></text>
