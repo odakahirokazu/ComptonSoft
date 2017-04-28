@@ -1,0 +1,25 @@
+<?xml version="1.0" ?>
+<?xml-stylesheet type="text/xsl" href="https://raw.githubusercontent.com/odakahirokazu/ComptonSoft/master/xmlstyle/detector_parameters_v1.xsl" ?>
+
+<detector_parameters>
+  <name>Si pixel detector</name>
+  <comment>2017-04-24 | Hiro Odaka</comment>
+  <auto_position flag="0" />
+  <sensitive_detector_not_found_warning flag="1" />
+  <data>
+    <sensitive_detector type="2DPixel" name="SiDetector.log">
+      <common>
+        <parameters>
+          <channel_properties>
+            <noise_level param0="0.2" param1="0.0" param2="0.0" />
+            <threshold value="1.0" />
+          </channel_properties>
+          <reconstruction mode="1" />
+        </parameters>
+      </common>
+      <detector_list id_method="path" layer_offset="1">
+        <detector id="1" path="SiDetector" />
+      </detector_list>
+    </sensitive_detector>
+  </data>
+</detector_parameters>

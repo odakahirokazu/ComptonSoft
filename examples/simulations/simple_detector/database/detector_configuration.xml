@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="https://raw.githubusercontent.com/odakahirokazu/ComptonSoft/master/xmlstyle/detector_configuration_v4.xsl" ?>
+
+<configuration>
+  <name>Si pixel detector</name>
+  <comment>2017-04-24 | Hirokazu Odaka</comment>
+  <length_unit>cm</length_unit>
+  <detectors>
+    <detector id="1" type="2DPixel" name="Sensor:1">
+      <geometry x="1.0" y="1.0" z="0.05" />
+      <offset x="0.0" y="0.0" />
+      <pixel number_x="1" number_y="1" size_x="1.0" size_y="1.0" />
+      <position x="0.0" y="0.0" z="0.0" />
+      <xaxis_direction x="+1.0" y="0.0"  z="0.0" />
+      <yaxis_direction x="0.0"  y="+1.0" z="0.0" />
+    </detector>
+  </detectors>
+  <readout />
+  <groups />
+</configuration>
