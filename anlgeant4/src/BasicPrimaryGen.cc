@@ -49,7 +49,7 @@ BasicPrimaryGen::BasicPrimaryGen()
     energyDistribution_(SpectralShape::Undefined),
     energyMin_(0.1*keV), energyMax_(1000.0*keV),
     photonIndex_(0.0),
-    energyMean_(511.0*keV), energySigma_(2.0*keV),
+    energyMean_(511.0*keV), energySigma_(0.0*keV),
     kT_(10.0*keV)
 {
   add_alias("BasicPrimaryGen");
