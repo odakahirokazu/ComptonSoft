@@ -74,6 +74,7 @@ class InitialParticleTree;
 class DumpMass;
 class SimulateCXBShieldPlate;
 class RescaleSimulationNoiseOfSGDSiUntriggered;
+class UniformlyRandomizeEPI;
 class ReadSGDEventFITS;
 class WriteSGDEventFITS;
 class ReadHXIEventFITS;

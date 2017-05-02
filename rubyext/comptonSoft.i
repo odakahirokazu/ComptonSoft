@@ -87,6 +87,7 @@
 #include "DumpMass.hh"
 #include "SimulateCXBShieldPlate.hh"
 #include "RescaleSimulationNoiseOfSGDSiUntriggered.hh"
+#include "UniformlyRandomizeEPI.hh"
 #ifdef USE_FITSIO
 #include "ReadSGDEventFITS.hh"
 #endif
@@ -724,6 +725,14 @@ class RescaleSimulationNoiseOfSGDSiUntriggered : public VCSModule
 public:
   RescaleSimulationNoiseOfSGDSiUntriggered();
   ~RescaleSimulationNoiseOfSGDSiUntriggered() = default;
+};
+
+
+class UniformlyRandomizeEPI : public VCSModule
+{
+public:
+  UniformlyRandomizeEPI();
+  ~UniformlyRandomizeEPI();
 };
 
 
