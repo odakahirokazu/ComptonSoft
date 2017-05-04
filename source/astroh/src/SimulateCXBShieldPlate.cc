@@ -24,6 +24,7 @@
 #include "TFile.h"
 #include "TH2.h"
 #include "TGraph.h"
+#include "TRandom3.h"
 #include "AstroUnits.hh"
 #include "InitialInformation.hh"
 
@@ -35,7 +36,9 @@ namespace comptonsoft
 SimulateCXBShieldPlate::SimulateCXBShieldPlate()
   : m_ShieldDensity(1.0*g/cm3),
     m_ShieldThickness(0.0),
-    m_ShieldHeight(0.0)
+    m_ShieldHeight(0.0),
+    m_ShieldFillingFraction(1.0),
+    m_RandomGen(new TRandom3)
 {
 }
 
@@ -44,6 +47,7 @@ ANLStatus SimulateCXBShieldPlate::mod_startup()
   register_parameter(&m_ShieldDensity, "density", g/cm3, "g/cm3");
   register_parameter(&m_ShieldHeight, "height", cm, "cm");
   register_parameter(&m_ShieldThickness, "thickness", cm, "cm");
+  register_parameter(&m_ShieldFillingFraction, "filling_fraction");
   register_parameter(&m_CSFilename, "cross_section_file");
   register_parameter(&m_PositionFilename, "position_file");
   
@@ -104,6 +108,10 @@ ANLStatus SimulateCXBShieldPlate::mod_ana()
   const bool onShield = (m_ShieldDistribution->GetBinContent(binX, binY) > 0.0);
 
   if (onShield) {
+    if (m_RandomGen->Uniform(1.0) > m_ShieldFillingFraction) {
+      return AS_OK;
+    }
+    
     const double weight0 = m_InitialInfo->Weight();
     const double energy0 = m_InitialInfo->InitialEnergy();
     const double alpha = m_CS->Eval(energy0);

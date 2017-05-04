@@ -25,6 +25,7 @@
 
 class TH2;
 class TGraph;
+class TRandom;
 namespace anlgeant4 { class InitialInformation; }
 
 namespace comptonsoft {
@@ -52,6 +53,7 @@ private:
   double m_ShieldDensity;
   double m_ShieldThickness;
   double m_ShieldHeight;
+  double m_ShieldFillingFraction;
   std::string m_CSFilename;
   std::string m_PositionFilename;
   
@@ -59,6 +61,7 @@ private:
   std::unique_ptr<TFile> m_PositionFile;
   std::unique_ptr<TGraph> m_CS;
   TH2* m_ShieldDistribution = nullptr;
+  std::unique_ptr<TRandom> m_RandomGen;
 };
 
 } /* namespace comptonsoft */

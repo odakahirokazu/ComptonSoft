@@ -1,5 +1,6 @@
 #include "TGraph.h"
 #include "TFile.h"
+#include "TRandom.h"
 #include "BasicComptonEvent.hh"
 #include "VEventReconstructionAlgorithm.hh"
 #include "HitTreeIOWithInitialInfo.hh"
