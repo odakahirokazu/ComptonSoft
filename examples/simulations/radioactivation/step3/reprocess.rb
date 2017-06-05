@@ -10,7 +10,7 @@ class Reprocess < ANL::ANLApp
 
     chain :CSHitCollection
     chain :ConstructDetector
-    with_parameters(detector_configuration: "../step1/database/detector_configuration.xml",
+    with_parameters(detector_configuration: "../database/detector_configuration.xml",
                     verbose_level: 1)
     chain :ReadHitTree
     with_parameters(file_list: @input_files)
@@ -36,5 +36,5 @@ end
 file_list = Dir::glob("sim_decay_CdTeWafer_*.root")
 app = Reprocess.new
 app.input_files = file_list
-app.output_file = "sim_decay_CdTeWafer_reprocessed.root"
+app.output_file = "simulation_reprocessed.root"
 app.run(:all, 1000000)

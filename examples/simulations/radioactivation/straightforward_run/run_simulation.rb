@@ -25,10 +25,10 @@ def run_simulation(num, random, output)
     radius: 2.0,
   }
 
-  sim.set_pickup_data :ActivationPickUpData, {
-    output_filename_base: output.sub(".root", ".act"),
-    detection_by_generation: false,
-    processes_to_detect: ["RadioactiveDecay"],
+  sim.enable_timing_process()
+
+  sim.set_event_selection :EventSelection, {
+    discard_time_group_zero: true
   }
 
   sim.run(num)
@@ -37,12 +37,12 @@ end
 ### Main
 
 num = 1000000
-runs = (1..16).to_a
+runs = (1..128).to_a
 
 a = ANL::ParallelRun.new
 a.num_processes = 4
 a.set_log "simulation_%03d.log"
-a.run(runs, testrun: false) do |run_id|
+a.run(runs) do |run_id|
   output = "simulation_%03d.root" % run_id
   random = run_id
   run_simulation(num, random, output)

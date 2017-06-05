@@ -9,9 +9,9 @@ def run_simulation(num, random, output, ri, volume_path)
   sim.random_seed = random
   sim.verbose = 0
   sim.print_detector_info
-  sim.set_database(detector_configuration: "../step1/database/detector_configuration.xml",
-                   detector_parameters: "../step1/database/detector_parameters.xml")
-  sim.set_gdml "../step1/database/mass_model.gdml"
+  sim.set_database(detector_configuration: "../database/detector_configuration.xml",
+                   detector_parameters: "../database/detector_parameters.xml")
+  sim.set_gdml "../database/mass_model.gdml"
   sim.set_physics(hadron_model: "BIC",
                   hadron_hp: true,
                   radioactive_decay: true)

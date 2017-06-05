@@ -10,10 +10,10 @@ def run_simulation(num, random, output)
   sim.random_seed = random
   sim.verbose = 0
   sim.print_detector_info
-  sim.set_database(detector_configuration: "database/detector_configuration.xml",
-                   detector_parameters: "database/detector_parameters.xml")
-  sim.set_gdml "database/mass_model.gdml"
-  sim.set_physics(physics_list: "FTFP_INCLXX_HP_RD")
+  sim.set_database(detector_configuration: "../database/detector_configuration.xml",
+                   detector_parameters: "../database/detector_parameters.xml")
+  sim.set_gdml "../database/mass_model.gdml"
+  sim.set_physics(physics_list: "QGSP_BIC_HP")
 
   sim.set_primary_generator :PlaneWavePrimaryGen, {
     particle: "proton",
@@ -22,13 +22,13 @@ def run_simulation(num, random, output)
     energy_max: energy,
     position: vec(0.0, 0.0, 10.0),
     direction: vec(0.0, 0.0, -1.0),
-    radius: 1.6
+    radius: 2.0,
   }
 
   sim.set_pickup_data :ActivationPickUpData, {
     output_filename_base: output.sub(".root", ".act"),
-    detection_by_generation: false,
-    processes_to_detect: ["RadioactiveDecay"],
+    detection_by_generation: true,
+    processes_to_detect: ["protonInelastic"],
   }
 
   sim.run(num)
@@ -41,9 +41,9 @@ runs = (1..16).to_a
 
 a = ANL::ParallelRun.new
 a.num_processes = 4
-a.set_log "simulation_decay_mode_%03d.log"
-a.run(runs, testrun: true) do |run_id|
-  output = "simulation_decay_mode_%03d.root" % run_id
+a.set_log "simulation_%03d.log"
+a.run(runs, testrun: false) do |run_id|
+  output = "simulation_%03d.root" % run_id
   random = run_id
   run_simulation(num, random, output)
 end

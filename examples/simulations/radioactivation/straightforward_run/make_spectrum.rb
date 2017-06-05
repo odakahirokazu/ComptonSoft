@@ -2,9 +2,10 @@
 
 require "RubyROOT"
 
-file_list = Dir.glob("sim_decay_CdTeWafer_*.root")
+file_list = ["simulation_selected.root"]
 file_output = "spectrum.root"
-exposure =  10000.0
+scale = (4563862.9*(13860.0-1020.0))/(128*1000000)
+exposure =  (28911.0 + 10000.0)/scale
 
 tree = Root::TChain.new("hittree", "hittree")
 file_list.each do |file|
