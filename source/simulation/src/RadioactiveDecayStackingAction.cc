@@ -1,6 +1,6 @@
 /*************************************************************************
  *                                                                       *
- * Copyright (c) 2011 Hirokazu Odaka                                     *
+ * Copyright (c) 2011 Hirokazu Odaka, Makoto Asai                        *
  *                                                                       *
  * This program is free software: you can redistribute it and/or modify  *
  * it under the terms of the GNU General Public License as published by  *
@@ -17,46 +17,39 @@
  *                                                                       *
  *************************************************************************/
 
-#ifndef COMPTONSOFT_RadioactiveDecayPickUpData_H
-#define COMPTONSOFT_RadioactiveDecayPickUpData_H 1
+#include "RadioactiveDecayStackingAction.hh"
 
-#include "StandardPickUpData.hh"
+#include "G4Track.hh"
+#include "G4ParticleTypes.hh"
 
-namespace comptonsoft {
-
-class RadioactiveDecayStackingAction;
+using namespace comptonsoft;
 
 
-/**
- * PickUpData for radioactive decay.
- *
- * @author Hirokazu Odaka
- * @date 2008-08-27
- * @date 2011-04-08
- * @date 2016-06-29 | rename the module name.
- */
-class RadioactiveDecayPickUpData : public anlgeant4::StandardPickUpData
+RadioactiveDecayStackingAction::RadioactiveDecayStackingAction()
 {
-  DEFINE_ANL_MODULE(RadioactiveDecayPickUpData, 2.0);
-public:
-  RadioactiveDecayPickUpData();
+  G4cout << "RadioactiveDecayStackingAction: constructed" << G4endl;
+}
+
+
+RadioactiveDecayStackingAction::~RadioactiveDecayStackingAction()
+{
+  G4cout << "RadioactiveDecayStackingAction: destructed" << G4endl;
+}
+
+
+G4ClassificationOfNewTrack 
+RadioactiveDecayStackingAction::ClassifyNewTrack(const G4Track* aTrack)
+{
+  /* selection: fKill, fUrgent, fSuspend */
+  G4ClassificationOfNewTrack classification = fUrgent;
   
-  virtual anl::ANLStatus mod_startup();
-
-  virtual void CreateUserActions();
-  virtual void StepAct(const G4Step* aStep, G4Track* aTrack);
-
-  void SetTerminationTime(double v) { m_TerminationTime = v; }
-  double TerminationTime() const { return m_TerminationTime; }
-
-  double FirstDecayTime() const { return m_FirstDecayTime; }
-
-private:
-  double m_TerminationTime;
-  double m_FirstDecayTime;
-  RadioactiveDecayStackingAction* m_StackingAction = nullptr;
-};
-
-} /* namespace comptonsoft */
-
-#endif /* COMPTONSOFT_RadioactiveDecayPickUpData_H */
+  /* kill if the particle is not relevant to radioactivation */
+  if (aTrack->GetParentID() != 0) {
+    const double t = aTrack->GetGlobalTime() - firstDecayTime_;
+    if (t > terminationTime_) {
+      classification = fKill;
+    }
+  }
+  
+  return classification;
+}

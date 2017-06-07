@@ -1,6 +1,6 @@
 /*************************************************************************
  *                                                                       *
- * Copyright (c) 2011 Hirokazu Odaka                                     *
+ * Copyright (c) 2012 Hirokazu Odaka, Makoto Asai                        *
  *                                                                       *
  * This program is free software: you can redistribute it and/or modify  *
  * it under the terms of the GNU General Public License as published by  *
@@ -17,46 +17,41 @@
  *                                                                       *
  *************************************************************************/
 
-#ifndef COMPTONSOFT_RadioactiveDecayPickUpData_H
-#define COMPTONSOFT_RadioactiveDecayPickUpData_H 1
+#ifndef COMPTONSOFT_RadioactiveDecayStackingAction_H
+#define COMPTONSOFT_RadioactiveDecayStackingAction_H 1
 
-#include "StandardPickUpData.hh"
+#include "G4UserStackingAction.hh"
+
+class G4Track;
 
 namespace comptonsoft {
 
-class RadioactiveDecayStackingAction;
-
 
 /**
- * PickUpData for radioactive decay.
+ * Geant4 user statiking action for radioactive decay simulations.
  *
  * @author Hirokazu Odaka
- * @date 2008-08-27
- * @date 2011-04-08
- * @date 2016-06-29 | rename the module name.
+ * @date 2017-06-07
  */
-class RadioactiveDecayPickUpData : public anlgeant4::StandardPickUpData
+class RadioactiveDecayStackingAction : public G4UserStackingAction
 {
-  DEFINE_ANL_MODULE(RadioactiveDecayPickUpData, 2.0);
 public:
-  RadioactiveDecayPickUpData();
+  RadioactiveDecayStackingAction();
+  virtual ~RadioactiveDecayStackingAction();
   
-  virtual anl::ANLStatus mod_startup();
+public:
+  virtual G4ClassificationOfNewTrack ClassifyNewTrack(const G4Track* aTrack);
+  virtual void NewStage() {}
+  virtual void PrepareNewEvent() {}
 
-  virtual void CreateUserActions();
-  virtual void StepAct(const G4Step* aStep, G4Track* aTrack);
-
-  void SetTerminationTime(double v) { m_TerminationTime = v; }
-  double TerminationTime() const { return m_TerminationTime; }
-
-  double FirstDecayTime() const { return m_FirstDecayTime; }
+  void setFirstDecayTime(double v) { firstDecayTime_ = v; }
+  void setTerminationTime(double v) { terminationTime_ = v; }
 
 private:
-  double m_TerminationTime;
-  double m_FirstDecayTime;
-  RadioactiveDecayStackingAction* m_StackingAction = nullptr;
+  double firstDecayTime_ = 0.0;
+  double terminationTime_ = 0.0;
 };
 
 } /* namespace comptonsoft */
 
-#endif /* COMPTONSOFT_RadioactiveDecayPickUpData_H */
+#endif /* COMPTONSOFT_RadioactiveDecayStackingAction_H */
