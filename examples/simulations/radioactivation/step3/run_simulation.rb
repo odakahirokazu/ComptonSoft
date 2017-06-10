@@ -64,7 +64,7 @@ end
 decay_rates_file = "../step2/decay_rates.dat"
 volume = 'CdTeWafer'
 volume_path = '/World.log_PV/CdTeDetector'
-time = 10000.0 # s
+time = 1000000.0 # s
 number_threshold = 100.0
 
 as = ComptonSoft::ActivationSummary.new

@@ -37,13 +37,13 @@ end
 ### Main
 
 num = 1000000
-runs = (1..128).to_a
+runs = (1..100).to_a
 
 a = ANL::ParallelRun.new
 a.num_processes = 4
-a.set_log "simulation_%03d.log"
+a.set_log "simulation_%06d.log"
 a.run(runs) do |run_id|
-  output = "simulation_%03d.root" % run_id
+  output = "simulation_%06d.root" % run_id
   random = run_id
   run_simulation(num, random, output)
 end

@@ -3,5 +3,5 @@
 require 'comptonsoft/radioactivation'
 
 as = ComptonSoft::ActivationSummary.new
-1.upto(16){|i| as.read("./simulation_%03d.act.summary.dat" % i) }
+1.upto(16){|i| as.read("./simulation_%06d.act.summary.dat" % i) }
 as.write("simulation.act.summary.dat")

@@ -4,7 +4,7 @@ require "RubyROOT"
 
 file_list = Dir.glob("sim_decay_CdTeWafer_*.root")
 file_output = "spectrum.root"
-exposure =  10000.0
+exposure =  1000000.0
 
 tree = Root::TChain.new("hittree", "hittree")
 file_list.each do |file|
