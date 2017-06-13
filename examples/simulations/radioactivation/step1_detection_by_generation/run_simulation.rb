@@ -41,9 +41,9 @@ runs = (1..16).to_a
 
 a = ANL::ParallelRun.new
 a.num_processes = 4
-a.set_log "simulation_%03d.log"
+a.set_log "simulation_%06d.log"
 a.run(runs, testrun: false) do |run_id|
-  output = "simulation_%03d.root" % run_id
+  output = "simulation_%06d.root" % run_id
   random = run_id
   run_simulation(num, random, output)
 end
