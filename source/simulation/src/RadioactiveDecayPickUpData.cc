@@ -22,7 +22,6 @@
 #include "G4PhysicalConstants.hh"
 #include "G4Track.hh"
 #include "G4VProcess.hh"
-#include "RadioactiveDecayStackingAction.hh"
 
 using namespace anl;
 
@@ -42,12 +41,6 @@ ANLStatus RadioactiveDecayPickUpData::mod_startup()
   return AS_OK;
 }
 
-void RadioactiveDecayPickUpData::CreateUserActions()
-{
-  m_StackingAction = new RadioactiveDecayStackingAction;
-  SetStackingAction(m_StackingAction);
-}
-
 void RadioactiveDecayPickUpData::StepAct(const G4Step* aStep, G4Track* aTrack)
 {
   const double globalTime = aTrack->GetGlobalTime();
@@ -58,8 +51,6 @@ void RadioactiveDecayPickUpData::StepAct(const G4Step* aStep, G4Track* aTrack)
     if (processName == "RadioactiveDecay") {
       m_FirstDecayTime = globalTime;
       setInitialTime(m_FirstDecayTime);
-      m_StackingAction->setFirstDecayTime(m_FirstDecayTime);
-      m_StackingAction->setTerminationTime(m_TerminationTime);
     }
     else {
       throw ANLException("RadioactiveDecayPickUpData:Error---First step is not radioactive decay.");
@@ -68,7 +59,7 @@ void RadioactiveDecayPickUpData::StepAct(const G4Step* aStep, G4Track* aTrack)
 
   const double timeFromFirstDecay = globalTime - m_FirstDecayTime;
   if (timeFromFirstDecay > m_TerminationTime) {
-    aTrack->SetTrackStatus(fStopAndKill);
+    aTrack->SetTrackStatus(fKillTrackAndSecondaries);
     return;
   }
 }

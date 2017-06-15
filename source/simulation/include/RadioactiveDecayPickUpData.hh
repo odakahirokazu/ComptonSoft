@@ -24,8 +24,6 @@
 
 namespace comptonsoft {
 
-class RadioactiveDecayStackingAction;
-
 
 /**
  * PickUpData for radioactive decay.
@@ -43,7 +41,6 @@ public:
   
   virtual anl::ANLStatus mod_startup();
 
-  virtual void CreateUserActions();
   virtual void StepAct(const G4Step* aStep, G4Track* aTrack);
 
   void SetTerminationTime(double v) { m_TerminationTime = v; }
@@ -54,7 +51,6 @@ public:
 private:
   double m_TerminationTime;
   double m_FirstDecayTime;
-  RadioactiveDecayStackingAction* m_StackingAction = nullptr;
 };
 
 } /* namespace comptonsoft */
