@@ -76,6 +76,7 @@ clSim = [# primary generator
   ANL::SWIGClass.new("KillStepPickUpData"),
   ANL::SWIGClass.new("MaterialSamplePickUpData"),
   ANL::SWIGClass.new("ScatteringPickUpData"),
+  ANL::SWIGClass.new("ObservationPickUpData"),
   # physics list
   ANL::SWIGClass.new("PhysicsListManager"),
   # others
@@ -85,6 +86,7 @@ clSim = [# primary generator
   ANL::SWIGClass.new("AssignG4CopyNumber"),
   ANL::SWIGClass.new("InitialParticleTree"),
   ANL::SWIGClass.new("DumpMass"),
+  ANL::SWIGClass.new("WriteObservationTree"),
 ]
 
 clAH = [

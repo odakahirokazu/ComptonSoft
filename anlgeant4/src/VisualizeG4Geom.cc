@@ -111,6 +111,14 @@ ANLStatus VisualizeG4Geom::mod_endrun()
   return AS_OK;
 }
 
+ANLStatus VisualizeG4Geom::mod_exit()
+{
+  m_UIExecutive.reset();
+  m_VisManager.reset();
+
+  return AS_OK;
+}
+
 void VisualizeG4Geom::applyDefaultCommands()
 {
   m_UIManager->ApplyCommand("/control/verbose 2");

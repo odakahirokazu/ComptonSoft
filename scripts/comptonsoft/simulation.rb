@@ -35,6 +35,9 @@ module ComptonSoft
   #
   class Simulation < ANL::ANLApp
     def initialize()
+      ### Basic settings
+      @setup_mode = :normal
+
       ### Input files
       @detector_configuration = nil # "detector_configuration.xml"
       @detector_parameters = nil    # "detector_parameters.xml"
@@ -59,10 +62,13 @@ module ComptonSoft
       super
     end
 
+    ### Basic settings
+    attr_accessor :setup_mode
+
     ### Output files
     attr_accessor :output
 
-    ### Geant4 setting
+    ### Geant4 settings
     attr_accessor :random_seed, :verbose
 
     ### ANL module setup.
@@ -107,6 +113,7 @@ module ComptonSoft
       self.thread_mode = false
       set_visualization()
       with(params)
+      self.setup_mode = :minimal
     end
 
     # Set GDML file for geometry building.
@@ -132,9 +139,10 @@ module ComptonSoft
     end
 
     def setup()
-      if module_of_visualization
+      case @setup_mode
+      when :minimal
         setup_minimal()
-      else
+      when :normal
         setup_normal()
       end
     end
@@ -306,6 +314,36 @@ module ComptonSoft
       chain :OutputSimXPrimaries
       with_parameters(filename: self.output.sub(".root", "")+"_incident_photons.fits",
                       area: @area)
+    end
+  end
+
+  # Simulation class for observation
+  #
+  class SimulationOfObservedSystem < Simulation
+    def initialize()
+      super
+      self.setup_mode = :minimal
+      @record_primaries = true
+      @particle_selection = []
+    end
+
+    attr_accessor :record_primaries, :particle_selection
+
+    def observe_gamma_emissions()
+      @record_primaries = false
+      @particle_selection = [22] # gamma: 22
+    end
+
+    def setup()
+      set_pickup_data :ObservationPickUpData, {
+        record_primaries: @record_primaries,
+        particle_selection: @particle_selection
+      }
+
+      super
+      chain(:WriteObservationTree)
+      chain(:SaveData)
+      with_parameters(output: self.output)
     end
   end
 end # module ComptonSoft

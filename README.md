@@ -1,7 +1,7 @@
 Compton Soft
 ================================================================
 
-- Version: 5.2.13
+- Version: 5.2.14
 - Author: Hirokazu Odaka
 
 ----

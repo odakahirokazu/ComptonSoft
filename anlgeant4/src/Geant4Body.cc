@@ -41,8 +41,8 @@ namespace anlgeant4
 {
 
 Geant4Body::Geant4Body()
-  : m_G4RunManager(0),
-    m_RandomEnginePtr(0),
+  : m_G4RunManager(new ANLG4RunManager),
+    m_RandomEnginePtr(nullptr),
     m_RandomEngine("MTwistEngine"),
     m_RandomInitMode(1),
     m_RandomSeed1(0),
@@ -51,8 +51,6 @@ Geant4Body::Geant4Body()
     m_RandomFinalStatusFileName("RandomSeed_f.dat"),
     m_VerboseLevel(0)
 {
-  m_G4RunManager = new ANLG4RunManager;
-  
   G4ScoringManager* scoringManager = G4ScoringManager::GetScoringManager();
   scoringManager->SetVerboseLevel(1);
   
@@ -64,8 +62,10 @@ Geant4Body::Geant4Body()
 
 Geant4Body::~Geant4Body()
 {
-  if (m_G4RunManager) delete m_G4RunManager;
-  if (m_RandomEnginePtr) delete m_RandomEnginePtr;
+  if (m_RandomEnginePtr) {
+    delete m_RandomEnginePtr;
+    m_RandomEnginePtr = nullptr;
+  }
 }
 
 ANLStatus Geant4Body::mod_startup()
@@ -174,7 +174,7 @@ void Geant4Body::set_user_std_actions()
 {
   VPickUpData* pickupdata;
   GetANLModuleNC("VPickUpData", &pickupdata);
-  pickupdata->RegisterUserActions(m_G4RunManager);
+  pickupdata->RegisterUserActions(m_G4RunManager.get());
 }
 
 void Geant4Body::apply_commands()
@@ -219,9 +219,6 @@ ANLStatus Geant4Body::mod_exit()
   if (m_OutputRandomStatus) {
     CLHEP::HepRandom::saveEngineStatus(m_RandomFinalStatusFileName.c_str());
   }
-
-  delete m_G4RunManager;
-  m_G4RunManager = 0;
 
   return AS_OK;
 }

@@ -1,6 +1,6 @@
 /*************************************************************************
  *                                                                       *
- * Copyright (c) 2011 Shin Watanabe, Hirokazu Odaka                      *
+ * Copyright (c) 2011 Hirokazu Odaka                                     *
  *                                                                       *
  * This program is free software: you can redistribute it and/or modify  *
  * it under the terms of the GNU General Public License as published by  *
@@ -17,37 +17,42 @@
  *                                                                       *
  *************************************************************************/
 
-#ifndef ANLGEANT4_ANLG4RunManager_H
-#define ANLGEANT4_ANLG4RunManager_H 1
+#ifndef COMPTONSOFT_ObservationPickUpData_H
+#define COMPTONSOFT_ObservationPickUpData_H 1
 
-#include "G4RunManager.hh"
+#include "StandardPickUpData.hh"
+#include "ObservedParticle.hh"
 
-class G4StateManager;
+namespace comptonsoft {
 
 
-namespace anlgeant4
-{
 /**
- * ANLG4RunManager : original implemenation came from ANLGeant4 for ANL++.
+ * PickUpData for observation from outside of the world.
  *
- * @date 2017-06-21 | Hiro Odaka | add default constructor/desctructor
+ * @author Hirokazu Odaka
+ * @date 2017-06-20
  */
-class ANLG4RunManager : public G4RunManager
+class ObservationPickUpData : public anlgeant4::StandardPickUpData
 {
+  DEFINE_ANL_MODULE(ObservationPickUpData, 1.0);
 public:
-  ANLG4RunManager() = default;
-  virtual ~ANLG4RunManager();
-
-  void ANLbgnrunfunc();
-  void ANLanafunc();
-  void ANLendrunfunc();
+  ObservationPickUpData();
+  ~ObservationPickUpData() = default;
   
+  anl::ANLStatus mod_startup();
+
+  void EventAct_begin(const G4Event* event);
+  void TrackAct_end(const G4Track* track);
+
+  const std::vector<ObservedParticle_sptr>& getParticleVector() const 
+  { return particleVector_; }
+
 private:
-  G4StateManager* ANLRunstatManager = nullptr;
-  G4bool cond = false;
-  G4int i_event = 0;
+  bool recordPrimaries_;
+  std::vector<int> particleSelection_;
+  std::vector<ObservedParticle_sptr> particleVector_;
 };
 
-} /* namespace anlgeant4 */
+} /* namespace comptonsoft */
 
-#endif /* ANLGEANT4_ANLG4RunManager_H */
+#endif /* COMPTONSOFT_ObservationPickUpData_H */

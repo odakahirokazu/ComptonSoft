@@ -1,6 +1,6 @@
 /*************************************************************************
  *                                                                       *
- * Copyright (c) 2011 Shin Watanabe, Hirokazu Odaka                      *
+ * Copyright (c) 2011 Hirokazu Odaka                                     *
  *                                                                       *
  * This program is free software: you can redistribute it and/or modify  *
  * it under the terms of the GNU General Public License as published by  *
@@ -17,37 +17,29 @@
  *                                                                       *
  *************************************************************************/
 
-#ifndef ANLGEANT4_ANLG4RunManager_H
-#define ANLGEANT4_ANLG4RunManager_H 1
+#include "ObservationTreeIOWithInitialInfo.hh"
 
-#include "G4RunManager.hh"
-
-class G4StateManager;
-
-
-namespace anlgeant4
+namespace comptonsoft
 {
-/**
- * ANLG4RunManager : original implemenation came from ANLGeant4 for ANL++.
- *
- * @date 2017-06-21 | Hiro Odaka | add default constructor/desctructor
- */
-class ANLG4RunManager : public G4RunManager
+
+ObservationTreeIOWithInitialInfo::~ObservationTreeIOWithInitialInfo() = default;
+
+void ObservationTreeIOWithInitialInfo::setTree(TTree* tree)
 {
-public:
-  ANLG4RunManager() = default;
-  virtual ~ANLG4RunManager();
+  ObservationTreeIO::setTree(tree);
+  InitialInfoTreeIO::setTree(tree);
+}
 
-  void ANLbgnrunfunc();
-  void ANLanafunc();
-  void ANLendrunfunc();
-  
-private:
-  G4StateManager* ANLRunstatManager = nullptr;
-  G4bool cond = false;
-  G4int i_event = 0;
-};
+void ObservationTreeIOWithInitialInfo::defineBranches()
+{
+  ObservationTreeIO::defineBranches();
+  InitialInfoTreeIO::defineBranches();
+}
 
-} /* namespace anlgeant4 */
+void ObservationTreeIOWithInitialInfo::setBranchAddresses()
+{
+  ObservationTreeIO::setBranchAddresses();
+  InitialInfoTreeIO::setBranchAddresses();
+}
 
-#endif /* ANLGEANT4_ANLG4RunManager_H */
+} /* namespace comptonsoft */

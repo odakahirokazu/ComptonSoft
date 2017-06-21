@@ -1,6 +1,6 @@
 /*************************************************************************
  *                                                                       *
- * Copyright (c) 2011 Shin Watanabe, Hirokazu Odaka                      *
+ * Copyright (c) 2011 Hirokazu Odaka                                     *
  *                                                                       *
  * This program is free software: you can redistribute it and/or modify  *
  * it under the terms of the GNU General Public License as published by  *
@@ -17,37 +17,26 @@
  *                                                                       *
  *************************************************************************/
 
-#ifndef ANLGEANT4_ANLG4RunManager_H
-#define ANLGEANT4_ANLG4RunManager_H 1
+#ifndef COMPTONSOFT_ObservedParticle_H
+#define COMPTONSOFT_ObservedParticle_H 1
 
-#include "G4RunManager.hh"
+#include "G4ThreeVector.hh"
 
-class G4StateManager;
+namespace comptonsoft {
 
-
-namespace anlgeant4
+struct ObservedParticle
 {
-/**
- * ANLG4RunManager : original implemenation came from ANLGeant4 for ANL++.
- *
- * @date 2017-06-21 | Hiro Odaka | add default constructor/desctructor
- */
-class ANLG4RunManager : public G4RunManager
-{
-public:
-  ANLG4RunManager() = default;
-  virtual ~ANLG4RunManager();
-
-  void ANLbgnrunfunc();
-  void ANLanafunc();
-  void ANLendrunfunc();
-  
-private:
-  G4StateManager* ANLRunstatManager = nullptr;
-  G4bool cond = false;
-  G4int i_event = 0;
+  int particle = 0;
+  int trackid = 0;
+  double time = 0.0;
+  G4ThreeVector position = {0.0, 0.0, 0.0};
+  double energy = 0.0;
+  G4ThreeVector direction = {0.0, 0.0, 0.0};
+  G4ThreeVector polarization = {0.0, 0.0, 0.0};
 };
 
-} /* namespace anlgeant4 */
+using ObservedParticle_sptr = std::shared_ptr<ObservedParticle>;
 
-#endif /* ANLGEANT4_ANLG4RunManager_H */
+} /* namespace comptonsoft */
+
+#endif /* COMPTONSOFT_ObservedParticle_H */

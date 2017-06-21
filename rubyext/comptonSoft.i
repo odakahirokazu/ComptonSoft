@@ -72,6 +72,7 @@
 #include "KillStepPickUpData.hh"
 #include "MaterialSamplePickUpData.hh"
 #include "ScatteringPickUpData.hh"
+#include "ObservationPickUpData.hh"
 #include "PhysicsListManager.hh"
 #ifdef USE_SIMX
 #include "SimXIF.hh"
@@ -85,6 +86,7 @@
 #include "AssignG4CopyNumber.hh"
 #include "InitialParticleTree.hh"
 #include "DumpMass.hh"
+#include "WriteObservationTree.hh"
 #include "SimulateCXBShieldPlate.hh"
 #include "RescaleSimulationNoiseOfSGDSiUntriggered.hh"
 #include "UniformlyRandomizeEPI.hh"
@@ -650,6 +652,14 @@ public:
 };
 
 
+class ObservationPickUpData : public anlgeant4::StandardPickUpData
+{
+public:
+  ObservationPickUpData();
+  ~ObservationPickUpData() = default;
+};
+
+
 class PhysicsListManager : public anlgeant4::VANLPhysicsList
 {
 public:
@@ -709,6 +719,14 @@ class DumpMass : public anl::BasicModule
 public:
   DumpMass();
   ~DumpMass();
+};
+
+
+class WriteObservationTree : public VCSModule
+{
+public:
+  WriteObservationTree();
+  ~WriteObservationTree() = default;
 };
 
 

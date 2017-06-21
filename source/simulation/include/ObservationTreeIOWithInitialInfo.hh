@@ -1,6 +1,6 @@
 /*************************************************************************
  *                                                                       *
- * Copyright (c) 2011 Shin Watanabe, Hirokazu Odaka                      *
+ * Copyright (c) 2011 Hirokazu Odaka                                     *
  *                                                                       *
  * This program is free software: you can redistribute it and/or modify  *
  * it under the terms of the GNU General Public License as published by  *
@@ -17,37 +17,30 @@
  *                                                                       *
  *************************************************************************/
 
-#ifndef ANLGEANT4_ANLG4RunManager_H
-#define ANLGEANT4_ANLG4RunManager_H 1
+#ifndef COMPTONSOFT_ObservationTreeIOWithInitialInfo_H
+#define COMPTONSOFT_ObservationTreeIOWithInitialInfo_H 1
 
-#include "G4RunManager.hh"
+#include "ObservationTreeIO.hh"
+#include "InitialInfoTreeIO.hh"
 
-class G4StateManager;
+namespace comptonsoft {
 
-
-namespace anlgeant4
-{
 /**
- * ANLG4RunManager : original implemenation came from ANLGeant4 for ANL++.
- *
- * @date 2017-06-21 | Hiro Odaka | add default constructor/desctructor
+ * 
+ * @author Hirokazu Odaka
+ * @date 2017-06-21 | based on HitTreeIOWithInitialInfo
  */
-class ANLG4RunManager : public G4RunManager
+class ObservationTreeIOWithInitialInfo : public ObservationTreeIO, public InitialInfoTreeIO
 {
 public:
-  ANLG4RunManager() = default;
-  virtual ~ANLG4RunManager();
+  ObservationTreeIOWithInitialInfo() = default;
+  ~ObservationTreeIOWithInitialInfo();
 
-  void ANLbgnrunfunc();
-  void ANLanafunc();
-  void ANLendrunfunc();
-  
-private:
-  G4StateManager* ANLRunstatManager = nullptr;
-  G4bool cond = false;
-  G4int i_event = 0;
+  void setTree(TTree* tree);
+  void defineBranches();
+  void setBranchAddresses();
 };
 
-} /* namespace anlgeant4 */
+} /* namespace comptonsoft */
 
-#endif /* ANLGEANT4_ANLG4RunManager_H */
+#endif /* COMPTONSOFT_ObservationTreeIOWithInitialInfo_H */

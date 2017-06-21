@@ -34,6 +34,7 @@ set(CS_SIMULATION_CLASSES_BASIC
   src/RadioactiveDecayPickUpData.cc
   src/ActivationStackingAction.cc
   src/ActivationPickUpData.cc
+  src/ObservationPickUpData.cc
   src/KillStepPickUpData.cc
   src/MaterialSamplePickUpData.cc
   src/ScatteringPickUpData.cc
@@ -45,6 +46,9 @@ set(CS_SIMULATION_CLASSES_BASIC
   src/AssignG4CopyNumber.cc
   src/DumpMass.cc
   src/InitialParticleTree.cc
+  src/ObservationTreeIO.cc
+  src/ObservationTreeIOWithInitialInfo.cc
+  src/WriteObservationTree.cc
   )
 
 if(CS_USE_SIMX)

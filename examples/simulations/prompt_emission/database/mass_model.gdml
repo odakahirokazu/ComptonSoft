@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<gdml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://service-spi.web.cern.ch/service-spi/app/releases/GDML/schema/gdml.xsd">
+  <define />
+  <materials>
+    <material name="Vacuum" Z="1.0" state="gas">
+      <D unit="g/cm3" value="1e-25" />
+      <atom unit="g/mole" value="1.008"/>
+    </material>
+    <material name="Lead" Z="82.0" state="solid">
+      <D unit="g/cm3" value="11.34" />
+      <atom unit="g/mole" value="207.20" />
+    </material>
+  </materials>
+  <solids>
+    <box lunit="cm" name="LeadTarget.box" x="2.0" y="2.0" z="1.0" />
+    <box lunit="cm" name="World.box" x="100.0" y="100.0" z="100.0" />
+  </solids>
+  <structure>
+    <volume name="LeadTarget.log">
+      <materialref ref="Lead" />
+      <solidref ref="LeadTarget.box" />
+    </volume>
+    <volume name="World.log">
+      <materialref ref="Vacuum" />
+      <solidref ref="World.box" />
+      <physvol name="LeadTarget">
+        <volumeref ref="LeadTarget.log" />
+        <position name="LeadTarget.pos" unit="cm" x="0.0" y="0.0" z="0.0" />
+      </physvol>
+    </volume>
+  </structure>
+  <setup name="Default" version="1.0">
+    <world ref="World.log" />
+  </setup>
+</gdml>

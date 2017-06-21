@@ -17,60 +17,68 @@
  *                                                                       *
  *************************************************************************/
 
-#ifndef ANLGEANT4_VisualizeG4Geom_H
-#define ANLGEANT4_VisualizeG4Geom_H 1
+#ifndef COMPTONSOFT_ObservationTreeIO_H
+#define COMPTONSOFT_ObservationTreeIO_H 1
 
-#include <memory>
-#include "BasicModule.hh"
-#include "G4ThreeVector.hh"
+#include <cstdint>
+#include <utility>
+#include "ObservedParticle.hh"
 
-class G4VisManager;
-class G4UImanager;
-class G4UIExecutive;
+class TTree;
 
-
-namespace anlgeant4 {
-
+namespace comptonsoft {
 
 /**
- * Geant4 visualization for Compton Soft
+ * 
  * @author Hirokazu Odaka
- * @date 2011-09-28
- * @date 2012-02-15
- * @date 2012-08-06
- * @date 2012-10-04
- * @date 2016-09-06
- * @date 2017-06-21 | explicit delete of the visualization manager.
+ * @date 2017-06-20
  */
-class VisualizeG4Geom  : public anl::BasicModule
+class ObservationTreeIO
 {
-  DEFINE_ANL_MODULE(VisualizeG4Geom, 1.4);
-public: 
-  VisualizeG4Geom();
-  ~VisualizeG4Geom();
+public:
+  ObservationTreeIO();
+  virtual ~ObservationTreeIO();
 
-  anl::ANLStatus mod_startup();
-  anl::ANLStatus mod_init();
-  anl::ANLStatus mod_endrun();
-  anl::ANLStatus mod_exit();
+  virtual void setTree(TTree* tree)
+  { tree_ = tree; }
 
-private:
-  void applyDefaultCommands();
+  virtual void defineBranches();
+  virtual void setBranchAddresses();
+
+  void fillParticles(int64_t eventID, const std::vector<ObservedParticle_sptr>& particles);
+
+  int64_t getEventID() const { return eventid_; }
+  int32_t getNumberOfParticles() const { return num_; }
+
+  ObservedParticle_sptr retrieveParticle() const;
+
+  std::pair<int64_t, std::vector<ObservedParticle_sptr>>
+  retrieveParticles(int64_t& entry,
+                    bool get_first_entry=true);
   
 private:
-  std::unique_ptr<G4VisManager> m_VisManager;
-  std::unique_ptr<G4UIExecutive> m_UIExecutive;
-  G4UImanager* m_UIManager;
+  TTree* tree_;
 
-  std::string m_Mode;
-  G4ThreeVector m_TargetPoint;
-  G4ThreeVector m_ViewPoint;
-  G4ThreeVector m_UpVector;
-  double m_Zoom;
-  bool m_AuxiliaryEdge;
-  std::string m_MacroFile;
+  /*
+   * tree contents
+   */
+  int64_t eventid_ = 0;
+  int32_t num_ = 0;
+  int32_t trackid_ = 0;
+  int32_t particle_ = 0;
+  double time_ = 0.0;
+  float posx_ = 0.0;
+  float posy_ = 0.0;
+  float posz_ = 0.0;
+  float energy_ = 0.0;
+  float dirx_ = 0.0;
+  float diry_ = 0.0;
+  float dirz_ = 0.0;
+  float polarx_ = 0.0;
+  float polary_ = 0.0;
+  float polarz_ = 0.0;
 };
 
-} /* namespace anlgeant4 */
+} /* namespace comptonsoft */
 
-#endif /* ANLGEANT4_VisualizeG4Geom_H */
+#endif /* COMPTONSOFT_ObservationTreeIO_H */

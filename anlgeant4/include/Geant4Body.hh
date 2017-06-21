@@ -21,6 +21,7 @@
 #define ANLGEANT4_Geant4Body_H 1
 
 #include <string>
+#include <memory>
 #include "BasicModule.hh"
 #include "globals.hh"
 
@@ -62,7 +63,7 @@ protected:
   virtual void apply_commands();
 
 private:
-  ANLG4RunManager* m_G4RunManager;
+  std::unique_ptr<ANLG4RunManager> m_G4RunManager;
   CLHEP::HepRandomEngine* m_RandomEnginePtr;
   
   std::string m_RandomEngine;

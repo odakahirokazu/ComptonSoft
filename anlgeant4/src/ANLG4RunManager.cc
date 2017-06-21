@@ -26,9 +26,13 @@
 // GEANT4 tag $Name:  $
 
 #include "ANLG4RunManager.hh"
+#include "G4StateManager.hh"
+#include "G4Timer.hh"
 
 namespace anlgeant4
 {
+
+ANLG4RunManager::~ANLG4RunManager() = default;
 
 void ANLG4RunManager::ANLbgnrunfunc()
 { 

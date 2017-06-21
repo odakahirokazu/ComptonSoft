@@ -1,6 +1,6 @@
 /*************************************************************************
  *                                                                       *
- * Copyright (c) 2011 Shin Watanabe, Hirokazu Odaka                      *
+ * Copyright (c) 2011 Hirokazu Odaka                                     *
  *                                                                       *
  * This program is free software: you can redistribute it and/or modify  *
  * it under the terms of the GNU General Public License as published by  *
@@ -17,37 +17,46 @@
  *                                                                       *
  *************************************************************************/
 
-#ifndef ANLGEANT4_ANLG4RunManager_H
-#define ANLGEANT4_ANLG4RunManager_H 1
+#ifndef COMPTONSOFT_WriteObservationTree_H
+#define COMPTONSOFT_WriteObservationTree_H 1
 
-#include "G4RunManager.hh"
+#include "VCSModule.hh"
+#include <memory>
 
-class G4StateManager;
+class TTree;
 
+namespace anlgeant4 {
+class InitialInformation;
+}
 
-namespace anlgeant4
-{
+namespace comptonsoft {
+
+class ObservationTreeIOWithInitialInfo;
+class ObservationPickUpData;
+
 /**
- * ANLG4RunManager : original implemenation came from ANLGeant4 for ANL++.
- *
- * @date 2017-06-21 | Hiro Odaka | add default constructor/desctructor
+ * 
+ * @author Hirokazu Odaka
+ * @date 2017-06-20
  */
-class ANLG4RunManager : public G4RunManager
+class WriteObservationTree : public VCSModule
 {
+  DEFINE_ANL_MODULE(WriteObservationTree, 1.0);
 public:
-  ANLG4RunManager() = default;
-  virtual ~ANLG4RunManager();
-
-  void ANLbgnrunfunc();
-  void ANLanafunc();
-  void ANLendrunfunc();
+  WriteObservationTree();
+  ~WriteObservationTree() = default;
   
+  anl::ANLStatus mod_init();
+  anl::ANLStatus mod_his();
+  anl::ANLStatus mod_ana();
+
 private:
-  G4StateManager* ANLRunstatManager = nullptr;
-  G4bool cond = false;
-  G4int i_event = 0;
+  const ObservationPickUpData* observationPUD_;
+  const anlgeant4::InitialInformation* initialInfo_;
+  TTree* tree_;
+  std::unique_ptr<ObservationTreeIOWithInitialInfo> treeIO_;
 };
 
-} /* namespace anlgeant4 */
+} /* namespace comptonsoft */
 
-#endif /* ANLGEANT4_ANLG4RunManager_H */
+#endif /* COMPTONSOFT_WriteObservationTree_H */

@@ -6,3 +6,4 @@
 #include "HitTreeIOWithInitialInfo.hh"
 #include "EventTreeIOWithInitialInfo.hh"
 #include "ComptonEventTreeIOWithInitialInfo.hh"
+#include "ObservationTreeIOWithInitialInfo.hh"
