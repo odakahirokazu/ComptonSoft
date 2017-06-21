@@ -53,15 +53,18 @@ void ObservationPickUpData::TrackAct_end(const G4Track* track)
     const int PDGEncoding = track->GetDefinition()->GetPDGEncoding();
     if (particleSelection_.empty() ||
         std::find(particleSelection_.begin(), particleSelection_.end(), PDGEncoding)!=particleSelection_.end()) {
-      ObservedParticle_sptr data(new ObservedParticle);
-      data->trackid = track->GetTrackID();
-      data->particle = PDGEncoding;
-      data->time = track->GetGlobalTime();
-      data->position = track->GetPosition();
-      data->energy = track->GetKineticEnergy();
-      data->direction = track->GetMomentumDirection();
-      data->polarization = track->GetPolarization();
-      particleVector_.push_back(data);
+      const int trackID = track->GetTrackID();
+      if (recordPrimaries_ || trackID > 1) {
+        ObservedParticle_sptr data(new ObservedParticle);
+        data->trackid = trackID;
+        data->particle = PDGEncoding;
+        data->time = track->GetGlobalTime();
+        data->position = track->GetPosition();
+        data->energy = track->GetKineticEnergy();
+        data->direction = track->GetMomentumDirection();
+        data->polarization = track->GetPolarization();
+        particleVector_.push_back(data);
+      }
     }
   }
 }
