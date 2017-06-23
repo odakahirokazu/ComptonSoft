@@ -23,22 +23,12 @@ message("-- ANLNEXT_INSTALL = ${ANLNEXT_INSTALL}")
 
 ### ROOT ###
 set(ROOTSYS $ENV{ROOTSYS})
-# find_path(ROOT_INC_DIR
-#   NAMES TH1.h TTree.h
-#   PATHS ${ROOTSYS}/include/root ${ROOTSYS}/include)
-# find_path(ROOT_LIB_DIR
-#   NAMES libHist.so libTree.so
-#   PATHS ${ROOTSYS}/lib/root ${ROOTSYS}/lib)
-# set(ROOT_LIB
-#   Core RIO Net Hist Graf Graf3d Gpad Tree
-#   Rint Postscript Matrix Physics MathCore Thread)
-
+list(APPEND CMAKE_PREFIX_PATH ${ROOTSYS})
 find_package(ROOT REQUIRED)
 set(ROOT_INC_DIR ${ROOT_INCLUDE_DIRS})
 set(ROOT_LIB_DIR ${ROOT_LIBRARY_DIR})
 set(ROOT_LIB ${ROOT_LIBRARIES})
 list(APPEND CMAKE_INSTALL_RPATH ${ROOT_LIBRARY_DIR})
-
 message("-- ROOTSYS = ${ROOTSYS}")
 message("-- ROOT_INC_DIR = ${ROOT_INC_DIR}")
 message("-- ROOT_LIB_DIR = ${ROOT_LIB_DIR}")
