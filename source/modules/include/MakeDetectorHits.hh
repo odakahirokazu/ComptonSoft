@@ -32,11 +32,11 @@ public:
   ~MakeDetectorHits() = default;
 
 private:
-  void doProcessing();
+  void doProcessing() override;
   bool setThresholdEnergy(VRealDetectorUnit* detector,
                           double threshold,
                           double thresholdCathode,
-                          double thresholdAnode);
+                          double thresholdAnode) override;
 };
 
 } /* namespace comptonsoft */

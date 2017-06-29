@@ -38,11 +38,12 @@ public:
 
 public:
   RealDetectorUnit2DStrip();
-  ~RealDetectorUnit2DStrip();
+  virtual ~RealDetectorUnit2DStrip();
 
-  DetectorType Type() const { return DetectorType::DoubleSidedStripDetector; }
+  DetectorType Type() const override
+  { return DetectorType::DoubleSidedStripDetector; }
 
-  void initializeEvent();
+  void initializeEvent() override;
 
   void setPrioritySide(ElectrodeSide v) { prioritySide_ = v; }
   ElectrodeSide PrioritySide() const { return prioritySide_; }
@@ -117,9 +118,9 @@ public:
   bool checkEnergyConsistency(double energy_x, double energy_y);
   
 protected:
-  virtual bool setReconstructionDetails(int mode);
-  virtual void reconstruct(const DetectorHitVector& hitSignals,
-                           DetectorHitVector& hitReconstructed);
+  bool setReconstructionDetails(int mode) override;
+  void reconstruct(const DetectorHitVector& hitSignals,
+                   DetectorHitVector& hitReconstructed) override;
   virtual void reconstructDoubleSides(const DetectorHitVector& hitsCathode,
                                       const DetectorHitVector& hitsAnode,
                                       DetectorHitVector& hitReconstructed);

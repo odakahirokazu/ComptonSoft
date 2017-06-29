@@ -38,13 +38,13 @@ public:
   DumpMass();
   ~DumpMass();
 
-  anl::ANLStatus mod_startup();
-  anl::ANLStatus mod_bgnrun();
+  anl::ANLStatus mod_startup() override;
+  anl::ANLStatus mod_bgnrun() override;
 
 private:
   std::string m_FileName;
 };
 
-}
+} /* namespace comptonsoft */
 
 #endif /* COMPTONSOFT_DumpMass_H */

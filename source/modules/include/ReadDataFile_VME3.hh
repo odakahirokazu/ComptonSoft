@@ -40,10 +40,10 @@ public:
   ReadDataFile_VME3();
   ~ReadDataFile_VME3() = default;
 
-  anl::ANLStatus mod_startup();
-  anl::ANLStatus mod_init();
-  anl::ANLStatus mod_bgnrun();
-  anl::ANLStatus mod_ana();
+  anl::ANLStatus mod_startup() override;
+  anl::ANLStatus mod_init() override;
+  anl::ANLStatus mod_bgnrun() override;
+  anl::ANLStatus mod_ana() override;
   
   unsigned short int DeadTime() const { return m_DeadTime; }
 

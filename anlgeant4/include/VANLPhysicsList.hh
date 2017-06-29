@@ -45,6 +45,6 @@ public:
   virtual G4VUserPhysicsList* create() = 0;
 };
 
-}
+} /* namespace anlgeant4 */
 
 #endif /* ANLGEANT4_VANLPhysicsList_H */

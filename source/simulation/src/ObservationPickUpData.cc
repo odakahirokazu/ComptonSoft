@@ -30,7 +30,6 @@ namespace comptonsoft
 ObservationPickUpData::ObservationPickUpData()
   : recordPrimaries_(true)
 {
-  SetStepActOn(false);
 }
 
 ANLStatus ObservationPickUpData::mod_startup()
@@ -41,13 +40,12 @@ ANLStatus ObservationPickUpData::mod_startup()
   return AS_OK;
 }
 
-void ObservationPickUpData::EventAct_begin(const G4Event* event)
+void ObservationPickUpData::EventActionAtBeginning(const G4Event*)
 {
-  StandardPickUpData::EventAct_begin(event);
   particleVector_.clear();
 }
 
-void ObservationPickUpData::TrackAct_end(const G4Track* track)
+void ObservationPickUpData::TrackActionAtEnd(const G4Track* track)
 {
   if (track->GetNextVolume() == 0) {
     const int PDGEncoding = track->GetDefinition()->GetPDGEncoding();

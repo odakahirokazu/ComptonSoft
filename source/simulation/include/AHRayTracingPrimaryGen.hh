@@ -34,17 +34,20 @@ namespace comptonsoft {
  * @date 2011-11-07
  * @date 2012-06-13
  * @date 2012-09-14
+ * @date 2017-07-27 | makePrimarySetting()
  */
 class AHRayTracingPrimaryGen : public anlgeant4::BasicPrimaryGen
 {
-  DEFINE_ANL_MODULE(AHRayTracingPrimaryGen, 1.1);
+  DEFINE_ANL_MODULE(AHRayTracingPrimaryGen, 4.1);
 public:
   AHRayTracingPrimaryGen();
   
-  anl::ANLStatus mod_startup();
-  anl::ANLStatus mod_init();
-  anl::ANLStatus mod_ana();
-  anl::ANLStatus mod_exit();
+  anl::ANLStatus mod_startup() override;
+  anl::ANLStatus mod_init() override;
+  anl::ANLStatus mod_ana() override;
+  anl::ANLStatus mod_exit() override;
+
+  void makePrimarySetting() override;
   
 private:
   std::string m_FileName;
@@ -56,6 +59,6 @@ private:
   G4ThreeVector m_offset;
 };
 
-}
+} /* namespace comptonsoft */
 
 #endif /* COMPTONSOFT_AHRayTracePrimaryGen_H */

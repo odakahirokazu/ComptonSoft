@@ -39,7 +39,7 @@ public:
   PhotoAbsorptionEventReconstructionAlgorithm& operator=(const PhotoAbsorptionEventReconstructionAlgorithm&) = default;
   PhotoAbsorptionEventReconstructionAlgorithm& operator=(PhotoAbsorptionEventReconstructionAlgorithm&&) = default;
 
-  void initializeEvent();
+  void initializeEvent() override;
 
   /**
    * perform the event reconstruction.
@@ -48,7 +48,7 @@ public:
    * @return true if the reconstruction is successful.
    */
   bool reconstruct(const std::vector<DetectorHit_sptr>& hits,
-                   BasicComptonEvent& eventReconstructed);
+                   BasicComptonEvent& eventReconstructed) override;
 };
 
 } /* namespace comptonsoft */

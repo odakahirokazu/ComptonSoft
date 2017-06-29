@@ -35,7 +35,7 @@ class DetectorGroup
 public:
   DetectorGroup();
   explicit DetectorGroup(const std::string& name);
-  ~DetectorGroup();
+  virtual ~DetectorGroup();
   DetectorGroup(const DetectorGroup&) = default;
   DetectorGroup(DetectorGroup&&) = default;
   DetectorGroup& operator=(const DetectorGroup&) = default;

@@ -17,43 +17,43 @@
  *                                                                       *
  *************************************************************************/
 
-#include "StandardPickUpData.hh"
-#include "globals.hh"
-#include "G4Event.hh"
-#include "G4VProcess.hh"
-#include "InitialInformation.hh"
+#ifndef COMPTONSOFT_RadioactiveDecayUserActionAssembly_H
+#define COMPTONSOFT_RadioactiveDecayUserActionAssembly_H 1
 
-using namespace anl;
+#include "StandardUserActionAssembly.hh"
 
-namespace anlgeant4
+namespace comptonsoft {
+
+
+/**
+ * UserActionAssembly for radioactive decay.
+ *
+ * @author Hirokazu Odaka
+ * @date 2008-08-27
+ * @date 2011-04-08
+ * @date 2016-06-29 | rename the module name.
+ * @date 2017-06-29 | new design of UserActionAssembly
+ */
+class RadioactiveDecayUserActionAssembly : public anlgeant4::StandardUserActionAssembly
 {
+  DEFINE_ANL_MODULE(RadioactiveDecayUserActionAssembly, 3.0);
+public:
+  RadioactiveDecayUserActionAssembly();
+  
+  anl::ANLStatus mod_startup() override;
 
-StandardPickUpData::StandardPickUpData()
-  : m_InitialInfo(0)
-{
-  add_alias("StandardPickUpData");
-  SetStepActOn(false);
-}
+  void SteppingAction(const G4Step* aStep) override;
 
-ANLStatus StandardPickUpData::mod_init()
-{
-  GetANLModuleIFNC("InitialInformation", &m_InitialInfo);
-  return AS_OK;
-}
+  void SetTerminationTime(double v) { m_TerminationTime = v; }
+  double TerminationTime() const { return m_TerminationTime; }
 
-void StandardPickUpData::EventAct_begin(const G4Event* aEvent)
-{
-  m_InitialInfo->setEventID(aEvent->GetEventID());
-}
+  double FirstDecayTime() const { return m_FirstDecayTime; }
 
-void StandardPickUpData::setInitialTime(double v)
-{
-  m_InitialInfo->setInitialTime(v);
-}
+private:
+  double m_TerminationTime;
+  double m_FirstDecayTime;
+};
 
-double StandardPickUpData::getInitialTime() const
-{
-  return m_InitialInfo->InitialTime();
-}
+} /* namespace comptonsoft */
 
-} /* namespace anlgeant4 */
+#endif /* COMPTONSOFT_RadioactiveDecayUserActionAssembly_H */

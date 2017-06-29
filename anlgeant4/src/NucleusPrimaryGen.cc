@@ -83,4 +83,8 @@ ANLStatus NucleusPrimaryGen::mod_bgnrun()
   return AS_OK;
 }
 
+void NucleusPrimaryGen::makePrimarySetting()
+{
+}
+
 } /* namespace anlgeant4 */

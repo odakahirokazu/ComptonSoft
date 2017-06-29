@@ -32,7 +32,7 @@ class CalcWPStrip
 {
 public:
   CalcWPStrip();
-  ~CalcWPStrip();
+  virtual ~CalcWPStrip();
   CalcWPStrip(const CalcWPStrip&) = default;
   CalcWPStrip(CalcWPStrip&&) = default;
   CalcWPStrip& operator=(const CalcWPStrip&) = default;

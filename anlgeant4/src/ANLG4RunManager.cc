@@ -17,77 +17,21 @@
  *                                                                       *
  *************************************************************************/
 
-// ref file is
-// $Id: G4ANLRunManager.cc,v 1.2 2004/03/02 14:30:04 watanabe Exp $
-// GEANT4 tag $Name:  $
-
-// ref file is
-// $Id: G4ANLRunManager.cc,v 1.2 2004/03/02 14:30:04 watanabe Exp $
-// GEANT4 tag $Name:  $
-
 #include "ANLG4RunManager.hh"
-#include "G4StateManager.hh"
-#include "G4Timer.hh"
 
 namespace anlgeant4
 {
 
 ANLG4RunManager::~ANLG4RunManager() = default;
 
-void ANLG4RunManager::ANLbgnrunfunc()
-{ 
-  // line 122
-  cond = ConfirmBeamOnCondition();
-  if(cond)
-  {
-    RunInitialization();
-
-    // line 200 in DoEventLoop
-    ANLRunstatManager = G4StateManager::GetStateManager();
-    if( verboseLevel > 0 )
-    {
-      timer->Start();
-    }
-    i_event = 0;
-  }
-}
-
-void ANLG4RunManager::ANLendrunfunc()
+anl::ANLStatus ANLG4RunManager::performOneEvent(G4int i_event)
 {
-  // line 226
-  if(cond)
-  {
-    if( verboseLevel > 0 )
-    {
-      timer->Stop();
-      G4cout << "Run terminated." << G4endl;
-      G4cout << "Run Summary" << G4endl;
-      if(runAborted)
-      {
-        G4cout << "  Run Aborted after " << i_event 
-               << " events processed." << G4endl;
-      }
-      else
-      {
-        G4cout << " Number of events processed : " 
-               << i_event << G4endl;
-      }
-      G4cout << "  " << *timer << G4endl;
-    }
-    // line 128
-    RunTermination();
+  ProcessOneEvent(i_event);
+  TerminateOneEvent();
+  if (runAborted) {
+    return anl::AS_QUIT;
   }
-}
-
-void ANLG4RunManager::ANLanafunc()
-{
-  // line 217
-  currentEvent = GenerateEvent(i_event);
-  eventManager->ProcessOneEvent(currentEvent);
-  AnalyzeEvent(currentEvent);
-  StackPreviousEvent(currentEvent);
-  currentEvent = 0;
-  i_event++;
+  return anl::AS_OK;
 }
 
 } /* namespace anlgeant4 */

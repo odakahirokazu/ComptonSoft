@@ -44,15 +44,15 @@ namespace anlgeant4 {
  */
 class VisualizeG4Geom  : public anl::BasicModule
 {
-  DEFINE_ANL_MODULE(VisualizeG4Geom, 1.4);
+  DEFINE_ANL_MODULE(VisualizeG4Geom, 1.5);
 public: 
   VisualizeG4Geom();
   ~VisualizeG4Geom();
 
-  anl::ANLStatus mod_startup();
-  anl::ANLStatus mod_init();
-  anl::ANLStatus mod_endrun();
-  anl::ANLStatus mod_exit();
+  anl::ANLStatus mod_startup() override;
+  anl::ANLStatus mod_init() override;
+  anl::ANLStatus mod_endrun() override;
+  anl::ANLStatus mod_exit() override;
 
 private:
   void applyDefaultCommands();

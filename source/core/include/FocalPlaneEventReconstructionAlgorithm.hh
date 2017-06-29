@@ -39,7 +39,7 @@ public:
   FocalPlaneEventReconstructionAlgorithm& operator=(const FocalPlaneEventReconstructionAlgorithm&) = default;
   FocalPlaneEventReconstructionAlgorithm& operator=(FocalPlaneEventReconstructionAlgorithm&&) = default;
 
-  void initializeEvent();
+  void initializeEvent() override;
 
   /**
    * perform the event reconstruction.
@@ -48,7 +48,7 @@ public:
    * @return true if the reconstruction is successful.
    */
   bool reconstruct(const std::vector<DetectorHit_sptr>& hits,
-                   BasicComptonEvent& eventReconstructed);
+                   BasicComptonEvent& eventReconstructed) override;
 
 protected:
   bool reconstruct2HitsLH(const std::vector<DetectorHit_sptr>& hits,

@@ -36,7 +36,7 @@ public:
   ~ReadEventTreeAsRawHits() = default;
   
 protected:
-  void insertHit(const DetectorHit_sptr& hit);
+  void insertHit(const DetectorHit_sptr& hit) override;
 };
 
 } /* namespace comptonsoft */

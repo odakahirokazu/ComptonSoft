@@ -1,6 +1,6 @@
 /*************************************************************************
  *                                                                       *
- * Copyright (c) 2011 Masanobu Ozaki, Shin Watanabe, Hirokazu Odaka      *
+ * Copyright (c) 2011 Shin Watanabe, Hirokazu Odaka                      *
  *                                                                       *
  * This program is free software: you can redistribute it and/or modify  *
  * it under the terms of the GNU General Public License as published by  *
@@ -17,36 +17,31 @@
  *                                                                       *
  *************************************************************************/
 
-#ifndef ANLGEANT4_PickUpDataTrackingAction_H
-#define ANLGEANT4_PickUpDataTrackingAction_H 1
-
-#include "G4UserTrackingAction.hh"
+#include "UserActionAssemblyRunAction.hh"
+#include "VUserActionAssembly.hh"
 
 namespace anlgeant4
 {
 
-class VPickUpData;
-
-/**
- * User TrackingAction class for PickUpData
- * @author M. Ozaki, T. Takahashi, S. Watanabe, H. Odaka
- * @date 2001-02-xx (M. Ozaki)
- * @date 2002-04-29 (S. Watanabe)
- * @date 2012-05-30 (H. Odaka)
- */
-class PickUpDataTrackingAction : public G4UserTrackingAction
+UserActionAssemblyRunAction::UserActionAssemblyRunAction(const std::list<VUserActionAssembly*>& userActions)
+  : userActions_(userActions)
 {
-public:
-  explicit PickUpDataTrackingAction(VPickUpData* pud);
-  ~PickUpDataTrackingAction();
-
-  void PreUserTrackingAction(const G4Track* aTrack);
-  void PostUserTrackingAction(const G4Track* aTrack);
-
-private:
-  VPickUpData* pickup_data;
-};
-
 }
 
-#endif /* ANLGEANT4_PickUpDataTrackingAction_H */
+UserActionAssemblyRunAction::~UserActionAssemblyRunAction() = default;
+
+void UserActionAssemblyRunAction::BeginOfRunAction(const G4Run* aRun)
+{
+  for (VUserActionAssembly* pud: userActions_) {
+    pud->RunActionAtBeginning(aRun);
+  }
+}
+
+void UserActionAssemblyRunAction::EndOfRunAction(const G4Run* aRun)
+{
+  for (VUserActionAssembly* pud: userActions_) {
+    pud->RunActionAtEnd(aRun);
+  }
+}
+
+} /* namespace anlgeant4 */

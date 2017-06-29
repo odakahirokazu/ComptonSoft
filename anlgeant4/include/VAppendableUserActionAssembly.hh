@@ -17,45 +17,29 @@
  *                                                                       *
  *************************************************************************/
 
-// ----- MySteppingAction -----
-// by M.Kouda
-//
-// ----- PickUpDataSteppingAction -----
-// 2003/1/10 Shin Watanabe Geant4ANL
-// **************************************************************************
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo....
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo....
+#ifndef ANLGEANT4_VAppendableUserActionAssembly_H
+#define ANLGEANT4_VAppendableUserActionAssembly_H 1
 
-#include "PickUpDataSteppingAction.hh"
-#include "globals.hh"
-#include "G4Step.hh"
-#include "VPickUpData.hh"
+#include "VUserActionAssembly.hh"
 
-using namespace anlgeant4;
-
-PickUpDataSteppingAction::PickUpDataSteppingAction(VPickUpData* pud)
+namespace anlgeant4
 {
-  pickup_data = pud;
-  G4cout << "Constructing SteppingAction." << G4endl;
-}
 
-
-PickUpDataSteppingAction::~PickUpDataSteppingAction()
+/**
+ * Virtual appendable UserActionAssembly module
+ * @author Hirokazu Odaka
+ * @date 2017-06-29
+ */
+class VAppendableUserActionAssembly : public VUserActionAssembly
 {
-  G4cout << "Destructing SteppingAction." << G4endl;
-}
+  DEFINE_ANL_MODULE(VAppendableUserActionAssembly, 5.0);
+public:
+  VAppendableUserActionAssembly();
+  virtual ~VAppendableUserActionAssembly();
 
+  anl::ANLStatus mod_prepare() override;
+};
 
-void PickUpDataSteppingAction::UserSteppingAction(const G4Step* aStep)
-{
-  G4Track* aTrack = aStep->GetTrack();
-  
-#if 0
-  // debug
-  G4cout << "PreStep " << aStep->GetPreStepPoint()->GetPosition()
-	 << " -- PostStep " << aStep->GetPostStepPoint()->GetPosition()
-	 << " >>> Material " << aTrack->GetMaterial()->GetName() << G4endl;
-#endif
-  
-  pickup_data->StepAct(aStep, aTrack);
-}
+} /* namespace anlgeant4 */
+
+#endif /* ANLGEANT4_VAppendableUserActionAssembly_H */

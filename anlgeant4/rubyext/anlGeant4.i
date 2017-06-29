@@ -20,8 +20,10 @@
 #include "PrimaryGenUniformSourceInVolume.hh"
 #include "NucleusPrimaryGen.hh"
 #include "NucleusPrimaryGenInVolume.hh"
-#include "VPickUpData.hh"
-#include "StandardPickUpData.hh"
+#include "VUserActionAssembly.hh"
+#include "VMasterUserActionAssembly.hh"
+#include "VAppendableUserActionAssembly.hh"
+#include "StandardUserActionAssembly.hh"
 #ifdef USE_VIS
 #include "VisualizeG4Geom.hh"
 #endif
@@ -93,10 +95,11 @@ class VANLPrimaryGen : public anl::BasicModule
 %makedefault;
 
 
+%nodefault;
 class BasicPrimaryGen : public VANLPrimaryGen
 {
-public:
-  };
+};
+%makedefault;
 
 
 class PointSourcePrimaryGen : public BasicPrimaryGen
@@ -163,17 +166,34 @@ public:
 };
 
 
-class VPickUpData : public anl::BasicModule
+class VUserActionAssembly : public anl::BasicModule
 {
 public:
-  VPickUpData();
+  VUserActionAssembly();
+  virtual ~VUserActionAssembly();
 };
 
 
-class StandardPickUpData : public VPickUpData
+class VMasterUserActionAssembly : public VUserActionAssembly
 {
 public:
-  StandardPickUpData();
+  VMasterUserActionAssembly();
+  virtual ~VMasterUserActionAssembly();
+};
+
+
+class VAppendableUserActionAssembly : public VUserActionAssembly
+{
+public:
+  VAppendableUserActionAssembly();
+  virtual ~VAppendableUserActionAssembly();
+};
+
+
+class StandardUserActionAssembly : public VMasterUserActionAssembly
+{
+public:
+  StandardUserActionAssembly();
 };
 
 

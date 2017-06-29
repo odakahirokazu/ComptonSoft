@@ -34,18 +34,19 @@ class RealDetectorUnitScintillator : public VRealDetectorUnit
 {
 public:
   RealDetectorUnitScintillator();
-  ~RealDetectorUnitScintillator();
+  virtual ~RealDetectorUnitScintillator();
 
-  DetectorType Type() const { return DetectorType::Scintillator; }
+  DetectorType Type() const override
+  { return DetectorType::Scintillator; }
 
-  void setSize(double x, double y, double z)
+  void setSize(double x, double y, double z) override
   {
     VRealDetectorUnit::setSize(x, y, z);
     VRealDetectorUnit::setPixelPitch(x, y);
   }
 
-  virtual void reconstruct(const DetectorHitVector& hitSignals,
-                           DetectorHitVector& hitsReconstructed);
+  void reconstruct(const DetectorHitVector& hitSignals,
+                   DetectorHitVector& hitsReconstructed) override;
 
 private:
   void determinePosition(DetectorHitVector& hits);

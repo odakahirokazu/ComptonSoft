@@ -40,9 +40,9 @@ public:
   ConstructDetector();
   ~ConstructDetector();
 
-  anl::ANLStatus mod_startup();
-  anl::ANLStatus mod_init();
-  anl::ANLStatus mod_ana();
+  anl::ANLStatus mod_startup() override;
+  anl::ANLStatus mod_init() override;
+  anl::ANLStatus mod_ana() override;
 
   DetectorSystem* getDetectorManager() { return detectorManager_.get(); }
 

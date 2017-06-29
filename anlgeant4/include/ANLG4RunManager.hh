@@ -21,9 +21,7 @@
 #define ANLGEANT4_ANLG4RunManager_H 1
 
 #include "G4RunManager.hh"
-
-class G4StateManager;
-
+#include "ANLStatus.hh"
 
 namespace anlgeant4
 {
@@ -31,6 +29,7 @@ namespace anlgeant4
  * ANLG4RunManager : original implemenation came from ANLGeant4 for ANL++.
  *
  * @date 2017-06-21 | Hiro Odaka | add default constructor/desctructor
+ * @date 2017-06-27 | Hiro Odaka | re-designed.
  */
 class ANLG4RunManager : public G4RunManager
 {
@@ -38,14 +37,7 @@ public:
   ANLG4RunManager() = default;
   virtual ~ANLG4RunManager();
 
-  void ANLbgnrunfunc();
-  void ANLanafunc();
-  void ANLendrunfunc();
-  
-private:
-  G4StateManager* ANLRunstatManager = nullptr;
-  G4bool cond = false;
-  G4int i_event = 0;
+  anl::ANLStatus performOneEvent(G4int i_event);
 };
 
 } /* namespace anlgeant4 */

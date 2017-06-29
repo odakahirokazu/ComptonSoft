@@ -37,7 +37,7 @@ public:
 
 public:
   EFieldModel();
-  ~EFieldModel() = default;
+  virtual ~EFieldModel() = default;
   EFieldModel(const EFieldModel&) = default;
   EFieldModel(EFieldModel&&) = default;
   EFieldModel& operator=(const EFieldModel&) = default;

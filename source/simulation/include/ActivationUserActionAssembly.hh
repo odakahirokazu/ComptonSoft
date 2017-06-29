@@ -17,10 +17,10 @@
  *                                                                       *
  *************************************************************************/
 
-#ifndef COMPTONSOFT_ActivationPickUpData_H
-#define COMPTONSOFT_ActivationPickUpData_H 1
+#ifndef COMPTONSOFT_ActivationUserActionAssembly_H
+#define COMPTONSOFT_ActivationUserActionAssembly_H 1
 
-#include "StandardPickUpData.hh"
+#include "StandardUserActionAssembly.hh"
 
 #include <cstdint>
 #include <memory>
@@ -37,7 +37,7 @@ class G4VAnalysisManager;
 namespace comptonsoft {
 
 /**
- * PickUpData module for radioactivation
+ * UserActionAssembly module for radioactivation
  *
  * @author Tamotsu Sato, Hirokazu Odaka
  * @date 2011-07-28 | T. Sato  | for ANLNext
@@ -46,25 +46,26 @@ namespace comptonsoft {
  * @date 2015-06-01 | Hiro Odaka
  * @date 2016-06-29 | Hiro Odaka | modify detection methods
  * @date 2017-04-25 | Hiro Odaka | support both detection methods
+ * @date 2017-07-29 | Hiro Odaka | new design of VUserActionAssembly
  */
-class ActivationPickUpData : public anlgeant4::StandardPickUpData
+class ActivationUserActionAssembly : public anlgeant4::StandardUserActionAssembly
 {
-  DEFINE_ANL_MODULE(ActivationPickUpData, 3.0);
+  DEFINE_ANL_MODULE(ActivationUserActionAssembly, 3.1);
 
   typedef std::map<std::string, int> volume_map_t;
   typedef std::map<int64_t, IsotopeInfo> data_map_t;
 public:
-  ActivationPickUpData();
-  virtual ~ActivationPickUpData();
+  ActivationUserActionAssembly();
+  virtual ~ActivationUserActionAssembly();
   
-  virtual anl::ANLStatus mod_startup();
+  anl::ANLStatus mod_startup() override;
   
-  virtual void RunAct_begin(const G4Run*);
-  virtual void RunAct_end(const G4Run* run);
-  virtual void TrackAct_begin(const G4Track* track);
-  virtual void StepAct(const G4Step* step, G4Track* track);
+  void RunActionAtBeginning(const G4Run*) override;
+  void RunActionAtEnd(const G4Run* run) override;
+  void TrackActionAtBeginning(const G4Track* track) override;
+  void SteppingAction(const G4Step* step) override;
 
-  virtual void CreateUserActions();
+  void createUserActions() override;
   
 protected:
   void SetInitialEnergy(double var) { m_InitialEnergy = var; }
@@ -93,4 +94,4 @@ private:
   
 } /* namespace comptonsoft */
 
-#endif /* COMPTONSOFT_ActivationPickUpData_H */
+#endif /* COMPTONSOFT_ActivationUserActionAssembly_H */

@@ -17,10 +17,6 @@
  *                                                                       *
  *************************************************************************/
 
-// 2008-09-19 Hirokazu Odaka
-// 2011-04-12 Hirokazu Odaka
-// 2011-06-22 Hirokazu Odaka
-
 #ifndef ANLGEANT4_NucleusPrimaryInVolume_H
 #define ANLGEANT4_NucleusPrimaryInVolume_H 1
 
@@ -31,17 +27,25 @@
 
 namespace anlgeant4 {
 
+/**
+ *
+ * @date 2008-09-19 Hirokazu Odaka
+ * @date 2011-04-12 Hirokazu Odaka
+ * @date 2011-06-22 Hirokazu Odaka
+ * @date 2017-06-27 Hirokazu Odaka | tweak
+ */
 class NucleusPrimaryGenInVolume : public NucleusPrimaryGen
 {
-  DEFINE_ANL_MODULE(NucleusPrimaryGenInVolume, 4.0);
+  DEFINE_ANL_MODULE(NucleusPrimaryGenInVolume, 4.1);
 public: 
   NucleusPrimaryGenInVolume();
   ~NucleusPrimaryGenInVolume();
 
-  anl::ANLStatus mod_startup();
-  anl::ANLStatus mod_com();
-  anl::ANLStatus mod_bgnrun();
-  anl::ANLStatus mod_ana();
+  anl::ANLStatus mod_startup() override;
+  anl::ANLStatus mod_com() override;
+  anl::ANLStatus mod_bgnrun() override;
+
+  void makePrimarySetting() override;
 
 private:
   anlgeant4::PositionSamplerInVolume m_PositionSampler;

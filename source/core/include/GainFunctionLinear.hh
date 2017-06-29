@@ -35,17 +35,17 @@ class GainFunctionLinear : public VGainFunction
 {
 public:
   GainFunctionLinear(std::size_t n, double c1);
-  ~GainFunctionLinear();
+  virtual ~GainFunctionLinear();
   
   GainFunctionLinear(const GainFunctionLinear&) = default;
   GainFunctionLinear(GainFunctionLinear&&) = default;
   GainFunctionLinear& operator=(const GainFunctionLinear&) = default;
   GainFunctionLinear& operator=(GainFunctionLinear&&) = default;
 
-  double RangeMin(std::size_t) const;
-  double RangeMax(std::size_t) const;
+  double RangeMin(std::size_t) const override;
+  double RangeMax(std::size_t) const override;
 
-  double eval(std::size_t index, double x) const;
+  double eval(std::size_t index, double x) const override;
   void set(std::size_t index, double c0, double c1);
   
 private:

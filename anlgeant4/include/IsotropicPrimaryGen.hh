@@ -32,18 +32,20 @@ namespace anlgeant4 {
  *
  * @author Hirokazu Odaka
  * @date 2010-xx-xx
+ * @date 2017-06-27 | Hirokazu Odaka | 4.1, makePrimarySetting()
  */
 class IsotropicPrimaryGen : public anlgeant4::BasicPrimaryGen
 {
-  DEFINE_ANL_MODULE(IsotropicPrimaryGen, 4.0);
+  DEFINE_ANL_MODULE(IsotropicPrimaryGen, 4.1);
 public:
   IsotropicPrimaryGen();
   ~IsotropicPrimaryGen();
   
-  anl::ANLStatus mod_startup();
-  anl::ANLStatus mod_init();
-  anl::ANLStatus mod_ana();
-  anl::ANLStatus mod_endrun();
+  anl::ANLStatus mod_startup() override;
+  anl::ANLStatus mod_init() override;
+  anl::ANLStatus mod_endrun() override;
+
+  void makePrimarySetting() override;
 
 protected:
   double Radius() const { return m_Radius; }

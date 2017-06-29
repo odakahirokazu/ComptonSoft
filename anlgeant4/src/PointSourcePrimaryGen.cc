@@ -92,7 +92,7 @@ ANLStatus PointSourcePrimaryGen::mod_init()
   return AS_OK;
 }
 
-ANLStatus PointSourcePrimaryGen::mod_ana()
+void PointSourcePrimaryGen::makePrimarySetting()
 {
   const G4ThreeVector position = samplePosition();
   const G4ThreeVector direction = sampleDirection();
@@ -103,8 +103,6 @@ ANLStatus PointSourcePrimaryGen::mod_ana()
   if (PolarizationMode()==0) {
     setUnpolarized();
   }
-
-  return BasicPrimaryGen::mod_ana();
 }
 
 G4ThreeVector PointSourcePrimaryGen::sampleDirection()

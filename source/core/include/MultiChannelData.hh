@@ -48,7 +48,7 @@ class MultiChannelData
 {
 public:
   MultiChannelData(std::size_t num_channels, ElectrodeSide eside);
-  ~MultiChannelData();
+  virtual ~MultiChannelData();
 
   MultiChannelData(const MultiChannelData&) = default;
   MultiChannelData(MultiChannelData&&) = default;

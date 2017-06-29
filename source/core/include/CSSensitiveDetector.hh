@@ -54,7 +54,7 @@ public:
     InsertIntoPositionCalculationSet(detectorID);
   }
 
-  int GetDetectorID(const G4VTouchable* touchable)
+  int GetDetectorID(const G4VTouchable* touchable) override
   {
     DetectorKeyType key = MakeKey(touchable);
     return GetDetectorIDByKey(key);

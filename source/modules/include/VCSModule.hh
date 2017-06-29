@@ -43,8 +43,8 @@ public:
   VCSModule();
   ~VCSModule();
   
-  virtual anl::ANLStatus mod_init();
-  virtual anl::ANLStatus mod_his();
+  virtual anl::ANLStatus mod_init() override;
+  virtual anl::ANLStatus mod_his() override;
 
 protected:
   void mkdir(const std::string& name="");

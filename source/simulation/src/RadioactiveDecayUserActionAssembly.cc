@@ -17,7 +17,7 @@
  *                                                                       *
  *************************************************************************/
 
-#include "RadioactiveDecayPickUpData.hh"
+#include "RadioactiveDecayUserActionAssembly.hh"
 #include "G4SystemOfUnits.hh"
 #include "G4PhysicalConstants.hh"
 #include "G4Track.hh"
@@ -28,21 +28,21 @@ using namespace anl;
 namespace comptonsoft
 {
 
-RadioactiveDecayPickUpData::RadioactiveDecayPickUpData()
+RadioactiveDecayUserActionAssembly::RadioactiveDecayUserActionAssembly()
   : m_TerminationTime(1.0*ms), m_FirstDecayTime(0.0)
 {
-  SetStepActOn(true);
 }
 
-ANLStatus RadioactiveDecayPickUpData::mod_startup()
+ANLStatus RadioactiveDecayUserActionAssembly::mod_startup()
 {
   register_parameter(&m_TerminationTime, "termination_time", s, "s");
 
   return AS_OK;
 }
 
-void RadioactiveDecayPickUpData::StepAct(const G4Step* aStep, G4Track* aTrack)
+void RadioactiveDecayUserActionAssembly::SteppingAction(const G4Step* aStep)
 {
+  G4Track* aTrack = aStep->GetTrack();
   const double globalTime = aTrack->GetGlobalTime();
   
   if (aTrack->GetTrackID()==1 && aTrack->GetCurrentStepNumber()==1) {
@@ -53,7 +53,7 @@ void RadioactiveDecayPickUpData::StepAct(const G4Step* aStep, G4Track* aTrack)
       setInitialTime(m_FirstDecayTime);
     }
     else {
-      throw ANLException("RadioactiveDecayPickUpData:Error---First step is not radioactive decay.");
+      throw ANLException("RadioactiveDecayUserActionAssembly:Error---First step is not radioactive decay.");
     }
   }
 

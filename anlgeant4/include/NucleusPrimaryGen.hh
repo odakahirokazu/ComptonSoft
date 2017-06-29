@@ -43,8 +43,10 @@ public:
   NucleusPrimaryGen();
   ~NucleusPrimaryGen();
 
-  virtual anl::ANLStatus mod_startup();
-  virtual anl::ANLStatus mod_bgnrun();
+  anl::ANLStatus mod_startup() override;
+  anl::ANLStatus mod_bgnrun() override;
+
+  void makePrimarySetting() override;
   
 private:
   G4ThreeVector m_Position0;

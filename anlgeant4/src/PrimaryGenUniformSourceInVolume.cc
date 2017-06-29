@@ -66,7 +66,7 @@ ANLStatus PrimaryGenUniformSourceInVolume::mod_bgnrun()
   return AS_OK;
 }
 
-ANLStatus PrimaryGenUniformSourceInVolume::mod_ana()
+void PrimaryGenUniformSourceInVolume::makePrimarySetting()
 {
   G4ThreeVector position(m_PositionSampler.samplePosition());
   setSourcePosition(position);
@@ -75,8 +75,8 @@ ANLStatus PrimaryGenUniformSourceInVolume::mod_ana()
     G4ThreeVector direction = (m_TargetPosition-position).unit();
     setCenterDirection(direction);
   }
-  
-  return PointSourcePrimaryGen::mod_ana();
+
+  PointSourcePrimaryGen::makePrimarySetting();
 }
 
 } /* namespace anlgeant4 */

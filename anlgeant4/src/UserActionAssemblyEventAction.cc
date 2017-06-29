@@ -17,56 +17,31 @@
  *                                                                       *
  *************************************************************************/
 
-#ifndef ANLGEANT4_VPickUpData_H
-#define ANLGEANT4_VPickUpData_H 1
-
-#include "BasicModule.hh"
-
-class G4Event;
-class G4Track;
-class G4Step;
-class G4Run;
-
-class G4RunManager;
-class G4UserStackingAction;
+#include "UserActionAssemblyEventAction.hh"
+#include "VUserActionAssembly.hh"
 
 namespace anlgeant4
 {
 
-/**
- * Virtual PickUpData module
- * @author *, Shin Watanabe, Hirokazu Odaka
- * @date 2012-05-30
- */
-class VPickUpData : public anl::BasicModule
+UserActionAssemblyEventAction::UserActionAssemblyEventAction(const std::list<VUserActionAssembly*>& userActions)
+  : userActions_(userActions)
 {
-  DEFINE_ANL_MODULE(VPickUpData, 4.0);
-public:
-  VPickUpData();
+}
+ 
+UserActionAssemblyEventAction::~UserActionAssemblyEventAction() = default;
 
-  anl::ANLStatus mod_startup();
-  
-  virtual void RunAct_begin(const G4Run*) {}
-  virtual void RunAct_end(const G4Run*)   {}
-  virtual void EventAct_begin(const G4Event* ) {}
-  virtual void EventAct_end(const G4Event* )   {}
-  virtual void TrackAct_begin(const G4Track* ) {}
-  virtual void TrackAct_end(const G4Track* )   {}
-  virtual void StepAct(const G4Step*, G4Track*) {}
+void UserActionAssemblyEventAction::BeginOfEventAction(const G4Event* anEvent)
+{
+  for (VUserActionAssembly* pud: userActions_) {
+    pud->EventActionAtBeginning(anEvent);
+  }
+}
 
-  bool StepActOn() { return m_StepActOn; }
-  void SetStepActOn(bool on) { m_StepActOn = on; }
-
-  void SetStackingAction(G4UserStackingAction* v) { m_StackingAction = v; }
-  
-  virtual void CreateUserActions();
-  void RegisterUserActions(G4RunManager* run_manager);
-  
-private:
-  bool m_StepActOn;
-  G4UserStackingAction* m_StackingAction;
-};
+void UserActionAssemblyEventAction::EndOfEventAction(const G4Event* anEvent)
+{
+  for (VUserActionAssembly* pud: userActions_) {
+    pud->EventActionAtEnd(anEvent);
+  }
+}
 
 } /* namespace anlgeant4 */
-
-#endif /* ANLGEANT4_VPickUpData_H */

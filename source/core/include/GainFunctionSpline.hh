@@ -37,16 +37,16 @@ class GainFunctionSpline : public VGainFunction
 {
 public:
   explicit GainFunctionSpline(std::size_t n);
-  ~GainFunctionSpline();
+  virtual ~GainFunctionSpline();
 
   GainFunctionSpline(const GainFunctionSpline&) = default;
   GainFunctionSpline(GainFunctionSpline&&) = default;
   GainFunctionSpline& operator=(const GainFunctionSpline& r) = default;
   GainFunctionSpline& operator=(GainFunctionSpline& rr) = default;
   
-  double RangeMin(std::size_t index) const;
-  double RangeMax(std::size_t index) const;
-  double eval(std::size_t index, double x) const;
+  double RangeMin(std::size_t index) const override;
+  double RangeMax(std::size_t index) const override;
+  double eval(std::size_t index, double x) const override;
   void set(std::size_t index, const TSpline* func);
 
 private:

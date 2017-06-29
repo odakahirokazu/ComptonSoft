@@ -39,9 +39,9 @@ public:
   InitialParticleTree();
   ~InitialParticleTree() {}
 
-  anl::ANLStatus mod_init();
-  anl::ANLStatus mod_his();
-  anl::ANLStatus mod_ana();
+  anl::ANLStatus mod_init() override;
+  anl::ANLStatus mod_his() override;
+  anl::ANLStatus mod_ana() override;
 
 protected:
   int eventid;
@@ -64,6 +64,6 @@ private:
   TTree* tree;
 };
 
-}
+} /* namespace comptonsoft */
 
 #endif /* COMPTONSOFT_InitialParticleTree_H */

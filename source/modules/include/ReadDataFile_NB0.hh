@@ -37,10 +37,10 @@ public:
   ReadDataFile_NB0();
   ~ReadDataFile_NB0() = default;
 
-  anl::ANLStatus mod_startup();
-  anl::ANLStatus mod_init();
-  anl::ANLStatus mod_bgnrun();
-  anl::ANLStatus mod_ana();
+  anl::ANLStatus mod_startup() override;
+  anl::ANLStatus mod_init() override;
+  anl::ANLStatus mod_bgnrun() override;
+  anl::ANLStatus mod_ana() override;
   
   uint32_t UnixTime() const { return m_UnixTime; }
   uint32_t TI() const { return m_TI; }

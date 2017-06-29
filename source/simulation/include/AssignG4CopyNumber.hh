@@ -38,13 +38,13 @@ public:
   AssignG4CopyNumber();
   ~AssignG4CopyNumber();
 
-  anl::ANLStatus mod_startup();
-  anl::ANLStatus mod_bgnrun();
+  anl::ANLStatus mod_startup() override;
+  anl::ANLStatus mod_bgnrun() override;
 
 private:
   std::string m_FileName;
 };
 
-}
+} /* namespace comptonsoft */
 
 #endif /* COMPTONSOFT_AssignG4CopyNumber_H */

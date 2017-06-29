@@ -45,10 +45,10 @@ public:
   ReadComptonEventTree();
   ~ReadComptonEventTree() = default;
 
-  anl::ANLStatus mod_startup();
-  anl::ANLStatus mod_init();
-  anl::ANLStatus mod_his();
-  anl::ANLStatus mod_ana();
+  anl::ANLStatus mod_startup() override;
+  anl::ANLStatus mod_init() override;
+  anl::ANLStatus mod_his() override;
+  anl::ANLStatus mod_ana() override;
    
 private:
   std::vector<std::string> fileList_;

@@ -17,7 +17,7 @@
  *                                                                       *
  *************************************************************************/
 
-#include "ActivationPickUpData.hh"
+#include "ActivationUserActionAssembly.hh"
 
 #include <fstream>
 #include <iterator>
@@ -42,7 +42,7 @@ using namespace anl;
 namespace comptonsoft
 {
 
-ActivationPickUpData::ActivationPickUpData()
+ActivationUserActionAssembly::ActivationUserActionAssembly()
   : m_AnalysisManager(G4RootAnalysisManager::Instance()),
     m_FilenameBase("activation"),
     m_DetectionByGeneration(true),
@@ -50,13 +50,12 @@ ActivationPickUpData::ActivationPickUpData()
     m_LifetimeLimit(1.0e-3*second),
     m_InitialEnergy(0.0)
 {
-  add_alias("ActivationPickUpData");
-  SetStepActOn(true);
+  add_alias("ActivationUserActionAssembly");
 }
 
-ActivationPickUpData::~ActivationPickUpData() = default;
+ActivationUserActionAssembly::~ActivationUserActionAssembly() = default;
 
-ANLStatus ActivationPickUpData::mod_startup()
+ANLStatus ActivationUserActionAssembly::mod_startup()
 {
   register_parameter(&m_FilenameBase, "output_filename_base");
   register_parameter(&m_DetectionByGeneration, "detection_by_generation");
@@ -65,12 +64,12 @@ ANLStatus ActivationPickUpData::mod_startup()
   return AS_OK;
 }
 
-void ActivationPickUpData::CreateUserActions()
+void ActivationUserActionAssembly::createUserActions()
 {
-  SetStackingAction(new ActivationStackingAction);
+  setStackingAction(new ActivationStackingAction);
 }
 
-void ActivationPickUpData::RunAct_begin(const G4Run*)
+void ActivationUserActionAssembly::RunActionAtBeginning(const G4Run*)
 {
   const G4String filename(m_FilenameBase+".root");
   m_AnalysisManager->SetNtupleDirectoryName("activation");
@@ -87,7 +86,7 @@ void ActivationPickUpData::RunAct_begin(const G4Run*)
   m_AnalysisManager->CreateNtupleDColumn("ini_energy");
 }
 
-void ActivationPickUpData::RunAct_end(const G4Run* run)
+void ActivationUserActionAssembly::RunActionAtEnd(const G4Run* run)
 {
   OutputVolumeInfo(m_FilenameBase+".volume.dat");
   OutputSummary(m_FilenameBase+".summary.dat", run->GetNumberOfEvent());
@@ -96,17 +95,18 @@ void ActivationPickUpData::RunAct_end(const G4Run* run)
   m_AnalysisManager->CloseFile();
 }
 
-void ActivationPickUpData::TrackAct_begin(const G4Track* track)
+void ActivationUserActionAssembly::TrackActionAtBeginning(const G4Track* track)
 {
-  StandardPickUpData::TrackAct_begin(track);
+  StandardUserActionAssembly::TrackActionAtBeginning(track);
 
   if (track->GetTrackID() == 1) {
     SetInitialEnergy(track->GetKineticEnergy());
   }
 }
 
-void ActivationPickUpData::StepAct(const G4Step* step, G4Track* track)
+void ActivationUserActionAssembly::SteppingAction(const G4Step* step)
 {
+  G4Track* track = step->GetTrack();
   const G4VProcess* process = step->GetPostStepPoint()->GetProcessDefinedStep();
   const G4String processName = process->GetProcessName();
 
@@ -146,17 +146,17 @@ void ActivationPickUpData::StepAct(const G4Step* step, G4Track* track)
   }
 }
 
-int ActivationPickUpData::NumberOfVolumes()
+int ActivationUserActionAssembly::NumberOfVolumes()
 {
   return m_VolumeArray.size();
 }
 
-std::string ActivationPickUpData::VolumeName(int index)
+std::string ActivationUserActionAssembly::VolumeName(int index)
 {
   return m_VolumeArray.at(index);
 }
 
-void ActivationPickUpData::Fill(const G4Ions* nucleus,
+void ActivationUserActionAssembly::Fill(const G4Ions* nucleus,
                                 const G4VTouchable* touchable,
                                 double posx, double posy, double posz)
 {
@@ -208,7 +208,7 @@ void ActivationPickUpData::Fill(const G4Ions* nucleus,
   }
 }
 
-void ActivationPickUpData::OutputVolumeInfo(const std::string& filename)
+void ActivationUserActionAssembly::OutputVolumeInfo(const std::string& filename)
 {
   std::ofstream fout(filename.c_str());
   size_t numVolume = NumberOfVolumes();
@@ -218,7 +218,7 @@ void ActivationPickUpData::OutputVolumeInfo(const std::string& filename)
   fout.close();
 }
 
-void ActivationPickUpData::OutputSummary(const std::string& filename,
+void ActivationUserActionAssembly::OutputSummary(const std::string& filename,
                                          int numberOfRun)
 {
   std::ofstream fout(filename.c_str());

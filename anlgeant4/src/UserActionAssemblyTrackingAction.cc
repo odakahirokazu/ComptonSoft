@@ -17,58 +17,36 @@
  *                                                                       *
  *************************************************************************/
 
-//
-// v1.0 2.?.2001 M.Ozaki
-// v1.1 2.? 2001 T.Takahashi
-//
-// v2.0 4.29. 2002 S. Watanabe 
-//      with class MyDaq for output interaction processes
-//      
-// ----- MyTrackingAction -----
-// by M.Ozaki & T.Takahashi
-//
-// 2002, 11, 11 Shin Watanabe 
-//
-// ----- stdTrackingAction -----
-// 2003/1/10 Shin Watanabe Geant4ANL
-//
-// **************************************************************************
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo...
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo...
-
-#include "PickUpDataTrackingAction.hh"
-
-#include "globals.hh"
+#include "UserActionAssemblyTrackingAction.hh"
 #include "G4TrackingManager.hh"
 #include "G4Trajectory.hh"
-#include "VPickUpData.hh"
+#include "VUserActionAssembly.hh"
 
-
-using namespace anlgeant4;
-
-PickUpDataTrackingAction::PickUpDataTrackingAction(VPickUpData* pud)
+namespace anlgeant4
 {
-  pickup_data = pud;
-  G4cout << "Constructing TrackingAction " << G4endl;
+
+UserActionAssemblyTrackingAction::UserActionAssemblyTrackingAction(const std::list<VUserActionAssembly*>& userActions)
+  : userActions_(userActions)
+{
 }
 
+UserActionAssemblyTrackingAction::~UserActionAssemblyTrackingAction() = default;
 
-PickUpDataTrackingAction::~PickUpDataTrackingAction()
-{
-  G4cout << "Destructing TrackingAction " << G4endl;
-}
-
-
-void PickUpDataTrackingAction::PreUserTrackingAction(const G4Track* aTrack)
+void UserActionAssemblyTrackingAction::PreUserTrackingAction(const G4Track* aTrack)
 {
   fpTrackingManager->SetStoreTrajectory(true);
   fpTrackingManager->SetTrajectory(new G4Trajectory(aTrack));
   
-  pickup_data->TrackAct_begin(aTrack);
+  for (VUserActionAssembly* pud: userActions_) {
+    pud->TrackActionAtBeginning(aTrack);
+  }
 }
 
-
-void PickUpDataTrackingAction::PostUserTrackingAction(const G4Track* aTrack)
+void UserActionAssemblyTrackingAction::PostUserTrackingAction(const G4Track* aTrack)
 {
-  pickup_data->TrackAct_end(aTrack);
+  for (VUserActionAssembly* pud: userActions_) {
+    pud->TrackActionAtEnd(aTrack);
+  }
 }
+
+} /* namespace anlgeant4 */

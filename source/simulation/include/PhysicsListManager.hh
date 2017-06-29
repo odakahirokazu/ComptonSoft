@@ -44,11 +44,11 @@ public:
   PhysicsListManager();
   ~PhysicsListManager() = default;
   
-  anl::ANLStatus mod_startup();
-  anl::ANLStatus mod_prepare();
-  anl::ANLStatus mod_init(); 
+  anl::ANLStatus mod_startup() override;
+  anl::ANLStatus mod_prepare() override;
+  anl::ANLStatus mod_init() override;
 
-  G4VUserPhysicsList* create();
+  G4VUserPhysicsList* create() override;
 
 private:
   std::string m_PhysicsListName;

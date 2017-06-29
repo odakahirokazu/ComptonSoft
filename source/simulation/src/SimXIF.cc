@@ -241,8 +241,8 @@ void SimXIF::addEvent(double time, double energy, int stripx, int stripy,
       double offsetx = det->getCenterPositionX() / det->getPixelPitchX();
       double offsety = det->getCenterPositionY() / det->getPixelPitchY();
       offset.set(offsetx, offsety, 0.0);
-      xaxis = det->getDirectionX();
-      yaxis = det->getDirectionY();
+      xaxis = det->getXAxisDirection();
+      yaxis = det->getYAxisDirection();
       widthx = det->getWidthX() / det->getPixelPitchX();
       widthy = det->getWidthY() / det->getPixelPitchY();
     }

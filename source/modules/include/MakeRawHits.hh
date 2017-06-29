@@ -31,11 +31,11 @@ public:
   MakeRawHits() = default;
   ~MakeRawHits() = default;
 
-  anl::ANLStatus mod_startup();
+  anl::ANLStatus mod_startup() override;
 
 private:
   bool setAnalysisParam();
-  void doProcessing();
+  void doProcessing() override;
 };
 
 } /* namespace comptonsoft */

@@ -21,54 +21,45 @@
 
 #include "G4ParticleGun.hh"
 #include "G4ParticleTable.hh"
+#include "BasicPrimaryGen.hh"
 
-using CLHEP::keV;
-using namespace anlgeant4;
-
+namespace anlgeant4
+{
 
 BasicPrimaryGeneratorAction::BasicPrimaryGeneratorAction()
-  : m_ParticleGun(0),
+  : m_ParticleGun(new G4ParticleGun(1)),
     m_Time(0.0), m_Position(0.0, 0.0, 0.0),
-    m_Energy(10.0*keV), m_Direction(1.0, 0.0, 0.0)
+    m_Energy(10.0*CLHEP::keV), m_Direction(1.0, 0.0, 0.0)
 {
-  G4int nParticle = 1;
-  m_ParticleGun = new G4ParticleGun(nParticle);
 }
 
-
 BasicPrimaryGeneratorAction::BasicPrimaryGeneratorAction(G4ParticleDefinition* definition)
-  : m_ParticleGun(0),
+  : m_ParticleGun(new G4ParticleGun(1)),
     m_Time(0.0), m_Position(0.0, 0.0, 0.0),
-    m_Energy(10.0*keV), m_Direction(1.0, 0.0, 0.0)
+    m_Energy(10.0*CLHEP::keV), m_Direction(1.0, 0.0, 0.0)
 {
-  G4int nParticle = 1;
-  m_ParticleGun = new G4ParticleGun(nParticle);
   m_ParticleGun->SetParticleDefinition(definition);
 }
 
-
 BasicPrimaryGeneratorAction::BasicPrimaryGeneratorAction(G4String particle_name)
-  : m_ParticleGun(0),
+  : m_ParticleGun(new G4ParticleGun(1)),
     m_Time(0.0), m_Position(0.0, 0.0, 0.0),
-    m_Energy(10.0*keV), m_Direction(1.0, 0.0, 0.0)
+    m_Energy(10.0*CLHEP::keV), m_Direction(1.0, 0.0, 0.0)
 {
-  G4int nParticle = 1;
-  m_ParticleGun = new G4ParticleGun(nParticle);
-
   G4ParticleDefinition* particle = 
     G4ParticleTable::GetParticleTable()->FindParticle(particle_name);
   m_ParticleGun->SetParticleDefinition(particle);
 }
 
-
-BasicPrimaryGeneratorAction::~BasicPrimaryGeneratorAction()
-{
-  delete m_ParticleGun;
-}
-
+BasicPrimaryGeneratorAction::~BasicPrimaryGeneratorAction() = default;
 
 void BasicPrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
 {
+  if (m_GeneratorSetting) {
+    m_GeneratorSetting->makePrimarySetting();
+    m_GeneratorSetting->confirmPrimarySetting();
+  }
+
   m_ParticleGun->SetParticleTime(m_Time);
   m_ParticleGun->SetParticlePosition(m_Position);
   m_ParticleGun->SetParticleEnergy(m_Energy);
@@ -81,8 +72,9 @@ void BasicPrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
   m_ParticleGun->GeneratePrimaryVertex(anEvent);
 }
 
-
 void BasicPrimaryGeneratorAction::SetDefinition(G4ParticleDefinition* definition)
 {
   m_ParticleGun->SetParticleDefinition(definition);
 }
+
+} /* namespace anlgeant4 */

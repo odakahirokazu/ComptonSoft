@@ -39,9 +39,9 @@ class SimDetectorUnit2DPixel
 {
 public:
   SimDetectorUnit2DPixel();
-  ~SimDetectorUnit2DPixel();
+  virtual ~SimDetectorUnit2DPixel();
 
-  void initializeEvent();
+  void initializeEvent() override;
 
   void setUsingSymmetry(bool val) { usingSymmetry_ = val; }
   bool isUsingSymmetry() const { return usingSymmetry_; }
@@ -53,28 +53,28 @@ public:
   TH3D* getWPMap() { return WPMap_; }
  
   double ChargeCollectionEfficiency(const PixelID& pixel,
-                                    double x, double y, double z) const;
+                                    double x, double y, double z) const override;
   double WeightingPotential(const PixelID& pixel, double x, double y, double z);
-  void buildWPMap();
-  void buildWPMap(int nx, int ny, int nz, double pixel_factor=1.0);
-  void buildCCEMap();
-  void buildCCEMap(int nx, int ny, int nz, double pixel_factor=1.0);
+  void buildWPMap() override;
+  void buildWPMap(int nx, int ny, int nz, double pixel_factor=1.0) override;
+  void buildCCEMap() override;
+  void buildCCEMap(int nx, int ny, int nz, double pixel_factor=1.0) override;
 
-  bool isCCEMapPrepared();
+  bool isCCEMapPrepared() override;
 
-  void printSimulationParameters(std::ostream& os) const;
+  void printSimulationParameters(std::ostream& os) const override;
 
 protected:
   virtual DetectorHit_sptr generateHit(const DetectorHit& rawhit,
                                        const PixelID& pixel);
 
-  bool checkRange(const PixelID& pixel) const;
-  int IndexOfTable(const PixelID& pixel) const;
-  int SizeOfTable() const;
-  PixelID TableIndexToPixelID(int index) const;
+  bool checkRange(const PixelID& pixel) const override;
+  int IndexOfTable(const PixelID& pixel) const override;
+  int SizeOfTable() const override;
+  PixelID TableIndexToPixelID(int index) const override;
 
 private:
-  void simulatePulseHeights();
+  void simulatePulseHeights() override;
 
 private:
   bool usingSymmetry_;

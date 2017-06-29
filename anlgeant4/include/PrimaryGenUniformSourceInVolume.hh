@@ -17,8 +17,6 @@
  *                                                                       *
  *************************************************************************/
 
-// 2011-06-22 Hirokazu Odaka
-
 #ifndef ANLGEANT4_PrimaryGenUniformSourceInVolume_H
 #define ANLGEANT4_PrimaryGenUniformSourceInVolume_H 1
 
@@ -29,17 +27,23 @@
 namespace anlgeant4
 {
 
+/**
+ *
+ * @date 2011-06-22 | Hirokazu Odaka
+ * @date 2017-06-27 | Hirokazu Odaka | 4.1, makePrimarySetting()
+ */
 class PrimaryGenUniformSourceInVolume : public PointSourcePrimaryGen
 {
-  DEFINE_ANL_MODULE(PrimaryGenUniformSourceInVolume, 4.0);
+  DEFINE_ANL_MODULE(PrimaryGenUniformSourceInVolume, 4.1);
 public: 
   PrimaryGenUniformSourceInVolume();
   ~PrimaryGenUniformSourceInVolume() = default;
 
-  anl::ANLStatus mod_startup();
-  anl::ANLStatus mod_init();
-  anl::ANLStatus mod_bgnrun();
-  anl::ANLStatus mod_ana();
+  anl::ANLStatus mod_startup() override;
+  anl::ANLStatus mod_init() override;
+  anl::ANLStatus mod_bgnrun() override;
+
+  void makePrimarySetting() override;
 
 private:
   PositionSamplerInVolume m_PositionSampler;

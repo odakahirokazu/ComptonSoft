@@ -33,15 +33,15 @@ namespace anlgeant4 {
  */
 class GaussianBeamPrimaryGen : public anlgeant4::PlaneWavePrimaryGen
 {
-  DEFINE_ANL_MODULE(GaussianBeamPrimaryGen, 4.0);
+  DEFINE_ANL_MODULE(GaussianBeamPrimaryGen, 4.1);
 public:
   GaussianBeamPrimaryGen();
   ~GaussianBeamPrimaryGen();
 
-  virtual anl::ANLStatus mod_startup();
+  anl::ANLStatus mod_startup() override;
 
 protected:
-  G4ThreeVector samplePosition();
+  G4ThreeVector samplePosition() override;
   
 private:
   double m_RSigma;

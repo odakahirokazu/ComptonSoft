@@ -21,6 +21,7 @@
 #define ANLGEANT4_Geant4Simple_H 1
 
 #include <string>
+#include <memory>
 #include "BasicModule.hh"
 #include "globals.hh"
 
@@ -37,28 +38,28 @@ namespace anlgeant4
 /**
  * Simple Geant4 run manager 
  * @author Hirokazu Odaka
+ * @date 2017-07-28 | 3.0, re-designed.
  */
 class Geant4Simple : public anl::BasicModule
 {
-  DEFINE_ANL_MODULE(Geant4Simple, 1.1);
+  DEFINE_ANL_MODULE(Geant4Simple, 3.0);
 public: 
   Geant4Simple();
   ~Geant4Simple();
   
-  anl::ANLStatus mod_startup();
-  anl::ANLStatus mod_init();
-  anl::ANLStatus mod_ana();
-  anl::ANLStatus mod_exit();
+  anl::ANLStatus mod_startup() override;
+  anl::ANLStatus mod_init() override;
+  anl::ANLStatus mod_ana() override;
 
 protected:
   virtual void set_user_initializations();
-  virtual void set_user_primarygen_action();
-  virtual void set_user_std_actions();
+  virtual void set_user_primary_generator_action();
+  virtual void set_user_defined_actions();
   virtual void apply_commands();
 
 private:
-  G4RunManager* m_G4RunManager;
-  CLHEP::HepRandomEngine* m_RandomEnginePtr;
+  std::unique_ptr<G4RunManager> m_G4RunManager;
+  std::unique_ptr<CLHEP::HepRandomEngine> m_RandomEnginePtr;
 
   std::string m_RandomEngine;
   int m_RandomSeed1;
@@ -67,6 +68,6 @@ private:
   int m_VerboseLevel;
 };
 
-}
+} /* namespace anlgeant4 */
 
 #endif /* ANLGEANT4_Geant4Simple_H */

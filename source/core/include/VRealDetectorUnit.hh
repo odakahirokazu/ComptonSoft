@@ -49,75 +49,94 @@ public:
   VRealDetectorUnit();
   virtual ~VRealDetectorUnit();
 
-  virtual DetectorType Type() const = 0;
-
-  void setName(const std::string& name) { name_ = name; };
-  std::string getName() const { return name_; }
-  std::string getNamePrefix() const;
+  void setName(const std::string& name) override
+  { name_ = name; };
+  std::string getName() const override
+  { return name_; }
+  std::string getNamePrefix() const override;
   
-  void setID(int i) { ID_ = i; }
-  int getID() const { return ID_; }
+  void setID(int i) override
+  { ID_ = i; }
+  int getID() const override
+  { return ID_; }
   
-  void setInstrumentID(int i) { instrumentID_ = i; };
-  int getInstrumentID() const { return instrumentID_; };
+  void setInstrumentID(int i) override
+  { instrumentID_ = i; };
+  int getInstrumentID() const override
+  { return instrumentID_; };
 
-  void setSize(double x, double y, double z)
+  void setSize(double x, double y, double z) override
   { sizeX_ = x; sizeY_ = y; sizeZ_ = z; }
-  double getSizeX() const { return sizeX_; }
-  double getSizeY() const { return sizeY_; }
-  double getSizeZ() const { return sizeZ_; }
+  double getSizeX() const override { return sizeX_; }
+  double getSizeY() const override { return sizeY_; }
+  double getSizeZ() const override { return sizeZ_; }
   
-  void setWidth(double x, double y)
+  void setWidth(double x, double y) override
   { sizeX_ = x; sizeY_ = y; }
-  double getWidthX() const { return sizeX_; }
-  double getWidthY() const { return sizeY_; }
+  double getWidthX() const override { return sizeX_; }
+  double getWidthY() const override { return sizeY_; }
 
-  void setThickness(double r) { sizeZ_ = r; }
-  double getThickness() const { return sizeZ_; }
+  void setThickness(double r) override { sizeZ_ = r; }
+  double getThickness() const override { return sizeZ_; }
   
-  void setOffset(double x, double y)
+  void setOffset(double x, double y) override
   { offsetX_ = x; offsetY_ = y; }
-  double getOffsetX() const { return offsetX_; }
-  double getOffsetY() const { return offsetY_; }  
-  void setPixelPitch(double x, double y)
+  double getOffsetX() const override { return offsetX_; }
+  double getOffsetY() const override { return offsetY_; }
+  void setPixelPitch(double x, double y) override
   { pixelPitchX_ = x; pixelPitchY_ = y; }
-  double getPixelPitchX() const { return pixelPitchX_; }
-  double getPixelPitchY() const { return pixelPitchY_; }
+  double getPixelPitchX() const override { return pixelPitchX_; }
+  double getPixelPitchY() const override { return pixelPitchY_; }
   
-  void setNumPixel(int x, int y)
+  void setNumPixel(int x, int y) override
   { numPixelX_ = x; numPixelY_ = y; }
-  double getNumPixelX() const { return numPixelX_; }
-  double getNumPixelY() const { return numPixelY_; }
+  double getNumPixelX() const override { return numPixelX_; }
+  double getNumPixelY() const override { return numPixelY_; }
   
-  void setCenterPosition(double x, double y, double z)
+  void setCenterPosition(double x, double y, double z) override
   { centerPosition_.set(x, y, z); }
-  void setCenterPosition(const vector3_t& v) { centerPosition_ = v; }
-  vector3_t getCenterPosition() const { return centerPosition_; }
-  double getCenterPositionX() const { return centerPosition_.x(); }
-  double getCenterPositionY() const { return centerPosition_.y(); }
-  double getCenterPositionZ() const { return centerPosition_.z(); }
+  void setCenterPosition(const vector3_t& v) override
+  { centerPosition_ = v; }
+  vector3_t getCenterPosition() const override
+  { return centerPosition_; }
+  double getCenterPositionX() const override
+  { return centerPosition_.x(); }
+  double getCenterPositionY() const override
+  { return centerPosition_.y(); }
+  double getCenterPositionZ() const override
+  { return centerPosition_.z(); }
   
-  void setXAxisDirection(double x, double y, double z) 
+  void setXAxisDirection(double x, double y, double z) override
   {
     directionX_.set(x, y, z);
     directionX_ = directionX_.unit();
   }
-  void setXAxisDirection(const vector3_t& v) { directionX_ = v.unit(); } 
-  vector3_t getXAxisDirection() const { return directionX_; }
-  double getXAxisDirectionX() const { return directionX_.x(); }
-  double getXAxisDirectionY() const { return directionX_.y(); }
-  double getXAxisDirectionZ() const { return directionX_.z(); }
+  void setXAxisDirection(const vector3_t& v) override
+  { directionX_ = v.unit(); }
+  vector3_t getXAxisDirection() const override
+  { return directionX_; }
+  double getXAxisDirectionX() const override
+  { return directionX_.x(); }
+  double getXAxisDirectionY() const override
+  { return directionX_.y(); }
+  double getXAxisDirectionZ() const override
+  { return directionX_.z(); }
   
-  void setYAxisDirection(double x, double y, double z) 
+  void setYAxisDirection(double x, double y, double z) override
   { 
     directionY_.set(x, y, z);
     directionY_ = directionY_.unit();
   } 
-  void setYAxisDirection(const vector3_t& v) { directionY_ = v.unit(); } 
-  vector3_t getYAxisDirection() const { return directionY_; }
-  double getYAxisDirectionX() const { return directionY_.x(); }
-  double getYAxisDirectionY() const { return directionY_.y(); }
-  double getYAxisDirectionZ() const { return directionY_.z(); }
+  void setYAxisDirection(const vector3_t& v) override
+  { directionY_ = v.unit(); }
+  vector3_t getYAxisDirection() const override
+  { return directionY_; }
+  double getYAxisDirectionX() const override
+  { return directionY_.x(); }
+  double getYAxisDirectionY() const override
+  { return directionY_.y(); }
+  double getYAxisDirectionZ() const override
+  { return directionY_.z(); }
 
   /**
    * register multi channel data.
@@ -132,59 +151,59 @@ public:
   std::shared_ptr<const VChannelMap> getChannelMap() const
   { return channelMap_; }
   
-  vector3_t Position(int pixelX, int pixelY) const;
+  vector3_t Position(int pixelX, int pixelY) const override;
   void Position(int pixelX, int pixelY,
-                double* x, double* y, double* z) const;
-  vector3_t Position(const PixelID& pixel) const;
+                double* x, double* y, double* z) const override;
+  vector3_t Position(const PixelID& pixel) const override;
   void Position(const PixelID& pixel,
-                double* x, double* y, double* z) const;
+                double* x, double* y, double* z) const override;
 
-  vector3_t LocalPosition(int pixelX, int pixelY) const;
+  vector3_t LocalPosition(int pixelX, int pixelY) const override;
   void LocalPosition(int pixelX, int pixelY,
-                     double* x, double* y, double* z) const;
-  vector3_t LocalPosition(const PixelID& pixel) const;
+                     double* x, double* y, double* z) const override;
+  vector3_t LocalPosition(const PixelID& pixel) const override;
   void LocalPosition(const PixelID& pixel,
-                     double* x, double* y, double* z) const;
+                     double* x, double* y, double* z) const override;
   
-  PixelID findPixel(double localx, double localy) const;
+  PixelID findPixel(double localx, double localy) const override;
 
   int NumberOfMultiChannelData() const { return MCDVector_.size(); }
   MultiChannelData* getMultiChannelData(int i) { return MCDVector_[i].get(); }
   
-  PixelID ChannelToPixel(int section, int channel) const;
-  PixelID ChannelToPixel(const SectionChannelPair& sectionChannel) const
+  PixelID ChannelToPixel(int section, int channel) const override;
+  PixelID ChannelToPixel(const SectionChannelPair& sectionChannel) const override
   {
     return ChannelToPixel(sectionChannel.Section(), sectionChannel.Channel());
   }
   PixelID ChannelToStripPair(int hit1Section, int hit1Channel,
-                             int hit2Section, int hit2Channel) const;
+                             int hit2Section, int hit2Channel) const override;
   PixelID ChannelToStripPair(const SectionChannelPair& hit1Channel,
-                             const SectionChannelPair& hit2Channel) const
+                             const SectionChannelPair& hit2Channel) const override
   {
     return ChannelToStripPair(hit1Channel.Section(), hit1Channel.Channel(),
                               hit2Channel.Section(), hit2Channel.Channel());
   }
 
-  SectionChannelPair PixelToChanelID(const PixelID& pixel) const;
+  SectionChannelPair PixelToChanelID(const PixelID& pixel) const override;
 
-  void setBottomSideElectrode(ElectrodeSide v)
+  void setBottomSideElectrode(ElectrodeSide v) override
   { bottomSideElectrode_ = v; }
-  ElectrodeSide BottomSideElectrode() const
+  ElectrodeSide BottomSideElectrode() const override
   { return bottomSideElectrode_; }
-  ElectrodeSide UpSideElectrode() const
+  ElectrodeSide UpSideElectrode() const override
   {
     return (isUpSideAnode() ? ElectrodeSide::Anode :
             isUpSideCathode() ? ElectrodeSide::Cathode :
             ElectrodeSide::Undefined);
   }
 
-  bool isBottomSideAnode() const
+  bool isBottomSideAnode() const override
   { return BottomSideElectrode()==ElectrodeSide::Anode; }
-  bool isBottomSideCathode() const
+  bool isBottomSideCathode() const override
   { return BottomSideElectrode()==ElectrodeSide::Cathode; }
-  bool isUpSideAnode() const
+  bool isUpSideAnode() const override
   { return isBottomSideCathode(); }
-  bool isUpSideCathode() const
+  bool isUpSideCathode() const override
   { return isBottomSideAnode(); }
 
   bool setReconstructionMode(int mode)
@@ -197,7 +216,7 @@ public:
   void setClusteringOn(bool v=true) { clusteringOn_ = v; }
   bool isClusteringOn() const { return clusteringOn_; }
 
-  virtual void initializeEvent();
+  void initializeEvent() override;
   virtual void selectHits();
   void discriminateHits();
   void reconstructHits();
@@ -205,7 +224,7 @@ public:
   void recalculateEPI();
   void assignReadoutInfo();
 
-  void insertDetectorHit(DetectorHit_sptr hit)
+  void insertDetectorHit(DetectorHit_sptr hit) override
   { detectorHits_.push_back(hit); }
   int NumberOfDetectorHits() const { return detectorHits_.size(); }
   DetectorHit_sptr getDetectorHit(int i) { return detectorHits_[i]; }

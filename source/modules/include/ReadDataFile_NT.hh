@@ -42,8 +42,8 @@ public:
   ReadDataFile_NT() = default;
   ~ReadDataFile_NT() = default;
 
-  anl::ANLStatus mod_init();
-  anl::ANLStatus mod_ana();
+  anl::ANLStatus mod_init() override;
+  anl::ANLStatus mod_ana() override;
 
 private:
   TChain* m_Tree = nullptr;

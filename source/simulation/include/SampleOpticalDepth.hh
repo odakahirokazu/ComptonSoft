@@ -1,6 +1,6 @@
 /*************************************************************************
  *                                                                       *
- * Copyright (c) 2011 Hirokazu Odaka                                     *
+ * Copyright (c) 2011 Tamotsu Sato, Hirokazu Odaka                       *
  *                                                                       *
  * This program is free software: you can redistribute it and/or modify  *
  * it under the terms of the GNU General Public License as published by  *
@@ -17,20 +17,13 @@
  *                                                                       *
  *************************************************************************/
 
-#ifndef COMPTONSOFT_AHStandardPickUpData_H
-#define COMPTONSOFT_AHStandardPickUpData_H 1
+#ifndef COMPTONSOFT_SampleOpticalDepth_H
+#define COMPTONSOFT_SampleOpticalDepth_H 1
 
-#include "StandardPickUpData.hh"
+#include "VAppendableUserActionAssembly.hh"
 
-#include <vector>
-#include <map>
-#include <boost/cstdint.hpp>
-
-#include "DetectorHit_sptr.hh"
-
-class G4VPhysicalVolume;
-class G4Ions;
-class G4VAnalysisManager;
+class TTree;
+class G4VEmProcess;
 
 namespace anlgeant4 {
 
@@ -40,51 +33,43 @@ class InitialInformation;
 
 namespace comptonsoft {
 
-class SimXIF;
-class EventReconstruction;
-class CSHitCollection;
-
-
 /**
- * PickUpData module for ASTRO-H
- *
- * @author Hirokazu Odaka
- * @date 2012-06-24
+ * @author Hirokazu Odaka, Tamotsu Sato
+ * @date 2017-07-29 | Hirokazu Odaka | new design of VAppendableUserActionAssembly, code cleanup.
  */
-class AHStandardPickUpData : public anlgeant4::StandardPickUpData
+class SampleOpticalDepth : public anlgeant4::VAppendableUserActionAssembly
 {
-  DEFINE_ANL_MODULE(AHStandardPickUpData, 1.0);
+  DEFINE_ANL_MODULE(SampleOpticalDepth, 2.0);
 public:
-  AHStandardPickUpData();
-  virtual ~AHStandardPickUpData();
+  SampleOpticalDepth();
   
-  virtual anl::ANLStatus mod_startup();
-  virtual anl::ANLStatus mod_init();
-  virtual anl::ANLStatus mod_ana();
-  virtual anl::ANLStatus mod_exit();
+  anl::ANLStatus mod_startup() override;
+  anl::ANLStatus mod_init() override;
+
+  void EventActionAtBeginning(const G4Event*) override;
+  void EventActionAtEnd(const G4Event*) override;
+  void SteppingAction(const G4Step* aStep) override;
   
-  virtual void RunAct_begin(const G4Run*);
-  virtual void RunAct_end(const G4Run*);
-
-protected:
-  void Fill(int seqnum, int totalhit,
-            comptonsoft::const_DetectorHit_sptr hit);
-
-  void MakeEvent(const std::vector<comptonsoft::DetectorHit_sptr>& hits);
-
 private:
-  G4VAnalysisManager* m_AnalysisManager;
-
-  CSHitCollection* m_HitCollection;
-  const anlgeant4::InitialInformation* m_InitialInfo;
-  SimXIF* m_SimXIF;
-  EventReconstruction* m_EventReconstruction;
+  double energy_;
+  std::string processName_;
+  std::string particleName_;
   
+  const anlgeant4::InitialInformation* initialInfo_ = nullptr;
+  G4VEmProcess* process_ = nullptr;
 
-  std::string m_FileName;
-  bool m_PolarizationEnable;
+  TTree* tree_ = nullptr;
+  
+  double ini_posx_ = 0.0;
+  double ini_posy_ = 0.0;
+  double ini_posz_ = 0.0;
+  double ini_dirx_ = 0.0;
+  double ini_diry_ = 0.0;
+  double ini_dirz_ = 0.0;
+  double length_ = 0.0;
+  double tau_ = 0.0;
 };
-  
-}
 
-#endif /* COMPTONSOFT_AHStandardPickUpData_H */
+} /* namespace comptonsoft */
+
+#endif /* COMPTONSOFT_SampleOpticalDepth_H */

@@ -28,7 +28,6 @@
 #include "BasicPrimaryGeneratorAction.hh"
 #include "VANLGeometry.hh"
 
-// using CLHEP::keV;
 using namespace anl;
 
 namespace anlgeant4
@@ -36,7 +35,6 @@ namespace anlgeant4
 
 BasicPrimaryGen::BasicPrimaryGen()
   : InitialInformation(true),
-    primaryGenerator_(0), pickupData_(0), geometry_(0),
     particleName_("gamma"),
     time_(0.0),
     position_(0.0, 0.0, 0.0),
@@ -138,8 +136,6 @@ ANLStatus BasicPrimaryGen::mod_prepare()
 
 ANLStatus BasicPrimaryGen::mod_init()
 {
-  GetANLModule("PickUpData", &pickupData_);
- 
   EvsDef("Polarization enable");
   if (PolarizationMode()>=0) {
     EvsSet("Polarization enable");
@@ -166,11 +162,13 @@ ANLStatus BasicPrimaryGen::mod_init()
 
 ANLStatus BasicPrimaryGen::mod_bgnrun()
 {
+  number_ = 0;
   totalEnergy_ = 0.0;
+
   return AS_OK;
 }
 
-ANLStatus BasicPrimaryGen::mod_ana()
+void BasicPrimaryGen::confirmPrimarySetting()
 {
   number_++;
   totalEnergy_ += energy_;
@@ -181,14 +179,14 @@ ANLStatus BasicPrimaryGen::mod_ana()
   setInitialTime(time_);
   setInitialPosition(position_);
   setInitialPolarization(polarization_);
-
-  return AS_OK;
 }
 
 void BasicPrimaryGen::setDefinition(G4ParticleDefinition* def)
 {
   definition_ = def;
-  if (primaryGenerator_) primaryGenerator_->SetDefinition(def);
+  if (primaryGenerator_) {
+    primaryGenerator_->SetDefinition(def);
+  }
 }
 
 void BasicPrimaryGen::enablePowerLawInput()
@@ -396,6 +394,9 @@ G4VUserPrimaryGeneratorAction* BasicPrimaryGen::create()
   else {
     primaryGenerator_ = new BasicPrimaryGeneratorAction;
   }
+
+  primaryGenerator_->RegisterGeneratorSetting(this);
+
   return primaryGenerator_;
 }
 

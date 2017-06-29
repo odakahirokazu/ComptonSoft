@@ -36,10 +36,10 @@ public:
   HistogramAzimuthAngle();
   ~HistogramAzimuthAngle() = default;
   
-  anl::ANLStatus mod_startup();
-  anl::ANLStatus mod_his();
-  anl::ANLStatus mod_ana();
-  anl::ANLStatus mod_endrun();
+  anl::ANLStatus mod_startup() override;
+  anl::ANLStatus mod_his() override;
+  anl::ANLStatus mod_ana() override;
+  anl::ANLStatus mod_endrun() override;
   
 private:
   const EventReconstruction* eventReconstruction_;

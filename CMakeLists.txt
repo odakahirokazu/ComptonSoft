@@ -35,14 +35,21 @@ option(CS_USE_SYSTEM_CLHEP "use system-clhep" OFF)
 option(CS_INSTALL_HEADERS "install all header files" ON)
 option(CS_INSTALL_CMAKE_FILES "install all cmake files" ON)
 ## shortcut options
-option(CS_ALL "enable all library options" OFF)
+option(CS_ALL "enable all consistent library options" OFF)
+option(CS_HARD_ALL "enable all library options" OFF)
 
 if(CS_ALL)
   set(CS_USE_GDML ON)
   set(CS_USE_FITSIO ON)
-  set(CS_USE_SIMX ON)
   set(CS_USE_VIS_QT ON)
 endif(CS_ALL)
+
+if(CS_HARD_ALL)
+  set(CS_USE_GDML ON)
+  set(CS_USE_FITSIO ON)
+  set(CS_USE_VIS_QT ON)
+  set(CS_USE_SIMX ON)
+endif(CS_HARD_ALL)
 
 set(USE_RUBY ${CS_USE_RUBY})
 set(USE_EXE ${CS_USE_EXE})

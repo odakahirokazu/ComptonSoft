@@ -32,7 +32,7 @@ public:
   ~AnalyzeHits() = default;
 
 private:
-  void doProcessing();
+  void doProcessing() override;
 };
 
 } /* namespace comptonsoft */

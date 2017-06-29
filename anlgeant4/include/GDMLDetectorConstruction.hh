@@ -40,6 +40,6 @@ private:
   bool m_Validate;
 };
 
-}
+} /* namespace anlgeant4 */
 
 #endif /* ANLGEANT4_GDMLDetectorConstruction_H */

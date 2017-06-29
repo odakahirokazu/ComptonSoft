@@ -35,13 +35,13 @@ class WriteGDML : public anl::BasicModule
 public:
   WriteGDML();
   
-  anl::ANLStatus mod_startup();
-  anl::ANLStatus mod_init();
+  anl::ANLStatus mod_startup() override;
+  anl::ANLStatus mod_init() override;
 
 private:
   std::string m_GeometryFileName;
 };
 
-}
+} /* namespace anlgeant4 */
 
 #endif /* ANLGEANT4_WriteGDML_H */

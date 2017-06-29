@@ -17,42 +17,73 @@
  *                                                                       *
  *************************************************************************/
 
-#ifndef COMPTONSOFT_RadioactiveDecayPickUpData_H
-#define COMPTONSOFT_RadioactiveDecayPickUpData_H 1
+#ifndef COMPTONSOFT_AHStandardPickUpData_H
+#define COMPTONSOFT_AHStandardPickUpData_H 1
 
-#include "StandardPickUpData.hh"
+#include "StandardUserActionAssembly.hh"
+
+#include <vector>
+#include <map>
+#include <boost/cstdint.hpp>
+
+#include "DetectorHit_sptr.hh"
+
+class G4VPhysicalVolume;
+class G4Ions;
+class G4VAnalysisManager;
+
+namespace anlgeant4 {
+
+class InitialInformation;
+
+}
 
 namespace comptonsoft {
 
+class SimXIF;
+class EventReconstruction;
+class CSHitCollection;
+
 
 /**
- * PickUpData for radioactive decay.
+ * PickUpData module for ASTRO-H
  *
  * @author Hirokazu Odaka
- * @date 2008-08-27
- * @date 2011-04-08
- * @date 2016-06-29 | rename the module name.
+ * @date 2012-06-24
  */
-class RadioactiveDecayPickUpData : public anlgeant4::StandardPickUpData
+class AHStandardUserActionAssembly : public anlgeant4::StandardUserActionAssembly
 {
-  DEFINE_ANL_MODULE(RadioactiveDecayPickUpData, 2.0);
+  DEFINE_ANL_MODULE(AHStandardUserActionAssembly, 2.0);
 public:
-  RadioactiveDecayPickUpData();
+  AHStandardUserActionAssembly();
+  virtual ~AHStandardUserActionAssembly();
   
-  virtual anl::ANLStatus mod_startup();
+  anl::ANLStatus mod_startup() override;
+  anl::ANLStatus mod_init() override;
+  anl::ANLStatus mod_ana() override;
+  anl::ANLStatus mod_exit() override;
+  
+  void RunActionAtBeginning(const G4Run*) override;
+  void RunActionAtEnd(const G4Run*) override;
 
-  virtual void StepAct(const G4Step* aStep, G4Track* aTrack);
+protected:
+  void Fill(int seqnum, int totalhit,
+            comptonsoft::const_DetectorHit_sptr hit);
 
-  void SetTerminationTime(double v) { m_TerminationTime = v; }
-  double TerminationTime() const { return m_TerminationTime; }
-
-  double FirstDecayTime() const { return m_FirstDecayTime; }
+  void MakeEvent(const std::vector<comptonsoft::DetectorHit_sptr>& hits);
 
 private:
-  double m_TerminationTime;
-  double m_FirstDecayTime;
+  G4VAnalysisManager* m_AnalysisManager;
+
+  CSHitCollection* m_HitCollection;
+  const anlgeant4::InitialInformation* m_InitialInfo;
+  SimXIF* m_SimXIF;
+  EventReconstruction* m_EventReconstruction;
+  
+  std::string m_FileName;
+  bool m_PolarizationEnable;
 };
+  
+} /* comptonsoft */
 
-} /* namespace comptonsoft */
-
-#endif /* COMPTONSOFT_RadioactiveDecayPickUpData_H */
+#endif /* COMPTONSOFT_AHStandardPickUpData_H */

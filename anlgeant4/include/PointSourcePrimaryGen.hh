@@ -35,26 +35,28 @@ namespace anlgeant4 {
  * @date 2010-02-17 | Hirokazu Odaka | PointSourcePrimaryGen
  * @date 2012-07-10 | Hirokazu Odaka | virtual methods: sampleDirection(), samplePosition()
  * @date 2013-08-18 | Hirokazu Odaka | be moved to anlgeant4
+ * @date 2017-06-27 | Hirokazu Odaka | 4.1, makePrimarySetting()
  */
 class PointSourcePrimaryGen : public BasicPrimaryGen
 {
-  DEFINE_ANL_MODULE(PointSourcePrimaryGen, 4.0);
+  DEFINE_ANL_MODULE(PointSourcePrimaryGen, 4.1);
 public:
   PointSourcePrimaryGen();
   ~PointSourcePrimaryGen();
 
-  anl::ANLStatus mod_startup();
-  anl::ANLStatus mod_init();
-  anl::ANLStatus mod_ana();
-  anl::ANLStatus mod_endrun();
+  anl::ANLStatus mod_startup() override;
+  anl::ANLStatus mod_init() override;
+  anl::ANLStatus mod_endrun() override;
+
+  void makePrimarySetting() override;
 
 protected:
   void setSourcePosition(G4ThreeVector v) { m_SourcePosition = v; }
   void setCenterDirection(G4ThreeVector v) { m_CenterDirection = v; }
   void calculateRotation();
 
-  G4ThreeVector sampleDirection();
-  G4ThreeVector samplePosition();
+  G4ThreeVector sampleDirection() override;
+  G4ThreeVector samplePosition() override;
 
   G4ThreeVector SourcePosition() { return m_SourcePosition; }
 

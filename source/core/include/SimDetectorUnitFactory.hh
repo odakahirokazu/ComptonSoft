@@ -32,9 +32,9 @@ namespace comptonsoft {
 class SimDetectorUnitFactory : public VDetectorUnitFactory
 {
 public:
-  VRealDetectorUnit* createDetectorUnit2DPixel();
-  VRealDetectorUnit* createDetectorUnit2DStrip();
-  VRealDetectorUnit* createDetectorUnitScintillator();
+  VRealDetectorUnit* createDetectorUnit2DPixel() override;
+  VRealDetectorUnit* createDetectorUnit2DStrip() override;
+  VRealDetectorUnit* createDetectorUnitScintillator() override;
 };
 
 } /* namespace comptonsoft */

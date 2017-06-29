@@ -69,12 +69,11 @@ clSim = [# primary generator
   ANL::SWIGClass.new("AHRayTracingPrimaryGen", false, 'USE_SIMX'),
   ANL::SWIGClass.new("SimXPrimaryGen", false, 'USE_SIMX'),
   ANL::SWIGClass.new("AHRadiationBackgroundPrimaryGen"),
-  # pick up data
-  ANL::SWIGClass.new("RadioactiveDecayPickUpData"),
-  ANL::SWIGClass.new("ActivationPickUpData"),
-  ANL::SWIGClass.new("AHStandardPickUpData", false, 'USE_SIMX'),
-  ANL::SWIGClass.new("KillStepPickUpData"),
-  ANL::SWIGClass.new("MaterialSamplePickUpData"),
+  # user action assembly
+  ANL::SWIGClass.new("RadioactiveDecayUserActionAssembly"),
+  ANL::SWIGClass.new("ActivationUserActionAssembly"),
+  ANL::SWIGClass.new("AHStandardUserActionAssembly", false, 'USE_SIMX'),
+  ANL::SWIGClass.new("SampleOpticalDepth"),
   ANL::SWIGClass.new("ScatteringPickUpData"),
   ANL::SWIGClass.new("ObservationPickUpData"),
   # physics list

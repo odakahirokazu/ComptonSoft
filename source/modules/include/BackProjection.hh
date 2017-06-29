@@ -41,9 +41,9 @@ public:
   BackProjection();
   ~BackProjection();
 
-  anl::ANLStatus mod_startup();
-  anl::ANLStatus mod_his();
-  anl::ANLStatus mod_ana();
+  anl::ANLStatus mod_startup() override;
+  anl::ANLStatus mod_his() override;
+  anl::ANLStatus mod_ana() override;
 
 protected:
   void setUnit(double unit, std::string name)

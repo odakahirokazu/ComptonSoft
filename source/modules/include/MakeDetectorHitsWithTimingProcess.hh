@@ -34,7 +34,7 @@ public:
   ~MakeDetectorHitsWithTimingProcess() = default;
   
 private:
-  void doProcessing();
+  void doProcessing() override;
 };
 
 } /* namespace comptonsoft */

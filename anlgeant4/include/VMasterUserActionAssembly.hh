@@ -1,6 +1,6 @@
 /*************************************************************************
  *                                                                       *
- * Copyright (c) 2011                                                    *
+ * Copyright (c) 2011 Shin Watanabe, Hirokazu Odaka                      *
  *                                                                       *
  * This program is free software: you can redistribute it and/or modify  *
  * it under the terms of the GNU General Public License as published by  *
@@ -17,39 +17,48 @@
  *                                                                       *
  *************************************************************************/
 
-#ifndef COMPTONSOFT_KillStepPickUpData_H
-#define COMPTONSOFT_KillStepPickUpData_H 1
+#ifndef ANLGEANT4_VMasterUserActionAssembly_H
+#define ANLGEANT4_VMasterUserActionAssembly_H 1
 
-#include "StandardPickUpData.hh"
+#include "VUserActionAssembly.hh"
+#include <list>
 
-#include <string>
+class G4UserStackingAction;
 
-
-class G4ParticleDefinition;
-
-namespace comptonsoft {
-
-
-class KillStepPickUpData : public anlgeant4::StandardPickUpData
+namespace anlgeant4
 {
-  DEFINE_ANL_MODULE(KillStepPickUpData, 1.0);
+
+class VAppendableUserActionAssembly;
+
+/**
+ * Virtual master UserActionAssembly module
+ * @author Hirokazu Odaka
+ * @date 2017-06-29
+ */
+class VMasterUserActionAssembly : public VUserActionAssembly
+{
+  DEFINE_ANL_MODULE(VMasterUserActionAssembly, 5.0);
 public:
-  KillStepPickUpData();
-  
-  anl::ANLStatus mod_startup();
-  anl::ANLStatus mod_init();
-  
-  void StepAct(const G4Step* aStep, G4Track* aTrack);
-  
+  VMasterUserActionAssembly();
+  virtual ~VMasterUserActionAssembly();
+
+  void registerUserActions(G4RunManager* run_manager) override;
+
+  bool hasStackingAction() const { return (stackingAction_!=nullptr); }
+  void appendUserActions(VAppendableUserActionAssembly* user_action_assembly);
+
+protected:
+  void setStackingAction(G4UserStackingAction* v) { stackingAction_ = v; }
+  void printSummary() override;
+
 private:
-  std::string m_ParticleName;
-  std::string stopping_volume_name;
-  //int enable;
-  
-  G4ParticleDefinition* m_ParticleType;
-	
+  virtual void createUserActions() {}
+
+private:
+  G4UserStackingAction* stackingAction_ = nullptr;
+  std::list<VAppendableUserActionAssembly*> userActionsAppended_;
 };
 
-}
+} /* namespace anlgeant4 */
 
-#endif /* COMPTONSOFT_KillStepPickUpData_H */
+#endif /* ANLGEANT4_VUserActionAssembly_H */

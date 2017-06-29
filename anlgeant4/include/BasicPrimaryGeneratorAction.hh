@@ -31,11 +31,15 @@ class G4ParticleDefinition;
 
 namespace anlgeant4 {
 
+class BasicPrimaryGen;
+
+
 /**
  * Primary generator action
  *
  * @author Hirokazu Odaka
  * @date 2010-xx-xx
+ * @date 2017-06-27 | tweaks
  */
 class BasicPrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction
 {
@@ -97,8 +101,14 @@ public:
     m_Polarization = polarization;
   }
 
+  void RegisterGeneratorSetting(BasicPrimaryGen* setting)
+  {
+    m_GeneratorSetting = setting;
+  }
+
 private:
-  G4ParticleGun* m_ParticleGun;
+  std::unique_ptr<G4ParticleGun> m_ParticleGun;
+  BasicPrimaryGen* m_GeneratorSetting = nullptr;
   G4double m_Time;
   G4ThreeVector m_Position;
   G4double m_Energy;
@@ -106,6 +116,6 @@ private:
   G4ThreeVector m_Polarization;
 };
 
-}
+} /* namespace anlgeant4 */
 
 #endif /* ANLGEANT4_BasicPrimaryGeneratorAction_H */

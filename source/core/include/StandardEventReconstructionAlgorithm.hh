@@ -40,7 +40,7 @@ public:
   StandardEventReconstructionAlgorithm& operator=(const StandardEventReconstructionAlgorithm&) = default;
   StandardEventReconstructionAlgorithm& operator=(StandardEventReconstructionAlgorithm&&) = default;
 
-  void initializeEvent();
+  void initializeEvent() override;
 
   /**
    * perform the event reconstruction.
@@ -49,7 +49,7 @@ public:
    * @return true if the reconstruction is successful.
    */
   bool reconstruct(const std::vector<DetectorHit_sptr>& hits,
-                   BasicComptonEvent& eventReconstructed);
+                   BasicComptonEvent& eventReconstructed) override;
 
   bool FluorescenceCut() const { return fluorescenceCut_; }
   void setFluorescenceCut(bool v) { fluorescenceCut_ = v; }

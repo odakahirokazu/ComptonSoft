@@ -22,20 +22,12 @@
 #include "G4Track.hh"
 #include "G4ParticleTypes.hh"
 
-using namespace comptonsoft;
-
-
-ActivationStackingAction::ActivationStackingAction()
+namespace comptonsoft
 {
-  G4cout << "ActivationStackingAction: constructed" << G4endl;
-}
 
+ActivationStackingAction::ActivationStackingAction() = default;
 
-ActivationStackingAction::~ActivationStackingAction()
-{
-  G4cout << "ActivationStackingAction: destructed" << G4endl;
-}
-
+ActivationStackingAction::~ActivationStackingAction() = default;
 
 G4ClassificationOfNewTrack 
 ActivationStackingAction::ClassifyNewTrack(const G4Track* aTrack)
@@ -59,3 +51,5 @@ ActivationStackingAction::ClassifyNewTrack(const G4Track* aTrack)
   
   return classification;
 }
+
+} /* namespace comptonsoft */

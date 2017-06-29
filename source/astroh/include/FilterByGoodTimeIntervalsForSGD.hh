@@ -38,8 +38,8 @@ public:
   FilterByGoodTimeIntervalsForSGD();
   ~FilterByGoodTimeIntervalsForSGD();
 
-  anl::ANLStatus mod_init();
-  anl::ANLStatus mod_ana();
+  anl::ANLStatus mod_init() override;
+  anl::ANLStatus mod_ana() override;
 
 private:
   const ReadSGDEventFITS* m_EventReader = nullptr;

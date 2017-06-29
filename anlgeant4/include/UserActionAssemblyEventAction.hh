@@ -17,38 +17,38 @@
  *                                                                       *
  *************************************************************************/
 
-// ----- PickUpDataEventAction -----
-// by S. Watanabe
-// 2003/1/10 Shin Watanabe for Geant4ANL
-// **************************************************************************
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo....
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo....
+#ifndef ANLGEANT4_UserActionAssemblyEventAction_H
+#define ANLGEANT4_UserActionAssemblyEventAction_H 1
 
-#include "PickUpDataEventAction.hh"
-#include "globals.hh"
-#include "VPickUpData.hh"
+#include "G4UserEventAction.hh"
+#include <list>
 
-using namespace anlgeant4;
-
-PickUpDataEventAction::PickUpDataEventAction(VPickUpData* pud)
+namespace anlgeant4
 {
-  pickup_data = pud;
-  G4cout << "Constructing EventAction." << G4endl;
-}
- 
-PickUpDataEventAction::~PickUpDataEventAction()
+
+class VUserActionAssembly;
+
+/**
+ * User EventAction class for UserActionAssembly.
+ * @author S. Watanabe, H. Odaka
+ * @date 2003-01-10 (modified: S. Watanabe)
+ * @date 2012-05-30 | Hirokazu Odaka | new design
+ * @date 2017-07-29 | Hirokazu Odaka | rename class, introduce user action list
+ */
+class UserActionAssemblyEventAction : public G4UserEventAction
 {
-  G4cout << "Destructing EventAction." << G4endl;
-}
+public:
+  explicit UserActionAssemblyEventAction(const std::list<VUserActionAssembly*>& userActions);
+  virtual ~UserActionAssemblyEventAction();
 
+public:
+  void BeginOfEventAction(const G4Event* anEvent) override;
+  void EndOfEventAction(const G4Event* anEvent) override;
 
-void PickUpDataEventAction::BeginOfEventAction(const G4Event* anEvent)
-{
-  pickup_data->EventAct_begin(anEvent);
-}
+private:
+  std::list<VUserActionAssembly*> userActions_;
+};
 
+} /* namespace anlgeant4 */
 
-void PickUpDataEventAction::EndOfEventAction(const G4Event* anEvent)
-{
-  pickup_data->EventAct_end(anEvent); 
-}
+#endif /* ANLGEANT4_UserActionAssemblyEventAction_H */

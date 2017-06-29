@@ -18,32 +18,28 @@
  *************************************************************************/
 
 #include "ScatteringPickUpData.hh"
-#include "globals.hh"
-#include "G4Track.hh"
 #include "G4VProcess.hh"
+#include "TTree.h"
 #include "TDirectory.h"
 #include "SaveData.hh"
 
 using namespace anl;
-using namespace comptonsoft;
 
+namespace comptonsoft
+{
 
 ScatteringPickUpData::ScatteringPickUpData()
-  : m_Tree(0), m_DirX(0.0), m_DirY(0.0), m_DirZ(0.0), m_Energy(0.0),
-    m_FirstInteraction(false), m_ProcessName("compton")
+  : processName_("compt")
 {
-  SetStepActOn(true);
 }
-
 
 ANLStatus ScatteringPickUpData::mod_startup()
 {
-  register_parameter(&m_ProcessName, "process_name");
+  register_parameter(&processName_, "process_name");
   return AS_OK;
 }
 
-
-ANLStatus ScatteringPickUpData::mod_his()
+ANLStatus ScatteringPickUpData::mod_init()
 {
   if (ModuleExist("SaveData")) {
     SaveData* saveModule;
@@ -51,40 +47,41 @@ ANLStatus ScatteringPickUpData::mod_his()
     saveModule->GetDirectory()->cd();
   }
   
-  m_Tree = new TTree("scattering_tree", "scattering_tree");
-  m_Tree->Branch("dirx", &m_DirX, "dirx/D");
-  m_Tree->Branch("diry", &m_DirY, "diry/D");
-  m_Tree->Branch("dirz", &m_DirZ, "dirz/D");
-  m_Tree->Branch("energy", &m_Energy, "energy/D");
+  tree_ = new TTree("stree", "Scattering tree");
+  tree_->Branch("dirx", &dirx_, "dirx/D");
+  tree_->Branch("diry", &diry_, "diry/D");
+  tree_->Branch("dirz", &dirz_, "dirz/D");
+  tree_->Branch("energy", &energy_, "energy/D");
   
   return AS_OK;
 }
 
-
-void ScatteringPickUpData::EventAct_begin(const G4Event*)
+void ScatteringPickUpData::EventActionAtBeginning(const G4Event*)
 {
-  m_FirstInteraction = true;
+  firstInteraction_ = true;
 }
 
-
-void ScatteringPickUpData::StepAct(const G4Step* aStep, G4Track* aTrack)
+void ScatteringPickUpData::SteppingAction(const G4Step* aStep)
 {
-  if (!m_FirstInteraction) return;
+  if (!firstInteraction_) return;
 
+  const G4Track* aTrack = aStep->GetTrack();
   if (aTrack->GetTrackID()==1) {
-    G4StepPoint* sp = aStep->GetPostStepPoint();
-    G4String processName = sp->GetProcessDefinedStep()->GetProcessName();
-    if (processName==m_ProcessName.c_str()) {
-      G4ThreeVector direction = sp->GetMomentumDirection();
-      m_DirX = direction.x();
-      m_DirY = direction.y();
-      m_DirZ = direction.z();
-      m_Energy = sp->GetKineticEnergy();
-      m_Tree->Fill();
-      m_FirstInteraction = false;
+    const G4StepPoint* sp = aStep->GetPostStepPoint();
+    const std::string processName = sp->GetProcessDefinedStep()->GetProcessName();
+    if (processName == processName_) {
+      const G4ThreeVector direction = sp->GetMomentumDirection();
+      dirx_ = direction.x();
+      diry_ = direction.y();
+      dirz_ = direction.z();
+      energy_ = sp->GetKineticEnergy();
+      tree_->Fill();
+      firstInteraction_ = false;
     }
   }
   else {
-    m_FirstInteraction = false;
+    firstInteraction_ = false;
   }
 }
+
+} /* namespace comptonsoft */

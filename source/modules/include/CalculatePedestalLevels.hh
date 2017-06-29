@@ -32,10 +32,10 @@ public:
   CalculatePedestalLevels();
   ~CalculatePedestalLevels() = default;
   
-  anl::ANLStatus mod_startup();
-  anl::ANLStatus mod_his();
-  anl::ANLStatus mod_ana();
-  anl::ANLStatus mod_endrun();
+  anl::ANLStatus mod_startup() override;
+  anl::ANLStatus mod_his() override;
+  anl::ANLStatus mod_ana() override;
+  anl::ANLStatus mod_endrun() override;
 
 private:
   std::vector<TH1*> m_hisSpec;

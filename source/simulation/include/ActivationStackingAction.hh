@@ -40,11 +40,9 @@ public:
   virtual ~ActivationStackingAction();
   
 public:
-  virtual G4ClassificationOfNewTrack ClassifyNewTrack(const G4Track* aTrack);
-  virtual void NewStage() {}
-  virtual void PrepareNewEvent() {}
+  G4ClassificationOfNewTrack ClassifyNewTrack(const G4Track* aTrack) override;
 };
 
-}
+} /* namespace comptonsoft */
 
 #endif /* COMPTONSOFT_ActivationStackingAction_H */

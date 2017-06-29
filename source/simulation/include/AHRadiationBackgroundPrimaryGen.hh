@@ -36,19 +36,20 @@ namespace comptonsoft {
  * @date 2013-04-11 | Tamotsu Sato | ver 1.0: based on IsotropicPrimaryGen
  * @date 2013-05-03 | Tamotsu Sato & Hirokazu Odaka | ver 1.1 bug fix: unit conversion
  * @date 2017-03-23 | Hirokazu Odaka | use unique_ptr for root File.
+ * @date 2017-07-27 | Hirokazu Odaka | tweak.
  */
 class AHRadiationBackgroundPrimaryGen : public anlgeant4::IsotropicPrimaryGen
 {
-  DEFINE_ANL_MODULE(AHRadiationBackgroundPrimaryGen, 1.2);
+  DEFINE_ANL_MODULE(AHRadiationBackgroundPrimaryGen, 4.1);
 public:
   AHRadiationBackgroundPrimaryGen();
   ~AHRadiationBackgroundPrimaryGen();
 
-  anl::ANLStatus mod_startup();
-  anl::ANLStatus mod_init();
+  anl::ANLStatus mod_startup() override;
+  anl::ANLStatus mod_init() override;
   
-  G4double sampleEnergy();
-    
+  G4double sampleEnergy() override;
+
 private:
   std::string m_Filename;
   std::unique_ptr<TFile> m_File;

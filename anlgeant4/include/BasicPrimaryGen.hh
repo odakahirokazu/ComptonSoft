@@ -23,7 +23,6 @@
 #include "VANLPrimaryGen.hh"
 #include "InitialInformation.hh"
 #include "G4ThreeVector.hh"
-#include "StandardPickUpData.hh"
 
 class G4ParticleDefinition;
 
@@ -41,10 +40,11 @@ class VANLGeometry;
  * @date 2012-07-04 | Hirokazu Odaka | sampleEnergy(), printSpectralInfo() as virtual
  * @date 2012-07-10 | Hirokazu Odaka | virtual methods: sampleDirection(), samplePosition()
  * @date 2014-12-15 | Hirokazu Odaka | histogram spectral distribution
+ * @date 2017-07-27 | Hirokazu Odaka | this can transfer its setting function to the generator action, introducing makePrimarySetting().
  */
 class BasicPrimaryGen : public VANLPrimaryGen, public InitialInformation
 {
-  DEFINE_ANL_MODULE(BasicPrimaryGen, 4.0);
+  DEFINE_ANL_MODULE(BasicPrimaryGen, 4.1);
 public:
   enum class SpectralShape {
     Undefined, Mono, PowerLaw, Gaussian, BlackBody, Histogram, User,
@@ -53,13 +53,12 @@ public:
   BasicPrimaryGen();
   ~BasicPrimaryGen();
   
-  virtual anl::ANLStatus mod_startup();
-  virtual anl::ANLStatus mod_prepare();
-  virtual anl::ANLStatus mod_init();
-  virtual anl::ANLStatus mod_bgnrun();
-  virtual anl::ANLStatus mod_ana();
-  
-  G4VUserPrimaryGeneratorAction* create();
+  anl::ANLStatus mod_startup() override;
+  anl::ANLStatus mod_prepare() override;
+  anl::ANLStatus mod_init() override;
+  anl::ANLStatus mod_bgnrun() override;
+
+  G4VUserPrimaryGeneratorAction* create() override;
   
   G4int Number() const { return number_; }
   G4double TotalEnergy() const { return totalEnergy_; }
@@ -67,6 +66,9 @@ public:
   void setPolarizationMode(int v) { polarizationMode_ = v; }
   int PolarizationMode() const { return polarizationMode_; }
   
+  virtual void makePrimarySetting() = 0;
+  virtual void confirmPrimarySetting();
+
 protected:
   void setPrimary(G4double time0,
                   G4ThreeVector position,
@@ -163,9 +165,8 @@ protected:
   std::string LengthUnitName() const;
   
 private:
-  BasicPrimaryGeneratorAction* primaryGenerator_;
-  const anlgeant4::StandardPickUpData* pickupData_;
-  const anlgeant4::VANLGeometry* geometry_;
+  BasicPrimaryGeneratorAction* primaryGenerator_ = nullptr;
+  const anlgeant4::VANLGeometry* geometry_ = nullptr;
 
   std::string particleName_;
 

@@ -34,11 +34,11 @@ class ComptonEventTreeIOWithInitialInfo : public ComptonEventTreeIO, public Init
 {
 public:
   ComptonEventTreeIOWithInitialInfo() = default;
-  ~ComptonEventTreeIOWithInitialInfo();
+  virtual ~ComptonEventTreeIOWithInitialInfo();
 
-  void setTree(TTree* tree);
-  void defineBranches();
-  void setBranchAddresses();
+  void setTree(TTree* tree) override;
+  void defineBranches() override;
+  void setBranchAddresses() override;
 };
 
 } /* namespace comptonsoft */

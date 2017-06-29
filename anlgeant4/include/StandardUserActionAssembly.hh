@@ -1,6 +1,6 @@
 /*************************************************************************
  *                                                                       *
- * Copyright (c) 2011 Shin Watanabe, Hirokazu Odaka                      *
+ * Copyright (c) 2011 Hirokazu Odaka                                     *
  *                                                                       *
  * This program is free software: you can redistribute it and/or modify  *
  * it under the terms of the GNU General Public License as published by  *
@@ -17,44 +17,40 @@
  *                                                                       *
  *************************************************************************/
 
-// ----- MyRunAction -----
-// by M.Kouda
-//
-// 2002, 11, 7, modefied S. Watanabe 
-// ----- stdRunAction -----
-// 2003/01/10 Shin Watanabe  Geant4ANL
-// 2012/05/30 Hirokazu Odaka
-// **************************************************************************
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo....
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo....
+#ifndef ANLGEANT4_StandardUserActionAssembly_H
+#define ANLGEANT4_StandardUserActionAssembly_H 1
 
-#include "PickUpDataRunAction.hh"
-#include "globals.hh"
-#include "VPickUpData.hh"
+#include "VMasterUserActionAssembly.hh"
+#include <list>
 
-using namespace anlgeant4;
+namespace anlgeant4 {
 
+class InitialInformation;
 
-PickUpDataRunAction::PickUpDataRunAction(VPickUpData* pud)
+/**
+ * @author Hirokazu Odaka
+ * @date 2011-04-11
+ * @date 2016-07-08 | setInitialTime()
+ * @date 2017-06-28 | Hirokazu Odaka | redesign, rename class and methods
+ */
+class StandardUserActionAssembly : public VMasterUserActionAssembly
 {
-  G4cout << "Constructing RunAction." << G4endl;
-  pickup_data = pud;
-}
+  DEFINE_ANL_MODULE(StandardUserActionAssembly, 5.0);
+public:
+  StandardUserActionAssembly();
 
+  anl::ANLStatus mod_init() override;
 
-PickUpDataRunAction::~PickUpDataRunAction()
-{
-  G4cout <<"Destructing RunAction."<< G4endl;
-}
+  void EventActionAtBeginning(const G4Event* anEvent) override;
 
+protected:
+  double getInitialTime() const;
+  void setInitialTime(double v);
 
-void PickUpDataRunAction::BeginOfRunAction(const G4Run* aRun)
-{
-  pickup_data->RunAct_begin(aRun);
-}
+private:
+  InitialInformation* m_InitialInfo;
+};
 
+} /* namespace anlgeant4 */
 
-void PickUpDataRunAction::EndOfRunAction(const G4Run* aRun)
-{
-  pickup_data->RunAct_end(aRun);
-}
+#endif /* ANLGEANT4_StandardUserActionAssembly_H */

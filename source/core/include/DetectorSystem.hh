@@ -109,7 +109,7 @@ public:
   
 public:
   DetectorSystem();
-  ~DetectorSystem();
+  virtual ~DetectorSystem();
 
   void setMCSimulation(bool v=true) { MCSimulation_ = v; }
   bool isMCSimulation() { return MCSimulation_; }

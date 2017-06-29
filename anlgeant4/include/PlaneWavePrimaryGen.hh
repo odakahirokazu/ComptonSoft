@@ -37,26 +37,28 @@ namespace anlgeant4 {
  * @date 2011-04-11 | Hirokazu Odaka | derived from AHPrimaryGen (BasicPrimaryGen)
  * @date 2012-07-10 | Hirokazu Odaka | add degree of polarization
  * @date 2013-08-18 | Hirokazu Odaka | v1.4: be moved to anlgeant4
+ * @date 2017-06-27 | Hirokazu Odaka | 4.1, makePrimarySetting()
  */
 class PlaneWavePrimaryGen : public anlgeant4::BasicPrimaryGen
 {
-  DEFINE_ANL_MODULE(PlaneWavePrimaryGen, 4.0);
+  DEFINE_ANL_MODULE(PlaneWavePrimaryGen, 4.1);
 public:
   PlaneWavePrimaryGen();
   ~PlaneWavePrimaryGen();
 
-  virtual anl::ANLStatus mod_startup();
-  virtual anl::ANLStatus mod_com();
-  virtual anl::ANLStatus mod_init();
-  virtual anl::ANLStatus mod_ana();
-  virtual anl::ANLStatus mod_endrun();
+  anl::ANLStatus mod_startup() override;
+  anl::ANLStatus mod_com() override;
+  anl::ANLStatus mod_init() override;
+  anl::ANLStatus mod_endrun() override;
   
+  void makePrimarySetting() override;
+
 protected:
   G4ThreeVector CenterPosition() const { return m_CenterPosition; }
   G4ThreeVector Direction() const { return m_Direction0; }
   G4ThreeVector DirectionOrthogonal() const { return m_DirectionOrthogonal; }
 
-  virtual G4ThreeVector samplePosition();
+  G4ThreeVector samplePosition() override;
   virtual G4double GenerationArea();
   
 private:

@@ -23,8 +23,9 @@
 
 using namespace anl;
 using namespace anlgeant4;
-using namespace comptonsoft;
 
+namespace comptonsoft
+{
 
 AHRayTracingPrimaryGen::AHRayTracingPrimaryGen()
   : m_FileName("raytracing.fits"),
@@ -33,7 +34,6 @@ AHRayTracingPrimaryGen::AHRayTracingPrimaryGen()
 {
   add_alias("AHRayTracingPrimaryGen");
 }
-
 
 ANLStatus AHRayTracingPrimaryGen::mod_startup()
 {
@@ -50,7 +50,6 @@ ANLStatus AHRayTracingPrimaryGen::mod_startup()
   
   return AS_OK;
 }
-
 
 ANLStatus AHRayTracingPrimaryGen::mod_init()
 {
@@ -143,11 +142,18 @@ ANLStatus AHRayTracingPrimaryGen::mod_init()
   return AS_OK;
 }
 
-
 ANLStatus AHRayTracingPrimaryGen::mod_ana()
 {
+  if (m_ID == m_EventNum) {
+    return AS_QUIT;
+  }
+    
+  return BasicPrimaryGen::mod_ana();
+}
+
+void AHRayTracingPrimaryGen::makePrimarySetting()
+{
   const int id = m_ID;
-  if (id == m_EventNum) return AS_QUIT;
   
   double energy = m_Column[0][id]*keV;
   double x = m_Column[1][id]*mm;
@@ -163,12 +169,9 @@ ANLStatus AHRayTracingPrimaryGen::mod_ana()
   direction.unit();
   
   setPrimary(position, energy, direction);
-  
-  ++m_ID;
-  
-  return BasicPrimaryGen::mod_ana();
-}
 
+  ++m_ID;
+}
 
 ANLStatus AHRayTracingPrimaryGen::mod_exit()
 {
@@ -179,3 +182,5 @@ ANLStatus AHRayTracingPrimaryGen::mod_exit()
   
   return AS_OK;
 }
+
+} /* namespace comptonsoft */

@@ -100,7 +100,7 @@ ANLStatus IsotropicPrimaryGen::mod_init()
   return AS_OK;
 }
 
-ANLStatus IsotropicPrimaryGen::mod_ana()
+void IsotropicPrimaryGen::makePrimarySetting()
 {
   using std::cos;
   using std::sin;
@@ -127,8 +127,6 @@ ANLStatus IsotropicPrimaryGen::mod_ana()
   G4double energy = sampleEnergy();
 
   setPrimary(position, energy, direction);
-  
-  return BasicPrimaryGen::mod_ana();
 }
 
 ANLStatus IsotropicPrimaryGen::mod_endrun()

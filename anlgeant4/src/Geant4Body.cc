@@ -24,7 +24,6 @@
 
 #include "ANLG4RunManager.hh"
 
-#include "G4ScoringManager.hh"
 #include "G4VUserDetectorConstruction.hh"
 #include "G4VUserPhysicsList.hh"
 #include "G4VUserPrimaryGeneratorAction.hh"
@@ -33,7 +32,7 @@
 #include "VANLGeometry.hh"
 #include "VANLPhysicsList.hh"
 #include "VANLPrimaryGen.hh"
-#include "VPickUpData.hh"
+#include "VUserActionAssembly.hh"
 
 using namespace anl;
 
@@ -42,7 +41,7 @@ namespace anlgeant4
 
 Geant4Body::Geant4Body()
   : m_G4RunManager(new ANLG4RunManager),
-    m_RandomEnginePtr(nullptr),
+    m_EventIndex(0),
     m_RandomEngine("MTwistEngine"),
     m_RandomInitMode(1),
     m_RandomSeed1(0),
@@ -51,22 +50,13 @@ Geant4Body::Geant4Body()
     m_RandomFinalStatusFileName("RandomSeed_f.dat"),
     m_VerboseLevel(0)
 {
-  G4ScoringManager* scoringManager = G4ScoringManager::GetScoringManager();
-  scoringManager->SetVerboseLevel(1);
-  
-  require_module_access("VPickUpData");
+  require_module_access("VUserActionAssembly");
   require_module_access("VANLGeometry");
   require_module_access("VANLPhysicsList");
   require_module_access("VANLPrimaryGen");
 }
 
-Geant4Body::~Geant4Body()
-{
-  if (m_RandomEnginePtr) {
-    delete m_RandomEnginePtr;
-    m_RandomEnginePtr = nullptr;
-  }
-}
+Geant4Body::~Geant4Body() = default;
 
 ANLStatus Geant4Body::mod_startup()
 {
@@ -81,56 +71,15 @@ ANLStatus Geant4Body::mod_startup()
                      "random_final_status_file");
 
   register_parameter(&m_VerboseLevel, "verbose");
+  register_parameter(&m_UserCommands, "commands");
   
   return AS_OK;
 }
 
-ANLStatus Geant4Body::mod_com()
-{
-  ask_parameter("random_initialization_mode");
-  hide_parameter("random_initialization_mode");
-  if (m_RandomInitMode!=1) {
-    hide_parameter("random_seed");
-  }
-  return BasicModule::mod_com();
-}
-
 ANLStatus Geant4Body::mod_init()
 {
-  using CLHEP::HepRandom;
-
-  if (m_RandomEngine=="MTwistEngine") {
-    m_RandomEnginePtr = new CLHEP::MTwistEngine;
-    HepRandom::setTheEngine(m_RandomEnginePtr);
-  }
-  else if (m_RandomEngine=="RanecuEngine") {
-    m_RandomEnginePtr = new CLHEP::RanecuEngine;
-    HepRandom::setTheEngine(m_RandomEnginePtr);
-  }
-  else if (m_RandomEngine=="HepJamesRandom") {
-    m_RandomEnginePtr = new CLHEP::HepJamesRandom;
-    HepRandom::setTheEngine(m_RandomEnginePtr);
-  }
-  
-  if (m_RandomInitMode==0) {
-    m_RandomSeed1 = std::time(0);
-    HepRandom::setTheSeed(m_RandomSeed1);
-    std::cout << "Random seed: " << m_RandomSeed1 << std::endl;
-
-    if (m_OutputRandomStatus) {
-      HepRandom::saveEngineStatus(m_RandomInitialStatusFileName.c_str());
-    }
-  }
-  else if (m_RandomInitMode==1) {
-    HepRandom::setTheSeed(m_RandomSeed1);
-    std::cout << "Random seed: " << m_RandomSeed1 << std::endl;
-
-    if (m_OutputRandomStatus) {
-      HepRandom::saveEngineStatus(m_RandomInitialStatusFileName.c_str());
-    }
-  }
-  else if (m_RandomInitMode==2) {
-    HepRandom::restoreEngineStatus(m_RandomInitialStatusFileName.c_str());
+  if (m_RandomInitMode==0 || m_RandomInitMode==1 || m_RandomInitMode==2) {
+    initialize_random_generator();
   }
   else {
     std::cout << "Invalid value [Random initialization mode] : "
@@ -139,13 +88,50 @@ ANLStatus Geant4Body::mod_init()
   }
 
   set_user_initializations();
-  set_user_primarygen_action();
-  set_user_std_actions();
+  set_user_primary_generator_action();
+  set_user_defined_actions();
   apply_commands();
 
   m_G4RunManager->Initialize();
 
   return AS_OK;
+}
+
+void Geant4Body::initialize_random_generator()
+{
+  if (m_RandomEngine=="MTwistEngine") {
+    m_RandomEnginePtr.reset(new CLHEP::MTwistEngine);
+    CLHEP::HepRandom::setTheEngine(m_RandomEnginePtr.get());
+  }
+  else if (m_RandomEngine=="RanecuEngine") {
+    m_RandomEnginePtr.reset(new CLHEP::RanecuEngine);
+    CLHEP::HepRandom::setTheEngine(m_RandomEnginePtr.get());
+  }
+  else if (m_RandomEngine=="HepJamesRandom") {
+    m_RandomEnginePtr.reset(new CLHEP::HepJamesRandom);
+    CLHEP::HepRandom::setTheEngine(m_RandomEnginePtr.get());
+  }
+  
+  if (m_RandomInitMode==0) {
+    m_RandomSeed1 = std::time(0);
+    CLHEP::HepRandom::setTheSeed(m_RandomSeed1);
+    std::cout << "Random seed: " << m_RandomSeed1 << std::endl;
+
+    if (m_OutputRandomStatus) {
+      CLHEP::HepRandom::saveEngineStatus(m_RandomInitialStatusFileName.c_str());
+    }
+  }
+  else if (m_RandomInitMode==1) {
+    CLHEP::HepRandom::setTheSeed(m_RandomSeed1);
+    std::cout << "Random seed: " << m_RandomSeed1 << std::endl;
+
+    if (m_OutputRandomStatus) {
+      CLHEP::HepRandom::saveEngineStatus(m_RandomInitialStatusFileName.c_str());
+    }
+  }
+  else if (m_RandomInitMode==2) {
+    CLHEP::HepRandom::restoreEngineStatus(m_RandomInitialStatusFileName.c_str());
+  }
 }
 
 void Geant4Body::set_user_initializations()
@@ -161,56 +147,76 @@ void Geant4Body::set_user_initializations()
   m_G4RunManager->SetUserInitialization(userPhysicsList);
 }
 
-void Geant4Body::set_user_primarygen_action()
+void Geant4Body::set_user_primary_generator_action()
 {
-  VANLPrimaryGen* primarygen;
-  GetANLModuleNC("VANLPrimaryGen", &primarygen); 
+  VANLPrimaryGen* primaryGen;
+  GetANLModuleNC("VANLPrimaryGen", &primaryGen);
   G4VUserPrimaryGeneratorAction* userPrimaryGeneratorAction
-    = primarygen->create();
+    = primaryGen->create();
   m_G4RunManager->SetUserAction(userPrimaryGeneratorAction);
 }
 
-void Geant4Body::set_user_std_actions()
+void Geant4Body::set_user_defined_actions()
 {
-  VPickUpData* pickupdata;
-  GetANLModuleNC("VPickUpData", &pickupdata);
-  pickupdata->RegisterUserActions(m_G4RunManager.get());
+  VUserActionAssembly* userActionAssembly;
+  GetANLModuleNC("VUserActionAssembly", &userActionAssembly);
+  userActionAssembly->registerUserActions(m_G4RunManager.get());
 }
 
 void Geant4Body::apply_commands()
 {
-  // set verbose levels
-  G4String runverbose = "/run/verbose ";
-  G4String eventverbose = "/event/verbose ";
-  G4String trackingverbose = "/tracking/verbose ";
-  std::string verbose = boost::lexical_cast<std::string>(m_VerboseLevel);
-  runverbose = runverbose + verbose;
-  eventverbose = eventverbose + verbose;
-  trackingverbose = trackingverbose + verbose;
-  G4cout << runverbose << G4endl;
-  G4cout << eventverbose << G4endl;
-  G4cout << trackingverbose << G4endl;
-  G4UImanager * UI = G4UImanager::GetUIpointer();
-  UI->ApplyCommand(runverbose);
-  UI->ApplyCommand(eventverbose);
-  UI->ApplyCommand(trackingverbose);
+  using boost::format;
+  using boost::str;
+
+  G4UImanager* ui = G4UImanager::GetUIpointer();
+  
+  std::vector<std::string> presetCommands;
+  presetCommands.push_back( str(format("/run/verbose %d") % m_VerboseLevel) );
+  presetCommands.push_back( str(format("/event/verbose %d") % m_VerboseLevel) );
+  presetCommands.push_back( str(format("/tracking/verbose %d") % m_VerboseLevel) );
+
+  std::cout << "\nApplying preset commands:" << std::endl;
+  for (const std::string& com: presetCommands) {
+    std::cout << com << std::endl;
+    ui->ApplyCommand(com);
+  }
+
+  std::cout << "\nApplying user commands:" << std::endl;
+  for (const std::string& com: m_UserCommands) {
+    std::cout << com << std::endl;
+    ui->ApplyCommand(com);
+  }
+  std::cout << std::endl;
 }
 
 ANLStatus Geant4Body::mod_bgnrun()
 {
-  m_G4RunManager->ANLbgnrunfunc();
+  const G4bool cond = m_G4RunManager->ConfirmBeamOnCondition();
+  if (cond) {
+    m_G4RunManager->ConstructScoringWorlds();
+    m_G4RunManager->RunInitialization();
+    m_G4RunManager->InitializeEventLoop(0, nullptr, 0);
+  }
+  else {
+    return AS_QUIT_ERR;
+  }
+
   return AS_OK;
 }
 
 ANLStatus Geant4Body::mod_ana()
 {
-  m_G4RunManager->ANLanafunc();
-  return AS_OK;
+  const ANLStatus status = m_G4RunManager->performOneEvent(m_EventIndex);
+  ++m_EventIndex;
+
+  return status;
 }
 
 ANLStatus Geant4Body::mod_endrun()
 {
-  m_G4RunManager->ANLendrunfunc();
+  m_G4RunManager->TerminateEventLoop();
+  m_G4RunManager->RunTermination();
+
   return AS_OK;
 }
 

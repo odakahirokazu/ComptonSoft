@@ -59,15 +59,13 @@ ANLStatus NucleusPrimaryGenInVolume::mod_bgnrun()
   return AS_OK;
 }
 
-ANLStatus NucleusPrimaryGenInVolume::mod_ana()
+void NucleusPrimaryGenInVolume::makePrimarySetting()
 {
   G4ThreeVector position(m_PositionSampler.samplePosition());
   
   G4double energy = 0.0;
   G4ThreeVector direction(0.0, 0.0, 0.0);
   setPrimary(position, energy, direction);
-  
-  return NucleusPrimaryGen::mod_ana();
 }
 
 } /* namespace anlgeant4 */

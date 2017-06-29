@@ -37,7 +37,7 @@ class HitPattern
 {
 public:
   HitPattern() = default;
-  ~HitPattern();
+  virtual ~HitPattern();
   
   const std::string& Name() const { return name_; }
   const std::string& ShortName() const { return shortName_; }

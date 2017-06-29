@@ -43,9 +43,9 @@ public:
   EfficiencyMapSky();
   ~EfficiencyMapSky();
 
-  anl::ANLStatus mod_startup();
-  anl::ANLStatus mod_init();
-  anl::ANLStatus mod_ana();
+  anl::ANLStatus mod_startup() override;
+  anl::ANLStatus mod_init() override;
+  anl::ANLStatus mod_ana() override;
   
 private:
   const anlgeant4::InitialInformation* m_InitialInfo;

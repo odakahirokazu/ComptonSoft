@@ -43,12 +43,12 @@ public:
    * @param name name of a logical volume associated with this sensitive detector
    */
   explicit VCSSensitiveDetector(G4String name);
-  ~VCSSensitiveDetector();
+  virtual ~VCSSensitiveDetector();
   
   /**
    * a mandatory method to process geant4 raw hits
    */
-  G4bool ProcessHits(G4Step* aStep, G4TouchableHistory* ROhist);
+  G4bool ProcessHits(G4Step* aStep, G4TouchableHistory* ROhist) override;
 
   void SetDetectorSystem(comptonsoft::DetectorSystem* detectorSystem)
   { detectorSystem_ = detectorSystem; }

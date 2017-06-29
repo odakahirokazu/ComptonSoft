@@ -17,7 +17,7 @@
  *                                                                       *
  *************************************************************************/
 
-#include "AHStandardPickUpData.hh"
+#include "AHStandardUserActionAssembly.hh"
 
 #include <fstream>
 #include <iomanip>
@@ -36,10 +36,11 @@
 #include "BasicComptonEvent.hh"
 
 using namespace anl;
-using namespace comptonsoft;
 
+namespace comptonsoft
+{
 
-AHStandardPickUpData::AHStandardPickUpData()
+AHStandardUserActionAssembly::AHStandardUserActionAssembly()
   : m_AnalysisManager(0),
     m_HitCollection(0),
     m_InitialInfo(0),
@@ -48,26 +49,23 @@ AHStandardPickUpData::AHStandardPickUpData()
     m_FileName("output.root"),
     m_PolarizationEnable(false)
 {
-  add_alias("AHStandardPickUpData");
+  add_alias("AHStandardUserActionAssembly");
   
   m_AnalysisManager = G4RootAnalysisManager::Instance();
 }
 
-
-AHStandardPickUpData::~AHStandardPickUpData()
+AHStandardUserActionAssembly::~AHStandardUserActionAssembly()
 {
   if (m_AnalysisManager) delete m_AnalysisManager;
 }
 
-
-ANLStatus AHStandardPickUpData::mod_startup()
+ANLStatus AHStandardUserActionAssembly::mod_startup()
 {
   register_parameter(&m_FileName, "output");
   return AS_OK;
 }
 
-
-ANLStatus AHStandardPickUpData::mod_init()
+ANLStatus AHStandardUserActionAssembly::mod_init()
 {
   GetANLModuleNC("CSHitCollection", &m_HitCollection);
   GetANLModuleIF("InitialInformation", &m_InitialInfo);
@@ -90,8 +88,7 @@ ANLStatus AHStandardPickUpData::mod_init()
   return AS_OK;
 }
 
-
-ANLStatus AHStandardPickUpData::mod_ana()
+ANLStatus AHStandardUserActionAssembly::mod_ana()
 {
   const std::vector<DetectorHit_sptr>& hitVec = m_HitCollection->getHits();
 
@@ -107,16 +104,14 @@ ANLStatus AHStandardPickUpData::mod_ana()
   return AS_OK;
 }
 
-
-ANLStatus AHStandardPickUpData::mod_exit()
+ANLStatus AHStandardUserActionAssembly::mod_exit()
 {
   if (m_SimXIF) m_SimXIF->outputEvents();
   
   return AS_OK;
 }
 
-
-void AHStandardPickUpData::RunAct_begin(const G4Run*)
+void AHStandardUserActionAssembly::RunActionAtBeginning(const G4Run*)
 {
   if (m_AnalysisManager==0) {
     std::cout << "Analysis manager was already deleted." << std::endl;
@@ -165,8 +160,7 @@ void AHStandardPickUpData::RunAct_begin(const G4Run*)
   }
 }
 
-
-void AHStandardPickUpData::RunAct_end(const G4Run*)
+void AHStandardUserActionAssembly::RunActionAtEnd(const G4Run*)
 {
   if (m_AnalysisManager) {
     m_AnalysisManager->Write();
@@ -177,8 +171,7 @@ void AHStandardPickUpData::RunAct_end(const G4Run*)
   on();
 }
 
-
-void AHStandardPickUpData::Fill(int seqnum,
+void AHStandardUserActionAssembly::Fill(int seqnum,
                                 int totalhit,
                                 const_DetectorHit_sptr hit)
 {
@@ -247,6 +240,7 @@ void AHStandardPickUpData::Fill(int seqnum,
   m_AnalysisManager->AddNtupleRow();
 }
 
+} /* namespace comptonsoft */
 
 namespace {
 
@@ -258,8 +252,7 @@ double ThetaCutOfComptonMode(double energy)
   return cut;
 }
 
-
-int findMaxPI(const std::vector<DetectorHit_sptr>& hits)
+int findMaxPI(const std::vector<comptonsoft::DetectorHit_sptr>& hits)
 {
   int index = -1;
   double x = -1.0;
@@ -273,10 +266,12 @@ int findMaxPI(const std::vector<DetectorHit_sptr>& hits)
   return index;
 }
 
-}
+} /* anonymous namespace */
 
+namespace comptonsoft
+{
 
-void AHStandardPickUpData::MakeEvent(const std::vector<DetectorHit_sptr>& hits)
+void AHStandardUserActionAssembly::MakeEvent(const std::vector<DetectorHit_sptr>& hits)
 {
   double energy(0.0), time1(0.0);
   int stripx(0), stripy(0);
@@ -312,3 +307,5 @@ void AHStandardPickUpData::MakeEvent(const std::vector<DetectorHit_sptr>& hits)
 
   m_SimXIF->addEvent(time1, energy, stripx, stripy, detectorID);
 }
+
+} /* namespace comptonsoft */

@@ -26,8 +26,9 @@
 
 using namespace anl;
 using namespace anlgeant4;
-using namespace comptonsoft;
 
+namespace comptonsoft
+{
 
 SimXPrimaryGen::SimXPrimaryGen()
   : m_SimXIF(0),
@@ -40,11 +41,9 @@ SimXPrimaryGen::SimXPrimaryGen()
   add_alias("SimXPrimaryGen");
 }
 
-
 SimXPrimaryGen::~SimXPrimaryGen()
 {
 }
-
 
 ANLStatus SimXPrimaryGen::mod_startup()
 {
@@ -70,7 +69,6 @@ ANLStatus SimXPrimaryGen::mod_startup()
   return AS_OK;
 }
 
-
 ANLStatus SimXPrimaryGen::mod_init()
 {
   G4double area = pi * m_Radius * m_Radius;
@@ -82,8 +80,7 @@ ANLStatus SimXPrimaryGen::mod_init()
   return AS_OK;
 }
 
-
-ANLStatus SimXPrimaryGen::mod_ana()
+void SimXPrimaryGen::makePrimarySetting()
 {
   using std::sqrt;
 
@@ -123,10 +120,7 @@ ANLStatus SimXPrimaryGen::mod_ana()
   else {
     setPrimary(position, energy, direction);
   }
-
-  return BasicPrimaryGen::mod_ana();
 }
-
 
 ANLStatus SimXPrimaryGen::mod_endrun()
 {
@@ -150,3 +144,5 @@ ANLStatus SimXPrimaryGen::mod_endrun()
   
   return AS_OK;
 }
+
+} /* namespace comptonsoft */

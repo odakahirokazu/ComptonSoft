@@ -35,9 +35,9 @@ public:
   GenerateSimXEvent();
   ~GenerateSimXEvent() {}
   
-  anl::ANLStatus mod_init();
-  anl::ANLStatus mod_ana();
-  anl::ANLStatus mod_exit();
+  anl::ANLStatus mod_init() override;
+  anl::ANLStatus mod_ana() override;
+  anl::ANLStatus mod_exit() override;
 
 protected:
   CSHitCollection* m_HitCollection;
@@ -83,6 +83,6 @@ private:
   SimXIF* m_SimXIF;
 };
 
-}
+} /* namespace comptonsoft */
 
 #endif /* COMPTONSOFT_GenerateSimXEvent_H */

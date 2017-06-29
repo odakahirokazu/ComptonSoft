@@ -1,6 +1,6 @@
 /*************************************************************************
  *                                                                       *
- * Copyright (c) 2011 Hirokazu Odaka                                     *
+ * Copyright (c) 2011 Shin Watanabe, Hirokazu Odaka                      *
  *                                                                       *
  * This program is free software: you can redistribute it and/or modify  *
  * it under the terms of the GNU General Public License as published by  *
@@ -17,46 +17,60 @@
  *                                                                       *
  *************************************************************************/
 
-#ifndef ANLGEANT4_VANLGeometry_H
-#define ANLGEANT4_VANLGeometry_H 1
+#ifndef ANLGEANT4_VUserActionAssembly_H
+#define ANLGEANT4_VUserActionAssembly_H 1
 
 #include "BasicModule.hh"
 
-class G4VUserDetectorConstruction;
+class G4Event;
+class G4Track;
+class G4Step;
+class G4Run;
+
+class G4RunManager;
+class G4UserStackingAction;
 
 namespace anlgeant4
 {
 
 /**
- * Virtual geometry module
+ * Virtual UserActionAssembly module
  * @author Hirokazu Odaka
- * @date xxxx-xx-xx
- * @date 2012-05-30
- * @date 2013-08-18 | H. Odaka | length unit, surface check
+ * @date 2012-05-30 | Hirokazu Odaka | redesign (originally came from VPickUpData by Shin Watanabe)
+ * @date 2017-06-28 | Hirokazu Odaka | redesign, rename class and methods
  */
-class VANLGeometry : public anl::BasicModule
+class VUserActionAssembly : public anl::BasicModule
 {
-  DEFINE_ANL_MODULE(VANLGeometry, 4.1);
+  DEFINE_ANL_MODULE(VUserActionAssembly, 5.0);
 public:
-  VANLGeometry();
+  VUserActionAssembly();
+  virtual ~VUserActionAssembly();
 
-  virtual G4VUserDetectorConstruction* create() = 0;
+  virtual void RunActionAtBeginning(const G4Run*) {}
+  virtual void RunActionAtEnd(const G4Run*) {}
 
-  void SetLengthUnit(double unit, const std::string& name);
-  void SetLengthUnit(const std::string& name);
-  double GetLengthUnit() const { return m_LengthUnit; }
-  std::string GetLengthUnitName() const { return m_LengthUnitName; }
+  virtual void EventActionAtBeginning(const G4Event*) {}
+  virtual void EventActionAtEnd(const G4Event*) {}
 
-  bool SurfaceCheck() const { return m_SurfaceCheck; }
+  virtual void TrackActionAtBeginning(const G4Track*) {}
+  virtual void TrackActionAtEnd(const G4Track*) {}
 
-  anl::ANLStatus mod_startup() override;
+  virtual void SteppingAction(const G4Step*) {}
+
+  bool isSteppingActionEnabled() const { return steppingActionEnabled_; }
+
+  virtual void registerUserActions(G4RunManager* run_manager);
+
+protected:
+  void enableSteppingAction() { steppingActionEnabled_ = true; }
+  void disableSteppingAction() { steppingActionEnabled_ = false; }
+
+  virtual void printSummary();
 
 private:
-  double m_LengthUnit;
-  std::string m_LengthUnitName;
-  bool m_SurfaceCheck;
+  bool steppingActionEnabled_ = true;
 };
 
 } /* namespace anlgeant4 */
 
-#endif /* ANLGEANT4_VANLGeometry_H */
+#endif /* ANLGEANT4_VUserActionAssembly_H */

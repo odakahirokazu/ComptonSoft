@@ -32,7 +32,7 @@ class CalcWPPixel
 {
 public:
   CalcWPPixel();
-  ~CalcWPPixel();
+  virtual ~CalcWPPixel();
   CalcWPPixel(const CalcWPPixel&) = default;
   CalcWPPixel(CalcWPPixel&&) = default;
   CalcWPPixel& operator=(const CalcWPPixel&) = default;

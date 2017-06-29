@@ -53,9 +53,9 @@ public:
   SimXIF();
   ~SimXIF();
   
-  anl::ANLStatus mod_prepare();
-  anl::ANLStatus mod_init();
-  anl::ANLStatus mod_ana();
+  anl::ANLStatus mod_prepare() override;
+  anl::ANLStatus mod_init() override;
+  anl::ANLStatus mod_ana() override;
 
   void generatePrimaries(double area);
   PhaseSpaceVector takePrimary();
@@ -83,6 +83,6 @@ private:
   comptonsoft::DetectorSystem* m_DetectorManager;
 };
 
-}
+} /* namespace comptonsoft */
 
 #endif /* COMPTONSOFT_SimXIF_H */

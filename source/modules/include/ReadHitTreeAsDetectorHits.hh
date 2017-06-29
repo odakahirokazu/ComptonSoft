@@ -36,7 +36,7 @@ public:
   ~ReadHitTreeAsDetectorHits() = default;
   
 protected:
-  virtual void insertHit(const DetectorHit_sptr& hit);
+  void insertHit(const DetectorHit_sptr& hit) override;
 };
 
 } /* namespace comptonsoft */

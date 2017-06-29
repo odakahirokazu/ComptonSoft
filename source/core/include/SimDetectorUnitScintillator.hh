@@ -36,22 +36,22 @@ class SimDetectorUnitScintillator
 {
 public:
   SimDetectorUnitScintillator();
-  ~SimDetectorUnitScintillator();
+  virtual ~SimDetectorUnitScintillator();
 
-  void initializeEvent();
+  void initializeEvent() override;
 
   double ChargeCollectionEfficiency(const PixelID& ,
-                                    double , double , double ) const
+                                    double , double , double ) const override
   { return 1.0; }
 
 protected:
-  bool checkRange(const PixelID& sp) const;
-  int IndexOfTable(const PixelID& sp) const;
-  int SizeOfTable() const;
-  PixelID TableIndexToPixelID(int index) const;
+  bool checkRange(const PixelID& sp) const override;
+  int IndexOfTable(const PixelID& sp) const override;
+  int SizeOfTable() const override;
+  PixelID TableIndexToPixelID(int index) const override;
 
 private:
-  void simulatePulseHeights();
+  void simulatePulseHeights() override;
 };
 
 inline bool SimDetectorUnitScintillator::checkRange(const PixelID& sp) const

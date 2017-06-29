@@ -37,7 +37,7 @@ public:
   RecalculateEPI() = default;
   ~RecalculateEPI() = default;
 
-  anl::ANLStatus mod_ana();
+  anl::ANLStatus mod_ana() override;
 };
 
 } /* namespace comptonsoft */

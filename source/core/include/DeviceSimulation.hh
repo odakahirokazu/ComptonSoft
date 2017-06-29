@@ -115,7 +115,7 @@ public:
   void setTemperature(double v) { temperature_ = v; }
   double Temperature() const { return temperature_; }
 
-  void initializeTables();
+  void initializeTables() override;
 
   template <typename IndexType>
   void setEPICompensationFunction(IndexType i, const TSpline* v)
@@ -161,10 +161,10 @@ public:
   double ChargeCollectionEfficiencyByHecht(double z) const
   { return EField_->CCEByHecht(z); }
   
-  virtual double calculateEnergyCharge(const PixelID& pixel,
-                                       double energyDeposit,
-                                       double x, double y, double z) const;
-  virtual double calculateEPI(double energyCharge, const PixelID& pixel) const;
+  double calculateEnergyCharge(const PixelID& pixel,
+                               double energyDeposit,
+                               double x, double y, double z) const override;
+  double calculateEPI(double energyCharge, const PixelID& pixel) const override;
 
   virtual double DiffusionSigmaAnode(double z);
   virtual double DiffusionSigmaCathode(double z);
@@ -177,7 +177,7 @@ public:
   virtual void buildCCEMap(int /* nx */, int /* ny */, int /* nz */,
                            double /* num_px */) {}
 
-  virtual void printSimulationParameters(std::ostream& os) const;
+  void printSimulationParameters(std::ostream& os) const override;
 
 protected:
   void setWeightingPotential(bool upside_electrode, boost::shared_array<double> wp, int num_point)

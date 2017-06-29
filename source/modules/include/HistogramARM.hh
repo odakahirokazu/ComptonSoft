@@ -36,9 +36,9 @@ public:
   HistogramARM();
   ~HistogramARM() = default;
 
-  anl::ANLStatus mod_startup();
-  anl::ANLStatus mod_his();
-  anl::ANLStatus mod_ana();
+  anl::ANLStatus mod_startup() override;
+  anl::ANLStatus mod_his() override;
+  anl::ANLStatus mod_ana() override;
   
 protected:
   const EventReconstruction* eventReconstruction_;

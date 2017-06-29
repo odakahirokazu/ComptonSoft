@@ -1,6 +1,6 @@
 /*************************************************************************
  *                                                                       *
- * Copyright (c) 2011 Hirokazu Odaka                                     *
+ * Copyright (c) 2011 Shin Watanabe, Hirokazu Odaka                      *
  *                                                                       *
  * This program is free software: you can redistribute it and/or modify  *
  * it under the terms of the GNU General Public License as published by  *
@@ -17,38 +17,24 @@
  *                                                                       *
  *************************************************************************/
 
-#ifndef ANLGEANT4_StandardPickUpData_H
-#define ANLGEANT4_StandardPickUpData_H 1
+#include "UserActionAssemblySteppingAction.hh"
+#include "VUserActionAssembly.hh"
 
-#include "VPickUpData.hh"
-
-namespace anlgeant4 {
-
-class InitialInformation;
-
-/**
- * @author Hirokazu Odaka
- * @date 2011-04-11
- * @date 2016-07-08 | setInitialTime()
- */
-class StandardPickUpData : public VPickUpData
+namespace anlgeant4
 {
-  DEFINE_ANL_MODULE(StandardPickUpData, 2.0);
-public:
-  StandardPickUpData();
 
-  anl::ANLStatus mod_init();
+UserActionAssemblySteppingAction::UserActionAssemblySteppingAction(const std::list<VUserActionAssembly*>& userActions)
+  : userActions_(userActions)
+{
+}
 
-  void EventAct_begin(const G4Event* aEvent);
+UserActionAssemblySteppingAction::~UserActionAssemblySteppingAction() = default;
 
-protected:
-  double getInitialTime() const;
-  void setInitialTime(double v);
-
-private:
-  InitialInformation* m_InitialInfo;
-};
+void UserActionAssemblySteppingAction::UserSteppingAction(const G4Step* aStep)
+{
+  for (VUserActionAssembly* pud: userActions_) {
+    pud->SteppingAction(aStep);
+  }
+}
 
 } /* namespace anlgeant4 */
-
-#endif /* ANLGEANT4_StandardPickUpData_H */

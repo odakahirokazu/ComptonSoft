@@ -32,14 +32,14 @@ public:
   OutputSimXPrimaries();
   ~OutputSimXPrimaries() {}
   
-  anl::ANLStatus mod_startup();
-  anl::ANLStatus mod_init();
+  anl::ANLStatus mod_startup() override;
+  anl::ANLStatus mod_init() override;
   
 private:
   std::string m_FileName;
   double m_Area;
 };
 
-}
+} /* namespace comptonsoft */
 
 #endif /* COMPTONSOFT_OutputSimXPrimaries_H */

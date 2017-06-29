@@ -64,13 +64,12 @@
 #include "SimXPrimaryGen.hh"
 #endif
 #include "AHRadiationBackgroundPrimaryGen.hh"
-#include "RadioactiveDecayPickUpData.hh"
-#include "ActivationPickUpData.hh"
+#include "RadioactiveDecayUserActionAssembly.hh"
+#include "ActivationUserActionAssembly.hh"
 #ifdef USE_SIMX
-#include "AHStandardPickUpData.hh"
+#include "AHStandardUserActionAssembly.hh"
 #endif
-#include "KillStepPickUpData.hh"
-#include "MaterialSamplePickUpData.hh"
+#include "SampleOpticalDepth.hh"
 #include "ScatteringPickUpData.hh"
 #include "ObservationPickUpData.hh"
 #include "PhysicsListManager.hh"
@@ -606,53 +605,46 @@ public:
 };
 
 
-class RadioactiveDecayPickUpData : public anlgeant4::StandardPickUpData
+class RadioactiveDecayUserActionAssembly : public anlgeant4::StandardUserActionAssembly
 {
 public:
-  RadioactiveDecayPickUpData();
+  RadioactiveDecayUserActionAssembly();
 };
 
 
-class ActivationPickUpData : public anlgeant4::StandardPickUpData
+class ActivationUserActionAssembly : public anlgeant4::StandardUserActionAssembly
 {
 public:
-  ActivationPickUpData();
-  virtual ~ActivationPickUpData();
+  ActivationUserActionAssembly();
+  virtual ~ActivationUserActionAssembly();
 };
 
 
 #ifdef USE_SIMX
-class AHStandardPickUpData : public anlgeant4::StandardPickUpData
+class AHStandardUserActionAssembly : public anlgeant4::StandardUserActionAssembly
 {
 public:
-  AHStandardPickUpData();
-  virtual ~AHStandardPickUpData();
+  AHStandardUserActionAssembly();
+  virtual ~AHStandardUserActionAssembly();
 };
 
 #endif
 
-class KillStepPickUpData : public anlgeant4::StandardPickUpData
+class SampleOpticalDepth : public anlgeant4::VAppendableUserActionAssembly
 {
 public:
-  KillStepPickUpData();
+  SampleOpticalDepth();
 };
 
 
-class MaterialSamplePickUpData : public anlgeant4::StandardPickUpData
-{
-public:
-  MaterialSamplePickUpData();
-};
-
-
-class ScatteringPickUpData : public anlgeant4::StandardPickUpData
+class ScatteringPickUpData : public anlgeant4::VAppendableUserActionAssembly
 {
 public:
   ScatteringPickUpData();
 };
 
 
-class ObservationPickUpData : public anlgeant4::StandardPickUpData
+class ObservationPickUpData : public anlgeant4::VAppendableUserActionAssembly
 {
 public:
   ObservationPickUpData();

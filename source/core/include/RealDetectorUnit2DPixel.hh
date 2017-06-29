@@ -34,9 +34,10 @@ class RealDetectorUnit2DPixel : public VRealDetectorUnit
 {
 public:
   RealDetectorUnit2DPixel();
-  ~RealDetectorUnit2DPixel();
+  virtual ~RealDetectorUnit2DPixel();
 
-  DetectorType Type() const { return DetectorType::PixelDetector; }
+  DetectorType Type() const override
+  { return DetectorType::PixelDetector; }
 
   void setReadoutElectrode(ElectrodeSide v)
   { readoutElectrode_ = v; }
@@ -58,9 +59,9 @@ public:
   }
 
 protected:
-  virtual bool setReconstructionDetails(int mode);
-  virtual void reconstruct(const DetectorHitVector& hitSignals,
-                           DetectorHitVector& hitsReconstructed);
+  bool setReconstructionDetails(int mode) override;
+  void reconstruct(const DetectorHitVector& hitSignals,
+                   DetectorHitVector& hitsReconstructed) override;
 
 private:
   void determinePosition(DetectorHitVector& hits) const;

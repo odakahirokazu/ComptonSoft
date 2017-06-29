@@ -38,9 +38,9 @@ public:
   FilterByGoodTimeIntervals();
   ~FilterByGoodTimeIntervals();
 
-  anl::ANLStatus mod_startup();
-  anl::ANLStatus mod_init();
-  anl::ANLStatus mod_ana();
+  anl::ANLStatus mod_startup() override;
+  anl::ANLStatus mod_init() override;
+  anl::ANLStatus mod_ana() override;
 
 protected:
   std::vector<std::tuple<double, double>> m_GTIs;

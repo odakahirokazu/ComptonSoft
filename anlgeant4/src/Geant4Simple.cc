@@ -33,37 +33,29 @@
 #include "VANLGeometry.hh"
 #include "VANLPhysicsList.hh"
 #include "VANLPrimaryGen.hh"
-#include "VPickUpData.hh"
+#include "VUserActionAssembly.hh"
 
 using namespace anl;
-using namespace anlgeant4;
 
+namespace anlgeant4
+{
 
 Geant4Simple::Geant4Simple()
-  : m_G4RunManager(0),
-    m_RandomEnginePtr(0),
+  : m_G4RunManager(new G4RunManager),
     m_RandomSeed1(0),
     m_NumberOfTrial(10000),
     m_VerboseLevel(0)
 {
-  m_G4RunManager = new G4RunManager;
-  
   G4ScoringManager* scoringManager = G4ScoringManager::GetScoringManager();
   scoringManager->SetVerboseLevel(1);
   
-  require_module_access("VPickUpData");
+  require_module_access("VUserActionAssembly");
   require_module_access("VANLGeometry");
   require_module_access("VANLPhysicsList");
   require_module_access("VANLPrimaryGen");
 }
 
-
-Geant4Simple::~Geant4Simple()
-{
-  if (m_G4RunManager) delete m_G4RunManager;
-  if (m_RandomEnginePtr) delete m_RandomEnginePtr;
-}
-
+Geant4Simple::~Geant4Simple() = default;
 
 ANLStatus Geant4Simple::mod_startup()
 {
@@ -74,27 +66,21 @@ ANLStatus Geant4Simple::mod_startup()
   return AS_OK;
 }
 
-
 ANLStatus Geant4Simple::mod_init()
 {
-  using CLHEP::HepRandom;
-
-  m_RandomEnginePtr = new CLHEP::MTwistEngine;
-  HepRandom::setTheEngine(m_RandomEnginePtr);
-  
-  HepRandom::setTheSeed(m_RandomSeed1);
-  std::cout << "Random seed: " << m_RandomSeed1 << std::endl;
+  m_RandomEnginePtr.reset(new CLHEP::MTwistEngine);
+  CLHEP::HepRandom::setTheEngine(m_RandomEnginePtr.get());
+  CLHEP::HepRandom::setTheSeed(m_RandomSeed1);
   
   set_user_initializations();
-  set_user_primarygen_action();
-  set_user_std_actions();
+  set_user_primary_generator_action();
+  set_user_defined_actions();
   apply_commands();
 
   m_G4RunManager->Initialize();
 
   return AS_OK;
 }
-
 
 void Geant4Simple::set_user_initializations()
 {
@@ -109,43 +95,41 @@ void Geant4Simple::set_user_initializations()
   m_G4RunManager->SetUserInitialization(userPhysicsList);
 }
 
-
-void Geant4Simple::set_user_primarygen_action()
+void Geant4Simple::set_user_primary_generator_action()
 {
   VANLPrimaryGen* primaryGen;
-  GetANLModuleNC("VANLPrimaryGen", &primaryGen); 
+  GetANLModuleNC("VANLPrimaryGen", &primaryGen);
   G4VUserPrimaryGeneratorAction* userPrimaryGeneratorAction
     = primaryGen->create();
   m_G4RunManager->SetUserAction(userPrimaryGeneratorAction);
 }
 
-
-void Geant4Simple::set_user_std_actions()
+void Geant4Simple::set_user_defined_actions()
 {
-  VPickUpData* pickupData;
-  GetANLModuleNC("VPickUpData", &pickupData);
-  pickupData->RegisterUserActions(m_G4RunManager);
+  VUserActionAssembly* userActionAssembly;
+  GetANLModuleNC("VUserActionAssembly", &userActionAssembly);
+  userActionAssembly->registerUserActions(m_G4RunManager.get());
 }
-
 
 void Geant4Simple::apply_commands()
 {
-  // set verbose levels
-  G4String runVerbose = "/run/verbose 1";
-  G4String eventVerbose = "/event/verbose ";
-  G4String trackingVerbose = "/tracking/verbose ";
-  std::string verbose = boost::lexical_cast<std::string>(m_VerboseLevel);
-  eventVerbose = eventVerbose + verbose;
-  trackingVerbose = trackingVerbose + verbose;
-  G4cout << runVerbose << G4endl;
-  G4cout << eventVerbose << G4endl;
-  G4cout << trackingVerbose << G4endl;
-  G4UImanager* ui = G4UImanager::GetUIpointer();
-  ui->ApplyCommand(runVerbose);
-  ui->ApplyCommand(eventVerbose);
-  ui->ApplyCommand(trackingVerbose);
-}
+  using boost::format;
+  using boost::str;
 
+  G4UImanager* ui = G4UImanager::GetUIpointer();
+  
+  std::vector<std::string> presetCommands;
+  presetCommands.push_back( str(format("/run/verbose %d") % m_VerboseLevel) );
+  presetCommands.push_back( str(format("/event/verbose %d") % m_VerboseLevel) );
+  presetCommands.push_back( str(format("/tracking/verbose %d") % m_VerboseLevel) );
+
+  std::cout << "\nApplying preset commands:" << std::endl;
+  for (const std::string& com: presetCommands) {
+    std::cout << com << std::endl;
+    ui->ApplyCommand(com);
+  }
+  std::cout << std::endl;
+}
 
 ANLStatus Geant4Simple::mod_ana()
 {
@@ -153,11 +137,4 @@ ANLStatus Geant4Simple::mod_ana()
   return AS_OK;
 }
 
-
-ANLStatus Geant4Simple::mod_exit()
-{
-  delete m_G4RunManager;
-  m_G4RunManager = 0;
-
-  return AS_OK;
-}
+} /* namespace anlgeant4 */

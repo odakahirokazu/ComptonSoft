@@ -1,6 +1,6 @@
 /*************************************************************************
  *                                                                       *
- * Copyright (c) 2011 Tamotsu Sato, Hirokazu Odaka                       *
+ * Copyright (c) 2011 Hirokazu Odaka                                     *
  *                                                                       *
  * This program is free software: you can redistribute it and/or modify  *
  * it under the terms of the GNU General Public License as published by  *
@@ -17,63 +17,40 @@
  *                                                                       *
  *************************************************************************/
 
-#ifndef COMPTONSOFT_MaterialSamplePickUpData_H
-#define COMPTONSOFT_MaterialSamplePickUpData_H 1
+#include "StandardUserActionAssembly.hh"
+#include "G4Event.hh"
+#include "InitialInformation.hh"
 
-#include "StandardPickUpData.hh"
+using namespace anl;
 
-class TTree;
-class TH1D;
-class G4PhotoElectricEffect;
-
-namespace anlgeant4 {
-
-class InitialInformation;
-
-}
-
-namespace comptonsoft {
-
-
-class MaterialSamplePickUpData : public anlgeant4::StandardPickUpData
+namespace anlgeant4
 {
-  DEFINE_ANL_MODULE(MaterialSamplePickUpData, 1.0);
-public:
-  MaterialSamplePickUpData();
-  
-  anl::ANLStatus mod_startup();
-  anl::ANLStatus mod_init();
-  anl::ANLStatus mod_ana();
-  
-  void StepAct(const G4Step* aStep, G4Track* aTrack);
-  
-private:
-  TTree* masstree;
-  
-protected:
-  double ini_energy;
 
-  double ini_dirx;
-  double ini_diry;
-  double ini_dirz;
-  
-  double ini_posx;
-  double ini_posy;
-  double ini_posz;
-	
-private:
-  const anlgeant4::InitialInformation* primary;
-  //  std::string filename;
-  double mass;
-  double tau1;
-  double tau2;
-  double tau3;
-  double tau4;
-  double tau5;
-  
-  G4PhotoElectricEffect* m_PhAbsProcess;
-};
-
+StandardUserActionAssembly::StandardUserActionAssembly()
+  : m_InitialInfo(0)
+{
+  add_alias("StandardUserActionAssembly");
 }
 
-#endif /* COMPTONSOFT_MaterialSamplePickUpData_H */
+ANLStatus StandardUserActionAssembly::mod_init()
+{
+  GetANLModuleIFNC("InitialInformation", &m_InitialInfo);
+  return AS_OK;
+}
+
+void StandardUserActionAssembly::EventActionAtBeginning(const G4Event* anEvent)
+{
+  m_InitialInfo->setEventID(anEvent->GetEventID());
+}
+
+void StandardUserActionAssembly::setInitialTime(double v)
+{
+  m_InitialInfo->setInitialTime(v);
+}
+
+double StandardUserActionAssembly::getInitialTime() const
+{
+  return m_InitialInfo->InitialTime();
+}
+
+} /* namespace anlgeant4 */

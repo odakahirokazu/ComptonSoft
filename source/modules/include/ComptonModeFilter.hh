@@ -35,9 +35,9 @@ public:
   ComptonModeFilter();
   ~ComptonModeFilter() = default;
 
-  anl::ANLStatus mod_init();
-  anl::ANLStatus mod_his();
-  anl::ANLStatus mod_ana();
+  anl::ANLStatus mod_init() override;
+  anl::ANLStatus mod_his() override;
+  anl::ANLStatus mod_ana() override;
 
   double theta_cut_limit(double energy) const;
   double theta_cut_limit2(double energy) const;

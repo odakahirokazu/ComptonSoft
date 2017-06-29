@@ -38,15 +38,15 @@ class ReadGDML : public VANLGeometry
 public:
   ReadGDML();
 
-  anl::ANLStatus mod_startup();
+  anl::ANLStatus mod_startup() override;
 
-  G4VUserDetectorConstruction* create();
+  G4VUserDetectorConstruction* create() override;
 
 private:
   std::string m_GeometryFileName;
   bool m_Validate;
 };
 
-}
+} /* namespace anlgeant4 */
 
 #endif /* ANLGEANT4_ReadGDML_H */

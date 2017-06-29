@@ -34,18 +34,20 @@ class SimXIF;
  * @author Hirokazu Odaka
  * @date 2012-02-16
  * @date 2012-06-29
+ * @date 2017-07-27 | makePrimarySetting()
  */
 class SimXPrimaryGen : public anlgeant4::BasicPrimaryGen
 {
-  DEFINE_ANL_MODULE(SimXPrimaryGen, 1.1);
+  DEFINE_ANL_MODULE(SimXPrimaryGen, 4.1);
 public:
   SimXPrimaryGen();
   ~SimXPrimaryGen();
  
-  anl::ANLStatus mod_startup();
-  anl::ANLStatus mod_init();
-  anl::ANLStatus mod_ana();
-  anl::ANLStatus mod_endrun();
+  anl::ANLStatus mod_startup() override;
+  anl::ANLStatus mod_init() override;
+  anl::ANLStatus mod_endrun() override;
+
+  void makePrimarySetting() override;
   
 private:
   SimXIF* m_SimXIF;

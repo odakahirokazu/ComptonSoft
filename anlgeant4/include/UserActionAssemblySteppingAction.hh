@@ -17,54 +17,36 @@
  *                                                                       *
  *************************************************************************/
 
-#include "VPickUpData.hh"
+#ifndef ANLGEANT4_UserActionAssemblySteppingAction_H
+#define ANLGEANT4_UserActionAssemblySteppingAction_H 1
 
-#include "G4RunManager.hh"
+#include "G4UserSteppingAction.hh"
+#include <list>
 
-#include "PickUpDataRunAction.hh"
-#include "PickUpDataEventAction.hh"
-#include "PickUpDataTrackingAction.hh"
-#include "PickUpDataSteppingAction.hh"
-
-using namespace anl;
-using namespace anlgeant4;
-
-VPickUpData::VPickUpData()
-  : m_StepActOn(true), m_StackingAction(0)
+namespace anlgeant4
 {
-  add_alias("VPickUpData");
-  add_alias("PickUpData");
-}
 
+class VUserActionAssembly;
 
-ANLStatus VPickUpData::mod_startup()
+/**
+ * User SteppingAction class for UserActionAssembly
+ * @author M. Kouda, S. Watanabe, H. Odaka
+ * @date 2003-01-10 (modified: S. Watanabe)
+ * @date 2012-05-30 | Hirokazu Odaka | new design
+ * @date 2017-07-29 | Hirokazu Odaka | rename class, introduce user action list
+ */
+class UserActionAssemblySteppingAction : public G4UserSteppingAction
 {
-  register_parameter(&m_StepActOn, "stepping_action_enable");
-  return AS_OK;
-}
+public:
+  explicit UserActionAssemblySteppingAction(const std::list<VUserActionAssembly*>& userActions);
+  ~UserActionAssemblySteppingAction();
 
+  void UserSteppingAction(const G4Step*) override;
 
-void VPickUpData::CreateUserActions()
-{
-}
+private:
+  std::list<VUserActionAssembly*> userActions_;
+};
 
+} /* namespace anlgeant4 */
 
-void VPickUpData::RegisterUserActions(G4RunManager* run_manager)
-{
-  CreateUserActions();
-
-  PickUpDataRunAction* runAction = new PickUpDataRunAction(this);
-  PickUpDataEventAction* eventAction = new PickUpDataEventAction(this);
-  PickUpDataTrackingAction* trackingAction = new PickUpDataTrackingAction(this);
-
-  run_manager->SetUserAction(runAction);
-  run_manager->SetUserAction(eventAction);
-  run_manager->SetUserAction(trackingAction);
-
-  if (StepActOn()) {
-    PickUpDataSteppingAction* steppingAction = new PickUpDataSteppingAction(this);
-    run_manager->SetUserAction(steppingAction);
-  }
-  
-  if (m_StackingAction) run_manager->SetUserAction(m_StackingAction);
-}
+#endif /* ANLGEANT4_UserActionAssemblySteppingAction_H */

@@ -11,7 +11,7 @@ classList = [
   ANL::SWIGClass.new('ReadGDML', false, "USE_GDML"),
   ANL::SWIGClass.new('WriteGDML', false, "USE_GDML"),
   ANL::SWIGClass.new('VANLPrimaryGen', true),
-  ANL::SWIGClass.new('BasicPrimaryGen'),
+  ANL::SWIGClass.new('BasicPrimaryGen', true),
   ANL::SWIGClass.new('PointSourcePrimaryGen'),
   ANL::SWIGClass.new('PlaneWavePrimaryGen'),
   ANL::SWIGClass.new('PlaneWaveRectanglePrimaryGen'),
@@ -20,8 +20,10 @@ classList = [
   ANL::SWIGClass.new('PrimaryGenUniformSourceInVolume'),
   ANL::SWIGClass.new('NucleusPrimaryGen'),
   ANL::SWIGClass.new('NucleusPrimaryGenInVolume'),
-  ANL::SWIGClass.new('VPickUpData'),
-  ANL::SWIGClass.new('StandardPickUpData'),
+  ANL::SWIGClass.new('VUserActionAssembly'),
+  ANL::SWIGClass.new('VMasterUserActionAssembly'),
+  ANL::SWIGClass.new('VAppendableUserActionAssembly'),
+  ANL::SWIGClass.new('StandardUserActionAssembly'),
   ANL::SWIGClass.new('VisualizeG4Geom', false, 'USE_VIS'),
 ]
 

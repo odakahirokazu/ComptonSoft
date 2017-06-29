@@ -60,13 +60,15 @@ add_library(${TARGET_LIBRARY} SHARED
   src/PositionSamplerInVolume.cc
   src/NucleusPrimaryGen.cc
   src/NucleusPrimaryGenInVolume.cc
-  src/PickUpDataRunAction.cc
-  src/PickUpDataEventAction.cc
-  src/PickUpDataTrackingAction.cc
-  src/PickUpDataSteppingAction.cc
+  src/UserActionAssemblyRunAction.cc
+  src/UserActionAssemblyEventAction.cc
+  src/UserActionAssemblyTrackingAction.cc
+  src/UserActionAssemblySteppingAction.cc
+  src/VUserActionAssembly.cc
+  src/VMasterUserActionAssembly.cc
+  src/VAppendableUserActionAssembly.cc
+  src/StandardUserActionAssembly.cc
   src/VANLGeometry.cc
-  src/VPickUpData.cc
-  src/StandardPickUpData.cc
   ${GDML_CLASSES}
   ${VIS_CLASSES}
   )

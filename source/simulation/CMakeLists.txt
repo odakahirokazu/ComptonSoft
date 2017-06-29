@@ -30,13 +30,12 @@ link_directories(
 set(CS_SIMULATION_CLASSES_BASIC
   # primary geneator
   src/AHRadiationBackgroundPrimaryGen.cc
-  # pick up data
-  src/RadioactiveDecayPickUpData.cc
+  # user actions
+  src/RadioactiveDecayUserActionAssembly.cc
   src/ActivationStackingAction.cc
-  src/ActivationPickUpData.cc
+  src/ActivationUserActionAssembly.cc
   src/ObservationPickUpData.cc
-  src/KillStepPickUpData.cc
-  src/MaterialSamplePickUpData.cc
+  src/SampleOpticalDepth.cc
   src/ScatteringPickUpData.cc
   # physics list
   src/AHG4EmLivermorePhysics.cc
@@ -59,7 +58,7 @@ if(CS_USE_SIMX)
     src/SimXPrimaryGen.cc  
     src/AHRayTracingPrimaryGen.cc
     # pick up data
-    src/AHStandardPickUpData.cc
+    src/AHStandardUserActionAssembly.cc
     # other
     src/OutputSimXPrimaries.cc
     src/GenerateSimXEvent.cc

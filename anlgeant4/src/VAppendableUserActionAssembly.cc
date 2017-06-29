@@ -17,36 +17,24 @@
  *                                                                       *
  *************************************************************************/
 
-#ifndef ANLGEANT4_PickUpDataRunAction_H
-#define ANLGEANT4_PickUpDataRunAction_H 1
+#include "VAppendableUserActionAssembly.hh"
+#include "VMasterUserActionAssembly.hh"
 
-#include "G4UserRunAction.hh"
+using namespace anl;
 
 namespace anlgeant4
 {
 
-class VPickUpData;
+VAppendableUserActionAssembly::VAppendableUserActionAssembly() = default;
+VAppendableUserActionAssembly::~VAppendableUserActionAssembly() = default;
 
-/**
- * User RunAction class for PickUpData.
- * @author M. Kouda, S. Watanabe, H. Odaka
- * @date 2002-12-07 (modified: S. Watanabe)
- * @date 2012-05-30 (modified: H. Odaka)
- */
-class PickUpDataRunAction : public G4UserRunAction
+ANLStatus VAppendableUserActionAssembly::mod_prepare()
 {
-public:
-  explicit PickUpDataRunAction(VPickUpData* pud);
-  ~PickUpDataRunAction();
+  VMasterUserActionAssembly* master;
+  GetANLModuleIFNC("VMasterUserActionAssembly", &master);
+  master->appendUserActions(this);
 
-public:
-  virtual void BeginOfRunAction(const G4Run* aRun);
-  virtual void EndOfRunAction(const G4Run* aRun);
-
-private:
-  VPickUpData* pickup_data;
-};
-
+  return AS_OK;
 }
 
-#endif /* ANLGEANT4_PickUpDataRunAction_H */
+} /* namespace anlgeant4 */

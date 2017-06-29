@@ -39,10 +39,10 @@ public:
   ReadDataFile_SpW2();
   ~ReadDataFile_SpW2() = default;
 
-  anl::ANLStatus mod_startup();
-  anl::ANLStatus mod_init();
-  anl::ANLStatus mod_bgnrun();
-  anl::ANLStatus mod_ana();
+  anl::ANLStatus mod_startup() override;
+  anl::ANLStatus mod_init() override;
+  anl::ANLStatus mod_bgnrun() override;
+  anl::ANLStatus mod_ana() override;
 
   int DeltaTime() const { return m_DeltaTime; }
 

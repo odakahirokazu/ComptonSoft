@@ -98,7 +98,7 @@ ANLStatus PlaneWavePrimaryGen::mod_init()
   return AS_OK;
 }
 
-ANLStatus PlaneWavePrimaryGen::mod_ana()
+void PlaneWavePrimaryGen::makePrimarySetting()
 {
   const G4ThreeVector position = samplePosition();
   const G4double energy = sampleEnergy();
@@ -122,8 +122,6 @@ ANLStatus PlaneWavePrimaryGen::mod_ana()
   else {
     setPrimary(position, energy, m_Direction0);
   }
-  
-  return BasicPrimaryGen::mod_ana();
 }
 
 G4ThreeVector PlaneWavePrimaryGen::samplePosition()

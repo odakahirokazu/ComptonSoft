@@ -37,18 +37,18 @@ class ChannelMap : public VChannelMap
 public:
   ChannelMap(std::size_t num_sections, std::size_t num_channels,
              std::size_t num_x, std::size_t num_y);
-  ~ChannelMap();
+  virtual ~ChannelMap();
 
   ChannelMap(const ChannelMap&) = default;
   ChannelMap(ChannelMap&&) = default;
   ChannelMap& operator=(const ChannelMap&) = default;
   ChannelMap& operator=(ChannelMap&&) = default;
 
-  std::size_t NumX() const
+  std::size_t NumX() const override
   {
     return tableToChannel_.size();
   }
-  std::size_t NumY() const
+  std::size_t NumY() const override
   {
     return tableToChannel_[0].size();
   }
@@ -59,7 +59,7 @@ public:
    * @param channel channel index.
    * @param pixel mapped pixel or strip pair.
    */
-  void set(int section, int channel, const PixelID& pixel)
+  void set(int section, int channel, const PixelID& pixel) override
   {
     VChannelMap::set(section, channel, pixel);
     tableToChannel_[pixel.X()][pixel.Y()] = SectionChannelPair{section, channel};
@@ -72,16 +72,16 @@ public:
    * @param x mapped pixel/strip index along x-axis.
    * @param y mapped pixel/strip index along y-axis.
    */
-  void set(int section, int channel, int x, int y)
+  void set(int section, int channel, int x, int y) override
   {
     VChannelMap::set(section, channel, x, y);
     tableToChannel_[x][y] = SectionChannelPair{section, channel};
   }
 
-  SectionChannelPair getSectionChannel(int x, int y) const
+  SectionChannelPair getSectionChannel(int x, int y) const override
   { return tableToChannel_[x][y]; }
 
-  SectionChannelPair getSectionChannel(const PixelID& pixel) const
+  SectionChannelPair getSectionChannel(const PixelID& pixel) const override
   { return tableToChannel_[pixel.X()][pixel.Y()]; }
 
 private:

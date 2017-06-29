@@ -15,7 +15,9 @@ class IsotropicPrimaryGen;
 class PrimaryGenUniformSourceInVolume;
 class NucleusPrimaryGen;
 class NucleusPrimaryGenInVolume;
-class VPickUpData;
-class StandardPickUpData;
+class VUserActionAssembly;
+class VMasterUserActionAssembly;
+class VAppendableUserActionAssembly;
+class StandardUserActionAssembly;
 class VisualizeG4Geom;
 }

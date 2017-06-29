@@ -35,36 +35,38 @@ namespace anlgeant4
 
 class ANLG4RunManager;
 
-
+/**
+ * @author Hirokazu Odaka
+ * @date 2017-07-28 | 3.0, re-designed.
+ */
 class Geant4Body : public anl::BasicModule
 {
-  DEFINE_ANL_MODULE(Geant4Body, 2.1);
+  DEFINE_ANL_MODULE(Geant4Body, 3.0);
 public: 
   Geant4Body();
   ~Geant4Body();
 
-  anl::ANLStatus mod_startup();
-  anl::ANLStatus mod_com();
-  anl::ANLStatus mod_init();
-  anl::ANLStatus mod_bgnrun(); 
-  anl::ANLStatus mod_ana();
-  anl::ANLStatus mod_endrun(); 
-  anl::ANLStatus mod_exit();
+  anl::ANLStatus mod_startup() override;
+  anl::ANLStatus mod_init() override;
+  anl::ANLStatus mod_bgnrun() override;
+  anl::ANLStatus mod_ana() override;
+  anl::ANLStatus mod_endrun() override;
+  anl::ANLStatus mod_exit() override;
 
   void set_verbose_level(G4int v) { m_VerboseLevel = v; }
   G4int get_verbose_level() { return m_VerboseLevel; }
   
-//---------------------------------------
-
 protected:
+  virtual void initialize_random_generator();
   virtual void set_user_initializations();
-  virtual void set_user_primarygen_action();
-  virtual void set_user_std_actions();
+  virtual void set_user_primary_generator_action();
+  virtual void set_user_defined_actions();
   virtual void apply_commands();
 
 private:
   std::unique_ptr<ANLG4RunManager> m_G4RunManager;
-  CLHEP::HepRandomEngine* m_RandomEnginePtr;
+  std::unique_ptr<CLHEP::HepRandomEngine> m_RandomEnginePtr;
+  int m_EventIndex = 0;
   
   std::string m_RandomEngine;
   int m_RandomInitMode;
@@ -74,6 +76,7 @@ private:
   std::string m_RandomFinalStatusFileName;
 
   int m_VerboseLevel;
+  std::vector<std::string> m_UserCommands;
 };
 
 } /* namespace anlgeant4 */

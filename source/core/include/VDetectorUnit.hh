@@ -185,6 +185,7 @@ public:
 
   virtual void setBottomSideElectrode(ElectrodeSide v) = 0;
   virtual ElectrodeSide BottomSideElectrode() const = 0;
+  virtual ElectrodeSide UpSideElectrode() const = 0;
 
   virtual void initializeEvent() = 0;
   virtual void insertDetectorHit(DetectorHit_sptr hit) = 0;
