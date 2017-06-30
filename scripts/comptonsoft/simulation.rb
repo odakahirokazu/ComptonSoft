@@ -72,13 +72,14 @@ module ComptonSoft
     attr_accessor :random_seed, :verbose
 
     ### ANL module setup.
-    define_setup_module("geometry", take_parameters: true)
-    define_setup_module("physics", :PhysicsListManager, take_parameters: true)
-    define_setup_module("primary_generator", take_parameters: true)
-    define_setup_module("pickup_data", take_parameters: true)
-    define_setup_module("event_selection", take_parameters: true)
+    define_setup_module("geometry")
+    define_setup_module("physics", :PhysicsListManager)
+    define_setup_module("primary_generator")
+    define_setup_module("user_action")
+    define_setup_module("pickup_data", array: true)
+    define_setup_module("event_selection")
     define_setup_module("visualization", :VisualizeG4Geom)
-    define_setup_module("fits_output", take_parameters: true)
+    define_setup_module("fits_output")
 
     # Set database files
     def set_database(detector_configuration:,
@@ -150,8 +151,8 @@ module ComptonSoft
     def setup_normal()
       add_namespace ComptonSoft
 
-      unless module_of_pickup_data()
-        set_pickup_data :StandardPickUpData
+      unless module_of_user_action()
+        set_user_action :StandardUserActionAssembly
       end
 
       unless module_of_event_selection()
@@ -204,7 +205,11 @@ module ComptonSoft
 
       chain @write_tree_module
 
-      chain_with_parameters module_of_pickup_data
+      chain_with_parameters module_of_user_action
+
+      if pickup_list = module_list_of_pickup_data
+        pickup_list.each{|m| chain_with_parameters(m) }
+      end
 
       if fits_output = module_of_fits_output
         chain_with_parameters fits_output
@@ -218,8 +223,8 @@ module ComptonSoft
     def setup_minimal()
       add_namespace ComptonSoft
 
-      unless module_of_pickup_data()
-        set_pickup_data :StandardPickUpData
+      unless module_of_user_action()
+        set_user_action :StandardUserActionAssembly
       end
 
       chain_with_parameters module_of_geometry
@@ -238,7 +243,11 @@ module ComptonSoft
                       output_random_status: false,
                       verbose: @verbose)
 
-      chain_with_parameters module_of_pickup_data
+      chain_with_parameters module_of_user_action
+
+      if pickup_list = module_list_of_pickup_data
+        pickup_list.each{|m| chain_with_parameters(m) }
+      end
 
       if vis = module_of_visualization
         chain_with_parameters vis
@@ -335,7 +344,7 @@ module ComptonSoft
     end
 
     def setup()
-      set_pickup_data :ObservationPickUpData, {
+      add_pickup_data :ObservationPickUpData, {
         record_primaries: @record_primaries,
         particle_selection: @particle_selection
       }
