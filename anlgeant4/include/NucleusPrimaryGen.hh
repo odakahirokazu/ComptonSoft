@@ -35,10 +35,11 @@ namespace anlgeant4 {
  * @author Hirokazu Odaka
  * @date 2011-04-12
  * @date 2016-12-09 | v4.1: migration to geant4 10.3
+ * @date 2017-06-30 | v4.2: floating level
  */
 class NucleusPrimaryGen : public BasicPrimaryGen
 {
-  DEFINE_ANL_MODULE(NucleusPrimaryGen, 4.1);
+  DEFINE_ANL_MODULE(NucleusPrimaryGen, 4.2);
 public:
   NucleusPrimaryGen();
   ~NucleusPrimaryGen();
@@ -50,9 +51,10 @@ public:
   
 private:
   G4ThreeVector m_Position0;
-  G4int m_RIZ;
-  G4int m_RIA;
-  G4double m_RIEnergy;
+  int m_RIZ = 0;
+  int m_RIA = 0;
+  double m_RIEnergy = 0.0;
+  int m_RIFloatingLevel = 0;
 };
 
 } /* namespace anlgeant4 */

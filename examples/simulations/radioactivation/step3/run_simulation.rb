@@ -20,10 +20,11 @@ def run_simulation(num, random, output, ri, volume_path)
     atomic_number: ri.z,
     mass_number: ri.a,
     energy: ri.energy,
+    floating_level: ri.floating_level
     volume_hierarchy: volume_path.split('/').drop(1),
   }
 
-  sim.set_pickup_data :RadioactiveDecayPickUpData, {
+  sim.set_user_action :RadioactiveDecayUserActionAssembly, {
     termination_time: 1.0e-6
   }
 

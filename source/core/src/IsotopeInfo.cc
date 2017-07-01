@@ -22,35 +22,49 @@
 
 namespace comptonsoft {
 
-int64_t IsotopeInfo::makeID(int z, int a, double energy)
+int64_t IsotopeInfo::makeID(int z, int a, double energy, int floating_level)
 {
-  /* Isotope ID :xxyyyzzzzzzzzz *
-   * Z = xx                     *
-   * A = yyy                    *
-   * E = zzz zzz zzz [eV]       */
+  /* Isotope ID :xxyyyzzzzzzzzzww *
+   * Z = xx                       *
+   * A = yyy                      *
+   * E = zzz zzz zzz [eV]         *
+   * floating level = ww
+   */
 
   int64_t id = 0L;
-  id += static_cast<int64_t>(z) * 1000000000L * 1000L;
-  id += static_cast<int64_t>(a) * 1000000000L;
-  id += static_cast<int64_t>(energy/eV) % 1000000000L;
+  id += (static_cast<int64_t>(z) % 100L);
+  id *= 1000L;
+  id += (static_cast<int64_t>(a) % 1000L);
+  id *= 1000000000L;
+  id += (static_cast<int64_t>(energy/eV) % 1000000000L);
+  id *= 100L;
+  id += (static_cast<int64_t>(floating_level) % 100L);
   return id;
 }
 
 IsotopeInfo::IsotopeInfo()
-  : Z_(0), A_(0), energy_(0.0), counts_(0), rate_(0.0)
+  : Z_(0), A_(0), energy_(0.0), floating_level_(0),
+    counts_(0), rate_(0.0)
 {
 }
 
 IsotopeInfo::IsotopeInfo(int64_t isotopeID)
-  : Z_(0), A_(0), energy_(0.0), counts_(0), rate_(0.0)
+  : Z_(0), A_(0), energy_(0.0), floating_level_(0),
+    counts_(0), rate_(0.0)
 {
-  Z_ = isotopeID / (1000000000L * 1000L);
-  A_ = (isotopeID % (1000000000L * 1000L)) / 1000000000L;
-  energy_ = (isotopeID % 1000000000L) * eV;
+  int64_t id = isotopeID;
+  floating_level_ = id % 100L;
+  id /= 100L;
+  energy_ = (id % 1000000000L) * eV;
+  id /= 1000000000L;
+  A_ = id % 1000L;
+  id /= 1000L;
+  Z_ = id;
 }
 
-IsotopeInfo::IsotopeInfo(int z, int a, double energy)
-  : Z_(z), A_(a), energy_(energy), counts_(0), rate_(0.0)
+IsotopeInfo::IsotopeInfo(int z, int a, double energy, int floating_level)
+  : Z_(z), A_(a), energy_(energy), floating_level_(floating_level),
+    counts_(0), rate_(0.0)
 {
 }
 
@@ -58,7 +72,7 @@ IsotopeInfo::~IsotopeInfo() = default;
 
 int64_t IsotopeInfo::IsotopeID() const
 {
-  return IsotopeInfo::makeID(Z_, A_, energy_);
+  return IsotopeInfo::makeID(Z_, A_, energy_, floating_level_);
 }
 
 } /* namespace comptonsoft */

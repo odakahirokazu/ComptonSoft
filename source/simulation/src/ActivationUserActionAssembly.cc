@@ -75,10 +75,11 @@ void ActivationUserActionAssembly::RunActionAtBeginning(const G4Run*)
   m_AnalysisManager->SetNtupleDirectoryName("activation");
   m_AnalysisManager->OpenFile(filename);
   
-  m_AnalysisManager->CreateNtuple("ritree", "ritree");
+  m_AnalysisManager->CreateNtuple("ritree", "Radioactive isotope tree");
   m_AnalysisManager->CreateNtupleIColumn("Z");
   m_AnalysisManager->CreateNtupleIColumn("A");
   m_AnalysisManager->CreateNtupleDColumn("E");
+  m_AnalysisManager->CreateNtupleIColumn("floating_level");
   m_AnalysisManager->CreateNtupleIColumn("volume");
   m_AnalysisManager->CreateNtupleFColumn("posx");
   m_AnalysisManager->CreateNtupleFColumn("posy");
@@ -157,12 +158,13 @@ std::string ActivationUserActionAssembly::VolumeName(int index)
 }
 
 void ActivationUserActionAssembly::Fill(const G4Ions* nucleus,
-                                const G4VTouchable* touchable,
-                                double posx, double posy, double posz)
+                                        const G4VTouchable* touchable,
+                                        double posx, double posy, double posz)
 {
   const int Z = nucleus->GetAtomicNumber();
   const int A = nucleus->GetAtomicMass();
   const double Energy = nucleus->GetExcitationEnergy();
+  const int floatingLevel = nucleus->GetFloatLevelBaseIndex();
   
   G4String volumeName;
   for (int d=touchable->GetHistoryDepth(); d>=0; d--) {
@@ -187,22 +189,23 @@ void ActivationUserActionAssembly::Fill(const G4Ions* nucleus,
   m_AnalysisManager->FillNtupleIColumn(0, Z);
   m_AnalysisManager->FillNtupleIColumn(1, A);
   m_AnalysisManager->FillNtupleDColumn(2, Energy);
-  m_AnalysisManager->FillNtupleIColumn(3, volumeIndex);
-  m_AnalysisManager->FillNtupleFColumn(4, posx);
-  m_AnalysisManager->FillNtupleFColumn(5, posy);
-  m_AnalysisManager->FillNtupleFColumn(6, posz);
-  m_AnalysisManager->FillNtupleDColumn(7, m_InitialEnergy);
+  m_AnalysisManager->FillNtupleIColumn(3, floatingLevel);
+  m_AnalysisManager->FillNtupleIColumn(4, volumeIndex);
+  m_AnalysisManager->FillNtupleFColumn(5, posx);
+  m_AnalysisManager->FillNtupleFColumn(6, posy);
+  m_AnalysisManager->FillNtupleFColumn(7, posz);
+  m_AnalysisManager->FillNtupleDColumn(8, m_InitialEnergy);
   m_AnalysisManager->AddNtupleRow();
   
   // fill data map
   data_map_t& data = m_RIMapVector[volumeIndex];
-  int64_t isotopeID = IsotopeInfo::makeID(Z, A, Energy);
+  const int64_t isotopeID = IsotopeInfo::makeID(Z, A, Energy, floatingLevel);
   data_map_t::iterator it = data.find(isotopeID);
   if (it != data.end()) {
     (*it).second.add1();
   }
   else {
-    IsotopeInfo isotope(Z, A, Energy);
+    IsotopeInfo isotope(Z, A, Energy, floatingLevel);
     isotope.add1();
     data[isotopeID] = isotope;
   }
@@ -219,7 +222,7 @@ void ActivationUserActionAssembly::OutputVolumeInfo(const std::string& filename)
 }
 
 void ActivationUserActionAssembly::OutputSummary(const std::string& filename,
-                                         int numberOfRun)
+                                                 int numberOfRun)
 {
   std::ofstream fout(filename.c_str());
   fout << "NumberOfEvents " << numberOfRun << '\n' << std::endl;
@@ -231,11 +234,12 @@ void ActivationUserActionAssembly::OutputSummary(const std::string& filename,
     for (data_map_t::iterator it=data.begin(); it!=data.end(); ++it) {
       int64_t isotopeID = (*it).first;
       IsotopeInfo isotope = (*it).second;
-      fout << (boost::format("Isotope %14d %3d %3d %15.9e %15d\n")
+      fout << (boost::format("Isotope %16d %3d %3d %15.9e %2d %15d\n")
                % isotopeID
                % isotope.Z()
                % isotope.A()
                % (isotope.Energy()/keV)
+               % isotope.FloatingLevel()
                % isotope.Counts());
     }
     fout << std::endl;

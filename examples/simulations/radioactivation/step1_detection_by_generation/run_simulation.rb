@@ -25,7 +25,7 @@ def run_simulation(num, random, output)
     radius: 2.0,
   }
 
-  sim.set_pickup_data :ActivationPickUpData, {
+  sim.set_user_action :ActivationUserActionAssembly, {
     output_filename_base: output.sub(".root", ".act"),
     detection_by_generation: true,
     processes_to_detect: ["protonInelastic"],

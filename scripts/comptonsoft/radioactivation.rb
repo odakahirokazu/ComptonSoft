@@ -5,18 +5,19 @@
 
 module ComptonSoft
   class RIData
-    def initialize(i, z, a, energy, value)
+    def initialize(i, z, a, energy, floating_level, value)
       @id = i
       @z = z
       @a = a
       @energy = energy
+      @floating_level = floating_level
       @value = value
     end
-    attr_reader :id, :z, :a, :energy, :value
+    attr_reader :id, :z, :a, :energy, :floating_level, :value
     attr_writer :value
 
     def format()
-      "%14d %3d %3d %15.9e %15d" % [@id, @z, @a, @energy, @value]
+      "%16d %3d %3d %15.9e %2d %15d" % [@id, @z, @a, @energy, @floating_level, @value]
     end
 
     def format_for_summary_file()
@@ -24,7 +25,7 @@ module ComptonSoft
     end
 
     def format_for_cosima()
-      id_cosima = @id/1000000000
+      id_cosima = @id/100000000000
       "RP %5d %15.9e %15d" % [id_cosima, @energy, @value]
     end
   end
@@ -76,12 +77,13 @@ module ComptonSoft
             ri_z = row_data[2].to_i
             ri_a = row_data[3].to_i
             ri_e = row_data[4].to_f
+            ri_floating = row_data[5].to_i
             if as_rate
-              value = row_data[5].to_f
+              value = row_data[6].to_f
             else
-              value = row_data[5].to_i
+              value = row_data[6].to_i
             end
-            ri = RIData.new(ri_id, ri_z, ri_a, ri_e, value)
+            ri = RIData.new(ri_id, ri_z, ri_a, ri_e, ri_floating, value)
             fill(ri_id, ri)
           end
         end
@@ -115,9 +117,9 @@ module ComptonSoft
             ri_z = cosima_id/1000
             ri_a = cosima_id%1000
             ri_e = row_data[2].to_f
-            ri_id = cosima_id*1000000000+((ri_e*1000).to_i)%1000000000
+            ri_id = (cosima_id*1000000000+((ri_e*1000).to_i)%1000000000)*100
             value = row_data[3].to_f
-            ri = RIData.new(ri_id, ri_z, ri_a, ri_e, value)
+            ri = RIData.new(ri_id, ri_z, ri_a, ri_e, 0, value)
             fill(ri_id, ri)
           end
         end

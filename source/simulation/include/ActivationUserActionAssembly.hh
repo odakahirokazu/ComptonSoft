@@ -47,10 +47,11 @@ namespace comptonsoft {
  * @date 2016-06-29 | Hiro Odaka | modify detection methods
  * @date 2017-04-25 | Hiro Odaka | support both detection methods
  * @date 2017-07-29 | Hiro Odaka | new design of VUserActionAssembly
+ * @date 2017-07-29 | Hiro Odaka | use floating level of isotope.
  */
 class ActivationUserActionAssembly : public anlgeant4::StandardUserActionAssembly
 {
-  DEFINE_ANL_MODULE(ActivationUserActionAssembly, 3.1);
+  DEFINE_ANL_MODULE(ActivationUserActionAssembly, 4.0);
 
   typedef std::map<std::string, int> volume_map_t;
   typedef std::map<int64_t, IsotopeInfo> data_map_t;

@@ -22,6 +22,7 @@
 
 #include "G4VUserPrimaryGeneratorAction.hh"
 
+#include <memory>
 #include "globals.hh"
 #include "G4ThreeVector.hh"
 

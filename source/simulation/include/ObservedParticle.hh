@@ -21,6 +21,7 @@
 #define COMPTONSOFT_ObservedParticle_H 1
 
 #include "G4ThreeVector.hh"
+#include <memory>
 
 namespace comptonsoft {
 

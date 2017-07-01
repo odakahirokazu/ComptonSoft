@@ -30,16 +30,17 @@ namespace comptonsoft {
  * @author Hirokazu Odaka
  * @date 2012-02-06
  * @date 2016-05-08
+ * @date 2017-07-26 | add property floating level
  */
 class IsotopeInfo
 {
 public:
-  static int64_t makeID(int z, int a, double energy);
-  
+  static int64_t makeID(int z, int a, double energy, int floating_level=0);
+
 public:
   IsotopeInfo();
   explicit IsotopeInfo(int64_t isotopeID);
-  IsotopeInfo(int z, int a, double energy=0.0);
+  IsotopeInfo(int z, int a, double energy, int floating_level=0);
   ~IsotopeInfo();
   
   IsotopeInfo(const IsotopeInfo&) = default;
@@ -50,13 +51,17 @@ public:
   int Z() const { return Z_; }
   int A() const { return A_; }
   double Energy() const { return energy_; }
+  int FloatingLevel() const { return floating_level_; }
   int Counts() const { return counts_; }
   double Rate() const { return rate_; }
+
+  void setFloatingLevel(int v) { floating_level_ = v; }
   
   void setCounts(int v) { counts_ = v; }
   void add1() { counts_++; }
 
   void setRate(double v) { rate_ = v; }
+  void addRate(double v) { rate_ += v; }
 
   int64_t IsotopeID() const;
 
@@ -64,6 +69,7 @@ private:
   int Z_;
   int A_;
   double energy_;
+  int floating_level_;
   int counts_;
   double rate_;
 };
