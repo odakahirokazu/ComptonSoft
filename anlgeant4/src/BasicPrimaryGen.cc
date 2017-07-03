@@ -22,8 +22,8 @@
 #include <algorithm>
 #include <iterator>
 #include <boost/format.hpp>
-#include "G4SystemOfUnits.hh"
-#include "G4PhysicalConstants.hh"
+#include "CLHEP/Units/SystemOfUnits.h"
+#include "CLHEP/Units/PhysicalConstants.h"
 #include "Randomize.hh"
 #include "BasicPrimaryGeneratorAction.hh"
 #include "VANLGeometry.hh"
@@ -45,10 +45,10 @@ BasicPrimaryGen::BasicPrimaryGen()
     polarizationMode_(-1),
     energyDistributionName_("power law"),
     energyDistribution_(SpectralShape::Undefined),
-    energyMin_(0.1*keV), energyMax_(1000.0*keV),
+    energyMin_(0.1*CLHEP::keV), energyMax_(1000.0*CLHEP::keV),
     photonIndex_(0.0),
-    energyMean_(511.0*keV), energySigma_(0.0*keV),
-    kT_(10.0*keV)
+    energyMean_(511.0*CLHEP::keV), energySigma_(0.0*CLHEP::keV),
+    kT_(10.0*CLHEP::keV)
 {
   add_alias("BasicPrimaryGen");
   add_alias("InitialInformation");
@@ -60,26 +60,24 @@ ANLStatus BasicPrimaryGen::mod_startup()
 {
   VANLPrimaryGen::mod_startup();
 
-  GetModule("VANLGeometry", &geometry_);
-
   register_parameter(&particleName_, "particle");
   set_parameter_description("Particle name (gamma, e-, e+, proton, neutron, geantino...)");
 
   register_parameter(&energyDistributionName_, "spectral_distribution");
 
-  register_parameter(&energyMin_, "energy_min", keV, "keV");
+  register_parameter(&energyMin_, "energy_min", CLHEP::keV, "keV");
   set_parameter_description("Minimum value of the energy distribution");
-  register_parameter(&energyMax_, "energy_max", keV, "keV");
+  register_parameter(&energyMax_, "energy_max", CLHEP::keV, "keV");
   set_parameter_description("Maximum value of the energy distribution");
   register_parameter(&photonIndex_, "photon_index");
   set_parameter_description("Power law index of the photon spectrum");
-  register_parameter(&energyMean_, "energy_mean", keV, "keV");
+  register_parameter(&energyMean_, "energy_mean", CLHEP::keV, "keV");
   set_parameter_description("Mean energy of the Gaussian distribution");
-  register_parameter(&energySigma_, "energy_sigma", keV, "keV");
+  register_parameter(&energySigma_, "energy_sigma", CLHEP::keV, "keV");
   set_parameter_description("Standard deviation of the Gaussian distribution");
-  register_parameter(&kT_, "radiation_temperature", keV, "keV");
+  register_parameter(&kT_, "radiation_temperature", CLHEP::keV, "keV");
   set_parameter_description("Radiation temperature in units of keV");
-  register_parameter(&spectrumEnergy_, "energy_array", keV, "keV");
+  register_parameter(&spectrumEnergy_, "energy_array", CLHEP::keV, "keV");
   set_parameter_description("Energy array of spectral histogram");
   register_parameter(&spectrumPhotons_, "photons_array");
   set_parameter_description("Photons array of spectral histogram");
@@ -94,6 +92,8 @@ ANLStatus BasicPrimaryGen::mod_startup()
 
 ANLStatus BasicPrimaryGen::mod_prepare()
 {
+  GetModule("VANLGeometry", &geometry_);
+
   disableDefaultEnergyInput();
   
   if (energyDistribution_==SpectralShape::Undefined) {
@@ -142,7 +142,7 @@ ANLStatus BasicPrimaryGen::mod_init()
   }
 
   if (energyMin_ == 0.0) {
-    energyMin_ = 1.0e-9 * keV;
+    energyMin_ = 1.0e-9 * CLHEP::keV;
     std::cout << "Energy min is reset to 1.0e-9 keV." << std::endl;
   }
 
@@ -231,25 +231,25 @@ void BasicPrimaryGen::printSpectralInfo()
   switch (energyDistribution_) {
   case SpectralShape::Mono:
     G4cout << "  Spectral shape: mono => "
-           << "Mean: " << energyMean_/keV  << " keV"
+           << "Mean: " << energyMean_/CLHEP::keV  << " keV"
            << G4endl;
     break;
   case SpectralShape::PowerLaw:
     G4cout << "  Spectral shape: power law =>"
            << " photon index = " << photonIndex_
-           << " ( " << energyMin_/keV  << " -- " << energyMax_/keV  << " keV )"
+           << " ( " << energyMin_/CLHEP::keV  << " -- " << energyMax_/CLHEP::keV  << " keV )"
            << G4endl;
     break;
   case SpectralShape::Gaussian:
     G4cout << "  Spectral shape: Gaussian =>"
-           << " mean: " << energyMean_/keV  << " keV ;"
-           << " sigma: " << energySigma_/keV  << " keV"
+           << " mean: " << energyMean_/CLHEP::keV  << " keV ;"
+           << " sigma: " << energySigma_/CLHEP::keV  << " keV"
            << G4endl;
     break;
   case SpectralShape::BlackBody:
     G4cout << "  Spectral shape: black body => "
-           << " temperature: " << kT_/keV  << " keV"
-           << " ( < " << energyMax_/keV  << " keV )"
+           << " temperature: " << kT_/CLHEP::keV  << " keV"
+           << " ( < " << energyMax_/CLHEP::keV  << " keV )"
            << G4endl;
     break;
   default:
@@ -354,7 +354,7 @@ void BasicPrimaryGen::buildSpectrumPhotonIntegral()
   std::cout << "Spectrum: (energy in keV, photon integral)\n";
   for (std::size_t i=0; i<spectrumEnergy_.size(); i++) {
     std::cout << boost::format("%10.3E %8.3f")
-      % (spectrumEnergy_[i]/keV) % spectrumPhotonIntegral_[i] << '\n';
+      % (spectrumEnergy_[i]/CLHEP::keV) % spectrumPhotonIntegral_[i] << '\n';
   }
   std::cout << std::endl;
 }
@@ -378,7 +378,7 @@ G4double BasicPrimaryGen::sampleFromHistogram()
 
 void BasicPrimaryGen::setUnpolarized()
 {
-  G4double phi2 = twopi * G4UniformRand();
+  G4double phi2 = CLHEP::twopi * G4UniformRand();
   G4ThreeVector directionOrthogonal = direction_.orthogonal().unit();
   polarization_ = directionOrthogonal.rotate(phi2, direction_);
 }
@@ -402,12 +402,12 @@ G4VUserPrimaryGeneratorAction* BasicPrimaryGen::create()
 
 double BasicPrimaryGen::LengthUnit() const
 {
-  return geometry_->GetLengthUnit();
+  return CLHEP::cm;
 }
 
 std::string BasicPrimaryGen::LengthUnitName() const
 {
-  return geometry_->GetLengthUnitName();
+  return "cm";
 }
 
 } /* namespace anlgeant4 */

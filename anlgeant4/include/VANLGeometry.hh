@@ -33,17 +33,16 @@ namespace anlgeant4
  * @date xxxx-xx-xx
  * @date 2012-05-30
  * @date 2013-08-18 | H. Odaka | length unit, surface check
+ * @date 2017-07-03 | 4.2 | H. Odaka | length unit is fixed to cm
  */
 class VANLGeometry : public anl::BasicModule
 {
-  DEFINE_ANL_MODULE(VANLGeometry, 4.1);
+  DEFINE_ANL_MODULE(VANLGeometry, 4.2);
 public:
   VANLGeometry();
 
   virtual G4VUserDetectorConstruction* create() = 0;
 
-  void SetLengthUnit(double unit, const std::string& name);
-  void SetLengthUnit(const std::string& name);
   double GetLengthUnit() const { return m_LengthUnit; }
   std::string GetLengthUnitName() const { return m_LengthUnitName; }
 
@@ -52,8 +51,8 @@ public:
   anl::ANLStatus mod_startup() override;
 
 private:
-  double m_LengthUnit;
-  std::string m_LengthUnitName;
+  const double m_LengthUnit;
+  const std::string m_LengthUnitName;
   bool m_SurfaceCheck;
 };
 

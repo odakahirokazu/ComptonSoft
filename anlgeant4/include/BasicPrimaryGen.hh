@@ -41,6 +41,7 @@ class VANLGeometry;
  * @date 2012-07-10 | Hirokazu Odaka | virtual methods: sampleDirection(), samplePosition()
  * @date 2014-12-15 | Hirokazu Odaka | histogram spectral distribution
  * @date 2017-07-27 | Hirokazu Odaka | this can transfer its setting function to the generator action, introducing makePrimarySetting().
+ * @date 2017-07-03 | 4.2 | Hirokazu Odaka | length unit is fixed to cm
  */
 class BasicPrimaryGen : public VANLPrimaryGen, public InitialInformation
 {

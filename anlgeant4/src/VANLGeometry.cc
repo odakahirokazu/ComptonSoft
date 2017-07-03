@@ -18,7 +18,7 @@
  *************************************************************************/
 
 #include "VANLGeometry.hh"
-#include "G4SystemOfUnits.hh"
+#include "CLHEP/Units/SystemOfUnits.h"
 
 using namespace anl;
 
@@ -26,33 +26,11 @@ namespace anlgeant4
 {
 
 VANLGeometry::VANLGeometry()
-  : m_LengthUnit(cm), m_LengthUnitName("cm"),
+  : m_LengthUnit(CLHEP::cm),
+    m_LengthUnitName("cm"),
     m_SurfaceCheck(true)
 {
   add_alias("VANLGeometry");
-}
-
-void VANLGeometry::SetLengthUnit(double unit, const std::string& name)
-{
-  m_LengthUnit = unit;
-  m_LengthUnitName = name;
-}
-
-void VANLGeometry::SetLengthUnit(const std::string& name)
-{
-  if (name=="cm") {
-    SetLengthUnit(cm, name);
-  }
-  else if (name=="pc") {
-    SetLengthUnit(pc, name);
-  }
-  else if (name=="mm") {
-    SetLengthUnit(mm, name);
-  }
-  else {
-    std::cout << "Unknown unit name is given. The length unit is set to cm." << std::endl;
-    SetLengthUnit(cm, name);
-  }
 }
 
 ANLStatus VANLGeometry::mod_startup()
