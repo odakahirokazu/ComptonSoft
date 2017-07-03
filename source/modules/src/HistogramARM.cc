@@ -45,7 +45,7 @@ ANLStatus HistogramARM::mod_startup()
 
 ANLStatus HistogramARM::mod_his()
 {
-  GetANLModule("EventReconstruction", &eventReconstruction_);
+  GetModule("EventReconstruction", &eventReconstruction_);
   
   VCSModule::mod_his();
   mkdir();

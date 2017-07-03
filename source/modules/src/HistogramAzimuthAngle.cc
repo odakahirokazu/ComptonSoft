@@ -50,7 +50,7 @@ ANLStatus HistogramAzimuthAngle::mod_startup()
 
 ANLStatus HistogramAzimuthAngle::mod_his()
 {
-  GetANLModule("EventReconstruction", &eventReconstruction_);
+  GetModule("EventReconstruction", &eventReconstruction_);
   
   VCSModule::mod_his();
   mkdir();

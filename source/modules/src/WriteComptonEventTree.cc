@@ -57,10 +57,10 @@ ANLStatus WriteComptonEventTree::mod_his()
 
 ANLStatus WriteComptonEventTree::mod_init()
 {
-  GetANLModuleNC("EventReconstruction", &eventReconstruction_);
+  GetModuleNC("EventReconstruction", &eventReconstruction_);
 
   if (ModuleExist("InitialInformation")) {
-    GetANLModuleIF("InitialInformation", &initialInfo_);
+    GetModuleIF("InitialInformation", &initialInfo_);
     treeIO_->enableInitialInfoRecord();
   }
   else {

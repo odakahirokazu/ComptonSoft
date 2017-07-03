@@ -50,7 +50,7 @@ ANLStatus ReadHitTree::mod_init()
 {
   VCSModule::mod_init();
   
-  GetANLModuleNC("CSHitCollection", &hitCollection_);
+  GetModuleNC("CSHitCollection", &hitCollection_);
 
   hittree_ = new TChain("hittree");
   for (const std::string& filename: fileList_) {

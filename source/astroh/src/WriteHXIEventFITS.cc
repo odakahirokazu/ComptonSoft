@@ -78,9 +78,9 @@ ANLStatus WriteHXIEventFITS::mod_init()
 {
   VCSModule::mod_init();
 
-  GetANLModule("CSHitCollection", &m_HitCollection);
+  GetModule("CSHitCollection", &m_HitCollection);
   if (ModuleExist("InitialInformation")) {
-    GetANLModuleIF("InitialInformation", &m_InitialInfo);
+    GetModuleIF("InitialInformation", &m_InitialInfo);
   }
 
   EvsDef("WriteHXIEventFITS:Fill");

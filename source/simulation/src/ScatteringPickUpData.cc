@@ -43,7 +43,7 @@ ANLStatus ScatteringPickUpData::mod_init()
 {
   if (ModuleExist("SaveData")) {
     SaveData* saveModule;
-    GetANLModuleNC("SaveData", &saveModule);
+    GetModuleNC("SaveData", &saveModule);
     saveModule->GetDirectory()->cd();
   }
   

@@ -34,7 +34,7 @@ StandardUserActionAssembly::StandardUserActionAssembly()
 
 ANLStatus StandardUserActionAssembly::mod_init()
 {
-  GetANLModuleIFNC("InitialInformation", &m_InitialInfo);
+  GetModuleIFNC("InitialInformation", &m_InitialInfo);
   return AS_OK;
 }
 

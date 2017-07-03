@@ -30,8 +30,8 @@ namespace comptonsoft
 
 ANLStatus SelectFullDeposit::mod_init()
 {
-  GetANLModuleNC("CSHitCollection", &m_HitCollection);
-  GetANLModuleIF("InitialInformation", &m_InitialInfo);
+  GetModuleNC("CSHitCollection", &m_HitCollection);
+  GetModuleIF("InitialInformation", &m_InitialInfo);
   
   return AS_OK;
 }

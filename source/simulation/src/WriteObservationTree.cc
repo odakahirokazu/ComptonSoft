@@ -51,11 +51,11 @@ ANLStatus WriteObservationTree::mod_init()
 {
   VCSModule::mod_init();
 
-  GetANLModule("ObservationPickUpData", &observationPUD_);
+  GetModule("ObservationPickUpData", &observationPUD_);
   EvsDef("WriteObservationTree:Fill");
 
   if (ModuleExist("InitialInformation")) {
-    GetANLModuleIF("InitialInformation", &initialInfo_);
+    GetModuleIF("InitialInformation", &initialInfo_);
     treeIO_->enableInitialInfoRecord();
   }
   else {

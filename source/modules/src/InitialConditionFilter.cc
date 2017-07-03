@@ -36,7 +36,7 @@ ANLStatus InitialConditionFilter::mod_startup()
   register_parameter(&energy0_, "energy_min", keV, "keV");
   register_parameter(&energy1_, "energy_max", keV, "keV");
 
-  GetANLModuleIF("InitialInformation", &initialInfo_);
+  GetModuleIF("InitialInformation", &initialInfo_);
 
   return AS_OK;
 }

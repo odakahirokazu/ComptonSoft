@@ -48,7 +48,7 @@ ANLStatus ReadEventTree::mod_init()
 {
   VCSModule::mod_init();
   
-  GetANLModuleNC("CSHitCollection", &hitCollection_);
+  GetModuleNC("CSHitCollection", &hitCollection_);
 
   tree_ = new TChain("eventtree");
   for (const std::string& filename: fileList_) {

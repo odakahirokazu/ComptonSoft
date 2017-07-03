@@ -44,7 +44,7 @@ ANLStatus ComptonEventFilter::mod_init()
   
   EvsDef("ComptonEventFilter:Selected");
   
-  GetANLModuleNC("EventReconstruction", &m_EventReconstruction);
+  GetModuleNC("EventReconstruction", &m_EventReconstruction);
 
   auto& hitPatterns = getDetectorManager()->getHitPatterns();
   for (auto& eventSelection: m_ConditionsVector) {

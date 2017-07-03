@@ -50,8 +50,8 @@ ANLStatus GenerateSimXEvent::mod_init()
 {
   BasicModule::mod_init();
 
-  GetANLModuleNC("CSHitCollection", &m_HitCollection);
-  GetANLModuleNC("SimXIF", &m_SimXIF);
+  GetModuleNC("CSHitCollection", &m_HitCollection);
+  GetModuleNC("SimXIF", &m_SimXIF);
   EvsDef("GenerateSimXEvent:Fill");
   
   return AS_OK;

@@ -53,8 +53,8 @@ ANLStatus ResponseMatrix::mod_startup()
 
 ANLStatus ResponseMatrix::mod_init()
 {
-  GetANLModule("EventReconstruction", &m_EventReconstruction);
-  GetANLModuleIFNC("InitialInformation", &m_InitialInfo);
+  GetModule("EventReconstruction", &m_EventReconstruction);
+  GetModuleIFNC("InitialInformation", &m_InitialInfo);
   return AS_OK;
 }
 

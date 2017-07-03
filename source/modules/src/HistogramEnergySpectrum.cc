@@ -51,8 +51,8 @@ ANLStatus HistogramEnergySpectrum::mod_startup()
 
 ANLStatus HistogramEnergySpectrum::mod_init()
 {
-  GetANLModuleNC("CSHitCollection", &m_HitCollection);
-  GetANLModuleIFNC("InitialInformation", &m_InitialInfo);
+  GetModuleNC("CSHitCollection", &m_HitCollection);
+  GetModuleIFNC("InitialInformation", &m_InitialInfo);
   return AS_OK;
 }
 

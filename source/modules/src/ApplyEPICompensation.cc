@@ -37,7 +37,7 @@ ApplyEPICompensation::~ApplyEPICompensation() = default;
 ANLStatus ApplyEPICompensation::mod_init()
 {
   VCSModule::mod_init();
-  GetANLModuleNC("CSHitCollection", &m_HitCollection);
+  GetModuleNC("CSHitCollection", &m_HitCollection);
   return AS_OK;
 }
 

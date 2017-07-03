@@ -182,7 +182,7 @@ ANLStatus SimXIF::mod_init()
   off();
 
   if (ModuleExist("ConstructDetector_Sim")) {
-    m_DetectorManager = GetANLModuleNC<ConstructDetectorForSimulation>("ConstructDetectorForSimulation")->getDetectorManager();
+    m_DetectorManager = GetModuleNC<ConstructDetectorForSimulation>("ConstructDetectorForSimulation")->getDetectorManager();
   }
   
   return AS_OK;
@@ -232,7 +232,7 @@ void SimXIF::addEvent(double time, double energy, int stripx, int stripy,
   double widthy(0.0);
 
   if (m_DetectorManager==0 && ModuleExist("ConstructDetector_Sim")) {
-    m_DetectorManager = GetANLModuleNC<ConstructDetectorForSimulation>("ConstructDetectorForSimulation")->getDetectorManager();
+    m_DetectorManager = GetModuleNC<ConstructDetectorForSimulation>("ConstructDetectorForSimulation")->getDetectorManager();
   }
   
   if (m_DetectorManager) {

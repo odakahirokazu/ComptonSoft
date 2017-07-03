@@ -60,7 +60,7 @@ ANLStatus BasicPrimaryGen::mod_startup()
 {
   VANLPrimaryGen::mod_startup();
 
-  GetANLModule("VANLGeometry", &geometry_);
+  GetModule("VANLGeometry", &geometry_);
 
   register_parameter(&particleName_, "particle");
   set_parameter_description("Particle name (gamma, e-, e+, proton, neutron, geantino...)");

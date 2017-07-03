@@ -67,7 +67,7 @@ ANLStatus EventReconstruction::mod_init()
   EvsDef("EventReconstruction:NG");
   
   assignSourceInformation();
-  GetANLModuleNC("CSHitCollection", &m_HitCollection);
+  GetModuleNC("CSHitCollection", &m_HitCollection);
   initializeHitPatternData();
 
   if (ReconstructionMethodName()=="standard") {

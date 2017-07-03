@@ -50,10 +50,6 @@ Geant4Body::Geant4Body()
     m_RandomFinalStatusFileName("RandomSeed_f.dat"),
     m_VerboseLevel(0)
 {
-  require_module_access("VUserActionAssembly");
-  require_module_access("VANLGeometry");
-  require_module_access("VANLPhysicsList");
-  require_module_access("VANLPrimaryGen");
 }
 
 Geant4Body::~Geant4Body() = default;
@@ -137,12 +133,12 @@ void Geant4Body::initialize_random_generator()
 void Geant4Body::set_user_initializations()
 {
   VANLGeometry* geometry;
-  GetANLModuleNC("VANLGeometry", &geometry);
+  GetModuleNC("VANLGeometry", &geometry);
   G4VUserDetectorConstruction* userDetectorConstruction = geometry->create();
   m_G4RunManager->SetUserInitialization(userDetectorConstruction);
   
   VANLPhysicsList* physics;
-  GetANLModuleNC("VANLPhysicsList", &physics);
+  GetModuleNC("VANLPhysicsList", &physics);
   G4VUserPhysicsList* userPhysicsList = physics->create();
   m_G4RunManager->SetUserInitialization(userPhysicsList);
 }
@@ -150,7 +146,7 @@ void Geant4Body::set_user_initializations()
 void Geant4Body::set_user_primary_generator_action()
 {
   VANLPrimaryGen* primaryGen;
-  GetANLModuleNC("VANLPrimaryGen", &primaryGen);
+  GetModuleNC("VANLPrimaryGen", &primaryGen);
   G4VUserPrimaryGeneratorAction* userPrimaryGeneratorAction
     = primaryGen->create();
   m_G4RunManager->SetUserAction(userPrimaryGeneratorAction);
@@ -159,7 +155,7 @@ void Geant4Body::set_user_primary_generator_action()
 void Geant4Body::set_user_defined_actions()
 {
   VUserActionAssembly* userActionAssembly;
-  GetANLModuleNC("VUserActionAssembly", &userActionAssembly);
+  GetModuleNC("VUserActionAssembly", &userActionAssembly);
   userActionAssembly->registerUserActions(m_G4RunManager.get());
 }
 

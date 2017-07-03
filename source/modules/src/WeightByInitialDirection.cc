@@ -40,7 +40,7 @@ ANLStatus WeightByInitialDirection::mod_startup()
 
 ANLStatus WeightByInitialDirection::mod_init()
 {
-  GetANLModuleIFNC("InitialInformation", &m_InitialInfo);
+  GetModuleIFNC("InitialInformation", &m_InitialInfo);
   m_WeightFunction.reset(new TGraph(m_DirZVector.size(), &m_DirZVector[0], &m_WeightVector[0]));
   return AS_OK;
 }

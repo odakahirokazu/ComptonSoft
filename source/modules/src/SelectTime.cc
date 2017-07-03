@@ -40,7 +40,7 @@ ANLStatus SelectTime::mod_startup()
 
 ANLStatus SelectTime::mod_init()
 {
-  GetANLModuleNC("ReadDataFile", &m_ReadDataModule);
+  GetModuleNC("ReadDataFile", &m_ReadDataModule);
   EvsDef("SelectTime:OK");
 
   return AS_OK;

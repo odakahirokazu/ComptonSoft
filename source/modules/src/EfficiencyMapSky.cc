@@ -44,7 +44,7 @@ ANLStatus EfficiencyMapSky::mod_startup()
 
 ANLStatus EfficiencyMapSky::mod_init()
 {
-  GetANLModuleIF("InitialInformation", &m_InitialInfo);
+  GetModuleIF("InitialInformation", &m_InitialInfo);
   
   return BackProjection::mod_init();
 }

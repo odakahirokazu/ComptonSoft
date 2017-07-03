@@ -61,7 +61,7 @@ ANLStatus BackProjection::mod_his()
 {
   VCSModule::mod_his();
 
-  GetANLModuleNC("EventReconstruction", &m_EventReconstruction);
+  GetModuleNC("EventReconstruction", &m_EventReconstruction);
   
   mkdir();
   

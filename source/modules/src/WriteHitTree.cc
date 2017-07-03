@@ -51,11 +51,11 @@ ANLStatus WriteHitTree::mod_init()
 {
   VCSModule::mod_init();
 
-  GetANLModule("CSHitCollection", &hitCollection_);
+  GetModule("CSHitCollection", &hitCollection_);
   EvsDef("WriteHitTree:Fill");
 
   if (ModuleExist("InitialInformation")) {
-    GetANLModuleIF("InitialInformation", &initialInfo_);
+    GetModuleIF("InitialInformation", &initialInfo_);
     treeIO_->enableInitialInfoRecord();
   }
   else {

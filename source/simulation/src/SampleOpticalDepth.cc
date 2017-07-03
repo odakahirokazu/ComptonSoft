@@ -50,11 +50,11 @@ ANLStatus SampleOpticalDepth::mod_startup()
 
 ANLStatus SampleOpticalDepth::mod_init()
 {
-  GetANLModuleIF("InitialInformation", &initialInfo_);
+  GetModuleIF("InitialInformation", &initialInfo_);
 
   if (ModuleExist("SaveData")) {
     SaveData* saveModule;
-    GetANLModuleNC("SaveData", &saveModule);
+    GetModuleNC("SaveData", &saveModule);
     saveModule->GetDirectory()->cd();
   }
 

@@ -47,7 +47,7 @@ ANLStatus UniformlyRandomizeEPI::mod_startup()
 
 ANLStatus UniformlyRandomizeEPI::mod_init()
 {
-  GetANLModuleNC("CSHitCollection", &m_HitCollection);
+  GetModuleNC("CSHitCollection", &m_HitCollection);
 
   return AS_OK;
 }

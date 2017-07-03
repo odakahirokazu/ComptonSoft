@@ -39,7 +39,7 @@ ANLStatus VCSModule::mod_init()
 {
   if (ModuleExist("ConstructDetector")) {
     ConstructDetector* detectorModule;
-    GetANLModuleNC("ConstructDetector", &detectorModule);
+    GetModuleNC("ConstructDetector", &detectorModule);
     detectorSystem_ = detectorModule->getDetectorManager();
   }
   
@@ -50,7 +50,7 @@ ANLStatus VCSModule::mod_his()
 {
   if (ModuleExist("SaveData")) {
     SaveData* saveModule;
-    GetANLModuleNC("SaveData", &saveModule);
+    GetModuleNC("SaveData", &saveModule);
     saveDir_ = saveModule->GetDirectory();
     saveDir_->cd();
   }

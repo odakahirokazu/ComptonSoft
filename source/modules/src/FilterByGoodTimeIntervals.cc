@@ -44,7 +44,7 @@ ANLStatus FilterByGoodTimeIntervals::mod_startup()
 
 ANLStatus FilterByGoodTimeIntervals::mod_init()
 {
-  GetANLModule("CSHitCollection", &m_HitCollection);
+  GetModule("CSHitCollection", &m_HitCollection);
   EvsDef("FilterByGoodTimeIntervals:OK");
 
   return AS_OK;

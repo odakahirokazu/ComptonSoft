@@ -56,7 +56,7 @@ ANLStatus SimulateCXBShieldPlate::mod_startup()
 
 ANLStatus SimulateCXBShieldPlate::mod_init()
 {
-  GetANLModuleIFNC("InitialInformation", &m_InitialInfo);
+  GetModuleIFNC("InitialInformation", &m_InitialInfo);
 
   {
     std::ifstream fin(m_CSFilename);

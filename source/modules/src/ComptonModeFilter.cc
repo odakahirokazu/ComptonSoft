@@ -47,7 +47,7 @@ ANLStatus ComptonModeFilter::mod_init()
   EvsDef("ComptonMode:DeltaTheta:GOOD");
   EvsDef("ComptonMode:DeltaTheta:GOOD2");
 
-  GetANLModuleNC("EventReconstruction", &m_EventReconstruction);
+  GetModuleNC("EventReconstruction", &m_EventReconstruction);
   
   return AS_OK;
 }

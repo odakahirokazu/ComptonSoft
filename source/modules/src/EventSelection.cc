@@ -52,7 +52,7 @@ ANLStatus EventSelection::mod_startup()
 ANLStatus EventSelection::mod_init()
 {
   VCSModule::mod_init();
-  GetANLModuleNC("CSHitCollection", &m_HitCollection);
+  GetModuleNC("CSHitCollection", &m_HitCollection);
   EvsDef("EventSelection:Veto");
   return AS_OK;
 }

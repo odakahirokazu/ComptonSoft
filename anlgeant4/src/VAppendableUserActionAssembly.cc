@@ -31,7 +31,7 @@ VAppendableUserActionAssembly::~VAppendableUserActionAssembly() = default;
 ANLStatus VAppendableUserActionAssembly::mod_prepare()
 {
   VMasterUserActionAssembly* master;
-  GetANLModuleIFNC("VMasterUserActionAssembly", &master);
+  GetModuleIFNC("VMasterUserActionAssembly", &master);
   master->appendUserActions(this);
 
   return AS_OK;

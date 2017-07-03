@@ -38,7 +38,7 @@ InitialParticleTree::InitialParticleTree()
 ANLStatus InitialParticleTree::mod_init()
 {
   VCSModule::mod_init();
-  GetANLModuleIF("InitialInformation", &initial_info);
+  GetModuleIF("InitialInformation", &initial_info);
   return AS_OK;
 }
 

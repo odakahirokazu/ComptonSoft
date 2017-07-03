@@ -54,7 +54,7 @@ ANLStatus SelectEventsOnFocalPlane::mod_init()
 {
   VCSModule::mod_init();
  
-  GetANLModule("EventReconstruction", &m_EventReconstruction);
+  GetModule("EventReconstruction", &m_EventReconstruction);
 
   if (m_RegionTypeString=="rectangle") {
     m_RegionType = Region_t::Rectangle;

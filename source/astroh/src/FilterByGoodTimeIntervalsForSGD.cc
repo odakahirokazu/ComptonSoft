@@ -33,7 +33,7 @@ FilterByGoodTimeIntervalsForSGD::~FilterByGoodTimeIntervalsForSGD() = default;
 
 ANLStatus FilterByGoodTimeIntervalsForSGD::mod_init()
 {
-  GetANLModule("ReadSGDEventFITS", &m_EventReader);
+  GetModule("ReadSGDEventFITS", &m_EventReader);
   EvsDef("FilterByGoodTimeIntervals:OK");
 
   return AS_OK;
