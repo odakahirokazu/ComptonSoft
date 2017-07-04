@@ -26,6 +26,8 @@
 
 using namespace anl;
 
+namespace unit = anlgeant4::unit;
+
 namespace comptonsoft
 {
 
@@ -72,31 +74,31 @@ ANLStatus ComptonModeFilter::mod_ana()
   const double dtheta = std::abs(ComptonEvent.DeltaTheta());
   const double e_gamma = ComptonEvent.TotalEnergy();
 
-  if (dtheta < 2.0*degree) {
+  if (dtheta < 2.0*unit::degree) {
     EvsSet("ComptonMode:DeltaTheta:02");
   }
 
-  if (dtheta < 4.0*degree) {
+  if (dtheta < 4.0*unit::degree) {
     EvsSet("ComptonMode:DeltaTheta:04");
   }
 
-  if (dtheta < 6.0*degree) {
+  if (dtheta < 6.0*unit::degree) {
     EvsSet("ComptonMode:DeltaTheta:06");
   }
 
-  if (dtheta < 8.0*degree) {
+  if (dtheta < 8.0*unit::degree) {
     EvsSet("ComptonMode:DeltaTheta:08");
   }
 
-  if (dtheta < 12.0*degree) {
+  if (dtheta < 12.0*unit::degree) {
     EvsSet("ComptonMode:DeltaTheta:12");
   }
 
-  if (dtheta < 16.0*degree) {
+  if (dtheta < 16.0*unit::degree) {
     EvsSet("ComptonMode:DeltaTheta:16");
   }
 
-  if (dtheta < 24.0*degree) {
+  if (dtheta < 24.0*unit::degree) {
     EvsSet("ComptonMode:DeltaTheta:24");
   }
 
@@ -114,23 +116,23 @@ ANLStatus ComptonModeFilter::mod_ana()
 // function formula taken from HXISGDComptonMode_Ana.cc by S.Watanabe
 double ComptonModeFilter::theta_cut_limit(double energy) const
 {
-  if( energy > 300. *keV) energy = 300. * keV;
-  double limit = (26.0 - energy/keV * 0.06) * deg;
+  if( energy > 300. *unit::keV) energy = 300. * unit::keV;
+  double limit = (26.0 - energy/unit::keV * 0.06) * unit::degree;
   return limit;
 }
 
 // function formula taken from MakeAnaSpectrum.cc by S.Watanabe
 double ComptonModeFilter::theta_cut_limit2(double energy) const
 {
-  double armcut = 180.0*deg;
+  double armcut = 180.0*unit::degree;
   if (Evs("HitPattern:SS")) {
-    armcut = m_ARMCutCurveSS->Eval(energy/keV,0,"S") * deg;
+    armcut = m_ARMCutCurveSS->Eval(energy/unit::keV,0,"S") * unit::degree;
   }
   else if (Evs("HitPattern:SC")) {
-    armcut = m_ARMCutCurveSC->Eval(energy/keV,0,"S") * deg;
+    armcut = m_ARMCutCurveSC->Eval(energy/unit::keV,0,"S") * unit::degree;
   }
   else if (Evs("HitPattern:CC")) {
-    armcut = m_ARMCutCurveCC->Eval(energy/keV,0,"S") * deg;
+    armcut = m_ARMCutCurveCC->Eval(energy/unit::keV,0,"S") * unit::degree;
   }
 
   return armcut;

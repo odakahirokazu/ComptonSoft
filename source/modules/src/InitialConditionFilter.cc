@@ -23,18 +23,20 @@
 
 using namespace anl;
 
+namespace unit = anlgeant4::unit;
+
 namespace comptonsoft
 {
 
 InitialConditionFilter::InitialConditionFilter()
-  : energy0_(-100.0*MeV), energy1_(100.0*MeV), initialInfo_(nullptr)
+  : energy0_(-100.0*unit::MeV), energy1_(100.0*unit::MeV), initialInfo_(nullptr)
 {
 }
 
 ANLStatus InitialConditionFilter::mod_startup()
 {
-  register_parameter(&energy0_, "energy_min", keV, "keV");
-  register_parameter(&energy1_, "energy_max", keV, "keV");
+  register_parameter(&energy0_, "energy_min", unit::keV, "keV");
+  register_parameter(&energy1_, "energy_max", unit::keV, "keV");
 
   GetModuleIF("InitialInformation", &initialInfo_);
 

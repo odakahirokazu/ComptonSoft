@@ -19,10 +19,12 @@
 
 #include "EfficiencyMapSky.hh"
 
-#include "G4SystemOfUnits.hh"
+#include "AstroUnits.hh"
 #include "InitialInformation.hh"
 
 using namespace anl;
+
+namespace unit = anlgeant4::unit;
 
 namespace comptonsoft
 {
@@ -36,7 +38,7 @@ EfficiencyMapSky::~EfficiencyMapSky() = default;
 
 ANLStatus EfficiencyMapSky::mod_startup()
 {
-  setUnit(degree, "degree");
+  setUnit(unit::degree, "degree");
   register_parameter(&m_Scale, "scale");
 
   return BackProjection::mod_startup();
@@ -54,9 +56,9 @@ ANLStatus EfficiencyMapSky::mod_ana()
   G4ThreeVector dir = -(m_InitialInfo->InitialDirection());
   G4ThreeVector yaxis(0.0, 1.0, 0.0);
   G4ThreeVector zaxis(0.0, 0.0, 1.0);
-  double y = 90.0 - dir.angle(yaxis)/degree;
+  double y = 90.0 - dir.angle(yaxis)/unit::degree;
   G4ThreeVector coneXZ(dir.x(), 0.0, dir.z());
-  double x = coneXZ.angle(zaxis)/degree;
+  double x = coneXZ.angle(zaxis)/unit::degree;
   if (coneXZ.x()<0.0) {
     x = -x;
   }

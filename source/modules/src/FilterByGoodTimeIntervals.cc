@@ -18,7 +18,7 @@
  *************************************************************************/
 
 #include "FilterByGoodTimeIntervals.hh"
-#include "CLHEP/Units/SystemOfUnits.h"
+#include "AstroUnits.hh"
 #include "CSHitCollection.hh"
 #include "DetectorHit.hh"
 

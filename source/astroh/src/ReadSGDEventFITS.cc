@@ -18,7 +18,7 @@
  *************************************************************************/
 
 #include "ReadSGDEventFITS.hh"
-#include "G4SystemOfUnits.hh"
+#include "AstroUnits.hh"
 #include "TChain.h"
 #include "ChannelID.hh"
 #include "SGDEvent.hh"
@@ -27,6 +27,8 @@
 #include "MultiChannelData.hh"
 
 using namespace anl;
+
+namespace unit = anlgeant4::unit;
 
 namespace
 {
@@ -141,7 +143,7 @@ ANLStatus ReadSGDEventFITS::mod_ana()
   m_EventReader->restoreEvent(row, event);
   setEventID(event.getOccurrenceID());
 
-  const double eventTime = event.getTime() * second;
+  const double eventTime = event.getTime() * unit::second;
   m_EventTime = eventTime;
 
   const astroh::sgd::EventFlags eventFlags = event.getFlags();
@@ -207,7 +209,7 @@ ANLStatus ReadSGDEventFITS::mod_ana()
       
     const int ChannelID = event.getReadoutChannelIDVector()[i];
     const uint16_t ADCValue = event.getPHAVector()[i];
-    const float EPI = event.getEPIVector()[i] * keV;
+    const float EPI = event.getEPIVector()[i] * unit::keV;
 
     MultiChannelData* ASICData = detectorManager->getMultiChannelData(ReadoutID);
     ASICData->setDataValid(ChannelID, 1);

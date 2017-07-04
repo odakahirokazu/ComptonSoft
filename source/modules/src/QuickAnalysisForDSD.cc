@@ -27,13 +27,15 @@
 
 using namespace anl;
 
+namespace unit = anlgeant4::unit;
+
 namespace comptonsoft
 {
 
 QuickAnalysisForDSD::QuickAnalysisForDSD()
   : m_DSD(nullptr), m_DetectorID(0),
     m_NBins(2048), m_Energy0(0.0), m_Energy1(204.8),
-    m_CutEnergy0(0.0*keV), m_CutEnergy1(204.8*keV)
+    m_CutEnergy0(0.0*unit::keV), m_CutEnergy1(204.8*unit::keV)
 {
 }
 
@@ -45,8 +47,8 @@ ANLStatus QuickAnalysisForDSD::mod_startup()
   register_parameter(&m_NBins, "num_bins");
   register_parameter(&m_Energy0, "energy_min", 1, "keV");
   register_parameter(&m_Energy1, "energy_max", 1, "keV");
-  register_parameter(&m_CutEnergy0, "cut_energy_min", keV, "keV");
-  register_parameter(&m_CutEnergy1, "cut_energy_max", keV, "keV");
+  register_parameter(&m_CutEnergy0, "cut_energy_min", unit::keV, "keV");
+  register_parameter(&m_CutEnergy1, "cut_energy_max", unit::keV, "keV");
   return AS_OK;
 }
 
@@ -109,7 +111,7 @@ ANLStatus QuickAnalysisForDSD::mod_ana()
   // cathode
   if (numCathode==1) {
     DetectorHit_sptr hit = m_DSD->getCathodeSideHit(0);
-    m_Spectrum1HitCathode->Fill(hit->EPI()/keV);
+    m_Spectrum1HitCathode->Fill(hit->EPI()/unit::keV);
   }
   else if (numCathode==2) {
     DetectorHit_sptr hit0 = m_DSD->getCathodeSideHit(0);
@@ -130,12 +132,12 @@ ANLStatus QuickAnalysisForDSD::mod_ana()
 
     if (adjacent) {
       double sum = hit0->EPI() + hit1->EPI();
-      m_Spectrum2HitCathode->Fill(sum/keV);
+      m_Spectrum2HitCathode->Fill(sum/unit::keV);
       if (strip0<strip1) {
-        m_E2D2HitCathode->Fill(hit0->EPI()/keV, hit1->EPI()/keV);
+        m_E2D2HitCathode->Fill(hit0->EPI()/unit::keV, hit1->EPI()/unit::keV);
       }
       else {
-        m_E2D2HitCathode->Fill(hit1->EPI()/keV, hit0->EPI()/keV);
+        m_E2D2HitCathode->Fill(hit1->EPI()/unit::keV, hit0->EPI()/unit::keV);
       }
     }
   }
@@ -143,7 +145,7 @@ ANLStatus QuickAnalysisForDSD::mod_ana()
   // anode
   if (numAnode==1) {
     DetectorHit_sptr hit = m_DSD->getAnodeSideHit(0);
-    m_Spectrum1HitAnode->Fill(hit->EPI()/keV);
+    m_Spectrum1HitAnode->Fill(hit->EPI()/unit::keV);
   }
   else if (numAnode==2) {
     DetectorHit_sptr hit0 = m_DSD->getAnodeSideHit(0);
@@ -164,12 +166,12 @@ ANLStatus QuickAnalysisForDSD::mod_ana()
 
     if (adjacent) {
       double sum = hit0->EPI() + hit1->EPI();
-      m_Spectrum2HitAnode->Fill(sum/keV);
+      m_Spectrum2HitAnode->Fill(sum/unit::keV);
       if (strip0<strip1) {
-        m_E2D2HitAnode->Fill(hit0->EPI()/keV, hit1->EPI()/keV);
+        m_E2D2HitAnode->Fill(hit0->EPI()/unit::keV, hit1->EPI()/unit::keV);
       }
       else {
-        m_E2D2HitAnode->Fill(hit1->EPI()/keV, hit0->EPI()/keV);
+        m_E2D2HitAnode->Fill(hit1->EPI()/unit::keV, hit0->EPI()/unit::keV);
       }
     }
   }
@@ -178,7 +180,7 @@ ANLStatus QuickAnalysisForDSD::mod_ana()
   if (numCathode==1 && numAnode==1) {
     DetectorHit_sptr hitAnode = m_DSD->getAnodeSideHit(0);
     DetectorHit_sptr hitCathode = m_DSD->getCathodeSideHit(0);
-    m_E2DDoubleSide->Fill(hitAnode->EPI()/keV, hitCathode->EPI()/keV);
+    m_E2DDoubleSide->Fill(hitAnode->EPI()/unit::keV, hitCathode->EPI()/unit::keV);
   }
 
   // image

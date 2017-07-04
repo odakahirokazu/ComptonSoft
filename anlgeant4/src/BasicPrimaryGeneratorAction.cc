@@ -21,6 +21,7 @@
 
 #include "G4ParticleGun.hh"
 #include "G4ParticleTable.hh"
+#include "AstroUnits.hh"
 #include "BasicPrimaryGen.hh"
 
 namespace anlgeant4
@@ -29,14 +30,14 @@ namespace anlgeant4
 BasicPrimaryGeneratorAction::BasicPrimaryGeneratorAction()
   : m_ParticleGun(new G4ParticleGun(1)),
     m_Time(0.0), m_Position(0.0, 0.0, 0.0),
-    m_Energy(10.0*CLHEP::keV), m_Direction(1.0, 0.0, 0.0)
+    m_Energy(10.0*unit::keV), m_Direction(1.0, 0.0, 0.0)
 {
 }
 
 BasicPrimaryGeneratorAction::BasicPrimaryGeneratorAction(G4ParticleDefinition* definition)
   : m_ParticleGun(new G4ParticleGun(1)),
     m_Time(0.0), m_Position(0.0, 0.0, 0.0),
-    m_Energy(10.0*CLHEP::keV), m_Direction(1.0, 0.0, 0.0)
+    m_Energy(10.0*unit::keV), m_Direction(1.0, 0.0, 0.0)
 {
   m_ParticleGun->SetParticleDefinition(definition);
 }
@@ -44,7 +45,7 @@ BasicPrimaryGeneratorAction::BasicPrimaryGeneratorAction(G4ParticleDefinition* d
 BasicPrimaryGeneratorAction::BasicPrimaryGeneratorAction(G4String particle_name)
   : m_ParticleGun(new G4ParticleGun(1)),
     m_Time(0.0), m_Position(0.0, 0.0, 0.0),
-    m_Energy(10.0*CLHEP::keV), m_Direction(1.0, 0.0, 0.0)
+    m_Energy(10.0*unit::keV), m_Direction(1.0, 0.0, 0.0)
 {
   G4ParticleDefinition* particle = 
     G4ParticleTable::GetParticleTable()->FindParticle(particle_name);

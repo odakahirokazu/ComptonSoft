@@ -19,11 +19,13 @@
 
 #include "UniformlyRandomizeEPI.hh"
 #include "TRandom3.h"
-#include "G4SystemOfUnits.hh"
+#include "AstroUnits.hh"
 #include "DetectorHit.hh"
 #include "CSHitCollection.hh"
 
 using namespace anl;
+
+namespace unit = anlgeant4::unit;
 
 namespace comptonsoft
 {
@@ -37,10 +39,10 @@ UniformlyRandomizeEPI::~UniformlyRandomizeEPI() = default;
 
 ANLStatus UniformlyRandomizeEPI::mod_startup()
 {
-  register_parameter(&m_LZDeltaE0, "si_delta0", keV, "keV");
-  register_parameter(&m_LZDeltaE1, "si_delta1", keV, "keV");
-  register_parameter(&m_HZDeltaE0, "cdte_delta0", keV, "keV");
-  register_parameter(&m_HZDeltaE1, "cdte_delta1", keV, "keV");
+  register_parameter(&m_LZDeltaE0, "si_delta0", unit::keV, "keV");
+  register_parameter(&m_LZDeltaE1, "si_delta1", unit::keV, "keV");
+  register_parameter(&m_HZDeltaE0, "cdte_delta0", unit::keV, "keV");
+  register_parameter(&m_HZDeltaE1, "cdte_delta1", unit::keV, "keV");
 
   return AS_OK;
 }

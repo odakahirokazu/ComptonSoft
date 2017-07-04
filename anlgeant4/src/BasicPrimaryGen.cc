@@ -22,9 +22,8 @@
 #include <algorithm>
 #include <iterator>
 #include <boost/format.hpp>
-#include "CLHEP/Units/SystemOfUnits.h"
-#include "CLHEP/Units/PhysicalConstants.h"
 #include "Randomize.hh"
+#include "AstroUnits.hh"
 #include "BasicPrimaryGeneratorAction.hh"
 #include "VANLGeometry.hh"
 
@@ -45,10 +44,10 @@ BasicPrimaryGen::BasicPrimaryGen()
     polarizationMode_(-1),
     energyDistributionName_("power law"),
     energyDistribution_(SpectralShape::Undefined),
-    energyMin_(0.1*CLHEP::keV), energyMax_(1000.0*CLHEP::keV),
+    energyMin_(0.1*unit::keV), energyMax_(1000.0*unit::keV),
     photonIndex_(0.0),
-    energyMean_(511.0*CLHEP::keV), energySigma_(0.0*CLHEP::keV),
-    kT_(10.0*CLHEP::keV)
+    energyMean_(511.0*unit::keV), energySigma_(0.0*unit::keV),
+    kT_(10.0*unit::keV)
 {
   add_alias("BasicPrimaryGen");
   add_alias("InitialInformation");
@@ -65,19 +64,19 @@ ANLStatus BasicPrimaryGen::mod_startup()
 
   register_parameter(&energyDistributionName_, "spectral_distribution");
 
-  register_parameter(&energyMin_, "energy_min", CLHEP::keV, "keV");
+  register_parameter(&energyMin_, "energy_min", unit::keV, "keV");
   set_parameter_description("Minimum value of the energy distribution");
-  register_parameter(&energyMax_, "energy_max", CLHEP::keV, "keV");
+  register_parameter(&energyMax_, "energy_max", unit::keV, "keV");
   set_parameter_description("Maximum value of the energy distribution");
   register_parameter(&photonIndex_, "photon_index");
   set_parameter_description("Power law index of the photon spectrum");
-  register_parameter(&energyMean_, "energy_mean", CLHEP::keV, "keV");
+  register_parameter(&energyMean_, "energy_mean", unit::keV, "keV");
   set_parameter_description("Mean energy of the Gaussian distribution");
-  register_parameter(&energySigma_, "energy_sigma", CLHEP::keV, "keV");
+  register_parameter(&energySigma_, "energy_sigma", unit::keV, "keV");
   set_parameter_description("Standard deviation of the Gaussian distribution");
-  register_parameter(&kT_, "radiation_temperature", CLHEP::keV, "keV");
+  register_parameter(&kT_, "radiation_temperature", unit::keV, "keV");
   set_parameter_description("Radiation temperature in units of keV");
-  register_parameter(&spectrumEnergy_, "energy_array", CLHEP::keV, "keV");
+  register_parameter(&spectrumEnergy_, "energy_array", unit::keV, "keV");
   set_parameter_description("Energy array of spectral histogram");
   register_parameter(&spectrumPhotons_, "photons_array");
   set_parameter_description("Photons array of spectral histogram");
@@ -142,7 +141,7 @@ ANLStatus BasicPrimaryGen::mod_init()
   }
 
   if (energyMin_ == 0.0) {
-    energyMin_ = 1.0e-9 * CLHEP::keV;
+    energyMin_ = 1.0e-9 * unit::keV;
     std::cout << "Energy min is reset to 1.0e-9 keV." << std::endl;
   }
 
@@ -230,34 +229,34 @@ void BasicPrimaryGen::printSpectralInfo()
 {
   switch (energyDistribution_) {
   case SpectralShape::Mono:
-    G4cout << "  Spectral shape: mono => "
-           << "Mean: " << energyMean_/CLHEP::keV  << " keV"
-           << G4endl;
+    std::cout << "  Spectral shape: mono => "
+              << "Mean: " << energyMean_/unit::keV  << " keV"
+              << std::endl;
     break;
   case SpectralShape::PowerLaw:
-    G4cout << "  Spectral shape: power law =>"
-           << " photon index = " << photonIndex_
-           << " ( " << energyMin_/CLHEP::keV  << " -- " << energyMax_/CLHEP::keV  << " keV )"
-           << G4endl;
+    std::cout << "  Spectral shape: power law =>"
+              << " photon index = " << photonIndex_
+              << " ( " << energyMin_/unit::keV  << " -- " << energyMax_/unit::keV  << " keV )"
+              << std::endl;
     break;
   case SpectralShape::Gaussian:
-    G4cout << "  Spectral shape: Gaussian =>"
-           << " mean: " << energyMean_/CLHEP::keV  << " keV ;"
-           << " sigma: " << energySigma_/CLHEP::keV  << " keV"
-           << G4endl;
+    std::cout << "  Spectral shape: Gaussian =>"
+              << " mean: " << energyMean_/unit::keV  << " keV ;"
+              << " sigma: " << energySigma_/unit::keV  << " keV"
+              << std::endl;
     break;
   case SpectralShape::BlackBody:
-    G4cout << "  Spectral shape: black body => "
-           << " temperature: " << kT_/CLHEP::keV  << " keV"
-           << " ( < " << energyMax_/CLHEP::keV  << " keV )"
-           << G4endl;
+    std::cout << "  Spectral shape: black body => "
+              << " temperature: " << kT_/unit::keV  << " keV"
+              << " ( < " << energyMax_/unit::keV  << " keV )"
+              << std::endl;
     break;
   default:
     break;
   }
 }
 
-G4double BasicPrimaryGen::sampleEnergy()
+double BasicPrimaryGen::sampleEnergy()
 {
   switch (energyDistribution_) {
     case SpectralShape::Mono:
@@ -276,50 +275,50 @@ G4double BasicPrimaryGen::sampleEnergy()
   return energyMean_;
 }
 
-G4double BasicPrimaryGen::sampleFromPowerLaw()
+double BasicPrimaryGen::sampleFromPowerLaw()
 {
   return sampleFromPowerLaw(photonIndex_, energyMin_, energyMax_);
 }
 
-G4double BasicPrimaryGen::sampleFromPowerLaw(double gamma, double e0, double e1)
+double BasicPrimaryGen::sampleFromPowerLaw(double gamma, double e0, double e1)
 {
   using std::pow;
 
-  G4double energy = 0.0;
+  double energy = 0.0;
   if ( 0.999 < gamma && gamma < 1.001 ) {
     // Photon index ~ 1
     energy = e0 * pow(e1/e0, G4UniformRand());
   }
   else {
-    G4double s = 1.0-gamma;
-    G4double a0 = pow(e0, s);
-    G4double a1 = pow(e1, s);
-    G4double a = a0 + G4UniformRand()*(a1-a0);
+    const double s = 1.0-gamma;
+    const double a0 = pow(e0, s);
+    const double a1 = pow(e1, s);
+    const double a = a0 + G4UniformRand()*(a1-a0);
     energy = pow(a, 1./s);
   }
 
   return energy;
 }
 
-G4double BasicPrimaryGen::sampleFromGaussian()
+double BasicPrimaryGen::sampleFromGaussian()
 {
   return sampleFromGaussian(energyMean_, energySigma_);
 }
 
-G4double BasicPrimaryGen::sampleFromGaussian(double mean, double sigma)
+double BasicPrimaryGen::sampleFromGaussian(double mean, double sigma)
 {
-  double x = CLHEP::RandGauss::shoot(CLHEP::HepRandom::getTheEngine());
-  double energy = mean + x * sigma;
+  const double x = CLHEP::RandGauss::shoot(CLHEP::HepRandom::getTheEngine());
+  const double energy = mean + x * sigma;
   return energy;
 }
 
-G4double BasicPrimaryGen::sampleFromBlackBody()
+double BasicPrimaryGen::sampleFromBlackBody()
 {
   return sampleFromBlackBody(kT_, energyMax_/kT_);
 }
 
-G4double BasicPrimaryGen::sampleFromBlackBody(double kT,
-                                              double upper_limit_factor)
+double BasicPrimaryGen::sampleFromBlackBody(double kT,
+                                            double upper_limit_factor)
 {
   // sample from f(x) = x^2/(e^x-1)
   using std::exp;
@@ -333,13 +332,13 @@ G4double BasicPrimaryGen::sampleFromBlackBody(double kT,
     fx = x*x/(exp(x)-1.0);
     if (y <= fx) break;
   }
-  double energy = kT * x;
+  const double energy = kT * x;
   return energy;
 }
 
 void BasicPrimaryGen::buildSpectrumPhotonIntegral()
 {
-  std::size_t NBins = spectrumPhotons_.size();
+  const std::size_t NBins = spectrumPhotons_.size();
   spectrumPhotonIntegral_.resize(spectrumEnergy_.size());
   spectrumPhotonIntegral_[0] = 0.0;
   for (std::size_t i=0; i<NBins; i++) {
@@ -354,12 +353,12 @@ void BasicPrimaryGen::buildSpectrumPhotonIntegral()
   std::cout << "Spectrum: (energy in keV, photon integral)\n";
   for (std::size_t i=0; i<spectrumEnergy_.size(); i++) {
     std::cout << boost::format("%10.3E %8.3f")
-      % (spectrumEnergy_[i]/CLHEP::keV) % spectrumPhotonIntegral_[i] << '\n';
+      % (spectrumEnergy_[i]/unit::keV) % spectrumPhotonIntegral_[i] << '\n';
   }
   std::cout << std::endl;
 }
 
-G4double BasicPrimaryGen::sampleFromHistogram()
+double BasicPrimaryGen::sampleFromHistogram()
 {
   const std::vector<double>& energies = spectrumEnergy_;
   const std::vector<double>& integrals = spectrumPhotonIntegral_;
@@ -378,7 +377,7 @@ G4double BasicPrimaryGen::sampleFromHistogram()
 
 void BasicPrimaryGen::setUnpolarized()
 {
-  G4double phi2 = CLHEP::twopi * G4UniformRand();
+  const double phi2 = CLHEP::twopi * G4UniformRand();
   G4ThreeVector directionOrthogonal = direction_.orthogonal().unit();
   polarization_ = directionOrthogonal.rotate(phi2, direction_);
 }
@@ -402,7 +401,7 @@ G4VUserPrimaryGeneratorAction* BasicPrimaryGen::create()
 
 double BasicPrimaryGen::LengthUnit() const
 {
-  return CLHEP::cm;
+  return unit::cm;
 }
 
 std::string BasicPrimaryGen::LengthUnitName() const

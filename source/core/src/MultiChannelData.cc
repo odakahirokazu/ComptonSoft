@@ -22,6 +22,8 @@
 #include "AstroUnits.hh"
 #include "GainFunctionLinear.hh"
 
+namespace unit = anlgeant4::unit;
+
 namespace comptonsoft {
 
 MultiChannelData::MultiChannelData(std::size_t n, ElectrodeSide eside)
@@ -155,7 +157,7 @@ double MultiChannelData::PHA2EPI(std::size_t i, double pha) const
   else {
     vpi = gainFunction_->eval(i, pha);
   }
-  return vpi*keV;
+  return vpi*unit::keV;
 }
 
 bool MultiChannelData::convertPHA2EPI()

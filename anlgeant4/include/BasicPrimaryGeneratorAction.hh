@@ -54,9 +54,9 @@ public:
 
   void SetDefinition(G4ParticleDefinition* definition);
   
-  void Set(G4double time0,
+  void Set(double time0,
            const G4ThreeVector& position,
-           G4double energy,
+           double energy,
            const G4ThreeVector& direction)
   {
     m_Time = time0;
@@ -66,9 +66,9 @@ public:
     m_Polarization.set(0., 0., 0.);
   }
 
-  void Set(G4double time0,
+  void Set(double time0,
            const G4ThreeVector& position,
-           G4double energy,
+           double energy,
            const G4ThreeVector& direction,
            const G4ThreeVector& polarization)
   {
@@ -80,7 +80,7 @@ public:
   }
 
   void Set(const G4ThreeVector& position,
-           G4double energy,
+           double energy,
            const G4ThreeVector& direction)
   {
     m_Time = 0.0;
@@ -91,7 +91,7 @@ public:
   }
 
   void Set(const G4ThreeVector& position,
-           G4double energy,
+           double energy,
            const G4ThreeVector& direction,
            const G4ThreeVector& polarization)
   {
@@ -110,9 +110,9 @@ public:
 private:
   std::unique_ptr<G4ParticleGun> m_ParticleGun;
   BasicPrimaryGen* m_GeneratorSetting = nullptr;
-  G4double m_Time;
+  double m_Time;
   G4ThreeVector m_Position;
-  G4double m_Energy;
+  double m_Energy;
   G4ThreeVector m_Direction;
   G4ThreeVector m_Polarization;
 };

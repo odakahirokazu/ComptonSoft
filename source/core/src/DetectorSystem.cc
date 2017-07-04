@@ -44,6 +44,8 @@
 #include "DeviceSimulation.hh"
 #include "CSSensitiveDetector.hh"
 
+namespace unit = anlgeant4::unit;
+
 namespace comptonsoft {
 
 DetectorSystem::DetectorSystem()
@@ -238,10 +240,10 @@ void DetectorSystem::loadDetectorConfigurationRootNode(const boost::property_tre
   double lengthUnit = 1.0;
   if (lengthUnitName) {
     if (*lengthUnitName == "cm") {
-      lengthUnit = cm;
+      lengthUnit = unit::cm;
     }
     else if (*lengthUnitName == "mm") {
-      lengthUnit = mm;
+      lengthUnit = unit::mm;
     }
     else {
       std::ostringstream message;
@@ -800,7 +802,7 @@ void DetectorSystem::setupDetectorParameters(const DetectorSystem::ParametersNod
           mcd->resetChannelDisabledVector(*o);
         }
         if (optional<double> o = channel_properties.threshold_value) {
-          const double value = (*o)*keV;
+          const double value = (*o)*unit::keV;
           mcd->resetThresholdEnergyVector(value);
         }
       }
@@ -810,7 +812,7 @@ void DetectorSystem::setupDetectorParameters(const DetectorSystem::ParametersNod
           mcd->resetChannelDisabledVector(*o);
         }
         if (optional<double> o = channel_properties.threshold_value) {
-          const double value = (*o)*keV;
+          const double value = (*o)*unit::keV;
           mcd->resetThresholdEnergyVector(value);
         }
       }
@@ -821,7 +823,7 @@ void DetectorSystem::setupDetectorParameters(const DetectorSystem::ParametersNod
         mcd->resetChannelDisabledVector(*o);
       }
       if (optional<double> o = channel_properties.threshold_value) {
-        const double value = (*o)*keV;
+        const double value = (*o)*unit::keV;
         mcd->resetThresholdEnergyVector(value);
       }
     }
@@ -877,12 +879,12 @@ void DetectorSystem::setupDetectorParameters(const DetectorSystem::ParametersNod
   }
 
   if (auto o = parameters.temperature_value) {
-    const double value = (*o)*kelvin;
+    const double value = (*o)*unit::kelvin;
     ds->setTemperature(value);
   }
 
   if (auto o = parameters.efield_bias) {
-    const double bias = (*o)*volt;
+    const double bias = (*o)*unit::volt;
     const int mode = (parameters.efield_mode) ? *(parameters.efield_mode) : 1;
     const double p0 = (parameters.efield_param0) ? *(parameters.efield_param0) : 0.0;
     const double p1 = (parameters.efield_param1) ? *(parameters.efield_param1) : 0.0;
@@ -919,11 +921,11 @@ void DetectorSystem::setupDetectorParameters(const DetectorSystem::ParametersNod
     }
 
     if (auto o = parameters.charge_collection_mutau_electron) {
-      const double value = (*o)*(cm2/volt);
+      const double value = (*o)*(unit::cm2/unit::volt);
       ds->setMuTauElectron(value);
     }
     if (auto o = parameters.charge_collection_mutau_hole) {
-      const double value = (*o)*(cm2/volt);
+      const double value = (*o)*(unit::cm2/unit::volt);
       ds->setMuTauHole(value);
     }
 
@@ -943,21 +945,21 @@ void DetectorSystem::setupDetectorParameters(const DetectorSystem::ParametersNod
       ds->setDiffusionSpreadFactorAnode(*o);
     }
     if (auto o = parameters.diffusion_constant_cathode) {
-      const double value = (*o)*cm;
+      const double value = (*o)*unit::cm;
       ds->setDiffusionSigmaConstantCathode(value);
     }
     if (auto o = parameters.diffusion_constant_anode) {
-      const double value = (*o)*cm;
+      const double value = (*o)*unit::cm;
       ds->setDiffusionSigmaConstantAnode(value);
     }
   }
   
   if (auto o = parameters.timing_resolution_trigger) {
-    const double value = (*o)*second;
+    const double value = (*o)*unit::second;
     ds->setTimingResolutionForTrigger(value);
   }
   if (auto o = parameters.timing_resolution_energy_measurement) {
-    const double value = (*o)*second;
+    const double value = (*o)*unit::second;
     ds->setTimingResolutionForEnergyMeasurement(value);
   }
   if (auto o = parameters.pedestal_generation_flag) {
@@ -996,11 +998,11 @@ void DetectorSystem::setupDetectorParameters(const DetectorSystem::ParametersNod
           ds->setChannelDisabledToSelected(*o, selector);
         }
         if (auto o = strip_info.trigger_discrimination_center) {
-          const double value = (*o)*keV;
+          const double value = (*o)*unit::keV;
           ds->setTriggerDiscriminationCenterToSelected(value, selector);
         }
         if (auto o = strip_info.trigger_discrimination_sigma) {
-          const double value = (*o)*keV;
+          const double value = (*o)*unit::keV;
           ds->setTriggerDiscriminationSigmaToSelected(value, selector);
         }
         if (auto o = strip_info.noise_level_param0) {
@@ -1021,7 +1023,7 @@ void DetectorSystem::setupDetectorParameters(const DetectorSystem::ParametersNod
           ds->setEPICompensationFunctionToSelected(func, selector);
         }
         if (auto o = strip_info.threshold_value) {
-          const double value = (*o)*keV;
+          const double value = (*o)*unit::keV;
           ds->setThresholdToSelected(value, selector);
         }
       }
@@ -1033,11 +1035,11 @@ void DetectorSystem::setupDetectorParameters(const DetectorSystem::ParametersNod
       ds->resetChannelDisabledVector(*o);
     }
     if (auto o = channel_properties.trigger_discrimination_center) {
-      const double value = (*o)*keV;
+      const double value = (*o)*unit::keV;
       ds->resetTriggerDiscriminationCenterVector(value);
     }
     if (auto o = channel_properties.trigger_discrimination_sigma) {
-      const double value = (*o)*keV;
+      const double value = (*o)*unit::keV;
       ds->resetTriggerDiscriminationSigmaVector(value);
     }
     if (auto o = channel_properties.noise_level_param0) {
@@ -1058,7 +1060,7 @@ void DetectorSystem::setupDetectorParameters(const DetectorSystem::ParametersNod
       ds->resetEPICompensationFunctionVector(func);
     }
     if (auto o = channel_properties.threshold_value) {
-      const double value = (*o)*keV;
+      const double value = (*o)*unit::keV;
       ds->resetThresholdVector(value);
     }
   }
@@ -1083,9 +1085,9 @@ void DetectorSystem::setupReconstructionParameters(const DetectorSystem::Paramet
           if (auto o3 = parameters.reconstruction_energy_consistency_check_upper_function_c0) {
             if (auto o4 = parameters.reconstruction_energy_consistency_check_upper_function_c1) {
               lc0 = (*o1);
-              lc1 = (*o2) * keV;
+              lc1 = (*o2) * unit::keV;
               uc0 = (*o3);
-              uc1 = (*o4) * keV;
+              uc1 = (*o4) * unit::keV;
               dsd->setEnergyConsistencyCheckFunctions(lc0, lc1, uc0, uc1);
             }
           }

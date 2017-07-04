@@ -22,11 +22,13 @@
 #include <list>
 #include <algorithm>
 #include <iterator>
-#include "G4SystemOfUnits.hh"
+#include "AstroUnits.hh"
 #include "FlagDefinition.hh"
 #include "MultiChannelData.hh"
 #include "VChannelMap.hh"
 #include "DetectorHit.hh"
+
+namespace unit = anlgeant4::unit;
 
 namespace {
 
@@ -317,19 +319,19 @@ void VRealDetectorUnit::
 printDetectorParameters(std::ostream& os) const
 {
   os << "Geometry\n"
-     << "  x: " << getSizeX()/cm << " cm\n"
-     << "  y: " << getSizeY()/cm << " cm\n"
-     << "  z: " << getSizeZ()/cm << " cm\n"
+     << "  x: " << getSizeX()/unit::cm << " cm\n"
+     << "  y: " << getSizeY()/unit::cm << " cm\n"
+     << "  z: " << getSizeZ()/unit::cm << " cm\n"
      << "Offset\n"
-     << "  x: " << getOffsetX()/cm << " cm\n"
-     << "  y: " << getOffsetY()/cm << " cm\n"
+     << "  x: " << getOffsetX()/unit::cm << " cm\n"
+     << "  y: " << getOffsetY()/unit::cm << " cm\n"
      << "Pixel\n"
      << "  number: (" << getNumPixelX() << ", " << getNumPixelY() << ")\n"
-     << "  size: (" << getPixelPitchX()/cm << " cm, " << getPixelPitchY()/cm << " cm)\n"
+     << "  size: (" << getPixelPitchX()/unit::cm << " cm, " << getPixelPitchY()/unit::cm << " cm)\n"
      << "Position\n"
-     << "  x: " << getCenterPositionX()/cm << " cm\n"
-     << "  y: " << getCenterPositionY()/cm << " cm\n"
-     << "  z: " << getCenterPositionZ()/cm << " cm\n"
+     << "  x: " << getCenterPositionX()/unit::cm << " cm\n"
+     << "  y: " << getCenterPositionY()/unit::cm << " cm\n"
+     << "  z: " << getCenterPositionZ()/unit::cm << " cm\n"
      << "X-axis direction\n"
      << "  x: " << getXAxisDirectionX() << "\n"
      << "  y: " << getXAxisDirectionY() << "\n"

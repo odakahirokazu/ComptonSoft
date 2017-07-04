@@ -33,6 +33,8 @@
 
 using namespace anl;
 
+namespace unit = anlgeant4::unit;
+
 namespace comptonsoft
 {
 
@@ -54,7 +56,7 @@ ANLStatus EventReconstruction::mod_startup()
   register_parameter(&m_ReconstructionMethodName, "reconstruction_method");
   register_parameter(&m_SourceDistant, "source_distant");
   register_parameter(&m_SourceDirection, "source_direction");
-  register_parameter(&m_SourcePosition, "source_position", cm, "cm");
+  register_parameter(&m_SourcePosition, "source_position", unit::cm, "cm");
 
   return AS_OK;
 }

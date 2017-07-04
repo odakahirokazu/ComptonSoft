@@ -20,7 +20,7 @@
 #include "CSPhysicsList.hh"
 
 #include "globals.hh"
-#include "G4SystemOfUnits.hh"
+#include "AstroUnits.hh"
 
 #include "G4EmLivermorePhysics.hh"
 #include "G4EmLivermorePolarizedPhysics.hh"
@@ -49,7 +49,6 @@
 #include "G4ParticleTable.hh"
 #include "G4ChargedGeantino.hh"
 
-
 namespace comptonsoft
 {
 
@@ -67,7 +66,7 @@ CSPhysicsList::CSPhysicsList(CSPhysicsOption option)
   }
   else if (modelEM == CSPhysicsOption::EMModel::LivermoreCustomized) {
     AHG4EmLivermorePhysics* physicsEM = new AHG4EmLivermorePhysics;
-    physicsEM->SetElectronFinalRange(0.001*mm);
+    physicsEM->SetElectronFinalRange(0.001*CLHEP::mm);
     physicsEM->ActivateAuger(true);
     physicsEM->ActivatePIXE(true);
     this->RegisterPhysics(physicsEM);

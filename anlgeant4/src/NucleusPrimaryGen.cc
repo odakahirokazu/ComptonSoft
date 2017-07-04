@@ -19,11 +19,10 @@
 
 #include "NucleusPrimaryGen.hh"
 
-#include "G4SystemOfUnits.hh"
-#include "G4PhysicalConstants.hh"
 #include "G4Ions.hh"
 #include "G4IonTable.hh"
 #include "G4VIsotopeTable.hh"
+#include "AstroUnits.hh"
 
 using namespace anl;
 
@@ -45,13 +44,13 @@ ANLStatus NucleusPrimaryGen::mod_startup()
 
   unregister_parameter("particle");
   setParticleName("");
-  register_parameter(&m_Position0, "position", cm, "cm");
+  register_parameter(&m_Position0, "position", unit::cm, "cm");
   set_parameter_description("Position of the source.");
   register_parameter(&m_RIZ, "atomic_number");
   set_parameter_description("Atomic number of the radioactive isotope.");
   register_parameter(&m_RIA, "mass_number");
   set_parameter_description("Mass number of the radioactive isotope.");
-  register_parameter(&m_RIEnergy, "energy", keV, "keV");
+  register_parameter(&m_RIEnergy, "energy", unit::keV, "keV");
   set_parameter_description("Excitation energy of the radioactive isotope. A value of 0 means the ground state of the nucleus.");
   register_parameter(&m_RIFloatingLevel, "floating_level");
   set_parameter_description("Index specifying a floating level. A value of 0 means a determined level.");
@@ -85,7 +84,7 @@ ANLStatus NucleusPrimaryGen::mod_bgnrun()
             << "    Z:              " << particle->GetAtomicNumber()        << '\n'
             << "    A:              " << particle->GetAtomicMass()          << '\n'
             << "    Floating level: " << particle->GetFloatLevelBaseIndex() << '\n'
-            << "    life time:      " << particle->GetPDGLifeTime()/second  << " second\n"
+            << "    life time:      " << particle->GetPDGLifeTime()/unit::s  << " second\n"
             << "------------------------------ \n"
             << std::endl;
   

@@ -125,7 +125,7 @@ void SimDetectorUnit2DStrip::simulatePulseHeights()
         std::vector<DetectorHit_sptr> diffusionHits;
         for (int l=0; l<numDivision; l++) {
           double radiusDiffusion = gRandom->Gaus(0.0, xDiffusionSigma);
-          double thetaDiffusion = gRandom->Uniform(twopi);
+          double thetaDiffusion = gRandom->Uniform(CLHEP::twopi);
           double dx = radiusDiffusion * std::cos(thetaDiffusion);
           double dy = radiusDiffusion * std::sin(thetaDiffusion);
           PixelID spDiff = findPixel(localposx+dx, localposy+dy);
@@ -158,7 +158,7 @@ void SimDetectorUnit2DStrip::simulatePulseHeights()
         std::vector<DetectorHit_sptr> diffusionHits;
         for (int l=0; l<numDivision; l++) {
           double radiusDiffusion = gRandom->Gaus(0.0, yDiffusionSigma);
-          double thetaDiffusion = gRandom->Uniform(twopi);
+          double thetaDiffusion = gRandom->Uniform(CLHEP::twopi);
           double dx = radiusDiffusion * std::cos(thetaDiffusion);
           double dy = radiusDiffusion * std::sin(thetaDiffusion);
           PixelID spDiff = findPixel(localposx+dx, localposy+dy);

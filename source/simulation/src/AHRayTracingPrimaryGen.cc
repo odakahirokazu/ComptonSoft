@@ -19,7 +19,7 @@
 
 #include "AHRayTracingPrimaryGen.hh"
 #include "fitsio.h"
-#include "G4SystemOfUnits.hh"
+#include "AstroUnits.hh"
 
 using namespace anl;
 using namespace anlgeant4;
@@ -46,7 +46,7 @@ ANLStatus AHRayTracingPrimaryGen::mod_startup()
   unregister_parameter("energy_max");
   
   register_parameter(&m_FileName, "filename");
-  register_parameter(&m_offset, "position_offset", mm, "mm");
+  register_parameter(&m_offset, "position_offset", unit::mm, "mm");
   
   return AS_OK;
 }
@@ -155,9 +155,9 @@ void AHRayTracingPrimaryGen::makePrimarySetting()
 {
   const int id = m_ID;
   
-  double energy = m_Column[0][id]*keV;
-  double x = m_Column[1][id]*mm;
-  double y = m_Column[2][id]*mm;
+  double energy = m_Column[0][id]*unit::keV;
+  double x = m_Column[1][id]*unit::mm;
+  double y = m_Column[2][id]*unit::mm;
   double z = 0.0;
   double xDirection = m_Column[3][id];
   double yDirection = m_Column[4][id];

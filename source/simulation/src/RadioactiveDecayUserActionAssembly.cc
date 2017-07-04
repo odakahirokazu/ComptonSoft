@@ -18,24 +18,25 @@
  *************************************************************************/
 
 #include "RadioactiveDecayUserActionAssembly.hh"
-#include "G4SystemOfUnits.hh"
-#include "G4PhysicalConstants.hh"
+#include "AstroUnits.hh"
 #include "G4Track.hh"
 #include "G4VProcess.hh"
 
 using namespace anl;
 
+namespace unit = anlgeant4::unit;
+
 namespace comptonsoft
 {
 
 RadioactiveDecayUserActionAssembly::RadioactiveDecayUserActionAssembly()
-  : m_TerminationTime(1.0*ms), m_FirstDecayTime(0.0)
+  : m_TerminationTime(1.0*unit::ms), m_FirstDecayTime(0.0)
 {
 }
 
 ANLStatus RadioactiveDecayUserActionAssembly::mod_startup()
 {
-  register_parameter(&m_TerminationTime, "termination_time", s, "s");
+  register_parameter(&m_TerminationTime, "termination_time", unit::s, "s");
 
   return AS_OK;
 }

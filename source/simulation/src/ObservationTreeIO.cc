@@ -19,9 +19,11 @@
 
 #include "ObservationTreeIO.hh"
 #include <sstream>
-#include "G4SystemOfUnits.hh"
+#include "AstroUnits.hh"
 #include "TTree.h"
 #include "CSException.hh"
+
+namespace unit = anlgeant4::unit;
 
 namespace comptonsoft
 {
@@ -84,11 +86,11 @@ fillParticles(const int64_t eventID,
     const ObservedParticle_sptr& particle = particles[i];
     trackid_ = particle->trackid;
     particle_ = particle->particle;
-    time_ = particle->time / second;
-    posx_ = static_cast<float>(particle->position.x()/cm);
-    posy_ = static_cast<float>(particle->position.y()/cm);
-    posz_ = static_cast<float>(particle->position.z()/cm);
-    energy_ = static_cast<float>(particle->energy/keV);
+    time_ = particle->time / unit::second;
+    posx_ = static_cast<float>(particle->position.x()/unit::cm);
+    posy_ = static_cast<float>(particle->position.y()/unit::cm);
+    posz_ = static_cast<float>(particle->position.z()/unit::cm);
+    energy_ = static_cast<float>(particle->energy/unit::keV);
     dirx_ = static_cast<float>(particle->direction.x());
     diry_ = static_cast<float>(particle->direction.y());
     dirz_ = static_cast<float>(particle->direction.z());
@@ -106,9 +108,9 @@ ObservationTreeIO::retrieveParticle() const
   ObservedParticle_sptr particle(new ObservedParticle);
   particle->trackid = trackid_;
   particle->particle = particle_;
-  particle->time = time_ * second;
-  particle->position.set(posx_*cm, posy_*cm, posz_*cm);
-  particle->energy = energy_ * keV;
+  particle->time = time_ * unit::second;
+  particle->position.set(posx_*unit::cm, posy_*unit::cm, posz_*unit::cm);
+  particle->energy = energy_ * unit::keV;
   particle->direction.set(dirx_, diry_, dirz_);
   particle->polarization.set(polarx_, polary_, polarz_);
 

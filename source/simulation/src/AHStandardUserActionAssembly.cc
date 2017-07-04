@@ -23,7 +23,7 @@
 #include <iomanip>
 #include <algorithm>
 
-#include "G4SystemOfUnits.hh"
+#include "AstroUnits.hh"
 #include "G4Run.hh"
 #include "G4Event.hh"
 #include "G4RootAnalysisManager.hh"
@@ -36,6 +36,8 @@
 #include "BasicComptonEvent.hh"
 
 using namespace anl;
+
+namespace unit = anlgeant4::unit;
 
 namespace comptonsoft
 {
@@ -172,8 +174,8 @@ void AHStandardUserActionAssembly::RunActionAtEnd(const G4Run*)
 }
 
 void AHStandardUserActionAssembly::Fill(int seqnum,
-                                int totalhit,
-                                const_DetectorHit_sptr hit)
+                                        int totalhit,
+                                        const_DetectorHit_sptr hit)
 {
   const int eventID = m_InitialInfo->EventID();
   
@@ -247,8 +249,8 @@ namespace {
 double ThetaCutOfComptonMode(double energy)
 {
   // by S. Watanabe
-  double cut = 8.0 * degree;
-  if (energy < 300.0*keV) { cut = (26.0 - energy/keV * 0.06) * degree; }
+  double cut = 8.0 * unit::degree;
+  if (energy < 300.0*unit::keV) { cut = (26.0 - energy/unit::keV * 0.06) * unit::degree; }
   return cut;
 }
 

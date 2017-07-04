@@ -27,7 +27,7 @@ namespace anlgeant4
 {
 
 GaussianBeamPrimaryGen::GaussianBeamPrimaryGen()
-  : m_RSigma(1.0*cm)
+  : m_RSigma(1.0*unit::cm)
 {
   add_alias("GaussianBeamPrimaryGen");
 }
@@ -50,7 +50,7 @@ G4ThreeVector GaussianBeamPrimaryGen::samplePosition()
 {
   const G4ThreeVector xaxis(DirectionOrthogonal());
   G4ThreeVector yaxis = xaxis;
-  yaxis.rotate(0.5*pi, Direction());
+  yaxis.rotate(0.5*CLHEP::pi, Direction());
   const double x = m_RSigma * CLHEP::RandGauss::shoot(CLHEP::HepRandom::getTheEngine());
   const double y = m_RSigma * CLHEP::RandGauss::shoot(CLHEP::HepRandom::getTheEngine());
   const G4ThreeVector position = CenterPosition() + x * xaxis + y * yaxis;

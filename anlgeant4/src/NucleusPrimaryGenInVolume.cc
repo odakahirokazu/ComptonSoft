@@ -63,8 +63,8 @@ void NucleusPrimaryGenInVolume::makePrimarySetting()
 {
   G4ThreeVector position(m_PositionSampler.samplePosition());
   
-  G4double energy = 0.0;
-  G4ThreeVector direction(0.0, 0.0, 0.0);
+  const double energy = 0.0;
+  const G4ThreeVector direction(0.0, 0.0, 0.0);
   setPrimary(position, energy, direction);
 }
 

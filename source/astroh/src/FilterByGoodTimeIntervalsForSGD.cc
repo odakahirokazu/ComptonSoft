@@ -18,7 +18,7 @@
  *************************************************************************/
 
 #include "FilterByGoodTimeIntervalsForSGD.hh"
-#include "CLHEP/Units/SystemOfUnits.h"
+#include "AstroUnits.hh"
 #include "ReadSGDEventFITS.hh"
 
 

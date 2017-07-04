@@ -104,9 +104,9 @@ void BasicComptonEvent::calc() const
   using std::atan2;
   using std::floor;
 
-  cosThetaE_ = 1.0 - (electron_mass_c2*hit1Energy_)/(hit2Energy_*(hit1Energy_+hit2Energy_));
+  cosThetaE_ = 1.0 - (CLHEP::electron_mass_c2*hit1Energy_)/(hit2Energy_*(hit1Energy_+hit2Energy_));
   const double k = floor(cosThetaE_/2.0+0.5);
-  thetaE_ = acos(cosThetaE_ - 2.0*k) - pi*k;
+  thetaE_ = acos(cosThetaE_ - 2.0*k) - CLHEP::pi*k;
 
   const vector3_t scatteringVector = (hit2Position_-hit1Position_).unit();
   coneAxis_ = -scatteringVector;

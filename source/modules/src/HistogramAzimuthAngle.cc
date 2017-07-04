@@ -27,13 +27,15 @@
 
 using namespace anl;
 
+namespace unit = anlgeant4::unit;
+
 namespace comptonsoft
 {
 
 HistogramAzimuthAngle::HistogramAzimuthAngle()
   : eventReconstruction_(nullptr),
     numBins_(64),
-    theta_min_(-1.0*degree), theta_max_(181.0*degree),
+    theta_min_(-1.0*unit::degree), theta_max_(181.0*unit::degree),
     phi_origin_(0.0)
 {
 }
@@ -41,8 +43,8 @@ HistogramAzimuthAngle::HistogramAzimuthAngle()
 ANLStatus HistogramAzimuthAngle::mod_startup()
 {
   register_parameter(&numBins_, "number_of_bins");
-  register_parameter(&theta_min_, "theta_min", degree, "degree");
-  register_parameter(&theta_max_, "theta_max", degree, "degree");
+  register_parameter(&theta_min_, "theta_min", unit::degree, "degree");
+  register_parameter(&theta_max_, "theta_max", unit::degree, "degree");
   register_parameter(&phi_origin_, "phi_origin", 1.0, "degree");
   
   return AS_OK;
@@ -108,7 +110,7 @@ ANLStatus HistogramAzimuthAngle::mod_ana()
     return AS_OK;
   }
 
-  const double phi0 = (event.PhiG()/degree) - phi_origin_;
+  const double phi0 = (event.PhiG()/unit::degree) - phi_origin_;
   const int n_phi = std::floor((phi0+180.0)/360.0);
   const double phi1 = phi0 - n_phi*360.0;
 

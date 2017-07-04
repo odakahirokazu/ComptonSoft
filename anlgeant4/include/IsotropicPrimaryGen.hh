@@ -54,16 +54,16 @@ protected:
   
 private:
   G4ThreeVector m_CenterPosition;
-  G4double m_Radius;
-  G4double m_Distance;
+  double m_Radius;
+  double m_Distance;
   G4ThreeVector m_CenterDirection;
-  G4double m_ThetaMin;
-  G4double m_ThetaMax;
-  G4double m_CosTheta0;
-  G4double m_CosTheta1;
-  G4double m_CoveringFactor;
+  double m_ThetaMin;
+  double m_ThetaMax;
+  double m_CosTheta0;
+  double m_CosTheta1;
+  double m_CoveringFactor;
 
-  G4double m_Flux; // energy per unit {time, area, solid angle}
+  double m_Flux; // energy per unit {time, area, solid angle}
 };
 
 } /* namespace anlgeant4 */

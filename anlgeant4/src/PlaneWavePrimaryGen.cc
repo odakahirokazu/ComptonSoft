@@ -18,8 +18,6 @@
  *************************************************************************/
 
 #include "PlaneWavePrimaryGen.hh"
-#include "G4SystemOfUnits.hh"
-#include "G4PhysicalConstants.hh"
 #include "Randomize.hh"
 #include "AstroUnits.hh"
 
@@ -32,10 +30,10 @@ PlaneWavePrimaryGen::PlaneWavePrimaryGen()
   : m_CenterPosition(0.0, 0.0, 0.0),
     m_Direction0(0.0, 0.0, -1.0),
     m_DirectionOrthogonal(0.0, 1.0, 0.0),
-    m_Radius(100.0*cm),
+    m_Radius(100.0*unit::cm),
     m_Polarization0(1.0, 0.0, 0.0),
     m_PolarizationDegree(0.0),
-    m_Flux(1.0e-9*(erg/s/cm2))
+    m_Flux(1.0e-9*(unit::erg/unit::s/unit::cm2))
 {
   add_alias("PlaneWavePrimaryGen");
 }
@@ -55,7 +53,7 @@ ANLStatus PlaneWavePrimaryGen::mod_startup()
   register_parameter(&m_Radius, "radius",
                      LengthUnit(), LengthUnitName());
   set_parameter_description("Radius of the circle where parimary particles are generated.");
-  register_parameter(&m_Flux, "flux", erg/s/cm2, "erg/s/cm2");
+  register_parameter(&m_Flux, "flux", unit::erg/unit::s/unit::cm2, "erg/s/cm2");
   set_parameter_description("Energy flux of the plane wave. This parameter is used only for calculating real time correspoing to a simulation.");
   register_parameter(&m_Polarization0, "polarization_vector");
   set_parameter_description("Polarization vector (if polarization is enable).");
@@ -81,19 +79,19 @@ ANLStatus PlaneWavePrimaryGen::mod_init()
   m_Direction0 = m_Direction0.unit();
   m_DirectionOrthogonal = m_Direction0.orthogonal().unit();
 
-  G4cout << "--------" << G4endl;
-  G4cout << "PrimaryGen status (plane wave)" << G4endl;
-  G4double posx = m_CenterPosition.x();
-  G4double posy = m_CenterPosition.y();
-  G4double posz = m_CenterPosition.z();
-  G4cout << "  Center position: "
-         << posx/cm << " " << posy/cm << " " << posz/cm << " cm" << G4endl;
+  std::cout << "--------" << std::endl;
+  std::cout << "PrimaryGen status (plane wave)" << std::endl;
+  const double posx = m_CenterPosition.x();
+  const double posy = m_CenterPosition.y();
+  const double posz = m_CenterPosition.z();
+  std::cout << "  Center position: "
+            << posx/unit::cm << " " << posy/unit::cm << " " << posz/unit::cm << " cm" << std::endl;
   printSpectralInfo();
-  G4double dirx = m_Direction0.x();
-  G4double diry = m_Direction0.y();
-  G4double dirz = m_Direction0.z();
-  G4cout << "  Direction: "
-         << dirx << " " << diry << " " << dirz << G4endl;
+  const double dirx = m_Direction0.x();
+  const double diry = m_Direction0.y();
+  const double dirz = m_Direction0.z();
+  std::cout << "  Direction: "
+            << dirx << " " << diry << " " << dirz << std::endl;
   
   return AS_OK;
 }
@@ -101,7 +99,7 @@ ANLStatus PlaneWavePrimaryGen::mod_init()
 void PlaneWavePrimaryGen::makePrimarySetting()
 {
   const G4ThreeVector position = samplePosition();
-  const G4double energy = sampleEnergy();
+  const double energy = sampleEnergy();
   
   if (PolarizationMode()==0) {
     setPrimary(position, energy, m_Direction0);
@@ -130,7 +128,7 @@ G4ThreeVector PlaneWavePrimaryGen::samplePosition()
 
   G4ThreeVector position(m_DirectionOrthogonal);
   const double r = m_Radius * sqrt(G4UniformRand());
-  const double t = twopi * G4UniformRand();
+  const double t = CLHEP::twopi * G4UniformRand();
   position.rotate(t, m_Direction0);
   position = m_CenterPosition + r * position;
   return position;
@@ -142,24 +140,24 @@ ANLStatus PlaneWavePrimaryGen::mod_endrun()
   const double realTime = TotalEnergy()/(m_Flux*area);
   const double pflux = Number()/area/realTime;
   
-  G4cout.setf(std::ios::scientific);
-  G4cout << "PWPrimaryGen::mod_endrun \n"
-         << "  Number: " << Number() << "\n"
-         << "  Flux: " << m_Flux/(erg/cm2/s) << " erg/cm2/s\n"
-         << "  Total Energy: " << TotalEnergy()/keV << " keV = "
-         << TotalEnergy()/erg << " erg\n"
-         << "  Area: " << area/cm2 << " cm2\n"
-         << "  Real time: " << realTime/s << " s\n"
-         << "  Photon flux: " << pflux/(1.0/cm2/s) << " photons/cm2/s\n"
-         << G4endl;
-  G4cout.unsetf(std::ios::scientific);
+  std::cout.setf(std::ios::scientific);
+  std::cout << "PWPrimaryGen::mod_endrun \n"
+            << "  Number: " << Number() << "\n"
+            << "  Flux: " << m_Flux/(unit::erg/unit::cm2/unit::s) << " erg/cm2/s\n"
+            << "  Total Energy: " << TotalEnergy()/unit::keV << " keV = "
+            << TotalEnergy()/unit::erg << " erg\n"
+            << "  Area: " << area/unit::cm2 << " cm2\n"
+            << "  Real time: " << realTime/unit::s << " s\n"
+            << "  Photon flux: " << pflux/(1.0/unit::cm2/unit::s) << " photons/cm2/s\n"
+            << std::endl;
+  std::cout.unsetf(std::ios::scientific);
   
   return AS_OK;
 }
 
-G4double PlaneWavePrimaryGen::GenerationArea()
+double PlaneWavePrimaryGen::GenerationArea()
 {
-  return pi*m_Radius*m_Radius;
+  return CLHEP::pi*m_Radius*m_Radius;
 }
 
 } /* namespace anlgeant4 */

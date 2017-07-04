@@ -62,7 +62,7 @@ public:
   G4VUserPrimaryGeneratorAction* create() override;
   
   G4int Number() const { return number_; }
-  G4double TotalEnergy() const { return totalEnergy_; }
+  double TotalEnergy() const { return totalEnergy_; }
 
   void setPolarizationMode(int v) { polarizationMode_ = v; }
   int PolarizationMode() const { return polarizationMode_; }
@@ -71,9 +71,9 @@ public:
   virtual void confirmPrimarySetting();
 
 protected:
-  void setPrimary(G4double time0,
+  void setPrimary(double time0,
                   G4ThreeVector position,
-                  G4double energy,
+                  double energy,
                   G4ThreeVector direction,
                   G4ThreeVector polarization)
   {
@@ -84,9 +84,9 @@ protected:
     polarization_ = polarization;
   }
 
-  void setPrimary(G4double time0,
+  void setPrimary(double time0,
                   G4ThreeVector position,
-                  G4double energy,
+                  double energy,
                   G4ThreeVector direction)
   {
     time_ = time0;
@@ -96,7 +96,7 @@ protected:
   }
 
   void setPrimary(G4ThreeVector position,
-                  G4double energy,
+                  double energy,
                   G4ThreeVector direction,
                   G4ThreeVector polarization)
   {
@@ -107,7 +107,7 @@ protected:
   }
 
   void setPrimary(G4ThreeVector position,
-                  G4double energy,
+                  double energy,
                   G4ThreeVector direction)
   {
     position_ = position;
@@ -115,9 +115,9 @@ protected:
     direction_ = direction;
   }
 
-  void setTime(G4double time0) { time_ = time0; }
+  void setTime(double time0) { time_ = time0; }
   void setPosition(G4ThreeVector position) { position_ = position; }
-  void setEnergy(G4double energy) { energy_ = energy; }
+  void setEnergy(double energy) { energy_ = energy; }
   void setDirection(G4ThreeVector direction) { direction_ = direction; }
   void setPolarization(G4ThreeVector polarization) { polarization_ = polarization; }
 
@@ -148,14 +148,14 @@ protected:
    *
    * @return sampled energy
    */
-  virtual G4double sampleEnergy();
-  G4double sampleFromPowerLaw(double gamma, double e0, double e1);
-  G4double sampleFromPowerLaw();
-  G4double sampleFromGaussian(double mean, double sigma);
-  G4double sampleFromGaussian();
-  G4double sampleFromBlackBody(double kT, double upper_limit_factor);
-  G4double sampleFromBlackBody();
-  G4double sampleFromHistogram();
+  virtual double sampleEnergy();
+  double sampleFromPowerLaw(double gamma, double e0, double e1);
+  double sampleFromPowerLaw();
+  double sampleFromGaussian(double mean, double sigma);
+  double sampleFromGaussian();
+  double sampleFromBlackBody(double kT, double upper_limit_factor);
+  double sampleFromBlackBody();
+  double sampleFromHistogram();
   
   virtual G4ThreeVector sampleDirection() { return direction_; }
   virtual G4ThreeVector samplePosition() { return position_; }
@@ -171,14 +171,14 @@ private:
 
   std::string particleName_;
 
-  G4double time_;
+  double time_;
   G4ThreeVector position_;
-  G4double energy_;
+  double energy_;
   G4ThreeVector direction_;
   G4ThreeVector polarization_;
 
   G4int number_;
-  G4double totalEnergy_;
+  double totalEnergy_;
 
   G4ParticleDefinition* definition_;
 
@@ -187,15 +187,15 @@ private:
   /* properties for the energy distribution */
   std::string energyDistributionName_;
   SpectralShape energyDistribution_;
-  G4double energyMin_;
-  G4double energyMax_;
+  double energyMin_;
+  double energyMax_;
   // power-law distribution
-  G4double photonIndex_;
+  double photonIndex_;
   // Gaussin distribution
-  G4double energyMean_;
-  G4double energySigma_;
+  double energyMean_;
+  double energySigma_;
   // black-body distribution
-  G4double kT_;
+  double kT_;
   // histogram
   std::vector<double> spectrumEnergy_;
   std::vector<double> spectrumPhotons_;

@@ -19,31 +19,29 @@
 
 #include "DumpMass.hh"
 #include <fstream>
-#include "G4SystemOfUnits.hh"
+#include "AstroUnits.hh"
 #include "G4LogicalVolumeStore.hh"
 #include "G4LogicalVolume.hh"
 
 using namespace anl;
-using namespace comptonsoft;
 
+namespace comptonsoft
+{
 
 DumpMass::DumpMass()
   : m_FileName("mass_volumes.txt")
 {
 }
 
-
 DumpMass::~DumpMass()
 {
 }
-
 
 ANLStatus DumpMass::mod_startup()
 {
   register_parameter(&m_FileName, "filename");
   return AS_OK;
 }
-
 
 ANLStatus DumpMass::mod_bgnrun()
 {
@@ -53,9 +51,11 @@ ANLStatus DumpMass::mod_bgnrun()
   G4LogicalVolumeStore* store = G4LogicalVolumeStore::GetInstance();
   for (LVIter it=store->begin(); it!=store->end(); ++it) {
     G4LogicalVolume* lv = *it;
-    fout << lv->GetName() << "    " << lv->GetMass()/g << std::endl;
+    fout << lv->GetName() << "    " << lv->GetMass()/anlgeant4::unit::g << std::endl;
   }
   fout.close();
 
   return AS_OK;
 }
+
+} /* namespace comptonsoft */

@@ -18,7 +18,9 @@
  *************************************************************************/
 
 #include "IsotopeInfo.hh"
-#include "G4SystemOfUnits.hh"
+#include "AstroUnits.hh"
+
+namespace unit = anlgeant4::unit;
 
 namespace comptonsoft {
 
@@ -36,7 +38,7 @@ int64_t IsotopeInfo::makeID(int z, int a, double energy, int floating_level)
   id *= 1000L;
   id += (static_cast<int64_t>(a) % 1000L);
   id *= 1000000000L;
-  id += (static_cast<int64_t>(energy/eV) % 1000000000L);
+  id += (static_cast<int64_t>(energy/unit::eV) % 1000000000L);
   id *= 100L;
   id += (static_cast<int64_t>(floating_level) % 100L);
   return id;
@@ -55,7 +57,7 @@ IsotopeInfo::IsotopeInfo(int64_t isotopeID)
   int64_t id = isotopeID;
   floating_level_ = id % 100L;
   id /= 100L;
-  energy_ = (id % 1000000000L) * eV;
+  energy_ = (id % 1000000000L) * unit::eV;
   id /= 1000000000L;
   A_ = id % 1000L;
   id /= 1000L;

@@ -25,6 +25,8 @@
 #include "FlagDefinition.hh"
 #include "DetectorHit.hh"
 
+namespace unit = anlgeant4::unit;
+
 namespace comptonsoft {
 
 StandardEventReconstructionAlgorithm::StandardEventReconstructionAlgorithm()
@@ -146,7 +148,7 @@ reconstruct2HitsSameMaterial(const std::vector<DetectorHit_sptr>& hits,
   eventReconstructed.setHit1(0, hits[0]);
   eventReconstructed.setHit2(1, hits[1]);
 
-  if (eventReconstructed.TotalEnergy() < 0.5*electron_mass_c2) {
+  if (eventReconstructed.TotalEnergy() < 0.5*CLHEP::electron_mass_c2) {
     if (!eventReconstructed.EnergyOrder()) {
       eventReconstructed.swap();
     }
@@ -305,8 +307,8 @@ bool StandardEventReconstructionAlgorithm::
 checkFluorescence(DetectorHit_sptr fluorescence,
                   DetectorHit_sptr absorption) const
 {
-  const double FluorCutLengthSiCdTe = 10.0 * mm;
-  const double FluorCutLengthCdTeCdTe = 7.0 * mm;
+  const double FluorCutLengthSiCdTe = 10.0 * unit::mm;
+  const double FluorCutLengthCdTeCdTe = 7.0 * unit::mm;
   
   if (fluorescence->isFlags(flag::FluorescenceHit)) {
     if (fluorescence->isFlags(flag::LowZHit) && absorption->isFlags(flag::HighZHit)) {

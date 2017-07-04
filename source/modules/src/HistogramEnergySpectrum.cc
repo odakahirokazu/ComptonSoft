@@ -29,6 +29,8 @@
 
 using namespace anl;
 
+namespace unit = anlgeant4::unit;
+
 namespace comptonsoft
 {
 
@@ -107,7 +109,7 @@ ANLStatus HistogramEnergySpectrum::mod_ana()
     const std::string& evsName = (*it).first;
     TH1* hist = (*it).second;
     if (Evs(evsName)) {
-      hist->Fill(energy/keV, weight);
+      hist->Fill(energy/unit::keV, weight);
     }
   }
 

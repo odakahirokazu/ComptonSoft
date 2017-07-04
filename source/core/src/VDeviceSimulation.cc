@@ -27,12 +27,14 @@
 #include "DetectorHit.hh"
 #include "FlagDefinition.hh"
 
+namespace unit = anlgeant4::unit;
+
 namespace comptonsoft {
 
 VDeviceSimulation::VDeviceSimulation()
   : QuenchingFactor_{1.0, 0.0, 0.0},
-    TimeResolutionFast_(100.0*ns),
-    TimeResolutionSlow_(1000.0*ns),
+    TimeResolutionFast_(100.0*unit::ns),
+    TimeResolutionSlow_(1000.0*unit::ns),
     pedestalEnabled_(false)
   {
   }
@@ -197,12 +199,12 @@ calculateEPI(double energyCharge, const PixelID& pixel) const
   // x: energy in keV
   // y: noise value in keV
   
-  const double x = energyCharge/keV; // in keV
+  const double x = energyCharge/unit::keV; // in keV
   const double param0 = getNoiseParam0(pixel);
   const double param1 = getNoiseParam1(pixel);
   const double param2 = getNoiseParam2(pixel);
   const double y2 = param0*param0 + param1*param1*x + param2*param2*x*x; // in keV2
-  const double sigma = std::sqrt(y2) * keV;
+  const double sigma = std::sqrt(y2) * unit::keV;
   const double ePI = CLHEP::RandGauss::shoot(energyCharge, sigma);
   return ePI;
 }
@@ -234,7 +236,7 @@ void VDeviceSimulation::prepareForTimingProcess()
   simulatePulseHeights();
   removeHitsOutOfPixelRange(SimulatedHits_);
 
-  const double SMALL_TIME = 1.0e-15 * second;
+  const double SMALL_TIME = 1.0e-15 * unit::second;
   mergeHitsIfCoincident(SMALL_TIME, SimulatedHits_);
   sortHitsInTimeOrder(SimulatedHits_);
   mergeHitsIfCoincident(TimeResolutionFast_, SimulatedHits_);

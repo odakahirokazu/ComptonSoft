@@ -27,12 +27,14 @@
 
 using namespace anl;
 
+namespace unit = anlgeant4::unit;
+
 namespace comptonsoft
 {
 
 SelectHits::SelectHits()
   : m_DetectorType(1), m_ReconstructionMode(0),
-    m_Threshold(1.0*keV), m_ThresholdCathode(1.0*keV), m_ThresholdAnode(1.0*keV),
+    m_Threshold(1.0*unit::keV), m_ThresholdCathode(1.0*unit::keV), m_ThresholdAnode(1.0*unit::keV),
     m_LowerECheckFuncC0(0.0), m_LowerECheckFuncC1(0.9),
     m_UpperECheckFuncC0(0.0), m_UpperECheckFuncC1(1.1)
 {
@@ -47,12 +49,12 @@ ANLStatus SelectHits::mod_startup()
   add_value_element(&m_DetectorType, "detector_type", "",
                     "Detector type (1: pad, 2: DSD, 3: scintillator)");
   add_value_element(&m_ReconstructionMode, "reconstruction_mode");
-  add_value_element(&m_Threshold, "threshold", keV, "keV");
-  add_value_element(&m_ThresholdCathode, "threshold_cathode", keV, "keV");
-  add_value_element(&m_ThresholdAnode, "threshold_anode", keV, "keV");
-  add_value_element(&m_LowerECheckFuncC0, "lower_energy_consistency_check_function_c0", keV, "keV");
+  add_value_element(&m_Threshold, "threshold", unit::keV, "keV");
+  add_value_element(&m_ThresholdCathode, "threshold_cathode", unit::keV, "keV");
+  add_value_element(&m_ThresholdAnode, "threshold_anode", unit::keV, "keV");
+  add_value_element(&m_LowerECheckFuncC0, "lower_energy_consistency_check_function_c0", unit::keV, "keV");
   add_value_element(&m_LowerECheckFuncC1, "lower_energy_consistency_check_function_c1");
-  add_value_element(&m_UpperECheckFuncC0, "upper_energy_consistency_check_function_c0", keV, "keV");
+  add_value_element(&m_UpperECheckFuncC0, "upper_energy_consistency_check_function_c0", unit::keV, "keV");
   add_value_element(&m_UpperECheckFuncC1, "upper_energy_consistency_check_function_c1");
   enable_value_elements(1, {1, 2});
   enable_value_elements(2, {1, 3, 4, 5, 6, 7, 8});

@@ -64,13 +64,13 @@ private:
   G4ThreeVector m_SourcePosition;
   
   G4ThreeVector m_CenterDirection;
-  G4double m_Theta0;
-  G4double m_Theta1;
-  G4double m_CosTheta0;
-  G4double m_CosTheta1;
-  G4double m_CoveringFactor;
+  double m_Theta0;
+  double m_Theta1;
+  double m_CosTheta0;
+  double m_CosTheta1;
+  double m_CoveringFactor;
   
-  G4double m_Luminosity;
+  double m_Luminosity;
 };
 
 } /* namespace anlgeant4 */

@@ -19,10 +19,12 @@
 
 #include "HitTreeIO.hh"
 #include <sstream>
-#include "G4SystemOfUnits.hh"
+#include "AstroUnits.hh"
 #include "TTree.h"
 #include "CSException.hh"
 #include "DetectorHit.hh"
+
+namespace unit = anlgeant4::unit;
 
 namespace comptonsoft
 {
@@ -146,26 +148,26 @@ void HitTreeIO::fillHits(const int64_t eventID,
     pixely_ = hit->PixelY();
     rawpha_ = hit->RawPHA();
     pha_ = hit->PHA();
-    epi_ = hit->EPI() / keV;
+    epi_ = hit->EPI() / unit::keV;
     flag_data_ = hit->FlagData();
     flags_ = hit->Flags();
-    real_time_ = hit->RealTime() / second;
-    time_trig_ = hit->TriggeredTime() / second;
+    real_time_ = hit->RealTime() / unit::second;
+    time_trig_ = hit->TriggeredTime() / unit::second;
     time_group_ = hit->TimeGroup();
-    real_posx_ = hit->RealPositionX() / cm;
-    real_posy_ = hit->RealPositionY() / cm;
-    real_posz_ = hit->RealPositionZ() / cm;
-    edep_ = hit->EnergyDeposit() / keV;
-    echarge_ = hit->EnergyCharge() / keV;
+    real_posx_ = hit->RealPositionX() / unit::cm;
+    real_posy_ = hit->RealPositionY() / unit::cm;
+    real_posz_ = hit->RealPositionZ() / unit::cm;
+    edep_ = hit->EnergyDeposit() / unit::keV;
+    echarge_ = hit->EnergyCharge() / unit::keV;
     process_ = hit->Process();
-    energy_ = hit->Energy() / keV;
-    posx_ = hit->PositionX() / cm;
-    posy_ = hit->PositionY() / cm;
-    posz_ = hit->PositionZ() / cm;
-    local_posx_ = hit->LocalPositionX() / cm;
-    local_posy_ = hit->LocalPositionY() / cm;
-    local_posz_ = hit->LocalPositionZ() / cm;
-    time_ = hit->Time() / second;
+    energy_ = hit->Energy() / unit::keV;
+    posx_ = hit->PositionX() / unit::cm;
+    posy_ = hit->PositionY() / unit::cm;
+    posz_ = hit->PositionZ() / unit::cm;
+    local_posx_ = hit->LocalPositionX() / unit::cm;
+    local_posy_ = hit->LocalPositionY() / unit::cm;
+    local_posz_ = hit->LocalPositionZ() / unit::cm;
+    time_ = hit->Time() / unit::second;
     grade_ = hit->Grade();
     
     hittree_->Fill();
@@ -183,20 +185,20 @@ DetectorHit_sptr HitTreeIO::retrieveHit() const
   hit->setPixel(pixelx_, pixely_);
   hit->setRawPHA(rawpha_);
   hit->setPHA(pha_);
-  hit->setEPI(epi_ * keV);
+  hit->setEPI(epi_ * unit::keV);
   hit->setFlagData(flag_data_);
   hit->setFlags(flags_);
-  hit->setRealTime(real_time_ * second);
-  hit->setTriggeredTime(time_trig_ * second);
+  hit->setRealTime(real_time_ * unit::second);
+  hit->setTriggeredTime(time_trig_ * unit::second);
   hit->setTimeGroup(time_group_);
-  hit->setRealPosition(real_posx_ * cm, real_posy_ * cm, real_posz_ * cm);
-  hit->setEnergyDeposit(edep_ * keV);
-  hit->setEnergyCharge(echarge_ * keV);
+  hit->setRealPosition(real_posx_ * unit::cm, real_posy_ * unit::cm, real_posz_ * unit::cm);
+  hit->setEnergyDeposit(edep_ * unit::keV);
+  hit->setEnergyCharge(echarge_ * unit::keV);
   hit->setProcess(process_);
-  hit->setEnergy(energy_ * keV);
-  hit->setPosition(posx_ * cm, posy_ * cm, posz_ * cm);
-  hit->setLocalPosition(local_posx_ * cm, local_posy_ * cm, local_posz_ * cm);
-  hit->setTime(time_ * second);
+  hit->setEnergy(energy_ * unit::keV);
+  hit->setPosition(posx_ * unit::cm, posy_ * unit::cm, posz_ * unit::cm);
+  hit->setLocalPosition(local_posx_ * unit::cm, local_posy_ * unit::cm, local_posz_ * unit::cm);
+  hit->setTime(time_ * unit::second);
   hit->setGrade(grade_);
 
   return hit;

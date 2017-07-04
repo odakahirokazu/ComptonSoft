@@ -20,18 +20,20 @@
 #include "EFieldModel.hh"
 
 #include <iostream>
-#include "TMath.h"
+#include <cmath>
 #include "AstroUnits.hh"
+
+namespace unit = anlgeant4::unit;
 
 namespace comptonsoft {
 
 EFieldModel::EFieldModel()
   : upsideAnode_(false),
-    thickness_(0.5*mm),
+    thickness_(0.5*unit::mm),
     upsideReadElectrode_(true),
-    mutauElectron_(5.0e-3*cm2/volt),
-    mutauHole_(1.5e-4*cm2/volt),
-    biasVoltage_(600*volt),
+    mutauElectron_(5.0e-3*unit::cm2/unit::volt),
+    mutauHole_(1.5e-4*unit::cm2/unit::volt),
+    biasVoltage_(600*unit::volt),
     EFieldMode_(FieldShape::Constant),
     numDivisions_(127)
 {
@@ -65,6 +67,8 @@ double EFieldModel::WeightingPotential(double z) const
   
 double EFieldModel::CCEByHecht(double z) const
 {
+  using std::exp;
+  
   double zAnode, zCathode;
   if (isUpSideAnode()) {
     zAnode = +0.5*Thickness();
@@ -75,14 +79,16 @@ double EFieldModel::CCEByHecht(double z) const
     zAnode = -0.5*Thickness();
   }
 
-  const double cceElectron = MuTauElectron()*EFieldMean_/Thickness()*(1.-TMath::Exp(-DriftTimeMobility(zAnode,z)/MuTauElectron()));
-  const double cceHole = MuTauHole()*EFieldMean_/Thickness()*(1.-TMath::Exp(-DriftTimeMobility(zCathode,z)/MuTauHole()));
+  const double cceElectron = MuTauElectron()*EFieldMean_/Thickness()*(1.-exp(-DriftTimeMobility(zAnode,z)/MuTauElectron()));
+  const double cceHole = MuTauHole()*EFieldMean_/Thickness()*(1.-exp(-DriftTimeMobility(zCathode,z)/MuTauHole()));
   double cce = cceElectron + cceHole;
   return cce;
 }
 
 double EFieldModel::CCE_impl(bool electron, double z) const
 {
+  using std::exp;
+
   bool runUp = (electron==isUpSideAnode());
 
   double mutau;
@@ -108,13 +114,13 @@ double EFieldModel::CCE_impl(bool electron, double z) const
     double deltaWP, z1, qEff;
     deltaWP = WeightingPotentialByIndex(ki) - wpi;
     z1 = 0.5*(zi+PositionZ(ki));
-    qEff = TMath::Exp(-DriftTimeMobility(z1,zi)/mutau);
+    qEff = exp(-DriftTimeMobility(z1,zi)/mutau);
     cce += qEff * deltaWP;
 
     for (int k=ki; k<nDiv; k++) {
       deltaWP = WeightingPotentialByIndex(k+1) - WeightingPotentialByIndex(k);
       z1 = PositionZ(k+0.5);
-      qEff = TMath::Exp(-DriftTimeMobility(z1,zi)/mutau);
+      qEff = exp(-DriftTimeMobility(z1,zi)/mutau);
       cce += qEff * deltaWP;
     }
 
@@ -129,13 +135,13 @@ double EFieldModel::CCE_impl(bool electron, double z) const
     double deltaWP, z1, qEff;
     deltaWP = WeightingPotentialByIndex(ki) - wpi;
     z1 = 0.5*(zi+PositionZ(ki));
-    qEff = TMath::Exp(-DriftTimeMobility(z1,zi)/mutau);
+    qEff = exp(-DriftTimeMobility(z1,zi)/mutau);
     cce += qEff * deltaWP;
   
     for (int k=ki; k>0; k--) {
       deltaWP = WeightingPotentialByIndex(k-1) - WeightingPotentialByIndex(k);
       z1 = PositionZ(k-0.5);
-      qEff = TMath::Exp(-DriftTimeMobility(z1,zi)/mutau);
+      qEff = exp(-DriftTimeMobility(z1,zi)/mutau);
       cce += qEff * deltaWP;
     }
 
@@ -173,6 +179,8 @@ bool EFieldModel::setEField(double bias, FieldShape mode)
 
 bool EFieldModel::setEField(double bias, FieldShape mode, double p0)
 {
+  using std::abs;
+
   if (mode==FieldShape::Linear) {
     biasVoltage_ = bias;
     EFieldMode_ = mode;
@@ -181,7 +189,7 @@ bool EFieldModel::setEField(double bias, FieldShape mode, double p0)
     EFieldParam_[2] = 0.0;
     EFieldParam_[3] = 0.0;
     
-    if (TMath::Abs(EFieldParam(0)-1.0)<0.0001) {
+    if (abs(EFieldParam(0)-1.0)<0.0001) {
       std::cout << "Error: EFieldRatio ~ 1." << std::endl;
       return false;
     }
@@ -214,6 +222,8 @@ bool EFieldModel::setEField(double /* bias */, FieldShape /* mode */, double /* 
 
 bool EFieldModel::setEField(double bias, FieldShape mode, double p0, double p1, double p2)
 {
+  using std::abs;
+  
   if (mode==FieldShape::Bending) {
     biasVoltage_ = bias;
     EFieldMode_ = mode;
@@ -222,7 +232,7 @@ bool EFieldModel::setEField(double bias, FieldShape mode, double p0, double p1, 
     EFieldParam_[2] = p2;
     EFieldParam_[3] = 0.0;
 
-    if (TMath::Abs(EFieldParam(0)-1.0)<0.0001 || TMath::Abs(EFieldParam(1)-1.0)<0.0001) {
+    if (abs(EFieldParam(0)-1.0)<0.0001 || abs(EFieldParam(1)-1.0)<0.0001) {
       std::cout << "Error: EFieldRatio ~ 1." << std::endl;
       return false;
     }
@@ -268,37 +278,40 @@ bool EFieldModel::setEField(double bias, FieldShape mode, double p0, double p1, 
 
 double EFieldModel::DriftTimeMobility(double z, double zInitial) const
 {
+  using std::abs;
+  using std::log;
+  
   double muT = 0.0;
   if (EFieldMode()==FieldShape::Constant) {
-    muT = TMath::Abs((z-zInitial)/EFieldMean_);
+    muT = abs((z-zInitial)/EFieldMean_);
   }
   else if (EFieldMode()==FieldShape::Linear) {
-    muT = TMath::Abs(alpha_*TMath::Log((z+alpha_)/(zInitial+alpha_))/EFieldMean_);
+    muT = abs(alpha_*log((z+alpha_)/(zInitial+alpha_))/EFieldMean_);
   }
   else if (EFieldMode()==FieldShape::Bending) {
     if (zInitial <= z) {
       if (bendingPoint_ <= zInitial) {
-        muT = TMath::Abs(alpha2_*TMath::Log((z-bendingPoint_+alpha2_)/(zInitial-bendingPoint_+alpha2_)))/EFieldMax_;
+        muT = abs(alpha2_*log((z-bendingPoint_+alpha2_)/(zInitial-bendingPoint_+alpha2_)))/EFieldMax_;
       }
       else {
         if (z <= bendingPoint_) {
-          muT = TMath::Abs(alpha1_*TMath::Log((z-bendingPoint_+alpha1_)/(zInitial-bendingPoint_+alpha1_)))/EFieldMax_;
+          muT = abs(alpha1_*log((z-bendingPoint_+alpha1_)/(zInitial-bendingPoint_+alpha1_)))/EFieldMax_;
         }
         else {
-          muT = (TMath::Abs(alpha1_*TMath::Log(alpha1_/(zInitial-bendingPoint_+alpha1_))) + TMath::Abs(alpha2_*TMath::Log((z-bendingPoint_+alpha2_)/alpha2_)))/EFieldMax_;
+          muT = (abs(alpha1_*log(alpha1_/(zInitial-bendingPoint_+alpha1_))) + abs(alpha2_*log((z-bendingPoint_+alpha2_)/alpha2_)))/EFieldMax_;
         }
       }
     }
     else {
       if (bendingPoint_ >= zInitial) {
-        muT = TMath::Abs(alpha1_*TMath::Log((z-bendingPoint_+alpha1_)/(zInitial-bendingPoint_+alpha1_)))/EFieldMax_;
+        muT = abs(alpha1_*log((z-bendingPoint_+alpha1_)/(zInitial-bendingPoint_+alpha1_)))/EFieldMax_;
       }
       else {
         if (z >= bendingPoint_) {
-          muT = TMath::Abs(alpha2_*TMath::Log((z-bendingPoint_+alpha2_)/(zInitial-bendingPoint_+alpha2_)))/EFieldMax_;
+          muT = abs(alpha2_*log((z-bendingPoint_+alpha2_)/(zInitial-bendingPoint_+alpha2_)))/EFieldMax_;
         }
         else {
-          muT = (TMath::Abs(alpha2_*TMath::Log(alpha2_/(zInitial-bendingPoint_+alpha2_))) + TMath::Abs(alpha1_*TMath::Log((z-bendingPoint_+alpha1_)/alpha1_)))/EFieldMax_;
+          muT = (abs(alpha2_*log(alpha2_/(zInitial-bendingPoint_+alpha2_))) + abs(alpha1_*log((z-bendingPoint_+alpha1_)/alpha1_)))/EFieldMax_;
         }
       }
     }

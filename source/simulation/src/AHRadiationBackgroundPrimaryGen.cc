@@ -18,13 +18,14 @@
  *************************************************************************/
 
 #include "AHRadiationBackgroundPrimaryGen.hh"
-#include "G4SystemOfUnits.hh"
-#include "G4PhysicalConstants.hh"
+#include "AstroUnits.hh"
 #include "TFile.h"
 #include "TH1.h"
 #include "TGraph.h"
 
 using namespace anl;
+
+namespace unit = anlgeant4::unit;
 
 namespace comptonsoft
 {
@@ -54,7 +55,7 @@ ANLStatus AHRadiationBackgroundPrimaryGen::mod_init()
   
   m_File.reset(new TFile(m_Filename.c_str()));
   if ( m_File->IsZombie() ) {
-    G4cout << "Cannot open " << m_Filename << " ! " << G4endl;
+    std::cout << "Cannot open " << m_Filename << " ! " << std::endl;
     return AS_QUIT_ERR;
   }
   
@@ -64,26 +65,26 @@ ANLStatus AHRadiationBackgroundPrimaryGen::mod_init()
   double* x_array = graph->GetX(); // GeV
   std::vector<double> energies(N);
   for (int i=0; i<N; i++) {
-    energies[i] = x_array[i] * GeV;
+    energies[i] = x_array[i] * unit::GeV;
   }
 
   m_Hist = new TH1D("spectrum", "spectrum", N-1, &energies[0]);
   double sum(0.0);
-  G4cout << "** output spectral information of particles **" << G4endl;
+  std::cout << "** output spectral information of particles **" << std::endl;
   
   for (int bin=1; bin<=N; bin++) {
-    double energy = m_Hist->GetBinCenter(bin);
-    double differentialFlux = graph->Eval(energy/GeV) * (1.0/s/m2/sr/GeV);
-    double deltaE = m_Hist->GetBinWidth(bin);
-    double flux = differentialFlux * deltaE;
+    const double energy = m_Hist->GetBinCenter(bin);
+    const double differentialFlux = graph->Eval(energy/unit::GeV) * (1.0/unit::s/unit::m2/unit::sr/unit::GeV);
+    const double deltaE = m_Hist->GetBinWidth(bin);
+    const double flux = differentialFlux * deltaE;
     m_Hist->SetBinContent(bin, flux);
     sum += flux;
-    G4cout << energy/MeV << " [MeV] : " << differentialFlux/(1.0/s/cm2/sr/MeV) << " [#/s/cm2/sr/MeV] " << G4endl;
+    std::cout << energy/unit::MeV << " [MeV] : " << differentialFlux/(1.0/unit::s/unit::cm2/unit::sr/unit::MeV) << " [#/s/cm2/sr/MeV] " << std::endl;
   }
   
-  double circleArea = Radius()*Radius()*pi;
-  double norm = sum * circleArea * (4.0*pi*CoveringFactor());
-  G4cout << " -> Normalization factor: " << norm/(1.0/s) << " particles/s\n" << G4endl;
+  const double circleArea = Radius()*Radius()*CLHEP::pi;
+  const double norm = sum * circleArea * (4.0*CLHEP::pi*CoveringFactor());
+  std::cout << " -> Normalization factor: " << norm/(1.0/unit::s) << " particles/s\n" << std::endl;
   
   return AS_OK;
 }

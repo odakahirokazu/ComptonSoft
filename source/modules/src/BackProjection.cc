@@ -19,7 +19,7 @@
 
 #include "BackProjection.hh"
 
-#include "G4SystemOfUnits.hh"
+#include "AstroUnits.hh"
 #include "TDirectory.h"
 #include "TRandom3.h"
 #include "TMath.h"
@@ -27,17 +27,19 @@
 
 using namespace anl;
 
+namespace unit = anlgeant4::unit;
+
 namespace comptonsoft
 {
 
 BackProjection::BackProjection()
   : m_EventReconstruction(0),
     m_PlaneNormal(0.0, 0.0, 1.0),
-    m_PlanePoint(0.0*cm, 0.0*cm, 10.0*cm),
+    m_PlanePoint(0.0*unit::cm, 0.0*unit::cm, 10.0*unit::cm),
     m_NumPixelX(256), m_NumPixelY(256),
-    m_RangeX1(-4.0*cm), m_RangeX2(+4.0*cm),
-    m_RangeY1(-4.0*cm), m_RangeY2(+4.0*cm),
-    m_PixelUnit(cm), m_PixelUnitName("cm")
+    m_RangeX1(-4.0*unit::cm), m_RangeX2(+4.0*unit::cm),
+    m_RangeY1(-4.0*unit::cm), m_RangeY2(+4.0*unit::cm),
+    m_PixelUnit(unit::cm), m_PixelUnitName("cm")
 {
 }
 

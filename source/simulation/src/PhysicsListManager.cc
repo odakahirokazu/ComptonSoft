@@ -18,7 +18,7 @@
  *************************************************************************/
 
 #include "PhysicsListManager.hh"
-#include "G4SystemOfUnits.hh"
+#include "AstroUnits.hh"
 #include "QGSP_BIC.hh"
 #include "QGSP_BIC_HP.hh"
 #include "FTFP_BERT.hh"

@@ -19,7 +19,7 @@
 
 #include "GenerateSimXEvent.hh"
 
-#include "G4SystemOfUnits.hh"
+#include "AstroUnits.hh"
 #include "DetectorHit.hh"
 #include "CSHitCollection.hh"
 #include "SimXIF.hh"

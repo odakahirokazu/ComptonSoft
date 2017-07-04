@@ -24,8 +24,7 @@
 #include <algorithm>
 #include <boost/format.hpp>
 
-#include "G4SystemOfUnits.hh"
-#include "G4PhysicalConstants.hh"
+#include "AstroUnits.hh"
 #include "G4Run.hh"
 #include "G4VProcess.hh"
 #include "G4ProcessManager.hh"
@@ -39,6 +38,8 @@
 
 using namespace anl;
 
+namespace unit = anlgeant4::unit;
+
 namespace comptonsoft
 {
 
@@ -47,7 +48,7 @@ ActivationUserActionAssembly::ActivationUserActionAssembly()
     m_FilenameBase("activation"),
     m_DetectionByGeneration(true),
     m_ProcessesToDetect{"protonInelastic"},
-    m_LifetimeLimit(1.0e-3*second),
+    m_LifetimeLimit(1.0e-3*unit::second),
     m_InitialEnergy(0.0)
 {
   add_alias("ActivationUserActionAssembly");
@@ -60,7 +61,7 @@ ANLStatus ActivationUserActionAssembly::mod_startup()
   register_parameter(&m_FilenameBase, "output_filename_base");
   register_parameter(&m_DetectionByGeneration, "detection_by_generation");
   register_parameter(&m_ProcessesToDetect, "processes_to_detect");
-  register_parameter(&m_LifetimeLimit, "lifetime_limit", second, "s");
+  register_parameter(&m_LifetimeLimit, "lifetime_limit", unit::second, "s");
   return AS_OK;
 }
 
@@ -188,13 +189,13 @@ void ActivationUserActionAssembly::Fill(const G4Ions* nucleus,
   // fill ntuple
   m_AnalysisManager->FillNtupleIColumn(0, Z);
   m_AnalysisManager->FillNtupleIColumn(1, A);
-  m_AnalysisManager->FillNtupleDColumn(2, Energy);
+  m_AnalysisManager->FillNtupleDColumn(2, Energy/unit::keV);
   m_AnalysisManager->FillNtupleIColumn(3, floatingLevel);
   m_AnalysisManager->FillNtupleIColumn(4, volumeIndex);
-  m_AnalysisManager->FillNtupleFColumn(5, posx);
-  m_AnalysisManager->FillNtupleFColumn(6, posy);
-  m_AnalysisManager->FillNtupleFColumn(7, posz);
-  m_AnalysisManager->FillNtupleDColumn(8, m_InitialEnergy);
+  m_AnalysisManager->FillNtupleFColumn(5, posx/unit::cm);
+  m_AnalysisManager->FillNtupleFColumn(6, posy/unit::cm);
+  m_AnalysisManager->FillNtupleFColumn(7, posz/unit::cm);
+  m_AnalysisManager->FillNtupleDColumn(8, m_InitialEnergy/unit::keV);
   m_AnalysisManager->AddNtupleRow();
   
   // fill data map
@@ -238,7 +239,7 @@ void ActivationUserActionAssembly::OutputSummary(const std::string& filename,
                % isotopeID
                % isotope.Z()
                % isotope.A()
-               % (isotope.Energy()/keV)
+               % (isotope.Energy()/unit::keV)
                % isotope.FloatingLevel()
                % isotope.Counts());
     }

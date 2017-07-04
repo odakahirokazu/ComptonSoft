@@ -30,6 +30,8 @@
 
 using namespace anl;
 
+namespace unit = anlgeant4::unit;
+
 namespace comptonsoft
 {
 
@@ -90,7 +92,7 @@ ANLStatus ResponseMatrix::mod_ana()
     const std::string& evsName = pair.first;
     TH2* hist = pair.second;
     if (Evs(evsName)) {
-      hist->Fill(initialEnergy/keV, energy/keV, weight);
+      hist->Fill(initialEnergy/unit::keV, energy/unit::keV, weight);
     }
   }
 

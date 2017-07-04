@@ -24,6 +24,8 @@
 
 using namespace anl;
 
+namespace unit = anlgeant4::unit;
+
 namespace comptonsoft
 {
 
@@ -43,10 +45,10 @@ ANLStatus SelectEventsOnFocalPlane::mod_startup()
 {
   register_parameter(&m_DetectorID, "detector_id");
   register_parameter(&m_RegionTypeString, "region_type");
-  register_parameter(&m_Center, "center", cm, "cm");
-  register_parameter(&m_SizeX, "size_x", cm, "cm");
-  register_parameter(&m_SizeY, "size_y", cm, "cm");
-  register_parameter(&m_Radius, "radius", cm, "cm");
+  register_parameter(&m_Center, "center", unit::cm, "cm");
+  register_parameter(&m_SizeX, "size_x", unit::cm, "cm");
+  register_parameter(&m_SizeY, "size_y", unit::cm, "cm");
+  register_parameter(&m_Radius, "radius", unit::cm, "cm");
   return AS_OK;
 }
 

@@ -26,6 +26,8 @@
 
 using namespace anl;
 
+namespace unit = anlgeant4::unit;
+
 namespace comptonsoft
 {
 
@@ -82,7 +84,7 @@ ANLStatus HistogramARM::mod_ana()
     return AS_OK;
   }
 
-  const double ARMValue = event.DeltaTheta()/degree;
+  const double ARMValue = event.DeltaTheta()/unit::degree;
   hist_all_->Fill(ARMValue);
   for (std::size_t i=0; i<hist_vec_.size(); i++) {
     if (eventReconstruction_->HitPatternFlag(i)) {

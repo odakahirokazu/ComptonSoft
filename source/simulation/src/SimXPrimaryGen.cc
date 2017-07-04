@@ -33,10 +33,10 @@ namespace comptonsoft
 SimXPrimaryGen::SimXPrimaryGen()
   : m_SimXIF(0),
     m_CenterPosition(0.0, 0.0, 0.0),
-    m_Radius(100.0*cm),
+    m_Radius(100.0*unit::cm),
     m_Polarization0(1.0, 0.0, 0.0),
     m_PolarizationDegree(0.0),
-    m_Flux(1.0e-9*(erg/s/cm2))
+    m_Flux(1.0e-9*(unit::erg/unit::s/unit::cm2))
 {
   add_alias("SimXPrimaryGen");
 }
@@ -49,9 +49,9 @@ ANLStatus SimXPrimaryGen::mod_startup()
 {
   BasicPrimaryGen::mod_startup();
 
-  register_parameter(&m_CenterPosition, "center_position", cm, "cm");
+  register_parameter(&m_CenterPosition, "center_position", unit::cm, "cm");
   set_parameter_description("Position of the sphere.");
-  register_parameter(&m_Radius, "radius", cm, "cm");
+  register_parameter(&m_Radius, "radius", unit::cm, "cm");
   set_parameter_description("Radius of the sphere.");
 
   register_parameter(&m_Polarization0, "polarization_vector");
@@ -59,7 +59,7 @@ ANLStatus SimXPrimaryGen::mod_startup()
   register_parameter(&m_PolarizationDegree, "degree_of_polarization");
   set_parameter_description("Degree of polarization (if polarization is enable).");
 
-  register_parameter(&m_Flux, "flux", (erg/cm2/s/sr), "erg/cm2/s/sr");
+  register_parameter(&m_Flux, "flux", (unit::erg/unit::cm2/unit::s/unit::sr), "erg/cm2/s/sr");
   set_parameter_description("Energy flux of the primaries. This parameter is used only for calculating real time correspoing to a simulation.");
 
   unregister_parameter("photon_index");
@@ -71,7 +71,7 @@ ANLStatus SimXPrimaryGen::mod_startup()
 
 ANLStatus SimXPrimaryGen::mod_init()
 {
-  G4double area = pi * m_Radius * m_Radius;
+  G4double area = CLHEP::pi * m_Radius * m_Radius;
   GetModuleNC("SimXIF", &m_SimXIF);
   m_SimXIF->generatePrimaries(area);
   std::cout << "Number of primaries: " << m_SimXIF->NumberOfPrimaries() << std::endl;
@@ -95,7 +95,7 @@ void SimXPrimaryGen::makePrimarySetting()
   G4ThreeVector v = (-m_Radius) * direction;
   G4ThreeVector v2 = v.orthogonal();
   v2.setMag( m_Radius * sqrt(G4UniformRand()) );
-  G4double chi = twopi * G4UniformRand();
+  G4double chi = CLHEP::twopi * G4UniformRand();
   v2.rotate(chi, v);
   G4ThreeVector position = m_CenterPosition + v + v2;
 
@@ -124,23 +124,21 @@ void SimXPrimaryGen::makePrimarySetting()
 
 ANLStatus SimXPrimaryGen::mod_endrun()
 {
-  G4double area = pi*m_Radius*m_Radius;
-  G4double realTime = 0.;
-  G4double pflux = 0.;
-  realTime = TotalEnergy()/(m_Flux*area);
-  pflux = Number()/area/realTime;
+  const double area = CLHEP::pi*m_Radius*m_Radius;
+  const double realTime = TotalEnergy()/(m_Flux*area);
+  const double pflux = Number()/area/realTime;
     
-  G4cout.setf(std::ios::scientific);
-  G4cout << "SimXPrimaryGen::mod_endrun \n"
-         << "  Number: " << Number() << "\n"
-         << "  Flux: " << m_Flux/(erg/cm2/s) << " erg/cm2/s\n"
-         << "  Total Energy: " << TotalEnergy()/keV << " keV = "
-         << TotalEnergy()/erg << " erg\n"
-         << "  Area: " << area/cm2 << " cm2\n"
-         << "  Real time: " << realTime/s << " s\n"
-         << "  Photon flux: " << pflux/(1.0/cm2/s) << " photons/cm2/s\n"
-         << G4endl;
-  G4cout.unsetf(std::ios::scientific);
+  std::cout.setf(std::ios::scientific);
+  std::cout << "SimXPrimaryGen::mod_endrun \n"
+            << "  Number: " << Number() << "\n"
+            << "  Flux: " << m_Flux/(unit::erg/unit::cm2/unit::s) << " erg/cm2/s\n"
+            << "  Total Energy: " << TotalEnergy()/unit::keV << " keV = "
+            << TotalEnergy()/unit::erg << " erg\n"
+            << "  Area: " << area/unit::cm2 << " cm2\n"
+            << "  Real time: " << realTime/unit::s << " s\n"
+            << "  Photon flux: " << pflux/(1.0/unit::cm2/unit::s) << " photons/cm2/s\n"
+            << std::endl;
+  std::cout.unsetf(std::ios::scientific);
   
   return AS_OK;
 }

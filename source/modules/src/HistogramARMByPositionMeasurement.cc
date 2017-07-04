@@ -19,7 +19,7 @@
 
 #include "HistogramARMByPositionMeasurement.hh"
 
-#include "G4SystemOfUnits.hh"
+#include "AstroUnits.hh"
 #include "TDirectory.h"
 #include "TH1.h"
 #include "TRandom3.h"
@@ -29,6 +29,8 @@
 #include "EventReconstruction.hh"
 
 using namespace anl;
+
+namespace unit = anlgeant4::unit;
 
 namespace comptonsoft
 {
@@ -106,7 +108,7 @@ ANLStatus HistogramARMByPositionMeasurement::mod_ana()
 
     const vector3_t coneAxis1 = hit1Position1 - hit2Position1;
     const double thetaG1 = sourceDirection.angle(coneAxis1);
-    const double ARMValueByPosition = (thetaG1 - thetaG)/degree;
+    const double ARMValueByPosition = (thetaG1 - thetaG)/unit::degree;
     hist_all_->Fill(ARMValueByPosition, FillWeight);
     for (std::size_t i=0; i<hist_vec_.size(); i++) {
       if (eventReconstruction_->HitPatternFlag(i)) {

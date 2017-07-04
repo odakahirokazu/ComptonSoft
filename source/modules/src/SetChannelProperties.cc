@@ -24,7 +24,7 @@
 #include <boost/format.hpp>
 #include <boost/property_tree/xml_parser.hpp>
 
-#include "G4SystemOfUnits.hh"
+#include "AstroUnits.hh"
 
 #include "ANLException.hh"
 #include "VRealDetectorUnit.hh"
@@ -35,6 +35,8 @@
 #include "SimDetectorUnitScintillator.hh"
 
 using namespace anl;
+
+namespace unit = anlgeant4::unit;
 
 namespace comptonsoft
 {
@@ -194,18 +196,18 @@ void SetChannelProperties::setupChannelProperties(int section,
     ds->setNoiseParam2(channelID, *o);
   }
   if (optional<double> o = properties.trigger_discrimination_center) {
-    const double value = (*o) * keV;
+    const double value = (*o) * unit::keV;
     ds->setTriggerDiscriminationCenter(channelID, value);
   }
   if (optional<double> o = properties.trigger_discrimination_sigma) {
-    const double value = (*o) * keV;
+    const double value = (*o) * unit::keV;
     ds->setTriggerDiscriminationSigma(channelID, value);
   }
   if (optional<double> o = properties.compensation_factor) {
     ds->setEPICompensationFactor(channelID, *o);
   }
   if (optional<double> o = properties.threshold_value) {
-    const double value = (*o) * keV;
+    const double value = (*o) * unit::keV;
     ds->setThreshold(channelID, value);
   }
 }
@@ -227,7 +229,7 @@ void SetChannelProperties::setupChannelProperties(int section,
     mcd->setChannelDisabled(channel, *status);
   }
   if (optional<double> o = properties.threshold_value) {
-    const double value = (*o) * keV;
+    const double value = (*o) * unit::keV;
     mcd->setThresholdEnergy(channel, value);
   }
 }

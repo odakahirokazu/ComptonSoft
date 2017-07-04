@@ -18,26 +18,27 @@
  *************************************************************************/
 
 #include "OutputSimXPrimaries.hh"
-#include "G4SystemOfUnits.hh"
+#include "AstroUnits.hh"
 #include "SimXIF.hh"
 
 using namespace anl;
-using namespace comptonsoft;
 
+namespace unit = anlgeant4::unit;
+
+namespace comptonsoft
+{
 
 OutputSimXPrimaries::OutputSimXPrimaries()
-  : m_FileName("incident_photons.fits"), m_Area(300.0*cm2)
+  : m_FileName("incident_photons.fits"), m_Area(300.0*unit::cm2)
 {
 }
-
 
 ANLStatus OutputSimXPrimaries::mod_startup()
 {
   register_parameter(&m_FileName, "filename");
-  register_parameter(&m_Area, "area", cm2, "cm2");
+  register_parameter(&m_Area, "area", unit::cm2, "cm2");
   return AS_OK;
 }
-
 
 ANLStatus OutputSimXPrimaries::mod_init()
 {
@@ -50,3 +51,5 @@ ANLStatus OutputSimXPrimaries::mod_init()
   
   return AS_OK;
 }
+
+} /* namespace comptonsoft */

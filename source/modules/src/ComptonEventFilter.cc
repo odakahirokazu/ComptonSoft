@@ -25,6 +25,8 @@
 
 using namespace anl;
 
+namespace unit = anlgeant4::unit;
+
 namespace comptonsoft
 {
 
@@ -149,17 +151,17 @@ void ComptonEventFilter::add_condition(const std::string& type,
   if (type == "E1") {
     condition = std::bind(filter_compton<double>,
                           &BasicComptonEvent::Hit1Energy,
-                          arg::_1, min_value*keV, max_value*keV);
+                          arg::_1, min_value*unit::keV, max_value*unit::keV);
   }
   else if (type == "E2") {
     condition = std::bind(filter_compton<double>,
                           &BasicComptonEvent::Hit2Energy,
-                          arg::_1, min_value*keV, max_value*keV);
+                          arg::_1, min_value*unit::keV, max_value*unit::keV);
   }
   else if (type == "E1+E2") {
     condition = std::bind(filter_compton<double>,
                           &BasicComptonEvent::TotalEnergy,
-                          arg::_1, min_value*keV, max_value*keV);
+                          arg::_1, min_value*unit::keV, max_value*unit::keV);
   }
   else if (type == "theta K") {
     condition = std::bind(filter_compton<double>,
@@ -179,37 +181,37 @@ void ComptonEventFilter::add_condition(const std::string& type,
   else if (type == "time") {
     condition = std::bind(filter_compton<double>,
                           &BasicComptonEvent::Hit1Time,
-                          arg::_1, min_value*s, max_value*s);
+                          arg::_1, min_value*unit::s, max_value*unit::s);
   }
   else if (type == "hit 1 position x") {
     condition = std::bind(filter_compton<double>,
                           &BasicComptonEvent::Hit1PositionX,
-                          arg::_1, min_value*cm, max_value*cm);
+                          arg::_1, min_value*unit::cm, max_value*unit::cm);
   }
   else if (type == "hit 1 position y") {
     condition = std::bind(filter_compton<double>,
                           &BasicComptonEvent::Hit1PositionY,
-                          arg::_1, min_value*cm, max_value*cm);
+                          arg::_1, min_value*unit::cm, max_value*unit::cm);
   }
   else if (type == "hit 1 position z") {
     condition = std::bind(filter_compton<double>,
                           &BasicComptonEvent::Hit1PositionZ,
-                          arg::_1, min_value*cm, max_value*cm);
+                          arg::_1, min_value*unit::cm, max_value*unit::cm);
   }
   else if (type == "hit 2 position x") {
     condition = std::bind(filter_compton<double>,
                           &BasicComptonEvent::Hit2PositionX,
-                          arg::_1, min_value*cm, max_value*cm);
+                          arg::_1, min_value*unit::cm, max_value*unit::cm);
   }
   else if (type == "hit 2 position y") {
     condition = std::bind(filter_compton<double>,
                           &BasicComptonEvent::Hit2PositionY,
-                          arg::_1, min_value*cm, max_value*cm);
+                          arg::_1, min_value*unit::cm, max_value*unit::cm);
   }
   else if (type == "hit 2 position z") {
     condition = std::bind(filter_compton<double>,
                           &BasicComptonEvent::Hit2PositionZ,
-                          arg::_1, min_value*cm, max_value*cm);
+                          arg::_1, min_value*unit::cm, max_value*unit::cm);
   }
   else {
     std::cout << "invalid condition type: " << type << std::endl;

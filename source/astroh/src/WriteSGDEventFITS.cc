@@ -29,6 +29,8 @@
 
 using namespace anl;
 
+namespace unit = anlgeant4::unit;
+
 namespace
 {
 
@@ -58,7 +60,7 @@ void fillHits(int64_t occurrenceID,
                            channelID,
                            channelID_remapped,
                            hit->PHA(),
-                           hit->EPI()/keV);
+                           hit->EPI()/unit::keV);
     if (hit->SelfTriggered()) {
       const int triggerIndex = readoutModuleID;
       flags.addTriggerPatternByIndex(triggerIndex);

@@ -40,8 +40,8 @@ struct SimputCatalog;
 }
 
 using namespace anl;
-using namespace comptonsoft;
 
+namespace unit = anlgeant4::unit;
 
 extern "C"
 void get_input_data(int argc, char *argv[],
@@ -94,17 +94,21 @@ void generate_primaries(struct simx::PARAMETERS *params,
                         struct simx::Response_Type *response,
                         struct simx::Source_Type *src,
                         double area,
-                        std::vector<PhaseSpaceVector>* primaries);
+                        std::vector<comptonsoft::PhaseSpaceVector>* primaries);
 
-void output_primaries(const std::vector<PhaseSpaceVector>* primaries,
+void output_primaries(const std::vector<comptonsoft::PhaseSpaceVector>* primaries,
                       const char* file_name);
 
-bool compair_time(const PhaseSpaceVector& left, const PhaseSpaceVector& right)
+bool compair_time(const comptonsoft::PhaseSpaceVector& left, const comptonsoft::PhaseSpaceVector& right)
 {
   return left.Time() < right.Time();
 }
 
-}
+} /* anonymous namespace */
+
+
+namespace comptonsoft
+{
 
 SimXIF::SimXIF()
   : m_SimXParameters(0),
@@ -123,7 +127,6 @@ SimXIF::SimXIF()
   m_PrimaryIter = m_Primaries.begin();
 }
 
-
 SimXIF::~SimXIF()
 {
   delete m_Source;
@@ -139,7 +142,6 @@ SimXIF::~SimXIF()
   m_Event = 0;
   m_EventList = 0;
 }
-
 
 ANLStatus SimXIF::mod_prepare()
 {
@@ -168,7 +170,6 @@ ANLStatus SimXIF::mod_prepare()
   return AS_OK;
 }
 
-
 ANLStatus SimXIF::mod_init()
 {
   /* Read in files, set things up, etc */ 
@@ -188,14 +189,12 @@ ANLStatus SimXIF::mod_init()
   return AS_OK;
 }
 
-
 ANLStatus SimXIF::mod_ana()
 {
   if (m_PrimaryIter == m_Primaries.end()) return AS_QUIT;
 
   return AS_OK;
 }
-
 
 void SimXIF::generatePrimaries(double area)
 {
@@ -206,7 +205,7 @@ void SimXIF::generatePrimaries(double area)
   m_SimXParameters->tcdlt3 = 1.0;
 
   generate_primaries(m_SimXParameters, m_Response, m_Source,
-                     area/cm2, &m_Primaries);
+                     area/unit::cm2, &m_Primaries);
 
   m_SimXParameters->tcdlt2 = tcdlt2;
   m_SimXParameters->tcdlt3 = tcdlt3;
@@ -215,12 +214,10 @@ void SimXIF::generatePrimaries(double area)
   on();
 }
 
-
 PhaseSpaceVector SimXIF::takePrimary()
 {
   return *(m_PrimaryIter++);
 }
-
 
 void SimXIF::addEvent(double time, double energy, int stripx, int stripy,
                       int detector_id)
@@ -249,7 +246,7 @@ void SimXIF::addEvent(double time, double energy, int stripx, int stripy,
   }
   
   simx::Event_Type* event = new simx::Event_Type;
-  event->Time = time/second;
+  event->Time = time/unit::second;
   double localx = stripx;
   double localy = stripy;
   vector3_t position = offset + (localx-0.5*widthx)*xaxis + (localy-0.5*widthy)*yaxis;
@@ -258,7 +255,7 @@ void SimXIF::addEvent(double time, double energy, int stripx, int stripy,
   event->y = 1.0 + position.y() + (G4UniformRand()-0.5);
   event->ix = static_cast<int>(event->x+0.5);
   event->iy = static_cast<int>(event->y+0.5);
-  event->Energy = energy/keV;
+  event->Energy = energy/unit::keV;
   event->pi = findPI(energy);
   
   event->resflag = HIGHRES;
@@ -275,12 +272,10 @@ void SimXIF::addEvent(double time, double energy, int stripx, int stripy,
   }
 }
 
-
 void SimXIF::outputEvents()
 {
   fits_output(m_SimXParameters, m_Source, m_EventList, &m_SimXStatus);
 }
-
 
 void SimXIF::outputPrimaries(const std::string& file_name)
 {
@@ -289,18 +284,18 @@ void SimXIF::outputPrimaries(const std::string& file_name)
   output_primaries(&m_Primaries, file.c_str());
 }
 
-
 int SimXIF::findPI(double energy)
 {
   const int length = m_Response->rmf_Nchannels;
   float* array = m_Response->rmf_emin;
-  float* ptr = std::lower_bound(array, array+length, energy/keV) - 1;
+  float* ptr = std::lower_bound(array, array+length, energy/unit::keV) - 1;
   int index = (ptr-1) - array; 
   int channel = -1;
   if (index>=0) channel = (m_Response->rmf_channel)[index];
   return channel;
 }
 
+} /* namespace comptonsoft */
 
 namespace {
 
@@ -308,7 +303,7 @@ void generate_primaries(struct simx::PARAMETERS *params,
                         struct simx::Response_Type *response,
                         struct simx::Source_Type *src,
                         double area,
-                        std::vector<PhaseSpaceVector> *primaries)
+                        std::vector<comptonsoft::PhaseSpaceVector> *primaries)
 {
   // this function is based on simx/generate_events.c
   int idum;
@@ -373,11 +368,11 @@ void generate_primaries(struct simx::PARAMETERS *params,
       
       double xsrad = xs*DEG2RAD;
       double ysrad = ys*DEG2RAD;
-      PhaseSpaceVector primary(src->energy[ii]*keV,
-                               -sin(xsrad),
-                               -cos(xsrad)*sin(ysrad),
-                               -cos(xsrad)*cos(ysrad));
-      primary.setTime(timeset(params,&idum,status)*second);
+      comptonsoft::PhaseSpaceVector primary(src->energy[ii]*unit::keV,
+                                            -sin(xsrad),
+                                            -cos(xsrad)*sin(ysrad),
+                                            -cos(xsrad)*cos(ysrad));
+      primary.setTime(timeset(params,&idum,status)*unit::second);
       
       // std::cout << xs << " " << ys << std::endl;
       primaries->at(i++) = primary;
@@ -392,8 +387,7 @@ void generate_primaries(struct simx::PARAMETERS *params,
   image_prob = 0;
 }
 
-
-void output_primaries(const std::vector<PhaseSpaceVector>* primaries,
+void output_primaries(const std::vector<comptonsoft::PhaseSpaceVector>* primaries,
                       const char* file_name)
 {
   int fitsStatus = 0;
@@ -423,7 +417,7 @@ void output_primaries(const std::vector<PhaseSpaceVector>* primaries,
   double* phiArray = new double[nRows];
 
   for (size_t i=0; i<nRows; i++) {
-    double energy = primaries->at(i).Energy()/keV;
+    double energy = primaries->at(i).Energy()/unit::keV;
     G4ThreeVector vec(-primaries->at(i).DirectionX(),
                       -primaries->at(i).DirectionY(),
                       -primaries->at(i).DirectionZ());
@@ -454,4 +448,4 @@ void output_primaries(const std::vector<PhaseSpaceVector>* primaries,
   delete[] phiArray;
 }
 
-}
+} /* anonymous namespace */

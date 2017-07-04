@@ -27,7 +27,7 @@ namespace anlgeant4
 {
 
 PlaneWaveRectanglePrimaryGen::PlaneWaveRectanglePrimaryGen()
-  : m_SizeX(100.0*cm), m_SizeY(100.0*cm), m_RollAngle(0.0)
+  : m_SizeX(100.0*unit::cm), m_SizeY(100.0*unit::cm), m_RollAngle(0.0)
 {
   add_alias("PlaneWaveRectanglePrimaryGen");
 }

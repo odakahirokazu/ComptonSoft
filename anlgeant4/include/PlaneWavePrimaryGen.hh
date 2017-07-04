@@ -59,19 +59,19 @@ protected:
   G4ThreeVector DirectionOrthogonal() const { return m_DirectionOrthogonal; }
 
   G4ThreeVector samplePosition() override;
-  virtual G4double GenerationArea();
+  virtual double GenerationArea();
   
 private:
   G4ThreeVector m_CenterPosition;
   
   G4ThreeVector m_Direction0;
   G4ThreeVector m_DirectionOrthogonal;
-  G4double m_Radius;
+  double m_Radius;
 
   G4ThreeVector m_Polarization0;
-  G4double m_PolarizationDegree;
+  double m_PolarizationDegree;
   
-  G4double m_Flux;
+  double m_Flux;
 };
 
 } /* namespace anlgeant4 */

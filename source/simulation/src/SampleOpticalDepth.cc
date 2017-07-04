@@ -22,7 +22,7 @@
 #include "TTree.h"
 #include "TDirectory.h"
 
-#include "G4SystemOfUnits.hh"
+#include "AstroUnits.hh"
 #include "G4Step.hh"
 #include "G4ProcessTable.hh"
 #include "G4VEmProcess.hh"
@@ -32,17 +32,19 @@
 
 using namespace anl;
 
+namespace unit = anlgeant4::unit;
+
 namespace comptonsoft
 {
 
 SampleOpticalDepth::SampleOpticalDepth()
-  : energy_(60.0*keV), processName_("phot"), particleName_("gamma")
+  : energy_(60.0*unit::keV), processName_("phot"), particleName_("gamma")
 {
 }
 
 ANLStatus SampleOpticalDepth::mod_startup()
 {
-  register_parameter(&energy_, "energy", keV, "keV");
+  register_parameter(&energy_, "energy", unit::keV, "keV");
   register_parameter(&processName_, "process");
   register_parameter(&particleName_, "particle");
   return AS_OK;
@@ -98,9 +100,9 @@ void SampleOpticalDepth::EventActionAtBeginning(const G4Event*)
 void SampleOpticalDepth::EventActionAtEnd(const G4Event*)
 {
   const G4ThreeVector iniPos = initialInfo_->InitialPosition();
-  ini_posx_ = iniPos.x();
-  ini_posy_ = iniPos.y();
-  ini_posz_ = iniPos.z();
+  ini_posx_ = iniPos.x()/unit::cm;
+  ini_posy_ = iniPos.y()/unit::cm;
+  ini_posz_ = iniPos.z()/unit::cm;
   const G4ThreeVector iniDir = initialInfo_->InitialDirection();
   ini_dirx_ = iniDir.x();
   ini_diry_ = iniDir.y();
@@ -116,7 +118,7 @@ void SampleOpticalDepth::SteppingAction(const G4Step* aStep)
   const double stepLength = aStep->GetStepLength();
   const double deltaTau = stepLength * process_->GetLambda(energy_, mcc);
 
-  length_ += stepLength;
+  length_ += stepLength/unit::cm;
   tau_ += deltaTau;
 }
 

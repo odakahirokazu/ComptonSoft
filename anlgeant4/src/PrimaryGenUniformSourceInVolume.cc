@@ -19,7 +19,7 @@
 
 #include "PrimaryGenUniformSourceInVolume.hh"
 
-#include "G4SystemOfUnits.hh"
+#include "AstroUnits.hh"
 
 using namespace anl;
 
@@ -37,7 +37,7 @@ ANLStatus PrimaryGenUniformSourceInVolume::mod_startup()
 
   register_parameter(&m_TargetMode, "target_mode");
   set_parameter_description("If on, the primary direction is distrubuted around the vector toward the target position.");
-  register_parameter(&m_TargetPosition, "target_position", cm, "cm");
+  register_parameter(&m_TargetPosition, "target_position", unit::cm, "cm");
   register_parameter(&m_VolumeHierarchy, "volume_hierarchy", "seq", "World");
   set_parameter_description("Volume hierarchy that identifies the primary generating volume.");
 
@@ -72,7 +72,7 @@ void PrimaryGenUniformSourceInVolume::makePrimarySetting()
   setSourcePosition(position);
 
   if (m_TargetMode) {
-    G4ThreeVector direction = (m_TargetPosition-position).unit();
+    const G4ThreeVector direction = (m_TargetPosition-position).unit();
     setCenterDirection(direction);
   }
 

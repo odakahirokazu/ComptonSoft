@@ -23,6 +23,8 @@
 #include "DetectorHit.hh"
 #include "FlagDefinition.hh"
 
+namespace unit = anlgeant4::unit;
+
 namespace comptonsoft {
 
 DeviceSimulation::DeviceSimulation()
@@ -36,7 +38,7 @@ DeviceSimulation::DeviceSimulation()
     diffusionSigmaConstantCathode_(0.0),
     diffusionSpreadFactorAnode_(1.0),
     diffusionSpreadFactorCathode_(1.0),
-    temperature_(260.0*kelvin)
+    temperature_(260.0*unit::kelvin)
 {
 }
 
@@ -75,7 +77,7 @@ double DeviceSimulation::DiffusionSigmaAnode(double z)
     ;
   }
   else if (DiffusionMode()==1) {
-    const double KTOverQe = ( k_Boltzmann * Temperature() ) / eplus;
+    const double KTOverQe = ( CLHEP::k_Boltzmann * Temperature() ) / CLHEP::eplus;
     
     double zAnode;
     if (isUpSideAnode()) {
@@ -103,7 +105,7 @@ double DeviceSimulation::DiffusionSigmaCathode(double z)
     ;
   }
   else if (DiffusionMode()==1) {
-    const double KTOverQe = ( k_Boltzmann * Temperature() ) / eplus;
+    const double KTOverQe = ( CLHEP::k_Boltzmann * Temperature() ) / CLHEP::eplus;
     
     double zCathode;
     if (isUpSideAnode()) {
@@ -147,20 +149,20 @@ calculateEPI(double energyCharge, const PixelID& pixel) const
 void DeviceSimulation::printSimulationParameters(std::ostream& os) const
 {
   os << "Quenching factor : " << QuenchingFactor() << '\n';
-  os << "Temperature : " << Temperature()/kelvin << " K\n";
+  os << "Temperature : " << Temperature()/unit::kelvin << " K\n";
   os << "E-field\n"
-     << "  Bias voltage   : " << BiasVoltage()/volt << " V\n"
+     << "  Bias voltage   : " << BiasVoltage()/unit::volt << " V\n"
      << "  E field mode   : " << static_cast<int>(EFieldMode()) << '\n'
      << "  E field param0 : " << EFieldParam(0) << '\n'
      << "  E field param1 : " << EFieldParam(1) << '\n'
      << "  E field param2 : " << EFieldParam(2) << '\n'
      << "  E field param3 : " << EFieldParam(3) << '\n'
-     << "  Thickness      : " << EField_->Thickness()/cm << " cm" << '\n';
+     << "  Thickness      : " << EField_->Thickness()/unit::cm << " cm" << '\n';
   os << "Charge collection\n"
      << "  Mode: " << ChargeCollectionMode() << '\n';
   if (CCEMapName()=="") {
-    os << "  mutau e : " << MuTauElectron()/(cm2/volt) << " cm2/V\n"
-       << "  mutau h : " << MuTauHole()/(cm2/volt) << " cm2/V\n"
+    os << "  mutau e : " << MuTauElectron()/(unit::cm2/unit::volt) << " cm2/V\n"
+       << "  mutau h : " << MuTauHole()/(unit::cm2/unit::volt) << " cm2/V\n"
        << "  number of pixels for WP calculation : " << NumPixelsInWPCalculation() << '\n';
   }
   else {
@@ -170,11 +172,11 @@ void DeviceSimulation::printSimulationParameters(std::ostream& os) const
      << "  Mode: " << DiffusionMode() << '\n'
      << "  Spread factor Anode   : " << DiffusionSpreadFactorAnode() << '\n'
      << "  Spread factor Cathode : " << DiffusionSpreadFactorCathode() << '\n'
-     << "  Constant Anode        : " << DiffusionSigmaConstantAnode()/um << " um\n"
-     << "  Constant Cathode      : " << DiffusionSigmaConstantCathode()/um << " um\n";
+     << "  Constant Anode        : " << DiffusionSigmaConstantAnode()/unit::um << " um\n"
+     << "  Constant Cathode      : " << DiffusionSigmaConstantCathode()/unit::um << " um\n";
   os << "Timing resolution\n"
-     << "  for trigger            : " << TimingResolutionForTrigger()/nanosecond << " ns\n"
-     << "  for energy measurement : " << TimingResolutionForEnergyMeasurement()/nanosecond << " ns\n";
+     << "  for trigger            : " << TimingResolutionForTrigger()/unit::ns << " ns\n"
+     << "  for energy measurement : " << TimingResolutionForEnergyMeasurement()/unit::ns << " ns\n";
   os << "Pedestal generation : " << isPedestalEnabled() << '\n';
 }
 

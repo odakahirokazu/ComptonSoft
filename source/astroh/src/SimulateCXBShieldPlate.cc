@@ -30,11 +30,13 @@
 
 using namespace anl;
 
+namespace unit = anlgeant4::unit;
+
 namespace comptonsoft
 {
 
 SimulateCXBShieldPlate::SimulateCXBShieldPlate()
-  : m_ShieldDensity(1.0*g/cm3),
+  : m_ShieldDensity(1.0*unit::g/unit::cm3),
     m_ShieldThickness(0.0),
     m_ShieldHeight(0.0),
     m_ShieldFillingFraction(1.0),
@@ -44,9 +46,9 @@ SimulateCXBShieldPlate::SimulateCXBShieldPlate()
 
 ANLStatus SimulateCXBShieldPlate::mod_startup()
 {
-  register_parameter(&m_ShieldDensity, "density", g/cm3, "g/cm3");
-  register_parameter(&m_ShieldHeight, "height", cm, "cm");
-  register_parameter(&m_ShieldThickness, "thickness", cm, "cm");
+  register_parameter(&m_ShieldDensity, "density", unit::g/unit::cm3, "g/cm3");
+  register_parameter(&m_ShieldHeight, "height", unit::cm, "cm");
+  register_parameter(&m_ShieldThickness, "thickness", unit::cm, "cm");
   register_parameter(&m_ShieldFillingFraction, "filling_fraction");
   register_parameter(&m_CSFilename, "cross_section_file");
   register_parameter(&m_PositionFilename, "position_file");
@@ -65,8 +67,8 @@ ANLStatus SimulateCXBShieldPlate::mod_init()
       std::vector<double> ys;
       double c1(0.0), c2(0.0);
       while (fin >> c1 >> c2) {
-        const double energy = c1 * MeV;
-        const double alpha = (c2 * cm2/g) * m_ShieldDensity;
+        const double energy = c1 * unit::MeV;
+        const double alpha = (c2 * unit::cm2/unit::g) * m_ShieldDensity;
         xs.push_back(energy);
         ys.push_back(alpha);
       }
@@ -96,8 +98,8 @@ ANLStatus SimulateCXBShieldPlate::mod_ana()
 
   const double xi = (m_ShieldHeight-pos0.z())/dir0.z();
   const G4ThreeVector pos1 = pos0 + xi*dir0; // position on the shield plane
-  const int binX = m_ShieldDistribution->GetXaxis()->FindBin(pos1.x()/cm);
-  const int binY = m_ShieldDistribution->GetYaxis()->FindBin(pos1.y()/cm);
+  const int binX = m_ShieldDistribution->GetXaxis()->FindBin(pos1.x()/unit::cm);
+  const int binY = m_ShieldDistribution->GetYaxis()->FindBin(pos1.y()/unit::cm);
   if (binX <= 0 || m_ShieldDistribution->GetXaxis()->GetNbins() < binX) {
     return AS_OK;
   }

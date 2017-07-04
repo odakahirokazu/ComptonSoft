@@ -25,6 +25,8 @@
 
 using namespace anl;
 
+namespace unit = anlgeant4::unit;
+
 namespace comptonsoft
 {
 
@@ -78,8 +80,8 @@ ANLStatus HistogramEnergy1D::mod_ana()
   }
   
   const BasicComptonEvent& event = eventReconstruction_->getComptonEvent();
-  const double energy1 = event.Hit1Energy() / keV;
-  const double energy2 = event.Hit2Energy() / keV;
+  const double energy1 = event.Hit1Energy() / unit::keV;
+  const double energy2 = event.Hit2Energy() / unit::keV;
   const double energy = energy1+energy2;
 
   hist_all_->Fill(energy);

@@ -20,6 +20,7 @@
 #include "VisualizeG4Geom.hh"
 
 #include <sstream>
+#include "AstroUnits.hh"
 
 // #define G4VIS_USE 1
 // #define G4VIS_USE_OPENGLX 1
@@ -47,7 +48,6 @@
 
 
 using namespace anl;
-using CLHEP::cm;
 
 namespace anlgeant4
 {
@@ -69,7 +69,7 @@ VisualizeG4Geom::~VisualizeG4Geom() = default;
 ANLStatus VisualizeG4Geom::mod_startup()
 {
   register_parameter(&m_Mode, "mode");
-  register_parameter(&m_TargetPoint, "target_point", cm, "cm");
+  register_parameter(&m_TargetPoint, "target_point", unit::cm, "cm");
   register_parameter(&m_ViewPoint, "view_point");
   register_parameter(&m_UpVector, "up_direction");
   register_parameter(&m_Zoom, "zoom");
@@ -135,9 +135,9 @@ void VisualizeG4Geom::applyDefaultCommands()
 
   cmd.str("");
   cmd << "/vis/viewer/set/targetPoint "
-      << m_TargetPoint.x()/cm << " "
-      << m_TargetPoint.y()/cm << " "
-      << m_TargetPoint.z()/cm << " cm";
+      << m_TargetPoint.x()/unit::cm << " "
+      << m_TargetPoint.y()/unit::cm << " "
+      << m_TargetPoint.z()/unit::cm << " cm";
   m_UIManager->ApplyCommand(cmd.str());
   cmd.str("");
 

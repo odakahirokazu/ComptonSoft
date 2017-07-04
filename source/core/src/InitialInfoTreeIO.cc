@@ -18,9 +18,11 @@
  *************************************************************************/
 
 #include "InitialInfoTreeIO.hh"
-#include "G4SystemOfUnits.hh"
+#include "AstroUnits.hh"
 #include "TTree.h"
 #include "DetectorHit.hh"
+
+namespace unit = anlgeant4::unit;
 
 namespace comptonsoft
 {
@@ -70,7 +72,7 @@ void InitialInfoTreeIO::setBranchAddresses()
 
 double InitialInfoTreeIO::getInitialEnergy() const
 {
-  return ini_energy_ * keV;
+  return ini_energy_ * unit::keV;
 }
 
 vector3_t InitialInfoTreeIO::getInitialDirection() const
@@ -80,12 +82,12 @@ vector3_t InitialInfoTreeIO::getInitialDirection() const
 
 double InitialInfoTreeIO::getInitialTime() const
 {
-  return ini_time_ * second;
+  return ini_time_ * unit::second;
 }
 
 vector3_t InitialInfoTreeIO::getInitialPosition() const
 {
-  return vector3_t(ini_posx_ * cm, ini_posy_ * cm, ini_posz_ * cm);
+  return vector3_t(ini_posx_ * unit::cm, ini_posy_ * unit::cm, ini_posz_ * unit::cm);
 }
   
 vector3_t InitialInfoTreeIO::getInitialPolarization() const
@@ -100,7 +102,7 @@ double InitialInfoTreeIO::getWeight() const
 
 void InitialInfoTreeIO::setInitialEnergy(double v)
 {
-  ini_energy_ = v / keV;
+  ini_energy_ = v / unit::keV;
 }
 
 void InitialInfoTreeIO::setInitialDirection(double x, double y, double z)
@@ -112,14 +114,14 @@ void InitialInfoTreeIO::setInitialDirection(double x, double y, double z)
 
 void InitialInfoTreeIO::setInitialTime(double v)
 {
-  ini_time_ = v / second;
+  ini_time_ = v / unit::second;
 }
 
 void InitialInfoTreeIO::setInitialPosition(double x, double y, double z)
 {
-  ini_posx_ = x / cm;
-  ini_posy_ = y / cm;
-  ini_posz_ = z / cm;
+  ini_posx_ = x / unit::cm;
+  ini_posy_ = y / unit::cm;
+  ini_posz_ = z / unit::cm;
 }
   
 void InitialInfoTreeIO::setInitialPolarization(double x, double y, double z)

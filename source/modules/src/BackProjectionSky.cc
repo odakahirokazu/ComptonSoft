@@ -19,8 +19,7 @@
 
 #include "BackProjectionSky.hh"
 
-#include "G4SystemOfUnits.hh"
-#include "G4PhysicalConstants.hh"
+#include "AstroUnits.hh"
 #include "TDirectory.h"
 #include "TRandom3.h"
 #include "TMath.h"
@@ -28,13 +27,15 @@
 
 using namespace anl;
 
+namespace unit = anlgeant4::unit;
+
 namespace comptonsoft
 {
 
 BackProjectionSky::BackProjectionSky()
   : m_Rotation(0.0)
 {
-  setUnit(degree, "degree");
+  setUnit(unit::degree, "degree");
 }
 
 BackProjectionSky::~BackProjectionSky() = default;
@@ -45,7 +46,7 @@ ANLStatus BackProjectionSky::mod_startup()
 
   unregister_parameter("plane_normal");
   unregister_parameter("plane_point");
-  register_parameter(&m_Rotation, "rotation_angle", degree, "degree");
+  register_parameter(&m_Rotation, "rotation_angle", unit::degree, "degree");
 
   return AS_OK;
 }
@@ -88,7 +89,7 @@ ANLStatus BackProjectionSky::mod_ana()
     double uy = coneSample.dot(m_YAxis);
     double uz = coneSample.dot(m_ZAxis);
     double x = std::atan2(ux, uz);
-    double y = 0.5*pi - std::acos(uy);
+    double y = 0.5*CLHEP::pi - std::acos(uy);
 
     fillImage(x/PixelUnit(), y/PixelUnit(), FillWeight);
   }

@@ -18,7 +18,7 @@
  *************************************************************************/
 
 #include "VANLGeometry.hh"
-#include "CLHEP/Units/SystemOfUnits.h"
+#include "AstroUnits.hh"
 
 using namespace anl;
 
@@ -26,7 +26,7 @@ namespace anlgeant4
 {
 
 VANLGeometry::VANLGeometry()
-  : m_LengthUnit(CLHEP::cm),
+  : m_LengthUnit(unit::cm),
     m_LengthUnitName("cm"),
     m_SurfaceCheck(true)
 {
