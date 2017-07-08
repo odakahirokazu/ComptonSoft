@@ -16,8 +16,9 @@ class MyApp < ANL::ANLApp
     chain :ReadComptonEventTree
     with_parameters(file_list: inputs)
     chain :ComptonEventFilter
-    with_parameters(hit_patterns: ["Si-CdTe"]) do |m|
+    with_parameters() do |m|
       m.define_condition
+      m.add_hit_pattern("Si-CdTe")
       m.add_condition("E1+E2", @emin, @emax)
       m.add_condition("E1", @emin_si, @emax_si)
       m.add_condition("E2", @emin_cdte, @emax_cdte)
