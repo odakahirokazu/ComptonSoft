@@ -39,19 +39,19 @@ ConstructChannelMap::ConstructChannelMap()
 
 ConstructChannelMap::~ConstructChannelMap() = default;
 
-ANLStatus ConstructChannelMap::mod_startup()
+ANLStatus ConstructChannelMap::mod_define()
 {
   register_parameter(&filename_, "filename");
   set_parameter_description("XML data file describing a channel map.");
   return AS_OK;
 }
 
-ANLStatus ConstructChannelMap::mod_init()
+ANLStatus ConstructChannelMap::mod_initialize()
 {
   using boost::property_tree::ptree;
   using boost::optional;
 
-  VCSModule::mod_init();
+  VCSModule::mod_initialize();
 
   ptree pt;
   try {
@@ -64,7 +64,7 @@ ANLStatus ConstructChannelMap::mod_init()
               << "message: " << ex.message() << "\n"
               << "filename: " << ex.filename() << "\n"
               << "line: " << ex.line() << std::endl;
-    return AS_QUIT_ERR;
+    return AS_QUIT_ERROR;
   }
 
   return AS_OK;

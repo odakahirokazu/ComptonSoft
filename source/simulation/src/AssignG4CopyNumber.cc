@@ -38,7 +38,7 @@ AssignG4CopyNumber::~AssignG4CopyNumber()
 }
 
 
-ANLStatus AssignG4CopyNumber::mod_startup()
+ANLStatus AssignG4CopyNumber::mod_define()
 {
   register_parameter(&m_FileName, "filename");
 
@@ -46,7 +46,7 @@ ANLStatus AssignG4CopyNumber::mod_startup()
 }
 
 
-ANLStatus AssignG4CopyNumber::mod_bgnrun()
+ANLStatus AssignG4CopyNumber::mod_begin_run()
 {
   typedef std::map<std::string, int> volume_map_t;
   typedef volume_map_t::const_iterator volume_map_iter;
@@ -55,7 +55,7 @@ ANLStatus AssignG4CopyNumber::mod_bgnrun()
   std::ifstream fin(m_FileName.c_str());
   if (!fin) {
     std::cout << "AssignG4CopyNumber: file cannot open" << std::endl;
-    return AS_QUIT_ERR;
+    return AS_QUIT_ERROR;
   }
 
   const size_t BufSize = 256;

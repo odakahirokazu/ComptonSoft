@@ -33,14 +33,14 @@ RecalculateSimulationNoise::RecalculateSimulationNoise()
 {
 }  
 
-ANLStatus RecalculateSimulationNoise::mod_init()
+ANLStatus RecalculateSimulationNoise::mod_initialize()
 {
-  GetModuleNC("CSHitCollection", &m_HitCollection);
+  get_module_NC("CSHitCollection", &m_HitCollection);
 
   return AS_OK;
 }
 
-ANLStatus RecalculateSimulationNoise::mod_ana()
+ANLStatus RecalculateSimulationNoise::mod_analyze()
 {
   DetectorSystem* detectorManager = getDetectorManager();
 

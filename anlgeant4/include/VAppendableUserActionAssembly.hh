@@ -37,7 +37,7 @@ public:
   VAppendableUserActionAssembly();
   virtual ~VAppendableUserActionAssembly();
 
-  anl::ANLStatus mod_prepare() override;
+  anl::ANLStatus mod_pre_initialize() override;
 };
 
 } /* namespace anlgeant4 */

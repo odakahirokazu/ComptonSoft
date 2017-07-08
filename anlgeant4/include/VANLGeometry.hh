@@ -48,7 +48,7 @@ public:
 
   bool SurfaceCheck() const { return m_SurfaceCheck; }
 
-  anl::ANLStatus mod_startup() override;
+  anl::ANLStatus mod_define() override;
 
 private:
   const double m_LengthUnit;

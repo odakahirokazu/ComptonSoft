@@ -87,7 +87,7 @@ WriteSGDEventFITS::WriteSGDEventFITS()
 
 WriteSGDEventFITS::~WriteSGDEventFITS() = default;
 
-ANLStatus WriteSGDEventFITS::mod_startup()
+ANLStatus WriteSGDEventFITS::mod_define()
 {
   register_parameter(&m_Filename, "filename");
   register_parameter(&m_SGDID, "sgd");
@@ -96,33 +96,33 @@ ANLStatus WriteSGDEventFITS::mod_startup()
   return AS_OK;
 }
 
-ANLStatus WriteSGDEventFITS::mod_init()
+ANLStatus WriteSGDEventFITS::mod_initialize()
 {
-  VCSModule::mod_init();
+  VCSModule::mod_initialize();
 
-  GetModule("CSHitCollection", &m_HitCollection);
-  if (ModuleExist("InitialInformation")) {
-    GetModuleIF("InitialInformation", &m_InitialInfo);
+  get_module("CSHitCollection", &m_HitCollection);
+  if (exist_module("InitialInformation")) {
+    get_module_IF("InitialInformation", &m_InitialInfo);
   }
 
-  EvsDef("WriteSGDEventFITS:Fill");
+  define_evs("WriteSGDEventFITS:Fill");
 
   m_EventWriter->setSGDIDs(m_SGDID, m_CCID);
   if (!(m_EventWriter->open(m_Filename))) {
-    return AS_QUIT_ERR;
+    return AS_QUIT_ERROR;
   }
 
   return AS_OK;
 }
 
-ANLStatus WriteSGDEventFITS::mod_ana()
+ANLStatus WriteSGDEventFITS::mod_analyze()
 {
   int64_t eventID = -1;
   if (m_InitialInfo) {
     eventID = m_InitialInfo->EventID();
   }
   else {
-    eventID = get_event_loop_index();
+    eventID = get_loop_index();
   }
 
   const int NumTimeGroups = m_HitCollection->NumberOfTimeGroups();
@@ -138,14 +138,14 @@ ANLStatus WriteSGDEventFITS::mod_ana()
       
       fillHits(occurrenceID, hits, &event);
       m_EventWriter->fillEvent(event);
-      EvsSet("WriteSGDEventFITS:Fill");
+      set_evs("WriteSGDEventFITS:Fill");
     }
   }
 
   return AS_OK;
 }
 
-ANLStatus WriteSGDEventFITS::mod_exit()
+ANLStatus WriteSGDEventFITS::mod_finalize()
 {
   m_EventWriter->close();
   return AS_OK;

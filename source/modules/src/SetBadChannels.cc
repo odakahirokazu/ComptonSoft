@@ -40,16 +40,16 @@ SetBadChannels::SetBadChannels()
 
 SetBadChannels::~SetBadChannels() = default;
 
-ANLStatus SetBadChannels::mod_startup()
+ANLStatus SetBadChannels::mod_define()
 {
   register_parameter(&m_FileName, "filename");
   
   return AS_OK;
 }
 
-ANLStatus SetBadChannels::mod_init()
+ANLStatus SetBadChannels::mod_initialize()
 {
-  VCSModule::mod_init();
+  VCSModule::mod_initialize();
 
   bool rval = set_by_file();
   if (!rval) {

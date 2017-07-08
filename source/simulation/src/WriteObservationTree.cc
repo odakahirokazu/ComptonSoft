@@ -37,9 +37,21 @@ WriteObservationTree::WriteObservationTree()
 {
 }
 
-ANLStatus WriteObservationTree::mod_his()
+ANLStatus WriteObservationTree::mod_initialize()
 {
-  VCSModule::mod_his();
+  VCSModule::mod_initialize();
+
+  get_module("ObservationPickUpData", &observationPUD_);
+  define_evs("WriteObservationTree:Fill");
+
+  if (exist_module("InitialInformation")) {
+    get_module_IF("InitialInformation", &initialInfo_);
+    treeIO_->enableInitialInfoRecord();
+  }
+  else {
+    treeIO_->disableInitialInfoRecord();
+  }
+
   tree_ = new TTree("otree", "Observation tree");
   treeIO_->setTree(tree_);
   treeIO_->defineBranches();
@@ -47,25 +59,7 @@ ANLStatus WriteObservationTree::mod_his()
   return AS_OK;
 }
 
-ANLStatus WriteObservationTree::mod_init()
-{
-  VCSModule::mod_init();
-
-  GetModule("ObservationPickUpData", &observationPUD_);
-  EvsDef("WriteObservationTree:Fill");
-
-  if (ModuleExist("InitialInformation")) {
-    GetModuleIF("InitialInformation", &initialInfo_);
-    treeIO_->enableInitialInfoRecord();
-  }
-  else {
-    treeIO_->disableInitialInfoRecord();
-  }
-  
-  return AS_OK;
-}
-
-ANLStatus WriteObservationTree::mod_ana()
+ANLStatus WriteObservationTree::mod_analyze()
 {
   int64_t eventID = -1;
   
@@ -79,14 +73,14 @@ ANLStatus WriteObservationTree::mod_ana()
     treeIO_->setWeight(initialInfo_->Weight());
   }
   else {
-    eventID = get_event_loop_index();
+    eventID = get_loop_index();
   }
   
   const std::vector<ObservedParticle_sptr>& particles
     = observationPUD_->getParticleVector();
   if (particles.size() > 0) {
     treeIO_->fillParticles(eventID, particles);
-    EvsSet("WriteObservationTree:Fill");
+    set_evs("WriteObservationTree:Fill");
   }
 
   return AS_OK;

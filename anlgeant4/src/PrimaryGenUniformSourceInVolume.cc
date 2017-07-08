@@ -31,9 +31,9 @@ PrimaryGenUniformSourceInVolume::PrimaryGenUniformSourceInVolume()
 {
 }
 
-ANLStatus PrimaryGenUniformSourceInVolume::mod_startup()
+ANLStatus PrimaryGenUniformSourceInVolume::mod_define()
 {
-  PointSourcePrimaryGen::mod_startup();
+  PointSourcePrimaryGen::mod_define();
 
   register_parameter(&m_TargetMode, "target_mode");
   set_parameter_description("If on, the primary direction is distrubuted around the vector toward the target position.");
@@ -44,9 +44,9 @@ ANLStatus PrimaryGenUniformSourceInVolume::mod_startup()
   return AS_OK;
 }
 
-ANLStatus PrimaryGenUniformSourceInVolume::mod_init()
+ANLStatus PrimaryGenUniformSourceInVolume::mod_initialize()
 {
-  PointSourcePrimaryGen::mod_init();
+  PointSourcePrimaryGen::mod_initialize();
   unregister_parameter("source_position");
   if (m_TargetMode) {
     hide_parameter("center_direction");
@@ -58,7 +58,7 @@ ANLStatus PrimaryGenUniformSourceInVolume::mod_init()
   return AS_OK;
 }
 
-ANLStatus PrimaryGenUniformSourceInVolume::mod_bgnrun()
+ANLStatus PrimaryGenUniformSourceInVolume::mod_begin_run()
 {
   m_PositionSampler.setVolumeHierarchy(m_VolumeHierarchy);
   m_PositionSampler.defineVolumeSize();

@@ -34,14 +34,13 @@ namespace comptonsoft {
 
 class InitialParticleTree : public VCSModule
 {
-  DEFINE_ANL_MODULE(InitialParticleTree, 1.0);
+  DEFINE_ANL_MODULE(InitialParticleTree, 1.1);
 public:
   InitialParticleTree();
   ~InitialParticleTree() {}
 
-  anl::ANLStatus mod_init() override;
-  anl::ANLStatus mod_his() override;
-  anl::ANLStatus mod_ana() override;
+  anl::ANLStatus mod_initialize() override;
+  anl::ANLStatus mod_analyze() override;
 
 protected:
   int eventid;

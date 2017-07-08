@@ -42,7 +42,7 @@ SampleOpticalDepth::SampleOpticalDepth()
 {
 }
 
-ANLStatus SampleOpticalDepth::mod_startup()
+ANLStatus SampleOpticalDepth::mod_define()
 {
   register_parameter(&energy_, "energy", unit::keV, "keV");
   register_parameter(&processName_, "process");
@@ -50,13 +50,13 @@ ANLStatus SampleOpticalDepth::mod_startup()
   return AS_OK;
 }
 
-ANLStatus SampleOpticalDepth::mod_init()
+ANLStatus SampleOpticalDepth::mod_initialize()
 {
-  GetModuleIF("InitialInformation", &initialInfo_);
+  get_module_IF("InitialInformation", &initialInfo_);
 
-  if (ModuleExist("SaveData")) {
+  if (exist_module("SaveData")) {
     SaveData* saveModule;
-    GetModuleNC("SaveData", &saveModule);
+    get_module_NC("SaveData", &saveModule);
     saveModule->GetDirectory()->cd();
   }
 
@@ -73,13 +73,13 @@ ANLStatus SampleOpticalDepth::mod_init()
   G4VProcess* process_base = G4ProcessTable::GetProcessTable()->FindProcess(processName_, particleName_);
   if (process_base == nullptr) {
     std::cout << "Process " << processName_ << " for " << particleName_ << " is not found." << std::endl;
-    return AS_QUIT_ERR;
+    return AS_QUIT_ERROR;
   }
 
   process_ = dynamic_cast<G4VEmProcess*>(process_base);
   if (process_ == nullptr) {
     std::cout << "Process " << processName_ << " is not an EM process." << std::endl;
-    return AS_QUIT_ERR;
+    return AS_QUIT_ERROR;
   }
   
   return AS_OK;

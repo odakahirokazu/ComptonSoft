@@ -37,7 +37,7 @@ ConstructDetector::ConstructDetector()
 
 ConstructDetector::~ConstructDetector() = default;
 
-ANLStatus ConstructDetector::mod_startup()
+ANLStatus ConstructDetector::mod_define()
 {
   detectorManager_->setMCSimulation(false);
 
@@ -52,7 +52,7 @@ ANLStatus ConstructDetector::mod_startup()
   return AS_OK;
 }
 
-ANLStatus ConstructDetector::mod_init()
+ANLStatus ConstructDetector::mod_initialize()
 {
   if (detectorManager_->isMCSimulation() && parametersFile_=="") {
     std::cout << "Error: detector parameters file should be given." << std::endl;
@@ -68,7 +68,7 @@ ANLStatus ConstructDetector::mod_init()
   }
   catch (CSException& e) {
     std::cout << "\n\n";
-    std::cout << "Error in ConstructDetector::mod_init()\n"
+    std::cout << "Error in ConstructDetector::mod_initialize()\n"
               << "Loading the XML data files failed." << std::endl;
     std::cout << "CSException ===> \n"
               << e.toString()
@@ -95,7 +95,7 @@ ANLStatus ConstructDetector::mod_init()
   return AS_OK;
 }
 
-ANLStatus ConstructDetector::mod_ana()
+ANLStatus ConstructDetector::mod_analyze()
 {
   detectorManager_->initializeEvent();
   return AS_OK;

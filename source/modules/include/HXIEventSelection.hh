@@ -38,8 +38,8 @@ public:
   HXIEventSelection() = default;
   ~HXIEventSelection() = default;
 
-  anl::ANLStatus mod_init() override;
-  anl::ANLStatus mod_ana() override;
+  anl::ANLStatus mod_initialize() override;
+  anl::ANLStatus mod_analyze() override;
 
 private:
   CSHitCollection* m_HitCollection = nullptr;

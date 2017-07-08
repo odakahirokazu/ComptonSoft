@@ -61,41 +61,41 @@ AHStandardUserActionAssembly::~AHStandardUserActionAssembly()
   if (m_AnalysisManager) delete m_AnalysisManager;
 }
 
-ANLStatus AHStandardUserActionAssembly::mod_startup()
+ANLStatus AHStandardUserActionAssembly::mod_define()
 {
   register_parameter(&m_FileName, "output");
   return AS_OK;
 }
 
-ANLStatus AHStandardUserActionAssembly::mod_init()
+ANLStatus AHStandardUserActionAssembly::mod_initialize()
 {
-  GetModuleNC("CSHitCollection", &m_HitCollection);
-  GetModuleIF("InitialInformation", &m_InitialInfo);
-  if (ModuleExist("SimXIF")) {
-    GetModuleNC("SimXIF", &m_SimXIF);
+  get_module_NC("CSHitCollection", &m_HitCollection);
+  get_module_IF("InitialInformation", &m_InitialInfo);
+  if (exist_module("SimXIF")) {
+    get_module_NC("SimXIF", &m_SimXIF);
   }
 
-  if (ModuleExist("EventReconstruction")) {
-    GetModuleNC("EventReconstruction", &m_EventReconstruction);
+  if (exist_module("EventReconstruction")) {
+    get_module_NC("EventReconstruction", &m_EventReconstruction);
   }
   
-  EvsDef("HitTree:Fill");
-  EvsDef("CompMode:DeltaTheta:GOOD");
-  EvsDef("CompMode:DeltaTheta:NG");
+  define_evs("HitTree:Fill");
+  define_evs("CompMode:DeltaTheta:GOOD");
+  define_evs("CompMode:DeltaTheta:NG");
 
-  if (Evs("Polarization enable")) {
+  if (evs("Polarization enable")) {
     m_PolarizationEnable = true;
   }
 
   return AS_OK;
 }
 
-ANLStatus AHStandardUserActionAssembly::mod_ana()
+ANLStatus AHStandardUserActionAssembly::mod_analyze()
 {
   const std::vector<DetectorHit_sptr>& hitVec = m_HitCollection->getHits();
 
   int num = hitVec.size();
-  if (num>0) { EvsSet("HitTree:Fill"); }
+  if (num>0) { set_evs("HitTree:Fill"); }
   
   for (int i=0; i<num; i++) {
     Fill(i, num, hitVec[i]);
@@ -106,7 +106,7 @@ ANLStatus AHStandardUserActionAssembly::mod_ana()
   return AS_OK;
 }
 
-ANLStatus AHStandardUserActionAssembly::mod_exit()
+ANLStatus AHStandardUserActionAssembly::mod_finalize()
 {
   if (m_SimXIF) m_SimXIF->outputEvents();
   
@@ -285,11 +285,11 @@ void AHStandardUserActionAssembly::MakeEvent(const std::vector<DetectorHit_sptr>
     energy = twoHitData.TotalEnergy();
 
     if (dtheta > ThetaCutOfComptonMode(energy)) {
-      EvsSet("CompMode:DeltaTheta:NG");
+      set_evs("CompMode:DeltaTheta:NG");
       return;
     }
 
-    EvsSet("CompMode:DeltaTheta:GOOD");
+    set_evs("CompMode:DeltaTheta:GOOD");
     time1 = twoHitData.Hit1Time();
     stripx = twoHitData.Hit1Pixel().X();
     stripy = twoHitData.Hit1Pixel().Y();

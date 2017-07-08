@@ -40,7 +40,7 @@ HistogramAzimuthAngle::HistogramAzimuthAngle()
 {
 }
 
-ANLStatus HistogramAzimuthAngle::mod_startup()
+ANLStatus HistogramAzimuthAngle::mod_define()
 {
   register_parameter(&numBins_, "number_of_bins");
   register_parameter(&theta_min_, "theta_min", unit::degree, "degree");
@@ -50,11 +50,11 @@ ANLStatus HistogramAzimuthAngle::mod_startup()
   return AS_OK;
 }
 
-ANLStatus HistogramAzimuthAngle::mod_his()
+ANLStatus HistogramAzimuthAngle::mod_initialize()
 {
-  GetModule("EventReconstruction", &eventReconstruction_);
+  get_module("EventReconstruction", &eventReconstruction_);
   
-  VCSModule::mod_his();
+  VCSModule::mod_initialize();
   mkdir();
 
   const double phi_min = -180.0;
@@ -93,9 +93,9 @@ ANLStatus HistogramAzimuthAngle::mod_his()
   return AS_OK;
 }
 
-ANLStatus HistogramAzimuthAngle::mod_ana()
+ANLStatus HistogramAzimuthAngle::mod_analyze()
 {
-  if (!Evs("EventReconstruction:OK")) {
+  if (!evs("EventReconstruction:OK")) {
     return AS_OK;
   }
   
@@ -135,7 +135,7 @@ ANLStatus HistogramAzimuthAngle::mod_ana()
   return AS_OK;
 }
 
-ANLStatus HistogramAzimuthAngle::mod_endrun()
+ANLStatus HistogramAzimuthAngle::mod_end_run()
 {
   hist_delta_all_->Divide(hist_all_);
   for (std::size_t i=0; i<hist_vec_.size(); i++) {

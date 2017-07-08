@@ -59,7 +59,7 @@ public:
   ActivationUserActionAssembly();
   virtual ~ActivationUserActionAssembly();
   
-  anl::ANLStatus mod_startup() override;
+  anl::ANLStatus mod_define() override;
   
   void RunActionAtBeginning(const G4Run*) override;
   void RunActionAtEnd(const G4Run* run) override;

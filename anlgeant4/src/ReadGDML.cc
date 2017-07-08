@@ -29,7 +29,7 @@ ReadGDML::ReadGDML()
 }
 
 
-ANLStatus ReadGDML::mod_startup()
+ANLStatus ReadGDML::mod_define()
 {
   register_parameter(&m_GeometryFileName, "file");
   register_parameter(&m_Validate, "validate");

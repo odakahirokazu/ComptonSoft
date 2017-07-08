@@ -52,7 +52,7 @@ Geant4Simple::Geant4Simple()
 
 Geant4Simple::~Geant4Simple() = default;
 
-ANLStatus Geant4Simple::mod_startup()
+ANLStatus Geant4Simple::mod_define()
 {
   register_parameter(&m_RandomSeed1, "random_seed");
   register_parameter(&m_NumberOfTrial, "number_of_trials");
@@ -61,7 +61,7 @@ ANLStatus Geant4Simple::mod_startup()
   return AS_OK;
 }
 
-ANLStatus Geant4Simple::mod_init()
+ANLStatus Geant4Simple::mod_initialize()
 {
   m_RandomEnginePtr.reset(new CLHEP::MTwistEngine);
   CLHEP::HepRandom::setTheEngine(m_RandomEnginePtr.get());
@@ -80,12 +80,12 @@ ANLStatus Geant4Simple::mod_init()
 void Geant4Simple::set_user_initializations()
 {
   VANLGeometry* geometry;
-  GetModuleNC("VANLGeometry", &geometry);
+  get_module_NC("VANLGeometry", &geometry);
   G4VUserDetectorConstruction* userDetectorConstruction = geometry->create();
   m_G4RunManager->SetUserInitialization(userDetectorConstruction);
   
   VANLPhysicsList* physics;
-  GetModuleNC("VANLPhysicsList", &physics);
+  get_module_NC("VANLPhysicsList", &physics);
   G4VUserPhysicsList* userPhysicsList = physics->create();
   m_G4RunManager->SetUserInitialization(userPhysicsList);
 }
@@ -93,7 +93,7 @@ void Geant4Simple::set_user_initializations()
 void Geant4Simple::set_user_primary_generator_action()
 {
   VANLPrimaryGen* primaryGen;
-  GetModuleNC("VANLPrimaryGen", &primaryGen);
+  get_module_NC("VANLPrimaryGen", &primaryGen);
   G4VUserPrimaryGeneratorAction* userPrimaryGeneratorAction
     = primaryGen->create();
   m_G4RunManager->SetUserAction(userPrimaryGeneratorAction);
@@ -102,7 +102,7 @@ void Geant4Simple::set_user_primary_generator_action()
 void Geant4Simple::set_user_defined_actions()
 {
   VUserActionAssembly* userActionAssembly;
-  GetModuleNC("VUserActionAssembly", &userActionAssembly);
+  get_module_NC("VUserActionAssembly", &userActionAssembly);
   userActionAssembly->registerUserActions(m_G4RunManager.get());
 }
 
@@ -126,7 +126,7 @@ void Geant4Simple::apply_commands()
   std::cout << std::endl;
 }
 
-ANLStatus Geant4Simple::mod_ana()
+ANLStatus Geant4Simple::mod_analyze()
 {
   m_G4RunManager->BeamOn(m_NumberOfTrial);
   return AS_OK;

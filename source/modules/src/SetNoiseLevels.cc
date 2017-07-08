@@ -45,7 +45,7 @@ SetNoiseLevels::SetNoiseLevels()
 
 SetNoiseLevels::~SetNoiseLevels() = default;
 
-ANLStatus SetNoiseLevels::mod_startup()
+ANLStatus SetNoiseLevels::mod_define()
 {
   register_parameter(&m_FileName, "filename");
   register_parameter_map(&m_NoiseLevelMap, "noise_level_map",
@@ -69,9 +69,9 @@ ANLStatus SetNoiseLevels::mod_startup()
   return AS_OK;
 }
 
-ANLStatus SetNoiseLevels::mod_init()
+ANLStatus SetNoiseLevels::mod_initialize()
 {
-  VCSModule::mod_init();
+  VCSModule::mod_initialize();
 
   if (m_FileName == "") { m_ByFile = false; }
 

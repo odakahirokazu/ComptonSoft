@@ -33,17 +33,17 @@ OutputSimXPrimaries::OutputSimXPrimaries()
 {
 }
 
-ANLStatus OutputSimXPrimaries::mod_startup()
+ANLStatus OutputSimXPrimaries::mod_define()
 {
   register_parameter(&m_FileName, "filename");
   register_parameter(&m_Area, "area", unit::cm2, "cm2");
   return AS_OK;
 }
 
-ANLStatus OutputSimXPrimaries::mod_init()
+ANLStatus OutputSimXPrimaries::mod_initialize()
 {
   SimXIF* simx = 0;
-  GetModuleNC("SimXIF", &simx);
+  get_module_NC("SimXIF", &simx);
 
   simx->generatePrimaries(m_Area);
   std::cout << "Number of primaries: " << simx->NumberOfPrimaries() << std::endl;

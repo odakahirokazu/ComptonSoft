@@ -45,9 +45,9 @@ SimXPrimaryGen::~SimXPrimaryGen()
 {
 }
 
-ANLStatus SimXPrimaryGen::mod_startup()
+ANLStatus SimXPrimaryGen::mod_define()
 {
-  BasicPrimaryGen::mod_startup();
+  BasicPrimaryGen::mod_define();
 
   register_parameter(&m_CenterPosition, "center_position", unit::cm, "cm");
   set_parameter_description("Position of the sphere.");
@@ -69,13 +69,13 @@ ANLStatus SimXPrimaryGen::mod_startup()
   return AS_OK;
 }
 
-ANLStatus SimXPrimaryGen::mod_init()
+ANLStatus SimXPrimaryGen::mod_initialize()
 {
   G4double area = CLHEP::pi * m_Radius * m_Radius;
-  GetModuleNC("SimXIF", &m_SimXIF);
+  get_module_NC("SimXIF", &m_SimXIF);
   m_SimXIF->generatePrimaries(area);
   std::cout << "Number of primaries: " << m_SimXIF->NumberOfPrimaries() << std::endl;
-  BasicPrimaryGen::mod_init();
+  BasicPrimaryGen::mod_initialize();
   
   return AS_OK;
 }
@@ -122,14 +122,14 @@ void SimXPrimaryGen::makePrimarySetting()
   }
 }
 
-ANLStatus SimXPrimaryGen::mod_endrun()
+ANLStatus SimXPrimaryGen::mod_end_run()
 {
   const double area = CLHEP::pi*m_Radius*m_Radius;
   const double realTime = TotalEnergy()/(m_Flux*area);
   const double pflux = Number()/area/realTime;
     
   std::cout.setf(std::ios::scientific);
-  std::cout << "SimXPrimaryGen::mod_endrun \n"
+  std::cout << "SimXPrimaryGen::mod_end_run \n"
             << "  Number: " << Number() << "\n"
             << "  Flux: " << m_Flux/(unit::erg/unit::cm2/unit::s) << " erg/cm2/s\n"
             << "  Total Energy: " << TotalEnergy()/unit::keV << " keV = "

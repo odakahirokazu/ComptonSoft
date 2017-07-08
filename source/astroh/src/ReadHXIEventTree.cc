@@ -35,7 +35,7 @@ ReadHXIEventTree::ReadHXIEventTree()
   add_alias("InitialInformation");
 }
 
-ANLStatus ReadHXIEventTree::mod_startup()
+ANLStatus ReadHXIEventTree::mod_define()
 {
   register_parameter(&file_names, "file_list", "seq", "hxi_event.root");
   register_parameter(&tree_names, "trees", "seq", "event_tree");
@@ -43,7 +43,7 @@ ANLStatus ReadHXIEventTree::mod_startup()
   return AS_OK;
 }
 
-ANLStatus ReadHXIEventTree::mod_init()
+ANLStatus ReadHXIEventTree::mod_initialize()
 {
   if (file_names.size()==0) {
     std::cout << "Event file to be read is not specified." << std::endl;
@@ -67,7 +67,7 @@ ANLStatus ReadHXIEventTree::mod_init()
   return AS_OK;
 }
 
-ANLStatus ReadHXIEventTree::mod_ana()
+ANLStatus ReadHXIEventTree::mod_analyze()
 {
   if (index==num_events) {
     return AS_QUIT;

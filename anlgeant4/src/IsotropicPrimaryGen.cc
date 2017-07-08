@@ -39,9 +39,9 @@ IsotropicPrimaryGen::IsotropicPrimaryGen()
 
 IsotropicPrimaryGen::~IsotropicPrimaryGen() = default;
 
-ANLStatus IsotropicPrimaryGen::mod_startup()
+ANLStatus IsotropicPrimaryGen::mod_define()
 {
-  BasicPrimaryGen::mod_startup();
+  BasicPrimaryGen::mod_define();
 
   enablePowerLawInput();
   register_parameter(&m_CenterPosition, "center_position", unit::cm, "cm");
@@ -62,13 +62,13 @@ ANLStatus IsotropicPrimaryGen::mod_startup()
   return AS_OK;
 }
 
-ANLStatus IsotropicPrimaryGen::mod_init()
+ANLStatus IsotropicPrimaryGen::mod_initialize()
 {
   using std::cos;
   using std::acos;
   using std::sqrt;
   
-  BasicPrimaryGen::mod_init();
+  BasicPrimaryGen::mod_initialize();
 
   m_CenterDirection = m_CenterDirection.unit();
   if (m_Distance < 0.0) { m_Distance = m_Radius; }
@@ -129,7 +129,7 @@ void IsotropicPrimaryGen::makePrimarySetting()
   setPrimary(position, energy, direction);
 }
 
-ANLStatus IsotropicPrimaryGen::mod_endrun()
+ANLStatus IsotropicPrimaryGen::mod_end_run()
 {
   const double area = CLHEP::pi*m_Radius*m_Radius;
   const G4double solid = 4*CLHEP::pi*m_CoveringFactor*unit::sr;
@@ -141,7 +141,7 @@ ANLStatus IsotropicPrimaryGen::mod_endrun()
   }
   
   std::cout.setf(std::ios::scientific);
-  std::cout << "IsotropicPrimaryGen::mod_endrun \n"
+  std::cout << "IsotropicPrimaryGen::mod_end_run \n"
             << "  Number: " << Number() << "\n"
             << "  Flux: " << m_Flux/(unit::erg/unit::cm2/unit::s/unit::sr) << " erg/cm2/s/sr\n"
             << "  Total Energy: " << TotalEnergy()/unit::keV << " keV = "

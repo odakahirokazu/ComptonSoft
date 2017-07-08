@@ -35,18 +35,18 @@ ComptonEventFilter::ComptonEventFilter()
 {
 }
 
-ANLStatus ComptonEventFilter::mod_startup()
+ANLStatus ComptonEventFilter::mod_define()
 {
   return AS_OK;
 }
 
-ANLStatus ComptonEventFilter::mod_init()
+ANLStatus ComptonEventFilter::mod_initialize()
 {
-  VCSModule::mod_init();
+  VCSModule::mod_initialize();
   
-  EvsDef("ComptonEventFilter:Selected");
+  define_evs("ComptonEventFilter:Selected");
   
-  GetModuleNC("EventReconstruction", &m_EventReconstruction);
+  get_module_NC("EventReconstruction", &m_EventReconstruction);
 
   auto& hitPatterns = getDetectorManager()->getHitPatterns();
   for (auto& eventSelection: m_ConditionsVector) {
@@ -70,12 +70,12 @@ ANLStatus ComptonEventFilter::mod_init()
   return AS_OK;
 }
 
-ANLStatus ComptonEventFilter::mod_ana()
+ANLStatus ComptonEventFilter::mod_analyze()
 {
   const BasicComptonEvent& comptonEvent = m_EventReconstruction->getComptonEvent();
 
   if (m_ConditionsVector.empty()) {
-    EvsSet("ComptonEventFilter:Selected");
+    set_evs("ComptonEventFilter:Selected");
     return AS_OK;
   }
   
@@ -84,7 +84,7 @@ ANLStatus ComptonEventFilter::mod_ana()
     bool goodHitPattern = false;
     const std::vector<std::string>& keys = eventSelection.get_evs_keys();
     for (const std::string& key: keys) {
-      if (Evs(key)) {
+      if (evs(key)) {
         goodHitPattern = true;
         break;
       }
@@ -110,7 +110,7 @@ ANLStatus ComptonEventFilter::mod_ana()
     return AS_SKIP;
   }
 
-  EvsSet("ComptonEventFilter:Selected");
+  set_evs("ComptonEventFilter:Selected");
   return AS_OK;
 }
 

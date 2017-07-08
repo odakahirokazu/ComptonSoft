@@ -39,18 +39,18 @@ ReadHitTree::ReadHitTree()
 
 ReadHitTree::~ReadHitTree() = default;
 
-ANLStatus ReadHitTree::mod_startup()
+ANLStatus ReadHitTree::mod_define()
 {
   register_parameter(&fileList_, "file_list", "seq", "hittree.root");
   register_parameter(&trustNumHits_, "trust_num_hits");
   return AS_OK;
 }
 
-ANLStatus ReadHitTree::mod_init()
+ANLStatus ReadHitTree::mod_initialize()
 {
-  VCSModule::mod_init();
+  VCSModule::mod_initialize();
   
-  GetModuleNC("CSHitCollection", &hitCollection_);
+  get_module_NC("CSHitCollection", &hitCollection_);
 
   hittree_ = new TChain("hittree");
   for (const std::string& filename: fileList_) {
@@ -74,7 +74,7 @@ ANLStatus ReadHitTree::mod_init()
   return AS_OK;
 }
 
-ANLStatus ReadHitTree::mod_ana()
+ANLStatus ReadHitTree::mod_analyze()
 {
   if (entryIndex_ == numEntries_) {
     return AS_QUIT;

@@ -34,7 +34,7 @@ HistogramPHA::HistogramPHA()
 {
 }
 
-ANLStatus HistogramPHA::mod_startup()
+ANLStatus HistogramPHA::mod_define()
 {
   register_parameter(&m_ReadoutOrder, "readout_order");
   register_parameter(&m_GroupingInSection, "group");
@@ -45,9 +45,9 @@ ANLStatus HistogramPHA::mod_startup()
   return AS_OK;
 }
 
-ANLStatus HistogramPHA::mod_his()
+ANLStatus HistogramPHA::mod_initialize()
 {
-  VCSModule::mod_his();
+  VCSModule::mod_initialize();
   mkdir();
 
   if (m_ReadoutOrder) {
@@ -112,13 +112,13 @@ ANLStatus HistogramPHA::mod_his()
   }
   else {
     std::cout << "Histogram type \"" << m_HistogramType << "\" is invalid." << std::endl;
-    return AS_QUIT_ERR;
+    return AS_QUIT_ERROR;
   }
   
   return AS_OK;
 }
 
-ANLStatus HistogramPHA::mod_ana()
+ANLStatus HistogramPHA::mod_analyze()
 {
   std::vector<TH1*>::iterator itHist = std::begin(m_Histograms);
 

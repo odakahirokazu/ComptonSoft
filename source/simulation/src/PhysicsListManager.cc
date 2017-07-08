@@ -48,9 +48,9 @@ PhysicsListManager::PhysicsListManager()
   add_alias(module_name());
 }
 
-ANLStatus PhysicsListManager::mod_startup()
+ANLStatus PhysicsListManager::mod_define()
 {
-  anlgeant4::VANLPhysicsList::mod_startup();
+  anlgeant4::VANLPhysicsList::mod_define();
   register_parameter(&m_DefaultCut, "cut_value", CLHEP::cm, "cm");
   register_parameter(&m_PhysicsListName, "physics_list");
   register_parameter(&m_EMPolarization, "polarization");
@@ -64,7 +64,7 @@ ANLStatus PhysicsListManager::mod_startup()
   return AS_OK;
 }
 
-ANLStatus PhysicsListManager::mod_prepare()
+ANLStatus PhysicsListManager::mod_pre_initialize()
 {
   if (m_PhysicsListName != "CSPhysicsList") {
     hide_parameter("polarization");
@@ -78,7 +78,7 @@ ANLStatus PhysicsListManager::mod_prepare()
   return AS_OK;
 }
 
-ANLStatus PhysicsListManager::mod_init()
+ANLStatus PhysicsListManager::mod_initialize()
 {
   CSPhysicsOption option;
 
@@ -89,7 +89,7 @@ ANLStatus PhysicsListManager::mod_init()
       std::cout << "PhysicsListManager: \n"
                 << "Customized version of LivermorePolarized is not prepared.\n"
                 << std::endl;
-      return AS_QUIT_ERR;
+      return AS_QUIT_ERROR;
     }
   }
   else if (m_EMCustomized) {
@@ -116,7 +116,7 @@ ANLStatus PhysicsListManager::mod_init()
     std::cout << "PhysicsListManager: \n"
               << "Unknown hadron model is given. ===> " << m_HadronModel
               << std::endl;
-    return AS_QUIT_ERR;
+    return AS_QUIT_ERROR;
   }
 
   // radioactive decay

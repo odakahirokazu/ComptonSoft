@@ -37,9 +37,21 @@ WriteEventTree::WriteEventTree()
 {
 }
 
-ANLStatus WriteEventTree::mod_his()
+ANLStatus WriteEventTree::mod_initialize()
 {
-  VCSModule::mod_his();
+  VCSModule::mod_initialize();
+
+  get_module("CSHitCollection", &hitCollection_);
+  define_evs("WriteEventTree:Fill");
+
+  if (exist_module("InitialInformation")) {
+    get_module_IF("InitialInformation", &initialInfo_);
+    treeIO_->enableInitialInfoRecord();
+  }
+  else {
+    treeIO_->disableInitialInfoRecord();
+  }
+  
   tree_ = new TTree("eventtree", "eventtree");
   treeIO_->setTree(tree_);
   treeIO_->defineBranches();
@@ -47,25 +59,7 @@ ANLStatus WriteEventTree::mod_his()
   return AS_OK;
 }
 
-ANLStatus WriteEventTree::mod_init()
-{
-  VCSModule::mod_init();
-
-  GetModule("CSHitCollection", &hitCollection_);
-  EvsDef("WriteEventTree:Fill");
-
-  if (ModuleExist("InitialInformation")) {
-    GetModuleIF("InitialInformation", &initialInfo_);
-    treeIO_->enableInitialInfoRecord();
-  }
-  else {
-    treeIO_->disableInitialInfoRecord();
-  }
-  
-  return AS_OK;
-}
-
-ANLStatus WriteEventTree::mod_ana()
+ANLStatus WriteEventTree::mod_analyze()
 {
   int64_t eventID = -1;
   
@@ -79,7 +73,7 @@ ANLStatus WriteEventTree::mod_ana()
     treeIO_->setWeight(initialInfo_->Weight());
   }
   else {
-    eventID = get_event_loop_index();
+    eventID = get_loop_index();
   }
 
   const int NumTimeGroups = hitCollection_->NumberOfTimeGroups();
@@ -88,7 +82,7 @@ ANLStatus WriteEventTree::mod_ana()
       = hitCollection_->getHits(timeGroup);
     if (hits.size() > 0) {
       treeIO_->fillHits(eventID, hits);
-      EvsSet("WriteEventTree:Fill");
+      set_evs("WriteEventTree:Fill");
     }
   }
 

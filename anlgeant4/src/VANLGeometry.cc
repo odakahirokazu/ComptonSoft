@@ -33,7 +33,7 @@ VANLGeometry::VANLGeometry()
   add_alias("VANLGeometry");
 }
 
-ANLStatus VANLGeometry::mod_startup()
+ANLStatus VANLGeometry::mod_define()
 {
   register_parameter(&m_SurfaceCheck, "surface_check");
   return AS_OK;

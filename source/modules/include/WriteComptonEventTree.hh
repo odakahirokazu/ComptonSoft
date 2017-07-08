@@ -40,10 +40,9 @@ public:
   WriteComptonEventTree();
   ~WriteComptonEventTree();
 
-  anl::ANLStatus mod_startup() override;
-  anl::ANLStatus mod_init() override;
-  anl::ANLStatus mod_his() override;
-  anl::ANLStatus mod_ana() override;
+  anl::ANLStatus mod_define() override;
+  anl::ANLStatus mod_initialize() override;
+  anl::ANLStatus mod_analyze() override;
 
 protected:
   TTree * cetree_;

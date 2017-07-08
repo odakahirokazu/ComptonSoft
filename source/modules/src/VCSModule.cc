@@ -35,22 +35,17 @@ VCSModule::VCSModule()
 
 VCSModule::~VCSModule() = default;
 
-ANLStatus VCSModule::mod_init()
+ANLStatus VCSModule::mod_initialize()
 {
-  if (ModuleExist("ConstructDetector")) {
+  if (exist_module("ConstructDetector")) {
     ConstructDetector* detectorModule;
-    GetModuleNC("ConstructDetector", &detectorModule);
+    get_module_NC("ConstructDetector", &detectorModule);
     detectorSystem_ = detectorModule->getDetectorManager();
   }
   
-  return AS_OK;
-}
-
-ANLStatus VCSModule::mod_his()
-{
-  if (ModuleExist("SaveData")) {
+  if (exist_module("SaveData")) {
     SaveData* saveModule;
-    GetModuleNC("SaveData", &saveModule);
+    get_module_NC("SaveData", &saveModule);
     saveDir_ = saveModule->GetDirectory();
     saveDir_->cd();
   }

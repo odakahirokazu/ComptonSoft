@@ -35,9 +35,9 @@ AHRayTracingPrimaryGen::AHRayTracingPrimaryGen()
   add_alias("AHRayTracingPrimaryGen");
 }
 
-ANLStatus AHRayTracingPrimaryGen::mod_startup()
+ANLStatus AHRayTracingPrimaryGen::mod_define()
 {
-  BasicPrimaryGen::mod_startup();
+  BasicPrimaryGen::mod_define();
   
   unregister_parameter("particle");
   setParticleName("gamma");
@@ -51,9 +51,9 @@ ANLStatus AHRayTracingPrimaryGen::mod_startup()
   return AS_OK;
 }
 
-ANLStatus AHRayTracingPrimaryGen::mod_init()
+ANLStatus AHRayTracingPrimaryGen::mod_initialize()
 {
-  BasicPrimaryGen::mod_init();
+  BasicPrimaryGen::mod_initialize();
 
   fitsfile* fits(0);
   int fits_status(0);
@@ -66,7 +66,7 @@ ANLStatus AHRayTracingPrimaryGen::mod_init()
   
   if (fits_status) {
     fits_report_error(stderr, fits_status);
-    return AS_QUIT_ERR;
+    return AS_QUIT_ERROR;
   }
   
   
@@ -82,7 +82,7 @@ ANLStatus AHRayTracingPrimaryGen::mod_init()
     
     if (fits_status) {
       fits_report_error(stderr, fits_status);
-      return AS_QUIT_ERR;
+      return AS_QUIT_ERROR;
     }
   }
   
@@ -101,7 +101,7 @@ ANLStatus AHRayTracingPrimaryGen::mod_init()
   
   if (fits_status) {
     fits_report_error(stderr, fits_status);
-    return AS_QUIT_ERR;
+    return AS_QUIT_ERROR;
   }
   
   
@@ -122,7 +122,7 @@ ANLStatus AHRayTracingPrimaryGen::mod_init()
     
     if (fits_status) {
       fits_report_error(stderr, fits_status);
-      return AS_QUIT_ERR;
+      return AS_QUIT_ERROR;
     }
     
     std::cout << "  ** -> OK "<< std::endl;
@@ -136,19 +136,19 @@ ANLStatus AHRayTracingPrimaryGen::mod_init()
   
   if (fits_status) {
     fits_report_error(stderr, fits_status);
-    return AS_QUIT_ERR;
+    return AS_QUIT_ERROR;
   }
   
   return AS_OK;
 }
 
-ANLStatus AHRayTracingPrimaryGen::mod_ana()
+ANLStatus AHRayTracingPrimaryGen::mod_analyze()
 {
   if (m_ID == m_EventNum) {
     return AS_QUIT;
   }
     
-  return BasicPrimaryGen::mod_ana();
+  return BasicPrimaryGen::mod_analyze();
 }
 
 void AHRayTracingPrimaryGen::makePrimarySetting()
@@ -173,7 +173,7 @@ void AHRayTracingPrimaryGen::makePrimarySetting()
   ++m_ID;
 }
 
-ANLStatus AHRayTracingPrimaryGen::mod_exit()
+ANLStatus AHRayTracingPrimaryGen::mod_finalize()
 {
   for( int i=0; i<6; ++i ){
     std::cout << " ** delete FITS column " << std::endl;

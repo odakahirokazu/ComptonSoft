@@ -40,8 +40,8 @@ class ScatteringPickUpData : public anlgeant4::VAppendableUserActionAssembly
 public:
   ScatteringPickUpData();
   
-  anl::ANLStatus mod_startup() override;
-  anl::ANLStatus mod_init() override;
+  anl::ANLStatus mod_define() override;
+  anl::ANLStatus mod_initialize() override;
 
   void EventActionAtBeginning(const G4Event*) override;
   void SteppingAction(const G4Step* aStep) override;

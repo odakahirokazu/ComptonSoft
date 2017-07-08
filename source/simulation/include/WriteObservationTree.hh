@@ -46,9 +46,8 @@ public:
   WriteObservationTree();
   ~WriteObservationTree() = default;
   
-  anl::ANLStatus mod_init() override;
-  anl::ANLStatus mod_his() override;
-  anl::ANLStatus mod_ana() override;
+  anl::ANLStatus mod_initialize() override;
+  anl::ANLStatus mod_analyze() override;
 
 private:
   const ObservationPickUpData* observationPUD_;

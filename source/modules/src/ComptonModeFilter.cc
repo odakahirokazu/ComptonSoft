@@ -37,35 +37,31 @@ ComptonModeFilter::ComptonModeFilter()
 {
 }
 
-ANLStatus ComptonModeFilter::mod_init()
+ANLStatus ComptonModeFilter::mod_initialize()
 {
-  EvsDef("ComptonMode:DeltaTheta:02");
-  EvsDef("ComptonMode:DeltaTheta:04");
-  EvsDef("ComptonMode:DeltaTheta:06");
-  EvsDef("ComptonMode:DeltaTheta:08");
-  EvsDef("ComptonMode:DeltaTheta:12");
-  EvsDef("ComptonMode:DeltaTheta:16");
-  EvsDef("ComptonMode:DeltaTheta:24");
-  EvsDef("ComptonMode:DeltaTheta:GOOD");
-  EvsDef("ComptonMode:DeltaTheta:GOOD2");
+  VCSModule::mod_initialize();
 
-  GetModuleNC("EventReconstruction", &m_EventReconstruction);
+  define_evs("ComptonMode:DeltaTheta:02");
+  define_evs("ComptonMode:DeltaTheta:04");
+  define_evs("ComptonMode:DeltaTheta:06");
+  define_evs("ComptonMode:DeltaTheta:08");
+  define_evs("ComptonMode:DeltaTheta:12");
+  define_evs("ComptonMode:DeltaTheta:16");
+  define_evs("ComptonMode:DeltaTheta:24");
+  define_evs("ComptonMode:DeltaTheta:GOOD");
+  define_evs("ComptonMode:DeltaTheta:GOOD2");
+
+  get_module_NC("EventReconstruction", &m_EventReconstruction);
   
-  return AS_OK;
-}
-
-ANLStatus ComptonModeFilter::mod_his()
-{
-  VCSModule::mod_his();
   mkdir();
   create_armcut_curves();
 
   return AS_OK;
 }
 
-ANLStatus ComptonModeFilter::mod_ana()
+ANLStatus ComptonModeFilter::mod_analyze()
 {
-  if (!Evs("EventReconstruction:OK")) {
+  if (!evs("EventReconstruction:OK")) {
     return AS_OK;
   }
   
@@ -75,39 +71,39 @@ ANLStatus ComptonModeFilter::mod_ana()
   const double e_gamma = ComptonEvent.TotalEnergy();
 
   if (dtheta < 2.0*unit::degree) {
-    EvsSet("ComptonMode:DeltaTheta:02");
+    set_evs("ComptonMode:DeltaTheta:02");
   }
 
   if (dtheta < 4.0*unit::degree) {
-    EvsSet("ComptonMode:DeltaTheta:04");
+    set_evs("ComptonMode:DeltaTheta:04");
   }
 
   if (dtheta < 6.0*unit::degree) {
-    EvsSet("ComptonMode:DeltaTheta:06");
+    set_evs("ComptonMode:DeltaTheta:06");
   }
 
   if (dtheta < 8.0*unit::degree) {
-    EvsSet("ComptonMode:DeltaTheta:08");
+    set_evs("ComptonMode:DeltaTheta:08");
   }
 
   if (dtheta < 12.0*unit::degree) {
-    EvsSet("ComptonMode:DeltaTheta:12");
+    set_evs("ComptonMode:DeltaTheta:12");
   }
 
   if (dtheta < 16.0*unit::degree) {
-    EvsSet("ComptonMode:DeltaTheta:16");
+    set_evs("ComptonMode:DeltaTheta:16");
   }
 
   if (dtheta < 24.0*unit::degree) {
-    EvsSet("ComptonMode:DeltaTheta:24");
+    set_evs("ComptonMode:DeltaTheta:24");
   }
 
   if (dtheta < theta_cut_limit(e_gamma)) {
-    EvsSet("ComptonMode:DeltaTheta:GOOD");
+    set_evs("ComptonMode:DeltaTheta:GOOD");
   }
   
   if (dtheta < theta_cut_limit2(e_gamma)) {
-    EvsSet("ComptonMode:DeltaTheta:GOOD2");
+    set_evs("ComptonMode:DeltaTheta:GOOD2");
   }
   
   return AS_OK;
@@ -125,13 +121,13 @@ double ComptonModeFilter::theta_cut_limit(double energy) const
 double ComptonModeFilter::theta_cut_limit2(double energy) const
 {
   double armcut = 180.0*unit::degree;
-  if (Evs("HitPattern:SS")) {
+  if (evs("HitPattern:SS")) {
     armcut = m_ARMCutCurveSS->Eval(energy/unit::keV,0,"S") * unit::degree;
   }
-  else if (Evs("HitPattern:SC")) {
+  else if (evs("HitPattern:SC")) {
     armcut = m_ARMCutCurveSC->Eval(energy/unit::keV,0,"S") * unit::degree;
   }
-  else if (Evs("HitPattern:CC")) {
+  else if (evs("HitPattern:CC")) {
     armcut = m_ARMCutCurveCC->Eval(energy/unit::keV,0,"S") * unit::degree;
   }
 

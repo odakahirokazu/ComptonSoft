@@ -40,9 +40,9 @@ BackProjectionSky::BackProjectionSky()
 
 BackProjectionSky::~BackProjectionSky() = default;
 
-ANLStatus BackProjectionSky::mod_startup()
+ANLStatus BackProjectionSky::mod_define()
 {
-  BackProjection::mod_startup();
+  BackProjection::mod_define();
 
   unregister_parameter("plane_normal");
   unregister_parameter("plane_point");
@@ -51,9 +51,9 @@ ANLStatus BackProjectionSky::mod_startup()
   return AS_OK;
 }
 
-ANLStatus BackProjectionSky::mod_init()
+ANLStatus BackProjectionSky::mod_initialize()
 {
-  BackProjection::mod_init();
+  BackProjection::mod_initialize();
   m_XAxis.set(std::cos(m_Rotation), std::sin(m_Rotation), 0.0);
   m_YAxis.set(-m_XAxis.y(), m_XAxis.x(), 0.0);
   m_ZAxis.set(0.0, 0.0, 1.0);
@@ -61,7 +61,7 @@ ANLStatus BackProjectionSky::mod_init()
   return AS_OK;
 }
 
-ANLStatus BackProjectionSky::mod_ana()
+ANLStatus BackProjectionSky::mod_analyze()
 {
   const BasicComptonEvent& compton_event = getComptonEvent();
 

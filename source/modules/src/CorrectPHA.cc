@@ -47,7 +47,7 @@ CorrectPHA::CorrectPHA()
 
 CorrectPHA::~CorrectPHA() = default;
 
-ANLStatus CorrectPHA::mod_startup()
+ANLStatus CorrectPHA::mod_define()
 {
   register_parameter(&m_PHARandomization, "pha_randomization");
   set_parameter_description("Randomize PHA values if true");
@@ -64,9 +64,9 @@ ANLStatus CorrectPHA::mod_startup()
   return AS_OK;
 }
 
-ANLStatus CorrectPHA::mod_init()
+ANLStatus CorrectPHA::mod_initialize()
 {
-  VCSModule::mod_init();
+  VCSModule::mod_initialize();
 
   std::unique_ptr<TFile> pedestalFile;
   if (m_PedestalFileName=="0") {
@@ -132,7 +132,7 @@ ANLStatus CorrectPHA::mod_init()
   return AS_OK;
 }
 
-ANLStatus CorrectPHA::mod_ana()
+ANLStatus CorrectPHA::mod_analyze()
 {
   DetectorSystem* detectorManager = getDetectorManager();
   for (auto& detector: detectorManager->getDetectors()) {
@@ -173,7 +173,7 @@ ANLStatus CorrectPHA::mod_ana()
   return AS_OK;
 }
 
-ANLStatus CorrectPHA::mod_exit()
+ANLStatus CorrectPHA::mod_finalize()
 {
   if (m_GainFile.get()) {
     m_GainFile->Close();

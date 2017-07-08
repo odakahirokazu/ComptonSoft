@@ -45,7 +45,7 @@ BackProjection::BackProjection()
 
 BackProjection::~BackProjection() = default;
 
-ANLStatus BackProjection::mod_startup()
+ANLStatus BackProjection::mod_define()
 {
   register_parameter(&m_PlaneNormal, "plane_normal");
   register_parameter(&m_PlanePoint, "plane_point", 1, m_PixelUnitName);
@@ -59,11 +59,11 @@ ANLStatus BackProjection::mod_startup()
   return AS_OK;
 }
 
-ANLStatus BackProjection::mod_his()
+ANLStatus BackProjection::mod_initialize()
 {
-  VCSModule::mod_his();
+  VCSModule::mod_initialize();
 
-  GetModuleNC("EventReconstruction", &m_EventReconstruction);
+  get_module_NC("EventReconstruction", &m_EventReconstruction);
   
   mkdir();
   
@@ -94,7 +94,7 @@ ANLStatus BackProjection::mod_his()
   return AS_OK;
 }
 
-ANLStatus BackProjection::mod_ana()
+ANLStatus BackProjection::mod_analyze()
 {
   const BasicComptonEvent& compton_event = getComptonEvent();
 
@@ -141,14 +141,14 @@ void BackProjection::fillImage(double x, double y, double weight)
   // Filling histograms 
   // All
   m_hist_bp_All->Fill(x, y, weight);
-  if (!Evs("EventReconst:CdTeFluor")) { 
+  if (!evs("EventReconst:CdTeFluor")) { 
     m_hist_bp_All_nf->Fill(x, y, weight);
   }
   
   for(unsigned int i=0; i<m_hist_vec.size(); i++) {
     if(m_EventReconstruction->HitPatternFlag(i)) {
       m_hist_vec[i]->Fill(x, y, weight);
-      if(!Evs("EventReconst:CdTeFluor")) {
+      if(!evs("EventReconst:CdTeFluor")) {
         m_hist_nf_vec[i]->Fill(x, y, weight);
       }
     }

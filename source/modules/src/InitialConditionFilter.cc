@@ -33,17 +33,17 @@ InitialConditionFilter::InitialConditionFilter()
 {
 }
 
-ANLStatus InitialConditionFilter::mod_startup()
+ANLStatus InitialConditionFilter::mod_define()
 {
   register_parameter(&energy0_, "energy_min", unit::keV, "keV");
   register_parameter(&energy1_, "energy_max", unit::keV, "keV");
 
-  GetModuleIF("InitialInformation", &initialInfo_);
+  get_module_IF("InitialInformation", &initialInfo_);
 
   return AS_OK;
 }
 
-ANLStatus InitialConditionFilter::mod_ana()
+ANLStatus InitialConditionFilter::mod_analyze()
 {
   const double initialEnergy = initialInfo_->InitialEnergy();
   

@@ -30,7 +30,7 @@ SelectTime::SelectTime()
 {
 }
 
-ANLStatus SelectTime::mod_startup()
+ANLStatus SelectTime::mod_define()
 {
   register_parameter(&m_Time0, "time_start");
   register_parameter(&m_Time1, "time_end");
@@ -38,22 +38,22 @@ ANLStatus SelectTime::mod_startup()
   return AS_OK;
 }
 
-ANLStatus SelectTime::mod_init()
+ANLStatus SelectTime::mod_initialize()
 {
-  GetModuleNC("ReadDataFile", &m_ReadDataModule);
-  EvsDef("SelectTime:OK");
+  get_module_NC("ReadDataFile", &m_ReadDataModule);
+  define_evs("SelectTime:OK");
 
   return AS_OK;
 }
 
-ANLStatus SelectTime::mod_ana()
+ANLStatus SelectTime::mod_analyze()
 {
   const int t = m_ReadDataModule->Time();
   if (t < m_Time0 || m_Time1 < t) {
     return AS_SKIP;
   }
 
-  EvsSet("SelectTime:OK");
+  set_evs("SelectTime:OK");
 
   return AS_OK;
 }

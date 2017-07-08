@@ -33,26 +33,26 @@ ReadDataFile_SpW2::ReadDataFile_SpW2()
 {
 }
 
-ANLStatus ReadDataFile_SpW2::mod_startup()
+ANLStatus ReadDataFile_SpW2::mod_define()
 {
   m_ReadPacketSize = HEADER_SIZE;
 
-  EvsDef("ReadDataFile_SpW2:Error1");
-  EvsDef("ReadDataFile_SpW2:Error2");
-  EvsDef("ReadDataFile_SpW2:Error3");
-  EvsDef("ReadDataFile_SpW2:Error4");
-  EvsDef("ReadDataFile_SpW2:Error5");
+  define_evs("ReadDataFile_SpW2:Error1");
+  define_evs("ReadDataFile_SpW2:Error2");
+  define_evs("ReadDataFile_SpW2:Error3");
+  define_evs("ReadDataFile_SpW2:Error4");
+  define_evs("ReadDataFile_SpW2:Error5");
 
-  return ReadDataFile::mod_startup();
+  return ReadDataFile::mod_define();
 }
 
-ANLStatus ReadDataFile_SpW2::mod_init()
+ANLStatus ReadDataFile_SpW2::mod_initialize()
 {
-  ReadDataFile::mod_init();
+  ReadDataFile::mod_initialize();
 
   // check file open
   bool check = checkFiles();
-  if (!check) return AS_QUIT_ERR;
+  if (!check) return AS_QUIT_ERROR;
   
   int readPacketSize = HEADER_SIZE;
   DetectorSystem* detectorManager = getDetectorManager();
@@ -77,7 +77,7 @@ ANLStatus ReadDataFile_SpW2::mod_init()
   return AS_OK;
 }
 
-ANLStatus ReadDataFile_SpW2::mod_bgnrun()
+ANLStatus ReadDataFile_SpW2::mod_begin_run()
 {
   if (wasLastFile()) {
     std::cout << "The file list seems empty." << std::endl;
@@ -93,7 +93,7 @@ ANLStatus ReadDataFile_SpW2::mod_bgnrun()
   return AS_OK;
 }
 
-ANLStatus ReadDataFile_SpW2::mod_ana()
+ANLStatus ReadDataFile_SpW2::mod_analyze()
 {
   static unsigned char buf[READ_BUF_SIZE];
 
@@ -127,19 +127,19 @@ ANLStatus ReadDataFile_SpW2::mod_ana()
 
   int errcode = static_cast<int>(*p);
   if (errcode == 1) {
-    EvsSet("ReadDataFile_SpW2:Error1");
+    set_evs("ReadDataFile_SpW2:Error1");
   }
   else if (errcode == 2) {
-    EvsSet("ReadDataFile_SpW2:Error2");
+    set_evs("ReadDataFile_SpW2:Error2");
   }
   else if (errcode == 3) {
-    EvsSet("ReadDataFile_SpW2:Error3");
+    set_evs("ReadDataFile_SpW2:Error3");
   }
   else if (errcode == 4) {
-    EvsSet("ReadDataFile_SpW2:Error4");
+    set_evs("ReadDataFile_SpW2:Error4");
   }
   else if (errcode == 5) {
-    EvsSet("ReadDataFile_SpW2:Error5");
+    set_evs("ReadDataFile_SpW2:Error5");
   }
   
   if (errcode != 0 && errcode != 2) {
@@ -199,7 +199,7 @@ ANLStatus ReadDataFile_SpW2::mod_ana()
 
   m_DeltaTime = deltaTime;
    
-  return ReadDataFile::mod_ana();
+  return ReadDataFile::mod_analyze();
 }
 
 } /* namespace comptonsoft */

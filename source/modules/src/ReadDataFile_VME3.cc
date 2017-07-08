@@ -35,20 +35,20 @@ ReadDataFile_VME3::ReadDataFile_VME3()
 {
 }
 
-ANLStatus ReadDataFile_VME3::mod_startup()
+ANLStatus ReadDataFile_VME3::mod_define()
 {
   m_ReadPacketSize = HEADER_SIZE;
 
-  return ReadDataFile::mod_startup();
+  return ReadDataFile::mod_define();
 }
 
-ANLStatus ReadDataFile_VME3::mod_init()
+ANLStatus ReadDataFile_VME3::mod_initialize()
 {
-  ReadDataFile::mod_init();
+  ReadDataFile::mod_initialize();
 
   // check file open
   bool check = checkFiles();
-  if (!check) return AS_QUIT_ERR;
+  if (!check) return AS_QUIT_ERROR;
   
   int readPacketSize = HEADER_SIZE;
   DetectorSystem* detectorManager = getDetectorManager();
@@ -75,7 +75,7 @@ ANLStatus ReadDataFile_VME3::mod_init()
   return AS_OK;
 }
 
-ANLStatus ReadDataFile_VME3::mod_bgnrun()
+ANLStatus ReadDataFile_VME3::mod_begin_run()
 {
   if (wasLastFile()) {
     std::cout << "The file list seems empty." << std::endl;
@@ -91,7 +91,7 @@ ANLStatus ReadDataFile_VME3::mod_bgnrun()
   return AS_OK;
 }
 
-ANLStatus ReadDataFile_VME3::mod_ana()
+ANLStatus ReadDataFile_VME3::mod_analyze()
 {
   static unsigned char buf[READ_BUF_SIZE];
   
@@ -177,7 +177,7 @@ ANLStatus ReadDataFile_VME3::mod_ana()
     p++;
   }
 
-  return ReadDataFile::mod_ana();
+  return ReadDataFile::mod_analyze();
 }
 
 } /* namespace comptonsoft */

@@ -46,12 +46,12 @@ public:
   Geant4Body();
   ~Geant4Body();
 
-  anl::ANLStatus mod_startup() override;
-  anl::ANLStatus mod_init() override;
-  anl::ANLStatus mod_bgnrun() override;
-  anl::ANLStatus mod_ana() override;
-  anl::ANLStatus mod_endrun() override;
-  anl::ANLStatus mod_exit() override;
+  anl::ANLStatus mod_define() override;
+  anl::ANLStatus mod_initialize() override;
+  anl::ANLStatus mod_begin_run() override;
+  anl::ANLStatus mod_analyze() override;
+  anl::ANLStatus mod_end_run() override;
+  anl::ANLStatus mod_finalize() override;
 
   void set_verbose_level(G4int v) { m_VerboseLevel = v; }
   G4int get_verbose_level() { return m_VerboseLevel; }

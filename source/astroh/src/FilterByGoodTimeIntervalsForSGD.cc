@@ -31,15 +31,15 @@ FilterByGoodTimeIntervalsForSGD::FilterByGoodTimeIntervalsForSGD() = default;
 
 FilterByGoodTimeIntervalsForSGD::~FilterByGoodTimeIntervalsForSGD() = default;
 
-ANLStatus FilterByGoodTimeIntervalsForSGD::mod_init()
+ANLStatus FilterByGoodTimeIntervalsForSGD::mod_initialize()
 {
-  GetModule("ReadSGDEventFITS", &m_EventReader);
-  EvsDef("FilterByGoodTimeIntervals:OK");
+  get_module("ReadSGDEventFITS", &m_EventReader);
+  define_evs("FilterByGoodTimeIntervals:OK");
 
   return AS_OK;
 }
 
-ANLStatus FilterByGoodTimeIntervalsForSGD::mod_ana()
+ANLStatus FilterByGoodTimeIntervalsForSGD::mod_analyze()
 {
   bool passed = false;
 
@@ -54,7 +54,7 @@ ANLStatus FilterByGoodTimeIntervalsForSGD::mod_ana()
   }
 
   if (passed) {
-    EvsSet("FilterByGoodTimeIntervals:OK");
+    set_evs("FilterByGoodTimeIntervals:OK");
   }
   else {
     return AS_SKIP;

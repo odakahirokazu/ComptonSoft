@@ -36,9 +36,9 @@ ConstructDetectorForSimulation::ConstructDetectorForSimulation()
 
 ConstructDetectorForSimulation::~ConstructDetectorForSimulation() = default;
 
-ANLStatus ConstructDetectorForSimulation::mod_startup()
+ANLStatus ConstructDetectorForSimulation::mod_define()
 {
-  ConstructDetector::mod_startup();
+  ConstructDetector::mod_define();
 
   DetectorSystem* detectorManager = getDetectorManager();
   detectorManager->setMCSimulation(true);
@@ -46,9 +46,9 @@ ANLStatus ConstructDetectorForSimulation::mod_startup()
   return AS_OK;
 }
 
-ANLStatus ConstructDetectorForSimulation::mod_init()
+ANLStatus ConstructDetectorForSimulation::mod_initialize()
 {
-  ANLStatus status = ConstructDetector::mod_init();
+  ANLStatus status = ConstructDetector::mod_initialize();
   if (status != AS_OK) {
     return status;
   }
@@ -72,9 +72,9 @@ ANLStatus ConstructDetectorForSimulation::mod_init()
   return AS_OK;
 }
 
-ANLStatus ConstructDetectorForSimulation::mod_bgnrun()
+ANLStatus ConstructDetectorForSimulation::mod_begin_run()
 {
-  if (!ModuleExist("Geant4Body")) {
+  if (!exist_module("Geant4Body")) {
     return AS_OK;
   }
 

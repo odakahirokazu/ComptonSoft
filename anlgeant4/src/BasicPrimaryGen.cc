@@ -55,9 +55,9 @@ BasicPrimaryGen::BasicPrimaryGen()
 
 BasicPrimaryGen::~BasicPrimaryGen() = default;
 
-ANLStatus BasicPrimaryGen::mod_startup()
+ANLStatus BasicPrimaryGen::mod_define()
 {
-  VANLPrimaryGen::mod_startup();
+  VANLPrimaryGen::mod_define();
 
   register_parameter(&particleName_, "particle");
   set_parameter_description("Particle name (gamma, e-, e+, proton, neutron, geantino...)");
@@ -89,9 +89,9 @@ ANLStatus BasicPrimaryGen::mod_startup()
   return AS_OK;
 }
 
-ANLStatus BasicPrimaryGen::mod_prepare()
+ANLStatus BasicPrimaryGen::mod_pre_initialize()
 {
-  GetModule("VANLGeometry", &geometry_);
+  get_module("VANLGeometry", &geometry_);
 
   disableDefaultEnergyInput();
   
@@ -126,18 +126,18 @@ ANLStatus BasicPrimaryGen::mod_prepare()
       std::cout << "Invalid input to \"Energy distribution\": "
                 << energyDistributionName_
                 << std::endl;
-      return AS_QUIT_ERR;
+      return AS_QUIT_ERROR;
     }
   }
 
   return AS_OK;
 }
 
-ANLStatus BasicPrimaryGen::mod_init()
+ANLStatus BasicPrimaryGen::mod_initialize()
 {
-  EvsDef("Polarization enable");
+  define_evs("Polarization enable");
   if (PolarizationMode()>=0) {
-    EvsSet("Polarization enable");
+    set_evs("Polarization enable");
   }
 
   if (energyMin_ == 0.0) {
@@ -150,7 +150,7 @@ ANLStatus BasicPrimaryGen::mod_init()
       std::cout << "Spectral historam binning is invalid.\n"
                 << "Should be energy_array.size == photons_array.size+1."
                 << std::endl;
-      return AS_QUIT_ERR;
+      return AS_QUIT_ERROR;
     }
 
     buildSpectrumPhotonIntegral();
@@ -159,7 +159,7 @@ ANLStatus BasicPrimaryGen::mod_init()
   return AS_OK;
 }
 
-ANLStatus BasicPrimaryGen::mod_bgnrun()
+ANLStatus BasicPrimaryGen::mod_begin_run()
 {
   number_ = 0;
   totalEnergy_ = 0.0;

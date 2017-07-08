@@ -25,9 +25,9 @@
 namespace comptonsoft
 {
 
-anl::ANLStatus MakeRawHits::mod_startup()
+anl::ANLStatus MakeRawHits::mod_define()
 {
-  SelectHits::mod_startup();
+  SelectHits::mod_define();
   hide_parameter("analysis_map");
   return anl::AS_OK;
 }

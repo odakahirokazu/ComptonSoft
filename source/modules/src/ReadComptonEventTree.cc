@@ -36,25 +36,21 @@ ReadComptonEventTree::ReadComptonEventTree()
   add_alias("InitialInformation");
 }
 
-ANLStatus ReadComptonEventTree::mod_startup()
+ANLStatus ReadComptonEventTree::mod_define()
 {
   register_parameter(&fileList_, "file_list", "seq", "compton_events.root");
   
   return AS_OK;
 }
 
-ANLStatus ReadComptonEventTree::mod_init()
+ANLStatus ReadComptonEventTree::mod_initialize()
 {
-  VCSModule::mod_init();
-  EvsDef("EventReconstruction:OK");
-  EvsDef("EventReconstruction:NG");
+  VCSModule::mod_initialize();
+
+  define_evs("EventReconstruction:OK");
+  define_evs("EventReconstruction:NG");
   initializeHitPatternData();
   
-  return AS_OK;
-}
-
-ANLStatus ReadComptonEventTree::mod_his()
-{
   cetree_ = new TChain("cetree");
   for (const std::string& filename: fileList_) {
     cetree_->Add(filename.c_str());
@@ -76,7 +72,7 @@ ANLStatus ReadComptonEventTree::mod_his()
   return AS_OK;
 }
 
-ANLStatus ReadComptonEventTree::mod_ana()
+ANLStatus ReadComptonEventTree::mod_analyze()
 {
   if (entryIndex_ == numEntries_) {
     return AS_QUIT;
@@ -104,7 +100,7 @@ ANLStatus ReadComptonEventTree::mod_ana()
   resetComptonEvent(event);
   resetHitPatternFlags();
   retrieveHitPatterns();
-  EvsSet("EventReconstruction:OK");
+  set_evs("EventReconstruction:OK");
 
   ++entryIndex_;
   return AS_OK;

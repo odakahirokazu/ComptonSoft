@@ -33,8 +33,8 @@ public:
   SetBadChannels();
   ~SetBadChannels();
 
-  anl::ANLStatus mod_startup() override;
-  anl::ANLStatus mod_init() override;
+  anl::ANLStatus mod_define() override;
+  anl::ANLStatus mod_initialize() override;
 
 private:
   bool set_by_file();

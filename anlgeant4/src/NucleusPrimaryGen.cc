@@ -38,9 +38,9 @@ NucleusPrimaryGen::NucleusPrimaryGen()
 
 NucleusPrimaryGen::~NucleusPrimaryGen() = default;
 
-ANLStatus NucleusPrimaryGen::mod_startup()
+ANLStatus NucleusPrimaryGen::mod_define()
 {
-  BasicPrimaryGen::mod_startup();
+  BasicPrimaryGen::mod_define();
 
   unregister_parameter("particle");
   setParticleName("");
@@ -58,9 +58,9 @@ ANLStatus NucleusPrimaryGen::mod_startup()
   return AS_OK;
 }
 
-ANLStatus NucleusPrimaryGen::mod_bgnrun()
+ANLStatus NucleusPrimaryGen::mod_begin_run()
 {
-  BasicPrimaryGen::mod_bgnrun();
+  BasicPrimaryGen::mod_begin_run();
   
   G4IonTable* ionTable = static_cast<G4IonTable*>(G4ParticleTable::GetParticleTable()->GetIonTable());
   G4ParticleDefinition* particle_base =
@@ -68,7 +68,7 @@ ANLStatus NucleusPrimaryGen::mod_bgnrun()
   G4Ions* particle = dynamic_cast<G4Ions*>(particle_base);
   if (particle == nullptr) {
     std::cout << "The particle can not be converted into G4Ions." << std::endl;
-    return AS_QUIT_ERR;
+    return AS_QUIT_ERROR;
   }
   
   setDefinition(particle);

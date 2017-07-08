@@ -38,9 +38,9 @@ PointSourcePrimaryGen::PointSourcePrimaryGen()
 
 PointSourcePrimaryGen::~PointSourcePrimaryGen() = default;
 
-ANLStatus PointSourcePrimaryGen::mod_startup()
+ANLStatus PointSourcePrimaryGen::mod_define()
 {
-  BasicPrimaryGen::mod_startup();
+  BasicPrimaryGen::mod_define();
 
   enablePowerLawInput();
   register_parameter(&m_SourcePosition, "position",
@@ -58,11 +58,11 @@ ANLStatus PointSourcePrimaryGen::mod_startup()
   return AS_OK;
 }
 
-ANLStatus PointSourcePrimaryGen::mod_init()
+ANLStatus PointSourcePrimaryGen::mod_initialize()
 {
   using std::cos;
   
-  BasicPrimaryGen::mod_init();
+  BasicPrimaryGen::mod_initialize();
   m_CenterDirection = m_CenterDirection.unit();
 
   const double posx = m_SourcePosition.x();
@@ -118,7 +118,7 @@ G4ThreeVector PointSourcePrimaryGen::samplePosition()
   return m_SourcePosition;
 }
 
-ANLStatus PointSourcePrimaryGen::mod_endrun()
+ANLStatus PointSourcePrimaryGen::mod_end_run()
 {
   double realTime = 0.;
   double pflux = 0.;
@@ -128,7 +128,7 @@ ANLStatus PointSourcePrimaryGen::mod_endrun()
   }
 
   std::cout.setf(std::ios::scientific);
-  std::cout << "PSPrimaryGen::mod_endrun \n"
+  std::cout << "PSPrimaryGen::mod_end_run \n"
             << "  Number: " << Number() << "\n"
             << "  Luminosity: " << m_Luminosity/(unit::erg/unit::s) << " erg/s\n"
             << "  Total Energy: " << TotalEnergy()/unit::keV << " keV = "

@@ -34,7 +34,7 @@ RadioactiveDecayUserActionAssembly::RadioactiveDecayUserActionAssembly()
 {
 }
 
-ANLStatus RadioactiveDecayUserActionAssembly::mod_startup()
+ANLStatus RadioactiveDecayUserActionAssembly::mod_define()
 {
   register_parameter(&m_TerminationTime, "termination_time", unit::s, "s");
 

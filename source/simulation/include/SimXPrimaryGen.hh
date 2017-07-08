@@ -43,9 +43,9 @@ public:
   SimXPrimaryGen();
   ~SimXPrimaryGen();
  
-  anl::ANLStatus mod_startup() override;
-  anl::ANLStatus mod_init() override;
-  anl::ANLStatus mod_endrun() override;
+  anl::ANLStatus mod_define() override;
+  anl::ANLStatus mod_initialize() override;
+  anl::ANLStatus mod_end_run() override;
 
   void makePrimarySetting() override;
   

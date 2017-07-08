@@ -69,39 +69,39 @@ WriteHXIEventFITS::WriteHXIEventFITS()
 
 WriteHXIEventFITS::~WriteHXIEventFITS() = default;
 
-ANLStatus WriteHXIEventFITS::mod_startup()
+ANLStatus WriteHXIEventFITS::mod_define()
 {
   register_parameter(&m_Filename, "filename");
 
   return AS_OK;
 }
 
-ANLStatus WriteHXIEventFITS::mod_init()
+ANLStatus WriteHXIEventFITS::mod_initialize()
 {
-  VCSModule::mod_init();
+  VCSModule::mod_initialize();
 
-  GetModule("CSHitCollection", &m_HitCollection);
-  if (ModuleExist("InitialInformation")) {
-    GetModuleIF("InitialInformation", &m_InitialInfo);
+  get_module("CSHitCollection", &m_HitCollection);
+  if (exist_module("InitialInformation")) {
+    get_module_IF("InitialInformation", &m_InitialInfo);
   }
 
-  EvsDef("WriteHXIEventFITS:Fill");
+  define_evs("WriteHXIEventFITS:Fill");
 
   if (!(m_EventWriter->open(m_Filename))) {
-    return AS_QUIT_ERR;
+    return AS_QUIT_ERROR;
   }
 
   return AS_OK;
 }
 
-ANLStatus WriteHXIEventFITS::mod_ana()
+ANLStatus WriteHXIEventFITS::mod_analyze()
 {
   int64_t eventID = -1;
   if (m_InitialInfo) {
     eventID = m_InitialInfo->EventID();
   }
   else {
-    eventID = get_event_loop_index();
+    eventID = get_loop_index();
   }
 
   const int NumTimeGroups = m_HitCollection->NumberOfTimeGroups();
@@ -117,14 +117,14 @@ ANLStatus WriteHXIEventFITS::mod_ana()
       
       fillHits(occurrenceID, hits, &event);
       m_EventWriter->fillEvent(event);
-      EvsSet("WriteHXIEventFITS:Fill");
+      set_evs("WriteHXIEventFITS:Fill");
     }
   }
 
   return AS_OK;
 }
 
-ANLStatus WriteHXIEventFITS::mod_exit()
+ANLStatus WriteHXIEventFITS::mod_finalize()
 {
   m_EventWriter->close();
   return AS_OK;

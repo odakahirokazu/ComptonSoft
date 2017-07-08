@@ -40,7 +40,7 @@ public:
   PlaneWaveRectanglePrimaryGen();
   ~PlaneWaveRectanglePrimaryGen();
 
-  anl::ANLStatus mod_startup() override;
+  anl::ANLStatus mod_define() override;
 
 protected:
   G4ThreeVector samplePosition() override;

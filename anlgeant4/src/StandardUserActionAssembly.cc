@@ -32,9 +32,9 @@ StandardUserActionAssembly::StandardUserActionAssembly()
   add_alias("StandardUserActionAssembly");
 }
 
-ANLStatus StandardUserActionAssembly::mod_init()
+ANLStatus StandardUserActionAssembly::mod_initialize()
 {
-  GetModuleIFNC("InitialInformation", &m_InitialInfo);
+  get_module_IFNC("InitialInformation", &m_InitialInfo);
   return AS_OK;
 }
 

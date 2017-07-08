@@ -42,7 +42,7 @@ SelectHits::SelectHits()
 
 SelectHits::~SelectHits() = default;
 
-ANLStatus SelectHits::mod_startup()
+ANLStatus SelectHits::mod_define()
 {
   register_parameter_map(&m_AnalysisMap, "analysis_map",
                          "detector_name_prefix", "Si");
@@ -63,14 +63,14 @@ ANLStatus SelectHits::mod_startup()
   return AS_OK;
 }
 
-ANLStatus SelectHits::mod_init()
+ANLStatus SelectHits::mod_initialize()
 {
-  VCSModule::mod_init();
-  GetModuleNC("CSHitCollection", &m_HitCollection);
+  VCSModule::mod_initialize();
+  get_module_NC("CSHitCollection", &m_HitCollection);
   return AS_OK;
 }
 
-ANLStatus SelectHits::mod_ana()
+ANLStatus SelectHits::mod_analyze()
 {
   doProcessing();
   collectHits();

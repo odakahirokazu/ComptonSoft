@@ -45,10 +45,10 @@ public:
   CorrectPHA();
   ~CorrectPHA();
 
-  anl::ANLStatus mod_startup() override;
-  anl::ANLStatus mod_init() override;
-  anl::ANLStatus mod_ana() override;
-  anl::ANLStatus mod_exit() override;
+  anl::ANLStatus mod_define() override;
+  anl::ANLStatus mod_initialize() override;
+  anl::ANLStatus mod_analyze() override;
+  anl::ANLStatus mod_finalize() override;
 
 private:
   bool m_PHARandomization;

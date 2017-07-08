@@ -21,8 +21,10 @@
 #include "TTree.h"
 #include "InitialInformation.hh"
 
-using namespace comptonsoft;
 using namespace anl;
+
+namespace comptonsoft
+{
 
 InitialParticleTree::InitialParticleTree()
   : eventid(0),
@@ -34,18 +36,11 @@ InitialParticleTree::InitialParticleTree()
 {
 }
 
-
-ANLStatus InitialParticleTree::mod_init()
+ANLStatus InitialParticleTree::mod_initialize()
 {
-  VCSModule::mod_init();
-  GetModuleIF("InitialInformation", &initial_info);
-  return AS_OK;
-}
+  VCSModule::mod_initialize();
 
-
-ANLStatus InitialParticleTree::mod_his()
-{
-  VCSModule::mod_his();
+  get_module_IF("InitialInformation", &initial_info);
 
   tree = new TTree("ini_tree", "ini_tree");
 
@@ -60,7 +55,7 @@ ANLStatus InitialParticleTree::mod_his()
   tree->Branch("ini_posz", &ini_posz,  "ini_posz/D");
   tree->Branch("weight",   &weight,    "weight/D");
 
-  if (Evs("Polarization enable")) {
+  if (evs("Polarization enable")) {
     polarization_enable = true;
     tree->Branch("ini_polarx", &ini_polarx,  "ini_polarx/D");
     tree->Branch("ini_polary", &ini_polary,  "ini_polary/D");
@@ -70,8 +65,7 @@ ANLStatus InitialParticleTree::mod_his()
   return AS_OK;
 }
 
-
-ANLStatus InitialParticleTree::mod_ana()
+ANLStatus InitialParticleTree::mod_analyze()
 {
   ini_energy = initial_info->InitialEnergy();
   G4ThreeVector iniDir = initial_info->InitialDirection();
@@ -98,3 +92,5 @@ ANLStatus InitialParticleTree::mod_ana()
   
   return AS_OK;
 }
+
+} /* namespace comptonsoft */

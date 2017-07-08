@@ -56,7 +56,7 @@ ActivationUserActionAssembly::ActivationUserActionAssembly()
 
 ActivationUserActionAssembly::~ActivationUserActionAssembly() = default;
 
-ANLStatus ActivationUserActionAssembly::mod_startup()
+ANLStatus ActivationUserActionAssembly::mod_define()
 {
   register_parameter(&m_FilenameBase, "output_filename_base");
   register_parameter(&m_DetectionByGeneration, "detection_by_generation");

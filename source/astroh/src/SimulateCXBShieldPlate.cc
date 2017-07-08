@@ -44,7 +44,7 @@ SimulateCXBShieldPlate::SimulateCXBShieldPlate()
 {
 }
 
-ANLStatus SimulateCXBShieldPlate::mod_startup()
+ANLStatus SimulateCXBShieldPlate::mod_define()
 {
   register_parameter(&m_ShieldDensity, "density", unit::g/unit::cm3, "g/cm3");
   register_parameter(&m_ShieldHeight, "height", unit::cm, "cm");
@@ -56,9 +56,9 @@ ANLStatus SimulateCXBShieldPlate::mod_startup()
   return AS_OK;
 }
 
-ANLStatus SimulateCXBShieldPlate::mod_init()
+ANLStatus SimulateCXBShieldPlate::mod_initialize()
 {
-  GetModuleIFNC("InitialInformation", &m_InitialInfo);
+  get_module_IFNC("InitialInformation", &m_InitialInfo);
 
   {
     std::ifstream fin(m_CSFilename);
@@ -77,7 +77,7 @@ ANLStatus SimulateCXBShieldPlate::mod_init()
     }
     else {
       std::cout << "Cannot open CS file: " << m_CSFilename << std::endl;
-      return AS_QUIT_ERR;
+      return AS_QUIT_ERROR;
     }
   }
 
@@ -87,7 +87,7 @@ ANLStatus SimulateCXBShieldPlate::mod_init()
   return AS_OK;
 }
 
-ANLStatus SimulateCXBShieldPlate::mod_ana()
+ANLStatus SimulateCXBShieldPlate::mod_analyze()
 {
   const G4ThreeVector dir0 = m_InitialInfo->InitialDirection();
   const G4ThreeVector pos0 = m_InitialInfo->InitialPosition();
@@ -131,7 +131,7 @@ ANLStatus SimulateCXBShieldPlate::mod_ana()
   return AS_OK;
 }
 
-ANLStatus SimulateCXBShieldPlate::mod_exit()
+ANLStatus SimulateCXBShieldPlate::mod_finalize()
 {
   m_PositionFile->Close();
   return AS_OK;

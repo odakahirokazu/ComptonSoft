@@ -37,13 +37,13 @@ DumpMass::~DumpMass()
 {
 }
 
-ANLStatus DumpMass::mod_startup()
+ANLStatus DumpMass::mod_define()
 {
   register_parameter(&m_FileName, "filename");
   return AS_OK;
 }
 
-ANLStatus DumpMass::mod_bgnrun()
+ANLStatus DumpMass::mod_begin_run()
 {
   typedef G4LogicalVolumeStore::iterator LVIter;
 

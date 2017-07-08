@@ -39,14 +39,24 @@ WriteComptonEventTree::WriteComptonEventTree()
 
 WriteComptonEventTree::~WriteComptonEventTree() = default;
 
-ANLStatus WriteComptonEventTree::mod_startup()
+ANLStatus WriteComptonEventTree::mod_define()
 {
   return AS_OK;
 }
 
-ANLStatus WriteComptonEventTree::mod_his()
+ANLStatus WriteComptonEventTree::mod_initialize()
 {
-  VCSModule::mod_his();
+  VCSModule::mod_initialize();
+
+  get_module_NC("EventReconstruction", &eventReconstruction_);
+
+  if (exist_module("InitialInformation")) {
+    get_module_IF("InitialInformation", &initialInfo_);
+    treeIO_->enableInitialInfoRecord();
+  }
+  else {
+    treeIO_->disableInitialInfoRecord();
+  }
 
   cetree_ = new TTree("cetree", "cetree");
   treeIO_->setTree(cetree_);
@@ -55,22 +65,7 @@ ANLStatus WriteComptonEventTree::mod_his()
   return AS_OK;
 }
 
-ANLStatus WriteComptonEventTree::mod_init()
-{
-  GetModuleNC("EventReconstruction", &eventReconstruction_);
-
-  if (ModuleExist("InitialInformation")) {
-    GetModuleIF("InitialInformation", &initialInfo_);
-    treeIO_->enableInitialInfoRecord();
-  }
-  else {
-    treeIO_->disableInitialInfoRecord();
-  }
-
-  return AS_OK;
-}
-
-ANLStatus WriteComptonEventTree::mod_ana()
+ANLStatus WriteComptonEventTree::mod_analyze()
 {
   int64_t eventID = -1;
   
@@ -84,7 +79,7 @@ ANLStatus WriteComptonEventTree::mod_ana()
     treeIO_->setWeight(initialInfo_->Weight());
   }
   else {
-    eventID = get_event_loop_index();
+    eventID = get_loop_index();
   }
   
   const BasicComptonEvent& event

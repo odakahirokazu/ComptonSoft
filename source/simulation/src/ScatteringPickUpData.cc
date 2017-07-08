@@ -33,17 +33,17 @@ ScatteringPickUpData::ScatteringPickUpData()
 {
 }
 
-ANLStatus ScatteringPickUpData::mod_startup()
+ANLStatus ScatteringPickUpData::mod_define()
 {
   register_parameter(&processName_, "process_name");
   return AS_OK;
 }
 
-ANLStatus ScatteringPickUpData::mod_init()
+ANLStatus ScatteringPickUpData::mod_initialize()
 {
-  if (ModuleExist("SaveData")) {
+  if (exist_module("SaveData")) {
     SaveData* saveModule;
-    GetModuleNC("SaveData", &saveModule);
+    get_module_NC("SaveData", &saveModule);
     saveModule->GetDirectory()->cd();
   }
   

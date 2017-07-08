@@ -37,7 +37,7 @@ HistogramEnergy2D::HistogramEnergy2D()
 {
 }
 
-ANLStatus HistogramEnergy2D::mod_startup()
+ANLStatus HistogramEnergy2D::mod_define()
 {
   register_parameter(&numBins_, "number_of_bins");
   register_parameter(&energy0_, "energy_min", 1, "keV");
@@ -46,11 +46,11 @@ ANLStatus HistogramEnergy2D::mod_startup()
   return AS_OK;
 }
 
-ANLStatus HistogramEnergy2D::mod_his()
+ANLStatus HistogramEnergy2D::mod_initialize()
 {
-  GetModule("EventReconstruction", &eventReconstruction_);
+  get_module("EventReconstruction", &eventReconstruction_);
   
-  VCSModule::mod_his();
+  VCSModule::mod_initialize();
   mkdir();
   
   hist_all_ = new TH2D("energy2d_all","Energy1:Energy2 (All)",
@@ -75,9 +75,9 @@ ANLStatus HistogramEnergy2D::mod_his()
   return AS_OK;
 }
 
-ANLStatus HistogramEnergy2D::mod_ana()
+ANLStatus HistogramEnergy2D::mod_analyze()
 {
-  if (!Evs("EventReconstruction:OK")) {
+  if (!evs("EventReconstruction:OK")) {
     return AS_OK;
   }
   

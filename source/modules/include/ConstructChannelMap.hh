@@ -42,8 +42,8 @@ public:
   ConstructChannelMap();
   ~ConstructChannelMap();
 
-  anl::ANLStatus mod_startup() override;
-  anl::ANLStatus mod_init() override;
+  anl::ANLStatus mod_define() override;
+  anl::ANLStatus mod_initialize() override;
 
 private:
   void loadChannelMap(const boost::property_tree::ptree& pt);

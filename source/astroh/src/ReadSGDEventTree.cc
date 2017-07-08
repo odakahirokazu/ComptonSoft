@@ -54,7 +54,7 @@ ReadSGDEventTree::ReadSGDEventTree()
 
 ReadSGDEventTree::~ReadSGDEventTree() = default;
 
-ANLStatus ReadSGDEventTree::mod_startup()
+ANLStatus ReadSGDEventTree::mod_define()
 {
   register_parameter(&m_FileNames, "file_list", "seq", "event.root");
   register_parameter(&m_TreeNames, "tree_list", "seq", "event_tree");
@@ -62,9 +62,9 @@ ANLStatus ReadSGDEventTree::mod_startup()
   return AS_OK;
 }
 
-ANLStatus ReadSGDEventTree::mod_init()
+ANLStatus ReadSGDEventTree::mod_initialize()
 {
-  VCSModule::mod_init();
+  VCSModule::mod_initialize();
 
   if (m_FileNames.size()==0) {
     std::cout << "Event file to be read is not specified." << std::endl;
@@ -90,7 +90,7 @@ ANLStatus ReadSGDEventTree::mod_init()
   return AS_OK;
 }
 
-ANLStatus ReadSGDEventTree::mod_ana()
+ANLStatus ReadSGDEventTree::mod_analyze()
 {
   if (m_Index==m_NumEvents) {
     return AS_QUIT;

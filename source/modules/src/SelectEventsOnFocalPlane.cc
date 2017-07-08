@@ -41,7 +41,7 @@ SelectEventsOnFocalPlane::SelectEventsOnFocalPlane()
 {
 }
 
-ANLStatus SelectEventsOnFocalPlane::mod_startup()
+ANLStatus SelectEventsOnFocalPlane::mod_define()
 {
   register_parameter(&m_DetectorID, "detector_id");
   register_parameter(&m_RegionTypeString, "region_type");
@@ -52,11 +52,11 @@ ANLStatus SelectEventsOnFocalPlane::mod_startup()
   return AS_OK;
 }
 
-ANLStatus SelectEventsOnFocalPlane::mod_init()
+ANLStatus SelectEventsOnFocalPlane::mod_initialize()
 {
-  VCSModule::mod_init();
+  VCSModule::mod_initialize();
  
-  GetModule("EventReconstruction", &m_EventReconstruction);
+  get_module("EventReconstruction", &m_EventReconstruction);
 
   if (m_RegionTypeString=="rectangle") {
     m_RegionType = Region_t::Rectangle;
@@ -66,7 +66,7 @@ ANLStatus SelectEventsOnFocalPlane::mod_init()
   }
   else {
     std::cout << "Unknown region type: " << m_RegionTypeString << std::endl;
-    return AS_QUIT_ERR;
+    return AS_QUIT_ERROR;
   }
   
   m_Radius2 = m_Radius * m_Radius;
@@ -74,7 +74,7 @@ ANLStatus SelectEventsOnFocalPlane::mod_init()
   return AS_OK;
 }
 
-ANLStatus SelectEventsOnFocalPlane::mod_ana()
+ANLStatus SelectEventsOnFocalPlane::mod_analyze()
 {
   const BasicComptonEvent& comptonEvent = m_EventReconstruction->getComptonEvent();
 

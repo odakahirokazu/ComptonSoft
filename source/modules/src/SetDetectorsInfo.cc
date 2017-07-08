@@ -43,15 +43,15 @@ SetDetectorsInfo::SetDetectorsInfo()
 
 SetDetectorsInfo::~SetDetectorsInfo() = default;
 
-ANLStatus SetDetectorsInfo::mod_startup()
+ANLStatus SetDetectorsInfo::mod_define()
 {
   register_parameter(&m_Filename, "filename");
   return AS_OK;
 }
 
-ANLStatus SetDetectorsInfo::mod_init()
+ANLStatus SetDetectorsInfo::mod_initialize()
 {
-  VCSModule::mod_init();
+  VCSModule::mod_initialize();
   readFile();
   return AS_OK;
 }

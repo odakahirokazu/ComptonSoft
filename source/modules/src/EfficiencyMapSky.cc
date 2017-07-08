@@ -36,22 +36,22 @@ EfficiencyMapSky::EfficiencyMapSky()
 
 EfficiencyMapSky::~EfficiencyMapSky() = default;
 
-ANLStatus EfficiencyMapSky::mod_startup()
+ANLStatus EfficiencyMapSky::mod_define()
 {
   setUnit(unit::degree, "degree");
   register_parameter(&m_Scale, "scale");
 
-  return BackProjection::mod_startup();
+  return BackProjection::mod_define();
 }
 
-ANLStatus EfficiencyMapSky::mod_init()
+ANLStatus EfficiencyMapSky::mod_initialize()
 {
-  GetModuleIF("InitialInformation", &m_InitialInfo);
+  get_module_IF("InitialInformation", &m_InitialInfo);
   
-  return BackProjection::mod_init();
+  return BackProjection::mod_initialize();
 }
 
-ANLStatus EfficiencyMapSky::mod_ana()
+ANLStatus EfficiencyMapSky::mod_analyze()
 {
   G4ThreeVector dir = -(m_InitialInfo->InitialDirection());
   G4ThreeVector yaxis(0.0, 1.0, 0.0);

@@ -32,7 +32,7 @@ ObservationPickUpData::ObservationPickUpData()
 {
 }
 
-ANLStatus ObservationPickUpData::mod_startup()
+ANLStatus ObservationPickUpData::mod_define()
 {
   register_parameter(&recordPrimaries_, "record_primaries");
   register_parameter(&particleSelection_, "particle_selection");

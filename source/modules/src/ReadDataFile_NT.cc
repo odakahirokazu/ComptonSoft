@@ -33,9 +33,9 @@ using namespace anl;
 namespace comptonsoft
 {
 
-ANLStatus ReadDataFile_NT::mod_init()
+ANLStatus ReadDataFile_NT::mod_initialize()
 {
-  ReadDataFile::mod_init();
+  ReadDataFile::mod_initialize();
 
   m_Tree = new TChain("eventtree");
   while (!wasLastFile()) {
@@ -74,7 +74,7 @@ ANLStatus ReadDataFile_NT::mod_init()
   return AS_OK;
 }
 
-ANLStatus ReadDataFile_NT::mod_ana()
+ANLStatus ReadDataFile_NT::mod_analyze()
 {
   static unsigned int iEvent = 0;
   if(iEvent == m_NEvents) {
@@ -100,7 +100,7 @@ ANLStatus ReadDataFile_NT::mod_ana()
   }
   
   iEvent++;
-  return ReadDataFile::mod_ana();
+  return ReadDataFile::mod_analyze();
 }
 
 } /* namespace comptonsoft */

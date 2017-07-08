@@ -38,17 +38,17 @@ ReadEventTree::ReadEventTree()
 
 ReadEventTree::~ReadEventTree() = default;
 
-ANLStatus ReadEventTree::mod_startup()
+ANLStatus ReadEventTree::mod_define()
 {
   register_parameter(&fileList_, "file_list", "seq", "hittree.root");
   return AS_OK;
 }
 
-ANLStatus ReadEventTree::mod_init()
+ANLStatus ReadEventTree::mod_initialize()
 {
-  VCSModule::mod_init();
+  VCSModule::mod_initialize();
   
-  GetModuleNC("CSHitCollection", &hitCollection_);
+  get_module_NC("CSHitCollection", &hitCollection_);
 
   tree_ = new TChain("eventtree");
   for (const std::string& filename: fileList_) {
@@ -71,7 +71,7 @@ ANLStatus ReadEventTree::mod_init()
   return AS_OK;
 }
 
-ANLStatus ReadEventTree::mod_ana()
+ANLStatus ReadEventTree::mod_analyze()
 {
   if (entryIndex_ == numEntries_) {
     return AS_QUIT;

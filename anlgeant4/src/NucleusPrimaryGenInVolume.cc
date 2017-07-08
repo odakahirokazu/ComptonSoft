@@ -30,9 +30,9 @@ NucleusPrimaryGenInVolume::NucleusPrimaryGenInVolume()
 
 NucleusPrimaryGenInVolume::~NucleusPrimaryGenInVolume() = default;
 
-ANLStatus NucleusPrimaryGenInVolume::mod_startup()
+ANLStatus NucleusPrimaryGenInVolume::mod_define()
 {
-  NucleusPrimaryGen::mod_startup();
+  NucleusPrimaryGen::mod_define();
 
   register_parameter(&m_VolumeHierarchy, "volume_hierarchy", "seq", "World");
   set_parameter_description("Volume hierarchy that identifies the primary generating volume.");
@@ -40,15 +40,15 @@ ANLStatus NucleusPrimaryGenInVolume::mod_startup()
   return AS_OK;
 }
 
-ANLStatus NucleusPrimaryGenInVolume::mod_com()
+ANLStatus NucleusPrimaryGenInVolume::mod_communicate()
 {
   unregister_parameter("position");
-  return NucleusPrimaryGen::mod_com();
+  return NucleusPrimaryGen::mod_communicate();
 }
 
-ANLStatus NucleusPrimaryGenInVolume::mod_bgnrun()
+ANLStatus NucleusPrimaryGenInVolume::mod_begin_run()
 {
-  anl::ANLStatus status = NucleusPrimaryGen::mod_bgnrun();
+  anl::ANLStatus status = NucleusPrimaryGen::mod_begin_run();
   if (status != AS_OK) {
     return status;
   }

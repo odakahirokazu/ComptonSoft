@@ -50,7 +50,7 @@ EventReconstruction::EventReconstruction()
   add_alias("EventReconstruction");
 }
 
-ANLStatus EventReconstruction::mod_startup()
+ANLStatus EventReconstruction::mod_define()
 {
   register_parameter(&m_MaxHits, "max_hits");
   register_parameter(&m_ReconstructionMethodName, "reconstruction_method");
@@ -61,15 +61,15 @@ ANLStatus EventReconstruction::mod_startup()
   return AS_OK;
 }
 
-ANLStatus EventReconstruction::mod_init()
+ANLStatus EventReconstruction::mod_initialize()
 {
-  VCSModule::mod_init();
+  VCSModule::mod_initialize();
   
-  EvsDef("EventReconstruction:OK");
-  EvsDef("EventReconstruction:NG");
+  define_evs("EventReconstruction:OK");
+  define_evs("EventReconstruction:NG");
   
   assignSourceInformation();
-  GetModuleNC("CSHitCollection", &m_HitCollection);
+  get_module_NC("CSHitCollection", &m_HitCollection);
   initializeHitPatternData();
 
   if (ReconstructionMethodName()=="standard") {
@@ -87,7 +87,7 @@ ANLStatus EventReconstruction::mod_init()
   else {
     std::cout << "Unknown reconstruction method is given: " << ReconstructionMethodName()
               << std::endl;
-    return AS_QUIT_ERR;
+    return AS_QUIT_ERROR;
   }
 
   m_Reconstruction->setMaxHits(m_MaxHits);
@@ -95,7 +95,7 @@ ANLStatus EventReconstruction::mod_init()
   return AS_OK;
 }
 
-ANLStatus EventReconstruction::mod_ana()
+ANLStatus EventReconstruction::mod_analyze()
 {
   resetComptonEvent();
   resetHitPatternFlags();
@@ -104,17 +104,17 @@ ANLStatus EventReconstruction::mod_ana()
   determineHitPatterns(hits);
   const bool result = m_Reconstruction->reconstruct(hits, *m_ComptonEvent);
   if (result) {
-    EvsSet("EventReconstruction:OK");
+    set_evs("EventReconstruction:OK");
   }
   else {
-    EvsSet("EventReconstruction:NG");
+    set_evs("EventReconstruction:NG");
     return AS_SKIP;
   }
   
   return AS_OK;
 }
 
-ANLStatus EventReconstruction::mod_endrun()
+ANLStatus EventReconstruction::mod_end_run()
 {
   std::cout << std::endl;
   printHitPatternData();
@@ -142,7 +142,7 @@ void EventReconstruction::initializeHitPatternData()
   for (std::size_t i=0; i<n; i++) {
     std::string evsName = "HitPattern:";
     evsName += hitPatterns[i].ShortName();
-    EvsDef(evsName);
+    define_evs(evsName);
   }
 }
 
@@ -176,7 +176,7 @@ void EventReconstruction::determineHitPatterns(const std::vector<int>& detectorI
 
       std::string evsName = "HitPattern:";
       evsName += hitPatterns[i].ShortName();
-      EvsSet(evsName);
+      set_evs(evsName);
 
       const unsigned int bit = hitPatterns[i].Bit();
       flags |= (1ul<<bit);
@@ -206,7 +206,7 @@ void EventReconstruction::retrieveHitPatterns()
 
       std::string evsName = "HitPattern:";
       evsName += hitPatterns[i].ShortName();
-      EvsSet(evsName);
+      set_evs(evsName);
     }
     else {
       m_HitPatternFlags[i] = 0;
@@ -245,7 +245,7 @@ void EventReconstruction::clearAllHitPatternEVS()
   for (std::size_t i=0; i<n; i++) {
     std::string evsName = "HitPattern:";
     evsName += hitPatterns[i].ShortName();
-    EvsReset(evsName);
+    reset_evs(evsName);
   }
 }
 

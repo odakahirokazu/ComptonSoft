@@ -54,7 +54,7 @@ Geant4Body::Geant4Body()
 
 Geant4Body::~Geant4Body() = default;
 
-ANLStatus Geant4Body::mod_startup()
+ANLStatus Geant4Body::mod_define()
 {
   register_parameter(&m_RandomEngine, "random_engine");
   register_parameter(&m_RandomInitMode, "random_initialization_mode");
@@ -72,7 +72,7 @@ ANLStatus Geant4Body::mod_startup()
   return AS_OK;
 }
 
-ANLStatus Geant4Body::mod_init()
+ANLStatus Geant4Body::mod_initialize()
 {
   if (m_RandomInitMode==0 || m_RandomInitMode==1 || m_RandomInitMode==2) {
     initialize_random_generator();
@@ -80,7 +80,7 @@ ANLStatus Geant4Body::mod_init()
   else {
     std::cout << "Invalid value [Random initialization mode] : "
               << m_RandomInitMode << std::endl;
-    return AS_QUIT_ERR;
+    return AS_QUIT_ERROR;
   }
 
   set_user_initializations();
@@ -133,12 +133,12 @@ void Geant4Body::initialize_random_generator()
 void Geant4Body::set_user_initializations()
 {
   VANLGeometry* geometry;
-  GetModuleNC("VANLGeometry", &geometry);
+  get_module_NC("VANLGeometry", &geometry);
   G4VUserDetectorConstruction* userDetectorConstruction = geometry->create();
   m_G4RunManager->SetUserInitialization(userDetectorConstruction);
   
   VANLPhysicsList* physics;
-  GetModuleNC("VANLPhysicsList", &physics);
+  get_module_NC("VANLPhysicsList", &physics);
   G4VUserPhysicsList* userPhysicsList = physics->create();
   m_G4RunManager->SetUserInitialization(userPhysicsList);
 }
@@ -146,7 +146,7 @@ void Geant4Body::set_user_initializations()
 void Geant4Body::set_user_primary_generator_action()
 {
   VANLPrimaryGen* primaryGen;
-  GetModuleNC("VANLPrimaryGen", &primaryGen);
+  get_module_NC("VANLPrimaryGen", &primaryGen);
   G4VUserPrimaryGeneratorAction* userPrimaryGeneratorAction
     = primaryGen->create();
   m_G4RunManager->SetUserAction(userPrimaryGeneratorAction);
@@ -155,7 +155,7 @@ void Geant4Body::set_user_primary_generator_action()
 void Geant4Body::set_user_defined_actions()
 {
   VUserActionAssembly* userActionAssembly;
-  GetModuleNC("VUserActionAssembly", &userActionAssembly);
+  get_module_NC("VUserActionAssembly", &userActionAssembly);
   userActionAssembly->registerUserActions(m_G4RunManager.get());
 }
 
@@ -185,7 +185,7 @@ void Geant4Body::apply_commands()
   std::cout << std::endl;
 }
 
-ANLStatus Geant4Body::mod_bgnrun()
+ANLStatus Geant4Body::mod_begin_run()
 {
   const G4bool cond = m_G4RunManager->ConfirmBeamOnCondition();
   if (cond) {
@@ -194,13 +194,13 @@ ANLStatus Geant4Body::mod_bgnrun()
     m_G4RunManager->InitializeEventLoop(0, nullptr, 0);
   }
   else {
-    return AS_QUIT_ERR;
+    return AS_QUIT_ERROR;
   }
 
   return AS_OK;
 }
 
-ANLStatus Geant4Body::mod_ana()
+ANLStatus Geant4Body::mod_analyze()
 {
   const ANLStatus status = m_G4RunManager->performOneEvent(m_EventIndex);
   ++m_EventIndex;
@@ -208,7 +208,7 @@ ANLStatus Geant4Body::mod_ana()
   return status;
 }
 
-ANLStatus Geant4Body::mod_endrun()
+ANLStatus Geant4Body::mod_end_run()
 {
   m_G4RunManager->TerminateEventLoop();
   m_G4RunManager->RunTermination();
@@ -216,7 +216,7 @@ ANLStatus Geant4Body::mod_endrun()
   return AS_OK;
 }
 
-ANLStatus Geant4Body::mod_exit()
+ANLStatus Geant4Body::mod_finalize()
 {
   if (m_OutputRandomStatus) {
     CLHEP::HepRandom::saveEngineStatus(m_RandomFinalStatusFileName.c_str());

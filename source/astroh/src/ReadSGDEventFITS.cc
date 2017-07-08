@@ -102,7 +102,7 @@ ReadSGDEventFITS::ReadSGDEventFITS()
 
 ReadSGDEventFITS::~ReadSGDEventFITS() = default;
 
-ANLStatus ReadSGDEventFITS::mod_startup()
+ANLStatus ReadSGDEventFITS::mod_define()
 {
   register_parameter(&m_Filename, "filename");
   register_parameter(&m_CCID, "cc_id");
@@ -113,26 +113,26 @@ ANLStatus ReadSGDEventFITS::mod_startup()
   return AS_OK;
 }
 
-ANLStatus ReadSGDEventFITS::mod_init()
+ANLStatus ReadSGDEventFITS::mod_initialize()
 {
-  VCSModule::mod_init();
+  VCSModule::mod_initialize();
 
   m_EventReader.reset(new astroh::sgd::EventFITSReader);
   m_EventReader->open(m_Filename);
   m_NumEvents = m_EventReader->NumberOfRows();
   std::cout << "Total events: " << m_NumEvents << std::endl;
 
-  EvsDef("ReadSGDEventFITS:PseudoTrigger");
-  EvsDef("ReadSGDEventFITS:PseudoEffective");
-  EvsDef("ReadSGDEventFITS:ShieldSelection:OK");
-  EvsDef("ReadSGDEventFITS:ShieldSelection:NG");
-  EvsDef("ReadSGDEventFITS:StandardSelection:OK");
-  EvsDef("ReadSGDEventFITS:StandardSelection:NG");
+  define_evs("ReadSGDEventFITS:PseudoTrigger");
+  define_evs("ReadSGDEventFITS:PseudoEffective");
+  define_evs("ReadSGDEventFITS:ShieldSelection:OK");
+  define_evs("ReadSGDEventFITS:ShieldSelection:NG");
+  define_evs("ReadSGDEventFITS:StandardSelection:OK");
+  define_evs("ReadSGDEventFITS:StandardSelection:NG");
   
   return AS_OK;
 }
 
-ANLStatus ReadSGDEventFITS::mod_ana()
+ANLStatus ReadSGDEventFITS::mod_analyze()
 {
   if (m_Index==m_NumEvents) {
     return AS_QUIT;
@@ -149,11 +149,11 @@ ANLStatus ReadSGDEventFITS::mod_ana()
   const astroh::sgd::EventFlags eventFlags = event.getFlags();
 
   if (is_pseudo_triggered(eventFlags)) {
-    EvsSet("ReadSGDEventFITS:PseudoTrigger");
+    set_evs("ReadSGDEventFITS:PseudoTrigger");
   }
 
   if (is_pseudo_effective(m_CCID, eventFlags)) {
-    EvsSet("ReadSGDEventFITS:PseudoEffective");
+    set_evs("ReadSGDEventFITS:PseudoEffective");
     if (m_PseudoPass) {
       m_Index++;
       return AS_OK;
@@ -161,10 +161,10 @@ ANLStatus ReadSGDEventFITS::mod_ana()
   }
 
   if (pass_shield_selection(eventFlags)) {
-    EvsSet("ReadSGDEventFITS:ShieldSelection:OK");
+    set_evs("ReadSGDEventFITS:ShieldSelection:OK");
   }
   else {
-    EvsSet("ReadSGDEventFITS:ShieldSelection:NG");
+    set_evs("ReadSGDEventFITS:ShieldSelection:NG");
     if (m_VetoEnabled) {
       m_Index++;
       return AS_SKIP;
@@ -172,10 +172,10 @@ ANLStatus ReadSGDEventFITS::mod_ana()
   }
 
   if (pass_standard_selection(eventFlags)) {
-    EvsSet("ReadSGDEventFITS:StandardSelection:OK");
+    set_evs("ReadSGDEventFITS:StandardSelection:OK");
   }
   else {
-    EvsSet("ReadSGDEventFITS:StandardSelection:NG");
+    set_evs("ReadSGDEventFITS:StandardSelection:NG");
     if (m_StandardSelectionEnabled) {
       m_Index++;
       return AS_SKIP;

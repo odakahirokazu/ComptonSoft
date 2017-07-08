@@ -67,30 +67,30 @@ ReadHXIEventFITS::ReadHXIEventFITS()
 
 ReadHXIEventFITS::~ReadHXIEventFITS() = default;
 
-ANLStatus ReadHXIEventFITS::mod_startup()
+ANLStatus ReadHXIEventFITS::mod_define()
 {
   register_parameter(&m_Filename, "filename");
 
   return AS_OK;
 }
 
-ANLStatus ReadHXIEventFITS::mod_init()
+ANLStatus ReadHXIEventFITS::mod_initialize()
 {
-  VCSModule::mod_init();
+  VCSModule::mod_initialize();
 
   m_EventReader.reset(new astroh::hxi::EventFITSReader);
   m_EventReader->open(m_Filename);
   m_NumEvents = m_EventReader->NumberOfRows();
   std::cout << "Total events: " << m_NumEvents << std::endl;
 
-  EvsDef("ReadHXIEventFITS:PseudoTrigger");
-  EvsDef("ReadHXIEventFITS:PseudoEffective");
-  EvsDef("ReadHXIEventFITS:ShieldTrigger");
+  define_evs("ReadHXIEventFITS:PseudoTrigger");
+  define_evs("ReadHXIEventFITS:PseudoEffective");
+  define_evs("ReadHXIEventFITS:ShieldTrigger");
   
   return AS_OK;
 }
 
-ANLStatus ReadHXIEventFITS::mod_ana()
+ANLStatus ReadHXIEventFITS::mod_analyze()
 {
   if (m_Index==m_NumEvents) {
     return AS_QUIT;
@@ -105,14 +105,14 @@ ANLStatus ReadHXIEventFITS::mod_ana()
   const astroh::hxi::EventFlags eventFlags = event.getFlags();
 
   if (is_pseudo_triggered(eventFlags)) {
-    EvsSet("ReadHXIEventFITS:PseudoTrigger");
+    set_evs("ReadHXIEventFITS:PseudoTrigger");
   }
   if (is_pseudo_effective(eventFlags)) {
-    EvsSet("ReadHXIEventFITS:PseudoEffective");
+    set_evs("ReadHXIEventFITS:PseudoEffective");
   }
 
   if (eventFlags.getHitPattern() || eventFlags.getFastBGO()) {
-    EvsSet("ReadHXIEventFITS:ShieldTrigger");
+    set_evs("ReadHXIEventFITS:ShieldTrigger");
     if (m_VetoEnable) {
       m_Index++;
       return AS_SKIP;

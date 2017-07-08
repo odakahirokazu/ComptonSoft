@@ -49,10 +49,10 @@ public:
   VisualizeG4Geom();
   ~VisualizeG4Geom();
 
-  anl::ANLStatus mod_startup() override;
-  anl::ANLStatus mod_init() override;
-  anl::ANLStatus mod_endrun() override;
-  anl::ANLStatus mod_exit() override;
+  anl::ANLStatus mod_define() override;
+  anl::ANLStatus mod_initialize() override;
+  anl::ANLStatus mod_end_run() override;
+  anl::ANLStatus mod_finalize() override;
 
 private:
   void applyDefaultCommands();

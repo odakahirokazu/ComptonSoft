@@ -34,9 +34,9 @@ GaussianBeamPrimaryGen::GaussianBeamPrimaryGen()
 
 GaussianBeamPrimaryGen::~GaussianBeamPrimaryGen() = default;
 
-ANLStatus GaussianBeamPrimaryGen::mod_startup()
+ANLStatus GaussianBeamPrimaryGen::mod_define()
 {
-  PlaneWavePrimaryGen::mod_startup();
+  PlaneWavePrimaryGen::mod_define();
 
   unregister_parameter("radius");
   

@@ -37,7 +37,7 @@ HistogramARM::HistogramARM()
 {
 }
 
-ANLStatus HistogramARM::mod_startup()
+ANLStatus HistogramARM::mod_define()
 {
   register_parameter(&numBins_, "number_of_bins");
   register_parameter(&range0_, "range_min", 1.0, "degree");
@@ -45,11 +45,11 @@ ANLStatus HistogramARM::mod_startup()
   return AS_OK;
 }
 
-ANLStatus HistogramARM::mod_his()
+ANLStatus HistogramARM::mod_initialize()
 {
-  GetModule("EventReconstruction", &eventReconstruction_);
+  get_module("EventReconstruction", &eventReconstruction_);
   
-  VCSModule::mod_his();
+  VCSModule::mod_initialize();
   mkdir();
   
   hist_all_ = new TH1D("arm_all", "ARM (All)",
@@ -72,9 +72,9 @@ ANLStatus HistogramARM::mod_his()
   return AS_OK;
 }
 
-ANLStatus HistogramARM::mod_ana()
+ANLStatus HistogramARM::mod_analyze()
 {
-  if (!Evs("EventReconstruction:OK")) {
+  if (!evs("EventReconstruction:OK")) {
     return AS_OK;
   }
   

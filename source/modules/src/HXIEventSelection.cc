@@ -28,81 +28,81 @@ using namespace anl;
 namespace comptonsoft
 {
 
-ANLStatus HXIEventSelection::mod_init()
+ANLStatus HXIEventSelection::mod_initialize()
 {
-  VCSModule::mod_init();
-  GetModuleNC("CSHitCollection", &m_HitCollection);
+  VCSModule::mod_initialize();
+  get_module_NC("CSHitCollection", &m_HitCollection);
 
   DetectorSystem* detectorManager = getDetectorManager();
   for (auto& detector: detectorManager->getDetectors()) {
     int detid = detector->getID();
-    EvsDef((boost::format("HXIEventSelection:detection:%04d") % detid).str());
-    EvsDef((boost::format("HXIEventSelection:1hit:%04d") % detid).str());
+    define_evs((boost::format("HXIEventSelection:detection:%04d") % detid).str());
+    define_evs((boost::format("HXIEventSelection:1hit:%04d") % detid).str());
   }
 
-  EvsDef("HXIEventSelection:1hit");
-  EvsDef("HXIEventSelection:1hit:Si");
-  EvsDef("HXIEventSelection:1hit:CdTe");
-  EvsDef("HXIEventSelection:2hit");
-  EvsDef("HXIEventSelection:2hit:Si-Si");
-  EvsDef("HXIEventSelection:2hit:Si-CdTe");
-  EvsDef("HXIEventSelection:2hit:CdTe-CdTe");
-  EvsDef("HXIEventSelection:2hit:Si-CdTe:fluorescence");
-  EvsDef("HXIEventSelection:2hit:Si-CdTe:not-fluorescence");
-  EvsDef("HXIEventSelection:2hit:CdTe-CdTe:fluorescence");
-  EvsDef("HXIEventSelection:2hit:CdTe-CdTe:not-fluorescence");
+  define_evs("HXIEventSelection:1hit");
+  define_evs("HXIEventSelection:1hit:Si");
+  define_evs("HXIEventSelection:1hit:CdTe");
+  define_evs("HXIEventSelection:2hit");
+  define_evs("HXIEventSelection:2hit:Si-Si");
+  define_evs("HXIEventSelection:2hit:Si-CdTe");
+  define_evs("HXIEventSelection:2hit:CdTe-CdTe");
+  define_evs("HXIEventSelection:2hit:Si-CdTe:fluorescence");
+  define_evs("HXIEventSelection:2hit:Si-CdTe:not-fluorescence");
+  define_evs("HXIEventSelection:2hit:CdTe-CdTe:fluorescence");
+  define_evs("HXIEventSelection:2hit:CdTe-CdTe:not-fluorescence");
 
   return AS_OK;
 }
 
-ANLStatus HXIEventSelection::mod_ana()
+ANLStatus HXIEventSelection::mod_analyze()
 {
   auto& hits = m_HitCollection->getHits();
   for (auto& hit: hits) {
     int detid = hit->DetectorID();
-    EvsSet((boost::format("HXIEventSelection:detection:%04d") % detid).str());
+    set_evs((boost::format("HXIEventSelection:detection:%04d") % detid).str());
   }
 
   if (hits.size() == 1) {
-    EvsSet("HXIEventSelection:1hit");
+    set_evs("HXIEventSelection:1hit");
     const_DetectorHit_sptr hit = hits[0];
-    if (hit->isFlags(flag::LowZHit)) EvsSet("HXIEventSelection:1hit:Si");
-    if (hit->isFlags(flag::HighZHit)) EvsSet("HXIEventSelection:1hit:CdTe");
+    if (hit->isFlags(flag::LowZHit)) set_evs("HXIEventSelection:1hit:Si");
+    if (hit->isFlags(flag::HighZHit)) set_evs("HXIEventSelection:1hit:CdTe");
     int detid = hit->DetectorID();
-    EvsSet((boost::format("HXIEventSelection:1hit:%04d") % detid).str());
+    set_evs((boost::format("HXIEventSelection:1hit:%04d") % detid).str());
   }
   else if (hits.size() == 2) {
-    EvsSet("HXIEventSelection:2hit");
+    set_evs("HXIEventSelection:2hit");
     const_DetectorHit_sptr hit0 = hits[0];
     const_DetectorHit_sptr hit1 = hits[1];
     if (hit0->isFlags(flag::LowZHit) && hit1->isFlags(flag::LowZHit)) {
-      EvsSet("HXIEventSelection:2hit:Si-Si");
+      set_evs("HXIEventSelection:2hit:Si-Si");
     }
     else if (hit0->isFlags(flag::LowZHit) && hit1->isFlags(flag::HighZHit)) {
-      EvsSet("HXIEventSelection:2hit:Si-CdTe");
+      set_evs("HXIEventSelection:2hit:Si-CdTe");
       if (hit0->isFlags(flag::FluorescenceHit)) {
-        EvsSet("HXIEventSelection:2hit:Si-CdTe:fluorescence");
+        set_evs("HXIEventSelection:2hit:Si-CdTe:fluorescence");
       }
       else {
-        EvsSet("HXIEventSelection:2hit:Si-CdTe:not-fluorescence");
+        set_evs("HXIEventSelection:2hit:Si-CdTe:not-fluorescence");
       }
     }
     else if (hit1->isFlags(flag::LowZHit) && hit0->isFlags(flag::HighZHit)) {
-      EvsSet("HXIEventSelection:2hit:Si-CdTe");
+      set_evs("HXIEventSelection:2hit:Si-CdTe");
       if (hit1->isFlags(flag::FluorescenceHit)) {
-        EvsSet("HXIEventSelection:2hit:Si-CdTe:fluorescence");
+        set_evs("HXIEventSelection:2hit:Si-CdTe:fluorescence");
       }
       else {
-        EvsSet("HXIEventSelection:2hit:Si-CdTe:not-fluorescence");
+        set_evs("HXIEventSelection:2hit:Si-CdTe:not-fluorescence");
       }
     }
     else if (hit1->isFlags(flag::HighZHit) && hit0->isFlags(flag::HighZHit)) {
-      EvsSet("HXIEventSelection:2hit:CdTe-CdTe");
+      set_evs("HXIEventSelection:2hit:CdTe-CdTe");
       if (hit0->isFlags(flag::FluorescenceHit) || hit1->isFlags(flag::FluorescenceHit)) {
-        EvsSet("HXIEventSelection:2hit:CdTe-CdTe:fluorescence");
+        set_evs("HXIEventSelection:2hit:CdTe-CdTe:fluorescence");
       }
       else {
-        EvsSet("HXIEventSelection:2hit:CdTe-CdTe:not-fluorescence");
+        set_evs("HXIEventSelection:2hit:CdTe-CdTe:not-fluorescence");
       }
     }
   }

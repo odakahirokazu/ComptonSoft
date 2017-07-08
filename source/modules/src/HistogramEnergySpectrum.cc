@@ -40,7 +40,7 @@ HistogramEnergySpectrum::HistogramEnergySpectrum()
 {
 }
 
-ANLStatus HistogramEnergySpectrum::mod_startup()
+ANLStatus HistogramEnergySpectrum::mod_define()
 {
   register_parameter(&m_EnergyBinType, "bin_type");
   register_parameter(&m_NumBinEnergy, "number_of_bins");
@@ -51,16 +51,12 @@ ANLStatus HistogramEnergySpectrum::mod_startup()
   return AS_OK;
 }
 
-ANLStatus HistogramEnergySpectrum::mod_init()
+ANLStatus HistogramEnergySpectrum::mod_initialize()
 {
-  GetModuleNC("CSHitCollection", &m_HitCollection);
-  GetModuleIFNC("InitialInformation", &m_InitialInfo);
-  return AS_OK;
-}
+  get_module_NC("CSHitCollection", &m_HitCollection);
+  get_module_IFNC("InitialInformation", &m_InitialInfo);
 
-ANLStatus HistogramEnergySpectrum::mod_his()
-{
-  VCSModule::mod_his();
+  VCSModule::mod_initialize();
   mkdir();
 
   std::vector<double> xs(m_NumBinEnergy+1);
@@ -92,7 +88,7 @@ ANLStatus HistogramEnergySpectrum::mod_his()
   return AS_OK;
 }
 
-ANLStatus HistogramEnergySpectrum::mod_ana()
+ANLStatus HistogramEnergySpectrum::mod_analyze()
 {
   typedef std::vector<DetectorHit_sptr> HitVector;
 
@@ -108,7 +104,7 @@ ANLStatus HistogramEnergySpectrum::mod_ana()
   for (std::map<std::string, TH1*>::iterator it=m_Histograms.begin(); it!=m_Histograms.end(); ++it) {
     const std::string& evsName = (*it).first;
     TH1* hist = (*it).second;
-    if (Evs(evsName)) {
+    if (evs(evsName)) {
       hist->Fill(energy/unit::keV, weight);
     }
   }

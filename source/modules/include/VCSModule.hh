@@ -35,16 +35,16 @@ namespace comptonsoft {
  * @date 2008-08-30
  * @date 2014-11-22
  * @date 2016-08-19 | Add isMCSimulation()
+ * @date 2017-07-07 | merge mod_hit() to mod_initialize()
  */
 class VCSModule : public anl::BasicModule
 {
-  DEFINE_ANL_MODULE(VCSModule, 1.2);
+  DEFINE_ANL_MODULE(VCSModule, 1.3);
 public:
   VCSModule();
   ~VCSModule();
   
-  virtual anl::ANLStatus mod_init() override;
-  virtual anl::ANLStatus mod_his() override;
+  virtual anl::ANLStatus mod_initialize() override;
 
 protected:
   void mkdir(const std::string& name="");

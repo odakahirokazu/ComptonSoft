@@ -28,10 +28,10 @@ namespace anlgeant4
 VAppendableUserActionAssembly::VAppendableUserActionAssembly() = default;
 VAppendableUserActionAssembly::~VAppendableUserActionAssembly() = default;
 
-ANLStatus VAppendableUserActionAssembly::mod_prepare()
+ANLStatus VAppendableUserActionAssembly::mod_pre_initialize()
 {
   VMasterUserActionAssembly* master;
-  GetModuleIFNC("VMasterUserActionAssembly", &master);
+  get_module_IFNC("VMasterUserActionAssembly", &master);
   master->appendUserActions(this);
 
   return AS_OK;

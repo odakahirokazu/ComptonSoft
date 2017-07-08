@@ -35,8 +35,8 @@ public:
   InitialConditionFilter();
   ~InitialConditionFilter() = default;
 
-  anl::ANLStatus mod_startup() override;
-  anl::ANLStatus mod_ana() override;
+  anl::ANLStatus mod_define() override;
+  anl::ANLStatus mod_analyze() override;
 
 private:
   double energy0_;

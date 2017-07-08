@@ -54,10 +54,10 @@ public:
   BasicPrimaryGen();
   ~BasicPrimaryGen();
   
-  anl::ANLStatus mod_startup() override;
-  anl::ANLStatus mod_prepare() override;
-  anl::ANLStatus mod_init() override;
-  anl::ANLStatus mod_bgnrun() override;
+  anl::ANLStatus mod_define() override;
+  anl::ANLStatus mod_pre_initialize() override;
+  anl::ANLStatus mod_initialize() override;
+  anl::ANLStatus mod_begin_run() override;
 
   G4VUserPrimaryGeneratorAction* create() override;
   

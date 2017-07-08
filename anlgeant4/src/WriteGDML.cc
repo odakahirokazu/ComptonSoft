@@ -29,7 +29,7 @@ WriteGDML::WriteGDML()
 }
 
 
-ANLStatus WriteGDML::mod_startup()
+ANLStatus WriteGDML::mod_define()
 {
   register_parameter(&m_GeometryFileName, "file");
     
@@ -37,7 +37,7 @@ ANLStatus WriteGDML::mod_startup()
 }
 
 
-ANLStatus WriteGDML::mod_init()
+ANLStatus WriteGDML::mod_initialize()
 { 
   G4VPhysicalVolume* world = 
     G4TransportationManager::GetTransportationManager()

@@ -50,9 +50,9 @@ public:
   void insertHit(const DetectorHit_sptr& hit);
   int NumberOfTimeGroups() const { return hitsVector_.size(); }
 
-  anl::ANLStatus mod_bgnrun() override;
-  anl::ANLStatus mod_ana() override;
-  anl::ANLStatus mod_endrun() override;
+  anl::ANLStatus mod_begin_run() override;
+  anl::ANLStatus mod_analyze() override;
+  anl::ANLStatus mod_end_run() override;
 
 private:
   std::vector<std::vector<comptonsoft::DetectorHit_sptr>> hitsVector_;

@@ -34,7 +34,7 @@ CalculatePedestalLevels::CalculatePedestalLevels()
 {
 }
 
-ANLStatus CalculatePedestalLevels::mod_startup()
+ANLStatus CalculatePedestalLevels::mod_define()
 {
   register_parameter(&m_NBins, "num_bins");
   register_parameter(&m_NegativeADC, "adc_nagative");
@@ -44,9 +44,9 @@ ANLStatus CalculatePedestalLevels::mod_startup()
   return AS_OK;
 }
 
-ANLStatus CalculatePedestalLevels::mod_his()
+ANLStatus CalculatePedestalLevels::mod_initialize()
 {
-  VCSModule::mod_his();
+  VCSModule::mod_initialize();
   mkdir("pedestal");
 
   if (m_NegativeADC) {
@@ -91,7 +91,7 @@ ANLStatus CalculatePedestalLevels::mod_his()
   return AS_OK;
 }
 
-ANLStatus CalculatePedestalLevels::mod_ana()
+ANLStatus CalculatePedestalLevels::mod_analyze()
 {
   std::vector<TH1*>::iterator itHist = m_hisSpec.begin();
 
@@ -116,7 +116,7 @@ ANLStatus CalculatePedestalLevels::mod_ana()
   return AS_OK;
 }
 
-ANLStatus CalculatePedestalLevels::mod_endrun()
+ANLStatus CalculatePedestalLevels::mod_end_run()
 {
   const int ADCZeroLevelBin = m_ADCZeroLevelBin;
   const int SearchHalfWidth = m_PeakSearchHalfWidth;

@@ -30,13 +30,13 @@ ReadDataFile::ReadDataFile()
   add_alias("ReadDataFile");
 }
 
-ANLStatus ReadDataFile::mod_startup()
+ANLStatus ReadDataFile::mod_define()
 {
   register_parameter(&m_FileList, "file_list");
   return AS_OK;
 }
 
-ANLStatus ReadDataFile::mod_init()
+ANLStatus ReadDataFile::mod_initialize()
 {
   m_FileIterator = m_FileList.begin();
   return AS_OK;

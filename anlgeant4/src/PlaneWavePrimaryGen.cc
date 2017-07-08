@@ -40,9 +40,9 @@ PlaneWavePrimaryGen::PlaneWavePrimaryGen()
 
 PlaneWavePrimaryGen::~PlaneWavePrimaryGen() = default;
 
-ANLStatus PlaneWavePrimaryGen::mod_startup()
+ANLStatus PlaneWavePrimaryGen::mod_define()
 {
-  BasicPrimaryGen::mod_startup();
+  BasicPrimaryGen::mod_define();
 
   enablePowerLawInput();
   register_parameter(&m_CenterPosition, "position",
@@ -63,18 +63,18 @@ ANLStatus PlaneWavePrimaryGen::mod_startup()
   return AS_OK;
 }
 
-ANLStatus PlaneWavePrimaryGen::mod_com()
+ANLStatus PlaneWavePrimaryGen::mod_communicate()
 {
   if (PolarizationMode() < 1) {
     hide_parameter("polarization_vector");
   }
   
-  return BasicPrimaryGen::mod_com();
+  return BasicPrimaryGen::mod_communicate();
 }
 
-ANLStatus PlaneWavePrimaryGen::mod_init()
+ANLStatus PlaneWavePrimaryGen::mod_initialize()
 {
-  BasicPrimaryGen::mod_init();
+  BasicPrimaryGen::mod_initialize();
 
   m_Direction0 = m_Direction0.unit();
   m_DirectionOrthogonal = m_Direction0.orthogonal().unit();
@@ -134,14 +134,14 @@ G4ThreeVector PlaneWavePrimaryGen::samplePosition()
   return position;
 }
 
-ANLStatus PlaneWavePrimaryGen::mod_endrun()
+ANLStatus PlaneWavePrimaryGen::mod_end_run()
 {
   const double area = GenerationArea();
   const double realTime = TotalEnergy()/(m_Flux*area);
   const double pflux = Number()/area/realTime;
   
   std::cout.setf(std::ios::scientific);
-  std::cout << "PWPrimaryGen::mod_endrun \n"
+  std::cout << "PWPrimaryGen::mod_end_run \n"
             << "  Number: " << Number() << "\n"
             << "  Flux: " << m_Flux/(unit::erg/unit::cm2/unit::s) << " erg/cm2/s\n"
             << "  Total Energy: " << TotalEnergy()/unit::keV << " keV = "

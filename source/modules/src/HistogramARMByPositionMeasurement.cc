@@ -42,16 +42,16 @@ HistogramARMByPositionMeasurement::HistogramARMByPositionMeasurement()
 
 HistogramARMByPositionMeasurement::~HistogramARMByPositionMeasurement() = default;
 
-ANLStatus HistogramARMByPositionMeasurement::mod_startup()
+ANLStatus HistogramARMByPositionMeasurement::mod_define()
 {
-  HistogramARM::mod_startup();
+  HistogramARM::mod_define();
   register_parameter(&m_NumSamples, "num_samples");
   return AS_OK;
 }
 
-ANLStatus HistogramARMByPositionMeasurement::mod_ana()
+ANLStatus HistogramARMByPositionMeasurement::mod_analyze()
 {
-  if (!Evs("EventReconstruction:OK")) {
+  if (!evs("EventReconstruction:OK")) {
     return AS_OK;
   }
 

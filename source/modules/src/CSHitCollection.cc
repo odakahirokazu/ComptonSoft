@@ -31,19 +31,19 @@ CSHitCollection::CSHitCollection()
 
 CSHitCollection::~CSHitCollection() = default;
 
-ANLStatus CSHitCollection::mod_bgnrun()
+ANLStatus CSHitCollection::mod_begin_run()
 {
   initializeEvent();
   return AS_OK;
 }
 
-ANLStatus CSHitCollection::mod_ana()
+ANLStatus CSHitCollection::mod_analyze()
 {
   initializeEvent();
   return AS_OK;
 }
 
-ANLStatus CSHitCollection::mod_endrun()
+ANLStatus CSHitCollection::mod_end_run()
 {
   initializeEvent();
   return AS_OK;

@@ -31,21 +31,21 @@ WeightByInitialDirection::WeightByInitialDirection()
 {
 }
 
-ANLStatus WeightByInitialDirection::mod_startup()
+ANLStatus WeightByInitialDirection::mod_define()
 {
   register_parameter(&m_DirZVector, "dirz_vector");
   register_parameter(&m_WeightVector, "weight_vector");
   return AS_OK;
 }
 
-ANLStatus WeightByInitialDirection::mod_init()
+ANLStatus WeightByInitialDirection::mod_initialize()
 {
-  GetModuleIFNC("InitialInformation", &m_InitialInfo);
+  get_module_IFNC("InitialInformation", &m_InitialInfo);
   m_WeightFunction.reset(new TGraph(m_DirZVector.size(), &m_DirZVector[0], &m_WeightVector[0]));
   return AS_OK;
 }
 
-ANLStatus WeightByInitialDirection::mod_ana()
+ANLStatus WeightByInitialDirection::mod_analyze()
 {
   const G4ThreeVector dir0 = m_InitialInfo->InitialDirection();
   const double weight0 = m_InitialInfo->Weight();

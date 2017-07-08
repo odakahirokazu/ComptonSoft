@@ -40,7 +40,7 @@ public:
   ObservationPickUpData();
   ~ObservationPickUpData() = default;
   
-  anl::ANLStatus mod_startup() override;
+  anl::ANLStatus mod_define() override;
 
   void EventActionAtBeginning(const G4Event*) override;
   void TrackActionAtEnd(const G4Track* track) override;

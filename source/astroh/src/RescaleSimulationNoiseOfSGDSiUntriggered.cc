@@ -31,21 +31,21 @@ RescaleSimulationNoiseOfSGDSiUntriggered::RescaleSimulationNoiseOfSGDSiUntrigger
 {
 }  
 
-ANLStatus RescaleSimulationNoiseOfSGDSiUntriggered::mod_startup()
+ANLStatus RescaleSimulationNoiseOfSGDSiUntriggered::mod_define()
 {
   register_parameter(&m_Scale, "factor");
 
   return AS_OK;
 }
 
-ANLStatus RescaleSimulationNoiseOfSGDSiUntriggered::mod_init()
+ANLStatus RescaleSimulationNoiseOfSGDSiUntriggered::mod_initialize()
 {
-  GetModuleNC("CSHitCollection", &m_HitCollection);
+  get_module_NC("CSHitCollection", &m_HitCollection);
 
   return AS_OK;
 }
 
-ANLStatus RescaleSimulationNoiseOfSGDSiUntriggered::mod_ana()
+ANLStatus RescaleSimulationNoiseOfSGDSiUntriggered::mod_analyze()
 {
   const int NumTimeGroups = m_HitCollection->NumberOfTimeGroups();
   for (int timeGroup=0; timeGroup<NumTimeGroups; timeGroup++) {

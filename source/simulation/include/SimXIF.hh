@@ -53,9 +53,9 @@ public:
   SimXIF();
   ~SimXIF();
   
-  anl::ANLStatus mod_prepare() override;
-  anl::ANLStatus mod_init() override;
-  anl::ANLStatus mod_ana() override;
+  anl::ANLStatus mod_pre_initialize() override;
+  anl::ANLStatus mod_initialize() override;
+  anl::ANLStatus mod_analyze() override;
 
   void generatePrimaries(double area);
   PhaseSpaceVector takePrimary();

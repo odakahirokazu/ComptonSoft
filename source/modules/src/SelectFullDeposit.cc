@@ -28,15 +28,15 @@ using namespace anl;
 namespace comptonsoft
 {
 
-ANLStatus SelectFullDeposit::mod_init()
+ANLStatus SelectFullDeposit::mod_initialize()
 {
-  GetModuleNC("CSHitCollection", &m_HitCollection);
-  GetModuleIF("InitialInformation", &m_InitialInfo);
+  get_module_NC("CSHitCollection", &m_HitCollection);
+  get_module_IF("InitialInformation", &m_InitialInfo);
   
   return AS_OK;
 }
 
-ANLStatus SelectFullDeposit::mod_ana()
+ANLStatus SelectFullDeposit::mod_analyze()
 {
   const std::vector<DetectorHit_sptr>& hits
     = m_HitCollection->getHits();

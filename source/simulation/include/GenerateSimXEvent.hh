@@ -35,9 +35,9 @@ public:
   GenerateSimXEvent();
   ~GenerateSimXEvent() {}
   
-  anl::ANLStatus mod_init() override;
-  anl::ANLStatus mod_ana() override;
-  anl::ANLStatus mod_exit() override;
+  anl::ANLStatus mod_initialize() override;
+  anl::ANLStatus mod_analyze() override;
+  anl::ANLStatus mod_finalize() override;
 
 protected:
   CSHitCollection* m_HitCollection;

@@ -34,9 +34,9 @@ PlaneWaveRectanglePrimaryGen::PlaneWaveRectanglePrimaryGen()
 
 PlaneWaveRectanglePrimaryGen::~PlaneWaveRectanglePrimaryGen() = default;
 
-ANLStatus PlaneWaveRectanglePrimaryGen::mod_startup()
+ANLStatus PlaneWaveRectanglePrimaryGen::mod_define()
 {
-  PlaneWavePrimaryGen::mod_startup();
+  PlaneWavePrimaryGen::mod_define();
 
   unregister_parameter("radius");
   

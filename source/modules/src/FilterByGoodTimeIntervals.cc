@@ -33,7 +33,7 @@ FilterByGoodTimeIntervals::FilterByGoodTimeIntervals()
 
 FilterByGoodTimeIntervals::~FilterByGoodTimeIntervals() = default;
 
-ANLStatus FilterByGoodTimeIntervals::mod_startup()
+ANLStatus FilterByGoodTimeIntervals::mod_define()
 {
   register_parameter(&m_GTIs, "time_intervals");
   add_value_element(&m_TimeStart, "start", CLHEP::second, "s");
@@ -42,15 +42,15 @@ ANLStatus FilterByGoodTimeIntervals::mod_startup()
   return AS_OK;
 }
 
-ANLStatus FilterByGoodTimeIntervals::mod_init()
+ANLStatus FilterByGoodTimeIntervals::mod_initialize()
 {
-  GetModule("CSHitCollection", &m_HitCollection);
-  EvsDef("FilterByGoodTimeIntervals:OK");
+  get_module("CSHitCollection", &m_HitCollection);
+  define_evs("FilterByGoodTimeIntervals:OK");
 
   return AS_OK;
 }
 
-ANLStatus FilterByGoodTimeIntervals::mod_ana()
+ANLStatus FilterByGoodTimeIntervals::mod_analyze()
 {
   bool passed = false;
   const int NumTimeGroups = m_HitCollection->NumberOfTimeGroups();
@@ -72,7 +72,7 @@ ANLStatus FilterByGoodTimeIntervals::mod_ana()
 
   out_of_loop:
   if (passed) {
-    EvsSet("FilterByGoodTimeIntervals:OK");
+    set_evs("FilterByGoodTimeIntervals:OK");
   }
   else {
     return AS_SKIP;

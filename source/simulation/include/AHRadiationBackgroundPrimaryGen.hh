@@ -45,8 +45,8 @@ public:
   AHRadiationBackgroundPrimaryGen();
   ~AHRadiationBackgroundPrimaryGen();
 
-  anl::ANLStatus mod_startup() override;
-  anl::ANLStatus mod_init() override;
+  anl::ANLStatus mod_define() override;
+  anl::ANLStatus mod_initialize() override;
   
   G4double sampleEnergy() override;
 

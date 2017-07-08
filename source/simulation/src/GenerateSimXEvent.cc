@@ -46,19 +46,19 @@ GenerateSimXEvent::GenerateSimXEvent()
 }
 
 
-ANLStatus GenerateSimXEvent::mod_init()
+ANLStatus GenerateSimXEvent::mod_initialize()
 {
-  BasicModule::mod_init();
+  BasicModule::mod_initialize();
 
-  GetModuleNC("CSHitCollection", &m_HitCollection);
-  GetModuleNC("SimXIF", &m_SimXIF);
-  EvsDef("GenerateSimXEvent:Fill");
+  get_module_NC("CSHitCollection", &m_HitCollection);
+  get_module_NC("SimXIF", &m_SimXIF);
+  define_evs("GenerateSimXEvent:Fill");
   
   return AS_OK;
 }
 
 
-ANLStatus GenerateSimXEvent::mod_ana()
+ANLStatus GenerateSimXEvent::mod_analyze()
 {
   const std::vector<DetectorHit_sptr>& hitVec 
     = m_HitCollection->getHits();
@@ -68,7 +68,7 @@ ANLStatus GenerateSimXEvent::mod_ana()
 
   flag = 0;
 
-  if (num>0) EvsSet("GenerateSimXEvent:Fill");
+  if (num>0) set_evs("GenerateSimXEvent:Fill");
 
   for (int i=0; i<num; i++) {
     flag = 0;
@@ -113,7 +113,7 @@ ANLStatus GenerateSimXEvent::mod_ana()
 }
 
 
-ANLStatus GenerateSimXEvent::mod_exit()
+ANLStatus GenerateSimXEvent::mod_finalize()
 {
   if (m_SimXIF) m_SimXIF->outputEvents();
   

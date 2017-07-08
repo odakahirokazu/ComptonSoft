@@ -42,14 +42,13 @@ class CSHitCollection;
  */
 class WriteHitTree : public VCSModule
 {
-  DEFINE_ANL_MODULE(WriteHitTree, 2.0);
+  DEFINE_ANL_MODULE(WriteHitTree, 2.1);
 public:
   WriteHitTree();
   ~WriteHitTree() = default;
   
-  anl::ANLStatus mod_init() override;
-  anl::ANLStatus mod_his() override;
-  anl::ANLStatus mod_ana() override;
+  anl::ANLStatus mod_initialize() override;
+  anl::ANLStatus mod_analyze() override;
 
 private:
   const CSHitCollection* hitCollection_;

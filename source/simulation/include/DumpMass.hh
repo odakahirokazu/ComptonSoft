@@ -38,8 +38,8 @@ public:
   DumpMass();
   ~DumpMass();
 
-  anl::ANLStatus mod_startup() override;
-  anl::ANLStatus mod_bgnrun() override;
+  anl::ANLStatus mod_define() override;
+  anl::ANLStatus mod_begin_run() override;
 
 private:
   std::string m_FileName;

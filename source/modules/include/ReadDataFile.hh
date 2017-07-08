@@ -40,9 +40,9 @@ public:
   ReadDataFile();
   ~ReadDataFile() = default;
 
-  anl::ANLStatus mod_startup() override;
-  anl::ANLStatus mod_init() override;
-  anl::ANLStatus mod_ana() override
+  anl::ANLStatus mod_define() override;
+  anl::ANLStatus mod_initialize() override;
+  anl::ANLStatus mod_analyze() override
   { ++m_EventID; return anl::AS_OK; }
 
   int EventID() const { return m_EventID; }

@@ -41,7 +41,7 @@ QuickAnalysisForDSD::QuickAnalysisForDSD()
 
 QuickAnalysisForDSD::~QuickAnalysisForDSD() = default;
 
-ANLStatus QuickAnalysisForDSD::mod_startup()
+ANLStatus QuickAnalysisForDSD::mod_define()
 {
   register_parameter(&m_DetectorID, "detector_id");
   register_parameter(&m_NBins, "num_bins");
@@ -52,9 +52,9 @@ ANLStatus QuickAnalysisForDSD::mod_startup()
   return AS_OK;
 }
 
-ANLStatus QuickAnalysisForDSD::mod_his()
+ANLStatus QuickAnalysisForDSD::mod_initialize()
 {
-  VCSModule::mod_his();
+  VCSModule::mod_initialize();
 
   const int NBin = m_NBins;
   const double EMin = m_Energy0;
@@ -86,13 +86,6 @@ ANLStatus QuickAnalysisForDSD::mod_his()
   m_Image1DY = new TH1D("image_1D_Y", "Image 1D Y",
                         NPixelY, -0.5, NPixelY-0.5);
 
-  return AS_OK;
-}
-
-ANLStatus QuickAnalysisForDSD::mod_init()
-{
-  VCSModule::mod_init();
-
   VRealDetectorUnit* det = getDetectorManager()->getDetectorByID(m_DetectorID);
   m_DSD = dynamic_cast<RealDetectorUnit2DStrip*>(det);
   if (m_DSD==nullptr) {
@@ -103,7 +96,7 @@ ANLStatus QuickAnalysisForDSD::mod_init()
   return AS_OK;
 }
 
-ANLStatus QuickAnalysisForDSD::mod_ana()
+ANLStatus QuickAnalysisForDSD::mod_analyze()
 {
   const int numCathode = m_DSD->NumberOfCathodeSideHits();
   const int numAnode = m_DSD->NumberOfAnodeSideHits();

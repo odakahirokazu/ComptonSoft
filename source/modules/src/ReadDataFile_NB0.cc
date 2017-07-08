@@ -36,27 +36,27 @@ ReadDataFile_NB0::ReadDataFile_NB0()
 {
 }
 
-ANLStatus ReadDataFile_NB0::mod_startup()
+ANLStatus ReadDataFile_NB0::mod_define()
 {
   register_parameter(&m_EventLength, "event_length");
 
-  return ReadDataFile::mod_startup();
+  return ReadDataFile::mod_define();
 }
 
-ANLStatus ReadDataFile_NB0::mod_init()
+ANLStatus ReadDataFile_NB0::mod_initialize()
 {
-  ReadDataFile::mod_init();
+  ReadDataFile::mod_initialize();
 
   // check file open
   bool check = checkFiles();
-  if (!check) return AS_QUIT_ERR;
+  if (!check) return AS_QUIT_ERROR;
 
-  EvsDef("ReadDataFile:ReadHK");
+  define_evs("ReadDataFile:ReadHK");
 
   return AS_OK;
 }
 
-ANLStatus ReadDataFile_NB0::mod_bgnrun()
+ANLStatus ReadDataFile_NB0::mod_begin_run()
 {
   if (wasLastFile()) {
     std::cout << "The file list seems empty." << std::endl;
@@ -72,7 +72,7 @@ ANLStatus ReadDataFile_NB0::mod_bgnrun()
   return AS_OK;
 }
 
-ANLStatus ReadDataFile_NB0::mod_ana()
+ANLStatus ReadDataFile_NB0::mod_analyze()
 {
   unsigned int tmp;
 
@@ -110,12 +110,12 @@ ANLStatus ReadDataFile_NB0::mod_ana()
     if ((tmp&0xFF000000) == 0x03000000) {
       if (readHK()) {
         m_NewFrame = true;
-        EvsSet("ReadDataFile:ReadHK");
+        set_evs("ReadDataFile:ReadHK");
         return AS_OK;
       }
       else {
         m_NewFrame = true;
-        return AS_SKIP_ERR;
+        return AS_SKIP_ERROR;
       }
     }
     else if ((tmp&0xFF000000) == 0x02000000) {
@@ -124,17 +124,17 @@ ANLStatus ReadDataFile_NB0::mod_ana()
       }
       else {
         m_NewFrame = true;
-        return AS_SKIP_ERR;
+        return AS_SKIP_ERROR;
       }
     }
     else {
       std::cout << "wrong character." << std::endl;
-      return AS_QUIT_ERR;
+      return AS_QUIT_ERROR;
     }
   }
 
   m_PtrFrame = readEvent(m_PtrFrame);
-  return ReadDataFile::mod_ana();
+  return ReadDataFile::mod_analyze();
 }
 
 bool ReadDataFile_NB0::readHK()

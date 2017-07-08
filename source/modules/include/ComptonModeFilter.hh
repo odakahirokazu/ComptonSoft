@@ -30,14 +30,13 @@ class EventReconstruction;
 
 class ComptonModeFilter : public VCSModule
 {
-  DEFINE_ANL_MODULE(ComptonModeFilter, 1.1);
+  DEFINE_ANL_MODULE(ComptonModeFilter, 1.2);
 public:
   ComptonModeFilter();
   ~ComptonModeFilter() = default;
 
-  anl::ANLStatus mod_init() override;
-  anl::ANLStatus mod_his() override;
-  anl::ANLStatus mod_ana() override;
+  anl::ANLStatus mod_initialize() override;
+  anl::ANLStatus mod_analyze() override;
 
   double theta_cut_limit(double energy) const;
   double theta_cut_limit2(double energy) const;

@@ -40,23 +40,23 @@ AHRadiationBackgroundPrimaryGen::AHRadiationBackgroundPrimaryGen()
 
 AHRadiationBackgroundPrimaryGen::~AHRadiationBackgroundPrimaryGen() = default;
 
-ANLStatus AHRadiationBackgroundPrimaryGen::mod_startup()
+ANLStatus AHRadiationBackgroundPrimaryGen::mod_define()
 {
-  anlgeant4::IsotropicPrimaryGen::mod_startup();
+  anlgeant4::IsotropicPrimaryGen::mod_define();
   disableDefaultEnergyInput();
   register_parameter(&m_Filename, "filename");
   set_parameter_description("ROOT file of background radiation spectrum.");
   return AS_OK;
 }
 
-ANLStatus AHRadiationBackgroundPrimaryGen::mod_init()
+ANLStatus AHRadiationBackgroundPrimaryGen::mod_initialize()
 {
-  anlgeant4::IsotropicPrimaryGen::mod_init();
+  anlgeant4::IsotropicPrimaryGen::mod_initialize();
   
   m_File.reset(new TFile(m_Filename.c_str()));
   if ( m_File->IsZombie() ) {
     std::cout << "Cannot open " << m_Filename << " ! " << std::endl;
-    return AS_QUIT_ERR;
+    return AS_QUIT_ERROR;
   }
   
   TGraph* graph = (TGraph*) m_File->Get("Graph");

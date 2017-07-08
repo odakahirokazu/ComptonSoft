@@ -66,7 +66,7 @@ VisualizeG4Geom::VisualizeG4Geom()
 
 VisualizeG4Geom::~VisualizeG4Geom() = default;
 
-ANLStatus VisualizeG4Geom::mod_startup()
+ANLStatus VisualizeG4Geom::mod_define()
 {
   register_parameter(&m_Mode, "mode");
   register_parameter(&m_TargetPoint, "target_point", unit::cm, "cm");
@@ -79,7 +79,7 @@ ANLStatus VisualizeG4Geom::mod_startup()
   return AS_OK;
 }
 
-ANLStatus VisualizeG4Geom::mod_init()
+ANLStatus VisualizeG4Geom::mod_initialize()
 {
   m_VisManager.reset(new G4VisExecutive);
   m_UIManager = G4UImanager::GetUIpointer();
@@ -102,7 +102,7 @@ ANLStatus VisualizeG4Geom::mod_init()
   return AS_OK;
 }
 
-ANLStatus VisualizeG4Geom::mod_endrun()
+ANLStatus VisualizeG4Geom::mod_end_run()
 {
   if (m_Mode.find("OGL") != std::string::npos) {
     m_UIExecutive->SessionStart();
@@ -111,7 +111,7 @@ ANLStatus VisualizeG4Geom::mod_endrun()
   return AS_OK;
 }
 
-ANLStatus VisualizeG4Geom::mod_exit()
+ANLStatus VisualizeG4Geom::mod_finalize()
 {
   m_UIExecutive.reset();
   m_VisManager.reset();

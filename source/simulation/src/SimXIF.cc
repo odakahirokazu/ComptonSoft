@@ -143,7 +143,7 @@ SimXIF::~SimXIF()
   m_EventList = 0;
 }
 
-ANLStatus SimXIF::mod_prepare()
+ANLStatus SimXIF::mod_pre_initialize()
 {
   std::cout << "*******************************\n"
             << "***      SimX 2.0 IF        ***\n"
@@ -160,36 +160,36 @@ ANLStatus SimXIF::mod_prepare()
   get_input_data(argc, argv, NULL, m_SimXParameters, &m_SimXStatus);
   if (m_SimXStatus != 0) {
     std::cout << "simx: Error reading input data.  Exiting without running." << std::endl;
-    return AS_QUIT_ERR;
+    return AS_QUIT_ERROR;
   }
 
   std::string filter("SimXIF:FilterName:");
   filter += m_SimXParameters->FilterName;
-  EvsDef(filter);
+  define_evs(filter);
   
   return AS_OK;
 }
 
-ANLStatus SimXIF::mod_init()
+ANLStatus SimXIF::mod_initialize()
 {
   /* Read in files, set things up, etc */ 
   simx::SimputCatalog *simcat = 0;
   initialize(m_SimXParameters, &m_Response, m_Source, &simcat, &m_SimXStatus);
   if (m_SimXStatus != 0) {
     std::cout << "simx: Error doing initialization.  Exiting without running." << std::endl;
-    return AS_QUIT_ERR;
+    return AS_QUIT_ERROR;
   }
 
   off();
 
-  if (ModuleExist("ConstructDetector_Sim")) {
-    m_DetectorManager = GetModuleNC<ConstructDetectorForSimulation>("ConstructDetectorForSimulation")->getDetectorManager();
+  if (exist_module("ConstructDetector_Sim")) {
+    m_DetectorManager = get_module_NC<ConstructDetectorForSimulation>("ConstructDetectorForSimulation")->getDetectorManager();
   }
   
   return AS_OK;
 }
 
-ANLStatus SimXIF::mod_ana()
+ANLStatus SimXIF::mod_analyze()
 {
   if (m_PrimaryIter == m_Primaries.end()) return AS_QUIT;
 
@@ -228,8 +228,8 @@ void SimXIF::addEvent(double time, double energy, int stripx, int stripy,
   double widthx(0.0);
   double widthy(0.0);
 
-  if (m_DetectorManager==0 && ModuleExist("ConstructDetector_Sim")) {
-    m_DetectorManager = GetModuleNC<ConstructDetectorForSimulation>("ConstructDetectorForSimulation")->getDetectorManager();
+  if (m_DetectorManager==0 && exist_module("ConstructDetector_Sim")) {
+    m_DetectorManager = get_module_NC<ConstructDetectorForSimulation>("ConstructDetectorForSimulation")->getDetectorManager();
   }
   
   if (m_DetectorManager) {

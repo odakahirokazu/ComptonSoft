@@ -39,7 +39,7 @@ EventSelection::EventSelection()
 {
 }
 
-ANLStatus EventSelection::mod_startup()
+ANLStatus EventSelection::mod_define()
 {
   register_parameter(&m_DiscardTimeGroupZero, "discard_time_group_zero");
   register_parameter(&m_DiscardTimeGroupNonZero, "discard_time_group_nonzero");
@@ -49,15 +49,15 @@ ANLStatus EventSelection::mod_startup()
   return AS_OK;
 }
 
-ANLStatus EventSelection::mod_init()
+ANLStatus EventSelection::mod_initialize()
 {
-  VCSModule::mod_init();
-  GetModuleNC("CSHitCollection", &m_HitCollection);
-  EvsDef("EventSelection:Veto");
+  VCSModule::mod_initialize();
+  get_module_NC("CSHitCollection", &m_HitCollection);
+  define_evs("EventSelection:Veto");
   return AS_OK;
 }
 
-ANLStatus EventSelection::mod_ana()
+ANLStatus EventSelection::mod_analyze()
 {
   DetectorSystem* detectorManager = getDetectorManager();
   const DetectorGroup& AntiDetectorGroup
@@ -107,7 +107,7 @@ ANLStatus EventSelection::mod_ana()
         veto = true;
         hit->addFlags(flag::AntiCoincidence);
         if (timeGroup==0) {
-          EvsSet("EventSelection:Veto");
+          set_evs("EventSelection:Veto");
         }
       }
       else if (LowZDetectorGroup.isMember(detectorID)) {

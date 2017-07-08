@@ -43,7 +43,7 @@ ResponseMatrix::ResponseMatrix()
 
 ResponseMatrix::~ResponseMatrix() = default;
 
-ANLStatus ResponseMatrix::mod_startup()
+ANLStatus ResponseMatrix::mod_define()
 {
   register_parameter(&m_NumBinEnergy, "number_of_bins");
   register_parameter(&m_RangeEnergy1, "energy_min", 1.0, "keV");
@@ -53,16 +53,12 @@ ANLStatus ResponseMatrix::mod_startup()
   return AS_OK;
 }
 
-ANLStatus ResponseMatrix::mod_init()
+ANLStatus ResponseMatrix::mod_initialize()
 {
-  GetModule("EventReconstruction", &m_EventReconstruction);
-  GetModuleIFNC("InitialInformation", &m_InitialInfo);
-  return AS_OK;
-}
+  get_module("EventReconstruction", &m_EventReconstruction);
+  get_module_IFNC("InitialInformation", &m_InitialInfo);
 
-ANLStatus ResponseMatrix::mod_his()
-{
-  VCSModule::mod_his();
+  VCSModule::mod_initialize();
   mkdir();
 
   const size_t n = m_Selections.size();
@@ -80,7 +76,7 @@ ANLStatus ResponseMatrix::mod_his()
   return AS_OK;
 }
 
-ANLStatus ResponseMatrix::mod_ana()
+ANLStatus ResponseMatrix::mod_analyze()
 {
   const double weight = m_InitialInfo->Weight();
   const double initialEnergy = m_InitialInfo->InitialEnergy();
@@ -91,7 +87,7 @@ ANLStatus ResponseMatrix::mod_ana()
   for (auto& pair: m_Responses) {
     const std::string& evsName = pair.first;
     TH2* hist = pair.second;
-    if (Evs(evsName)) {
+    if (evs(evsName)) {
       hist->Fill(initialEnergy/unit::keV, energy/unit::keV, weight);
     }
   }

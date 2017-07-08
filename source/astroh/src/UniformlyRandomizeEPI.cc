@@ -37,7 +37,7 @@ UniformlyRandomizeEPI::UniformlyRandomizeEPI()
 
 UniformlyRandomizeEPI::~UniformlyRandomizeEPI() = default;
 
-ANLStatus UniformlyRandomizeEPI::mod_startup()
+ANLStatus UniformlyRandomizeEPI::mod_define()
 {
   register_parameter(&m_LZDeltaE0, "si_delta0", unit::keV, "keV");
   register_parameter(&m_LZDeltaE1, "si_delta1", unit::keV, "keV");
@@ -47,14 +47,14 @@ ANLStatus UniformlyRandomizeEPI::mod_startup()
   return AS_OK;
 }
 
-ANLStatus UniformlyRandomizeEPI::mod_init()
+ANLStatus UniformlyRandomizeEPI::mod_initialize()
 {
-  GetModuleNC("CSHitCollection", &m_HitCollection);
+  get_module_NC("CSHitCollection", &m_HitCollection);
 
   return AS_OK;
 }
 
-ANLStatus UniformlyRandomizeEPI::mod_ana()
+ANLStatus UniformlyRandomizeEPI::mod_analyze()
 {
   const int NumTimeGroups = m_HitCollection->NumberOfTimeGroups();
   for (int timeGroup=0; timeGroup<NumTimeGroups; timeGroup++) {

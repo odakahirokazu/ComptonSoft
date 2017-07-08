@@ -24,7 +24,7 @@ using namespace anl;
 namespace comptonsoft
 {
 
-ANLStatus RecalculateEPI::mod_ana()
+ANLStatus RecalculateEPI::mod_analyze()
 {
   for (auto& detector: getDetectorManager()->getDetectors()) {
     detector->recalculateEPI();

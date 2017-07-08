@@ -48,15 +48,15 @@ SetChannelProperties::SetChannelProperties()
 
 SetChannelProperties::~SetChannelProperties() = default;
 
-ANLStatus SetChannelProperties::mod_startup()
+ANLStatus SetChannelProperties::mod_define()
 {
   register_parameter(&m_Filename, "filename");
   return AS_OK;
 }
 
-ANLStatus SetChannelProperties::mod_init()
+ANLStatus SetChannelProperties::mod_initialize()
 {
-  VCSModule::mod_init();
+  VCSModule::mod_initialize();
   readFile();
   return AS_OK;
 }
