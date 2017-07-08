@@ -17,9 +17,8 @@
  *                                                                       *
  *************************************************************************/
 
-#include "SaveData.hh"
-#include <cstdio>
-#include <iostream>
+#include "CreateRootFile.hh"
+#include <boost/format.hpp>
 #include "TFile.h"
 
 using namespace anl;
@@ -27,48 +26,59 @@ using namespace anl;
 namespace comptonsoft
 {
 
-SaveData::SaveData()
-  : m_Filename("output.root"),
+CreateRootFile::CreateRootFile()
+  : m_FilenameBase("output"),
     m_RootFile(nullptr)
 {
 }
 
-SaveData::~SaveData() = default;
+CreateRootFile::~CreateRootFile() = default;
 
-ANLStatus SaveData::mod_define()
+std::string CreateRootFile::Filename() const
 {
-  register_parameter(&m_Filename, "output");
+  if (is_master() && m_MasterFile) { return FilenameBase()+".root"; }
+  return FilenameBase()+(boost::format("_%3d.root")%copy_id()).str();
+}
+
+ANLStatus CreateRootFile::mod_define()
+{
+  register_parameter(&m_FilenameBase, "filename_base");
+  register_parameter(&m_MasterFile, "master_file");
+  register_parameter(&m_SeparateClones, "parallel");
+  register_parameter(&m_SaveClones, "save_parallel");
   return AS_OK;
 }
 
-ANLStatus SaveData::mod_pre_initialize()
+ANLStatus CreateRootFile::mod_initialize()
 {
-  m_RootFile.reset(new TFile(m_Filename.c_str(), "recreate"));
-  if ( !m_RootFile ) {
-    std::cout << "SaveData: cannot create ROOT file" << std::endl;
-    return AS_QUIT;
+  if (is_master() || m_SeparateClones) {
+    m_RootFile.reset(new TFile(Filename().c_str(), "recreate"));
+    if ( !m_RootFile ) {
+      std::cout << "CreateRootFile: cannot create ROOT file" << std::endl;
+      return AS_QUIT;
+    }
   }
   
   return AS_OK;
 }
 
-ANLStatus SaveData::mod_finalize()
+ANLStatus CreateRootFile::mod_finalize()
 {
-  std::cout << "SaveData: saving data to ROOT file" << std::endl;
-  m_RootFile->Write();
-  std::cout << "SaveData: closing ROOT file" << std::endl;
-  m_RootFile->Close();
-  std::cout << "SaveData: ROOT file closed " << std::endl;
-  
+  if (is_master() || (m_SeparateClones && m_SaveClones)) {
+    std::cout << "CreateRootFile: saving data to ROOT file" << std::endl;
+    m_RootFile->Write();
+    m_RootFile->Close();
+    std::cout << "CreateRootFile: ROOT file closed " << std::endl;
+  }
   return AS_OK;
 }
 
-TDirectory* SaveData::GetDirectory()
+TDirectory* CreateRootFile::GetDirectory()
 {
   return m_RootFile->GetDirectory(0);
 }
 
-bool SaveData::cd()
+bool CreateRootFile::cd()
 {
   return m_RootFile->cd();
 }

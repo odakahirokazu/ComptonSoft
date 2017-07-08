@@ -17,8 +17,8 @@
  *                                                                       *
  *************************************************************************/
 
-#ifndef COMPTONSOFT_SaveData_H
-#define COMPTONSOFT_SaveData_H 1
+#ifndef COMPTONSOFT_CreateRootFile_H
+#define COMPTONSOFT_CreateRootFile_H 1
 
 #include "BasicModule.hh"
 #include <memory>
@@ -30,30 +30,33 @@ namespace comptonsoft {
 /**
  * Module to manage TFile for save histograms/trees.
  * @author Hirokazu Odaka
- * @date 2008-04-30
- * @date 2017-03-23 | use unique_ptr for the root file.
+ * @date 2017-07-07 | based on SaveData
  */
-class SaveData : public anl::BasicModule
+class CreateRootFile : public anl::BasicModule
 {
-  DEFINE_ANL_MODULE(SaveData, 3.0);
+  DEFINE_ANL_MODULE(CreateRootFile, 1.0);
 public:
-  SaveData();
-  ~SaveData();
+  CreateRootFile();
+  ~CreateRootFile();
   
   anl::ANLStatus mod_define() override;
-  anl::ANLStatus mod_pre_initialize() override;
+  anl::ANLStatus mod_initialize() override;
   anl::ANLStatus mod_finalize() override;
 
   TDirectory* GetDirectory();
   bool cd();
 
-  std::string Filename() const { return m_Filename; }
+  std::string FilenameBase() const { return m_FilenameBase; }
+  std::string Filename() const;
 
 private:
-  std::string m_Filename;
+  std::string m_FilenameBase;
   std::unique_ptr<TFile> m_RootFile;
+  bool m_MasterFile = true;
+  bool m_SeparateClones = false;
+  bool m_SaveClones = false;
 };
 
 } /* namespace comptonsoft */
 
-#endif /* COMPTONSOFT_SaveData_H */
+#endif /* COMPTONSOFT_CreateRootFile_H */

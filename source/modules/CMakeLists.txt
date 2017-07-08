@@ -45,6 +45,7 @@ set(CS_MODULES
   src/EventReconstruction.cc
   src/HXIEventSelection.cc
   ### IO
+  src/CreateRootFile.cc
   src/SaveData.cc
   src/ReadDataFile.cc
   src/ReadDataFile_VME3.cc

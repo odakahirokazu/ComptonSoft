@@ -17,6 +17,7 @@
 #include "EventSelection.hh"
 #include "EventReconstruction.hh"
 #include "HXIEventSelection.hh"
+#include "CreateRootFile.hh"
 #include "SaveData.hh"
 #include "ReadDataFile.hh"
 #include "ReadDataFile_VME3.hh"
@@ -249,6 +250,14 @@ class HXIEventSelection : public VCSModule
 public:
   HXIEventSelection() = default;
   ~HXIEventSelection() = default;
+};
+
+
+class CreateRootFile : public anl::BasicModule
+{
+public:
+  CreateRootFile();
+  ~CreateRootFile();
 };
 
 

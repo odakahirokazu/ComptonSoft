@@ -23,6 +23,7 @@ clMod = [
   ANL::SWIGClass.new("EventSelection"),
   ANL::SWIGClass.new("EventReconstruction"),
   ANL::SWIGClass.new("HXIEventSelection"),
+  ANL::SWIGClass.new("CreateRootFile"),
   ANL::SWIGClass.new("SaveData"),
   ANL::SWIGClass.new("ReadDataFile"),
   ANL::SWIGClass.new("ReadDataFile_VME3"),

@@ -16,6 +16,7 @@ class ApplyEPICompensation;
 class EventSelection;
 class EventReconstruction;
 class HXIEventSelection;
+class CreateRootFile;
 class SaveData;
 class ReadDataFile;
 class ReadDataFile_VME3;
