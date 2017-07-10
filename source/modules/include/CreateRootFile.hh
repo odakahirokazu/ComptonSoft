@@ -23,6 +23,7 @@
 #include "BasicModule.hh"
 #include <memory>
 
+class TDirectory;
 class TFile;
 
 namespace comptonsoft {
@@ -35,10 +36,15 @@ namespace comptonsoft {
 class CreateRootFile : public anl::BasicModule
 {
   DEFINE_ANL_MODULE(CreateRootFile, 1.0);
+  ENABLE_PARALLEL_RUN();
 public:
   CreateRootFile();
   ~CreateRootFile();
   
+protected:
+  CreateRootFile(const CreateRootFile& r);
+
+public:
   anl::ANLStatus mod_define() override;
   anl::ANLStatus mod_initialize() override;
   anl::ANLStatus mod_finalize() override;

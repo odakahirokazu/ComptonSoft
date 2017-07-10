@@ -20,6 +20,7 @@
 #include "CreateRootFile.hh"
 #include <boost/format.hpp>
 #include "TFile.h"
+#include "TMemFile.h"
 
 using namespace anl;
 
@@ -34,10 +35,19 @@ CreateRootFile::CreateRootFile()
 
 CreateRootFile::~CreateRootFile() = default;
 
+CreateRootFile::CreateRootFile(const CreateRootFile& r)
+  : BasicModule::BasicModule(r),
+    m_FilenameBase(r.m_FilenameBase),
+    m_RootFile(nullptr),
+    m_SeparateClones(r.m_SeparateClones),
+    m_SaveClones(r.m_SaveClones)
+{
+}
+
 std::string CreateRootFile::Filename() const
 {
   if (is_master() && m_MasterFile) { return FilenameBase()+".root"; }
-  return FilenameBase()+(boost::format("_%3d.root")%copy_id()).str();
+  return FilenameBase()+(boost::format("_%03d.root")%copy_id()).str();
 }
 
 ANLStatus CreateRootFile::mod_define()
@@ -51,12 +61,24 @@ ANLStatus CreateRootFile::mod_define()
 
 ANLStatus CreateRootFile::mod_initialize()
 {
-  if (is_master() || m_SeparateClones) {
+  if (is_master()) {
     m_RootFile.reset(new TFile(Filename().c_str(), "recreate"));
-    if ( !m_RootFile ) {
-      std::cout << "CreateRootFile: cannot create ROOT file" << std::endl;
-      return AS_QUIT;
+  }
+  else if (m_SeparateClones) {
+    if (m_SaveClones) {
+      m_RootFile.reset(new TFile(Filename().c_str(), "recreate"));
     }
+    else {
+      m_RootFile.reset(new TMemFile(Filename().c_str(), "recreate"));
+    }
+  }
+  else {
+    return AS_OK;
+  }
+
+  if ( !m_RootFile ) {
+    std::cout << "CreateRootFile: cannot create ROOT file" << std::endl;
+    return AS_QUIT;
   }
   
   return AS_OK;
@@ -65,11 +87,15 @@ ANLStatus CreateRootFile::mod_initialize()
 ANLStatus CreateRootFile::mod_finalize()
 {
   if (is_master() || (m_SeparateClones && m_SaveClones)) {
-    std::cout << "CreateRootFile: saving data to ROOT file" << std::endl;
+    std::cout << "CreateRootFile: saving data to ROOT file " << Filename() << std::endl;
     m_RootFile->Write();
+  }
+
+  if (is_master() || m_SeparateClones) {
     m_RootFile->Close();
     std::cout << "CreateRootFile: ROOT file closed " << std::endl;
   }
+  
   return AS_OK;
 }
 
