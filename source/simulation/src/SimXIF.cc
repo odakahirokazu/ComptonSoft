@@ -182,7 +182,7 @@ ANLStatus SimXIF::mod_initialize()
 
   off();
 
-  if (exist_module("ConstructDetector_Sim")) {
+  if (exist_module("ConstructDetectorForSimulation")) {
     m_DetectorManager = get_module_NC<ConstructDetectorForSimulation>("ConstructDetectorForSimulation")->getDetectorManager();
   }
   

@@ -25,8 +25,9 @@
 #include "SimXIF.hh"
 
 using namespace anl;
-using namespace comptonsoft;
 
+namespace comptonsoft
+{
 
 GenerateSimXEvent::GenerateSimXEvent()
   : m_HitCollection(0),
@@ -45,7 +46,6 @@ GenerateSimXEvent::GenerateSimXEvent()
 {
 }
 
-
 ANLStatus GenerateSimXEvent::mod_initialize()
 {
   BasicModule::mod_initialize();
@@ -56,7 +56,6 @@ ANLStatus GenerateSimXEvent::mod_initialize()
   
   return AS_OK;
 }
-
 
 ANLStatus GenerateSimXEvent::mod_analyze()
 {
@@ -112,10 +111,10 @@ ANLStatus GenerateSimXEvent::mod_analyze()
   return AS_OK;
 }
 
-
 ANLStatus GenerateSimXEvent::mod_finalize()
 {
-  if (m_SimXIF) m_SimXIF->outputEvents();
-  
+  if (m_SimXIF) { m_SimXIF->outputEvents(); }
   return AS_OK;
 }
+
+} /* namespace comptonsoft */
