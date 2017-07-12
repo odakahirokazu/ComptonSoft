@@ -34,6 +34,8 @@ m.includeModules = []
 
 if ARGV.include? '-l'
   m.print_class_list
+elsif ARGV.include? '-d'
+  m.print_make_doc
 else
   m.print_interface
 end

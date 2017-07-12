@@ -38,6 +38,11 @@ ANLStatus InitialConditionFilter::mod_define()
   register_parameter(&energy0_, "energy_min", unit::keV, "keV");
   register_parameter(&energy1_, "energy_max", unit::keV, "keV");
 
+  return AS_OK;
+}
+
+ANLStatus InitialConditionFilter::mod_initialize()
+{
   get_module_IF("InitialInformation", &initialInfo_);
 
   return AS_OK;

@@ -30,12 +30,13 @@ namespace comptonsoft {
 
 class InitialConditionFilter : public anl::BasicModule
 {
-  DEFINE_ANL_MODULE(InitialConditionFilter, 1.1);
+  DEFINE_ANL_MODULE(InitialConditionFilter, 1.2);
 public:
   InitialConditionFilter();
   ~InitialConditionFilter() = default;
 
   anl::ANLStatus mod_define() override;
+  anl::ANLStatus mod_initialize() override;
   anl::ANLStatus mod_analyze() override;
 
 private:
