@@ -40,7 +40,7 @@ comptonsoft::ReadoutBasedChannelID getReadoutID(uint16_t ASIC_ID)
   return comptonsoft::ReadoutBasedChannelID(TrayIndex, ASICIndex);
 }
 
-}
+} /* anonymous namespace */
 
 namespace comptonsoft
 {
@@ -56,8 +56,8 @@ ReadSGDEventTree::~ReadSGDEventTree() = default;
 
 ANLStatus ReadSGDEventTree::mod_define()
 {
-  register_parameter(&m_FileNames, "file_list", "seq", "event.root");
-  register_parameter(&m_TreeNames, "tree_list", "seq", "event_tree");
+  register_parameter(&m_FileNames, "file_list");
+  register_parameter(&m_TreeNames, "tree_list");
 
   return AS_OK;
 }

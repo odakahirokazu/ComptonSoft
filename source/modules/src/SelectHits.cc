@@ -44,10 +44,10 @@ SelectHits::~SelectHits() = default;
 
 ANLStatus SelectHits::mod_define()
 {
-  register_parameter_map(&m_AnalysisMap, "analysis_map",
-                         "detector_name_prefix", "Si");
-  add_value_element(&m_DetectorType, "detector_type", "",
-                    "Detector type (1: pad, 2: DSD, 3: scintillator)");
+  register_parameter(&m_AnalysisMap, "analysis_map");
+  define_map_key("detector_name_prefix", "Si");
+  add_value_element(&m_DetectorType, "detector_type");
+  set_value_element_description("Detector type (1: pad, 2: DSD, 3: scintillator)");
   add_value_element(&m_ReconstructionMode, "reconstruction_mode");
   add_value_element(&m_Threshold, "threshold", unit::keV, "keV");
   add_value_element(&m_ThresholdCathode, "threshold_cathode", unit::keV, "keV");

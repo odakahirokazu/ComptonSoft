@@ -38,7 +38,7 @@ ANLStatus PrimaryGenUniformSourceInVolume::mod_define()
   register_parameter(&m_TargetMode, "target_mode");
   set_parameter_description("If on, the primary direction is distrubuted around the vector toward the target position.");
   register_parameter(&m_TargetPosition, "target_position", unit::cm, "cm");
-  register_parameter(&m_VolumeHierarchy, "volume_hierarchy", "seq", "World");
+  register_parameter(&m_VolumeHierarchy, "volume_hierarchy");
   set_parameter_description("Volume hierarchy that identifies the primary generating volume.");
 
   return AS_OK;

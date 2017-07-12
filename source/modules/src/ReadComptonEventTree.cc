@@ -38,7 +38,7 @@ ReadComptonEventTree::ReadComptonEventTree()
 
 ANLStatus ReadComptonEventTree::mod_define()
 {
-  register_parameter(&fileList_, "file_list", "seq", "compton_events.root");
+  register_parameter(&fileList_, "file_list");
   
   return AS_OK;
 }

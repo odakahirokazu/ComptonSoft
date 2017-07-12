@@ -40,7 +40,7 @@ ReadEventTree::~ReadEventTree() = default;
 
 ANLStatus ReadEventTree::mod_define()
 {
-  register_parameter(&fileList_, "file_list", "seq", "hittree.root");
+  register_parameter(&fileList_, "file_list");
   return AS_OK;
 }
 

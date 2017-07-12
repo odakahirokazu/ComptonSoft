@@ -41,7 +41,7 @@ ReadHitTree::~ReadHitTree() = default;
 
 ANLStatus ReadHitTree::mod_define()
 {
-  register_parameter(&fileList_, "file_list", "seq", "hittree.root");
+  register_parameter(&fileList_, "file_list");
   register_parameter(&trustNumHits_, "trust_num_hits");
   return AS_OK;
 }

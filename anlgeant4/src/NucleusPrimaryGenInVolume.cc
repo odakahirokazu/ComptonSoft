@@ -34,7 +34,7 @@ ANLStatus NucleusPrimaryGenInVolume::mod_define()
 {
   NucleusPrimaryGen::mod_define();
 
-  register_parameter(&m_VolumeHierarchy, "volume_hierarchy", "seq", "World");
+  register_parameter(&m_VolumeHierarchy, "volume_hierarchy");
   set_parameter_description("Volume hierarchy that identifies the primary generating volume.");
   
   return AS_OK;

@@ -48,10 +48,10 @@ SetNoiseLevels::~SetNoiseLevels() = default;
 ANLStatus SetNoiseLevels::mod_define()
 {
   register_parameter(&m_FileName, "filename");
-  register_parameter_map(&m_NoiseLevelMap, "noise_level_map",
-                         "detector_name_prefix", "Si");
-  add_value_element(&m_DetectorType, "detector_type", "",
-                    "Detector type (1: single, 2: double)");
+  register_parameter(&m_NoiseLevelMap, "noise_level_map");
+  define_map_key("detector_name_prefix", "Si");
+  add_value_element(&m_DetectorType, "detector_type");
+  set_value_element_description("Detector type (1: single, 2: double)");
   add_value_element(&m_Noise0, "noise_coefficient0");
   add_value_element(&m_Noise1, "noise_coefficient1");
   add_value_element(&m_Noise2, "noise_coefficient2");
