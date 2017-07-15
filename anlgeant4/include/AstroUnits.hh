@@ -94,6 +94,10 @@ using CLHEP::rad;
 using CLHEP::steradian;
 using CLHEP::sr;
 
+using CLHEP::newton;
+
+constexpr double pascal = newton/m2;
+
 using CLHEP::watt;
 
 using CLHEP::eplus;
