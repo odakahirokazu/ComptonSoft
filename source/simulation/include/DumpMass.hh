@@ -20,7 +20,7 @@
 #ifndef COMPTONSOFT_DumpMass_H
 #define COMPTONSOFT_DumpMass_H 1
 
-#include "BasicModule.hh"
+#include <anl/BasicModule.hh>
 
 namespace comptonsoft {
 

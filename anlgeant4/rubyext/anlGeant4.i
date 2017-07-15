@@ -32,7 +32,7 @@
 %}
 
 
-%import "ANL.i"
+%import "anl/ruby/ANL.i"
 
 namespace anlgeant4 {
 

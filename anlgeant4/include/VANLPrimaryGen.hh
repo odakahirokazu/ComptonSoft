@@ -20,7 +20,7 @@
 #ifndef ANLGEANT4_VANLPrimaryGen_H
 #define ANLGEANT4_VANLPrimaryGen_H 1
 
-#include "BasicModule.hh"
+#include <anl/BasicModule.hh>
 
 class G4VUserPrimaryGeneratorAction;
 

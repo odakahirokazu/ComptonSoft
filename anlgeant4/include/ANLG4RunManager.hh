@@ -21,7 +21,7 @@
 #define ANLGEANT4_ANLG4RunManager_H 1
 
 #include "G4RunManager.hh"
-#include "ANLStatus.hh"
+#include <anl/ANLStatus.hh>
 
 namespace anlgeant4
 {

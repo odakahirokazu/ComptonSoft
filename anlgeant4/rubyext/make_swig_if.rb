@@ -29,7 +29,7 @@ classList = [
 
 m = ANL::SWIGModule.new(name, classList, namespace)
 m.includeFiles = []
-m.importModules = ['ANL.i']
+m.importModules = ['anl/ruby/ANL.i']
 m.includeModules = []
 
 if ARGV.include? '-l'

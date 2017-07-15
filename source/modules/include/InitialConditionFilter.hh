@@ -20,7 +20,7 @@
 #ifndef COMPTONSOFT_InitialConditionFilter_H
 #define COMPTONSOFT_InitialConditionFilter_H 1
 
-#include "BasicModule.hh"
+#include <anl/BasicModule.hh>
 
 namespace anlgeant4 {
 class InitialInformation;

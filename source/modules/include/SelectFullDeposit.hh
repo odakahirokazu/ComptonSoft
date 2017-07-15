@@ -20,7 +20,7 @@
 #ifndef COMPTONSOFT_SelectFullDeposit_H
 #define COMPTONSOFT_SelectFullDeposit_H 1
 
-#include "BasicModule.hh"
+#include <anl/BasicModule.hh>
 
 namespace anlgeant4 {
 

@@ -112,7 +112,7 @@
 %}
 
 
-%import "ANL.i"
+%import "anl/ruby/ANL.i"
 %import "anlGeant4.i"
 
 namespace comptonsoft {

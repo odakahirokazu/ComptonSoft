@@ -20,7 +20,7 @@
 #ifndef COMPTONSOFT_AssignG4CopyNumber_H
 #define COMPTONSOFT_AssignG4CopyNumber_H 1
 
-#include "BasicModule.hh"
+#include <anl/BasicModule.hh>
 
 namespace comptonsoft {
 

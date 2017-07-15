@@ -16,7 +16,6 @@ set(RUBY_EXT_INCLUDE_DIRS
   ${SIMX_INC_DIR}
   ${BOOST_INC_DIR}
   ${ANLG4_DIR}/rubyext
-  ${ANLNEXT_INC_DIR}/ruby
   .
   )
 set(RUBY_EXT_LIBRARY_DIRS

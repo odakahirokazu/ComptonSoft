@@ -20,7 +20,7 @@
 #ifndef ANLGEANT4_VUserActionAssembly_H
 #define ANLGEANT4_VUserActionAssembly_H 1
 
-#include "BasicModule.hh"
+#include <anl/BasicModule.hh>
 
 class G4Event;
 class G4Track;

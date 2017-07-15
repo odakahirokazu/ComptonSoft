@@ -20,7 +20,7 @@
 #ifndef COMPTONSOFT_EventReconstruction_H
 #define COMPTONSOFT_EventReconstruction_H 1
 
-#include "BasicModule.hh"
+#include <anl/BasicModule.hh>
 
 #include <vector>
 #include "CSTypes.hh"

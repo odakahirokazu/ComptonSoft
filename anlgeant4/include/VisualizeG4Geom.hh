@@ -21,7 +21,7 @@
 #define ANLGEANT4_VisualizeG4Geom_H 1
 
 #include <memory>
-#include "BasicModule.hh"
+#include <anl/BasicModule.hh>
 #include "G4ThreeVector.hh"
 
 class G4VisManager;

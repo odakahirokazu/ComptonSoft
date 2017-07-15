@@ -20,7 +20,7 @@
 #ifndef COMPTONSOFT_CreateRootFile_H
 #define COMPTONSOFT_CreateRootFile_H 1
 
-#include "BasicModule.hh"
+#include <anl/BasicModule.hh>
 #include <memory>
 
 class TDirectory;

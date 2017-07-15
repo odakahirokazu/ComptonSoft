@@ -20,7 +20,7 @@
 #ifndef COMPTONSOFT_SimXIF_H
 #define COMPTONSOFT_SimXIF_H 1
 
-#include "BasicModule.hh"
+#include <anl/BasicModule.hh>
 #include "PhaseSpaceVector.hh"
 
 

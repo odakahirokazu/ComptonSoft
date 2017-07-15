@@ -20,7 +20,7 @@
 #ifndef COMPTONSOFT_SelectTime_H
 #define COMPTONSOFT_SelectTime_H 1
 
-#include "BasicModule.hh"
+#include <anl/BasicModule.hh>
 
 namespace comptonsoft {
 

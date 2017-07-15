@@ -20,7 +20,7 @@
 #ifndef COMPTONSOFT_VCSModule_H
 #define COMPTONSOFT_VCSModule_H 1
 
-#include "BasicModule.hh"
+#include <anl/BasicModule.hh>
 #include <memory>
 #include "DetectorSystem.hh"
 #include "VRealDetectorUnit.hh"

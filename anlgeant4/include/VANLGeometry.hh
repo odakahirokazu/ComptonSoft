@@ -20,7 +20,7 @@
 #ifndef ANLGEANT4_VANLGeometry_H
 #define ANLGEANT4_VANLGeometry_H 1
 
-#include "BasicModule.hh"
+#include <anl/BasicModule.hh>
 
 class G4VUserDetectorConstruction;
 

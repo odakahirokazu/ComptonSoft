@@ -20,7 +20,7 @@
 #ifndef COMPTONSOFT_ComptonEventFilter_H
 #define COMPTONSOFT_ComptonEventFilter_H 1
 
-#include "BasicModule.hh"
+#include <anl/BasicModule.hh>
 
 #include <functional>
 #include "HitPattern.hh"

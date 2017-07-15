@@ -26,7 +26,6 @@
 
 #include "AstroUnits.hh"
 
-#include "ANLException.hh"
 #include "VRealDetectorUnit.hh"
 #include "MultiChannelData.hh"
 #include "VChannelMap.hh"

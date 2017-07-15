@@ -20,7 +20,7 @@
 #ifndef COMPTONSOFT_ConstructDetector_H
 #define COMPTONSOFT_ConstructDetector_H 1
 
-#include "BasicModule.hh"
+#include <anl/BasicModule.hh>
 
 namespace comptonsoft {
 

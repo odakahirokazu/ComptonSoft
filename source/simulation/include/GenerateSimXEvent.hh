@@ -20,7 +20,7 @@
 #ifndef COMPTONSOFT_GenerateSimXEvent_H
 #define COMPTONSOFT_GenerateSimXEvent_H 1
 
-#include "BasicModule.hh"
+#include <anl/BasicModule.hh>
 
 namespace comptonsoft {
 

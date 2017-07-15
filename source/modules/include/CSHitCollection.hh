@@ -20,7 +20,7 @@
 #ifndef COMPTONSOFT_CSHitCollection_H
 #define COMPTONSOFT_CSHitCollection_H 1
 
-#include "BasicModule.hh"
+#include <anl/BasicModule.hh>
 #include <cstdint>
 #include <vector>
 #include "DetectorHit_sptr.hh"

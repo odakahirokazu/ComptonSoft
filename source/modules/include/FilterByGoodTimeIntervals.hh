@@ -20,7 +20,7 @@
 #ifndef COMPTONSOFT_FilterByGoodTimeIntervals_H
 #define COMPTONSOFT_FilterByGoodTimeIntervals_H 1
 
-#include "BasicModule.hh"
+#include <anl/BasicModule.hh>
 #include <tuple>
 
 namespace comptonsoft {

@@ -20,7 +20,7 @@
 #ifndef COMPTONSOFT_WeightByInitialDirection_H
 #define COMPTONSOFT_WeightByInitialDirection_H 1
 
-#include "BasicModule.hh"
+#include <anl/BasicModule.hh>
 #include <memory>
 
 class TGraph;

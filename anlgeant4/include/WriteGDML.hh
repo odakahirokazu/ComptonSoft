@@ -20,7 +20,7 @@
 #ifndef ANLGEANT4_WriteGDML_H
 #define ANLGEANT4_WriteGDML_H 1
 
-#include "BasicModule.hh"
+#include <anl/BasicModule.hh>
 
 namespace anlgeant4 {
 

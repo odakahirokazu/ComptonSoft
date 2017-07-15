@@ -18,7 +18,7 @@
  *************************************************************************/
 
 #include "InitialInformation.hh"
-#include "BasicModule.hh"
+#include <anl/BasicModule.hh>
 
 anlgeant4::
 InitialInformation::InitialInformation(bool stored, anl::BasicModule* mod)

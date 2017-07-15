@@ -20,7 +20,7 @@
 #ifndef ANLGEANT4_VANLPhysicsList_H
 #define ANLGEANT4_VANLPhysicsList_H
 
-#include "BasicModule.hh"
+#include <anl/BasicModule.hh>
 
 class G4VUserPhysicsList;
 

@@ -22,7 +22,7 @@
 
 #include <string>
 #include <memory>
-#include "BasicModule.hh"
+#include <anl/BasicModule.hh>
 #include "globals.hh"
 
 namespace CLHEP
