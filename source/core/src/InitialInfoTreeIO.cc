@@ -18,9 +18,9 @@
  *************************************************************************/
 
 #include "InitialInfoTreeIO.hh"
-#include "AstroUnits.hh"
+
 #include "TTree.h"
-#include "DetectorHit.hh"
+#include "AstroUnits.hh"
 
 namespace unit = anlgeant4::unit;
 
