@@ -108,7 +108,7 @@ module ComptonSoft
     # Enable visualization.
     #
     def visualize(params={})
-      self.thread_mode = false
+      self.console = false
       set_visualization()
       with(params)
       self.setup_mode = :minimal
