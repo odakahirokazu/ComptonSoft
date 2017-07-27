@@ -1,8 +1,8 @@
 ########################################################
 set(TARGET_EXT_LIBRARY anlGeant4)
 set(EXT_LIB_INSTALL_DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/ruby/anlgeant4)
-set(SWIG_IF_FILE ${TARGET_EXT_LIBRARY}.i)
-set(CLASS_LIST_FILE class_list_${TARGET_EXT_LIBRARY}.hh)
+set(SWIG_IF_FILE interface/${TARGET_EXT_LIBRARY}.i)
+set(CLASS_LIST_FILE interface/class_list_${TARGET_EXT_LIBRARY}.hh)
 set(RUBY_EXT_INCLUDE_DIRS
   ../include
   ${ANLNEXT_INC_DIR}
@@ -32,5 +32,6 @@ install(FILES ${SWIG_IF_FILE} ${CLASS_LIST_FILE}
 ########################################################
 # install Ruby libraries written in Ruby
 ########################################################
-install(FILES anlgeant4.rb
-  DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/ruby)
+install(DIRECTORY library/
+  DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/ruby
+  FILES_MATCHING PATTERN "*.rb")

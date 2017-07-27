@@ -102,9 +102,9 @@ clAH = [
 
 classList = clMod + clSim + clAH
 classList.each{|s|
-  s.include_path = ["../source/modules/include",
-    "../source/simulation/include",
-    "../source/astroh/include",
+  s.include_path = ["../../source/modules/include",
+    "../../source/simulation/include",
+    "../../source/astroh/include",
   ]
 }
 
