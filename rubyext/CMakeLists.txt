@@ -56,3 +56,13 @@ include(CreateSwigRuby)
 
 install(FILES ${SWIG_IF_FILE} ${CLASS_LIST_FILE}
   DESTINATION ${CMAKE_INSTALL_PREFIX}/include/comptonsoft/ruby)
+
+########################################################
+# install Ruby libraries written in Ruby
+########################################################
+install(FILES comptonsoft.rb
+  DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/ruby)
+
+install(DIRECTORY comptonsoft/
+  DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/ruby/comptonsoft
+  FILES_MATCHING PATTERN "*.rb")

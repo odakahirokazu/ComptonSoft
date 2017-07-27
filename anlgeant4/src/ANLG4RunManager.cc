@@ -24,14 +24,14 @@ namespace anlgeant4
 
 ANLG4RunManager::~ANLG4RunManager() = default;
 
-anl::ANLStatus ANLG4RunManager::performOneEvent(G4int i_event)
+anlnext::ANLStatus ANLG4RunManager::performOneEvent(G4int i_event)
 {
   ProcessOneEvent(i_event);
   TerminateOneEvent();
   if (runAborted) {
-    return anl::AS_QUIT;
+    return anlnext::AS_QUIT;
   }
-  return anl::AS_OK;
+  return anlnext::AS_OK;
 }
 
 } /* namespace anlgeant4 */

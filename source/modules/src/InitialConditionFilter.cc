@@ -21,7 +21,7 @@
 #include "AstroUnits.hh"
 #include "InitialInformation.hh"
 
-using namespace anl;
+using namespace anlnext;
 
 namespace unit = anlgeant4::unit;
 

@@ -41,9 +41,9 @@ public:
   ReadSGDEventTree();
   ~ReadSGDEventTree();
   
-  anl::ANLStatus mod_define() override;
-  anl::ANLStatus mod_initialize() override;
-  anl::ANLStatus mod_analyze() override;
+  anlnext::ANLStatus mod_define() override;
+  anlnext::ANLStatus mod_initialize() override;
+  anlnext::ANLStatus mod_analyze() override;
   
 private:
   std::vector<std::string> m_FileNames;

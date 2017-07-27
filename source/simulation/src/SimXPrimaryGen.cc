@@ -24,7 +24,7 @@
 #include "PhaseSpaceVector.hh"
 #include "SimXIF.hh"
 
-using namespace anl;
+using namespace anlnext;
 using namespace anlgeant4;
 
 namespace comptonsoft

@@ -21,7 +21,7 @@
 #include "G4Event.hh"
 #include "InitialInformation.hh"
 
-using namespace anl;
+using namespace anlnext;
 
 namespace anlgeant4
 {

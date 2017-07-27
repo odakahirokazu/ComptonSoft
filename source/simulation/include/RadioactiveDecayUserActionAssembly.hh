@@ -40,7 +40,7 @@ class RadioactiveDecayUserActionAssembly : public anlgeant4::StandardUserActionA
 public:
   RadioactiveDecayUserActionAssembly();
   
-  anl::ANLStatus mod_define() override;
+  anlnext::ANLStatus mod_define() override;
 
   void SteppingAction(const G4Step* aStep) override;
 

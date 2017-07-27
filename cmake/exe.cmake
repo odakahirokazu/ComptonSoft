@@ -1,4 +1,4 @@
-add_definitions(-DANL_USE_TVECTOR -DANL_USE_HEPVECTOR)
+add_definitions(-DANLNEXT_USE_TVECTOR -DANLNEXT_USE_HEPVECTOR)
 
 include_directories(include
   ${COMPTONSOFT}/source/tools/include
@@ -21,10 +21,10 @@ link_directories(
   ${ADD_LIB_DIR}
   )
 
-set(ANL_DEF_DIR src)
-set(ANL_BIN_DIR ${COMPTONSOFT_BUILD}/bin)
+set(ANLNEXT_DEF_DIR src)
+set(ANLNEXT_BIN_DIR ${COMPTONSOFT_BUILD}/bin)
 
-set(ANL_EXE_LIB
+set(ANLNEXT_EXE_LIB
   CSSimulation CSModules CSTools
   ANLGeant4 ${ROOT_LIB} ${G4_LIB} ${CLHEP_LIB} ${ADD_LIB}
   )

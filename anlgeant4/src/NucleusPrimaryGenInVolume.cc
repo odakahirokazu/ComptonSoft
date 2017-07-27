@@ -19,7 +19,7 @@
 
 #include "NucleusPrimaryGenInVolume.hh"
 
-using namespace anl;
+using namespace anlnext;
 
 namespace anlgeant4
 {
@@ -48,7 +48,7 @@ ANLStatus NucleusPrimaryGenInVolume::mod_communicate()
 
 ANLStatus NucleusPrimaryGenInVolume::mod_begin_run()
 {
-  anl::ANLStatus status = NucleusPrimaryGen::mod_begin_run();
+  anlnext::ANLStatus status = NucleusPrimaryGen::mod_begin_run();
   if (status != AS_OK) {
     return status;
   }

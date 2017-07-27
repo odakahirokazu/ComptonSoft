@@ -20,7 +20,7 @@
 #ifndef COMPTONSOFT_SelectTime_H
 #define COMPTONSOFT_SelectTime_H 1
 
-#include <anl/BasicModule.hh>
+#include <anlnext/BasicModule.hh>
 
 namespace comptonsoft {
 
@@ -29,16 +29,16 @@ class ReadDataFile;
 /**
  * @author Hirokazu Odaka
  */
-class SelectTime : public anl::BasicModule
+class SelectTime : public anlnext::BasicModule
 {
   DEFINE_ANL_MODULE(SelectTime, 1.1);
 public:
   SelectTime();
   ~SelectTime() = default;
 
-  anl::ANLStatus mod_define() override;
-  anl::ANLStatus mod_initialize() override;
-  anl::ANLStatus mod_analyze() override;
+  anlnext::ANLStatus mod_define() override;
+  anlnext::ANLStatus mod_initialize() override;
+  anlnext::ANLStatus mod_analyze() override;
 
 private:
   const ReadDataFile* m_ReadDataModule;

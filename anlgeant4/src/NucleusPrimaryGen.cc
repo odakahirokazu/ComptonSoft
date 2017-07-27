@@ -24,7 +24,7 @@
 #include "G4VIsotopeTable.hh"
 #include "AstroUnits.hh"
 
-using namespace anl;
+using namespace anlnext;
 
 namespace anlgeant4
 {

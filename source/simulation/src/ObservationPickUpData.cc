@@ -22,7 +22,7 @@
 #include "G4Event.hh"
 #include "G4Track.hh"
 
-using namespace anl;
+using namespace anlnext;
 
 namespace comptonsoft
 {

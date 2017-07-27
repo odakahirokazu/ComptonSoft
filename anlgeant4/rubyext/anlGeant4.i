@@ -32,11 +32,11 @@
 %}
 
 
-%import "anl/ruby/ANL.i"
+%import(module="anlnext/ANL") "anlnext/ruby/ANL.i"
 
 namespace anlgeant4 {
 
-class Geant4Body : public anl::BasicModule
+class Geant4Body : public anlnext::BasicModule
 {
 public:
   Geant4Body();
@@ -44,7 +44,7 @@ public:
 };
 
 
-class Geant4Simple : public anl::BasicModule
+class Geant4Simple : public anlnext::BasicModule
 {
 public:
   Geant4Simple();
@@ -53,14 +53,14 @@ public:
 
 
 %nodefault;
-class VANLPhysicsList : public anl::BasicModule
+class VANLPhysicsList : public anlnext::BasicModule
 {
 };
 %makedefault;
 
 
 %nodefault;
-class VANLGeometry : public anl::BasicModule
+class VANLGeometry : public anlnext::BasicModule
 {
 public:
   double GetLengthUnit() const;
@@ -79,7 +79,7 @@ public:
 #endif
 
 #ifdef USE_GDML
-class WriteGDML : public anl::BasicModule
+class WriteGDML : public anlnext::BasicModule
 {
 public:
   WriteGDML();
@@ -88,7 +88,7 @@ public:
 #endif
 
 %nodefault;
-class VANLPrimaryGen : public anl::BasicModule
+class VANLPrimaryGen : public anlnext::BasicModule
 {
 };
 %makedefault;
@@ -165,7 +165,7 @@ public:
 };
 
 
-class VUserActionAssembly : public anl::BasicModule
+class VUserActionAssembly : public anlnext::BasicModule
 {
 public:
   VUserActionAssembly();
@@ -197,7 +197,7 @@ public:
 
 
 #ifdef USE_VIS
-class VisualizeG4Geom  : public anl::BasicModule
+class VisualizeG4Geom  : public anlnext::BasicModule
 {
 public:
   VisualizeG4Geom();

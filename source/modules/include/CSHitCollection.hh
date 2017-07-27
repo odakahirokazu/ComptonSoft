@@ -20,7 +20,7 @@
 #ifndef COMPTONSOFT_CSHitCollection_H
 #define COMPTONSOFT_CSHitCollection_H 1
 
-#include <anl/BasicModule.hh>
+#include <anlnext/BasicModule.hh>
 #include <cstdint>
 #include <vector>
 #include "DetectorHit_sptr.hh"
@@ -32,7 +32,7 @@ namespace comptonsoft {
  * @date 2014-11-22
  * @date 2015-11-12
  */
-class CSHitCollection : public anl::BasicModule
+class CSHitCollection : public anlnext::BasicModule
 {
   DEFINE_ANL_MODULE(CSHitCollection, 1.2);
 public:
@@ -50,9 +50,9 @@ public:
   void insertHit(const DetectorHit_sptr& hit);
   int NumberOfTimeGroups() const { return hitsVector_.size(); }
 
-  anl::ANLStatus mod_begin_run() override;
-  anl::ANLStatus mod_analyze() override;
-  anl::ANLStatus mod_end_run() override;
+  anlnext::ANLStatus mod_begin_run() override;
+  anlnext::ANLStatus mod_analyze() override;
+  anlnext::ANLStatus mod_end_run() override;
 
 private:
   std::vector<std::vector<comptonsoft::DetectorHit_sptr>> hitsVector_;

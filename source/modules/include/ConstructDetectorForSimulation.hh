@@ -34,9 +34,9 @@ public:
   ConstructDetectorForSimulation();
   ~ConstructDetectorForSimulation();
 
-  anl::ANLStatus mod_define() override;
-  anl::ANLStatus mod_initialize() override;
-  anl::ANLStatus mod_begin_run() override;
+  anlnext::ANLStatus mod_define() override;
+  anlnext::ANLStatus mod_initialize() override;
+  anlnext::ANLStatus mod_begin_run() override;
 };
 
 } /* namespace comptonsoft */

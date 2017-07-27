@@ -22,7 +22,7 @@
 
 #include <string>
 #include <memory>
-#include <anl/BasicModule.hh>
+#include <anlnext/BasicModule.hh>
 #include "globals.hh"
 
 namespace CLHEP
@@ -39,19 +39,19 @@ class ANLG4RunManager;
  * @author Hirokazu Odaka
  * @date 2017-07-28 | 3.0, re-designed.
  */
-class Geant4Body : public anl::BasicModule
+class Geant4Body : public anlnext::BasicModule
 {
   DEFINE_ANL_MODULE(Geant4Body, 3.0);
 public: 
   Geant4Body();
   ~Geant4Body();
 
-  anl::ANLStatus mod_define() override;
-  anl::ANLStatus mod_initialize() override;
-  anl::ANLStatus mod_begin_run() override;
-  anl::ANLStatus mod_analyze() override;
-  anl::ANLStatus mod_end_run() override;
-  anl::ANLStatus mod_finalize() override;
+  anlnext::ANLStatus mod_define() override;
+  anlnext::ANLStatus mod_initialize() override;
+  anlnext::ANLStatus mod_begin_run() override;
+  anlnext::ANLStatus mod_analyze() override;
+  anlnext::ANLStatus mod_end_run() override;
+  anlnext::ANLStatus mod_finalize() override;
 
   void set_verbose_level(G4int v) { m_VerboseLevel = v; }
   G4int get_verbose_level() { return m_VerboseLevel; }

@@ -51,8 +51,8 @@ public:
   SetDetectorsInfo();
   ~SetDetectorsInfo();
 
-  anl::ANLStatus mod_define() override;
-  anl::ANLStatus mod_initialize() override;
+  anlnext::ANLStatus mod_define() override;
+  anlnext::ANLStatus mod_initialize() override;
 
 private:
   void readFile();

@@ -1,5 +1,5 @@
 %nodefault;
-class VANLGeometry : public anl::BasicModule
+class VANLGeometry : public anlnext::BasicModule
 {
 public:
   double GetLengthUnit() const;

@@ -41,9 +41,9 @@ public:
   NucleusPrimaryGenInVolume();
   ~NucleusPrimaryGenInVolume();
 
-  anl::ANLStatus mod_define() override;
-  anl::ANLStatus mod_communicate() override;
-  anl::ANLStatus mod_begin_run() override;
+  anlnext::ANLStatus mod_define() override;
+  anlnext::ANLStatus mod_communicate() override;
+  anlnext::ANLStatus mod_begin_run() override;
 
   void makePrimarySetting() override;
 

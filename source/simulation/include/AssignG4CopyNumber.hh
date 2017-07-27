@@ -20,7 +20,7 @@
 #ifndef COMPTONSOFT_AssignG4CopyNumber_H
 #define COMPTONSOFT_AssignG4CopyNumber_H 1
 
-#include <anl/BasicModule.hh>
+#include <anlnext/BasicModule.hh>
 
 namespace comptonsoft {
 
@@ -31,15 +31,15 @@ namespace comptonsoft {
  * @author Hirokazu Odaka
  * @date 2012-07-04
  */
-class AssignG4CopyNumber : public anl::BasicModule
+class AssignG4CopyNumber : public anlnext::BasicModule
 {
   DEFINE_ANL_MODULE(AssignG4CopyNumber, 0.0);
 public:
   AssignG4CopyNumber();
   ~AssignG4CopyNumber();
 
-  anl::ANLStatus mod_define() override;
-  anl::ANLStatus mod_begin_run() override;
+  anlnext::ANLStatus mod_define() override;
+  anlnext::ANLStatus mod_begin_run() override;
 
 private:
   std::string m_FileName;

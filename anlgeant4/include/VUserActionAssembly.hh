@@ -20,7 +20,7 @@
 #ifndef ANLGEANT4_VUserActionAssembly_H
 #define ANLGEANT4_VUserActionAssembly_H 1
 
-#include <anl/BasicModule.hh>
+#include <anlnext/BasicModule.hh>
 
 class G4Event;
 class G4Track;
@@ -39,7 +39,7 @@ namespace anlgeant4
  * @date 2012-05-30 | Hirokazu Odaka | redesign (originally came from VPickUpData by Shin Watanabe)
  * @date 2017-06-28 | Hirokazu Odaka | redesign, rename class and methods
  */
-class VUserActionAssembly : public anl::BasicModule
+class VUserActionAssembly : public anlnext::BasicModule
 {
   DEFINE_ANL_MODULE(VUserActionAssembly, 5.0);
 public:

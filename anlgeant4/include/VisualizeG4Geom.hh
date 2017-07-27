@@ -21,7 +21,7 @@
 #define ANLGEANT4_VisualizeG4Geom_H 1
 
 #include <memory>
-#include <anl/BasicModule.hh>
+#include <anlnext/BasicModule.hh>
 #include "G4ThreeVector.hh"
 
 class G4VisManager;
@@ -42,17 +42,17 @@ namespace anlgeant4 {
  * @date 2016-09-06
  * @date 2017-06-21 | explicit delete of the visualization manager.
  */
-class VisualizeG4Geom  : public anl::BasicModule
+class VisualizeG4Geom  : public anlnext::BasicModule
 {
   DEFINE_ANL_MODULE(VisualizeG4Geom, 1.5);
 public: 
   VisualizeG4Geom();
   ~VisualizeG4Geom();
 
-  anl::ANLStatus mod_define() override;
-  anl::ANLStatus mod_initialize() override;
-  anl::ANLStatus mod_end_run() override;
-  anl::ANLStatus mod_finalize() override;
+  anlnext::ANLStatus mod_define() override;
+  anlnext::ANLStatus mod_initialize() override;
+  anlnext::ANLStatus mod_end_run() override;
+  anlnext::ANLStatus mod_finalize() override;
 
 private:
   void applyDefaultCommands();

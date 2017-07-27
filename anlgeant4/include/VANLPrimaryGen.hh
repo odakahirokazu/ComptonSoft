@@ -20,7 +20,7 @@
 #ifndef ANLGEANT4_VANLPrimaryGen_H
 #define ANLGEANT4_VANLPrimaryGen_H 1
 
-#include <anl/BasicModule.hh>
+#include <anlnext/BasicModule.hh>
 
 class G4VUserPrimaryGeneratorAction;
 
@@ -33,7 +33,7 @@ namespace anlgeant4
  * @date xxxx-xx-xx
  * @date 2011-xx-xx
  */
-class VANLPrimaryGen : public anl::BasicModule
+class VANLPrimaryGen : public anlnext::BasicModule
 {
   DEFINE_ANL_MODULE(VANLPrimaryGen, 4.0);
 public: 

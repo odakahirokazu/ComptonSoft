@@ -23,7 +23,7 @@
 #include "TH1.h"
 #include "TGraph.h"
 
-using namespace anl;
+using namespace anlnext;
 
 namespace unit = anlgeant4::unit;
 

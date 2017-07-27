@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 
-require 'ANLLib'
+require 'anlnext'
 
 name = 'comptonSoft'
 namespace = 'comptonsoft'
@@ -110,7 +110,10 @@ classList.each{|s|
 
 m = ANL::SWIGModule.new(name, classList, namespace)
 m.includeFiles = ['class_list_anlGeant4.hh', 'comptonsoft_basic_classes.hh']
-m.importModules = ['anl/ruby/ANL.i', 'anlGeant4.i']
+m.importModules = [
+  {name: 'anlnext/ANL', file: 'anlnext/ruby/ANL.i'},
+  {name: 'anlgeant4/anlGeant4', file: 'anlGeant4.i'},
+]
 m.includeModules = []
 
 if ARGV.include? '-l'

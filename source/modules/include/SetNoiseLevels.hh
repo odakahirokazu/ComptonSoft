@@ -33,8 +33,8 @@ public:
   SetNoiseLevels();
   ~SetNoiseLevels();
 
-  anl::ANLStatus mod_define() override;
-  anl::ANLStatus mod_initialize() override;
+  anlnext::ANLStatus mod_define() override;
+  anlnext::ANLStatus mod_initialize() override;
 
 private:
   bool set_by_map();

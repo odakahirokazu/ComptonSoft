@@ -20,7 +20,7 @@
 #ifndef COMPTONSOFT_VCSModule_H
 #define COMPTONSOFT_VCSModule_H 1
 
-#include <anl/BasicModule.hh>
+#include <anlnext/BasicModule.hh>
 #include <memory>
 #include "DetectorSystem.hh"
 #include "VRealDetectorUnit.hh"
@@ -37,14 +37,14 @@ namespace comptonsoft {
  * @date 2016-08-19 | Add isMCSimulation()
  * @date 2017-07-07 | merge mod_hit() to mod_initialize()
  */
-class VCSModule : public anl::BasicModule
+class VCSModule : public anlnext::BasicModule
 {
   DEFINE_ANL_MODULE(VCSModule, 1.3);
 public:
   VCSModule();
   ~VCSModule();
   
-  virtual anl::ANLStatus mod_initialize() override;
+  virtual anlnext::ANLStatus mod_initialize() override;
 
 protected:
   void mkdir(const std::string& name="");

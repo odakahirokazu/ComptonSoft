@@ -72,7 +72,6 @@ endif(USE_EXE)
 
 if(USE_RUBY)
   add_subdirectory(rubyext)
-  add_subdirectory(scripts)
 endif(USE_RUBY)
 
 add_subdirectory(cmake)

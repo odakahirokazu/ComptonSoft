@@ -38,7 +38,7 @@ public:
   GaussianBeamPrimaryGen();
   ~GaussianBeamPrimaryGen();
 
-  anl::ANLStatus mod_define() override;
+  anlnext::ANLStatus mod_define() override;
 
 protected:
   G4ThreeVector samplePosition() override;

@@ -20,20 +20,20 @@
 #ifndef COMPTONSOFT_OutputSimXPrimaries_H
 #define COMPTONSOFT_OutputSimXPrimaries_H 1
 
-#include <anl/BasicModule.hh>
+#include <anlnext/BasicModule.hh>
 
 namespace comptonsoft {
 
 
-class OutputSimXPrimaries : public anl::BasicModule
+class OutputSimXPrimaries : public anlnext::BasicModule
 {
   DEFINE_ANL_MODULE(OutputSimXPrimaries, 0.1);
 public:
   OutputSimXPrimaries();
   ~OutputSimXPrimaries() {}
   
-  anl::ANLStatus mod_define() override;
-  anl::ANLStatus mod_initialize() override;
+  anlnext::ANLStatus mod_define() override;
+  anlnext::ANLStatus mod_initialize() override;
   
 private:
   std::string m_FileName;

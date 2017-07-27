@@ -20,7 +20,7 @@
 #include "CSHitCollection.hh"
 #include "DetectorHit.hh"
 
-using namespace anl;
+using namespace anlnext;
 
 namespace comptonsoft
 {

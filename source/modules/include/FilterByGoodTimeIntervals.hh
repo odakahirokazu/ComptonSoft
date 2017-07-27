@@ -20,7 +20,7 @@
 #ifndef COMPTONSOFT_FilterByGoodTimeIntervals_H
 #define COMPTONSOFT_FilterByGoodTimeIntervals_H 1
 
-#include <anl/BasicModule.hh>
+#include <anlnext/BasicModule.hh>
 #include <tuple>
 
 namespace comptonsoft {
@@ -31,16 +31,16 @@ class CSHitCollection;
  * @author Hirokazu Odaka
  * @date 2016-12-08
  */
-class FilterByGoodTimeIntervals : public anl::BasicModule
+class FilterByGoodTimeIntervals : public anlnext::BasicModule
 {
   DEFINE_ANL_MODULE(FilterByGoodTimeIntervals, 1.0);
 public:
   FilterByGoodTimeIntervals();
   ~FilterByGoodTimeIntervals();
 
-  anl::ANLStatus mod_define() override;
-  anl::ANLStatus mod_initialize() override;
-  anl::ANLStatus mod_analyze() override;
+  anlnext::ANLStatus mod_define() override;
+  anlnext::ANLStatus mod_initialize() override;
+  anlnext::ANLStatus mod_analyze() override;
 
 protected:
   std::vector<std::tuple<double, double>> m_GTIs;

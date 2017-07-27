@@ -20,7 +20,7 @@
 #ifndef COMPTONSOFT_DumpMass_H
 #define COMPTONSOFT_DumpMass_H 1
 
-#include <anl/BasicModule.hh>
+#include <anlnext/BasicModule.hh>
 
 namespace comptonsoft {
 
@@ -31,15 +31,15 @@ namespace comptonsoft {
  * @author Hirokazu Odaka
  * @date 2013-06-17
  */
-class DumpMass : public anl::BasicModule
+class DumpMass : public anlnext::BasicModule
 {
   DEFINE_ANL_MODULE(DumpMass, 1.0);
 public:
   DumpMass();
   ~DumpMass();
 
-  anl::ANLStatus mod_define() override;
-  anl::ANLStatus mod_begin_run() override;
+  anlnext::ANLStatus mod_define() override;
+  anlnext::ANLStatus mod_begin_run() override;
 
 private:
   std::string m_FileName;

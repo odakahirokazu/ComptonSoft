@@ -20,7 +20,7 @@
 #ifndef ANLGEANT4_VANLGeometry_H
 #define ANLGEANT4_VANLGeometry_H 1
 
-#include <anl/BasicModule.hh>
+#include <anlnext/BasicModule.hh>
 
 class G4VUserDetectorConstruction;
 
@@ -35,7 +35,7 @@ namespace anlgeant4
  * @date 2013-08-18 | H. Odaka | length unit, surface check
  * @date 2017-07-03 | 4.2 | H. Odaka | length unit is fixed to cm
  */
-class VANLGeometry : public anl::BasicModule
+class VANLGeometry : public anlnext::BasicModule
 {
   DEFINE_ANL_MODULE(VANLGeometry, 4.2);
 public:
@@ -48,7 +48,7 @@ public:
 
   bool SurfaceCheck() const { return m_SurfaceCheck; }
 
-  anl::ANLStatus mod_define() override;
+  anlnext::ANLStatus mod_define() override;
 
 private:
   const double m_LengthUnit;

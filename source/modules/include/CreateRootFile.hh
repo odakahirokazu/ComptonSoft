@@ -20,7 +20,7 @@
 #ifndef COMPTONSOFT_CreateRootFile_H
 #define COMPTONSOFT_CreateRootFile_H 1
 
-#include <anl/BasicModule.hh>
+#include <anlnext/BasicModule.hh>
 #include <memory>
 
 class TDirectory;
@@ -33,7 +33,7 @@ namespace comptonsoft {
  * @author Hirokazu Odaka
  * @date 2017-07-07 | based on SaveData
  */
-class CreateRootFile : public anl::BasicModule
+class CreateRootFile : public anlnext::BasicModule
 {
   DEFINE_ANL_MODULE(CreateRootFile, 1.0);
   ENABLE_PARALLEL_RUN();
@@ -45,9 +45,9 @@ protected:
   CreateRootFile(const CreateRootFile& r);
 
 public:
-  anl::ANLStatus mod_define() override;
-  anl::ANLStatus mod_initialize() override;
-  anl::ANLStatus mod_finalize() override;
+  anlnext::ANLStatus mod_define() override;
+  anlnext::ANLStatus mod_initialize() override;
+  anlnext::ANLStatus mod_finalize() override;
 
   TDirectory* GetDirectory();
   bool cd();

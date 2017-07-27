@@ -1,7 +1,6 @@
 #! /usr/bin/env ruby
 
-require 'comptonsoft/basic'
-require 'comptonsoft/radioactivation'
+require 'comptonsoft'
 
 def run_simulation(num, random, output, ri, volume_path)
   sim = ComptonSoft::Simulation.new

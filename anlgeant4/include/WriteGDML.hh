@@ -20,7 +20,7 @@
 #ifndef ANLGEANT4_WriteGDML_H
 #define ANLGEANT4_WriteGDML_H 1
 
-#include <anl/BasicModule.hh>
+#include <anlnext/BasicModule.hh>
 
 namespace anlgeant4 {
 
@@ -29,14 +29,14 @@ namespace anlgeant4 {
  * @author Hirokazu Odaka
  * @date 2011-07-30
  */
-class WriteGDML : public anl::BasicModule
+class WriteGDML : public anlnext::BasicModule
 {
   DEFINE_ANL_MODULE(WriteGDML, 1.0);
 public:
   WriteGDML();
   
-  anl::ANLStatus mod_define() override;
-  anl::ANLStatus mod_initialize() override;
+  anlnext::ANLStatus mod_define() override;
+  anlnext::ANLStatus mod_initialize() override;
 
 private:
   std::string m_GeometryFileName;

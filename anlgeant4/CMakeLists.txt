@@ -27,7 +27,7 @@ if(ANLG4_USE_VIS OR ANLG4_USE_VIS_QT)
   endif()
 endif()
 
-add_definitions(-DANL_USE_HEPVECTOR)
+add_definitions(-DANLNEXT_USE_HEPVECTOR)
  
 include_directories(include
   ${CLHEP_INC_DIR}

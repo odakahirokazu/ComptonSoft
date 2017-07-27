@@ -35,7 +35,7 @@
 #include "VANLPrimaryGen.hh"
 #include "VUserActionAssembly.hh"
 
-using namespace anl;
+using namespace anlnext;
 
 namespace anlgeant4
 {

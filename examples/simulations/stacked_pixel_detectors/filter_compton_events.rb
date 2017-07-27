@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 
-require 'comptonsoft/basic'
+require 'comptonsoft'
 
 Degree = Math::PI / 180.0
 

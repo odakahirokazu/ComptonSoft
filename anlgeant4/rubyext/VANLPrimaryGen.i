@@ -1,5 +1,5 @@
 %nodefault;
-class VANLPrimaryGen : public anl::BasicModule
+class VANLPrimaryGen : public anlnext::BasicModule
 {
 };
 %makedefault;

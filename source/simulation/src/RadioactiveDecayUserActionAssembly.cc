@@ -22,7 +22,7 @@
 #include "G4Track.hh"
 #include "G4VProcess.hh"
 
-using namespace anl;
+using namespace anlnext;
 
 namespace unit = anlgeant4::unit;
 

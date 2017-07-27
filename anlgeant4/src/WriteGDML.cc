@@ -20,7 +20,7 @@
 #include "WriteGDML.hh"
 #include "G4GDMLParser.hh"
 
-using namespace anl;
+using namespace anlnext;
 using namespace anlgeant4;
 
 WriteGDML::WriteGDML()

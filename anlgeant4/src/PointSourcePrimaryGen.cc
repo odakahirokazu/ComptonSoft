@@ -22,7 +22,7 @@
 #include "AstroUnits.hh"
 #include "VANLGeometry.hh"
 
-using namespace anl;
+using namespace anlnext;
 
 namespace anlgeant4
 {

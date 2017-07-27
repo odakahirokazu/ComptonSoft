@@ -22,7 +22,7 @@
 #include "TH1.h"
 #include "MultiChannelData.hh"
 
-using namespace anl;
+using namespace anlnext;
 
 namespace comptonsoft
 {

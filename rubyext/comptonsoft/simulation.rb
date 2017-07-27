@@ -3,10 +3,6 @@
 # @author Hirokazu Odaka, Yuto Ichinohe
 #
 
-require 'comptonsoft/comptonSoft'
-require 'anlGeant4'
-require 'ANLLib'
-
 module ComptonSoft
   include AnlGeant4
 

@@ -20,7 +20,7 @@
 #ifndef COMPTONSOFT_SaveData_H
 #define COMPTONSOFT_SaveData_H 1
 
-#include <anl/BasicModule.hh>
+#include <anlnext/BasicModule.hh>
 #include <memory>
 
 class TFile;
@@ -33,16 +33,16 @@ namespace comptonsoft {
  * @date 2008-04-30
  * @date 2017-03-23 | use unique_ptr for the root file.
  */
-class SaveData : public anl::BasicModule
+class SaveData : public anlnext::BasicModule
 {
   DEFINE_ANL_MODULE(SaveData, 3.0);
 public:
   SaveData();
   ~SaveData();
   
-  anl::ANLStatus mod_define() override;
-  anl::ANLStatus mod_pre_initialize() override;
-  anl::ANLStatus mod_finalize() override;
+  anlnext::ANLStatus mod_define() override;
+  anlnext::ANLStatus mod_pre_initialize() override;
+  anlnext::ANLStatus mod_finalize() override;
 
   TDirectory* GetDirectory();
   bool cd();

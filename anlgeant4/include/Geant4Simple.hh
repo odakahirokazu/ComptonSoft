@@ -22,7 +22,7 @@
 
 #include <string>
 #include <memory>
-#include <anl/BasicModule.hh>
+#include <anlnext/BasicModule.hh>
 #include "globals.hh"
 
 namespace CLHEP
@@ -40,16 +40,16 @@ namespace anlgeant4
  * @author Hirokazu Odaka
  * @date 2017-07-28 | 3.0, re-designed.
  */
-class Geant4Simple : public anl::BasicModule
+class Geant4Simple : public anlnext::BasicModule
 {
   DEFINE_ANL_MODULE(Geant4Simple, 3.0);
 public: 
   Geant4Simple();
   ~Geant4Simple();
   
-  anl::ANLStatus mod_define() override;
-  anl::ANLStatus mod_initialize() override;
-  anl::ANLStatus mod_analyze() override;
+  anlnext::ANLStatus mod_define() override;
+  anlnext::ANLStatus mod_initialize() override;
+  anlnext::ANLStatus mod_analyze() override;
 
 protected:
   virtual void set_user_initializations();

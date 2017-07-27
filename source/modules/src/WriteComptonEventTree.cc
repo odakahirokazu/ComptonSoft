@@ -24,7 +24,7 @@
 #include "ComptonEventTreeIOWithInitialInfo.hh"
 #include "EventReconstruction.hh"
 
-using namespace anl;
+using namespace anlnext;
 
 namespace comptonsoft
 {

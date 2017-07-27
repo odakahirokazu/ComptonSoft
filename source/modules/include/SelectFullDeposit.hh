@@ -20,7 +20,7 @@
 #ifndef COMPTONSOFT_SelectFullDeposit_H
 #define COMPTONSOFT_SelectFullDeposit_H 1
 
-#include <anl/BasicModule.hh>
+#include <anlnext/BasicModule.hh>
 
 namespace anlgeant4 {
 
@@ -38,15 +38,15 @@ class CSHitCollection;
  * @date 2008-12-12
  * @date 2011-04-26
  */
-class SelectFullDeposit : public anl::BasicModule
+class SelectFullDeposit : public anlnext::BasicModule
 {
   DEFINE_ANL_MODULE(SelectFullDeposit, 1.1);
 public:
   SelectFullDeposit() = default;
   ~SelectFullDeposit() = default;
 
-  anl::ANLStatus mod_initialize() override;
-  anl::ANLStatus mod_analyze() override;
+  anlnext::ANLStatus mod_initialize() override;
+  anlnext::ANLStatus mod_analyze() override;
   
 private:
   CSHitCollection* m_HitCollection;

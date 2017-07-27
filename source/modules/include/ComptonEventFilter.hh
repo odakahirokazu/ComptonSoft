@@ -20,7 +20,7 @@
 #ifndef COMPTONSOFT_ComptonEventFilter_H
 #define COMPTONSOFT_ComptonEventFilter_H 1
 
-#include <anl/BasicModule.hh>
+#include <anlnext/BasicModule.hh>
 
 #include <functional>
 #include "HitPattern.hh"
@@ -73,9 +73,9 @@ public:
   ComptonEventFilter();
   ~ComptonEventFilter() = default;
 
-  anl::ANLStatus mod_define() override;
-  anl::ANLStatus mod_initialize() override;
-  anl::ANLStatus mod_analyze() override;
+  anlnext::ANLStatus mod_define() override;
+  anlnext::ANLStatus mod_initialize() override;
+  anlnext::ANLStatus mod_analyze() override;
 
   void define_condition();
   void add_hit_pattern(const std::string& name);

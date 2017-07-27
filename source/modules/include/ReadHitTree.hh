@@ -46,9 +46,9 @@ public:
   ReadHitTree();
   ~ReadHitTree();
   
-  anl::ANLStatus mod_define() override;
-  anl::ANLStatus mod_initialize() override;
-  anl::ANLStatus mod_analyze() override;
+  anlnext::ANLStatus mod_define() override;
+  anlnext::ANLStatus mod_initialize() override;
+  anlnext::ANLStatus mod_analyze() override;
 
 protected:
   virtual void insertHit(const DetectorHit_sptr& hit);

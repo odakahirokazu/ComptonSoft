@@ -112,12 +112,12 @@
 %}
 
 
-%import "anl/ruby/ANL.i"
-%import "anlGeant4.i"
+%import(module="anlnext/ANL") "anlnext/ruby/ANL.i"
+%import(module="anlgeant4/anlGeant4") "anlGeant4.i"
 
 namespace comptonsoft {
 
-class ConstructDetector : public anl::BasicModule
+class ConstructDetector : public anlnext::BasicModule
 {
 public:
   ConstructDetector();
@@ -133,7 +133,7 @@ public:
 };
 
 
-class VCSModule : public anl::BasicModule
+class VCSModule : public anlnext::BasicModule
 {
 public:
   VCSModule();
@@ -141,7 +141,7 @@ public:
 };
 
 
-class CSHitCollection : public anl::BasicModule
+class CSHitCollection : public anlnext::BasicModule
 {
 public:
   CSHitCollection();
@@ -253,7 +253,7 @@ public:
 };
 
 
-class CreateRootFile : public anl::BasicModule
+class CreateRootFile : public anlnext::BasicModule
 {
 public:
   CreateRootFile();
@@ -261,7 +261,7 @@ public:
 };
 
 
-class SaveData : public anl::BasicModule
+class SaveData : public anlnext::BasicModule
 {
 public:
   SaveData();
@@ -333,7 +333,7 @@ public:
 };
 
 
-class InitialConditionFilter : public anl::BasicModule
+class InitialConditionFilter : public anlnext::BasicModule
 {
 public:
   InitialConditionFilter();
@@ -341,7 +341,7 @@ public:
 };
 
 
-class WeightByInitialDirection : public anl::BasicModule
+class WeightByInitialDirection : public anlnext::BasicModule
 {
 public:
   WeightByInitialDirection();
@@ -365,7 +365,7 @@ public:
 };
 
 
-class SelectFullDeposit : public anl::BasicModule
+class SelectFullDeposit : public anlnext::BasicModule
 {
 public:
   SelectFullDeposit() = default;
@@ -373,7 +373,7 @@ public:
 };
 
 
-class ComptonEventFilter : public anl::BasicModule
+class ComptonEventFilter : public anlnext::BasicModule
 {
 public:
   ComptonEventFilter();
@@ -395,7 +395,7 @@ public:
 };
 
 
-class SelectTime : public anl::BasicModule
+class SelectTime : public anlnext::BasicModule
 {
 public:
   SelectTime();
@@ -403,7 +403,7 @@ public:
 };
 
 
-class FilterByGoodTimeIntervals : public anl::BasicModule
+class FilterByGoodTimeIntervals : public anlnext::BasicModule
 {
 public:
   FilterByGoodTimeIntervals();
@@ -670,7 +670,7 @@ public:
 
 
 #ifdef USE_SIMX
-class SimXIF : public anl::BasicModule
+class SimXIF : public anlnext::BasicModule
 {
 public:
   SimXIF();
@@ -680,7 +680,7 @@ public:
 #endif
 
 #ifdef USE_SIMX
-class GenerateSimXEvent : public anl::BasicModule
+class GenerateSimXEvent : public anlnext::BasicModule
 {
 public:
   GenerateSimXEvent();
@@ -690,7 +690,7 @@ public:
 #endif
 
 #ifdef USE_SIMX
-class OutputSimXPrimaries : public anl::BasicModule
+class OutputSimXPrimaries : public anlnext::BasicModule
 {
 public:
   OutputSimXPrimaries();
@@ -699,7 +699,7 @@ public:
 
 #endif
 
-class AssignG4CopyNumber : public anl::BasicModule
+class AssignG4CopyNumber : public anlnext::BasicModule
 {
 public:
   AssignG4CopyNumber();
@@ -715,7 +715,7 @@ public:
 };
 
 
-class DumpMass : public anl::BasicModule
+class DumpMass : public anlnext::BasicModule
 {
 public:
   DumpMass();

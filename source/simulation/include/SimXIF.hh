@@ -20,7 +20,7 @@
 #ifndef COMPTONSOFT_SimXIF_H
 #define COMPTONSOFT_SimXIF_H 1
 
-#include <anl/BasicModule.hh>
+#include <anlnext/BasicModule.hh>
 #include "PhaseSpaceVector.hh"
 
 
@@ -46,16 +46,16 @@ class DetectorSystem;
  * @date 2012-10-11 | v 1.2 | Detector manager
  * @date 2013-01-21 | v 2.0 | SimX 2.0
  */
-class SimXIF : public anl::BasicModule
+class SimXIF : public anlnext::BasicModule
 {
   DEFINE_ANL_MODULE(SimXIF, 2.0);
 public:
   SimXIF();
   ~SimXIF();
   
-  anl::ANLStatus mod_pre_initialize() override;
-  anl::ANLStatus mod_initialize() override;
-  anl::ANLStatus mod_analyze() override;
+  anlnext::ANLStatus mod_pre_initialize() override;
+  anlnext::ANLStatus mod_initialize() override;
+  anlnext::ANLStatus mod_analyze() override;
 
   void generatePrimaries(double area);
   PhaseSpaceVector takePrimary();

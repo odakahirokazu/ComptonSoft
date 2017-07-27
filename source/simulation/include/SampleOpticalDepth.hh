@@ -43,8 +43,8 @@ class SampleOpticalDepth : public anlgeant4::VAppendableUserActionAssembly
 public:
   SampleOpticalDepth();
   
-  anl::ANLStatus mod_define() override;
-  anl::ANLStatus mod_initialize() override;
+  anlnext::ANLStatus mod_define() override;
+  anlnext::ANLStatus mod_initialize() override;
 
   void EventActionAtBeginning(const G4Event*) override;
   void EventActionAtEnd(const G4Event*) override;

@@ -23,7 +23,7 @@
 #include <cstdint>
 #include "G4ThreeVector.hh"
 
-namespace anl {
+namespace anlnext {
 class BasicModule;
 }
 
@@ -36,7 +36,7 @@ namespace anlgeant4 {
 class InitialInformation
 {
 public:
-  explicit InitialInformation(bool stored, anl::BasicModule* mod=nullptr);
+  explicit InitialInformation(bool stored, anlnext::BasicModule* mod=nullptr);
 
   bool InitialInformationStored() const { return stored_; }
   void setInitialInformationStored(bool v=true) { stored_ = v; }

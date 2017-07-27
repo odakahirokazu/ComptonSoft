@@ -20,7 +20,7 @@
 #ifndef COMPTONSOFT_EventReconstruction_H
 #define COMPTONSOFT_EventReconstruction_H 1
 
-#include <anl/BasicModule.hh>
+#include <anlnext/BasicModule.hh>
 
 #include <vector>
 #include "CSTypes.hh"
@@ -47,10 +47,10 @@ public:
   EventReconstruction();
   ~EventReconstruction() = default;
 
-  anl::ANLStatus mod_define() override;
-  anl::ANLStatus mod_initialize() override;
-  anl::ANLStatus mod_analyze() override;
-  anl::ANLStatus mod_end_run() override;
+  anlnext::ANLStatus mod_define() override;
+  anlnext::ANLStatus mod_initialize() override;
+  anlnext::ANLStatus mod_analyze() override;
+  anlnext::ANLStatus mod_end_run() override;
 
   const BasicComptonEvent& getComptonEvent() const
   { return *m_ComptonEvent; }

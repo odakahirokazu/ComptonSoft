@@ -39,7 +39,7 @@ class StandardUserActionAssembly : public VMasterUserActionAssembly
 public:
   StandardUserActionAssembly();
 
-  anl::ANLStatus mod_initialize() override;
+  anlnext::ANLStatus mod_initialize() override;
 
   void EventActionAtBeginning(const G4Event* anEvent) override;
 

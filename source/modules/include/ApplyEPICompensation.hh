@@ -38,8 +38,8 @@ public:
   ApplyEPICompensation();
   ~ApplyEPICompensation();
 
-  anl::ANLStatus mod_initialize() override;
-  anl::ANLStatus mod_analyze() override;
+  anlnext::ANLStatus mod_initialize() override;
+  anlnext::ANLStatus mod_analyze() override;
 
 private:
   CSHitCollection* m_HitCollection = nullptr;

@@ -22,7 +22,7 @@
 #include "MultiChannelData.hh"
 #include "ReadoutModule.hh"
 
-using namespace anl;
+using namespace anlnext;
 
 namespace comptonsoft
 {

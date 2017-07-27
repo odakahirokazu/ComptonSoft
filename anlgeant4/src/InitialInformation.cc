@@ -18,10 +18,10 @@
  *************************************************************************/
 
 #include "InitialInformation.hh"
-#include <anl/BasicModule.hh>
+#include <anlnext/BasicModule.hh>
 
 anlgeant4::
-InitialInformation::InitialInformation(bool stored, anl::BasicModule* mod)
+InitialInformation::InitialInformation(bool stored, anlnext::BasicModule* mod)
   : stored_(stored), weight_stored_(stored),
     energy_(0.0), direction_(0.0, 0.0, -1.0),
     time_(0.0), position_(0.0, 0.0, 0.0),

@@ -1,6 +1,6 @@
 #! /usr/bin/env ruby
 
-require 'comptonsoft/basic'
+require 'comptonsoft'
 
 def run_simulation(num)
   energy = 30.0 # keV

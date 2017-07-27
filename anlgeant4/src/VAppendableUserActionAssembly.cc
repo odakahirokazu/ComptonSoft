@@ -20,7 +20,7 @@
 #include "VAppendableUserActionAssembly.hh"
 #include "VMasterUserActionAssembly.hh"
 
-using namespace anl;
+using namespace anlnext;
 
 namespace anlgeant4
 {

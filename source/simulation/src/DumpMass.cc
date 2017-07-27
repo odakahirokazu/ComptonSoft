@@ -23,7 +23,7 @@
 #include "G4LogicalVolumeStore.hh"
 #include "G4LogicalVolume.hh"
 
-using namespace anl;
+using namespace anlnext;
 
 namespace comptonsoft
 {

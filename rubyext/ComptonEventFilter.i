@@ -1,4 +1,4 @@
-class ComptonEventFilter : public anl::BasicModule
+class ComptonEventFilter : public anlnext::BasicModule
 {
 public:
   ComptonEventFilter();

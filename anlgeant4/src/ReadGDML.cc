@@ -20,7 +20,7 @@
 #include "ReadGDML.hh"
 #include "GDMLDetectorConstruction.hh"
 
-using namespace anl;
+using namespace anlnext;
 using namespace anlgeant4;
 
 ReadGDML::ReadGDML()

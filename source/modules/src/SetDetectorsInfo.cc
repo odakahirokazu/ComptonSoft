@@ -31,7 +31,7 @@
 #include "SimDetectorUnit2DStrip.hh"
 #include "SimDetectorUnitScintillator.hh"
 
-using namespace anl;
+using namespace anlnext;
 
 namespace comptonsoft
 {

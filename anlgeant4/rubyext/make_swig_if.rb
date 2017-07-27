@@ -1,5 +1,5 @@
 #!/usr/bin/env ruby
-require 'ANLLib'
+require 'anlnext'
 
 name = 'anlGeant4'
 namespace = 'anlgeant4'
@@ -29,7 +29,7 @@ classList = [
 
 m = ANL::SWIGModule.new(name, classList, namespace)
 m.includeFiles = []
-m.importModules = ['anl/ruby/ANL.i']
+m.importModules = [{name: 'anlnext/ANL', file: 'anlnext/ruby/ANL.i'}]
 m.includeModules = []
 
 if ARGV.include? '-l'

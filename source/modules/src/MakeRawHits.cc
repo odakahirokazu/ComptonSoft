@@ -25,11 +25,11 @@
 namespace comptonsoft
 {
 
-anl::ANLStatus MakeRawHits::mod_define()
+anlnext::ANLStatus MakeRawHits::mod_define()
 {
   SelectHits::mod_define();
   hide_parameter("analysis_map");
-  return anl::AS_OK;
+  return anlnext::AS_OK;
 }
 
 void MakeRawHits::doProcessing()

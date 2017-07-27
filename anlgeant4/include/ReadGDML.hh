@@ -38,7 +38,7 @@ class ReadGDML : public VANLGeometry
 public:
   ReadGDML();
 
-  anl::ANLStatus mod_define() override;
+  anlnext::ANLStatus mod_define() override;
 
   G4VUserDetectorConstruction* create() override;
 

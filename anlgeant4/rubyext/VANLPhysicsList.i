@@ -1,5 +1,5 @@
 %nodefault;
-class VANLPhysicsList : public anl::BasicModule
+class VANLPhysicsList : public anlnext::BasicModule
 {
 };
 %makedefault;

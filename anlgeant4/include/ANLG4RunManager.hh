@@ -21,7 +21,7 @@
 #define ANLGEANT4_ANLG4RunManager_H 1
 
 #include "G4RunManager.hh"
-#include <anl/ANLStatus.hh>
+#include <anlnext/ANLStatus.hh>
 
 namespace anlgeant4
 {
@@ -37,7 +37,7 @@ public:
   ANLG4RunManager() = default;
   virtual ~ANLG4RunManager();
 
-  anl::ANLStatus performOneEvent(G4int i_event);
+  anlnext::ANLStatus performOneEvent(G4int i_event);
 };
 
 } /* namespace anlgeant4 */

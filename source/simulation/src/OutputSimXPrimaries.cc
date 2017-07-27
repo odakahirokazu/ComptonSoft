@@ -21,7 +21,7 @@
 #include "AstroUnits.hh"
 #include "SimXIF.hh"
 
-using namespace anl;
+using namespace anlnext;
 
 namespace unit = anlgeant4::unit;
 

@@ -26,7 +26,7 @@
 #include "ReadoutModule.hh"
 #include "MultiChannelData.hh"
 
-using namespace anl;
+using namespace anlnext;
 
 namespace unit = anlgeant4::unit;
 

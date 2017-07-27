@@ -20,7 +20,7 @@
 #ifndef COMPTONSOFT_GenerateSimXEvent_H
 #define COMPTONSOFT_GenerateSimXEvent_H 1
 
-#include <anl/BasicModule.hh>
+#include <anlnext/BasicModule.hh>
 
 namespace comptonsoft {
 
@@ -28,16 +28,16 @@ class SimXIF;
 class CSHitCollection;
 
 
-class GenerateSimXEvent : public anl::BasicModule
+class GenerateSimXEvent : public anlnext::BasicModule
 {
   DEFINE_ANL_MODULE(GenerateSimXEvent, 0.0);
 public:
   GenerateSimXEvent();
   ~GenerateSimXEvent() {}
   
-  anl::ANLStatus mod_initialize() override;
-  anl::ANLStatus mod_analyze() override;
-  anl::ANLStatus mod_finalize() override;
+  anlnext::ANLStatus mod_initialize() override;
+  anlnext::ANLStatus mod_analyze() override;
+  anlnext::ANLStatus mod_finalize() override;
 
 protected:
   CSHitCollection* m_HitCollection;

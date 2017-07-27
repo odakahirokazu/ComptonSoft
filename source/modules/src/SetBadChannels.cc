@@ -28,7 +28,7 @@
 #include "MultiChannelData.hh"
 #include "DeviceSimulation.hh"
 
-using namespace anl;
+using namespace anlnext;
 
 namespace comptonsoft
 {

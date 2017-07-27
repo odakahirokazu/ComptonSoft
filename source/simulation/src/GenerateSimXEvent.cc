@@ -24,7 +24,7 @@
 #include "CSHitCollection.hh"
 #include "SimXIF.hh"
 
-using namespace anl;
+using namespace anlnext;
 
 namespace comptonsoft
 {

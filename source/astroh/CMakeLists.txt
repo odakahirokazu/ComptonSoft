@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.0)
 
-add_definitions(-DANL_USE_TVECTOR -DANL_USE_HEPVECTOR)
+add_definitions(-DANLNEXT_USE_TVECTOR -DANLNEXT_USE_HEPVECTOR)
 
 include_directories(
   include

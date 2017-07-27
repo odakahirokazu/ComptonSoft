@@ -29,7 +29,7 @@
 #include "G4NuclearLevelData.hh"
 #include "PhysicsListWithRadioactiveDecay.hh"
 
-using namespace anl;
+using namespace anlnext;
 
 namespace comptonsoft
 {

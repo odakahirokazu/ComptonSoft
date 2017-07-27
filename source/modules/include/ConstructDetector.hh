@@ -20,7 +20,7 @@
 #ifndef COMPTONSOFT_ConstructDetector_H
 #define COMPTONSOFT_ConstructDetector_H 1
 
-#include <anl/BasicModule.hh>
+#include <anlnext/BasicModule.hh>
 
 namespace comptonsoft {
 
@@ -33,16 +33,16 @@ class DetectorSystem;
  * @date 2015-10-11
  * @date 2016-08-31
  */
-class ConstructDetector : public anl::BasicModule
+class ConstructDetector : public anlnext::BasicModule
 {
   DEFINE_ANL_MODULE(ConstructDetector, 3.3);
 public:
   ConstructDetector();
   ~ConstructDetector();
 
-  anl::ANLStatus mod_define() override;
-  anl::ANLStatus mod_initialize() override;
-  anl::ANLStatus mod_analyze() override;
+  anlnext::ANLStatus mod_define() override;
+  anlnext::ANLStatus mod_initialize() override;
+  anlnext::ANLStatus mod_analyze() override;
 
   DetectorSystem* getDetectorManager() { return detectorManager_.get(); }
 

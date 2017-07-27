@@ -31,7 +31,7 @@ public:
   MakeRawHits() = default;
   ~MakeRawHits() = default;
 
-  anl::ANLStatus mod_define() override;
+  anlnext::ANLStatus mod_define() override;
 
 private:
   bool setAnalysisParam();

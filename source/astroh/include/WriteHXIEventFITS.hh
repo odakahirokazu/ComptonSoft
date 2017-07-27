@@ -45,10 +45,10 @@ public:
   WriteHXIEventFITS();
   ~WriteHXIEventFITS();
   
-  anl::ANLStatus mod_define() override;
-  anl::ANLStatus mod_initialize() override;
-  anl::ANLStatus mod_analyze() override;
-  anl::ANLStatus mod_finalize() override;
+  anlnext::ANLStatus mod_define() override;
+  anlnext::ANLStatus mod_initialize() override;
+  anlnext::ANLStatus mod_analyze() override;
+  anlnext::ANLStatus mod_finalize() override;
   
 private:
   std::string m_Filename;

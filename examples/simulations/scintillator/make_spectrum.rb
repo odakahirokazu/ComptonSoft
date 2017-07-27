@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 
-require 'comptonsoft/basic'
+require 'comptonsoft'
 
 class MyApp < ANL::ANLApp
   attr_accessor :inputs, :output

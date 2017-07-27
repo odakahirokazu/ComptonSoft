@@ -34,8 +34,8 @@ public:
   HistogramARMByPositionMeasurement();
   ~HistogramARMByPositionMeasurement();
 
-  anl::ANLStatus mod_define() override;
-  anl::ANLStatus mod_analyze() override;
+  anlnext::ANLStatus mod_define() override;
+  anlnext::ANLStatus mod_analyze() override;
 
 private:
   int m_NumSamples;

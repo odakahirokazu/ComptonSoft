@@ -31,7 +31,7 @@
 #include "SGDEventReconstructionAlgorithm.hh"
 #include "CSHitCollection.hh"
 
-using namespace anl;
+using namespace anlnext;
 
 namespace unit = anlgeant4::unit;
 

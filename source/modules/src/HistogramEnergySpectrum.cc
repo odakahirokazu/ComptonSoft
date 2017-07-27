@@ -27,7 +27,7 @@
 #include "InitialInformation.hh"
 #include "DetectorHit.hh"
 
-using namespace anl;
+using namespace anlnext;
 
 namespace unit = anlgeant4::unit;
 

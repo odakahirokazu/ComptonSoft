@@ -42,9 +42,9 @@ public:
   SelectEventsOnFocalPlane();
   ~SelectEventsOnFocalPlane() = default;
 
-  anl::ANLStatus mod_define() override;
-  anl::ANLStatus mod_initialize() override;
-  anl::ANLStatus mod_analyze() override;
+  anlnext::ANLStatus mod_define() override;
+  anlnext::ANLStatus mod_initialize() override;
+  anlnext::ANLStatus mod_analyze() override;
 
 private:
   const EventReconstruction* m_EventReconstruction = nullptr;

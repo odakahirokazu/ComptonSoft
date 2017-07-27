@@ -44,9 +44,9 @@ public:
   PhysicsListManager();
   ~PhysicsListManager() = default;
   
-  anl::ANLStatus mod_define() override;
-  anl::ANLStatus mod_pre_initialize() override;
-  anl::ANLStatus mod_initialize() override;
+  anlnext::ANLStatus mod_define() override;
+  anlnext::ANLStatus mod_pre_initialize() override;
+  anlnext::ANLStatus mod_initialize() override;
 
   G4VUserPhysicsList* create() override;
 

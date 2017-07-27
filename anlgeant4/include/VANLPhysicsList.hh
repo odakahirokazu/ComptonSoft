@@ -20,7 +20,7 @@
 #ifndef ANLGEANT4_VANLPhysicsList_H
 #define ANLGEANT4_VANLPhysicsList_H
 
-#include <anl/BasicModule.hh>
+#include <anlnext/BasicModule.hh>
 
 class G4VUserPhysicsList;
 
@@ -33,7 +33,7 @@ namespace anlgeant4
  * @date xxxx-xx-xx
  * @date 2012-05-30
  */
-class VANLPhysicsList : public anl::BasicModule
+class VANLPhysicsList : public anlnext::BasicModule
 {
   DEFINE_ANL_MODULE(VANLPhysicsList, 4.0);
 public:
