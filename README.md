@@ -1,7 +1,7 @@
 Compton Soft
 ================================================================
 
-- Version: 5.2.14
+- Version: 5.3.0
 - Author: Hirokazu Odaka
 
 ----
@@ -107,6 +107,7 @@ Information
 
 ### History
 
+- 5.3 | 2017-08-28 | H. Odaka | migration to ANL Next 2.0
 - 5.2 | 2016-09-07 | H. Odaka | New design of XML database. Timing process.
 - 5.1 | 2015-10-19 | H. Odaka | Stable version. A big minor update since 5.0.
 - 5.0 | 2015-08-17 | H. Odaka | For C++11 and ANL Next 1.7.
