@@ -29,7 +29,7 @@ class CSPhysicsOption
 {
 public:
   enum class EMModel { Livermore, LivermorePolarized, LivermoreCustomized };
-  enum class HadronModel { BERT, BIC, INCLXX };
+  enum class HadronModel { BERT, BIC, INCLXX, BERT_HP, BIC_HP, BIC_AllHP };
 
 public:
   CSPhysicsOption() = default;

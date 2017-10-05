@@ -112,6 +112,15 @@ ANLStatus PhysicsListManager::mod_initialize()
   else if (m_HadronModel=="INCLXX" || m_HadronModel=="INCL++") {
     m_PhysicsOption.setHadronPhysicsModel(CSPhysicsOption::HadronModel::INCLXX);
   }
+  else if (m_HadronModel=="BERT_HP") {
+    m_PhysicsOption.setHadronPhysicsModel(CSPhysicsOption::HadronModel::BERT_HP);
+  }
+  else if (m_HadronModel=="BIC_HP") {
+    m_PhysicsOption.setHadronPhysicsModel(CSPhysicsOption::HadronModel::BIC_HP);
+  }
+  else if (m_HadronModel=="BIC_AllHP") {
+    m_PhysicsOption.setHadronPhysicsModel(CSPhysicsOption::HadronModel::BIC_AllHP);
+  }
   else {
     std::cout << "PhysicsListManager: \n"
               << "Unknown hadron model is given. ===> " << m_HadronModel

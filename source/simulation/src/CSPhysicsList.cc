@@ -32,6 +32,7 @@
 #include "G4HadronPhysicsQGSP_BERT_HP.hh"
 #include "G4HadronPhysicsQGSP_BIC.hh"
 #include "G4HadronPhysicsQGSP_BIC_HP.hh"
+#include "G4HadronPhysicsQGSP_BIC_AllHP.hh"
 #include "G4HadronPhysicsINCLXX.hh"
 #include "G4StoppingPhysics.hh"
 #include "G4IonPhysics.hh"
@@ -111,6 +112,15 @@ CSPhysicsList::CSPhysicsList(CSPhysicsOption option)
   }
   else if (modelHadron == CSPhysicsOption::HadronModel::INCLXX) {
     this->RegisterPhysics( new G4HadronPhysicsINCLXX );
+  }
+  else if (modelHadron == CSPhysicsOption::HadronModel::BERT_HP) {
+    this->RegisterPhysics( new G4HadronPhysicsQGSP_BERT_HP );
+  }
+  else if (modelHadron == CSPhysicsOption::HadronModel::BIC_HP) {
+    this->RegisterPhysics( new G4HadronPhysicsQGSP_BIC_HP );
+  }
+  else if (modelHadron == CSPhysicsOption::HadronModel::BIC_AllHP) {
+    this->RegisterPhysics( new G4HadronPhysicsQGSP_BIC_AllHP );
   }
   else {
     std::cout << "CSPhysicsList: unknown hadron physics is specified." << std::endl;
