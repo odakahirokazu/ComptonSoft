@@ -21,6 +21,7 @@
 #define COMPTONSOFT_ObservationTreeIO_H 1
 
 #include <cstdint>
+#include <vector>
 #include <utility>
 #include "ObservedParticle.hh"
 
