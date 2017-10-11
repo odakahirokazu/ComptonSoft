@@ -500,6 +500,11 @@ module ComptonSoft
             sl.list << s
             s.id = ee.attributes["id"]
             s.all = ee.attributes["all"]
+            ee.elements.each("common") do |eee|
+              c = ChannelProperties.new
+              s.common = c
+              c.load(eee)
+            end
             ee.elements.each("channel") do |eee|
               c = ChannelProperties.new
               s.data << c
@@ -518,6 +523,11 @@ module ComptonSoft
             sl.list << s
             s.id = ee.attributes["id"]
             s.all = ee.attributes["all"]
+            ee.elements.each("common") do |eee|
+              c = ChannelProperties.new
+              s.common = c
+              c.load(eee)
+            end
             ee.elements.each("channel") do |eee|
               c = ChannelProperties.new
               s.data << c
