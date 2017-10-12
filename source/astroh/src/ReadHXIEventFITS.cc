@@ -60,7 +60,8 @@ namespace comptonsoft
 
 ReadHXIEventFITS::ReadHXIEventFITS()
   : anlgeant4::InitialInformation(false),
-    m_VetoEnable(true), m_NumEvents(0), m_Index(0)
+    m_VetoEnable(true), m_NumEvents(0), m_Index(0),
+    m_EventTime(0.0)
 {
   add_alias("InitialInformation");
 }
@@ -102,6 +103,8 @@ ANLStatus ReadHXIEventFITS::mod_analyze()
   setEventID(event.getOccurrenceID());
 
   const double eventTime = event.getTime() * unit::second;
+  m_EventTime = eventTime;
+
   const astroh::hxi::EventFlags eventFlags = event.getFlags();
 
   if (is_pseudo_triggered(eventFlags)) {

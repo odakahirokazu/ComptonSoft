@@ -1,6 +1,6 @@
 /*************************************************************************
  *                                                                       *
- * Copyright (c) 2013 Hirokazu Odaka                                     *
+ * Copyright (c) 2011 Hirokazu Odaka                                     *
  *                                                                       *
  * This program is free software: you can redistribute it and/or modify  *
  * it under the terms of the GNU General Public License as published by  *
@@ -17,46 +17,50 @@
  *                                                                       *
  *************************************************************************/
 
-#ifndef COMPTONSOFT_ReadHXIEventFITS_H
-#define COMPTONSOFT_ReadHXIEventFITS_H 1
+#include "FilterByGoodTimeIntervalsForHXI.hh"
+#include "AstroUnits.hh"
+#include "ReadHXIEventFITS.hh"
 
-#include "VCSModule.hh"
-#include "InitialInformation.hh"
-#include <memory>
-#include "HXIEventFITS.hh"
 
-namespace comptonsoft {
+using namespace anlnext;
 
-/**
- * ANL module to read HXI event ROOT files.
- *
- * @author Hirokazu Odaka
- * @date 2016-11-10
- * @date 2017-10-11 | access to event time */
-class ReadHXIEventFITS : public VCSModule, public anlgeant4::InitialInformation
+namespace comptonsoft
 {
-  DEFINE_ANL_MODULE(ReadHXIEventFITS, 1.0);
-public:
-  ReadHXIEventFITS();
-  ~ReadHXIEventFITS();
-  
-  anlnext::ANLStatus mod_define() override;
-  anlnext::ANLStatus mod_initialize() override;
-  anlnext::ANLStatus mod_analyze() override;
 
-  double EventTime() const { return m_EventTime; }
+FilterByGoodTimeIntervalsForHXI::FilterByGoodTimeIntervalsForHXI() = default;
 
-private:
-  std::string m_Filename;
-  bool m_VetoEnable;
+FilterByGoodTimeIntervalsForHXI::~FilterByGoodTimeIntervalsForHXI() = default;
 
-  std::unique_ptr<astroh::hxi::EventFITSReader> m_EventReader;
-  Long64_t m_NumEvents;
-  Long64_t m_Index;
+ANLStatus FilterByGoodTimeIntervalsForHXI::mod_initialize()
+{
+  get_module("ReadHXIEventFITS", &m_EventReader);
+  define_evs("FilterByGoodTimeIntervals:OK");
 
-  double m_EventTime;
-};
+  return AS_OK;
+}
+
+ANLStatus FilterByGoodTimeIntervalsForHXI::mod_analyze()
+{
+  bool passed = false;
+
+  const double t = m_EventReader->EventTime();
+  for (const std::tuple<double, double>& interval: m_GTIs) {
+    const double time0 = std::get<0>(interval);
+    const double time1 = std::get<1>(interval);
+    if (time0<=t && t<time1) {
+      passed = true;
+      break;
+    }
+  }
+
+  if (passed) {
+    set_evs("FilterByGoodTimeIntervals:OK");
+  }
+  else {
+    return AS_SKIP;
+  }
+
+  return AS_OK;
+}
 
 } /* namespace comptonsoft */
-
-#endif /* COMPTONSOFT_ReadHXIEventFITS_H */

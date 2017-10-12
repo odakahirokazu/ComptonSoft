@@ -98,6 +98,7 @@ clAH = [
   ANL::SWIGClass.new("ReadHXIEventFITS", false, 'USE_FITSIO'),
   ANL::SWIGClass.new("WriteHXIEventFITS", false, 'USE_FITSIO'),
   ANL::SWIGClass.new("FilterByGoodTimeIntervalsForSGD", false, 'USE_FITSIO'),
+  ANL::SWIGClass.new("FilterByGoodTimeIntervalsForHXI", false, 'USE_FITSIO'),
 ]
 
 classList = clMod + clSim + clAH

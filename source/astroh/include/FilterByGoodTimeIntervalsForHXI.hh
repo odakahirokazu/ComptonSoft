@@ -1,6 +1,6 @@
 /*************************************************************************
  *                                                                       *
- * Copyright (c) 2013 Hirokazu Odaka                                     *
+ * Copyright (c) 2011 Hirokazu Odaka                                     *
  *                                                                       *
  * This program is free software: you can redistribute it and/or modify  *
  * it under the terms of the GNU General Public License as published by  *
@@ -17,46 +17,34 @@
  *                                                                       *
  *************************************************************************/
 
-#ifndef COMPTONSOFT_ReadHXIEventFITS_H
-#define COMPTONSOFT_ReadHXIEventFITS_H 1
+#ifndef COMPTONSOFT_FilterByGoodTimeIntervalsForHXI_H
+#define COMPTONSOFT_FilterByGoodTimeIntervalsForHXI_H 1
 
-#include "VCSModule.hh"
-#include "InitialInformation.hh"
-#include <memory>
-#include "HXIEventFITS.hh"
+#include "FilterByGoodTimeIntervals.hh"
 
 namespace comptonsoft {
 
+class ReadHXIEventFITS;
+
+
 /**
- * ANL module to read HXI event ROOT files.
- *
  * @author Hirokazu Odaka
- * @date 2016-11-10
- * @date 2017-10-11 | access to event time */
-class ReadHXIEventFITS : public VCSModule, public anlgeant4::InitialInformation
+ * @date 2017-02-06
+ */
+class FilterByGoodTimeIntervalsForHXI : public FilterByGoodTimeIntervals
 {
-  DEFINE_ANL_MODULE(ReadHXIEventFITS, 1.0);
+  DEFINE_ANL_MODULE(FilterByGoodTimeIntervalsForHXI, 1.0);
 public:
-  ReadHXIEventFITS();
-  ~ReadHXIEventFITS();
-  
-  anlnext::ANLStatus mod_define() override;
+  FilterByGoodTimeIntervalsForHXI();
+  ~FilterByGoodTimeIntervalsForHXI();
+
   anlnext::ANLStatus mod_initialize() override;
   anlnext::ANLStatus mod_analyze() override;
 
-  double EventTime() const { return m_EventTime; }
-
 private:
-  std::string m_Filename;
-  bool m_VetoEnable;
-
-  std::unique_ptr<astroh::hxi::EventFITSReader> m_EventReader;
-  Long64_t m_NumEvents;
-  Long64_t m_Index;
-
-  double m_EventTime;
+  const ReadHXIEventFITS* m_EventReader = nullptr;
 };
 
 } /* namespace comptonsoft */
 
-#endif /* COMPTONSOFT_ReadHXIEventFITS_H */
+#endif /* COMPTONSOFT_FilterByGoodTimeIntervalsForHXI_H */

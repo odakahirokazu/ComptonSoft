@@ -105,6 +105,9 @@
 #ifdef USE_FITSIO
 #include "FilterByGoodTimeIntervalsForSGD.hh"
 #endif
+#ifdef USE_FITSIO
+#include "FilterByGoodTimeIntervalsForHXI.hh"
+#endif
 
 #include "class_list_anlGeant4.hh"
 #include "comptonsoft_basic_classes.hh"
@@ -801,6 +804,16 @@ class FilterByGoodTimeIntervalsForSGD : public FilterByGoodTimeIntervals
 public:
   FilterByGoodTimeIntervalsForSGD();
   ~FilterByGoodTimeIntervalsForSGD();
+};
+
+#endif
+
+#ifdef USE_FITSIO
+class FilterByGoodTimeIntervalsForHXI : public FilterByGoodTimeIntervals
+{
+public:
+  FilterByGoodTimeIntervalsForHXI();
+  ~FilterByGoodTimeIntervalsForHXI();
 };
 
 #endif
