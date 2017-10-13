@@ -50,7 +50,7 @@ ANLStatus ComptonEventFilter::mod_initialize()
 
   auto& hitPatterns = getDetectorManager()->getHitPatterns();
   for (auto& eventSelection: m_ConditionsVector) {
-    const std::vector<std::string>& hitpatNames = eventSelection.get_hit_patterns();
+    const std::vector<std::string>& hitpatNames = eventSelection.get_hit_pattern_names();
     for (const std::string& name: hitpatNames) {
       auto it = std::find_if(std::begin(hitPatterns), std::end(hitPatterns),
                              [&](const HitPattern hitpat) {
@@ -59,7 +59,7 @@ ANLStatus ComptonEventFilter::mod_initialize()
       if (it != std::end(hitPatterns)) {
         std::string evsKey = "HitPattern:";
         evsKey += it->ShortName();
-        add_evs_key(evsKey);
+        eventSelection.add_hit_pattern_key(evsKey);
       }
       else {
         std::cout << "Hit pattern \"" << name << "\" is not found." << std::endl;
@@ -82,14 +82,27 @@ ANLStatus ComptonEventFilter::mod_analyze()
   bool selected = false;
   for (auto& eventSelection: m_ConditionsVector) {
     bool goodHitPattern = false;
-    const std::vector<std::string>& keys = eventSelection.get_evs_keys();
-    for (const std::string& key: keys) {
+    const std::vector<std::string>& hpKeys = eventSelection.get_hit_pattern_keys();
+    if (hpKeys.empty()) {
+      goodHitPattern = true;
+    }
+    for (const std::string& key: hpKeys) {
       if (evs(key)) {
         goodHitPattern = true;
         break;
       }
     }
     if (goodHitPattern == false) { continue; }
+
+    bool goodEvs = true;
+    const std::vector<std::string>& evsKeys = eventSelection.get_evs_keys();
+    for (const std::string& key: evsKeys) {
+      if (!evs(key)) {
+        goodEvs = false;
+        break;
+      }
+    }
+    if (goodEvs == false) { continue; }
 
     bool goodCondition = true;
     const std::vector<std::function<bool (const BasicComptonEvent&)>>& conditions = eventSelection.get_conditions();
@@ -128,13 +141,22 @@ void ComptonEventFilter::add_evs_key(const std::string& key)
   m_ConditionsVector.back().add_evs_key(key);
 }
 
+void ComptonEventFilter::add_hit_pattern_key(const std::string& key)
+{
+  if (m_ConditionsVector.size()==0) {
+    define_condition();
+  }
+
+  m_ConditionsVector.back().add_hit_pattern_key(key);
+}
+
 void ComptonEventFilter::add_hit_pattern(const std::string& name)
 {
   if (m_ConditionsVector.size()==0) {
     define_condition();
   }
 
-  m_ConditionsVector.back().add_hit_pattern(name);
+  m_ConditionsVector.back().add_hit_pattern_name(name);
 }
 
 void ComptonEventFilter::add_condition(const std::string& type,

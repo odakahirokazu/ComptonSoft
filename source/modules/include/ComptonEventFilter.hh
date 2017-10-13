@@ -37,23 +37,28 @@ public:
   ComptonEventSelectionCondition() = default;
   ~ComptonEventSelectionCondition() = default;
 
+  void add_hit_pattern_name(const std::string& name)
+  { hitPatternNames_.push_back(name); }
+  void add_hit_pattern_key(const std::string& key)
+  { hitPatternKeys_.push_back(key); }
   void add_evs_key(const std::string& key)
   { evsKeys_.push_back(key); }
-  void add_hit_pattern(const std::string& name)
-  { hitPatterns_.push_back(name); }
   void add_condition(const std::function<bool (const BasicComptonEvent&)>& condition)
   { conditions_.push_back(condition); }
 
+  std::vector<std::string>& get_hit_pattern_names()
+  { return hitPatternNames_; }
+  std::vector<std::string>& get_hit_pattern_keys()
+  { return hitPatternKeys_; }
   std::vector<std::string>& get_evs_keys()
   { return evsKeys_; }
-  std::vector<std::string>& get_hit_patterns()
-  { return hitPatterns_; }
   std::vector<std::function<bool (const BasicComptonEvent&)>>& get_conditions()
   { return conditions_; }
 
 private:
+  std::vector<std::string> hitPatternNames_;
+  std::vector<std::string> hitPatternKeys_;
   std::vector<std::string> evsKeys_;
-  std::vector<std::string> hitPatterns_;
   std::vector<std::function<bool (const BasicComptonEvent&)>> conditions_;
 };
 
@@ -65,10 +70,11 @@ private:
  * @date 2015-10-10 | derived from VCSModule
  * @date 2017-02-06 | 4.0 | do not determine hit patterns in this module.
  * @date 2017-02-15 | 4.1 | can specify hit pattern in the condition phase
+ * @date 2017-10-13 | 4.2 | fix hit pattern selection
  */
 class ComptonEventFilter : public VCSModule
 {
-  DEFINE_ANL_MODULE(ComptonEventFilter, 4.1);
+  DEFINE_ANL_MODULE(ComptonEventFilter, 4.2);
 public:
   ComptonEventFilter();
   ~ComptonEventFilter() = default;
@@ -79,6 +85,7 @@ public:
 
   void define_condition();
   void add_hit_pattern(const std::string& name);
+  void add_hit_pattern_key(const std::string& key);
   void add_evs_key(const std::string& key);
   void add_condition(const std::string& type,
                      double minValue,
