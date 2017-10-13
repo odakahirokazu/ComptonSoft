@@ -31,7 +31,7 @@ class EventReconstruction;
 
 class HistogramAzimuthAngle : public VCSModule
 {
-  DEFINE_ANL_MODULE(HistogramAzimuthAngle, 2.2);
+  DEFINE_ANL_MODULE(HistogramAzimuthAngle, 2.3);
 public:
   HistogramAzimuthAngle();
   ~HistogramAzimuthAngle() = default;
@@ -53,6 +53,7 @@ private:
   double theta_min_;
   double theta_max_;
   double phi_origin_;
+  bool sky_;
 };
 
 } /* namespace comptonsoft */

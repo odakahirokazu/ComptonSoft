@@ -36,7 +36,7 @@ HistogramAzimuthAngle::HistogramAzimuthAngle()
   : eventReconstruction_(nullptr),
     numBins_(64),
     theta_min_(-1.0*unit::degree), theta_max_(181.0*unit::degree),
-    phi_origin_(0.0)
+    phi_origin_(0.0), sky_(false)
 {
 }
 
@@ -46,6 +46,7 @@ ANLStatus HistogramAzimuthAngle::mod_define()
   register_parameter(&theta_min_, "theta_min", unit::degree, "degree");
   register_parameter(&theta_max_, "theta_max", unit::degree, "degree");
   register_parameter(&phi_origin_, "phi_origin", 1.0, "degree");
+  register_parameter(&sky_, "sky");
   
   return AS_OK;
 }
@@ -111,8 +112,9 @@ ANLStatus HistogramAzimuthAngle::mod_analyze()
   }
 
   const double phi0 = (event.PhiG()/unit::degree) - phi_origin_;
-  const int n_phi = std::floor((phi0+180.0)/360.0);
-  const double phi1 = phi0 - n_phi*360.0;
+  const double phi0a = sky_ ? (-phi0) : phi0;
+  const int n_phi = std::floor((phi0a+180.0)/360.0);
+  const double phi1 = phi0a - n_phi*360.0;
 
   hist_all_->Fill(phi1);
 
