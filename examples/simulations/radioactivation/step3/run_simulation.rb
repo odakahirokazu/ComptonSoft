@@ -19,7 +19,7 @@ def run_simulation(num, random, output, ri, volume_path)
     atomic_number: ri.z,
     mass_number: ri.a,
     energy: ri.energy,
-    floating_level: ri.floating_level
+    floating_level: ri.floating_level,
     volume_hierarchy: volume_path.split('/').drop(1),
   }
 
@@ -33,7 +33,7 @@ def run_simulation(num, random, output, ri, volume_path)
     discard_time_group_nonzero: true
   }
 
-  sim.thread_mode = false
+  sim.console = false
   sim.run(num)
 end
 
