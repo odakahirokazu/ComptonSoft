@@ -123,10 +123,10 @@ public:
   { return directionX_.z(); }
   
   void setYAxisDirection(double x, double y, double z) override
-  { 
+  {
     directionY_.set(x, y, z);
     directionY_ = directionY_.unit();
-  } 
+  }
   void setYAxisDirection(const vector3_t& v) override
   { directionY_ = v.unit(); }
   vector3_t getYAxisDirection() const override
@@ -137,6 +137,22 @@ public:
   { return directionY_.y(); }
   double getYAxisDirectionZ() const override
   { return directionY_.z(); }
+
+  void setZAxisDirection(double x, double y, double z) override
+  {
+    directionZ_.set(x, y, z);
+    directionZ_ = directionZ_.unit();
+  }
+  void setZAxisDirection(const vector3_t& v) override
+  { directionZ_ = v.unit(); }
+  vector3_t getZAxisDirection() const override
+  { return directionZ_; }
+  double getZAxisDirectionX() const override
+  { return directionZ_.x(); }
+  double getZAxisDirectionY() const override
+  { return directionZ_.y(); }
+  double getZAxisDirectionZ() const override
+  { return directionZ_.z(); }
 
   /**
    * register multi channel data.
@@ -164,6 +180,12 @@ public:
   vector3_t LocalPosition(const PixelID& pixel) const override;
   void LocalPosition(const PixelID& pixel,
                      double* x, double* y, double* z) const override;
+
+  vector3_t PositionWithDepth(int pixelX, int pixelY, double localz) const override;
+  vector3_t PositionWithDepth(const PixelID& pixel, double localz) const override;
+
+  vector3_t LocalPositionWithDepth(int pixelX, int pixelY, double localz) const override;
+  vector3_t LocalPositionWithDepth(const PixelID& pixel, double localz) const override;
   
   PixelID findPixel(double localx, double localy) const override;
 
@@ -258,6 +280,7 @@ private:
   vector3_t centerPosition_;
   vector3_t directionX_;
   vector3_t directionY_;
+  vector3_t directionZ_;
   
   ElectrodeSide bottomSideElectrode_;
 
@@ -299,6 +322,12 @@ void VRealDetectorUnit::Position(const PixelID& pixel,
 }
 
 inline
+vector3_t VRealDetectorUnit::PositionWithDepth(const PixelID& pixel, double localz) const
+{
+  return PositionWithDepth(pixel.X(), pixel.Y(), localz);
+}
+
+inline
 void VRealDetectorUnit::LocalPosition(int pixelX, int pixelY,
                                       double* x, double* y, double* z) const
 {
@@ -319,6 +348,12 @@ void VRealDetectorUnit::LocalPosition(const PixelID& pixel,
                                       double* x, double* y, double* z) const
 {
   LocalPosition(pixel.X(), pixel.Y(), x, y, z);
+}
+
+inline
+vector3_t VRealDetectorUnit::LocalPositionWithDepth(const PixelID& pixel, double localz) const
+{
+  return LocalPositionWithDepth(pixel.X(), pixel.Y(), localz);
 }
 
 } /* namespace comptonsoft */

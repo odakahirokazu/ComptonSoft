@@ -50,6 +50,11 @@ public:
 
 public:
   virtual void initializeEvent();
+
+  void setDepthSensingMode(int mode) { DepthSensingMode_ = mode; }
+  void setDepthResolution(double v) { DepthResolution_ = v; }
+  int DepthSensingMode() const { return DepthSensingMode_; }
+  double DepthResolution() const { return DepthResolution_; }
   
   void setQuenchingFactor(double c1, double c2=0.0, double c3=0.0)
   { QuenchingFactor_ = std::make_tuple(c1, c2, c3); }
@@ -197,7 +202,9 @@ public:
   virtual void printSimulationParameters(std::ostream& os) const = 0;
   
   void insertRawHit(DetectorHit_sptr hit) { RawHits_.push_back(hit); }
-  
+
+  void assignLocalDepth(DetectorHit_sptr hit) const;
+
 protected:
   virtual bool checkRange(const PixelID& pixel) const = 0;
   virtual int IndexOfTable(const PixelID& pixel) const = 0;
@@ -269,6 +276,8 @@ protected:
   }
 
 private:
+  int DepthSensingMode_;
+  double DepthResolution_;
   std::tuple<double, double, double> QuenchingFactor_;
 
   // channels properties

@@ -281,7 +281,6 @@ DetectorHit_sptr SimDetectorUnit2DStrip::generateHit(const DetectorHit& rawhit,
                                                     localposy,
                                                     localposz);
   hit->setEnergyCharge(energyCharge);
-  
   return hit;
 }
 

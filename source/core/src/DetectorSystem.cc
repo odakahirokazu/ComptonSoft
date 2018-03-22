@@ -421,12 +421,27 @@ loadDCDetectorNode(const boost::property_tree::ptree& DetectorNode,
     const optional<double> ydirx = DetectorNode.get_optional<double>("yaxis_direction.<xmlattr>.x");
     const optional<double> ydiry = DetectorNode.get_optional<double>("yaxis_direction.<xmlattr>.y");
     const optional<double> ydirz = DetectorNode.get_optional<double>("yaxis_direction.<xmlattr>.z");
-    if (xdirx && xdiry && xdirz && ydirx && ydiry && ydirz) {
+    const optional<double> zdirx = DetectorNode.get_optional<double>("zaxis_direction.<xmlattr>.x");
+    const optional<double> zdiry = DetectorNode.get_optional<double>("zaxis_direction.<xmlattr>.y");
+    const optional<double> zdirz = DetectorNode.get_optional<double>("zaxis_direction.<xmlattr>.z");
+    if (xdirx && xdiry && xdirz && ydirx && ydiry && ydirz && zdirx && zdiry && zdirz) {
       detector->setXAxisDirection(*xdirx, *xdiry, *xdirz);
       detector->setYAxisDirection(*ydirx, *ydiry, *ydirz);
+      detector->setZAxisDirection(*zdirx, *zdiry, *zdirz);
+    }
+    else if (xdirx && xdiry && xdirz && ydirx && ydiry && ydirz &&
+             zdirx==boost::none && zdiry==boost::none && zdirz==boost::none) {
+      detector->setXAxisDirection(*xdirx, *xdiry, *xdirz);
+      detector->setYAxisDirection(*ydirx, *ydiry, *ydirz);
+      const vector3_t xaxis = detector->getXAxisDirection();
+      const vector3_t yaxis = detector->getYAxisDirection();
+      const vector3_t zaxis = xaxis.cross(yaxis).unit();
+      detector->setZAxisDirection(zaxis);
+      std::cout << format("Warning: z-axis is set as x-axis cross y-axis for Detector ID: %d") % detector->getID() << std::endl;
     }
     else if (xdirx==boost::none && xdiry==boost::none && xdirz==boost::none &&
-             ydirx==boost::none && ydiry==boost::none && ydirz==boost::none) {
+             ydirx==boost::none && ydiry==boost::none && ydirz==boost::none &&
+             zdirx==boost::none && zdiry==boost::none && zdirz==boost::none) {
       std::cout << format("Warning: default axes directions are used for Detector ID: %d") % detector->getID() << std::endl;
     }
     else {
@@ -874,6 +889,15 @@ void DetectorSystem::setupDetectorParameters(const DetectorSystem::ParametersNod
     }
   }
 
+  if (auto o = parameters.depth_sensing_mode) {
+    ds->setDepthSensingMode(*o);
+  }
+
+  if (auto o = parameters.depth_sensing_resolution) {
+    const double value = (*o)*unit::cm;
+    ds->setDepthResolution(value);
+  }
+
   if (auto o = parameters.quenching_factor) {
     ds->setQuenchingFactor(*o);
   }
@@ -1146,6 +1170,12 @@ load(const boost::property_tree::ptree& node)
   }
   if (auto o=node.get_optional<int>("upside.<xmlattr>.xstrip")) {
     upside_xstrip = o;
+  }
+  if (auto o=node.get_optional<int>("depth_sensing.<xmlattr>.mode")) {
+    depth_sensing_mode = o;
+  }
+  if (auto o=node.get_optional<double>("depth_sensing.<xmlattr>.resolution")) {
+    depth_sensing_resolution = o;
   }
   if (auto o=node.get_optional<double>("quenching.<xmlattr>.factor")) {
     quenching_factor = o;

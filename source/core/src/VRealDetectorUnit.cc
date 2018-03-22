@@ -57,6 +57,7 @@ VRealDetectorUnit::VRealDetectorUnit()
     centerPosition_(0.0, 0.0, 0.0),
     directionX_(1.0, 0.0, 0.0),
     directionY_(0.0, 1.0, 0.0),
+    directionZ_(0.0, 0.0, 1.0),
     bottomSideElectrode_(ElectrodeSide::Undefined),
     reconstructionMode_(1), clusteringOn_(true),
     channelMap_(nullptr)
@@ -95,6 +96,27 @@ vector3_t VRealDetectorUnit::LocalPosition(int pixelX, int pixelY) const
   const vector3_t pos =
     (-0.5*sizeX_ + (offsetX_+(0.5+pixelX)*pixelPitchX_)) * dirx
     + (-0.5*sizeY_ + (offsetY_+(0.5+pixelY)*pixelPitchY_)) * diry;
+  return pos;
+}
+
+vector3_t VRealDetectorUnit::PositionWithDepth(int pixelX, int pixelY, double localz) const
+{
+  const vector3_t pos = centerPosition_
+    + (-0.5*sizeX_ + (offsetX_+(0.5+pixelX)*pixelPitchX_)) * directionX_
+    + (-0.5*sizeY_ + (offsetY_+(0.5+pixelY)*pixelPitchY_)) * directionY_
+    + localz * directionZ_;
+  return pos;
+}
+
+vector3_t VRealDetectorUnit::LocalPositionWithDepth(int pixelX, int pixelY, double localz) const
+{
+  const vector3_t dirx(1.0, 0.0, 0.0);
+  const vector3_t diry(0.0, 1.0, 0.0);
+  const vector3_t dirz(0.0, 0.0, 1.0);
+  const vector3_t pos =
+    (-0.5*sizeX_ + (offsetX_+(0.5+pixelX)*pixelPitchX_)) * dirx
+    + (-0.5*sizeY_ + (offsetY_+(0.5+pixelY)*pixelPitchY_)) * diry
+    + localz * dirz;
   return pos;
 }
 
@@ -339,7 +361,11 @@ printDetectorParameters(std::ostream& os) const
      << "Y-axis direction\n"
      << "  x: " << getYAxisDirectionX() << "\n"
      << "  y: " << getYAxisDirectionY() << "\n"
-     << "  z: " << getYAxisDirectionZ() << "\n";
+     << "  z: " << getYAxisDirectionZ() << "\n"
+     << "Z-axis direction\n"
+     << "  x: " << getZAxisDirectionX() << "\n"
+     << "  y: " << getZAxisDirectionY() << "\n"
+     << "  z: " << getZAxisDirectionZ() << "\n";
   os << "Number of MCD : " << NumberOfMultiChannelData() << '\n';
   os << "Reconstruction\n"
      << "  Mode : " << ReconstructionMode() << '\n'

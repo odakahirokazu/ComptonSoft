@@ -32,7 +32,9 @@ namespace unit = anlgeant4::unit;
 namespace comptonsoft {
 
 VDeviceSimulation::VDeviceSimulation()
-  : QuenchingFactor_{1.0, 0.0, 0.0},
+  : DepthSensingMode_(0),
+    DepthResolution_(0.0),
+    QuenchingFactor_{1.0, 0.0, 0.0},
     TimeResolutionFast_(100.0*unit::ns),
     TimeResolutionSlow_(1000.0*unit::ns),
     pedestalEnabled_(false)
@@ -92,6 +94,7 @@ void VDeviceSimulation::makeDetectorHits()
     hit->setTriggered(true);
     hit->setSelfTriggeredTime(hit->RealTime());
     hit->setTriggeredTime(hit->RealTime());
+    assignLocalDepth(hit);
     insertDetectorHit(hit);
   }
   SimulatedHits_.clear();
@@ -323,6 +326,7 @@ void VDeviceSimulation::makeDetectorHitsAtTime(double time_triggered, int time_g
     hit->setTimeGroup(time_group);
     hit->setTriggered(true);
     hit->setTriggeredTime(time_triggered);
+    assignLocalDepth(hit);
     insertDetectorHit(hit);
   }
 }
@@ -344,6 +348,26 @@ generatePedestalSignals(int time_group, double time_of_signal) const
   }
 
   return hits;
+}
+
+void VDeviceSimulation::assignLocalDepth(DetectorHit_sptr hit) const
+{
+  const double localposx = hit->LocalPositionX();
+  const double localposy = hit->LocalPositionY();
+  const double localposz = hit->LocalPositionZ();
+
+  if (DepthSensingMode()==1) {
+    double zMeasured = CLHEP::RandGauss::shoot(localposz, DepthResolution());
+    if (zMeasured < -0.5*getThickness()) {
+      zMeasured = -0.5*getThickness();
+    }
+    else if (zMeasured > +0.5*getThickness()) {
+      zMeasured = +0.5*getThickness();
+    }
+
+    hit->setDepthSensingMode(DepthSensingMode());
+    hit->setLocalPosition(localposx, localposy, zMeasured);
+  }
 }
 
 } /* namespace comptonsoft */

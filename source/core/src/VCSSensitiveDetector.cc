@@ -120,6 +120,7 @@ VCSSensitiveDetector::ProcessHits(G4Step* aStep, G4TouchableHistory* )
       G4ThreeVector center(0, 0, 0);
       G4ThreeVector xdir(1, 0, 0);
       G4ThreeVector ydir(0, 1, 0);
+      G4ThreeVector zdir(0, 0, 1);
       
       for (G4int i = 0; i < touchable->GetHistoryDepth(); i++) {
         G4VPhysicalVolume* physicalVolume = touchable->GetVolume(i);
@@ -127,6 +128,7 @@ VCSSensitiveDetector::ProcessHits(G4Step* aStep, G4TouchableHistory* )
           center = (*physicalVolume->GetObjectRotation()) * center;
           xdir   = (*physicalVolume->GetObjectRotation()) * xdir;
           ydir   = (*physicalVolume->GetObjectRotation()) * ydir;
+          zdir   = (*physicalVolume->GetObjectRotation()) * zdir;
         }
         center += physicalVolume->GetObjectTranslation();
       }
@@ -135,6 +137,7 @@ VCSSensitiveDetector::ProcessHits(G4Step* aStep, G4TouchableHistory* )
       detector->setCenterPosition(center);
       detector->setXAxisDirection(xdir);
       detector->setYAxisDirection(ydir);
+      detector->setZAxisDirection(zdir);
 
       positionCalculationSet_.erase(it);
     }

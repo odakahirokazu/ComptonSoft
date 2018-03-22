@@ -49,6 +49,7 @@ class VCSSensitiveDetector;
  * @date 2008-08-29
  * @date 2012-06-29
  * @date 2016-08-22 | new XML scheme (version 4)
+ * @date 2018-03-09 | new XML schema (detector config v5, detector parameters v2)
  */
 class DetectorSystem : private boost::noncopyable
 {
@@ -75,6 +76,8 @@ public:
     boost::optional<int> upside_anode = boost::none;
     boost::optional<int> upside_pixel = boost::none;
     boost::optional<int> upside_xstrip = boost::none;
+    boost::optional<int> depth_sensing_mode = boost::none;
+    boost::optional<double> depth_sensing_resolution = boost::none;
     boost::optional<double> quenching_factor = boost::none;
     boost::optional<double> temperature_value = boost::none;
     boost::optional<double> efield_bias = boost::none;

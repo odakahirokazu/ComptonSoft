@@ -183,6 +183,9 @@ public:
 
   void setGrade(int v) { grade_ = v; }
   int Grade() const { return grade_; }
+
+  void setDepthSensingMode(int v) { depthSensingMode_ = v; }
+  int DepthSensingMode() const { return depthSensingMode_; }
   
   /**
    * check if the given hit occurred in the same detector.
@@ -269,6 +272,7 @@ private:
   vector3_t localPosition_{0.0, 0.0, 0.0};
   double time_ = 0.0;
   int grade_ = 0;
+  int depthSensingMode_ = 0;
 };
 
 inline bool DetectorHit::isInSameDetector(const DetectorHit& r) const

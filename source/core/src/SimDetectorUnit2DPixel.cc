@@ -23,6 +23,8 @@
 #include <algorithm>
 #include <memory>
 
+#include "CLHEP/Random/RandGauss.h"
+#include "CLHEP/Random/RandFlat.h"
 #include "TMath.h"
 #include "TRandom3.h"
 #include "TH3.h"

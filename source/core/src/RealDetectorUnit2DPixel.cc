@@ -67,9 +67,15 @@ void RealDetectorUnit2DPixel::reconstruct(const DetectorHitVector& hitSignals,
 void RealDetectorUnit2DPixel::determinePosition(DetectorHitVector& hits) const
 {
   for (auto& hit: hits) {
-    PixelID pixel = hit->Pixel();
-    hit->setPosition(Position(pixel));
-    hit->setLocalPosition(LocalPosition(pixel));
+    const PixelID pixel = hit->Pixel();
+    if (hit->DepthSensingMode()==1) {
+      hit->setPosition(PositionWithDepth(pixel, hit->LocalPositionZ()));
+      hit->setLocalPosition(LocalPositionWithDepth(pixel, hit->LocalPositionZ()));
+    }
+    else {
+      hit->setPosition(Position(pixel));
+      hit->setLocalPosition(LocalPosition(pixel));
+    }
   }
 }
 

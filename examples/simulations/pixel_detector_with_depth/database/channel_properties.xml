@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<?xml-stylesheet type="text/xsl" href="https://raw.githubusercontent.com/odakahirokazu/ComptonSoft/master/xmlstyle/channel_properties_v1.xsl" ?>
+
+<channel_properties>
+  <name>CdTe pixel detector</name>
+  <comment>2016-08-26 | Hirokazu Odaka</comment>
+  <data>
+    <readout_module id="0">
+      <section id="0" all="1">
+        <common>
+          <disable status="0" />
+          <trigger_discrimination center="4.0" sigma="1.0" />
+          <noise_level param0="0.3" param1="0.019" param2="0.003" />
+          <compensation factor="1.0" />
+          <threshold value="5.0" />
+        </common>
+        <channel id="13">
+          <noise_level param0="20.0" />
+          <threshold value="120.0" />
+        </channel>
+        <channel id="27">
+          <disable status="1" />
+        </channel>
+      </section>
+      <section id="1">
+        <channel id="10">
+          <disable status="0" />
+          <trigger_discrimination center="5.0" sigma="1.0" />
+          <noise_level param0="0.6" param1="0.019" param2="0.003" />
+          <compensation factor="1.0" />
+          <threshold value="5.0" />
+        </channel>
+      </section>
+      <section id="2">
+        <channel id="20">
+          <noise_level param0="5.0" />
+          <threshold value="30.0" />
+        </channel>
+      </section>
+    </readout_module>
+  </data>
+</channel_properties>

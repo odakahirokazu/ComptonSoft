@@ -105,7 +105,14 @@ public:
   virtual double getYAxisDirectionX() const = 0;
   virtual double getYAxisDirectionY() const = 0;
   virtual double getYAxisDirectionZ() const = 0;
-  
+
+  virtual void setZAxisDirection(double x, double y, double z) = 0;
+  virtual void setZAxisDirection(const vector3_t& v) = 0;
+  virtual vector3_t getZAxisDirection() const = 0;
+  virtual double getZAxisDirectionX() const = 0;
+  virtual double getZAxisDirectionY() const = 0;
+  virtual double getZAxisDirectionZ() const = 0;
+
   /** 
    * calculate global position of the pixel center.
    * @param pixelX the pixel ID along the x axis of the detector
@@ -148,6 +155,13 @@ public:
   virtual vector3_t LocalPosition(const PixelID& pixel) const = 0;
   virtual void LocalPosition(const PixelID& pixel,
                              double* x, double* y, double* z) const = 0;
+
+  virtual vector3_t PositionWithDepth(int pixelX, int pixelY, double localz) const = 0;
+  virtual vector3_t PositionWithDepth(const PixelID& pixel, double localz) const = 0;
+
+  virtual vector3_t LocalPositionWithDepth(int pixelX, int pixelY, double localz) const = 0;
+  virtual vector3_t LocalPositionWithDepth(const PixelID& pixel, double localz) const = 0;
+  
   virtual PixelID findPixel(double localx, double localy) const = 0;
 
   /**
