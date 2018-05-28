@@ -14,7 +14,7 @@ def run_simulation(num, random, output)
 
   sim.set_primary_generator :PlaneWaveRectanglePrimaryGen, {
     particle: "gamma",
-    spectral_distribution: "mono",
+    spectral_distribution: "gaussian",
     energy_mean: 2200.0,
     energy_sigma: 220.0,
     position: vec(0.0, 0.0, 10.0),
