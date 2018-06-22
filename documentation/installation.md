@@ -55,13 +55,13 @@ Following building options are required:
 Example of running cmake:
 
     unix> cmake \
-      -DCMAKE_INSTALL_PREFIX=../geant4.10.02.p02-install \
+      -DCMAKE_INSTALL_PREFIX=../geant4.10.04.p02-install \
       -DGEANT4_USE_GDML=ON \
       -DGEANT4_USE_QT=ON \
       -DGEANT4_USE_OPENGL_X11=ON \
       -DGEANT4_USE_RAYTRACER_X11=ON \
       -DGEANT4_USE_NETWORKDAWN=ON \
-      ../geant4.10.02.p02
+      ../geant4.10.04.p02
 
 ### (6) [ROOT](http://root.cern.ch/)
 *We recommend version 6.06 or later.*

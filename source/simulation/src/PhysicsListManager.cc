@@ -38,6 +38,11 @@ PhysicsListManager::PhysicsListManager()
   : m_PhysicsListName("CSPhysicsList"),
     m_EMPolarization(false),
     m_EMCustomized(false),
+    m_EMOptionFluo(true),
+    m_EMOptionAuger(false),
+    m_EMOptionPIXE(false),
+    m_ElectronRangeRatio(0.2),
+    m_ElectronFinalRange(100.0*CLHEP::um),
     m_HadronHP(false),
     m_HadronModel("BIC"),
     m_NuclearLifeTimeThreshold(1.0e-12*CLHEP::second),
@@ -55,6 +60,11 @@ ANLStatus PhysicsListManager::mod_define()
   register_parameter(&m_PhysicsListName, "physics_list");
   register_parameter(&m_EMPolarization, "polarization");
   register_parameter(&m_EMCustomized, "customized_em");
+  register_parameter(&m_EMOptionFluo, "em_option_fluo");
+  register_parameter(&m_EMOptionAuger, "em_option_auger");
+  register_parameter(&m_EMOptionPIXE, "em_option_pixe");
+  register_parameter(&m_ElectronRangeRatio, "electron_range_ratio");
+  register_parameter(&m_ElectronFinalRange, "electron_final_range", CLHEP::cm, "cm");
   register_parameter(&m_HadronHP, "hadron_hp");
   register_parameter(&m_HadronModel, "hadron_model");
   register_parameter(&m_NuclearLifeTimeThreshold, "nuclear_lifetime_threshold", CLHEP::second, "s");
@@ -66,9 +76,23 @@ ANLStatus PhysicsListManager::mod_define()
 
 ANLStatus PhysicsListManager::mod_pre_initialize()
 {
-  if (m_PhysicsListName != "CSPhysicsList") {
+  if (m_PhysicsListName == "CSPhysicsList") {
+    if (!m_EMCustomized) {
+      hide_parameter("em_option_fluo");
+      hide_parameter("em_option_auger");
+      hide_parameter("em_option_pixe");
+      hide_parameter("electron_range_ratio");
+      hide_parameter("electron_final_range");
+    }
+  }
+  else {
     hide_parameter("polarization");
     hide_parameter("customized_em");
+    hide_parameter("em_option_fluo");
+    hide_parameter("em_option_auger");
+    hide_parameter("em_option_pixe");
+    hide_parameter("electron_range_ratio");
+    hide_parameter("electron_final_range");
     hide_parameter("hadron_hp");
     hide_parameter("hadron_model");
     hide_parameter("radioactive_decay");
@@ -83,20 +107,23 @@ ANLStatus PhysicsListManager::mod_initialize()
   CSPhysicsOption option;
 
   // EM physics model
-  if (m_EMPolarization) {
-    m_PhysicsOption.setEMPhysicsModel(CSPhysicsOption::EMModel::LivermorePolarized);
-    if (m_EMCustomized) {
-      std::cout << "PhysicsListManager: \n"
-                << "Customized version of LivermorePolarized is not prepared.\n"
-                << std::endl;
-      return AS_QUIT_ERROR;
+  if (m_EMCustomized) {
+    if (m_EMPolarization) {
+      m_PhysicsOption.setEMPhysicsModel(CSPhysicsOption::EMModel::CustomizedLivermorePolarized);
     }
-  }
-  else if (m_EMCustomized) {
-    m_PhysicsOption.setEMPhysicsModel(CSPhysicsOption::EMModel::LivermoreCustomized);
+    else {
+      m_PhysicsOption.setEMPhysicsModel(CSPhysicsOption::EMModel::CustomizedLivermore);
+    }
+    m_PhysicsOption.setEMOptions(m_EMOptionFluo, m_EMOptionAuger, m_EMOptionPIXE);
+    m_PhysicsOption.setElectronRangeParameters(m_ElectronRangeRatio, m_ElectronFinalRange);
   }
   else {
-    m_PhysicsOption.setEMPhysicsModel(CSPhysicsOption::EMModel::Livermore);
+    if (m_EMPolarization) {
+      m_PhysicsOption.setEMPhysicsModel(CSPhysicsOption::EMModel::LivermorePolarized);
+    }
+    else {
+      m_PhysicsOption.setEMPhysicsModel(CSPhysicsOption::EMModel::Livermore);
+    }
   }
 
   // hardron high-precision model

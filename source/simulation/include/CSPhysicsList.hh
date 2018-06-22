@@ -28,15 +28,33 @@ namespace comptonsoft
 class CSPhysicsOption
 {
 public:
-  enum class EMModel { Livermore, LivermorePolarized, LivermoreCustomized };
+  enum class EMModel { Livermore, LivermorePolarized, CustomizedLivermore, CustomizedLivermorePolarized };
   enum class HadronModel { BERT, BIC, INCLXX, BERT_HP, BIC_HP, BIC_AllHP };
 
 public:
-  CSPhysicsOption() = default;
+  CSPhysicsOption();
   ~CSPhysicsOption() = default;
 
   void setEMPhysicsModel(EMModel v) { EMModel_ = v; }
   EMModel getEMPhysicsModel() const { return EMModel_; }
+
+  void setEMOptions(bool fluo, bool auger, bool pixe)
+  {
+    EMOptionFluo_ = fluo;
+    EMOptionAuger_ = auger;
+    EMOptionPIXE_ = pixe;
+  }
+  bool EMOptionFluo() const { return EMOptionFluo_; }
+  bool EMOptionAuger() const { return EMOptionAuger_; }
+  bool EMOptionPIXE() const { return EMOptionPIXE_; }
+
+  void setElectronRangeParameters(double ratio, double finalRange)
+  {
+    electronRangeRatio_ = ratio;
+    electronFinalRange_ = finalRange;
+  }
+  double ElectronRangeRatio() const { return electronRangeRatio_; }
+  double ElectronFinalRange() const { return electronFinalRange_; }
 
   void setHadronPhysicsModel(HadronModel v) { hadronModel_ = v; }
   HadronModel getHadronPhysicsModel() const { return hadronModel_; }
@@ -49,6 +67,11 @@ public:
 
 private:
   EMModel EMModel_ = EMModel::Livermore;
+  bool EMOptionFluo_ = true;
+  bool EMOptionAuger_ = false;
+  bool EMOptionPIXE_ = false;
+  double electronRangeRatio_;
+  double electronFinalRange_;
   HadronModel hadronModel_ = HadronModel::BIC;
   bool hadronHP_ = false;
   bool RDEnabled_ = false;

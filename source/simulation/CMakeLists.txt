@@ -38,7 +38,8 @@ set(CS_SIMULATION_CLASSES_BASIC
   src/SampleOpticalDepth.cc
   src/ScatteringPickUpData.cc
   # physics list
-  src/AHG4EmLivermorePhysics.cc
+  src/CustomizedEmLivermorePhysics.cc
+  src/CustomizedEmLivermorePolarizedPhysics.cc
   src/CSPhysicsList.cc
   src/PhysicsListManager.cc
   # others

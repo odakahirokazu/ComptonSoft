@@ -38,7 +38,8 @@
 #include "G4IonPhysics.hh"
 #include "G4RadioactiveDecayPhysics.hh"
 
-#include "AHG4EmLivermorePhysics.hh"
+#include "CustomizedEmLivermorePhysics.hh"
+#include "CustomizedEmLivermorePolarizedPhysics.hh"
 
 #include "G4ParallelWorldProcess.hh"
 #include "G4RunManager.hh"
@@ -53,6 +54,11 @@
 namespace comptonsoft
 {
 
+CSPhysicsOption::CSPhysicsOption()
+  : electronRangeRatio_(0.2), electronFinalRange_(100.0*anlgeant4::unit::um)
+{
+}
+
 CSPhysicsList::CSPhysicsList(CSPhysicsOption option)
 {
   SetVerboseLevel(1);
@@ -65,11 +71,22 @@ CSPhysicsList::CSPhysicsList(CSPhysicsOption option)
   else if (modelEM == CSPhysicsOption::EMModel::LivermorePolarized) {
     this->RegisterPhysics( new G4EmLivermorePolarizedPhysics );
   }
-  else if (modelEM == CSPhysicsOption::EMModel::LivermoreCustomized) {
-    AHG4EmLivermorePhysics* physicsEM = new AHG4EmLivermorePhysics;
-    physicsEM->SetElectronFinalRange(0.001*CLHEP::mm);
-    physicsEM->ActivateAuger(true);
-    physicsEM->ActivatePIXE(true);
+  else if (modelEM == CSPhysicsOption::EMModel::CustomizedLivermore) {
+    CustomizedEmLivermorePhysics* physicsEM = new CustomizedEmLivermorePhysics;
+    physicsEM->setEMOptions(option.EMOptionFluo(),
+                            option.EMOptionAuger(),
+                            option.EMOptionPIXE());
+    physicsEM->setElectronRangeParameters(option.ElectronRangeRatio(),
+                                          option.ElectronFinalRange());
+    this->RegisterPhysics(physicsEM);
+  }
+  else if (modelEM == CSPhysicsOption::EMModel::CustomizedLivermorePolarized) {
+    CustomizedEmLivermorePolarizedPhysics* physicsEM = new CustomizedEmLivermorePolarizedPhysics;
+    physicsEM->setEMOptions(option.EMOptionFluo(),
+                            option.EMOptionAuger(),
+                            option.EMOptionPIXE());
+    physicsEM->setElectronRangeParameters(option.ElectronRangeRatio(),
+                                          option.ElectronFinalRange());
     this->RegisterPhysics(physicsEM);
   }
   else {

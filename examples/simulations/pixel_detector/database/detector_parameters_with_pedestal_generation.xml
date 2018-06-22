@@ -19,7 +19,7 @@
             <spread_factor cathode="2.0" anode="1.5" />
           </diffusion>
           <timing_resolution trigger="3.0e-7" energy_measurement="1.0e-6" />
-          <pedestal_generation flag="0" />
+          <pedestal_generation flag="1" />
           <channel_properties>
             <disable status="0" />
             <trigger_discrimination center="5.0" sigma="1.0" />

@@ -54,6 +54,11 @@ private:
   std::string m_PhysicsListName;
   bool m_EMPolarization;
   bool m_EMCustomized;
+  bool m_EMOptionFluo;
+  bool m_EMOptionAuger;
+  bool m_EMOptionPIXE;
+  double m_ElectronRangeRatio;
+  double m_ElectronFinalRange;
   bool m_HadronHP;
   std::string m_HadronModel;
   double m_NuclearLifeTimeThreshold;
