@@ -59,6 +59,7 @@ clMod = [
   ANL::SWIGClass.new("HistogramARM"),
   ANL::SWIGClass.new("HistogramARMByPositionMeasurement"),
   ANL::SWIGClass.new("HistogramAzimuthAngle"),
+  ANL::SWIGClass.new("Histogram2DDeltaEnergyWithARM"),
   ANL::SWIGClass.new("ResponseMatrix"),
   ANL::SWIGClass.new("BackProjection"),
   ANL::SWIGClass.new("BackProjectionSky"),

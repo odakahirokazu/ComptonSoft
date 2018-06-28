@@ -52,6 +52,7 @@ class HistogramEnergy2D;
 class HistogramARM;
 class HistogramARMByPositionMeasurement;
 class HistogramAzimuthAngle;
+class Histogram2DDeltaEnergyWithARM;
 class ResponseMatrix;
 class BackProjection;
 class BackProjectionSky;

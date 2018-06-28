@@ -83,6 +83,7 @@ set(CS_MODULES
   src/HistogramARM.cc
   src/HistogramARMByPositionMeasurement.cc
   src/HistogramAzimuthAngle.cc
+  src/Histogram2DDeltaEnergyWithARM.cc
   src/ResponseMatrix.cc
   src/BackProjection.cc
   src/BackProjectionSky.cc

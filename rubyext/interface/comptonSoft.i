@@ -53,6 +53,7 @@
 #include "HistogramARM.hh"
 #include "HistogramARMByPositionMeasurement.hh"
 #include "HistogramAzimuthAngle.hh"
+#include "Histogram2DDeltaEnergyWithARM.hh"
 #include "ResponseMatrix.hh"
 #include "BackProjection.hh"
 #include "BackProjectionSky.hh"
@@ -384,6 +385,7 @@ public:
 
   void define_condition();
   void add_hit_pattern(const std::string& name);
+  void add_hit_pattern_key(const std::string& key);
   void add_evs_key(const std::string& key);
   void add_condition(const std::string& type,
                      double min_value, double max_value);
@@ -547,6 +549,14 @@ class HistogramAzimuthAngle : public VCSModule
 public:
   HistogramAzimuthAngle();
   ~HistogramAzimuthAngle() = default;
+};
+
+
+class Histogram2DDeltaEnergyWithARM : public VCSModule
+{
+public:
+  Histogram2DDeltaEnergyWithARM();
+  ~Histogram2DDeltaEnergyWithARM() = default;
 };
 
 
