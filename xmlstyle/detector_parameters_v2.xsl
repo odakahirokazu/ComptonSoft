@@ -165,7 +165,7 @@
       <tr>
         <th colspan="3"></th>
         <th></th>
-        <th colspan="18">Sensor device simulation</th>
+        <th colspan="20">Sensor device simulation</th>
         <xsl:choose>
           <xsl:when test="$detector_type='2DStrip'">
             <th colspan="8">Channel properties (cathode)</th>
