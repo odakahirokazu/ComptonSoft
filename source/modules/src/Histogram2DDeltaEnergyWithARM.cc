@@ -23,6 +23,7 @@
 #include "EventReconstruction.hh"
 #include "InitialInformation.hh"
 #include "BasicComptonEvent.hh"
+#include "FlagDefinition.hh"
 
 using namespace anlnext;
 
@@ -34,7 +35,7 @@ namespace comptonsoft
 Histogram2DDeltaEnergyWithARM::Histogram2DDeltaEnergyWithARM()
   : eventReconstruction_(nullptr),
     initialInfo_(nullptr),
-    hist_all_(nullptr),
+    hist_all_(nullptr), hist_compton_all_(nullptr),
     numEnergyBins_(128), energy0_(-64.0), energy1_(+64.0),
     numARMBins_(72), arm0_(-180.0), arm1_(+180.0)
 {
@@ -63,11 +64,15 @@ ANLStatus Histogram2DDeltaEnergyWithARM::mod_initialize()
   hist_all_ = new TH2D("de_arm_all","ARM:DeltaEnergy (All)",
                        numEnergyBins_, energy0_, energy1_,
                        numARMBins_, arm0_, arm1_);
+  hist_compton_all_ = new TH2D("de_arm_compton_all","ARM:DeltaEnergy (All, Compton)",
+                               numEnergyBins_, energy0_, energy1_,
+                               numARMBins_, arm0_, arm1_);
 
   const std::vector<HitPattern>& hitPatterns
     = getDetectorManager()->getHitPatterns();
   const std::size_t numHitPatterns = hitPatterns.size();
   hist_vec_.resize(numHitPatterns);
+  hist_compton_vec_.resize(numHitPatterns);
   for (std::size_t i=0; i<numHitPatterns; i++) {
     std::string histName = "de_arm_";
     std::string histTitle = "ARM:DeltaEnergy (";
@@ -77,6 +82,14 @@ ANLStatus Histogram2DDeltaEnergyWithARM::mod_initialize()
     hist_vec_[i] = new TH2D(histName.c_str(), histTitle.c_str(),
                             numEnergyBins_, energy0_, energy1_,
                             numARMBins_, arm0_, arm1_);
+    histName = "de_arm_compton_";
+    histTitle = "ARM:DeltaEnergy (";
+    histName += hitPatterns[i].ShortName();
+    histTitle += hitPatterns[i].Name();
+    histTitle += ", Compton)";
+    hist_compton_vec_[i] = new TH2D(histName.c_str(), histTitle.c_str(),
+                                    numEnergyBins_, energy0_, energy1_,
+                                    numARMBins_, arm0_, arm1_);
   }
 
   return AS_OK;
@@ -89,15 +102,30 @@ ANLStatus Histogram2DDeltaEnergyWithARM::mod_analyze()
   }
   
   const BasicComptonEvent& event = eventReconstruction_->getComptonEvent();
+  const double cosThetaE = event.CosThetaE();
+  if (cosThetaE < -1.0 || +1.0 < cosThetaE) {
+    return AS_OK;
+  }
+
   const double energy = event.TotalEnergy() / unit::keV;
   const double ini_energy = initialInfo_->InitialEnergy() / unit::keV;
   const double de = energy - ini_energy;
   const double arm = event.DeltaTheta() / unit::degree;
+  const unsigned int hit1Process = event.Hit1Process();
 
   hist_all_->Fill(de, arm);
   for (std::size_t i=0; i<hist_vec_.size(); i++) {
     if (eventReconstruction_->HitPatternFlag(i)) {
       hist_vec_[i]->Fill(de, arm);
+    }
+  }
+
+  if (hit1Process==process::ComptonScattering) {
+    hist_compton_all_->Fill(de, arm);
+    for (std::size_t i=0; i<hist_vec_.size(); i++) {
+      if (eventReconstruction_->HitPatternFlag(i)) {
+        hist_compton_vec_[i]->Fill(de, arm);
+      }
     }
   }
 

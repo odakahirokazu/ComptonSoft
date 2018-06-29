@@ -49,6 +49,8 @@ private:
 
   TH2* hist_all_;
   std::vector<TH2*> hist_vec_;
+  TH2* hist_compton_all_;
+  std::vector<TH2*> hist_compton_vec_;
 
   int numEnergyBins_;
   double energy0_;
