@@ -47,9 +47,9 @@ ANLStatus PrimaryGenUniformSourceInVolume::mod_define()
 ANLStatus PrimaryGenUniformSourceInVolume::mod_initialize()
 {
   PointSourcePrimaryGen::mod_initialize();
-  unregister_parameter("source_position");
+  unregister_parameter("position");
   if (m_TargetMode) {
-    hide_parameter("center_direction");
+    hide_parameter("direction");
   }
   else {
     hide_parameter("target_position");
