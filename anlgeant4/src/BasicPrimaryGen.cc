@@ -172,7 +172,11 @@ void BasicPrimaryGen::confirmPrimarySetting()
   number_++;
   totalEnergy_ += energy_;
   primaryGenerator_->Set(time_, position_, energy_, direction_, polarization_);
+  storeInitialCondition();
+}
 
+void BasicPrimaryGen::storeInitialCondition()
+{
   setInitialEnergy(energy_);
   setInitialDirection(direction_);
   setInitialTime(time_);

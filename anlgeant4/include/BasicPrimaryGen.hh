@@ -69,6 +69,7 @@ public:
   
   virtual void makePrimarySetting() = 0;
   virtual void confirmPrimarySetting();
+  void storeInitialCondition();
 
 protected:
   void setPrimary(double time0,
