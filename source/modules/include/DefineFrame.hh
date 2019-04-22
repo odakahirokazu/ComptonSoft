@@ -17,28 +17,52 @@
  *                                                                       *
  *************************************************************************/
 
-#ifndef COMPTONSOFT_ReadEventTreeAsDetectorHits_H
-#define COMPTONSOFT_ReadEventTreeAsDetectorHits_H 1
+#ifndef COMPTONSOFT_DefineFrame_H
+#define COMPTONSOFT_DefineFrame_H 1
 
-#include "ReadEventTreeAsRawHits.hh"
+#include "VCSModule.hh"
+#include <list>
+#include "AstroUnits.hh"
+
+namespace anlgeant4 {
+class InitialInformation;
+}
 
 namespace comptonsoft {
 
+class CSHitCollection;
+
 /**
- * @author Hitokazu Odaka
- * @date 2015-11-14
+ * @author Hirokazu Odaka
+ * @date 2019-04-02
  */
-class ReadEventTreeAsDetectorHits : public ReadEventTreeAsRawHits
+class DefineFrame : public VCSModule
 {
-  DEFINE_ANL_MODULE(ReadEventTreeAsDetectorHits, 2.1);
+  DEFINE_ANL_MODULE(DefineFrame, 1.0);
 public:
-  ReadEventTreeAsDetectorHits() = default;
-  ~ReadEventTreeAsDetectorHits() = default;
-  
-protected:
-  void insertHit(const DetectorHit_sptr& hit) override;
+  DefineFrame();
+  ~DefineFrame();
+
+  anlnext::ANLStatus mod_define() override;
+  anlnext::ANLStatus mod_initialize() override;
+  anlnext::ANLStatus mod_begin_run() override;
+  anlnext::ANLStatus mod_analyze() override;
+
+private:
+  void sampleEventTimes();
+
+private:
+  double m_Time0 = 0.0;
+  double m_FrameExposure = 1.0*anlgeant4::unit::s;
+
+  anlgeant4::InitialInformation* m_InitialInfo = nullptr;
+  CSHitCollection* m_HitCollection = nullptr;
+
+  int m_CurrentFrameID = 0;
+  int m_CurrentEventID = 0;
+  int m_EventIndexInThisFrame = 0;
 };
 
 } /* namespace comptonsoft */
 
-#endif /* COMPTONSOFT_ReadEventTreeAsDetectorHits_H */
+#endif /* COMPTONSOFT_DefineFrame_H */

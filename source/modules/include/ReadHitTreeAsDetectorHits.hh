@@ -30,7 +30,7 @@ namespace comptonsoft {
  */
 class ReadHitTreeAsDetectorHits : public ReadHitTreeAsRawHits
 {
-  DEFINE_ANL_MODULE(ReadHitTreeAsDetectorHits, 2.0);
+  DEFINE_ANL_MODULE(ReadHitTreeAsDetectorHits, 2.1);
 public:
   ReadHitTreeAsDetectorHits() = default;
   ~ReadHitTreeAsDetectorHits() = default;

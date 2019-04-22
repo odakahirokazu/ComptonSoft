@@ -38,16 +38,18 @@ class EventTreeIOWithInitialInfo;
 /**
  * @author Hitokazu Odaka
  * @date 2015-11-14
+ * @date 2019-04-22 | initialization in mod_begin_run()
  */
 class ReadEventTree : public VCSModule, public anlgeant4::InitialInformation
 {
-  DEFINE_ANL_MODULE(ReadEventTree, 2.0);
+  DEFINE_ANL_MODULE(ReadEventTree, 2.1);
 public:
   ReadEventTree();
   ~ReadEventTree();
   
   anlnext::ANLStatus mod_define() override;
   anlnext::ANLStatus mod_initialize() override;
+  anlnext::ANLStatus mod_begin_run() override;
   anlnext::ANLStatus mod_analyze() override;
 
 protected:

@@ -74,6 +74,17 @@ ANLStatus ReadHitTree::mod_initialize()
   return AS_OK;
 }
 
+ANLStatus ReadHitTree::mod_begin_run()
+{
+  if (numEntries_ == 0) { return AS_OK; }
+  
+  hittree_->GetEntry(0);
+  const int64_t EventID = treeIO_->getEventID();
+  setEventID(EventID);
+
+  return AS_OK;
+}
+
 ANLStatus ReadHitTree::mod_analyze()
 {
   if (entryIndex_ == numEntries_) {
@@ -108,6 +119,9 @@ ANLStatus ReadHitTree::mod_analyze()
       DetectorHit_sptr hit = treeIO_->retrieveHit();
       insertHit(hit);
       entryIndex_++;
+      if (entryIndex_ == numEntries_) {
+        return AS_OK;
+      }
       hittree_->GetEntry(entryIndex_);
     } while (treeIO_->getEventID() == EventID);
   }

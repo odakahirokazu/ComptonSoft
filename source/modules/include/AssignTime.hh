@@ -17,28 +17,44 @@
  *                                                                       *
  *************************************************************************/
 
-#ifndef COMPTONSOFT_ReadEventTreeAsDetectorHits_H
-#define COMPTONSOFT_ReadEventTreeAsDetectorHits_H 1
+#ifndef COMPTONSOFT_AssignTime_H
+#define COMPTONSOFT_AssignTime_H 1
 
-#include "ReadEventTreeAsRawHits.hh"
+#include "VCSModule.hh"
+#include <list>
 
 namespace comptonsoft {
 
+class CSHitCollection;
+
 /**
- * @author Hitokazu Odaka
- * @date 2015-11-14
+ * @author Hirokazu Odaka
+ * @date 2019-01-30
  */
-class ReadEventTreeAsDetectorHits : public ReadEventTreeAsRawHits
+class AssignTime : public VCSModule
 {
-  DEFINE_ANL_MODULE(ReadEventTreeAsDetectorHits, 2.1);
+  DEFINE_ANL_MODULE(AssignTime, 1.0);
 public:
-  ReadEventTreeAsDetectorHits() = default;
-  ~ReadEventTreeAsDetectorHits() = default;
-  
-protected:
-  void insertHit(const DetectorHit_sptr& hit) override;
+  AssignTime();
+  ~AssignTime();
+
+  anlnext::ANLStatus mod_define() override;
+  anlnext::ANLStatus mod_initialize() override;
+  anlnext::ANLStatus mod_analyze() override;
+
+private:
+  void sampleEventTimes();
+
+private:
+  int m_NumEvents = 1;
+  double m_Time0 = 0.0;
+  double m_Time1 = 0.0;
+  int m_Seed = -1;
+
+  CSHitCollection* m_HitCollection = nullptr;
+  std::list<double> m_TimeList;
 };
 
 } /* namespace comptonsoft */
 
-#endif /* COMPTONSOFT_ReadEventTreeAsDetectorHits_H */
+#endif /* COMPTONSOFT_AssignTime_H */

@@ -30,7 +30,7 @@ namespace comptonsoft {
  */
 class ReadEventTreeAsRawHits : public ReadEventTree
 {
-  DEFINE_ANL_MODULE(ReadEventTreeAsRawHits, 2.0);
+  DEFINE_ANL_MODULE(ReadEventTreeAsRawHits, 2.1);
 public:
   ReadEventTreeAsRawHits();
   ~ReadEventTreeAsRawHits() = default;

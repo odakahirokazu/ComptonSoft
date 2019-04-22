@@ -59,6 +59,9 @@
 #include "BackProjectionSky.hh"
 #include "EfficiencyMapSky.hh"
 #include "QuickAnalysisForDSD.hh"
+#include "AssignTime.hh"
+#include "DefineFrame.hh"
+#include "MakeFrame.hh"
 #ifdef USE_SIMX
 #include "AHRayTracingPrimaryGen.hh"
 #endif
@@ -597,6 +600,30 @@ class QuickAnalysisForDSD : public VCSModule
 public:
   QuickAnalysisForDSD();
   ~QuickAnalysisForDSD();
+};
+
+
+class AssignTime : public VCSModule
+{
+public:
+  AssignTime();
+  ~AssignTime();
+};
+
+
+class DefineFrame : public VCSModule
+{
+public:
+  DefineFrame();
+  ~DefineFrame();
+};
+
+
+class MakeFrame : public VCSModule
+{
+public:
+  MakeFrame();
+  ~MakeFrame();
 };
 
 

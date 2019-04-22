@@ -71,6 +71,17 @@ ANLStatus ReadEventTree::mod_initialize()
   return AS_OK;
 }
 
+ANLStatus ReadEventTree::mod_begin_run()
+{
+  if (numEntries_ == 0) { return AS_OK; }
+  
+  tree_->GetEntry(0);
+  const int64_t EventID = treeIO_->getEventID();
+  setEventID(EventID);
+
+  return AS_OK;
+}
+
 ANLStatus ReadEventTree::mod_analyze()
 {
   if (entryIndex_ == numEntries_) {

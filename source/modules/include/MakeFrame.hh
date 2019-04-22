@@ -17,28 +17,43 @@
  *                                                                       *
  *************************************************************************/
 
-#ifndef COMPTONSOFT_ReadEventTreeAsDetectorHits_H
-#define COMPTONSOFT_ReadEventTreeAsDetectorHits_H 1
+#ifndef COMPTONSOFT_MakeFrame_H
+#define COMPTONSOFT_MakeFrame_H 1
 
-#include "ReadEventTreeAsRawHits.hh"
+#include "VCSModule.hh"
+#include <vector>
 
 namespace comptonsoft {
 
+class CSHitCollection;
+
 /**
- * @author Hitokazu Odaka
- * @date 2015-11-14
+ * @author Tsubasa Tamba, Hirokazu Odaka
+ * @date 2019-04-16 | created by T. Tamba
+ * @date 2019-04-19 | cleanup by H. Odaka
  */
-class ReadEventTreeAsDetectorHits : public ReadEventTreeAsRawHits
+class MakeFrame : public VCSModule
 {
-  DEFINE_ANL_MODULE(ReadEventTreeAsDetectorHits, 2.1);
+  DEFINE_ANL_MODULE(MakeFrame, 1.0);
 public:
-  ReadEventTreeAsDetectorHits() = default;
-  ~ReadEventTreeAsDetectorHits() = default;
-  
-protected:
-  void insertHit(const DetectorHit_sptr& hit) override;
+  MakeFrame();
+  ~MakeFrame();
+
+  anlnext::ANLStatus mod_define() override;
+  anlnext::ANLStatus mod_initialize() override;
+  anlnext::ANLStatus mod_analyze() override;
+
+private:
+  std::string m_FileNameBase;
+  int m_NumPixelX = 1;
+  int m_NumPixelY = 1;
+
+  CSHitCollection* m_HitCollection = nullptr;
+  long m_NumPixelsArray[2] = {1, 1};
+  long m_NumPixels = 1;
+  std::vector<double> m_EnergyArray;
 };
 
 } /* namespace comptonsoft */
 
-#endif /* COMPTONSOFT_ReadEventTreeAsDetectorHits_H */
+#endif /* COMPTONSOFT_MakeFrame_H */

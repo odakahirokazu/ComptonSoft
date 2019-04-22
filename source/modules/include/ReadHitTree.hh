@@ -38,16 +38,18 @@ class HitTreeIOWithInitialInfo;
 /**
  * @author Hitokazu Odaka
  * @date 2014-11-30
+ * @date 2019-04-22 | initialization in mod_begin_run()
  */
 class ReadHitTree : public VCSModule, public anlgeant4::InitialInformation
 {
-  DEFINE_ANL_MODULE(ReadHitTree, 2.0);
+  DEFINE_ANL_MODULE(ReadHitTree, 2.1);
 public:
   ReadHitTree();
   ~ReadHitTree();
   
   anlnext::ANLStatus mod_define() override;
   anlnext::ANLStatus mod_initialize() override;
+  anlnext::ANLStatus mod_begin_run() override;
   anlnext::ANLStatus mod_analyze() override;
 
 protected:

@@ -10,6 +10,7 @@ include_directories(
   ${ROOT_INC_DIR}
   ${G4_INC_DIR}
   ${CLHEP_INC_DIR}
+  ${CFITSIO_INC_DIR}
   ${SIMX_INC_DIR}
   ${ADD_INC_DIR}
   ${QT_INC_DIR}
@@ -44,6 +45,9 @@ set(CS_MODULES
   src/EventSelection.cc
   src/EventReconstruction.cc
   src/HXIEventSelection.cc
+  src/AssignTime.cc
+  src/DefineFrame.cc
+  src/MakeFrame.cc
   ### IO
   src/CreateRootFile.cc
   src/SaveData.cc
@@ -98,7 +102,7 @@ add_library(CSModules SHARED
 
 target_link_libraries(CSModules
   CSCore ${ANLG4_LIB} ${ANLNEXT_LIB}
-  ${ROOT_LIB} ${G4_LIB} ${CLHEP_LIB} ${SIMX_LIB} ${ADD_LIB})
+  ${ROOT_LIB} ${G4_LIB} ${CLHEP_LIB} ${CFITSIO_LIB} ${SIMX_LIB} ${ADD_LIB})
 
 install(TARGETS CSModules LIBRARY DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
 

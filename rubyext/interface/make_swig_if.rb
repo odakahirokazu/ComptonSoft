@@ -65,6 +65,9 @@ clMod = [
   ANL::SWIGClass.new("BackProjectionSky"),
   ANL::SWIGClass.new("EfficiencyMapSky"),
   ANL::SWIGClass.new("QuickAnalysisForDSD"),
+  ANL::SWIGClass.new("AssignTime"),
+  ANL::SWIGClass.new("DefineFrame"),
+  ANL::SWIGClass.new("MakeFrame"),
 ]
 
 clSim = [# primary generator
