@@ -47,7 +47,6 @@ set(CS_MODULES
   src/HXIEventSelection.cc
   src/AssignTime.cc
   src/DefineFrame.cc
-  src/MakeFrame.cc
   ### IO
   src/CreateRootFile.cc
   src/SaveData.cc
@@ -96,8 +95,15 @@ set(CS_MODULES
   src/QuickAnalysisForDSD.cc
   )
 
+if(CS_USE_FITSIO)
+  set(CS_FITSIO_MODULES
+    src/MakeFrame.cc
+    )
+endif()
+
 add_library(CSModules SHARED
   ${CS_MODULES}
+  ${CS_FITSIO_MODULES}
   )
 
 target_link_libraries(CSModules
