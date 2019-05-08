@@ -52,6 +52,7 @@ private:
   long m_NumPixelsArray[2] = {1, 1};
   long m_NumPixels = 1;
   std::vector<double> m_EnergyArray;
+  std::vector<long> m_CountArray;
 };
 
 } /* namespace comptonsoft */

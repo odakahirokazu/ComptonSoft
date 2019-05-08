@@ -28,7 +28,7 @@ class AssignEventTime < ANL::ANLApp
 end
 
 a = AssignEventTime.new
-a.inputs = ["simulation.root"]
-a.output = "simulation_time.root"
-a.set_time_info(1000, 1000.0, 1020.0)
+a.inputs = ["HitomiCCD_Gaussian_Crab.root"]
+a.output = "HitomiCCD_Gaussian_Crab_time.root"
+a.set_time_info(1050, 1000.0, 1020.0)
 a.run(:all, 1000)

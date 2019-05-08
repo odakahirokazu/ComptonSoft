@@ -70,6 +70,7 @@ ANLStatus MakeFrame::mod_initialize()
   m_NumPixelsArray[1] = m_NumPixelY;
   m_NumPixels = m_NumPixelX * m_NumPixelY;
   m_EnergyArray.resize(m_NumPixels, 0.0);
+  m_CountArray.resize(m_NumPixels, 0);
 
   return AS_OK;
 }
@@ -77,6 +78,7 @@ ANLStatus MakeFrame::mod_initialize()
 ANLStatus MakeFrame::mod_analyze()
 {
   m_EnergyArray.assign(m_NumPixels, 0.0);
+  m_CountArray.assign(m_NumPixels, 0);
 
   const std::vector<DetectorHit_sptr>& firstHits = m_HitCollection->getHits(0);
   if (firstHits.size() == 0) { return AS_OK; }
@@ -99,6 +101,12 @@ ANLStatus MakeFrame::mod_analyze()
     return AS_ERROR;
   }
 
+  cfitsio::fits_create_img(fitsFile, LONG_IMG, 2, m_NumPixelsArray, &fitsStatus);
+  if (fitsStatus) {
+    cfitsio::fits_report_error(stderr, fitsStatus);
+    return AS_ERROR;
+  }
+
   const int NumTimeGroups = m_HitCollection->NumberOfTimeGroups();
   for (int timeGroup=0; timeGroup<NumTimeGroups; timeGroup++) {
     const std::vector<DetectorHit_sptr>& hits = m_HitCollection->getHits(timeGroup);
@@ -108,12 +116,13 @@ ANLStatus MakeFrame::mod_analyze()
         return AS_ERROR;
       }
       const int pixelIndex = hit->PixelY() * m_NumPixelsArray[0] + hit->PixelX();
-      m_EnergyArray[pixelIndex] += hit->Energy();
+      m_EnergyArray[pixelIndex] += hit->EPI()/unit::keV;
+      m_CountArray[pixelIndex] += 1;
 
 #if 0 // DEBUG
       std::cout << "Pixel index: " << pixelIndex << std::endl;
       std::cout << "a[]: " << m_EnergyArray[pixelIndex] << std::endl;
-      const double a = hit -> Energy();
+      const double a = hit -> EPI();
       const double b = hit -> PositionX();
       const vector3_t c = hit-> Position();
       const int d = hit -> PixelX();
@@ -132,10 +141,26 @@ ANLStatus MakeFrame::mod_analyze()
   }
   
   long StartPixel[2] = {1, 1};
+
+  cfitsio::fits_movabs_hdu(fitsFile, 1, IMAGE_HDU, &fitsStatus);
+  if(fitsStatus){
+    cfitsio::fits_report_error(stderr, fitsStatus);
+  }
+
   cfitsio::fits_write_pix(fitsFile, TDOUBLE, StartPixel, m_NumPixels, &m_EnergyArray[0], &fitsStatus);
   if (fitsStatus) {
     cfitsio::fits_report_error(stderr, fitsStatus);
     return AS_ERROR;
+  }
+
+  cfitsio::fits_movabs_hdu(fitsFile, 2, IMAGE_HDU, &fitsStatus);
+  if (fitsStatus){
+    cfitsio::fits_report_error(stderr, fitsStatus);
+  }
+
+  cfitsio::fits_write_pix(fitsFile, TLONG, StartPixel, m_NumPixels, &m_CountArray[0], &fitsStatus);
+  if (fitsStatus) {
+    cfitsio::fits_report_error(stderr, fitsStatus);
   }
   
   cfitsio::fits_close_file(fitsFile, &fitsStatus);

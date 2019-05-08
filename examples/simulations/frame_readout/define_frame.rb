@@ -22,8 +22,8 @@ class MyApp < ANL::ANLApp
 end
 
 a = MyApp.new
-a.inputs = ["simulation_time.root"]
-a.output = "simulation_frame.root"
+a.inputs = ["HitomiCCD_Gaussian_Crab_time.root"]
+a.output = "HitomiCCD_Gaussian_Crab_frame.root"
 a.time_start = 1000.0
 a.frame_exposure = 4.0
 a.run(:all, 1000)

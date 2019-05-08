@@ -1,7 +1,7 @@
 Compton Soft
 ================================================================
 
-- Version: 5.3.6
+- Version: 5.3.7
 - Author: Hirokazu Odaka
 
 ----
@@ -96,6 +96,7 @@ Information
 - Shin'ichiro Takeda
 - Tamotsu Sato
 - Yuto Ichinohe
+- Tsubasa Tamba
 
 ### GitHub
 
