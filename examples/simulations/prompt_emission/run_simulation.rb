@@ -11,7 +11,7 @@ def run_simulation(num, random, output)
   sim.set_gdml "database/mass_model.gdml"
   sim.set_primary_generator :GaussianBeamPrimaryGen, {
     particle: "proton",
-    spectral_distribution: "mono",
+    spectral_distribution: "gaussian",
     energy_mean: energy,
     energy_sigma: energy*0.01,
     position: vec(0.0, 0.0, 10.0),

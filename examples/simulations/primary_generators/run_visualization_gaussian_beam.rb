@@ -12,7 +12,6 @@ def run_simulation(num)
     particle: "gamma",
     spectral_distribution: "mono",
     energy_mean: energy,
-    energy_sigma: 0.0,
     position: vec(0.0, 0.0, 10.0),
     direction: vec(0.0, 0.0, -1.0),
     radial_sigma: 0.5,

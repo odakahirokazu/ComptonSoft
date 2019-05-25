@@ -10,9 +10,9 @@ def run_simulation(num)
   sim.set_gdml "database/mass_model.gdml"
   sim.set_primary_generator :PointSourcePrimaryGen, {
     particle: "gamma",
-    spectral_distribution: "mono",
+    spectral_distribution: "gaussian",
     energy_mean: energy,
-    energy_sigma: 0.0,
+    energy_sigma: energy*0.01,
     position: vec(0.0, 0.0, 5.0),
     direction: vec(0.0, 0.0, -1.0),
     theta_min: 0.0,

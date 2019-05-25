@@ -10,7 +10,6 @@ def run_simulation(num)
     particle: "gamma",
     spectral_distribution: "mono",
     energy_mean: 122.1,
-    energy_sigma: 0.0,
     volume_hierarchy: ["CdTeDetector"]
   }
 
