@@ -2312,7 +2312,7 @@
   </module>
   <module>
     <name>ComptonEventFilter</name>
-    <version>4.1</version>
+    <version>4.2</version>
     <text></text>
     <parameters/>
   </module>
@@ -2422,7 +2422,7 @@
   </module>
   <module>
     <name>ReadHitTree</name>
-    <version>2.0</version>
+    <version>2.1</version>
     <text></text>
     <parameters>
       <param container_type=''>
@@ -2443,7 +2443,7 @@
   </module>
   <module>
     <name>ReadHitTreeAsRawHits</name>
-    <version>2.0</version>
+    <version>2.1</version>
     <text></text>
     <parameters>
       <param container_type=''>
@@ -2464,7 +2464,7 @@
   </module>
   <module>
     <name>ReadHitTreeAsDetectorHits</name>
-    <version>2.0</version>
+    <version>2.1</version>
     <text></text>
     <parameters>
       <param container_type=''>
@@ -2491,7 +2491,7 @@
   </module>
   <module>
     <name>ReadEventTree</name>
-    <version>2.0</version>
+    <version>2.1</version>
     <text></text>
     <parameters>
       <param container_type=''>
@@ -2505,7 +2505,7 @@
   </module>
   <module>
     <name>ReadEventTreeAsRawHits</name>
-    <version>2.0</version>
+    <version>2.1</version>
     <text></text>
     <parameters>
       <param container_type=''>
@@ -2519,7 +2519,7 @@
   </module>
   <module>
     <name>ReadEventTreeAsDetectorHits</name>
-    <version>2.0</version>
+    <version>2.1</version>
     <text></text>
     <parameters>
       <param container_type=''>
@@ -2763,7 +2763,7 @@
   </module>
   <module>
     <name>HistogramAzimuthAngle</name>
-    <version>2.2</version>
+    <version>2.3</version>
     <text></text>
     <parameters>
       <param container_type=''>
@@ -2791,6 +2791,13 @@
         <name>phi_origin</name>
         <type>double</type>
         <unit>degree</unit>
+        <default_value>0</default_value>
+        <description></description>
+      </param>
+      <param container_type=''>
+        <name>sky</name>
+        <type>bool</type>
+        <unit></unit>
         <default_value>0</default_value>
         <description></description>
       </param>
@@ -3065,6 +3072,79 @@
         <type>double</type>
         <unit>keV</unit>
         <default_value>204.8</default_value>
+        <description></description>
+      </param>
+    </parameters>
+  </module>
+  <module>
+    <name>AHRayTracingPrimaryGen</name>
+    <version>4.1</version>
+    <text></text>
+    <parameters>
+      <param container_type=''>
+        <name>spectral_distribution</name>
+        <type>string</type>
+        <unit></unit>
+        <default_value>power law</default_value>
+        <description></description>
+      </param>
+      <param container_type=''>
+        <name>energy_mean</name>
+        <type>double</type>
+        <unit>keV</unit>
+        <default_value>511</default_value>
+        <description>Mean energy of the Gaussian distribution</description>
+      </param>
+      <param container_type=''>
+        <name>energy_sigma</name>
+        <type>double</type>
+        <unit>keV</unit>
+        <default_value>0</default_value>
+        <description>Standard deviation of the Gaussian distribution</description>
+      </param>
+      <param container_type=''>
+        <name>radiation_temperature</name>
+        <type>double</type>
+        <unit>keV</unit>
+        <default_value>10</default_value>
+        <description>Radiation temperature in units of keV</description>
+      </param>
+      <param container_type=''>
+        <name>energy_array</name>
+        <type>vector&lt;double&gt;</type>
+        <unit>keV</unit>
+        <default_value></default_value>
+        <description>Energy array of spectral histogram</description>
+      </param>
+      <param container_type=''>
+        <name>photons_array</name>
+        <type>vector&lt;double&gt;</type>
+        <unit></unit>
+        <default_value></default_value>
+        <description>Photons array of spectral histogram</description>
+      </param>
+      <param container_type=''>
+        <name>polarization_mode</name>
+        <type>int</type>
+        <unit></unit>
+        <default_value>-1</default_value>
+        <description>
+          Polarization mode. -1: polarization disable, 0: unpolarized, 1:
+          linearly polarized (100%), 2: partially linearly polarized
+        </description>
+      </param>
+      <param container_type=''>
+        <name>filename</name>
+        <type>string</type>
+        <unit></unit>
+        <default_value>raytracing.fits</default_value>
+        <description></description>
+      </param>
+      <param container_type=''>
+        <name>position_offset</name>
+        <type>3-vector</type>
+        <unit>mm</unit>
+        <default_value>0 0 0</default_value>
         <description></description>
       </param>
     </parameters>
@@ -3365,6 +3445,41 @@
         <description></description>
       </param>
       <param container_type=''>
+        <name>em_option_fluo</name>
+        <type>bool</type>
+        <unit></unit>
+        <default_value>1</default_value>
+        <description></description>
+      </param>
+      <param container_type=''>
+        <name>em_option_auger</name>
+        <type>bool</type>
+        <unit></unit>
+        <default_value>0</default_value>
+        <description></description>
+      </param>
+      <param container_type=''>
+        <name>em_option_pixe</name>
+        <type>bool</type>
+        <unit></unit>
+        <default_value>0</default_value>
+        <description></description>
+      </param>
+      <param container_type=''>
+        <name>electron_range_ratio</name>
+        <type>double</type>
+        <unit></unit>
+        <default_value>0.2</default_value>
+        <description></description>
+      </param>
+      <param container_type=''>
+        <name>electron_final_range</name>
+        <type>double</type>
+        <unit>cm</unit>
+        <default_value>0.01</default_value>
+        <description></description>
+      </param>
+      <param container_type=''>
         <name>hadron_hp</name>
         <type>bool</type>
         <unit></unit>
@@ -3611,7 +3726,7 @@
   </module>
   <module>
     <name>ReadHXIEventFITS</name>
-    <version>0.0</version>
+    <version>1.0</version>
     <text></text>
     <parameters>
       <param container_type=''>

@@ -45,8 +45,15 @@ set(CS_MODULES
   src/EventSelection.cc
   src/EventReconstruction.cc
   src/HXIEventSelection.cc
+  ### Frame data processes
   src/AssignTime.cc
   src/DefineFrame.cc
+  src/ConstructFrame.cc
+  src/FillFrame.cc
+  src/LoadFrame.cc
+  src/AnalyzeFrame.cc
+  src/WriteXrayEventTree.cc
+  src/SortEventTreeWithTime.cc
   ### IO
   src/CreateRootFile.cc
   src/SaveData.cc
@@ -97,7 +104,8 @@ set(CS_MODULES
 
 if(CS_USE_FITSIO)
   set(CS_FITSIO_MODULES
-    src/MakeFrame.cc
+    ### Frame data processes
+    src/MakeFrameFITS.cc
     )
 endif()
 

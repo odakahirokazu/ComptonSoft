@@ -17,75 +17,44 @@
  *                                                                       *
  *************************************************************************/
 
-#include "WriteHitTree.hh"
+#include "WriteXrayEventTree.hh"
 #include "TTree.h"
 #include "InitialInformation.hh"
-#include "DetectorHit.hh"
-#include "HitTreeIOWithInitialInfo.hh"
-#include "CSHitCollection.hh"
+#include "XrayEvent.hh"
+#include "XrayEventTreeIO.hh"
+#include "AnalyzeFrame.hh"
 
 using namespace anlnext;
 
 namespace comptonsoft
 {
 
-WriteHitTree::WriteHitTree()
-  : hitCollection_(nullptr),
-    initialInfo_(nullptr),
-    hittree_(nullptr),
-    treeIO_(new HitTreeIOWithInitialInfo)
+WriteXrayEventTree::WriteXrayEventTree()
+  : treeIO_(new XrayEventTreeIO)
 {
 }
 
-ANLStatus WriteHitTree::mod_initialize()
+ANLStatus WriteXrayEventTree::mod_initialize()
 {
   VCSModule::mod_initialize();
 
-  get_module("CSHitCollection", &hitCollection_);
-  define_evs("WriteHitTree:Fill");
+  get_module("AnalyzeFrame", &analyzer_);
+  define_evs("WriteXrayEventTree:Fill");
 
-  if (exist_module("InitialInformation")) {
-    get_module_IF("InitialInformation", &initialInfo_);
-    treeIO_->enableInitialInfoRecord();
-  }
-  else {
-    treeIO_->disableInitialInfoRecord();
-  }
-
-  hittree_ = new TTree("hittree", "hittree");
-  treeIO_->setTree(hittree_);
+  tree_ = new TTree("xetree", "xetree");
+  treeIO_->setTree(tree_);
   treeIO_->defineBranches();
   
   return AS_OK;
 }
 
-ANLStatus WriteHitTree::mod_analyze()
+ANLStatus WriteXrayEventTree::mod_analyze()
 {
-  int64_t eventID = -1;
+  const int n = treeIO_->fillEvents(analyzer_->EventsBegin(), analyzer_->EventsEnd());
+  if (n>0) {
+    set_evs("WriteXrayEventTree:Fill");
+  }
   
-  if (initialInfo_) {
-    eventID = initialInfo_->EventID();
-    treeIO_->setInitialInfo(initialInfo_->InitialEnergy(),
-                            initialInfo_->InitialDirection(),
-                            initialInfo_->InitialTime(),
-                            initialInfo_->InitialPosition(),
-                            initialInfo_->InitialPolarization());
-    treeIO_->setWeight(initialInfo_->Weight());
-  }
-  else {
-    eventID = get_loop_index();
-  }
-
-  const int NumTimeGroups = hitCollection_->NumberOfTimeGroups();
-  for (int timeGroup=0; timeGroup<NumTimeGroups; timeGroup++) {
-    const std::vector<DetectorHit_sptr>& hits
-      = hitCollection_->getHits(timeGroup);
-    if (hits.size() > 0) {
-      treeIO_->fillHits(eventID, hits);
-      set_evs("WriteHitTree:Fill");
-    }
-  }
-
   return AS_OK;
 }
 

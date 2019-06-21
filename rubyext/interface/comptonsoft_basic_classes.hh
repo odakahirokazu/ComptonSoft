@@ -7,3 +7,5 @@
 #include "EventTreeIOWithInitialInfo.hh"
 #include "ComptonEventTreeIOWithInitialInfo.hh"
 #include "ObservationTreeIOWithInitialInfo.hh"
+#include "FrameData.hh"
+#include "XrayEventTreeIO.hh"

@@ -17,57 +17,43 @@
  *                                                                       *
  *************************************************************************/
 
-#ifndef COMPTONSOFT_ReadEventTree_H
-#define COMPTONSOFT_ReadEventTree_H 1
+#ifndef COMPTONSOFT_LoadFrame_H
+#define COMPTONSOFT_LoadFrame_H 1
 
-#include "VCSModule.hh"
-#include "InitialInformation.hh"
-
-#include <vector>
-#include <string>
-#include <cstdint>
-#include "DetectorHit_sptr.hh"
-
-class TChain;
+#include <anlnext/BasicModule.hh>
 
 namespace comptonsoft {
 
-class CSHitCollection;
-class EventTreeIOWithInitialInfo;
+class ConstructFrame;
+
 
 /**
- * @author Hitokazu Odaka
- * @date 2015-11-14
- * @date 2019-04-22 | initialization in mod_begin_run()
+ * LoadFrame
+ *
+ * @author Hirokazu Odaka
+ * @date 2019-05-23
  */
-class ReadEventTree : public VCSModule, public anlgeant4::InitialInformation
+class LoadFrame : public anlnext::BasicModule
 {
-  DEFINE_ANL_MODULE(ReadEventTree, 2.1);
+  DEFINE_ANL_MODULE(LoadFrame, 1.0);
+  // ENABLE_PARALLEL_RUN();
 public:
-  ReadEventTree();
-  ~ReadEventTree();
+  LoadFrame();
   
+protected:
+  LoadFrame(const LoadFrame&);
+
+public:
   anlnext::ANLStatus mod_define() override;
   anlnext::ANLStatus mod_initialize() override;
-  anlnext::ANLStatus mod_begin_run() override;
   anlnext::ANLStatus mod_analyze() override;
 
-  int64_t NumEntries() const { return numEntries_; }
-
-protected:
-  virtual void insertHit(const DetectorHit_sptr& hit);
-  
 private:
-  std::vector<std::string> fileList_;
+  std::vector<std::string> files_;
 
-  TChain* tree_;
-  int64_t numEntries_ = 0;
-  int64_t entryIndex_ = 0;
-
-  CSHitCollection* hitCollection_;
-  std::unique_ptr<EventTreeIOWithInitialInfo> treeIO_;
+  ConstructFrame* frame_owner_ = nullptr;
 };
 
 } /* namespace comptonsoft */
 
-#endif /* COMPTONSOFT_ReadEventTree_H */
+#endif /* COMPTONSOFT_LoadFrame_H */

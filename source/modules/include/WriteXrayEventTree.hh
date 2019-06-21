@@ -17,57 +17,44 @@
  *                                                                       *
  *************************************************************************/
 
-#ifndef COMPTONSOFT_ReadEventTree_H
-#define COMPTONSOFT_ReadEventTree_H 1
+#ifndef COMPTONSOFT_WriteXrayEventTree_H
+#define COMPTONSOFT_WriteXrayEventTree_H 1
 
 #include "VCSModule.hh"
-#include "InitialInformation.hh"
+#include <memory>
 
-#include <vector>
-#include <string>
-#include <cstdint>
-#include "DetectorHit_sptr.hh"
+class TTree;
 
-class TChain;
+namespace anlgeant4 {
+class InitialInformation;
+}
 
 namespace comptonsoft {
 
-class CSHitCollection;
-class EventTreeIOWithInitialInfo;
+class XrayEventTreeIO;
+class AnalyzeFrame;
 
 /**
- * @author Hitokazu Odaka
- * @date 2015-11-14
- * @date 2019-04-22 | initialization in mod_begin_run()
+ * 
+ * @author Hirokazu Odaka
+ * @date 2019-06-05
  */
-class ReadEventTree : public VCSModule, public anlgeant4::InitialInformation
+class WriteXrayEventTree : public VCSModule
 {
-  DEFINE_ANL_MODULE(ReadEventTree, 2.1);
+  DEFINE_ANL_MODULE(WriteXrayEventTree, 0.1);
 public:
-  ReadEventTree();
-  ~ReadEventTree();
+  WriteXrayEventTree();
+  ~WriteXrayEventTree() = default;
   
-  anlnext::ANLStatus mod_define() override;
   anlnext::ANLStatus mod_initialize() override;
-  anlnext::ANLStatus mod_begin_run() override;
   anlnext::ANLStatus mod_analyze() override;
 
-  int64_t NumEntries() const { return numEntries_; }
-
-protected:
-  virtual void insertHit(const DetectorHit_sptr& hit);
-  
 private:
-  std::vector<std::string> fileList_;
-
-  TChain* tree_;
-  int64_t numEntries_ = 0;
-  int64_t entryIndex_ = 0;
-
-  CSHitCollection* hitCollection_;
-  std::unique_ptr<EventTreeIOWithInitialInfo> treeIO_;
+  const AnalyzeFrame* analyzer_ = nullptr;
+  TTree* tree_ = nullptr;
+  std::unique_ptr<XrayEventTreeIO> treeIO_ = nullptr;
 };
 
 } /* namespace comptonsoft */
 
-#endif /* COMPTONSOFT_ReadEventTree_H */
+#endif /* COMPTONSOFT_WriteHitTree_H */

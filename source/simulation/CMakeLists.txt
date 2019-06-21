@@ -51,13 +51,18 @@ set(CS_SIMULATION_CLASSES_BASIC
   src/WriteObservationTree.cc
   )
 
+if(CS_USE_FITSIO)
+  set(CS_SIMULATION_CLASSES_FITSIO
+    src/AHRayTracingPrimaryGen.cc
+    )
+endif()
+
 if(CS_USE_SIMX)
   set(CS_SIMULATION_CLASSES_SIMX
     # basic interface
     src/SimXIF.cc
     # primary generator
     src/SimXPrimaryGen.cc  
-    src/AHRayTracingPrimaryGen.cc
     # pick up data
     src/AHStandardUserActionAssembly.cc
     # other
@@ -68,6 +73,7 @@ endif(CS_USE_SIMX)
 
 add_library(CSSimulation SHARED
   ${CS_SIMULATION_CLASSES_BASIC}
+  ${CS_SIMULATION_CLASSES_FITSIO}
   ${CS_SIMULATION_CLASSES_SIMX}
   )
 

@@ -17,49 +17,69 @@
  *                                                                       *
  *************************************************************************/
 
-#ifndef COMPTONSOFT_AssignTime_H
-#define COMPTONSOFT_AssignTime_H 1
+#include "AnalyzeFrame.hh"
+#include "FrameData.hh"
 
-#include "VCSModule.hh"
-#include <list>
-#include "ReadEventTree.hh"
+using namespace anlnext;
 
 namespace comptonsoft {
 
-class CSHitCollection;
-
-
-/**
- * @author Hirokazu Odaka
- * @date 2019-01-30
- */
-class AssignTime : public VCSModule
+AnalyzeFrame::AnalyzeFrame()
+  : event_size_(5)
 {
-  DEFINE_ANL_MODULE(AssignTime, 1.0);
-public:
-  AssignTime();
-  ~AssignTime();
+  add_alias("AnalyzeFrame");
+}
 
-  anlnext::ANLStatus mod_define() override;
-  anlnext::ANLStatus mod_initialize() override;
-  anlnext::ANLStatus mod_analyze() override;
+ANLStatus AnalyzeFrame::mod_define()
+{
+  define_parameter("pedestal_level", &mod_class::pedestal_level_);
+  define_parameter("event_threshold", &mod_class::event_threshold_);
+  define_parameter("split_threshold", &mod_class::split_threshold_);
+  define_parameter("event_size", &mod_class::event_size_);
+  
+  return AS_OK;
+}
 
-private:
-  void sampleEventTimes();
+ANLStatus AnalyzeFrame::mod_initialize()
+{
+  get_module_NC("ConstructFrame", &frame_owner_);
 
-private:
-  int64_t m_NumEvents = -1;
-  double m_Time0 = 0.0;
-  double m_Time1 = 0.0;
-  int m_Seed = -1;
-  bool m_SortTime = false;
-  double m_CountRate = 0.0;
+  return AS_OK;
+}
 
-  CSHitCollection* m_HitCollection = nullptr;
-  ReadEventTree* m_ReadEventTree = nullptr;
-  std::list<double> m_TimeList;
-};
+ANLStatus AnalyzeFrame::mod_begin_run()
+{
+  FrameData& frame = frame_owner_->getFrame();
+  frame.setThresholds(event_threshold_, split_threshold_);
+  frame.setPedestals(pedestal_level_);
+  frame.setEventSize(event_size_);
+
+  return AS_OK;
+}
+
+ANLStatus AnalyzeFrame::mod_analyze()
+{
+  events_.clear();
+
+  const int frameID = frame_owner_->FrameID();
+  FrameData& frame = frame_owner_->getFrame();
+  frame.stack();
+  frame.subtractPedestals();
+
+  std::vector<comptonsoft::XrayEvent_sptr> es = frame.extractEvents();
+  for (auto& event: es) {
+    event->setFrameID(frameID);
+  }
+  std::move(es.begin(), es.end(), std::back_inserter(events_));
+
+  return AS_OK;
+}
+
+ANLStatus AnalyzeFrame::mod_end_run()
+{
+  FrameData& frame = frame_owner_->getFrame();
+  frame.calculatePedestals();
+  return AS_OK;
+}
 
 } /* namespace comptonsoft */
-
-#endif /* COMPTONSOFT_AssignTime_H */

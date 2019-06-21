@@ -17,57 +17,58 @@
  *                                                                       *
  *************************************************************************/
 
-#ifndef COMPTONSOFT_ReadEventTree_H
-#define COMPTONSOFT_ReadEventTree_H 1
+#ifndef COMPTONSOFT_XrayEventTreeIO_H
+#define COMPTONSOFT_XrayEventTreeIO_H 1
 
-#include "VCSModule.hh"
-#include "InitialInformation.hh"
-
-#include <vector>
-#include <string>
 #include <cstdint>
-#include "DetectorHit_sptr.hh"
+#include <list>
+#include "XrayEvent.hh"
 
-class TChain;
+class TTree;
 
 namespace comptonsoft {
 
-class CSHitCollection;
-class EventTreeIOWithInitialInfo;
 
 /**
- * @author Hitokazu Odaka
- * @date 2015-11-14
- * @date 2019-04-22 | initialization in mod_begin_run()
+ * 
+ * @author Hirokazu Odaka
+ * @date 2019-06-05
  */
-class ReadEventTree : public VCSModule, public anlgeant4::InitialInformation
+class XrayEventTreeIO
 {
-  DEFINE_ANL_MODULE(ReadEventTree, 2.1);
 public:
-  ReadEventTree();
-  ~ReadEventTree();
-  
-  anlnext::ANLStatus mod_define() override;
-  anlnext::ANLStatus mod_initialize() override;
-  anlnext::ANLStatus mod_begin_run() override;
-  anlnext::ANLStatus mod_analyze() override;
+  XrayEventTreeIO();
+  virtual ~XrayEventTreeIO();
 
-  int64_t NumEntries() const { return numEntries_; }
+  virtual void setTree(TTree* tree)
+  { tree_ = tree; }
 
-protected:
-  virtual void insertHit(const DetectorHit_sptr& hit);
+  virtual void defineBranches();
+  virtual void setBranchAddresses();
+
+  int fillEvents(XrayEventCIter events_begin, XrayEventCIter events_end);
+  XrayEvent_sptr retrieveEvent() const;
+  std::list<XrayEvent_sptr> retrieveEvents(int64_t& entry) const;
   
 private:
-  std::vector<std::string> fileList_;
+  TTree* tree_ = nullptr;
 
-  TChain* tree_;
-  int64_t numEntries_ = 0;
-  int64_t entryIndex_ = 0;
-
-  CSHitCollection* hitCollection_;
-  std::unique_ptr<EventTreeIOWithInitialInfo> treeIO_;
+  /*
+   * tree contents
+   */
+  int32_t frameID_ = 0;
+  double time_ = 0.0;
+  int32_t ix_ = 0;
+  int32_t iy_ = 0;
+  double data_[9][9];
+  double value_ = 0.0;
+  double centerPH_ = 0.0;
+  int32_t weight_ = 0;
+  int32_t rank_ = 0;
+  double angle_ = 0.0;
+  int32_t grade_ = 0;
 };
 
 } /* namespace comptonsoft */
 
-#endif /* COMPTONSOFT_ReadEventTree_H */
+#endif /* COMPTONSOFT_XrayEventTreeIO_H */

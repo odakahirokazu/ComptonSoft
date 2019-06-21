@@ -1,6 +1,6 @@
 /*************************************************************************
  *                                                                       *
- * Copyright (c) 2011 Hirokazu Odaka                                     *
+ * Copyright (c) 2019 Hirokazu Odaka, Tsubasa Tamba                      *
  *                                                                       *
  * This program is free software: you can redistribute it and/or modify  *
  * it under the terms of the GNU General Public License as published by  *
@@ -17,57 +17,58 @@
  *                                                                       *
  *************************************************************************/
 
-#ifndef COMPTONSOFT_ReadEventTree_H
-#define COMPTONSOFT_ReadEventTree_H 1
+#ifndef COMPTONSOFT_SXIXrayEvent_H
+#define COMPTONSOFT_SXIXrayEvent_H 1
 
-#include "VCSModule.hh"
-#include "InitialInformation.hh"
-
+#include <list>
+#include <memory>
+#include <boost/multi_array.hpp>
 #include <vector>
-#include <string>
-#include <cstdint>
-#include "DetectorHit_sptr.hh"
 
-class TChain;
+#include "XrayEvent.hh"
 
-namespace comptonsoft {
+namespace comptonsoft
+{
 
-class CSHitCollection;
-class EventTreeIOWithInitialInfo;
+//using image_t = boost::multi_array<double, 2>;
 
 /**
- * @author Hitokazu Odaka
- * @date 2015-11-14
- * @date 2019-04-22 | initialization in mod_begin_run()
+ * A class of an X-ray event measured with an SXI CCD.
+ *
+ * @author Tsubasa Tamba
+ * @date 2019-06-03
  */
-class ReadEventTree : public VCSModule, public anlgeant4::InitialInformation
+class SXIXrayEvent: public XrayEvent
 {
-  DEFINE_ANL_MODULE(ReadEventTree, 2.1);
 public:
-  ReadEventTree();
-  ~ReadEventTree();
-  
-  anlnext::ANLStatus mod_define() override;
-  anlnext::ANLStatus mod_initialize() override;
-  anlnext::ANLStatus mod_begin_run() override;
-  anlnext::ANLStatus mod_analyze() override;
+  explicit SXIXrayEvent(int size);
+  virtual ~SXIXrayEvent();
 
-  int64_t NumEntries() const { return numEntries_; }
+  SXIXrayEvent(const SXIXrayEvent& r) = default;
+  SXIXrayEvent(SXIXrayEvent&& r) = default;
+  SXIXrayEvent& operator=(const SXIXrayEvent& r) = default;
+  SXIXrayEvent& operator=(SXIXrayEvent&& r) = default;
 
-protected:
-  virtual void insertHit(const DetectorHit_sptr& hit);
-  
+  void reduce() override;
+  void setOuterSplitThreshold(double v) { outerSplitThreshold_ = v; }
+  void determineAscaGrade();
+  double OuterSplitThreshold() const { return outerSplitThreshold_; }
+  int makeOuterMask (int innerGrade);
+  void classifyGrade();
+  double calculateSxiValue();
+
 private:
-  std::vector<std::string> fileList_;
-
-  TChain* tree_;
-  int64_t numEntries_ = 0;
-  int64_t entryIndex_ = 0;
-
-  CSHitCollection* hitCollection_;
-  std::unique_ptr<EventTreeIOWithInitialInfo> treeIO_;
+  double outerSplitThreshold_ = 0.0;
+  int sxiInnerGrade_ = 0;
+  int sxiOuterGrade_ = 0;
+  int sxiTotalGrade_ = 0;
+  int outerMask_ = 0;
+  int sxiOuterMaskedGrade_ = 0;
+  std::vector <double> dataVector_;
 };
+
+using SXIXrayEvent_sptr = std::shared_ptr<SXIXrayEvent>;
 
 } /* namespace comptonsoft */
 
-#endif /* COMPTONSOFT_ReadEventTree_H */
+#endif /* COMPTONSOFT_SXIXrayEvent_H */

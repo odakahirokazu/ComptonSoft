@@ -17,7 +17,7 @@
  *                                                                       *
  *************************************************************************/
 
-#include "MakeFrame.hh"
+#include "MakeFrameFITS.hh"
 
 #include <random>
 #include <array>
@@ -44,13 +44,13 @@ namespace unit = anlgeant4::unit;
 namespace comptonsoft
 {
 
-MakeFrame::MakeFrame()
+MakeFrameFITS::MakeFrameFITS()
 {
 }
 
-MakeFrame::~MakeFrame() = default;
+MakeFrameFITS::~MakeFrameFITS() = default;
 
-ANLStatus MakeFrame::mod_define()
+ANLStatus MakeFrameFITS::mod_define()
 {
   define_parameter("filename_base", &mod_class::m_FileNameBase);
   set_parameter_description ("The output filename will be \"(filename_base)_FrameN.fits\".");
@@ -61,7 +61,7 @@ ANLStatus MakeFrame::mod_define()
   return AS_OK;
 }
 
-ANLStatus MakeFrame::mod_initialize()
+ANLStatus MakeFrameFITS::mod_initialize()
 {
   VCSModule::mod_initialize();
   get_module_NC("CSHitCollection", &m_HitCollection);
@@ -75,7 +75,7 @@ ANLStatus MakeFrame::mod_initialize()
   return AS_OK;
 }
 
-ANLStatus MakeFrame::mod_analyze()
+ANLStatus MakeFrameFITS::mod_analyze()
 {
   m_EnergyArray.assign(m_NumPixels, 0.0);
   m_CountArray.assign(m_NumPixels, 0);
@@ -111,7 +111,7 @@ ANLStatus MakeFrame::mod_analyze()
   for (int timeGroup=0; timeGroup<NumTimeGroups; timeGroup++) {
     const std::vector<DetectorHit_sptr>& hits = m_HitCollection->getHits(timeGroup);
     for (DetectorHit_sptr hit: hits) {
-      if (hit->PixelX() >= m_NumPixelX || hit->PixelY() >= m_NumPixelY){
+      if (hit->PixelX() >= m_NumPixelX || hit->PixelY() >= m_NumPixelY) {
         std::cout << "This hit occurs outside the image area." << std::endl;
         return AS_ERROR;
       }

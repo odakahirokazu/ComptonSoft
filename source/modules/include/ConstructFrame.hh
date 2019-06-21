@@ -17,57 +17,59 @@
  *                                                                       *
  *************************************************************************/
 
-#ifndef COMPTONSOFT_ReadEventTree_H
-#define COMPTONSOFT_ReadEventTree_H 1
+#ifndef COMPTONSOFT_ConstructFrame_H
+#define COMPTONSOFT_ConstructFrame_H 1
 
-#include "VCSModule.hh"
-#include "InitialInformation.hh"
-
-#include <vector>
-#include <string>
-#include <cstdint>
-#include "DetectorHit_sptr.hh"
-
-class TChain;
+#include <anlnext/BasicModule.hh>
+#include <memory>
 
 namespace comptonsoft {
 
-class CSHitCollection;
-class EventTreeIOWithInitialInfo;
+class FrameData;
+
 
 /**
- * @author Hitokazu Odaka
- * @date 2015-11-14
- * @date 2019-04-22 | initialization in mod_begin_run()
+ * ConstructFrame
+ *
+ * @author Hirokazu Odaka
+ * @date 2019-06-05
  */
-class ReadEventTree : public VCSModule, public anlgeant4::InitialInformation
+class ConstructFrame : public anlnext::BasicModule
 {
-  DEFINE_ANL_MODULE(ReadEventTree, 2.1);
+  DEFINE_ANL_MODULE(ConstructFrame, 1.0);
+  // ENABLE_PARALLEL_RUN();
 public:
-  ReadEventTree();
-  ~ReadEventTree();
+  ConstructFrame();
   
+protected:
+  ConstructFrame(const ConstructFrame&);
+
+public:
   anlnext::ANLStatus mod_define() override;
   anlnext::ANLStatus mod_initialize() override;
-  anlnext::ANLStatus mod_begin_run() override;
-  anlnext::ANLStatus mod_analyze() override;
 
-  int64_t NumEntries() const { return numEntries_; }
+  void setFrameID(int v) { frame_id_ = v; }
+  int FrameID() const { return frame_id_; }
+
+  const comptonsoft::FrameData& getFrame() const
+  { return *frame_; }
+
+  comptonsoft::FrameData& getFrame()
+  { return *frame_; }
 
 protected:
-  virtual void insertHit(const DetectorHit_sptr& hit);
-  
+  virtual FrameData* createFrameData();
+  int NumPixelsX() const { return num_pixel_x_; }
+  int NumPixelsY() const { return num_pixel_y_; }
+
 private:
-  std::vector<std::string> fileList_;
+  int num_pixel_x_ = 1;
+  int num_pixel_y_ = 1;
 
-  TChain* tree_;
-  int64_t numEntries_ = 0;
-  int64_t entryIndex_ = 0;
-
-  CSHitCollection* hitCollection_;
-  std::unique_ptr<EventTreeIOWithInitialInfo> treeIO_;
+  int frame_id_ = 0;
+  std::unique_ptr<comptonsoft::FrameData> frame_;
 };
 
 } /* namespace comptonsoft */
 
-#endif /* COMPTONSOFT_ReadEventTree_H */
+#endif /* COMPTONSOFT_ConstructFrame_H */

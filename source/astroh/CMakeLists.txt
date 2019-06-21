@@ -47,6 +47,9 @@ if(CS_USE_FITSIO)
     src/WriteHXIEventFITS.cc
     src/FilterByGoodTimeIntervalsForSGD.cc
     src/FilterByGoodTimeIntervalsForHXI.cc
+    src/SXIFrameData.cc
+    src/SXIXrayEvent.cc
+    src/ConstructSXIFrame.cc
     )
 endif()
 

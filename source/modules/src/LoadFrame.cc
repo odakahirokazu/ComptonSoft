@@ -17,57 +17,46 @@
  *                                                                       *
  *************************************************************************/
 
-#ifndef COMPTONSOFT_ReadEventTree_H
-#define COMPTONSOFT_ReadEventTree_H 1
+#include "LoadFrame.hh"
+#include "FrameData.hh"
+#include "ConstructFrame.hh"
 
-#include "VCSModule.hh"
-#include "InitialInformation.hh"
-
-#include <vector>
-#include <string>
-#include <cstdint>
-#include "DetectorHit_sptr.hh"
-
-class TChain;
+using namespace anlnext;
 
 namespace comptonsoft {
 
-class CSHitCollection;
-class EventTreeIOWithInitialInfo;
-
-/**
- * @author Hitokazu Odaka
- * @date 2015-11-14
- * @date 2019-04-22 | initialization in mod_begin_run()
- */
-class ReadEventTree : public VCSModule, public anlgeant4::InitialInformation
+LoadFrame::LoadFrame()
 {
-  DEFINE_ANL_MODULE(ReadEventTree, 2.1);
-public:
-  ReadEventTree();
-  ~ReadEventTree();
+}
+
+ANLStatus LoadFrame::mod_define()
+{
+  define_parameter("files", &mod_class::files_);
   
-  anlnext::ANLStatus mod_define() override;
-  anlnext::ANLStatus mod_initialize() override;
-  anlnext::ANLStatus mod_begin_run() override;
-  anlnext::ANLStatus mod_analyze() override;
+  return AS_OK;
+}
 
-  int64_t NumEntries() const { return numEntries_; }
+ANLStatus LoadFrame::mod_initialize()
+{
+  get_module_NC("ConstructFrame", &frame_owner_);
 
-protected:
-  virtual void insertHit(const DetectorHit_sptr& hit);
-  
-private:
-  std::vector<std::string> fileList_;
+  return AS_OK;
+}
 
-  TChain* tree_;
-  int64_t numEntries_ = 0;
-  int64_t entryIndex_ = 0;
+ANLStatus LoadFrame::mod_analyze()
+{
+  const std::size_t fileIndex = get_loop_index();
+  if (fileIndex == files_.size()) {
+    return AS_QUIT;
+  }
 
-  CSHitCollection* hitCollection_;
-  std::unique_ptr<EventTreeIOWithInitialInfo> treeIO_;
-};
+  const std::string filename = files_[fileIndex];
+
+  frame_owner_->setFrameID(fileIndex);
+  FrameData& frame = frame_owner_->getFrame();
+  frame.load(filename);
+
+  return AS_OK;
+}
 
 } /* namespace comptonsoft */
-
-#endif /* COMPTONSOFT_ReadEventTree_H */

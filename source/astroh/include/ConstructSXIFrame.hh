@@ -17,44 +17,30 @@
  *                                                                       *
  *************************************************************************/
 
-#ifndef COMPTONSOFT_MakeFrame_H
-#define COMPTONSOFT_MakeFrame_H 1
+#ifndef COMPTONSOFT_ConstructSXIFrame_H
+#define COMPTONSOFT_ConstructSXIFrame_H 1
 
-#include "VCSModule.hh"
-#include <vector>
+#include "ConstructFrame.hh"
 
 namespace comptonsoft {
 
-class CSHitCollection;
-
 /**
- * @author Tsubasa Tamba, Hirokazu Odaka
- * @date 2019-04-16 | created by T. Tamba
- * @date 2019-04-19 | cleanup by H. Odaka
+ * ConstructFrame
+ *
+ * @author Hirokazu Odaka
+ * @date 2019-06-05
  */
-class MakeFrame : public VCSModule
+class ConstructSXIFrame : public ConstructFrame
 {
-  DEFINE_ANL_MODULE(MakeFrame, 1.0);
+  DEFINE_ANL_MODULE(ConstructSXIFrame, 1.0);
+  // ENABLE_PARALLEL_RUN();
 public:
-  MakeFrame();
-  ~MakeFrame();
+  ConstructSXIFrame() = default;
 
-  anlnext::ANLStatus mod_define() override;
-  anlnext::ANLStatus mod_initialize() override;
-  anlnext::ANLStatus mod_analyze() override;
-
-private:
-  std::string m_FileNameBase;
-  int m_NumPixelX = 1;
-  int m_NumPixelY = 1;
-
-  CSHitCollection* m_HitCollection = nullptr;
-  long m_NumPixelsArray[2] = {1, 1};
-  long m_NumPixels = 1;
-  std::vector<double> m_EnergyArray;
-  std::vector<long> m_CountArray;
+protected:
+  FrameData* createFrameData() override;
 };
 
 } /* namespace comptonsoft */
 
-#endif /* COMPTONSOFT_MakeFrame_H */
+#endif /* COMPTONSOFT_ConstructSXIFrame_H */

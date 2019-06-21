@@ -61,8 +61,17 @@
 #include "QuickAnalysisForDSD.hh"
 #include "AssignTime.hh"
 #include "DefineFrame.hh"
-#include "MakeFrame.hh"
-#ifdef USE_SIMX
+#ifdef USE_FITSIO
+#include "MakeFrameFITS.hh"
+#endif
+#include "ConstructFrame.hh"
+#include "ConstructSXIFrame.hh"
+#include "FillFrame.hh"
+#include "LoadFrame.hh"
+#include "AnalyzeFrame.hh"
+#include "WriteXrayEventTree.hh"
+#include "SortEventTreeWithTime.hh"
+#ifdef USE_FITSIO
 #include "AHRayTracingPrimaryGen.hh"
 #endif
 #ifdef USE_SIMX
@@ -619,15 +628,69 @@ public:
 };
 
 
-class MakeFrame : public VCSModule
+#ifdef USE_FITSIO
+class MakeFrameFITS : public VCSModule
 {
 public:
-  MakeFrame();
-  ~MakeFrame();
+  MakeFrameFITS();
+  ~MakeFrameFITS();
+};
+
+#endif
+
+class ConstructFrame : public anlnext::BasicModule
+{
+public:
+  ConstructFrame();
 };
 
 
-#ifdef USE_SIMX
+class ConstructSXIFrame : public ConstructFrame
+{
+public:
+  ConstructSXIFrame() = default;
+};
+
+
+class FillFrame : public VCSModule
+{
+public:
+  FillFrame();
+  ~FillFrame();
+};
+
+
+class LoadFrame : public anlnext::BasicModule
+{
+public:
+  LoadFrame();
+};
+
+
+class AnalyzeFrame : public anlnext::BasicModule
+{
+public:
+  AnalyzeFrame();
+};
+
+
+class WriteXrayEventTree : public VCSModule
+{
+public:
+  WriteXrayEventTree();
+  ~WriteXrayEventTree() = default;
+};
+
+
+class SortEventTreeWithTime : public VCSModule
+{
+public:
+  SortEventTreeWithTime();
+  ~SortEventTreeWithTime();
+};
+
+
+#ifdef USE_FITSIO
 class AHRayTracingPrimaryGen : public anlgeant4::BasicPrimaryGen
 {
 public:

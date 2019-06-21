@@ -13,10 +13,10 @@ class MyApp < ANL::ANLApp
     with_parameters(file_list: @inputs,
                     trust_num_hits: false)
     chain :MakeFrame
-    with_parameters(filename_base: "HitomiCCD_Gaussian_20mCrab", num_pixelx: 640, num_pixely: 640)
+    with_parameters(filename_base: @inputs[0].sub(".root", ""), num_pixelx: 640, num_pixely: 640)
   end
 end
 
 a = MyApp.new
-a.inputs = ["HitomiCCD_Gaussian_Crab_frame.root"]
+a.inputs = ["xray_ccd_crab_frame.root"]
 a.run(:all, 1)

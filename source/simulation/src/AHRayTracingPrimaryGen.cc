@@ -24,6 +24,8 @@
 using namespace anlnext;
 using namespace anlgeant4;
 
+
+
 namespace comptonsoft
 {
 
@@ -41,9 +43,9 @@ ANLStatus AHRayTracingPrimaryGen::mod_define()
   
   unregister_parameter("particle");
   setParticleName("gamma");
-  unregister_parameter("photon_index");
-  unregister_parameter("energy_min");
-  unregister_parameter("energy_max");
+  hide_parameter("photon_index");
+  hide_parameter("energy_min");
+  hide_parameter("energy_max");
   
   register_parameter(&m_FileName, "filename");
   register_parameter(&m_offset, "position_offset", unit::mm, "mm");
@@ -75,6 +77,11 @@ ANLStatus AHRayTracingPrimaryGen::mod_initialize()
   
   std::string colname[6] = {"energy","x","y","xDirection","yDirection","zDirection"};
   int colid[6] = {0};
+
+  ffmahd(fits, 2, IMAGE_HDU, &fits_status);
+  if(fits_status){
+    fits_report_error(stderr, fits_status);
+  }
   
   for( int i=0; i<6; ++i ){
     fits_get_colnum(fits, CASEINSEN, const_cast<char*>(colname[i].c_str()),

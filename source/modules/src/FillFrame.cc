@@ -17,12 +17,14 @@
  *                                                                       *
  *************************************************************************/
 
-#include "AssignTime.hh"
+#include "FillFrame.hh"
 
-#include <random>
 #include "AstroUnits.hh"
 #include "CSHitCollection.hh"
 #include "DetectorHit.hh"
+#include "ConstructFrame.hh"
+#include "FrameData.hh"
+
 
 using namespace anlnext;
 namespace unit = anlgeant4::unit;
@@ -30,78 +32,57 @@ namespace unit = anlgeant4::unit;
 namespace comptonsoft
 {
 
-AssignTime::AssignTime()
-  : m_CountRate(1.0/unit::s)
+FillFrame::FillFrame()
 {
 }
 
-AssignTime::~AssignTime() = default;
+FillFrame::~FillFrame() = default;
 
-ANLStatus AssignTime::mod_define()
+ANLStatus FillFrame::mod_define()
 {
-  define_parameter("number_of_events", &mod_class::m_NumEvents);
-  set_parameter_description("-1 denotes all.");
-  define_parameter("time_start", &mod_class::m_Time0, unit::s, "s");
-  define_parameter("count_rate", &mod_class::m_CountRate, 1.0/unit::s, "s^-1");
-  define_parameter("random_seed", &mod_class::m_Seed);
-  set_parameter_description("Random seed, unsigned integer, -1 for hardware generation.");
-  define_parameter("sort", &mod_class::m_SortTime);
-  set_parameter_description("If true, the time array is sorted.");
   return AS_OK;
 }
 
-ANLStatus AssignTime::mod_initialize()
+ANLStatus FillFrame::mod_initialize()
 {
   VCSModule::mod_initialize();
   get_module_NC("CSHitCollection", &m_HitCollection);
-  get_module_NC("ReadEventTree", &m_ReadEventTree);
-
-  if (m_NumEvents == -1) {
-    m_NumEvents = m_ReadEventTree->NumEntries();
-  }
-
-  m_Time1 = m_Time0 + m_NumEvents/m_CountRate;
-  
-  sampleEventTimes();
+  get_module_NC("ConstructFrame", &m_FrameOwner);
 
   return AS_OK;
 }
 
-ANLStatus AssignTime::mod_analyze()
+ANLStatus FillFrame::mod_analyze()
 {
-  if (m_TimeList.empty()) {
-    return AS_QUIT;
-  }
+  const std::vector<DetectorHit_sptr>& firstHits = m_HitCollection->getHits(0);
+  if (firstHits.size() == 0) { return AS_OK; }
 
-  const double t = m_TimeList.front();
-  m_TimeList.pop_front();
-  
+  const DetectorHit_sptr& hit0 = firstHits[0];
+  const long frameID = hit0->EventID();
+
+  m_FrameOwner->setFrameID(frameID);
+  FrameData& frame = m_FrameOwner->getFrame();
+  frame.resetRawFrame();
+  const int nx = frame.NumPixelsX();
+  const int ny = frame.NumPixelsY();
+  image_t& rawFrame = frame.getRawFrame();
+
   const int NumTimeGroups = m_HitCollection->NumberOfTimeGroups();
   for (int timeGroup=0; timeGroup<NumTimeGroups; timeGroup++) {
-    std::vector<DetectorHit_sptr>& hits = m_HitCollection->getHits(timeGroup);
+    const std::vector<DetectorHit_sptr>& hits = m_HitCollection->getHits(timeGroup);
     for (DetectorHit_sptr hit: hits) {
-      const double realTime = t + hit->RealTime();
-      hit->setRealTime(realTime);
+      const int ix = hit->PixelX();
+      const int iy = hit->PixelY();
+      if (ix >= nx || iy >= ny) {
+        std::cout << "This hit occurs outside the image area." << std::endl;
+        return AS_ERROR;
+      }
+
+      rawFrame[ix][iy] += hit->EPI()/unit::keV;
     }
   }
-
+  
   return AS_OK;
-}
-
-void AssignTime::sampleEventTimes()
-{
-  std::random_device seedGenerator;
-  const uint_fast32_t seed = (m_Seed == -1) ? seedGenerator() : m_Seed;
-  std::mt19937 engine(seed);
-  std::uniform_real_distribution<double> distribution(m_Time0, m_Time1);
-
-  for (int i=0; i<m_NumEvents; i++) {
-    const double t = distribution(engine);
-    m_TimeList.push_back(t);
-  }
-  if (m_SortTime) {
-    m_TimeList.sort();
-  }
 }
 
 } /* namespace comptonsoft */

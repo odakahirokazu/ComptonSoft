@@ -22,12 +22,13 @@ def run_simulation(num, random, output)
     direction: vec(0.0, 0.0, -1.0),
     radial_sigma: 0.0808, # corresponds to 30 arcsec
   }
+  sim.use_tree_format("eventtree")
   # sim.visualize
   sim.run(num)
 end
 
 ### main ###
 num = 10000
-output = "HitomiCCD_Gaussian_Crab.root"
+output = "xray_ccd_crab.root"
 random = 0
 run_simulation(num, random, output)

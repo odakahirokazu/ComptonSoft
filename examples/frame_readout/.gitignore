@@ -1,0 +1,16 @@
+*~
+.DS_Store
+*.root
+*_seed_I.txt
+*_seed_F.txt
+*_seed_i.dat
+*_seed_f.dat
+*_summary.txt
+*_volume.txt
+*.summary.dat
+*.volume.dat
+run_list.dat
+decay_rates.dat
+*.log
+*.fits
+

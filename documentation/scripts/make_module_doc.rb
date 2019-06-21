@@ -1,8 +1,6 @@
 #!/usr/bin/env ruby
 
-require 'comptonsoft/comptonSoft'
-require 'anlGeant4'
-require 'ANLLib'
+require 'comptonsoft'
 
 a = ANL::AnalysisChain.new
 
@@ -247,8 +245,8 @@ a.push ComptonSoft::EfficiencyMapSky.new
 a.push ComptonSoft::QuickAnalysisForDSD.new
 # a.text ""
 
-# a.push ComptonSoft::AHRayTracingPrimaryGen.new
-# a.text ""
+a.push ComptonSoft::AHRayTracingPrimaryGen.new
+a.text ""
 
 # a.push ComptonSoft::SimXPrimaryGen.new
 # a.text ""

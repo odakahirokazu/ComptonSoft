@@ -17,57 +17,54 @@
  *                                                                       *
  *************************************************************************/
 
-#ifndef COMPTONSOFT_ReadEventTree_H
-#define COMPTONSOFT_ReadEventTree_H 1
+#ifndef COMPTONSOFT_AnalyzeFrame_H
+#define COMPTONSOFT_AnalyzeFrame_H 1
 
-#include "VCSModule.hh"
-#include "InitialInformation.hh"
-
-#include <vector>
-#include <string>
-#include <cstdint>
-#include "DetectorHit_sptr.hh"
-
-class TChain;
+#include <iterator>
+#include <anlnext/BasicModule.hh>
+#include "ConstructFrame.hh"
+#include "XrayEvent.hh"
 
 namespace comptonsoft {
 
-class CSHitCollection;
-class EventTreeIOWithInitialInfo;
-
 /**
- * @author Hitokazu Odaka
- * @date 2015-11-14
- * @date 2019-04-22 | initialization in mod_begin_run()
+ * AnalyzeFrame
+ *
+ * @author Hirokazu Odaka
+ * @date 2019-05-23
  */
-class ReadEventTree : public VCSModule, public anlgeant4::InitialInformation
+class AnalyzeFrame : public anlnext::BasicModule
 {
-  DEFINE_ANL_MODULE(ReadEventTree, 2.1);
+  DEFINE_ANL_MODULE(AnalyzeFrame, 1.0);
+  // ENABLE_PARALLEL_RUN();
 public:
-  ReadEventTree();
-  ~ReadEventTree();
+  AnalyzeFrame();
   
+protected:
+  AnalyzeFrame(const AnalyzeFrame&);
+
+public:
   anlnext::ANLStatus mod_define() override;
   anlnext::ANLStatus mod_initialize() override;
   anlnext::ANLStatus mod_begin_run() override;
   anlnext::ANLStatus mod_analyze() override;
+  anlnext::ANLStatus mod_end_run() override;
 
-  int64_t NumEntries() const { return numEntries_; }
+  XrayEventCIter EventsBegin() const
+  { return std::begin(events_); }
+  XrayEventCIter EventsEnd() const
+  { return std::end(events_); }
 
-protected:
-  virtual void insertHit(const DetectorHit_sptr& hit);
-  
 private:
-  std::vector<std::string> fileList_;
+  double pedestal_level_ = 0.0;
+  double event_threshold_ = 0.0;
+  double split_threshold_ = 0.0;
+  int event_size_ = 1;
 
-  TChain* tree_;
-  int64_t numEntries_ = 0;
-  int64_t entryIndex_ = 0;
-
-  CSHitCollection* hitCollection_;
-  std::unique_ptr<EventTreeIOWithInitialInfo> treeIO_;
+  ConstructFrame* frame_owner_ = nullptr;
+  XrayEventContainer events_;
 };
 
 } /* namespace comptonsoft */
 
-#endif /* COMPTONSOFT_ReadEventTree_H */
+#endif /* COMPTONSOFT_AnalyzeFrame_H */

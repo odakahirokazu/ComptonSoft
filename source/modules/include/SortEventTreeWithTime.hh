@@ -17,18 +17,21 @@
  *                                                                       *
  *************************************************************************/
 
-#ifndef COMPTONSOFT_ReadEventTree_H
-#define COMPTONSOFT_ReadEventTree_H 1
+#ifndef COMPTONSOFT_SortEventTreeWithTime_H
+#define COMPTONSOFT_SortEventTreeWithTime_H 1
 
 #include "VCSModule.hh"
 #include "InitialInformation.hh"
 
+#include <list>
 #include <vector>
 #include <string>
 #include <cstdint>
 #include "DetectorHit_sptr.hh"
+#include <memory>
 
 class TChain;
+class TTree;
 
 namespace comptonsoft {
 
@@ -36,23 +39,20 @@ class CSHitCollection;
 class EventTreeIOWithInitialInfo;
 
 /**
- * @author Hitokazu Odaka
- * @date 2015-11-14
- * @date 2019-04-22 | initialization in mod_begin_run()
+ * @author Tsubasa Tamba
+ * @date 2014-06-07
  */
-class ReadEventTree : public VCSModule, public anlgeant4::InitialInformation
+class SortEventTreeWithTime : public VCSModule, public anlgeant4::InitialInformation
 {
-  DEFINE_ANL_MODULE(ReadEventTree, 2.1);
+  DEFINE_ANL_MODULE(SortEventTreeWithTime, 1.0);
 public:
-  ReadEventTree();
-  ~ReadEventTree();
+  SortEventTreeWithTime();
+  ~SortEventTreeWithTime();
   
   anlnext::ANLStatus mod_define() override;
   anlnext::ANLStatus mod_initialize() override;
   anlnext::ANLStatus mod_begin_run() override;
   anlnext::ANLStatus mod_analyze() override;
-
-  int64_t NumEntries() const { return numEntries_; }
 
 protected:
   virtual void insertHit(const DetectorHit_sptr& hit);
@@ -66,8 +66,10 @@ private:
 
   CSHitCollection* hitCollection_;
   std::unique_ptr<EventTreeIOWithInitialInfo> treeIO_;
+  std::list<std::vector<DetectorHit_sptr>> eventList_;
+  std::list<std::vector<DetectorHit_sptr>>::iterator eventIter_;
 };
 
 } /* namespace comptonsoft */
 
-#endif /* COMPTONSOFT_ReadEventTree_H */
+#endif /* COMPTONSOFT_SortEventTreeWithTime_H */

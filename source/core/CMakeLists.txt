@@ -73,6 +73,10 @@ set(CS_CORE_CLASSES
   src/HitTreeIOWithInitialInfo.cc
   src/ComptonEventTreeIOWithInitialInfo.cc
   src/EventTreeIOWithInitialInfo.cc
+  ### frame readout
+  src/FrameData.cc
+  src/XrayEvent.cc
+  src/XrayEventTreeIO.cc
 )
 
 add_library(CSCore SHARED

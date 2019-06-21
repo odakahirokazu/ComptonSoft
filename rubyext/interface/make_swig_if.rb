@@ -67,11 +67,18 @@ clMod = [
   ANL::SWIGClass.new("QuickAnalysisForDSD"),
   ANL::SWIGClass.new("AssignTime"),
   ANL::SWIGClass.new("DefineFrame"),
-  ANL::SWIGClass.new("MakeFrame"),
+  ANL::SWIGClass.new("MakeFrameFITS", false, 'USE_FITSIO'),
+  ANL::SWIGClass.new("ConstructFrame"),
+  ANL::SWIGClass.new("ConstructSXIFrame"),
+  ANL::SWIGClass.new("FillFrame"),
+  ANL::SWIGClass.new("LoadFrame"),
+  ANL::SWIGClass.new("AnalyzeFrame"),
+  ANL::SWIGClass.new("WriteXrayEventTree"),
+  ANL::SWIGClass.new("SortEventTreeWithTime"),
 ]
 
 clSim = [# primary generator
-  ANL::SWIGClass.new("AHRayTracingPrimaryGen", false, 'USE_SIMX'),
+  ANL::SWIGClass.new("AHRayTracingPrimaryGen", false, 'USE_FITSIO'),
   ANL::SWIGClass.new("SimXPrimaryGen", false, 'USE_SIMX'),
   ANL::SWIGClass.new("AHRadiationBackgroundPrimaryGen"),
   # user action assembly
