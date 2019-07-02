@@ -35,6 +35,7 @@ namespace comptonsoft {
  * @date 2012-06-13
  * @date 2012-09-14
  * @date 2017-07-27 | makePrimarySetting()
+ * @date 2019-07-01 | m_EnergyResample by Tsubasa Tamba
  */
 class AHRayTracingPrimaryGen : public anlgeant4::BasicPrimaryGen
 {
@@ -45,7 +46,6 @@ public:
   anlnext::ANLStatus mod_define() override;
   anlnext::ANLStatus mod_initialize() override;
   anlnext::ANLStatus mod_analyze() override;
-  anlnext::ANLStatus mod_finalize() override;
 
   void makePrimarySetting() override;
   
@@ -54,9 +54,12 @@ private:
   
   int m_EventNum;
   int m_ID;
-  
-  double* m_Column[6];
+
+  static const int NumColumns = 6;
+  std::vector<double> m_Columns[6];
   G4ThreeVector m_offset;
+
+  bool m_EnergyResample = false;
 };
 
 } /* namespace comptonsoft */

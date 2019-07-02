@@ -197,12 +197,62 @@ double SXIXrayEvent::calculateSxiValue()
   return sumph;
 }
 
+void SXIXrayEvent::calculateRank()
+{
+  if (Grade()==0){
+    setRank(0);
+  }
+  else if (Grade()==7 || Grade()==10){
+    setRank(2);
+  }
+  else{
+    setRank(1);
+  }
+}
+
+void SXIXrayEvent::calculateWeightAndModifyData()
+{
+  const image_t& data = Data();
+  const int size = data.shape()[0];
+  const int halfSize = size/2;
+  int weight = 0;
+
+  for (int i=0; i<size; i++) {
+    for (int j=0; j<size; j++) {
+      const double v = data[i][j];
+      if (i==halfSize && j==halfSize) {
+        weight += 1;
+      }
+      else if (std::abs(i-halfSize)<=1 && std::abs(j-halfSize)<=1) {
+        if (v>=SplitThreshold()) {
+          weight += 1;
+        }
+        else{
+          setData(i, j, 0.0);
+        }
+      }
+      else if (std::abs(i-halfSize)<=2 && std::abs(j-halfSize)<=2) {
+        if (v>=OuterSplitThreshold()) {
+          weight += 1;
+        }
+        else{
+          setData(i, j, 0.0);
+        }
+      }
+    }
+  }
+
+  setWeight(weight);
+}
+
 void SXIXrayEvent::reduce()
 {
   determineAscaGrade();
   outerMask_ = makeOuterMask(sxiInnerGrade_);
   classifyGrade();
   setValue(calculateSxiValue());
+  calculateRank();
+  calculateWeightAndModifyData();
 }
 
 } /* namespace comptonsoft */

@@ -80,6 +80,7 @@ protected:
   void setAngle(double v) { angle_ = v; }
   void setCenterPH(double v) { centerPH_ = v; }
   void setGrade(int v) { grade_ = v; }
+  void setData(int i, int j, double v) { data_[i][j]=v; }
 
   virtual double calculateEventAngle() const;
 

@@ -56,6 +56,8 @@ public:
   int makeOuterMask (int innerGrade);
   void classifyGrade();
   double calculateSxiValue();
+  void calculateRank();
+  void calculateWeightAndModifyData();
 
 private:
   double outerSplitThreshold_ = 0.0;
