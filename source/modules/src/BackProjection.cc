@@ -68,12 +68,9 @@ ANLStatus BackProjection::mod_initialize()
   mkdir();
   
   m_hist_bp_All  = new TH2D("h_bp_All","Back Projection (All)", m_NumPixelX, m_RangeX1, m_RangeX2, m_NumPixelY, m_RangeY1, m_RangeY2);
-  m_hist_bp_All_nf  = new TH2D("h_bp_All_nf","Back Projection (All, Fl Cut)", m_NumPixelX, m_RangeX1, m_RangeX2, m_NumPixelY, m_RangeY1, m_RangeY2);
 
   const std::vector<HitPattern>& hitpat_vec = getDetectorManager()->getHitPatterns();
   m_hist_vec.resize(hitpat_vec.size());
-  m_hist_nf_vec.resize(hitpat_vec.size());
-  
   for (unsigned int i=0; i<hitpat_vec.size(); i++) {
     std::string hist_name = "h_bp_";
     std::string hist_title = "BackProjection (";
@@ -81,14 +78,6 @@ ANLStatus BackProjection::mod_initialize()
     hist_title += hitpat_vec[i].Name();
     hist_title += ")";
     m_hist_vec[i] = new TH2D(hist_name.c_str(), hist_title.c_str(), m_NumPixelX, m_RangeX1, m_RangeX2, m_NumPixelY, m_RangeY1, m_RangeY2);
-
-    std::string hist_nf_name = "h_bp_";
-    std::string hist_nf_title = "BackProjection (";
-    hist_nf_name += hitpat_vec[i].ShortName();
-    hist_nf_name += "_nf";
-    hist_nf_title += hitpat_vec[i].Name();
-    hist_nf_title += ", Fl Cut)";
-    m_hist_nf_vec[i] = new TH2D(hist_nf_name.c_str(), hist_nf_title.c_str(), m_NumPixelX, m_RangeX1, m_RangeX2, m_NumPixelY, m_RangeY1, m_RangeY2);
   }
 
   return AS_OK;
@@ -141,24 +130,16 @@ void BackProjection::fillImage(double x, double y, double weight)
   // Filling histograms 
   // All
   m_hist_bp_All->Fill(x, y, weight);
-  if (!evs("EventReconst:CdTeFluor")) { 
-    m_hist_bp_All_nf->Fill(x, y, weight);
-  }
-  
   for(unsigned int i=0; i<m_hist_vec.size(); i++) {
     if(m_EventReconstruction->HitPatternFlag(i)) {
       m_hist_vec[i]->Fill(x, y, weight);
-      if(!evs("EventReconst:CdTeFluor")) {
-        m_hist_nf_vec[i]->Fill(x, y, weight);
-      }
     }
   }
 }
 
 bool BackProjection::sectionConeAndPlane(const vector3_t& vertex, const vector3_t& cone, vector3_t& coneProjected)
 {
-  double t;
-  t = (m_PlaneNormal*(m_PlanePoint-vertex)) / (m_PlaneNormal*cone);
+  const double t = (m_PlaneNormal*(m_PlanePoint-vertex)) / (m_PlaneNormal*cone);
   coneProjected = vertex + t*cone;
   if (t < 0.) { return false; }
   return true;

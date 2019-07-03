@@ -33,10 +33,11 @@ namespace comptonsoft {
  * @author Hirokazu Odaka
  * @date 2007-xx-xx
  * @date 2012-03-14
+ * @date 2019-07-03 | remove CdTeFluor flag
  */
 class BackProjection : public VCSModule
 {
-  DEFINE_ANL_MODULE(BackProjection, 2.2);
+  DEFINE_ANL_MODULE(BackProjection, 2.3);
 public:
   BackProjection();
   ~BackProjection();
@@ -65,10 +66,7 @@ private:
   vector3_t m_PlanePoint;
 
   TH2D* m_hist_bp_All;
-  TH2D* m_hist_bp_All_nf;
-
   std::vector<TH2D*> m_hist_vec;
-  std::vector<TH2D*> m_hist_nf_vec;
 
   int m_NumPixelX;
   int m_NumPixelY;
