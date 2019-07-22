@@ -31,7 +31,6 @@ namespace comptonsoft
 {
 
 AssignTime::AssignTime()
-  : m_CountRate(1.0/unit::s)
 {
 }
 
@@ -43,6 +42,7 @@ ANLStatus AssignTime::mod_define()
   set_parameter_description("-1 denotes all.");
   define_parameter("time_start", &mod_class::m_Time0, unit::s, "s");
   define_parameter("count_rate", &mod_class::m_CountRate, 1.0/unit::s, "s^-1");
+  define_parameter("exposure", &mod_class::m_Exposure, unit::s, "s");
   define_parameter("random_seed", &mod_class::m_Seed);
   set_parameter_description("Random seed, unsigned integer, -1 for hardware generation.");
   define_parameter("sort", &mod_class::m_SortTime);
@@ -60,7 +60,21 @@ ANLStatus AssignTime::mod_initialize()
     m_NumEvents = m_ReadEventTree->NumEntries();
   }
 
-  m_Time1 = m_Time0 + m_NumEvents/m_CountRate;
+  if (m_CountRate>0 && m_Exposure>0) {
+    std::cout << "ERROR: Both count_rate and exposure are set. Should delete either of the two." << std::endl;
+    return AS_QUIT_ERROR;
+  }
+
+  if (m_CountRate>0) {
+    m_Time1 = m_Time0 + m_NumEvents/m_CountRate;
+  }
+  else if (m_Exposure>0) {
+    m_Time1 = m_Time0 + m_Exposure;
+  }
+  else {
+    std::cout << "ERROR: Either of count_rate or exposure should be set positive." << std::endl;
+    return AS_QUIT_ERROR;
+  }
   
   sampleEventTimes();
 

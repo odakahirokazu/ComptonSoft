@@ -25,6 +25,10 @@
 #include <list>
 #include <algorithm>
 
+#include <TROOT.h>
+#include <TFile.h>
+#include <TTree.h>
+
 namespace comptonsoft
 {
 
@@ -38,13 +42,13 @@ FrameData::FrameData(const int nx, const int ny)
     weight_(boost::extents[nx][ny]),
     sum_(boost::extents[nx][ny]),
     sum2_(boost::extents[nx][ny]),
-    hotpix_(boost::extents[nx][ny])
+    hotPixels_(boost::extents[nx][ny])
 {
   for (int i=0; i<nx; i++) {
     for (int j=0; j<ny; j++) {
       sum_[i][j] = 0.0;
       sum2_[i][j] = 0.0;
-      hotpix_[i][j] = false;
+      hotPixels_[i][j] = false;
     }
   }
   buf_.resize(2*nx*ny);
@@ -86,6 +90,26 @@ bool FrameData::load(const std::string& filename)
       rawFrame_[i][j] = v;
     }
   }
+  return true;
+}
+
+bool FrameData::loadRoot(const std::string& filename, int frameID)
+{
+  const int nx = NumPixelsX();
+  const int ny = NumPixelsY();
+  uint16_t raw_ph[8][8];
+  TFile* f = new TFile(filename.c_str());
+  TTree* tree = static_cast<TTree*>(f->Get("XRPIX_Data"));
+  tree->SetBranchAddress("ADC", &raw_ph);
+  tree->GetEntry(frameID);
+
+	// read root of frameID
+  for (int i=0; i<nx; i++) {
+    for (int j=0; j<ny; j++) {
+      rawFrame_[i][j] = raw_ph[i][j];
+    }
+  }
+
   return true;
 }
 
@@ -159,7 +183,7 @@ std::vector<XrayEvent_sptr> FrameData::extractEvents()
   for (int ix=margin; ix<nx-margin; ix++) {
     for (int iy=margin; iy<ny-margin; iy++) {
       const double v = frame_[ix][iy];
-      if (!hotpix_[ix][iy] && v>=EventThreshold()) {
+      if (!hotPixels_[ix][iy] && v>=EventThreshold()) {
         if (isMaxPixel(ix, iy, size) && !(includeHotPixel(ix, iy, size))) {
           hitPixels.emplace_back(ix, iy);
         }
@@ -200,14 +224,15 @@ bool FrameData::isMaxPixel(int ix, int iy, int size) const
   return true;
 }
 
-void FrameData::detectHotPixels(double threshold)
+void FrameData::detectHotPixels()
 {
+  const double threshold = HotPixelThreshold();
   const int nx = NumPixelsX();
   const int ny = NumPixelsY();
   for (int ix=0; ix<nx; ix++) {
     for (int iy=0; iy<ny; iy++){
       if (rawFrame_[ix][iy] > threshold){
-        hotpix_[ix][iy] = true;
+        hotPixels_[ix][iy] = true;
       }
     }
   }
@@ -221,7 +246,7 @@ bool FrameData::includeHotPixel(int ix, int iy, int size) const
  
   for (int i=0; i<size; i++) {
     for (int j=0; j<size; j++) {
-      if (hotpix_[ix0+i][iy0+j]) {
+      if (hotPixels_[ix0+i][iy0+j]) {
         return true;
       }
     }

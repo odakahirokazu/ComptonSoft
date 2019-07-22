@@ -72,12 +72,24 @@
 #include "WriteXrayEventTree.hh"
 #include "SortEventTreeWithTime.hh"
 #ifdef USE_FITSIO
+#include "SetPedestals.hh"
+#endif
+#include "SetHotPixels.hh"
+#ifdef USE_FITSIO
+#include "MakePedestals.hh"
+#endif
+#include "MakeHotPixels.hh"
+#include "AnalyzeDarkFrame.hh"
+#ifdef USE_FITSIO
 #include "AHRayTracingPrimaryGen.hh"
 #endif
 #ifdef USE_SIMX
 #include "SimXPrimaryGen.hh"
 #endif
 #include "AHRadiationBackgroundPrimaryGen.hh"
+#ifdef USE_FITSIO
+#include "AEObservationPrimaryGen.hh"
+#endif
 #include "RadioactiveDecayUserActionAssembly.hh"
 #include "ActivationUserActionAssembly.hh"
 #ifdef USE_SIMX
@@ -691,6 +703,45 @@ public:
 
 
 #ifdef USE_FITSIO
+class SetPedestals : public anlnext::BasicModule
+{
+public:
+  SetPedestals();
+};
+
+#endif
+
+class SetHotPixels : public anlnext::BasicModule
+{
+public:
+  SetHotPixels();
+};
+
+
+#ifdef USE_FITSIO
+class MakePedestals : public anlnext::BasicModule
+{
+public:
+  MakePedestals();
+};
+
+#endif
+
+class MakeHotPixels : public anlnext::BasicModule
+{
+public:
+  MakeHotPixels();
+};
+
+
+class AnalyzeDarkFrame : public anlnext::BasicModule
+{
+public:
+  AnalyzeDarkFrame();
+};
+
+
+#ifdef USE_FITSIO
 class AHRayTracingPrimaryGen : public anlgeant4::BasicPrimaryGen
 {
 public:
@@ -716,6 +767,15 @@ public:
   ~AHRadiationBackgroundPrimaryGen();
 };
 
+
+#ifdef USE_FITSIO
+class AEObservationPrimaryGen : public anlgeant4::BasicPrimaryGen
+{
+public:
+  AEObservationPrimaryGen();
+};
+
+#endif
 
 class RadioactiveDecayUserActionAssembly : public anlgeant4::StandardUserActionAssembly
 {

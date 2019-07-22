@@ -17,66 +17,54 @@
  *                                                                       *
  *************************************************************************/
 
-#include "AnalyzeFrame.hh"
+#include "AnalyzeDarkFrame.hh"
 #include "FrameData.hh"
 
 using namespace anlnext;
 
 namespace comptonsoft {
 
-AnalyzeFrame::AnalyzeFrame()
-  : event_size_(5)
+AnalyzeDarkFrame::AnalyzeDarkFrame()
 {
-  add_alias("AnalyzeFrame");
+  add_alias("AnalyzeDarkFrame");
 }
 
-ANLStatus AnalyzeFrame::mod_define()
+ANLStatus AnalyzeDarkFrame::mod_define()
 {
   define_parameter("pedestal_level", &mod_class::pedestal_level_);
   define_parameter("event_threshold", &mod_class::event_threshold_);
-  define_parameter("split_threshold", &mod_class::split_threshold_);
-  define_parameter("event_size", &mod_class::event_size_);
+  define_parameter("hotpix_threshold", &mod_class::hotPixelThreshold_);
   
   return AS_OK;
 }
 
-ANLStatus AnalyzeFrame::mod_initialize()
+ANLStatus AnalyzeDarkFrame::mod_initialize()
 {
   get_module_NC("ConstructFrame", &frame_owner_);
 
   return AS_OK;
 }
 
-ANLStatus AnalyzeFrame::mod_begin_run()
+ANLStatus AnalyzeDarkFrame::mod_begin_run()
 {
   FrameData& frame = frame_owner_->getFrame();
   frame.setEventThreshold(event_threshold_);
-  frame.setSplitThreshold(split_threshold_);
+  frame.setHotPixelThreshold(hotPixelThreshold_);
   frame.setPedestals(pedestal_level_);
-  frame.setEventSize(event_size_);
 
   return AS_OK;
 }
 
-ANLStatus AnalyzeFrame::mod_analyze()
+ANLStatus AnalyzeDarkFrame::mod_analyze()
 {
-  events_.clear();
-
-  const int frameID = frame_owner_->FrameID();
   FrameData& frame = frame_owner_->getFrame();
   frame.stack();
-  frame.subtractPedestals();
-
-  std::vector<comptonsoft::XrayEvent_sptr> es = frame.extractEvents();
-  for (auto& event: es) {
-    event->setFrameID(frameID);
-  }
-  std::move(es.begin(), es.end(), std::back_inserter(events_));
+  frame.detectHotPixels();
 
   return AS_OK;
 }
 
-ANLStatus AnalyzeFrame::mod_end_run()
+ANLStatus AnalyzeDarkFrame::mod_end_run()
 {
   FrameData& frame = frame_owner_->getFrame();
   frame.calculatePedestals();

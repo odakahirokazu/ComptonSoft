@@ -17,50 +17,41 @@
  *                                                                       *
  *************************************************************************/
 
-#ifndef COMPTONSOFT_AssignTime_H
-#define COMPTONSOFT_AssignTime_H 1
-
-#include "VCSModule.hh"
-#include <list>
-#include "ReadEventTree.hh"
-
-namespace comptonsoft {
-
-class CSHitCollection;
-
-
 /**
- * @author Hirokazu Odaka
- * @date 2019-01-30
+ * SetHotPixels.
+ *
+ * @author Hirokazu Odaka & Tsubasa Tamba
+ * @date 2019-05
+ * merged to comptonsoft 2019-07-18
+ *
  */
-class AssignTime : public VCSModule
-{
-  DEFINE_ANL_MODULE(AssignTime, 1.0);
-public:
-  AssignTime();
-  ~AssignTime();
 
+#ifndef COMPTONSOFT_SetHotPixels_H
+#define COMPTONSOFT_SetHotPixels_H 1
+
+#include <anlnext/BasicModule.hh>
+#include "ConstructFrame.hh"
+#include <vector>
+
+namespace comptonsoft{
+
+class SetHotPixels : public anlnext::BasicModule
+{
+  DEFINE_ANL_MODULE(SetHotPixels, 1.0);
+  ENABLE_PARALLEL_RUN();
+public:
+  SetHotPixels();
+  
+public:
   anlnext::ANLStatus mod_define() override;
   anlnext::ANLStatus mod_initialize() override;
-  anlnext::ANLStatus mod_analyze() override;
+  anlnext::ANLStatus mod_begin_run() override;
 
 private:
-  void sampleEventTimes();
-
-private:
-  int64_t m_NumEvents = -1;
-  double m_Time0 = 0.0;
-  double m_Time1 = 0.0;
-  int m_Seed = -1;
-  bool m_SortTime = false;
-  double m_CountRate = 0.0;
-  double m_Exposure = 0.0;
-
-  CSHitCollection* m_HitCollection = nullptr;
-  ReadEventTree* m_ReadEventTree = nullptr;
-  std::list<double> m_TimeList;
+  std::string filename_;
+  ConstructFrame* frame_owner_ = nullptr;
 };
 
 } /* namespace comptonsoft */
 
-#endif /* COMPTONSOFT_AssignTime_H */
+#endif /* COMPTONSOFT_SetHotPixels_H */

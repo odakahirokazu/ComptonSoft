@@ -17,69 +17,80 @@
  *                                                                       *
  *************************************************************************/
 
-#include "AnalyzeFrame.hh"
+#include "SetPedestals.hh"
 #include "FrameData.hh"
+#include "ConstructFrame.hh"
+
+namespace cfitsio
+{
+extern "C" {
+#include "fitsio.h"
+}
+}
 
 using namespace anlnext;
 
-namespace comptonsoft {
+namespace comptonsoft{
 
-AnalyzeFrame::AnalyzeFrame()
-  : event_size_(5)
+SetPedestals::SetPedestals()
+  : filename_("pedestals.fits")
 {
-  add_alias("AnalyzeFrame");
 }
 
-ANLStatus AnalyzeFrame::mod_define()
+ANLStatus SetPedestals::mod_define()
 {
-  define_parameter("pedestal_level", &mod_class::pedestal_level_);
-  define_parameter("event_threshold", &mod_class::event_threshold_);
-  define_parameter("split_threshold", &mod_class::split_threshold_);
-  define_parameter("event_size", &mod_class::event_size_);
-  
+  define_parameter("filename", &mod_class::filename_);
   return AS_OK;
 }
 
-ANLStatus AnalyzeFrame::mod_initialize()
+ANLStatus SetPedestals::mod_initialize()
 {
   get_module_NC("ConstructFrame", &frame_owner_);
-
   return AS_OK;
 }
 
-ANLStatus AnalyzeFrame::mod_begin_run()
+ANLStatus SetPedestals::mod_begin_run()
 {
-  FrameData& frame = frame_owner_->getFrame();
-  frame.setEventThreshold(event_threshold_);
-  frame.setSplitThreshold(split_threshold_);
-  frame.setPedestals(pedestal_level_);
-  frame.setEventSize(event_size_);
+  FrameData& frameData = frame_owner_->getFrame();
 
-  return AS_OK;
-}
+  image_t& pedestals = frameData.getPedestals();
+  const int nx = pedestals.shape()[0];
+  const int ny = pedestals.shape()[1];
 
-ANLStatus AnalyzeFrame::mod_analyze()
-{
-  events_.clear();
+  cfitsio::fitsfile* fitsFile = nullptr;
+  int fitsStatus = 0;
+  long StartPixel[2] = {1, 1};
+  const long NumPixels = nx*ny;
+  int nulval = 0;
+  int anynul = 0;
 
-  const int frameID = frame_owner_->FrameID();
-  FrameData& frame = frame_owner_->getFrame();
-  frame.stack();
-  frame.subtractPedestals();
+  std::vector<double> array;
+  array.resize(NumPixels, 0.0);
 
-  std::vector<comptonsoft::XrayEvent_sptr> es = frame.extractEvents();
-  for (auto& event: es) {
-    event->setFrameID(frameID);
+  cfitsio::fits_open_image(&fitsFile, filename_.c_str(), READONLY, &fitsStatus);
+  if (fitsStatus) {
+    cfitsio::fits_report_error(stderr, fitsStatus);
+    return AS_ERROR;
   }
-  std::move(es.begin(), es.end(), std::back_inserter(events_));
 
-  return AS_OK;
-}
+  cfitsio::fits_read_pix(fitsFile, TDOUBLE, StartPixel, NumPixels, &nulval, &array[0], &anynul, &fitsStatus);
+  if (fitsStatus) {
+    cfitsio::fits_report_error(stderr, fitsStatus);
+    return AS_ERROR;
+  }
 
-ANLStatus AnalyzeFrame::mod_end_run()
-{
-  FrameData& frame = frame_owner_->getFrame();
-  frame.calculatePedestals();
+  cfitsio::fits_close_file(fitsFile, &fitsStatus);
+  if (fitsStatus) {
+    cfitsio::fits_report_error(stderr, fitsStatus);
+    return AS_ERROR;
+  }
+
+  for (int iy=0; iy<ny; iy++){
+    for (int ix=0; ix<nx; ix++){
+      pedestals[ix][iy] = array[iy*nx+ix];
+    }
+  }
+
   return AS_OK;
 }
 

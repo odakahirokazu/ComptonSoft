@@ -75,12 +75,19 @@ clMod = [
   ANL::SWIGClass.new("AnalyzeFrame"),
   ANL::SWIGClass.new("WriteXrayEventTree"),
   ANL::SWIGClass.new("SortEventTreeWithTime"),
+  ANL::SWIGClass.new("SetPedestals", false, 'USE_FITSIO'),
+  ANL::SWIGClass.new("SetHotPixels"),
+  ANL::SWIGClass.new("MakePedestals", false, 'USE_FITSIO'),
+  ANL::SWIGClass.new("MakeHotPixels"),
+  ANL::SWIGClass.new("AnalyzeDarkFrame"),
 ]
 
-clSim = [# primary generator
+clSim = [
+  # primary generator
   ANL::SWIGClass.new("AHRayTracingPrimaryGen", false, 'USE_FITSIO'),
   ANL::SWIGClass.new("SimXPrimaryGen", false, 'USE_SIMX'),
   ANL::SWIGClass.new("AHRadiationBackgroundPrimaryGen"),
+  ANL::SWIGClass.new("AEObservationPrimaryGen", false, 'USE_FITSIO'),
   # user action assembly
   ANL::SWIGClass.new("RadioactiveDecayUserActionAssembly"),
   ANL::SWIGClass.new("ActivationUserActionAssembly"),

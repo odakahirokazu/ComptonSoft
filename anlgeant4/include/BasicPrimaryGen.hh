@@ -165,7 +165,14 @@ protected:
 
   double LengthUnit() const;
   std::string LengthUnitName() const;
-  
+
+  void setSpectrumEnergy(const std::vector<double>& v) { spectrumEnergy_ = v; }
+  void setSpectrumPhotons(const std::vector<double>& v) { spectrumPhotons_ = v; }
+  std::vector<double>& SpectrumEnergy() { return spectrumEnergy_; }
+  const std::vector<double>& SpectrumEnergy() const { return spectrumEnergy_; }
+  std::vector <double>& SpectrumPhotons() { return spectrumPhotons_; }
+  const std::vector<double>& SpectrumPhotons() const { return spectrumPhotons_; }
+
 private:
   BasicPrimaryGeneratorAction* primaryGenerator_ = nullptr;
   const anlgeant4::VANLGeometry* geometry_ = nullptr;

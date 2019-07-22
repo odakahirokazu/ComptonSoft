@@ -48,6 +48,9 @@ public:
 
   int EventSize() const { return size_; }
 
+  virtual void copyFrom(const image_t& image, int ix, int iy);
+  virtual void reduce();
+
   void setSplitThreshold(double v) { splitThreshold_ = v; }
   double SplitThreshold() const { return splitThreshold_; }
 
@@ -57,13 +60,22 @@ public:
   void setTime(double v) { time_ = v; }
   double Time() const { return time_; }
 
-  virtual void copyFrom(const image_t& image, int ix, int iy);
-  virtual void reduce();
-
-  const image_t& Data() const { return data_; }
+  void setX(int v) { ix_ = v; }
+  void setY(int v) { iy_ = v; }
   int X() const { return  ix_;  }
   int Y() const { return  iy_;  }
+
+  void setData(int i, int j, double v) { data_[i][j] = v; }
+  image_t& Data() { return data_; }
+  const image_t& Data() const { return data_; }
   
+  void setValue(double v) { value_ = v; }
+  void setCenterPH(double v) { centerPH_ = v; }
+  void setWeight(int v) { weight_ = v; }
+  void setRank(int v) { rank_ = v;}
+  void setAngle(double v) { angle_ = v; }
+  void setGrade(int v) { grade_ = v; }
+
   double Value() const { return value_; }
   int Weight() const { return weight_; }
   int Rank() const { return rank_;}
@@ -72,16 +84,6 @@ public:
   int Grade() const { return grade_; }
 
 protected:
-  image_t& Data() { return data_; }
-
-  void setValue(double v) { value_ = v; }
-  void setWeight(int v) { weight_ = v; }
-  void setRank(int v) { rank_ = v;}
-  void setAngle(double v) { angle_ = v; }
-  void setCenterPH(double v) { centerPH_ = v; }
-  void setGrade(int v) { grade_ = v; }
-  void setData(int i, int j, double v) { data_[i][j]=v; }
-
   virtual double calculateEventAngle() const;
 
 private:
@@ -95,10 +97,10 @@ private:
   image_t data_;
   
   double value_ = 0.0;
+  double centerPH_ = 0.0;
   int weight_ = 0;
   int rank_ = 0;
   double angle_ = 0.0;
-  double centerPH_ = 0.0;
   int grade_ = -1;
 };
 

@@ -54,6 +54,7 @@ set(CS_SIMULATION_CLASSES_BASIC
 if(CS_USE_FITSIO)
   set(CS_SIMULATION_CLASSES_FITSIO
     src/AHRayTracingPrimaryGen.cc
+    src/AEObservationPrimaryGen.cc
     )
 endif()
 

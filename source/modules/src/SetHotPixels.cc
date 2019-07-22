@@ -17,69 +17,58 @@
  *                                                                       *
  *************************************************************************/
 
-#include "AnalyzeFrame.hh"
+#include "SetHotPixels.hh"
 #include "FrameData.hh"
+#include <fstream>
 
 using namespace anlnext;
 
-namespace comptonsoft {
+namespace comptonsoft{
 
-AnalyzeFrame::AnalyzeFrame()
-  : event_size_(5)
+SetHotPixels::SetHotPixels()
+  : filename_("hotpix.txt")
 {
-  add_alias("AnalyzeFrame");
 }
 
-ANLStatus AnalyzeFrame::mod_define()
+ANLStatus SetHotPixels::mod_define()
 {
-  define_parameter("pedestal_level", &mod_class::pedestal_level_);
-  define_parameter("event_threshold", &mod_class::event_threshold_);
-  define_parameter("split_threshold", &mod_class::split_threshold_);
-  define_parameter("event_size", &mod_class::event_size_);
-  
+  define_parameter("filename", &mod_class::filename_);
   return AS_OK;
 }
 
-ANLStatus AnalyzeFrame::mod_initialize()
+ANLStatus SetHotPixels::mod_initialize()
 {
   get_module_NC("ConstructFrame", &frame_owner_);
-
   return AS_OK;
 }
 
-ANLStatus AnalyzeFrame::mod_begin_run()
+ANLStatus SetHotPixels::mod_begin_run()
 {
-  FrameData& frame = frame_owner_->getFrame();
-  frame.setEventThreshold(event_threshold_);
-  frame.setSplitThreshold(split_threshold_);
-  frame.setPedestals(pedestal_level_);
-  frame.setEventSize(event_size_);
-
-  return AS_OK;
-}
-
-ANLStatus AnalyzeFrame::mod_analyze()
-{
-  events_.clear();
-
-  const int frameID = frame_owner_->FrameID();
-  FrameData& frame = frame_owner_->getFrame();
-  frame.stack();
-  frame.subtractPedestals();
-
-  std::vector<comptonsoft::XrayEvent_sptr> es = frame.extractEvents();
-  for (auto& event: es) {
-    event->setFrameID(frameID);
+  std::vector<std::pair<int, int>> hotPixels;
+  std::ifstream fin(filename_);
+  int x=0, y=0;
+  while (fin >> x >> y) {
+    hotPixels.emplace_back(x, y);
   }
-  std::move(es.begin(), es.end(), std::back_inserter(events_));
+  fin.close();
 
-  return AS_OK;
-}
+  FrameData& frameData = frame_owner_->getFrame();
+  FrameData::flags_t& array = frameData.getHotPixels();
+  const int nx = array.shape()[0];
+  const int ny = array.shape()[1];
 
-ANLStatus AnalyzeFrame::mod_end_run()
-{
-  FrameData& frame = frame_owner_->getFrame();
-  frame.calculatePedestals();
+  for (int ix=0; ix<nx; ix++){
+    for (int iy=0; iy<ny; iy++){
+      array[ix][iy] = false;
+    }
+  }
+
+  for (const auto& pair: hotPixels) {
+    const int x = pair.first;
+    const int y = pair.second;
+    array[x][y] = true;
+  }
+
   return AS_OK;
 }
 

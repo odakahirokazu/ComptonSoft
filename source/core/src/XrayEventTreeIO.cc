@@ -104,15 +104,24 @@ XrayEvent_sptr XrayEventTreeIO::retrieveEvent() const
 {
   const int eventSize = 5;
   XrayEvent_sptr event(new XrayEvent(eventSize));
-  // to be implemented
-  return event;
-}
 
-std::list<XrayEvent_sptr> XrayEventTreeIO::retrieveEvents(int64_t& entry) const
-{
-  std::list<XrayEvent_sptr> events;
-  // to be implemented
-  return events;
+  event->setFrameID(frameID_);
+  event->setTime(time_);
+  event->setX(ix_);
+  event->setY(iy_);
+  event->setValue(value_);
+  event->setCenterPH(centerPH_ );
+  event->setWeight(weight_);
+  event->setRank(rank_);
+  event->setAngle(angle_);
+  event->setGrade(grade_);
+  for (int ix=0; ix<eventSize; ix++) {
+    for (int iy=0; iy<eventSize; iy++){
+      event->setData(ix, iy, data_[ix][iy]);
+    }
+  }
+
+  return event;
 }
 
 } /* namespace comptonsoft */

@@ -69,8 +69,9 @@ ANLStatus AHRayTracingPrimaryGen::mod_initialize()
   std::string colname[NumColumns] = {"energy","x","y","xDirection","yDirection","zDirection"};
   int colid[NumColumns] = {0};
   ffmahd(fits, 2, IMAGE_HDU, &fits_status);
-  if(fits_status){
+  if (fits_status){
     fits_report_error(stderr, fits_status);
+    return AS_QUIT_ERROR;
   }
   
   for(int i=0; i<NumColumns; ++i) {

@@ -56,16 +56,16 @@ public:
   void setEventSize(int v) { eventSize_ = v; }
   int EventSize() const { return eventSize_; }
 
-  void setThresholds(double event, double split)
-  {
-    eventThreshold_ = event;
-    splitThreshold_ = split;
-  }
+  void setEventThreshold(double v) { eventThreshold_ = v; }
+  void setSplitThreshold(double v) { splitThreshold_ = v; }
   double EventThreshold() const { return eventThreshold_; }
   double SplitThreshold() const { return splitThreshold_; }
+  void setHotPixelThreshold(double v) { hotPixelThreshold_ = v; }
+  double HotPixelThreshold() { return hotPixelThreshold_; }
 
   void resetRawFrame();
   virtual bool load(const std::string& filename);
+  bool loadRoot(const std::string& filename, int frameID);
   void stack();
 
   void setPedestals(double v);
@@ -74,7 +74,7 @@ public:
   virtual void subtractPedestals();
   virtual std::vector<XrayEvent_sptr> extractEvents();
 
-  void detectHotPixels(double threshold);
+  void detectHotPixels();
 
   const image_t& getRawFrame() const { return rawFrame_; }
   image_t& getRawFrame() { return rawFrame_; }
@@ -90,8 +90,8 @@ public:
   const image_t& getSum2Frame() const { return sum2_; }
   image_t& getSum2Frame() { return sum2_; }
 
-  const flags_t& getHotPixels() const { return hotpix_; }
-  flags_t& getHotPixels() { return hotpix_; }
+  const flags_t& getHotPixels() const { return hotPixels_; }
+  flags_t& getHotPixels() { return hotPixels_; }
 
 protected:
   bool isMaxPixel(int ix, int iy, int size) const;
@@ -115,8 +115,9 @@ private:
 
   double eventThreshold_ = 0.0;
   double splitThreshold_ = 0.0;
+  double hotPixelThreshold_ = 0.0;
 
-  flags_t hotpix_;
+  flags_t hotPixels_;
 };
 
 } /* namespace comptonsoft */

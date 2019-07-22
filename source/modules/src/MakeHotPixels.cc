@@ -1,6 +1,6 @@
 /*************************************************************************
  *                                                                       *
- * Copyright (c) 2011 Hirokazu Odaka                                     *
+ * Copyright (c) 2019 Hirokazu Odaka                                     *
  *                                                                       *
  * This program is free software: you can redistribute it and/or modify  *
  * it under the terms of the GNU General Public License as published by  *
@@ -17,69 +17,50 @@
  *                                                                       *
  *************************************************************************/
 
-#include "AnalyzeFrame.hh"
+#include "MakeHotPixels.hh"
+#include <fstream>
 #include "FrameData.hh"
 
 using namespace anlnext;
 
-namespace comptonsoft {
+namespace comptonsoft{
 
-AnalyzeFrame::AnalyzeFrame()
-  : event_size_(5)
+MakeHotPixels::MakeHotPixels()
+  : filename_("hotpix.txt")
 {
-  add_alias("AnalyzeFrame");
 }
 
-ANLStatus AnalyzeFrame::mod_define()
+ANLStatus MakeHotPixels::mod_define()
 {
-  define_parameter("pedestal_level", &mod_class::pedestal_level_);
-  define_parameter("event_threshold", &mod_class::event_threshold_);
-  define_parameter("split_threshold", &mod_class::split_threshold_);
-  define_parameter("event_size", &mod_class::event_size_);
-  
+  define_parameter("filename", &mod_class::filename_);
   return AS_OK;
 }
 
-ANLStatus AnalyzeFrame::mod_initialize()
+ANLStatus MakeHotPixels::mod_initialize()
 {
-  get_module_NC("ConstructFrame", &frame_owner_);
-
+  get_module("ConstructFrame", &frame_owner_);
   return AS_OK;
 }
 
-ANLStatus AnalyzeFrame::mod_begin_run()
+ANLStatus MakeHotPixels::mod_end_run()
 {
-  FrameData& frame = frame_owner_->getFrame();
-  frame.setEventThreshold(event_threshold_);
-  frame.setSplitThreshold(split_threshold_);
-  frame.setPedestals(pedestal_level_);
-  frame.setEventSize(event_size_);
+  const comptonsoft::FrameData& frameData = frame_owner_->getFrame();
+  const comptonsoft::FrameData::flags_t& hotpixArray = frameData.getHotPixels();
+  const int nx = hotpixArray.shape()[0];
+  const int ny = hotpixArray.shape()[1];
 
-  return AS_OK;
-}
-
-ANLStatus AnalyzeFrame::mod_analyze()
-{
-  events_.clear();
-
-  const int frameID = frame_owner_->FrameID();
-  FrameData& frame = frame_owner_->getFrame();
-  frame.stack();
-  frame.subtractPedestals();
-
-  std::vector<comptonsoft::XrayEvent_sptr> es = frame.extractEvents();
-  for (auto& event: es) {
-    event->setFrameID(frameID);
+  std::ofstream outputfile(filename_.c_str());
+  for (int ix=0; ix<nx; ix++){
+    for (int iy=0; iy<ny; iy++){
+      if (hotpixArray[ix][iy]){
+        outputfile<<ix;
+        outputfile<<" ";
+        outputfile<<iy;
+        outputfile<<"\n";
+      }
+    }
   }
-  std::move(es.begin(), es.end(), std::back_inserter(events_));
-
-  return AS_OK;
-}
-
-ANLStatus AnalyzeFrame::mod_end_run()
-{
-  FrameData& frame = frame_owner_->getFrame();
-  frame.calculatePedestals();
+  outputfile.close();
   return AS_OK;
 }
 

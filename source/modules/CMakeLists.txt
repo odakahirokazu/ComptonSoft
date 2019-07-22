@@ -54,6 +54,9 @@ set(CS_MODULES
   src/AnalyzeFrame.cc
   src/WriteXrayEventTree.cc
   src/SortEventTreeWithTime.cc
+  src/SetHotPixels.cc
+  src/MakeHotPixels.cc
+  src/AnalyzeDarkFrame.cc
   ### IO
   src/CreateRootFile.cc
   src/SaveData.cc
@@ -106,6 +109,8 @@ if(CS_USE_FITSIO)
   set(CS_FITSIO_MODULES
     ### Frame data processes
     src/MakeFrameFITS.cc
+    src/MakePedestals.cc
+    src/SetPedestals.cc
     )
 endif()
 
