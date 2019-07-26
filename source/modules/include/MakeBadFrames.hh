@@ -1,6 +1,6 @@
 /*************************************************************************
  *                                                                       *
- * Copyright (c) 2011 Hirokazu Odaka                                     *
+ * Copyright (c) 2019 Hirokazu Odaka                                     *
  *                                                                       *
  * This program is free software: you can redistribute it and/or modify  *
  * it under the terms of the GNU General Public License as published by  *
@@ -18,40 +18,45 @@
  *************************************************************************/
 
 /**
- * SetPedestals.
+ * MakeBadFrames.
  *
- * @author Hirokazu Odaka & Tsubasa Tamba
- * @date 2019-05
- * @merged to comptonsoft 2019-07-19
+ * @author Tsubasa Tamba
+ * @date 2019-07-24
  *
  */
 
-#ifndef COMPTONSOFT_SetPedestals_H
-#define COMPTONSOFT_SetPedestals_H 1
+#ifndef COMPTONSOFT_MakeBadFrames_H
+#define COMPTONSOFT_MakeBadFrames_H 1
 
 #include <anlnext/BasicModule.hh>
-#include "LoadFrame.hh"
+#include "ConstructFrame.hh"
 
-namespace comptonsoft
-{
+namespace comptonsoft {
 
-class SetPedestals : public anlnext::BasicModule
+class MakeBadFrames : public anlnext::BasicModule
 {
-  DEFINE_ANL_MODULE(SetPedestals, 1.0);
+  DEFINE_ANL_MODULE(MakeBadFrames, 1.0);
   ENABLE_PARALLEL_RUN();
 public:
-  SetPedestals();
+  MakeBadFrames();
   
 public:
   anlnext::ANLStatus mod_define() override;
   anlnext::ANLStatus mod_initialize() override;
-  anlnext::ANLStatus mod_begin_run() override;
+  anlnext::ANLStatus mod_analyze() override;
+  anlnext::ANLStatus mod_end_run() override;
+
+  void calculateStatistics();
 
 private:
   std::string filename_;
-  ConstructFrame* frame_owner_ = nullptr;
+  const ConstructFrame* frame_owner_ = nullptr;
+  double thresholdSigma_;
+  std::vector<double> rawFrameMedian_;
+  double average_ = 0.0;
+  double sigma_ = 0.0;
 };
 
-} /* namespace comptonsoft */
+} /* namespace comptonsoft*/
 
-#endif /* COMPTONSOFT_SetPedestals_H */
+#endif /* COMPTONSOFT_MakeBadFrames_H */

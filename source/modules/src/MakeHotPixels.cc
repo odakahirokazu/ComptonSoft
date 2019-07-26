@@ -44,8 +44,8 @@ ANLStatus MakeHotPixels::mod_initialize()
 
 ANLStatus MakeHotPixels::mod_end_run()
 {
-  const comptonsoft::FrameData& frameData = frame_owner_->getFrame();
-  const comptonsoft::FrameData::flags_t& hotpixArray = frameData.getHotPixels();
+  const FrameData& frameData = frame_owner_->getFrame();
+  const FrameData::flags_t& hotpixArray = frameData.getHotPixels();
   const int nx = hotpixArray.shape()[0];
   const int ny = hotpixArray.shape()[1];
 

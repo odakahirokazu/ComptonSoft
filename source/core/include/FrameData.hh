@@ -50,9 +50,6 @@ public:
   int NumPixelsX() const { return num_pixels_x_; }
   int NumPixelsY() const { return num_pixels_y_; }
 
-  void setMargin(int v) { margin_ = v; }
-  int Margin() const { return margin_; }
-
   void setEventSize(int v) { eventSize_ = v; }
   int EventSize() const { return eventSize_; }
 
@@ -65,7 +62,6 @@ public:
 
   void resetRawFrame();
   virtual bool load(const std::string& filename);
-  bool loadRoot(const std::string& filename, int frameID);
   void stack();
 
   void setPedestals(double v);
@@ -76,6 +72,8 @@ public:
 
   void detectHotPixels();
 
+  void setRawFrame(const image_t& v) { rawFrame_ = v; }
+  void setFrame(const image_t& v) { frame_ = v; }
   const image_t& getRawFrame() const { return rawFrame_; }
   image_t& getRawFrame() { return rawFrame_; }
   const image_t& getFrame() const { return frame_; }
@@ -93,6 +91,11 @@ public:
   const flags_t& getHotPixels() const { return hotPixels_; }
   flags_t& getHotPixels() { return hotPixels_; }
 
+  void setBadFrame(bool v) { badFrame_ = v; }
+  bool BadFrame() { return badFrame_; }
+
+  double rawFrameMedian() const;
+
 protected:
   bool isMaxPixel(int ix, int iy, int size) const;
   bool includeHotPixel(int ix, int iy, int size) const;
@@ -101,7 +104,6 @@ private:
   const int num_pixels_x_ = 1;
   const int num_pixels_y_ = 1;
 
-  int margin_ = 0;
   int eventSize_ = 1;
 
   image_t rawFrame_;
@@ -118,6 +120,7 @@ private:
   double hotPixelThreshold_ = 0.0;
 
   flags_t hotPixels_;
+  bool badFrame_ = false;
 };
 
 } /* namespace comptonsoft */

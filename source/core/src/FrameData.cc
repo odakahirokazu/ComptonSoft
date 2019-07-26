@@ -35,7 +35,6 @@ namespace comptonsoft
 FrameData::FrameData(const int nx, const int ny)
   : num_pixels_x_(nx),
     num_pixels_y_(ny),
-    margin_(10),
     rawFrame_(boost::extents[nx][ny]),
     frame_(boost::extents[nx][ny]),
     pedestals_(boost::extents[nx][ny]),
@@ -90,26 +89,6 @@ bool FrameData::load(const std::string& filename)
       rawFrame_[i][j] = v;
     }
   }
-  return true;
-}
-
-bool FrameData::loadRoot(const std::string& filename, int frameID)
-{
-  const int nx = NumPixelsX();
-  const int ny = NumPixelsY();
-  uint16_t raw_ph[8][8];
-  TFile* f = new TFile(filename.c_str());
-  TTree* tree = static_cast<TTree*>(f->Get("XRPIX_Data"));
-  tree->SetBranchAddress("ADC", &raw_ph);
-  tree->GetEntry(frameID);
-
-	// read root of frameID
-  for (int i=0; i<nx; i++) {
-    for (int j=0; j<ny; j++) {
-      rawFrame_[i][j] = raw_ph[i][j];
-    }
-  }
-
   return true;
 }
 
@@ -169,15 +148,14 @@ void FrameData::subtractPedestals()
 std::vector<XrayEvent_sptr> FrameData::extractEvents()
 {
   std::vector<XrayEvent_sptr> events;
-  const int nx = NumPixelsX();
-  const int ny = NumPixelsY();
-  const int margin = Margin();
-  const int size = EventSize();
-
-  if (size>=margin) {
-    std::cout << "Event size is larger than the pixel margin." << std::endl;
+  if (badFrame_) {
     return events;
   }
+
+  const int nx = NumPixelsX();
+  const int ny = NumPixelsY();
+  const int size = EventSize();
+  const int margin = size/2;
 
   std::list<std::pair<int, int>> hitPixels;
   for (int ix=margin; ix<nx-margin; ix++) {
@@ -252,6 +230,26 @@ bool FrameData::includeHotPixel(int ix, int iy, int size) const
     }
   }
   return false;
+}
+
+double FrameData::rawFrameMedian() const
+{
+  const int nx = NumPixelsX();
+  const int ny = NumPixelsY();
+  std::vector<double> v;
+  for (int ix=0; ix<nx; ix++) {
+    for (int iy=0; iy<ny; iy++) {
+      v.push_back(rawFrame_[ix][iy]);
+    }
+  }
+  std::sort(v.begin(), v.end());
+  const int size = v.size();
+  if (size%2==1) {
+    return v[size/2];
+  }
+  else {
+    return 0.5*(v[size/2]+v[size/2-1]);
+  }
 }
 
 } /* namespace comptonsoft */

@@ -18,40 +18,41 @@
  *************************************************************************/
 
 /**
- * SetPedestals.
+ * SetBadFrames.
  *
- * @author Hirokazu Odaka & Tsubasa Tamba
- * @date 2019-05
- * @merged to comptonsoft 2019-07-19
+ * @author Tsubasa Tamba
+ * @date 2019-07-24
  *
  */
 
-#ifndef COMPTONSOFT_SetPedestals_H
-#define COMPTONSOFT_SetPedestals_H 1
+#ifndef COMPTONSOFT_SetBadFrames_H
+#define COMPTONSOFT_SetBadFrames_H 1
 
 #include <anlnext/BasicModule.hh>
-#include "LoadFrame.hh"
+#include <list>
+#include "ConstructFrame.hh"
 
-namespace comptonsoft
-{
+namespace comptonsoft {
 
-class SetPedestals : public anlnext::BasicModule
+class SetBadFrames : public anlnext::BasicModule
 {
-  DEFINE_ANL_MODULE(SetPedestals, 1.0);
+  DEFINE_ANL_MODULE(SetBadFrames, 1.0);
   ENABLE_PARALLEL_RUN();
 public:
-  SetPedestals();
+  SetBadFrames();
   
 public:
   anlnext::ANLStatus mod_define() override;
   anlnext::ANLStatus mod_initialize() override;
   anlnext::ANLStatus mod_begin_run() override;
+  anlnext::ANLStatus mod_analyze() override;
 
 private:
   std::string filename_;
   ConstructFrame* frame_owner_ = nullptr;
+  std::list<int> badFrames_;
 };
 
 } /* namespace comptonsoft */
 
-#endif /* COMPTONSOFT_SetPedestals_H */
+#endif /* COMPTONSOFT_SetBadFrames_H */

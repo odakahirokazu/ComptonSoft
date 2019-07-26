@@ -80,6 +80,10 @@ clMod = [
   ANL::SWIGClass.new("MakePedestals", false, 'USE_FITSIO'),
   ANL::SWIGClass.new("MakeHotPixels"),
   ANL::SWIGClass.new("AnalyzeDarkFrame"),
+  ANL::SWIGClass.new("LoadRootFrame"),
+  ANL::SWIGClass.new("MakeBadFrames"),
+  ANL::SWIGClass.new("SetBadFrames"),
+  ANL::SWIGClass.new("SetPedestalsByMedian"),
 ]
 
 clSim = [

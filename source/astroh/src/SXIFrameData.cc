@@ -42,14 +42,9 @@ std::vector<XrayEvent_sptr> SXIFrameData::extractEvents()
 
   const int nx = NumPixelsX();
   const int ny = NumPixelsY();
-  const int margin = 3;
+  const int margin = 2;
   const int innerSize = 3;
   const int outerSize = 5;
-
-  if (innerSize>margin) {
-    std::cout << "Event size is larger than the pixel margin." << std::endl;
-    return events;
-  }
 
   std::list<std::pair<int, int>> hitPixels;
   for (int iy=margin; iy<ny-margin; iy++) {

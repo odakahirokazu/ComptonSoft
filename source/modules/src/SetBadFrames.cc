@@ -17,41 +17,56 @@
  *                                                                       *
  *************************************************************************/
 
-/**
- * SetPedestals.
- *
- * @author Hirokazu Odaka & Tsubasa Tamba
- * @date 2019-05
- * @merged to comptonsoft 2019-07-19
- *
- */
+#include "SetBadFrames.hh"
+#include "FrameData.hh"
+#include <fstream>
 
-#ifndef COMPTONSOFT_SetPedestals_H
-#define COMPTONSOFT_SetPedestals_H 1
+using namespace anlnext;
 
-#include <anlnext/BasicModule.hh>
-#include "LoadFrame.hh"
+namespace comptonsoft{
 
-namespace comptonsoft
+SetBadFrames::SetBadFrames()
+  : filename_("hotpix.txt")
 {
+}
 
-class SetPedestals : public anlnext::BasicModule
+ANLStatus SetBadFrames::mod_define()
 {
-  DEFINE_ANL_MODULE(SetPedestals, 1.0);
-  ENABLE_PARALLEL_RUN();
-public:
-  SetPedestals();
-  
-public:
-  anlnext::ANLStatus mod_define() override;
-  anlnext::ANLStatus mod_initialize() override;
-  anlnext::ANLStatus mod_begin_run() override;
+  define_parameter("filename", &mod_class::filename_);
+  return AS_OK;
+}
 
-private:
-  std::string filename_;
-  ConstructFrame* frame_owner_ = nullptr;
-};
+ANLStatus SetBadFrames::mod_initialize()
+{
+  get_module_NC("ConstructFrame", &frame_owner_);
+  return AS_OK;
+}
+
+ANLStatus SetBadFrames::mod_begin_run()
+{
+  std::ifstream fin(filename_);
+  int x=0;
+  while (fin >> x) {
+    badFrames_.push_back(x);
+  }
+  fin.close();
+
+  return AS_OK;
+}
+
+ANLStatus SetBadFrames::mod_analyze()
+{
+  FrameData& frameData = frame_owner_->getFrame();
+  const int frameID = frame_owner_->FrameID();
+  if (frameID==badFrames_.front()) {
+    frameData.setBadFrame(true);
+    badFrames_.pop_front();
+  } 
+  else {
+    frameData.setBadFrame(false);
+  }
+
+  return AS_OK;
+}
 
 } /* namespace comptonsoft */
-
-#endif /* COMPTONSOFT_SetPedestals_H */

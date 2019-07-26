@@ -17,86 +17,70 @@
  *                                                                       *
  *************************************************************************/
 
-#include "MakePedestals.hh"
+#include "MakeBadFrames.hh"
+#include <fstream>
 #include "FrameData.hh"
-#include <string>
-
-namespace cfitsio
-{
-extern "C" {
-#include "fitsio.h"
-}
-}
 
 using namespace anlnext;
 
-namespace comptonsoft
-{
+namespace comptonsoft{
 
-MakePedestals::MakePedestals()
-  : filename_("pedestals.fits")
+MakeBadFrames::MakeBadFrames()
+  : filename_("badframes.txt"),
+    thresholdSigma_(3.0)
 {
 }
 
-ANLStatus MakePedestals::mod_define()
+ANLStatus MakeBadFrames::mod_define()
 {
   define_parameter("filename", &mod_class::filename_);
+  define_parameter("threshold_sigma", &mod_class::thresholdSigma_);
   return AS_OK;
 }
 
-ANLStatus MakePedestals::mod_initialize()
+ANLStatus MakeBadFrames::mod_initialize()
 {
   get_module("ConstructFrame", &frame_owner_);
-  
   return AS_OK;
 }
 
-ANLStatus MakePedestals::mod_end_run()
+ANLStatus MakeBadFrames::mod_analyze()
 {
-  const FrameData& currentFrameData = frame_owner_->getFrame();
-  const image_t& pedestals = currentFrameData.getPedestals();
-  const int nx = pedestals.shape()[0];
-  const int ny = pedestals.shape()[1];
-
-  std::vector<double> array;
-  array.reserve(nx*ny);
-  for (int iy=0; iy<ny; iy++) {
-    for (int ix=0; ix<nx; ix++) {
-      array.push_back(pedestals[ix][iy]);
-    }
-  }
-
-  cfitsio::fitsfile* fitsFile = nullptr;
-  int fitsStatus = 0;
-  long StartPixel[2] = {1, 1};
-  long NumPixelsArray[2]= {nx, ny};
-  const long NumPixels = nx*ny;
-
-  cfitsio::fits_create_file(&fitsFile, filename_.c_str(), &fitsStatus);
-  if (fitsStatus) {
-    cfitsio::fits_report_error(stderr, fitsStatus);
-    return AS_ERROR;
-  }
-
-  cfitsio::fits_create_img(fitsFile, DOUBLE_IMG, 2, NumPixelsArray, &fitsStatus);
-  if (fitsStatus) {
-    cfitsio::fits_report_error(stderr, fitsStatus);
-    return AS_ERROR;
-  }
-
-  cfitsio::fits_write_pix(fitsFile, TDOUBLE, StartPixel, NumPixels, &array[0], &fitsStatus);
-  if (fitsStatus){
-    cfitsio::fits_report_error(stderr, fitsStatus);
-    return AS_ERROR;
-  }
-
-  cfitsio::fits_close_file(fitsFile, &fitsStatus);
-  if (fitsStatus){
-    cfitsio::fits_report_error (stderr, fitsStatus);
-    return AS_ERROR;
-  }
+  const FrameData& frameData = frame_owner_->getFrame();
+  const double v = frameData.rawFrameMedian();
+  rawFrameMedian_.push_back(v);
 
   return AS_OK;
+}
+
+ANLStatus MakeBadFrames::mod_end_run()
+{
+  calculateStatistics();
+  const double upperTh = average_ + thresholdSigma_*sigma_;
+  const double lowerTh = average_ - thresholdSigma_*sigma_;
+  std::ofstream outputfile(filename_.c_str());
+  for (size_t i=0; i<rawFrameMedian_.size(); i++){
+    if (rawFrameMedian_[i]>upperTh || rawFrameMedian_[i]<lowerTh){
+      outputfile<<i;
+      outputfile<<"\n";
+    }
+  }
+  outputfile.close();
+  return AS_OK;
+}
+
+void MakeBadFrames::calculateStatistics()
+{
+  const size_t size = rawFrameMedian_.size();
+  double sum = 0.0;
+  double sum2 = 0.0;
+  for (size_t i=0; i<size; i++) {
+    sum += rawFrameMedian_[i];
+    sum2 += rawFrameMedian_[i]*rawFrameMedian_[i];
+  }
+  average_ = sum/size;
+  const double deviation = sum2/size-average_*average_;
+  sigma_ = sqrt(deviation);
 }
 
 } /* namespace comptonsoft */

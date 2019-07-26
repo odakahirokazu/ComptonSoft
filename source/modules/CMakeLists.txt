@@ -57,6 +57,10 @@ set(CS_MODULES
   src/SetHotPixels.cc
   src/MakeHotPixels.cc
   src/AnalyzeDarkFrame.cc
+  src/LoadRootFrame.cc
+  src/MakeBadFrames.cc
+  src/SetBadFrames.cc
+  src/SetPedestalsByMedian.cc
   ### IO
   src/CreateRootFile.cc
   src/SaveData.cc

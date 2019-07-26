@@ -80,6 +80,10 @@
 #endif
 #include "MakeHotPixels.hh"
 #include "AnalyzeDarkFrame.hh"
+#include "LoadRootFrame.hh"
+#include "MakeBadFrames.hh"
+#include "SetBadFrames.hh"
+#include "SetPedestalsByMedian.hh"
 #ifdef USE_FITSIO
 #include "AHRayTracingPrimaryGen.hh"
 #endif
@@ -738,6 +742,34 @@ class AnalyzeDarkFrame : public anlnext::BasicModule
 {
 public:
   AnalyzeDarkFrame();
+};
+
+
+class LoadRootFrame : public anlnext::BasicModule
+{
+public:
+  LoadRootFrame();
+};
+
+
+class MakeBadFrames : public anlnext::BasicModule
+{
+public:
+  MakeBadFrames();
+};
+
+
+class SetBadFrames : public anlnext::BasicModule
+{
+public:
+  SetBadFrames();
+};
+
+
+class SetPedestalsByMedian : public anlnext::BasicModule
+{
+public:
+  SetPedestalsByMedian();
 };
 
 
