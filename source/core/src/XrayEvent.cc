@@ -67,13 +67,13 @@ void XrayEvent::reduce()
 
   int rank = 0;
   int weight = 0;
-  double value = 0.0;
+  double sumPH = 0.0;
   for (int i=0; i<size; i++) {
     for (int j=0; j<size; j++) {
       const double v = data_[i][j];
       if (v > 0.0) {
         weight++;
-        value += v;
+        sumPH += v;
         const int dx = std::abs(i-halfSize);
         const int dy = std::abs(j-halfSize);
         const int thisRank = std::max(dx, dy);
@@ -86,7 +86,7 @@ void XrayEvent::reduce()
 
   rank_ = rank;
   weight_ = weight;
-  value_ = value;
+  sumPH_ = sumPH;
 
   angle_ = calculateEventAngle();
 }

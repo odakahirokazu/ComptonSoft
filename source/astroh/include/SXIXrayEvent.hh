@@ -55,7 +55,7 @@ public:
   double OuterSplitThreshold() const { return outerSplitThreshold_; }
   int makeOuterMask (int innerGrade);
   void classifyGrade();
-  double calculateSxiValue();
+  double calculateSxiSumPH();
   void calculateRank();
   void calculateWeightAndModifyData();
 

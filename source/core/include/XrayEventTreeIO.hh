@@ -61,7 +61,7 @@ private:
   int32_t ix_ = 0;
   int32_t iy_ = 0;
   double data_[9][9];
-  double value_ = 0.0;
+  double sumPH_ = 0.0;
   double centerPH_ = 0.0;
   int32_t weight_ = 0;
   int32_t rank_ = 0;

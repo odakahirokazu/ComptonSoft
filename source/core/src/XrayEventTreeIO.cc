@@ -41,7 +41,7 @@ void XrayEventTreeIO::defineBranches()
   tree_->Branch("ix",       &ix_,       "ix/I");
   tree_->Branch("iy",       &iy_,       "iy/I");
   tree_->Branch("data",     &data_,     "data[9][9]/D");
-  tree_->Branch("value",    &value_,    "value/D");
+  tree_->Branch("sumPH",    &sumPH_,    "sumPH/D");
   tree_->Branch("centerPH", &centerPH_, "centerPH/D");
   tree_->Branch("weight",   &weight_,   "weight/I");
   tree_->Branch("rank",     &rank_,     "rank/I");
@@ -56,7 +56,7 @@ void XrayEventTreeIO::setBranchAddresses()
   tree_->SetBranchAddress("ix",       &ix_);
   tree_->SetBranchAddress("iy",       &iy_);
   tree_->SetBranchAddress("data",     &data_);
-  tree_->SetBranchAddress("value",    &value_);
+  tree_->SetBranchAddress("sumPH",    &sumPH_);
   tree_->SetBranchAddress("centerPH", &centerPH_);
   tree_->SetBranchAddress("weight",   &weight_);
   tree_->SetBranchAddress("rank",     &rank_);
@@ -73,7 +73,7 @@ int XrayEventTreeIO::fillEvents(const XrayEventCIter events_begin, const XrayEve
     time_     = event->Time();
     ix_       = event->X();
     iy_       = event->Y();
-    value_    = event->Value();
+    sumPH_    = event->SumPH();
     centerPH_ = event->CenterPH();
     weight_   = event->Weight();
     rank_     = event->Rank();
@@ -109,7 +109,7 @@ XrayEvent_sptr XrayEventTreeIO::retrieveEvent() const
   event->setTime(time_);
   event->setX(ix_);
   event->setY(iy_);
-  event->setValue(value_);
+  event->setSumPH(sumPH_);
   event->setCenterPH(centerPH_ );
   event->setWeight(weight_);
   event->setRank(rank_);

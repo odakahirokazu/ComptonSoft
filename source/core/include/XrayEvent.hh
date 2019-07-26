@@ -69,14 +69,14 @@ public:
   image_t& Data() { return data_; }
   const image_t& Data() const { return data_; }
   
-  void setValue(double v) { value_ = v; }
+  void setSumPH(double v) { sumPH_ = v; }
   void setCenterPH(double v) { centerPH_ = v; }
   void setWeight(int v) { weight_ = v; }
   void setRank(int v) { rank_ = v;}
   void setAngle(double v) { angle_ = v; }
   void setGrade(int v) { grade_ = v; }
 
-  double Value() const { return value_; }
+  double SumPH() const { return sumPH_; }
   int Weight() const { return weight_; }
   int Rank() const { return rank_;}
   double Angle() const { return angle_; }
@@ -96,7 +96,7 @@ private:
   int iy_ = 0;
   image_t data_;
   
-  double value_ = 0.0;
+  double sumPH_ = 0.0;
   double centerPH_ = 0.0;
   int weight_ = 0;
   int rank_ = 0;

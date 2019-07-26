@@ -162,7 +162,7 @@ void SXIXrayEvent::classifyGrade()
   }
 }
 
-double SXIXrayEvent::calculateSxiValue()
+double SXIXrayEvent::calculateSxiSumPH()
 {
   double sumph;
   sumph = CenterPH();
@@ -250,7 +250,7 @@ void SXIXrayEvent::reduce()
   determineAscaGrade();
   outerMask_ = makeOuterMask(sxiInnerGrade_);
   classifyGrade();
-  setValue(calculateSxiValue());
+  setSumPH(calculateSxiSumPH());
   calculateRank();
   calculateWeightAndModifyData();
 }
