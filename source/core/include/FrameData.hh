@@ -66,6 +66,7 @@ public:
 
   void setPedestals(double v);
   virtual void calculatePedestals();
+  virtual void calculateDeviation();
 
   virtual void subtractPedestals();
   virtual std::vector<XrayEvent_sptr> extractEvents();
@@ -87,6 +88,8 @@ public:
   image_t& getSumFrame() { return sum_; }
   const image_t& getSum2Frame() const { return sum2_; }
   image_t& getSum2Frame() { return sum2_; }
+  const image_t& getDeviationFrame() const { return deviation_; }
+  image_t& getDeviationFrame() { return deviation_; }
 
   const flags_t& getHotPixels() const { return hotPixels_; }
   flags_t& getHotPixels() { return hotPixels_; }
@@ -95,6 +98,9 @@ public:
   bool BadFrame() { return badFrame_; }
 
   double rawFrameMedian() const;
+
+  void setTrimSize(int v) { trimSize_ = v; }
+  int TrimSize() { return trimSize_; }
 
 protected:
   bool isMaxPixel(int ix, int iy, int size) const;
@@ -105,6 +111,7 @@ private:
   const int num_pixels_y_ = 1;
 
   int eventSize_ = 1;
+  int trimSize_ = 0;
 
   image_t rawFrame_;
   image_t frame_;
@@ -113,6 +120,7 @@ private:
   image_t weight_;
   image_t sum_;
   image_t sum2_;
+  image_t deviation_;
   std::vector<char> buf_;
 
   double eventThreshold_ = 0.0;

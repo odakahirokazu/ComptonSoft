@@ -78,6 +78,7 @@ ANLStatus LoadRootFrame::mod_analyze()
       rawFrame_[i][j] = static_cast<double>(rawPH_[i][j]);
     }
   }
+
   frame.setRawFrame(rawFrame_);
 
   return AS_OK;

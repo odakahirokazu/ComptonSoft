@@ -70,6 +70,7 @@ ANLStatus SetPedestalsByMedian::mod_analyze()
   }
 
   if (frameID==frameBin_) {
+    frameData.setBadFrame(false);
     for (int ix=0; ix<nx_; ix++){
       for (int iy=0; iy<ny_; iy++){
         auto comp = [](const std::pair<int, double>& a, const std::pair<int, double>& b){

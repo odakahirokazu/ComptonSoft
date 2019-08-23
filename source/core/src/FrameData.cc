@@ -41,12 +41,14 @@ FrameData::FrameData(const int nx, const int ny)
     weight_(boost::extents[nx][ny]),
     sum_(boost::extents[nx][ny]),
     sum2_(boost::extents[nx][ny]),
+    deviation_(boost::extents[nx][ny]),
     hotPixels_(boost::extents[nx][ny])
 {
   for (int i=0; i<nx; i++) {
     for (int j=0; j<ny; j++) {
       sum_[i][j] = 0.0;
       sum2_[i][j] = 0.0;
+      deviation_[i][j] = 0.0;
       hotPixels_[i][j] = false;
     }
   }
@@ -120,6 +122,20 @@ void FrameData::setPedestals(const double v)
   }
 }
 
+void FrameData::calculateDeviation()
+{
+  const int nx = NumPixelsX();
+  const int ny = NumPixelsY();
+  for (int i=0; i<nx; i++) {
+    for (int j=0; j<ny; j++) {
+      const double w = weight_[i][j];
+      if (w != 0.0) {
+        deviation_[i][j] = sqrt(sum2_[i][j]/w - (sum_[i][j]*sum_[i][j])/(w*w));
+      }
+    }
+  }
+}
+
 void FrameData::calculatePedestals()
 {
   const int nx = NumPixelsX();
@@ -155,7 +171,7 @@ std::vector<XrayEvent_sptr> FrameData::extractEvents()
   const int nx = NumPixelsX();
   const int ny = NumPixelsY();
   const int size = EventSize();
-  const int margin = size/2;
+  const int margin = size/2+TrimSize();
 
   std::list<std::pair<int, int>> hitPixels;
   for (int ix=margin; ix<nx-margin; ix++) {

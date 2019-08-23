@@ -40,9 +40,13 @@ std::vector<XrayEvent_sptr> SXIFrameData::extractEvents()
   image_t &sxiFrame = getFrame();
   std::vector<XrayEvent_sptr> events;
 
+  if (BadFrame()) {
+    return events;
+  }
+
   const int nx = NumPixelsX();
   const int ny = NumPixelsY();
-  const int margin = 2;
+  const int margin = 2+TrimSize();
   const int innerSize = 3;
   const int outerSize = 5;
 
@@ -51,7 +55,7 @@ std::vector<XrayEvent_sptr> SXIFrameData::extractEvents()
     for (int ix=margin; ix<nx-margin; ix++) {
       const double v = sxiFrame[ix][iy];
       if (v > EventThreshold()) {
-        if (isMaxPixel(ix, iy, innerSize) && !surroundDiscri(sxiFrame, ix, iy, innerSize, SurroundThreshold(), NpixSurroundThreshold())) {
+        if (isMaxPixel(ix, iy, innerSize) && !surroundDiscri(sxiFrame, ix, iy, innerSize, SurroundThreshold(), NpixSurroundThreshold()) && !(includeHotPixel(ix, iy, outerSize))) {
           hitPixels.emplace_back(ix, iy);
         }
       }

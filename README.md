@@ -1,7 +1,7 @@
 Compton Soft
 ================================================================
 
-- Version: 5.3.7
+- Version: 5.3.8
 - Author: Hirokazu Odaka
 
 ----
@@ -108,6 +108,7 @@ Information
 
 ### History
 
+- 5.3.8 | 2019-08-23 | H. Odaka, T. Tamba | data analysis of CMOS/CCD imagers (RC for 5.4)
 - 5.3 | 2017-08-28 | H. Odaka | migration to ANL Next 2.0
 - 5.2 | 2016-09-07 | H. Odaka | New design of XML database. Timing process.
 - 5.1 | 2015-10-19 | H. Odaka | Stable version. A big minor update since 5.0.

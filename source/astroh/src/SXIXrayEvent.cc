@@ -253,6 +253,7 @@ void SXIXrayEvent::reduce()
   setSumPH(calculateSxiSumPH());
   calculateRank();
   calculateWeightAndModifyData();
+  setAngle(calculateEventAngle());
 }
 
 } /* namespace comptonsoft */

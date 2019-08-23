@@ -17,22 +17,27 @@
  *                                                                       *
  *************************************************************************/
 
-#ifndef COMPTONSOFT_AnalyzeFrame_H
-#define COMPTONSOFT_AnalyzeFrame_H 1
-
-#include <iterator>
-#include <anlnext/BasicModule.hh>
-#include "ConstructFrame.hh"
-#include "XrayEvent.hh"
-
-namespace comptonsoft {
-
 /**
  * AnalyzeFrame
  *
  * @author Hirokazu Odaka
  * @date 2019-05-23
  */
+
+#ifndef COMPTONSOFT_AnalyzeFrame_H
+#define COMPTONSOFT_AnalyzeFrame_H 1
+
+#include <iterator>
+#include <boost/multi_array.hpp>
+#include <tuple>
+#include <anlnext/BasicModule.hh>
+#include "ConstructFrame.hh"
+#include "XrayEvent.hh"
+
+namespace comptonsoft {
+
+using gain_t = boost::multi_array<std::tuple<double, double, double, double>, 2>;
+
 class AnalyzeFrame : public anlnext::BasicModule
 {
   DEFINE_ANL_MODULE(AnalyzeFrame, 1.0);
@@ -60,9 +65,13 @@ private:
   double event_threshold_ = 0.0;
   double split_threshold_ = 0.0;
   int event_size_ = 1;
+  bool setGain_ = false;
+  std::string gainFile_;
+  int trimSize_ = 0;
 
   ConstructFrame* frame_owner_ = nullptr;
   XrayEventContainer events_;
+  gain_t gainCoefficient_;
 };
 
 } /* namespace comptonsoft */

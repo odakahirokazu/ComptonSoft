@@ -55,9 +55,12 @@ ANLStatus AEObservationPrimaryGen::mod_define()
   register_parameter(&pixelX_, "num_pixel_x");
   register_parameter(&pixelY_, "num_pixel_y");
   register_parameter(&exposure_, "exposure", unit::s, "s");
-  register_parameter(&flux_, "flux", unit::erg/(unit::cm*unit::cm*unit::s), "erg s^-1 cm^-2");
-  register_parameter(&fluxEnergyMin_, "flux_energy_min", unit::keV, "keV");
-  register_parameter(&fluxEnergyMax_, "flux_energy_max", unit::keV, "keV");
+  register_parameter(&useFlux_, "use_flux");
+  if (useFlux_) {
+    register_parameter(&flux_, "flux", unit::erg/(unit::cm*unit::cm*unit::s), "erg s^-1 cm^-2");
+    register_parameter(&fluxEnergyMin_, "flux_energy_min", unit::keV, "keV");
+    register_parameter(&fluxEnergyMax_, "flux_energy_max", unit::keV, "keV");
+  }
 
   return AS_OK;
 }
@@ -163,6 +166,17 @@ ANLStatus AEObservationPrimaryGen::mod_pre_initialize()
 
   const std::vector<double>& spectrumEnergy = SpectrumEnergy();
   const std::vector<double>& spectrumPhotons = SpectrumPhotons();
+
+  if (!useFlux_) {
+    fluxEnergyMin_ = spectrumEnergy[0];
+    fluxEnergyMax_ = spectrumEnergy[spectrumEnergy.size()-1];
+    for (size_t i=0; i<spectrumPhotons.size(); i++) {
+      const double y = spectrumPhotons[i] / (unit::cm * unit::cm * unit::s);
+      const double energy = 0.5 * (spectrumEnergy[i+1] + spectrumEnergy[i]);
+      flux_ += y * energy;
+    }
+  }
+
   std::vector<double> newSpectrumPhotons;
   newSpectrumPhotons.resize(spectrumPhotons.size(), 0.0);
 
@@ -204,6 +218,11 @@ ANLStatus AEObservationPrimaryGen::mod_analyze()
 {
   if (sumFlux_ > flux_) {
     return AS_QUIT;
+  }
+
+  if (sumFlux_ > flux_*percent_/100.0) {
+    std::cout << percent_ << "\% completed." << std::endl;
+    percent_ += 1;
   }
     
   return BasicPrimaryGen::mod_analyze();
@@ -265,7 +284,7 @@ G4ThreeVector AEObservationPrimaryGen::samplePosition()
   const double dix = G4UniformRand();
   const double diy = G4UniformRand();
 
-  const double x = (ix+dix-halfSizeX) * pixelSize;
+  const double x = (ix+dix-halfSizeX) * pixelSize * (-1.0);
   const double y = (iy+diy-halfSizeY) * pixelSize;
   const double z = 0.0;
 

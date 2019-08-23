@@ -64,7 +64,8 @@ private:
   int pixelX_ = 1;
   int pixelY_ = 1;
 
-  double exposure_ = 0;
+  double exposure_ = 0.0;
+  bool useFlux_ = false;
   double flux_ = 0.0;
   double fluxEnergyMin_ = 0.0;
   double fluxEnergyMax_ = 0.0;
@@ -75,6 +76,7 @@ private:
   std::vector<double> PSFArray_;
   double sumFlux_ = 0.0;
   std::vector<double> positionIntegral_;
+  int percent_ = 0;
 };
 
 } /* namespace comptonsoft */
