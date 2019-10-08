@@ -47,6 +47,8 @@ ANLStatus AssignTime::mod_define()
   set_parameter_description("Random seed, unsigned integer, -1 for hardware generation.");
   define_parameter("sort", &mod_class::m_SortTime);
   set_parameter_description("If true, the time array is sorted.");
+  define_parameter("randomize_time", &mod_class::m_RandomizeTime);
+  set_parameter_description("If false, time will be assigned at a constant rate.");
   return AS_OK;
 }
 
@@ -104,17 +106,27 @@ ANLStatus AssignTime::mod_analyze()
 
 void AssignTime::sampleEventTimes()
 {
-  std::random_device seedGenerator;
-  const uint_fast32_t seed = (m_Seed == -1) ? seedGenerator() : m_Seed;
-  std::mt19937 engine(seed);
-  std::uniform_real_distribution<double> distribution(m_Time0, m_Time1);
+  if (m_RandomizeTime) {
+    std::random_device seedGenerator;
+    const uint_fast32_t seed = (m_Seed == -1) ? seedGenerator() : m_Seed;
+    std::mt19937 engine(seed);
+    std::uniform_real_distribution<double> distribution(m_Time0, m_Time1);
 
-  for (int i=0; i<m_NumEvents; i++) {
-    const double t = distribution(engine);
-    m_TimeList.push_back(t);
+    for (int i=0; i<m_NumEvents; i++) {
+      const double t = distribution(engine);
+      m_TimeList.push_back(t);
+    }
+  
+    if (m_SortTime) {
+      m_TimeList.sort();
+    }
   }
-  if (m_SortTime) {
-    m_TimeList.sort();
+  else {
+    const double interval = (m_Time1 - m_Time0) / m_NumEvents;
+    for (int i=0; i<m_NumEvents; i++) {
+      const double t = m_Time0 + (i+0.5)*interval;
+      m_TimeList.push_back(t);
+    }
   }
 }
 

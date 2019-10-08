@@ -12,7 +12,7 @@ class MyApp < ANL::ANLApp
     chain :ReadHitTree
     with_parameters(file_list: @inputs,
                     trust_num_hits: false)
-    chain :MakeFrame
+    chain :MakeFrameFITS
     with_parameters(filename_base: @inputs[0].sub(".root", ""), num_pixelx: 640, num_pixely: 640)
   end
 end

@@ -53,6 +53,7 @@ private:
   double m_Time1 = 0.0;
   int m_Seed = -1;
   bool m_SortTime = false;
+  bool m_RandomizeTime = true;
   double m_CountRate = 0.0;
   double m_Exposure = 0.0;
 
