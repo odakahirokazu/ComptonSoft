@@ -30,13 +30,12 @@
 namespace comptonsoft
 {
 
-//using image_t = boost::multi_array<double, 2>;
-
 /**
  * A class of an X-ray event measured with an SXI CCD.
  *
  * @author Tsubasa Tamba
  * @date 2019-06-03
+ * @date 2019-10-08 | Hirokazu Odaka | delete the assignment operators
  */
 class SXIXrayEvent: public XrayEvent
 {
@@ -46,8 +45,6 @@ public:
 
   SXIXrayEvent(const SXIXrayEvent& r) = default;
   SXIXrayEvent(SXIXrayEvent&& r) = default;
-  SXIXrayEvent& operator=(const SXIXrayEvent& r) = default;
-  SXIXrayEvent& operator=(SXIXrayEvent&& r) = default;
 
   void reduce() override;
   void setOuterSplitThreshold(double v) { outerSplitThreshold_ = v; }
@@ -58,6 +55,10 @@ public:
   double calculateSxiSumPH();
   void calculateRank();
   void calculateWeightAndModifyData();
+
+private:
+  SXIXrayEvent& operator=(const SXIXrayEvent& r) = delete;
+  SXIXrayEvent& operator=(SXIXrayEvent&& r) = delete;
 
 private:
   double outerSplitThreshold_ = 0.0;

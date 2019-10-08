@@ -34,6 +34,7 @@ using image_t = boost::multi_array<double, 2>;
  *
  * @author Hirokazu Odaka
  * @date 2019-05-22
+ * @date 2019-10-08 | delete the assignment operators
  */
 class XrayEvent
 {
@@ -43,8 +44,6 @@ public:
 
   XrayEvent(const XrayEvent& r) = default;
   XrayEvent(XrayEvent&& r) = default;
-  XrayEvent& operator=(const XrayEvent& r) = default;
-  XrayEvent& operator=(XrayEvent&& r) = default;
 
   int EventSize() const { return size_; }
 
@@ -85,6 +84,10 @@ public:
 
 protected:
   virtual double calculateEventAngle() const;
+
+private:
+  XrayEvent& operator=(const XrayEvent& r) = delete;
+  XrayEvent& operator=(XrayEvent&& r) = delete;
 
 private:
   const int size_ = 1;

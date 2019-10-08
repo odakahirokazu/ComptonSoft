@@ -35,7 +35,7 @@ MultiChannelData::MultiChannelData(std::size_t n, ElectrodeSide eside)
     negativeThresholdEnergyVector_(n, 0.0),
     channelDisabledVector_(n, 0),
     pedestalVector_(n, 0.0),
-    gainFunction_(new GainFunctionLinear(n, 1000.0)),
+    gainFunction_(std::make_shared<GainFunctionLinear>(n, 1000.0)),
     dataValidVector_(n, 1),
     rawADCVector_(n, 0),
     PHAVector_(n, 0.0),

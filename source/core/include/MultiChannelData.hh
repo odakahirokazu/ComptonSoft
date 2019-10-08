@@ -43,17 +43,15 @@ namespace comptonsoft {
  * @date 2016-05-02 | PHA randomization
  * @date 2016-08-19 | threshold: scalar value to vector
  * @date 2016-11-11 | add time and flags
+ * @date 2019-10-08 | use shared_ptr for the gain function; delete the assignment operators.
  */
 class MultiChannelData
 {
 public:
   MultiChannelData(std::size_t num_channels, ElectrodeSide eside);
   virtual ~MultiChannelData();
-
   MultiChannelData(const MultiChannelData&) = default;
   MultiChannelData(MultiChannelData&&) = default;
-  MultiChannelData& operator=(const MultiChannelData&) = default;
-  MultiChannelData& operator=(MultiChannelData&&) = default;
 
   std::size_t NumberOfChannels() const { return NumChannels_; }
   ElectrodeSide getElectrodeSide() const { return ElectrodeSide_; }
@@ -283,6 +281,10 @@ public:
   bool discriminate(std::size_t i, double energy) const;
 
 private:
+  MultiChannelData& operator=(const MultiChannelData&) = delete;
+  MultiChannelData& operator=(MultiChannelData&&) = delete;
+
+private:
   const std::size_t NumChannels_;
   const ElectrodeSide ElectrodeSide_;
   
@@ -297,7 +299,7 @@ private:
 
   std::vector<int8_t> channelDisabledVector_;
   std::vector<double> pedestalVector_;
-  std::unique_ptr<VGainFunction> gainFunction_;
+  std::shared_ptr<VGainFunction> gainFunction_;
 
   std::vector<int8_t> dataValidVector_;
   std::vector<int32_t> rawADCVector_;

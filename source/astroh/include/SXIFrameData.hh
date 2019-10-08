@@ -36,6 +36,7 @@ namespace comptonsoft
  *
  * @author Tsubasa Tamba
  * @date 2019-06-03
+ * @date 2019-10-08 | Hirokazu Odaka | delete the assignment operators
  */
 class SXIFrameData: public FrameData
 {
@@ -45,9 +46,6 @@ public:
   
   SXIFrameData(const SXIFrameData& r) = default;
   SXIFrameData(SXIFrameData&& r) = default;
-  SXIFrameData& operator=(const SXIFrameData& r) = default;
-  SXIFrameData& operator=(SXIFrameData&& r) = default;
-
 
   std::vector<XrayEvent_sptr> extractEvents() override;
   double SurroundThreshold() const { return surroundThreshold_;}
@@ -69,7 +67,10 @@ protected:
   bool surroundDiscri(image_t& frame, int ix, int iy, int size, double surroundThreshold, int npixSurroundThreshold);
 
 private:
+  SXIFrameData& operator=(const SXIFrameData& r) = delete;
+  SXIFrameData& operator=(SXIFrameData&& r) = delete;
 
+private:
   double outerSplitThreshold_ = 0.0;
   double surroundThreshold_ = 0.0;
   int npixSurroundThreshold_ = 0;

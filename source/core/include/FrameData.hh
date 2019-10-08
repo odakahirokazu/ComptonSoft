@@ -32,6 +32,7 @@ namespace comptonsoft
  *
  * @author Hirokazu Odaka
  * @date 2019-05-22
+ * @date 2019-10-08 | delete the assignment operators
  */
 class FrameData
 {
@@ -44,8 +45,6 @@ public:
   
   FrameData(const FrameData& r) = default;
   FrameData(FrameData&& r) = default;
-  FrameData& operator=(const FrameData& r) = default;
-  FrameData& operator=(FrameData&& r) = default;
 
   int NumPixelsX() const { return num_pixels_x_; }
   int NumPixelsY() const { return num_pixels_y_; }
@@ -105,6 +104,10 @@ public:
 protected:
   bool isMaxPixel(int ix, int iy, int size) const;
   bool includeHotPixel(int ix, int iy, int size) const;
+
+private:
+  FrameData& operator=(const FrameData& r) = delete;
+  FrameData& operator=(FrameData&& r) = delete;
 
 private:
   const int num_pixels_x_ = 1;
