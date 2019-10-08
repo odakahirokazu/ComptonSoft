@@ -40,7 +40,6 @@ void MakeRawHits::doProcessing()
   }
 
   for (auto& detector: detectorManager->getDetectors()) {
-    detector->assignReadoutInfo();
     detector->reconstructHits();
   }
 }

@@ -127,6 +127,14 @@ module ComptonSoft
       end
     end
 
+    def record_raw_hits(b=true)
+      if b
+        @make_detector_hits_module = :MakeRawHits
+      else
+        @make_detector_hits_module = :MakeDetectorHits
+      end
+    end
+
     def setup()
       case @setup_mode
       when :minimal
@@ -185,7 +193,9 @@ module ComptonSoft
 
       chain @make_detector_hits_module
 
-      chain_with_parameters module_of_event_selection
+      unless @make_detector_hits_module==:MakeRawHits
+        chain_with_parameters module_of_event_selection
+      end
 
       chain @write_tree_module
 

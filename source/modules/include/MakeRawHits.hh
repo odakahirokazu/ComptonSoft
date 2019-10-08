@@ -26,7 +26,7 @@ namespace comptonsoft {
 
 class MakeRawHits : public SelectHits
 {
-  DEFINE_ANL_MODULE(MakeRawHits, 2.3);
+  DEFINE_ANL_MODULE(MakeRawHits, 2.4);
 public:
   MakeRawHits() = default;
   ~MakeRawHits() = default;
