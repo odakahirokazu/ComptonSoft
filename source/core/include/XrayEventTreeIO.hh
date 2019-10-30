@@ -40,27 +40,34 @@ public:
   XrayEventTreeIO();
   virtual ~XrayEventTreeIO();
 
+  void setEventSize(int v);
+  int EventSize() const { return eventSize_; }
+
   virtual void setTree(TTree* tree)
   { tree_ = tree; }
 
   virtual void defineBranches();
   virtual void setBranchAddresses();
 
+  int fillEvents(const XrayEventContainer& events);
   int fillEvents(XrayEventCIter events_begin, XrayEventCIter events_end);
   XrayEvent_sptr retrieveEvent() const;
-  std::list<XrayEvent_sptr> retrieveEvents(int64_t& entry) const;
+  std::list<XrayEvent_sptr> retrieveEvents(int64_t& entry);
   
 private:
+  static constexpr int MaxEventSize_ = 9;
+
   TTree* tree_ = nullptr;
+  int eventSize_ = 1;
 
   /*
    * tree contents
    */
-  int32_t frameID_ = 0;
+  int32_t frameID_ = -1;
   double time_ = 0.0;
   int32_t ix_ = 0;
   int32_t iy_ = 0;
-  double data_[9][9];
+  double data_[MaxEventSize_][MaxEventSize_];
   double sumPH_ = 0.0;
   double centerPH_ = 0.0;
   int32_t weight_ = 0;

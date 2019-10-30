@@ -68,8 +68,10 @@
 #include "ConstructSXIFrame.hh"
 #include "FillFrame.hh"
 #include "LoadFrame.hh"
+#include "XrayEventCollection.hh"
 #include "AnalyzeFrame.hh"
 #include "WriteXrayEventTree.hh"
+#include "ReadXrayEventTree.hh"
 #include "SortEventTreeWithTime.hh"
 #ifdef USE_FITSIO
 #include "SetPedestals.hh"
@@ -683,6 +685,14 @@ public:
 };
 
 
+class XrayEventCollection : public anlnext::BasicModule
+{
+public:
+  XrayEventCollection();
+  ~XrayEventCollection();
+};
+
+
 class AnalyzeFrame : public anlnext::BasicModule
 {
 public:
@@ -695,6 +705,13 @@ class WriteXrayEventTree : public VCSModule
 public:
   WriteXrayEventTree();
   ~WriteXrayEventTree() = default;
+};
+
+
+class ReadXrayEventTree : public anlnext::BasicModule
+{
+public:
+  ReadXrayEventTree();
 };
 
 

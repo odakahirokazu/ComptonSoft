@@ -48,6 +48,7 @@ ANLStatus AnalyzeFrame::mod_define()
 ANLStatus AnalyzeFrame::mod_initialize()
 {
   get_module_NC("ConstructFrame", &frame_owner_);
+  get_module_NC("XrayEventCollection", &collection_);
 
   FrameData& frame = frame_owner_->getFrame();
   const int nx = frame.NumPixelsX();
@@ -88,8 +89,6 @@ ANLStatus AnalyzeFrame::mod_begin_run()
 
 ANLStatus AnalyzeFrame::mod_analyze()
 {
-  events_.clear();
-
   const int frameID = frame_owner_->FrameID();
   FrameData& frame = frame_owner_->getFrame();
   frame.stack();
@@ -114,8 +113,8 @@ ANLStatus AnalyzeFrame::mod_analyze()
   std::vector<comptonsoft::XrayEvent_sptr> es = frame.extractEvents();
   for (auto& event: es) {
     event->setFrameID(frameID);
+    collection_->insertEvent(event);
   }
-  std::move(es.begin(), es.end(), std::back_inserter(events_));
 
   return AS_OK;
 }

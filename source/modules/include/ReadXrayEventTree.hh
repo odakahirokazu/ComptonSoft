@@ -18,59 +18,52 @@
  *************************************************************************/
 
 /**
- * AnalyzeFrame
+ * ReadXrayEventTree
  *
  * @author Hirokazu Odaka
- * @date 2019-05-23
+ * @date 2019-10-30
  */
 
-#ifndef COMPTONSOFT_AnalyzeFrame_H
-#define COMPTONSOFT_AnalyzeFrame_H 1
+#ifndef COMPTONSOFT_ReadXrayEventTree_H
+#define COMPTONSOFT_ReadXrayEventTree_H 1
 
-#include <iterator>
-#include <boost/multi_array.hpp>
-#include <tuple>
 #include <anlnext/BasicModule.hh>
-#include "ConstructFrame.hh"
-#include "XrayEvent.hh"
-#include "XrayEventCollection.hh"
+
+class TChain;
 
 namespace comptonsoft {
 
-using gain_t = boost::multi_array<std::tuple<double, double, double, double>, 2>;
+class XrayEventCollection;
+class XrayEventTreeIO;
 
-class AnalyzeFrame : public anlnext::BasicModule
+class ReadXrayEventTree : public anlnext::BasicModule
 {
-  DEFINE_ANL_MODULE(AnalyzeFrame, 1.1);
+  DEFINE_ANL_MODULE(ReadXrayEventTree, 1.1);
   // ENABLE_PARALLEL_RUN();
 public:
-  AnalyzeFrame();
+  ReadXrayEventTree();
   
 protected:
-  AnalyzeFrame(const AnalyzeFrame&);
+  ReadXrayEventTree(const ReadXrayEventTree&);
 
 public:
   anlnext::ANLStatus mod_define() override;
   anlnext::ANLStatus mod_initialize() override;
   anlnext::ANLStatus mod_begin_run() override;
   anlnext::ANLStatus mod_analyze() override;
-  anlnext::ANLStatus mod_end_run() override;
 
 private:
-  double pedestal_level_ = 0.0;
-  double event_threshold_ = 0.0;
-  double split_threshold_ = 0.0;
-  int event_size_ = 1;
-  bool setGain_ = false;
-  std::string gainFile_;
-  int trimSize_ = 0;
+  std::vector<std::string> fileList_;
+  int eventSize_ = 1;
 
-  gain_t gainCoefficient_;
-  
-  ConstructFrame* frame_owner_ = nullptr;
+  TChain* tree_;
+  int64_t numEntries_ = 0;
+  int64_t entryIndex_ = 0;
+
   XrayEventCollection* collection_ = nullptr;
+  std::unique_ptr<XrayEventTreeIO> treeIO_;
 };
 
 } /* namespace comptonsoft */
 
-#endif /* COMPTONSOFT_AnalyzeFrame_H */
+#endif /* COMPTONSOFT_ReadXrayEventTree_H */

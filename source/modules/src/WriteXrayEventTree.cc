@@ -38,7 +38,7 @@ ANLStatus WriteXrayEventTree::mod_initialize()
 {
   VCSModule::mod_initialize();
 
-  get_module("AnalyzeFrame", &analyzer_);
+  get_module("XrayEventCollection", &collection_);
   define_evs("WriteXrayEventTree:Fill");
 
   tree_ = new TTree("xetree", "xetree");
@@ -50,7 +50,7 @@ ANLStatus WriteXrayEventTree::mod_initialize()
 
 ANLStatus WriteXrayEventTree::mod_analyze()
 {
-  const int n = treeIO_->fillEvents(analyzer_->EventsBegin(), analyzer_->EventsEnd());
+  const int n = treeIO_->fillEvents(collection_->getEvents());
   if (n>0) {
     set_evs("WriteXrayEventTree:Fill");
   }

@@ -20,7 +20,7 @@
 #include "XrayEventTreeIO.hh"
 #include "AstroUnits.hh"
 #include "TTree.h"
-#include "BasicComptonEvent.hh"
+#include "CSException.hh"
 
 namespace unit = anlgeant4::unit;
 
@@ -28,11 +28,21 @@ namespace comptonsoft
 {
 
 XrayEventTreeIO::XrayEventTreeIO()
-  : tree_(nullptr)
+  : tree_(nullptr),
+    eventSize_(5)
 {
 }
 
 XrayEventTreeIO::~XrayEventTreeIO() = default;
+
+void XrayEventTreeIO::setEventSize(int v)
+{
+  if (v > MaxEventSize_) {
+    throw CSException("XrayEventTreeIO: the event size given is larger than the allowed maximum (9).");
+  }
+
+  eventSize_ = v;
+}
 
 void XrayEventTreeIO::defineBranches()
 {
@@ -64,6 +74,11 @@ void XrayEventTreeIO::setBranchAddresses()
   tree_->SetBranchAddress("grade",    &grade_);
 }
 
+int XrayEventTreeIO::fillEvents(const XrayEventContainer& events)
+{
+  return fillEvents(events.begin(), events.end());
+}
+
 int XrayEventTreeIO::fillEvents(const XrayEventCIter events_begin, const XrayEventCIter events_end)
 {
   int num = 0;
@@ -80,8 +95,8 @@ int XrayEventTreeIO::fillEvents(const XrayEventCIter events_begin, const XrayEve
     angle_    = event->Angle();
     grade_    = event->Grade();
 
-    for (int ix=0; ix<9; ix++) {
-      for (int iy=0; iy<9; iy++) {
+    for (int ix=0; ix<MaxEventSize_; ix++) {
+      for (int iy=0; iy<MaxEventSize_; iy++) {
         data_[ix][iy] = 0.0;
       }
     }
@@ -102,7 +117,7 @@ int XrayEventTreeIO::fillEvents(const XrayEventCIter events_begin, const XrayEve
 
 XrayEvent_sptr XrayEventTreeIO::retrieveEvent() const
 {
-  const int eventSize = 5;
+  const int eventSize = eventSize_;
   XrayEvent_sptr event(new XrayEvent(eventSize));
 
   event->setFrameID(frameID_);
@@ -122,6 +137,32 @@ XrayEvent_sptr XrayEventTreeIO::retrieveEvent() const
   }
 
   return event;
+}
+
+std::list<XrayEvent_sptr> XrayEventTreeIO::retrieveEvents(int64_t& entry)
+{
+  if (frameID_ == -1) {
+    tree_->GetEntry(entry);
+  }
+  
+  const int32_t ThisFrameID = frameID_;
+
+  std::list<XrayEvent_sptr> events;
+  while (true) {
+    tree_->GetEntry(entry);
+
+    if (frameID_ != ThisFrameID) {
+      break;
+    }
+
+    events.push_back(retrieveEvent());
+    entry++;
+    if (entry >= tree_->GetEntries()) {
+      break;
+    }
+  }
+
+  return events;
 }
 
 } /* namespace comptonsoft */

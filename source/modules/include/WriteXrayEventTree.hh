@@ -32,16 +32,17 @@ class InitialInformation;
 namespace comptonsoft {
 
 class XrayEventTreeIO;
-class AnalyzeFrame;
+class XrayEventCollection;
 
 /**
  * 
  * @author Hirokazu Odaka
  * @date 2019-06-05
+ * @date 2019-10-30 | use XrayEventCollection
  */
 class WriteXrayEventTree : public VCSModule
 {
-  DEFINE_ANL_MODULE(WriteXrayEventTree, 0.1);
+  DEFINE_ANL_MODULE(WriteXrayEventTree, 1.1);
 public:
   WriteXrayEventTree();
   ~WriteXrayEventTree() = default;
@@ -50,7 +51,7 @@ public:
   anlnext::ANLStatus mod_analyze() override;
 
 private:
-  const AnalyzeFrame* analyzer_ = nullptr;
+  const XrayEventCollection* collection_ = nullptr;
   TTree* tree_ = nullptr;
   std::unique_ptr<XrayEventTreeIO> treeIO_ = nullptr;
 };
