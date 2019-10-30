@@ -77,6 +77,8 @@ set(CS_CORE_CLASSES
   src/FrameData.cc
   src/XrayEvent.cc
   src/XrayEventTreeIO.cc
+  ### coded-aperture
+  src/CodedAperture.cc
 )
 
 add_library(CSCore SHARED

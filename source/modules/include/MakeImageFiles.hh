@@ -17,48 +17,48 @@
  *                                                                       *
  *************************************************************************/
 
-#ifndef COMPTONSOFT_VCSModule_H
-#define COMPTONSOFT_VCSModule_H 1
+/**
+ * MakeImageFiles
+ *
+ * @author Tsubasa Tamba
+ * @date 2019-11-05
+ */
+
+#ifndef COMPTONSOFT_MakeImageFiles_H
+#define COMPTONSOFT_MakeImageFiles_H 1
 
 #include <anlnext/BasicModule.hh>
-#include <memory>
-#include "DetectorSystem.hh"
-#include "VRealDetectorUnit.hh"
+#include "VCSModule.hh"
 #include "TCanvas.h"
 
-class TDirectory;
+class TH2;
 
 namespace comptonsoft {
 
-/**
- * class VCSModule
- * @author Hirokazu Odaka
- * @date 2008-08-30
- * @date 2014-11-22
- * @date 2016-08-19 | Add isMCSimulation()
- * @date 2017-07-07 | merge mod_hit() to mod_initialize()
- */
-class VCSModule : public anlnext::BasicModule
+class MakeImageFiles : public VCSModule
 {
-  DEFINE_ANL_MODULE(VCSModule, 1.3);
+  DEFINE_ANL_MODULE(MakeImageFiles, 1.0);
+  // ENABLE_PARALLEL_RUN();
 public:
-  VCSModule();
-  ~VCSModule();
+  MakeImageFiles();
   
-  virtual anlnext::ANLStatus mod_initialize() override;
-  virtual void drawOutputFiles(TCanvas*){};
+protected:
+  MakeImageFiles(const MakeImageFiles&);
+
+public:
+  anlnext::ANLStatus mod_define() override;
+  anlnext::ANLStatus mod_initialize() override;
+  anlnext::ANLStatus mod_end_run() override;
 
 protected:
-  void mkdir(const std::string& name="");
-  DetectorSystem* getDetectorManager() { return detectorSystem_; }
-  const DetectorSystem* getDetectorManager() const { return detectorSystem_; }
-  bool isMCSimulation() const { return detectorSystem_->isMCSimulation(); }
 
 private:
-  DetectorSystem* detectorSystem_;
-  TDirectory* saveDir_;
+  std::vector<std::string> moduleList_;
+  std::vector<VCSModule*> modules_; 
+  TCanvas* canvas_;
+
 };
 
 } /* namespace comptonsoft */
 
-#endif /* COMPTONSOFT_VCSModule_H */
+#endif /* COMPTONSOFT_MakeImageFiles_H */

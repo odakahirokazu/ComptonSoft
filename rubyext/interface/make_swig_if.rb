@@ -86,6 +86,9 @@ clMod = [
   ANL::SWIGClass.new("MakeBadFrames"),
   ANL::SWIGClass.new("SetBadFrames"),
   ANL::SWIGClass.new("SetPedestalsByMedian"),
+  ANL::SWIGClass.new("MakeXrayEventImage"),
+  ANL::SWIGClass.new("ProcessCodedAperture"),
+  ANL::SWIGClass.new("MakeImageFiles"),
 ]
 
 clSim = [

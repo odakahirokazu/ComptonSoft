@@ -86,6 +86,9 @@
 #include "MakeBadFrames.hh"
 #include "SetBadFrames.hh"
 #include "SetPedestalsByMedian.hh"
+#include "MakeXrayEventImage.hh"
+#include "ProcessCodedAperture.hh"
+#include "MakeImageFiles.hh"
 #ifdef USE_FITSIO
 #include "AHRayTracingPrimaryGen.hh"
 #endif
@@ -787,6 +790,27 @@ class SetPedestalsByMedian : public anlnext::BasicModule
 {
 public:
   SetPedestalsByMedian();
+};
+
+
+class MakeXrayEventImage : public VCSModule
+{
+public:
+  MakeXrayEventImage();
+};
+
+
+class ProcessCodedAperture : public VCSModule
+{
+public:
+  ProcessCodedAperture();
+};
+
+
+class MakeImageFiles : public VCSModule
+{
+public:
+  MakeImageFiles();
 };
 
 

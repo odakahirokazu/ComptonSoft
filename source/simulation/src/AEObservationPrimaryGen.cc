@@ -220,11 +220,13 @@ ANLStatus AEObservationPrimaryGen::mod_analyze()
     return AS_QUIT;
   }
 
+/*
   if (sumFlux_ > flux_*percent_/100.0) {
     std::cout << percent_ << "\% completed." << std::endl;
     percent_ += 1;
   }
-    
+*/  
+  
   return BasicPrimaryGen::mod_analyze();
 }
 

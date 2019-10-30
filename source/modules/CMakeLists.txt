@@ -63,6 +63,9 @@ set(CS_MODULES
   src/MakeBadFrames.cc
   src/SetBadFrames.cc
   src/SetPedestalsByMedian.cc
+  src/MakeXrayEventImage.cc
+  src/ProcessCodedAperture.cc
+  src/MakeImageFiles.cc
   ### IO
   src/CreateRootFile.cc
   src/SaveData.cc
