@@ -178,12 +178,13 @@ bool MakeXrayEventImage::is_good_event(XrayEvent_sptr event)
          iy>=iymin && iy<=iymax;
 }
 
-void MakeXrayEventImage::drawOutputFiles(TCanvas* c1)
+void MakeXrayEventImage::drawOutputFiles(TCanvas* c1, std::vector<std::string>* filenames)
 {
   c1->cd();
   gStyle->SetOptStat(0);
   totalHistogram_->Draw("colz");
   c1->SaveAs(outputFile_.c_str());
+  filenames->push_back(outputFile_);
 }
 
 } /* namespace comptonsoft */

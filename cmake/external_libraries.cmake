@@ -79,3 +79,19 @@ if(CS_USE_SIMX)
     )
   set(SIMX_LIB simx simput cfitsio ape wcs fftw3 readline termcap)
 endif(CS_USE_SIMX)
+
+### HSQuickLook ###
+if(CS_USE_HSQUICKLOOK)
+  find_path(HSQUICKLOOK_INC_DIR
+    NAMES hsquicklook/DocumentBuilder.hh
+    PATHS $ENV{HSQUICKLOOK_INSTALL}/include /usr/local/include $ENV{HOME}/include)
+  find_library(HSQUICKLOOK_LIB
+    NAMES HSQuickLookAnalyzer
+    PATHS $ENV{HSQUICKLOOK_INSTALL}/lib /usr/local/lib $ENV{HOME}/lib)
+  message("-- HSQUICKLOOK_INC_DIR: ${HSQUICKLOOK_INC_DIR}")
+  message("-- HSQUICKLOOK_LIB: ${HSQUICKLOOK_LIB}")
+
+  find_package(libmongocxx REQUIRED)
+  message("-- LIBMONGOCXX_INCLUDE_DIRS: ${LIBMONGOCXX_INCLUDE_DIRS}")
+  message("-- LIBMONGOCXX_LIBRARIES: ${LIBMONGOCXX_LIBRARIES}")
+endif(CS_USE_HSQUICKLOOK)

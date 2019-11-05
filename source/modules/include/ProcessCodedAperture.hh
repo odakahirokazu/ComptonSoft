@@ -65,7 +65,7 @@ public:
   double MaskToDetectorDistance() { return maskToDetectorDistance_; }
   double SourceToMaskDistance() { return sourceToMaskDistance_; }
 
-  void drawOutputFiles(TCanvas* c1) override;
+  void drawOutputFiles(TCanvas* c1, std::vector<std::string>* filenames) override;
 
 protected:
   virtual CodedAperture* createCodedAperture();

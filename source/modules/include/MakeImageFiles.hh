@@ -33,6 +33,10 @@
 
 class TH2;
 
+namespace hsquicklook {
+class MongoDBClient;
+}
+
 namespace comptonsoft {
 
 class MakeImageFiles : public VCSModule
@@ -51,12 +55,14 @@ public:
   anlnext::ANLStatus mod_end_run() override;
 
 protected:
+  void pushImagesToDB();
 
 private:
   std::vector<std::string> moduleList_;
   std::vector<VCSModule*> modules_; 
   TCanvas* canvas_;
-
+  std::vector<std::string> fileList_;
+  hsquicklook::MongoDBClient* mongodb_ = nullptr;
 };
 
 } /* namespace comptonsoft */

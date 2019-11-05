@@ -64,7 +64,7 @@ public:
   image_t& Image() { return image_; }
   image_t& TotalImage() { return totalImage_; }
 
-  void drawOutputFiles(TCanvas* c1) override;
+  void drawOutputFiles(TCanvas* c1, std::vector<std::string>* filenames) override;
 
 protected:
   void resetImage(image_t image);

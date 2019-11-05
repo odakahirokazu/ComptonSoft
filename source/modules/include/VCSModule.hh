@@ -46,7 +46,7 @@ public:
   ~VCSModule();
   
   virtual anlnext::ANLStatus mod_initialize() override;
-  virtual void drawOutputFiles(TCanvas*){};
+  virtual void drawOutputFiles(TCanvas*, std::vector<std::string>*){};
 
 protected:
   void mkdir(const std::string& name="");
