@@ -70,7 +70,8 @@ ANLStatus MakeXrayEventImage::mod_initialize()
   mkdir();
   const std::string name = "EncodedImage";
   const std::string title = "Encoded Image";
-  totalHistogram_ = new TH2D(name.c_str(), title.c_str(), nx, 0.0, static_cast<double>(nx),
+  totalHistogram_ = new TH2D(name.c_str(), title.c_str(),
+                             nx, 0.0, static_cast<double>(nx),
                              ny, 0.0, static_cast<double>(ny));
 
   return AS_OK;
@@ -104,15 +105,7 @@ ANLStatus MakeXrayEventImage::mod_analyze()
 ANLStatus MakeXrayEventImage::mod_end_run()
 {
   rotateImage(totalImage_);
-  const int nx = NumPixelX();
-  const int ny = NumPixelY();
-  for (int ix=0; ix<nx; ix++) {
-    for (int iy=0; iy<ny; iy++) {
-      const double v = totalImage_[ix][iy];
-      totalHistogram_->Fill(ix, iy, v);
-    }
-  }
-
+  fillHistogram();
   return AS_OK;
 }
 
@@ -178,8 +171,21 @@ bool MakeXrayEventImage::is_good_event(XrayEvent_sptr event)
          iy>=iymin && iy<=iymax;
 }
 
+void MakeXrayEventImage::fillHistogram()
+{
+  const int nx = NumPixelX();
+  const int ny = NumPixelY();
+  for (int ix=0; ix<nx; ix++) {
+    for (int iy=0; iy<ny; iy++) {
+      const double v = totalImage_[ix][iy];
+      totalHistogram_->SetBinContent(ix+1, iy+1, v);
+    }
+  }
+}
+
 void MakeXrayEventImage::drawOutputFiles(TCanvas* c1, std::vector<std::string>* filenames)
 {
+  fillHistogram();
   c1->cd();
   gStyle->SetOptStat(0);
   totalHistogram_->Draw("colz");

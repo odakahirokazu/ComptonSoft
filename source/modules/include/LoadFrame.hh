@@ -48,6 +48,9 @@ public:
   anlnext::ANLStatus mod_initialize() override;
   anlnext::ANLStatus mod_analyze() override;
 
+  void addFile(const std::string& filename);
+  bool hasFile(const std::string& filename) const;
+
 private:
   std::vector<std::string> files_;
 

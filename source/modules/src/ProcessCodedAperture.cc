@@ -151,6 +151,7 @@ ANLStatus ProcessCodedAperture::mod_analyze()
       }
     }
   }
+
   return AS_OK;
 }
 
@@ -162,14 +163,7 @@ ANLStatus ProcessCodedAperture::mod_end_run()
   coded_aperture_->mirrorDecodedImage();
   totalDecodedImage_ = coded_aperture_->DecodedImage();
 
-  const int nx = NumDecodedImageX();
-  const int ny = NumDecodedImageY();
-  for (int ix=0; ix<nx; ix++) {
-    for (int iy=0; iy<ny; iy++) {
-      const double v = totalDecodedImage_[ix][iy];
-      totalHistogram_->Fill(ix, iy, v);
-    }
-  }
+  fillHistogram();
 
   return AS_OK;
 }
@@ -179,8 +173,27 @@ CodedAperture* ProcessCodedAperture::createCodedAperture()
   return new comptonsoft::CodedAperture;
 }
 
+void ProcessCodedAperture::fillHistogram()
+{
+  const int nx = NumDecodedImageX();
+  const int ny = NumDecodedImageY();
+  for (int ix=0; ix<nx; ix++) {
+    for (int iy=0; iy<ny; iy++) {
+      const double v = totalDecodedImage_[ix][iy];
+      totalHistogram_->SetBinContent(ix+1, iy+1, v);
+    }
+  }
+}
+
 void ProcessCodedAperture::drawOutputFiles(TCanvas* c1, std::vector<std::string>* filenames)
 {
+  image_t image = image_owner_->TotalImage();
+  coded_aperture_->setEncodedImage(image);
+  coded_aperture_->decode();
+  coded_aperture_->mirrorDecodedImage();
+  totalDecodedImage_ = coded_aperture_->DecodedImage();
+  fillHistogram();
+  
   c1->cd();
   gStyle->SetOptStat(0);
   totalHistogram_->Draw("colz");

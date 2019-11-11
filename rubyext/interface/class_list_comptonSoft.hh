@@ -82,6 +82,7 @@ class SetPedestalsByMedian;
 class MakeXrayEventImage;
 class ProcessCodedAperture;
 class MakeImageFiles;
+class GetInputFiles;
 class AHRayTracingPrimaryGen;
 class SimXPrimaryGen;
 class AHRadiationBackgroundPrimaryGen;

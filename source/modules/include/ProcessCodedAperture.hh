@@ -69,6 +69,7 @@ public:
 
 protected:
   virtual CodedAperture* createCodedAperture();
+  void fillHistogram();
 
 private:
   int numEncodedImageX_ = 1;

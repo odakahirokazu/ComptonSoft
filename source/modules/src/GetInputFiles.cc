@@ -17,61 +17,79 @@
  *                                                                       *
  *************************************************************************/
 
+#include "GetInputFiles.hh"
+#include <ctime>
+#include <thread>
+#include <chrono>
+#include <boost/filesystem.hpp>
+#include <boost/range/iterator_range.hpp>
 #include "LoadFrame.hh"
-#include <algorithm>
-#include "FrameData.hh"
-#include "ConstructFrame.hh"
 
 using namespace anlnext;
 
 namespace comptonsoft {
 
-LoadFrame::LoadFrame()
+GetInputFiles::GetInputFiles()
+  : directory_("."), extension_(".dat"), delay_(5), wait_(10)
 {
 }
 
-ANLStatus LoadFrame::mod_define()
+ANLStatus GetInputFiles::mod_define()
 {
-  define_parameter("files", &mod_class::files_);
+  define_parameter("directory", &mod_class::directory_);
+  define_parameter("extension", &mod_class::extension_);
+  define_parameter("delay", &mod_class::delay_);
+  define_parameter("wait", &mod_class::wait_);
   
   return AS_OK;
 }
 
-ANLStatus LoadFrame::mod_initialize()
+ANLStatus GetInputFiles::mod_initialize()
 {
-  get_module_NC("ConstructFrame", &frame_owner_);
+  get_module_NC("LoadFrame", &data_reader_);
 
   return AS_OK;
 }
 
-ANLStatus LoadFrame::mod_analyze()
+ANLStatus GetInputFiles::mod_analyze()
 {
-  const std::size_t fileIndex = get_loop_index();
-  if (fileIndex == files_.size()) {
-    return AS_QUIT;
-  }
+  namespace fs = boost::filesystem;
 
-  const std::string filename = files_[fileIndex];
-  std::cout << "[LoadFrame] filename: " << filename << std::endl;
+  const std::time_t entryTime = std::time(nullptr);
+  const fs::path dir(directory_);
+  
+  while (true) {
+    std::list<fs::path> files;
+    
+    for (const auto& f: boost::make_iterator_range(fs::directory_iterator(dir), {})) {
+      if (fs::is_directory(f)) { continue; }
 
-  frame_owner_->setFrameID(fileIndex);
-  FrameData& frame = frame_owner_->getFrame();
-  bool status = frame.load(filename);
-  if (!status) {
-    return AS_ERROR;
+      const fs::path file = f.path();
+
+      if (file.extension() != extension_) { continue; }
+      if (data_reader_->hasFile(file.string())) { continue; }
+
+      files.push_back(file);
+    }
+
+    if (files.empty()) {
+      if (entryTime+wait_ < std::time(nullptr)) {
+        break;
+      }
+    }
+
+    files.sort();
+    for (const fs::path& file: files) {
+      const std::time_t timeModified = fs::last_write_time(file);
+      if (timeModified+delay_ < std::time(nullptr)) {
+        data_reader_->addFile(file.string());
+      }
+    }
+
+    std::this_thread::sleep_for(std::chrono::seconds(1));
   }
 
   return AS_OK;
-}
-
-void LoadFrame::addFile(const std::string& filename)
-{
-  files_.push_back(filename);
-}
-
-bool LoadFrame::hasFile(const std::string& filename) const
-{
-  return (std::find(files_.begin(), files_.end(), filename) != files_.end());
 }
 
 } /* namespace comptonsoft */

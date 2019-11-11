@@ -89,6 +89,7 @@ clMod = [
   ANL::SWIGClass.new("MakeXrayEventImage"),
   ANL::SWIGClass.new("ProcessCodedAperture"),
   ANL::SWIGClass.new("MakeImageFiles"),
+  ANL::SWIGClass.new("GetInputFiles"),
 ]
 
 clSim = [

@@ -70,6 +70,7 @@ protected:
   void resetImage(image_t image);
   void rotateImage(image_t& image);
   bool is_good_event(XrayEvent_sptr event);
+  void fillHistogram();
 
 private:
   int numPixelX_ = 1;

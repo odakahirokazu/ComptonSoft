@@ -17,61 +17,44 @@
  *                                                                       *
  *************************************************************************/
 
-#include "LoadFrame.hh"
-#include <algorithm>
-#include "FrameData.hh"
-#include "ConstructFrame.hh"
+#ifndef COMPTONSOFT_GetInputFiles_H
+#define COMPTONSOFT_GetInputFiles_H 1
 
-using namespace anlnext;
+#include <anlnext/BasicModule.hh>
 
 namespace comptonsoft {
 
-LoadFrame::LoadFrame()
-{
-}
+class LoadFrame;
 
-ANLStatus LoadFrame::mod_define()
+/**
+ * GetInputFiles
+ *
+ * @author Hirokazu Odaka
+ * @date 2019-05-23
+ */
+class GetInputFiles : public anlnext::BasicModule
 {
-  define_parameter("files", &mod_class::files_);
+  DEFINE_ANL_MODULE(GetInputFiles, 1.0);
+  // ENABLE_PARALLEL_RUN();
+public:
+  GetInputFiles();
   
-  return AS_OK;
-}
+protected:
+  GetInputFiles(const GetInputFiles&);
 
-ANLStatus LoadFrame::mod_initialize()
-{
-  get_module_NC("ConstructFrame", &frame_owner_);
+public:
+  anlnext::ANLStatus mod_define() override;
+  anlnext::ANLStatus mod_initialize() override;
+  anlnext::ANLStatus mod_analyze() override;
 
-  return AS_OK;
-}
-
-ANLStatus LoadFrame::mod_analyze()
-{
-  const std::size_t fileIndex = get_loop_index();
-  if (fileIndex == files_.size()) {
-    return AS_QUIT;
-  }
-
-  const std::string filename = files_[fileIndex];
-  std::cout << "[LoadFrame] filename: " << filename << std::endl;
-
-  frame_owner_->setFrameID(fileIndex);
-  FrameData& frame = frame_owner_->getFrame();
-  bool status = frame.load(filename);
-  if (!status) {
-    return AS_ERROR;
-  }
-
-  return AS_OK;
-}
-
-void LoadFrame::addFile(const std::string& filename)
-{
-  files_.push_back(filename);
-}
-
-bool LoadFrame::hasFile(const std::string& filename) const
-{
-  return (std::find(files_.begin(), files_.end(), filename) != files_.end());
-}
+private:
+  std::string directory_;
+  std::string extension_;
+  int delay_ = 0;
+  int wait_ = 0;
+  LoadFrame* data_reader_ = nullptr;
+};
 
 } /* namespace comptonsoft */
+
+#endif /* COMPTONSOFT_GetInputFiles_H */

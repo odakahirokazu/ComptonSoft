@@ -52,6 +52,7 @@ protected:
 public:
   anlnext::ANLStatus mod_define() override;
   anlnext::ANLStatus mod_initialize() override;
+  anlnext::ANLStatus mod_analyze() override;
   anlnext::ANLStatus mod_end_run() override;
 
 protected:
@@ -59,7 +60,8 @@ protected:
 
 private:
   std::vector<std::string> moduleList_;
-  std::vector<VCSModule*> modules_; 
+  int period_ = 1;
+  std::vector<VCSModule*> modules_;
   TCanvas* canvas_;
   std::vector<std::string> fileList_;
   hsquicklook::MongoDBClient* mongodb_ = nullptr;

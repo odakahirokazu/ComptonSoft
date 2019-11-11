@@ -36,6 +36,7 @@ MakeImageFiles::MakeImageFiles()
 ANLStatus MakeImageFiles::mod_define()
 {
   define_parameter("module_list", &mod_class::moduleList_);
+  define_parameter("period", &mod_class::period_);
   
   return AS_OK;
 }    
@@ -53,15 +54,32 @@ ANLStatus MakeImageFiles::mod_initialize()
     mongodb_->createCappedCollection("images", 100*1024*1024);
   }
 
+  canvas_ = new TCanvas("c1", "c1", 604, 628);
+
+  return AS_OK;
+}
+
+ANLStatus MakeImageFiles::mod_analyze()
+{
+  if ((get_loop_index()+1)%period_ != 0) {
+    return AS_OK;
+  }
+  
+  for (auto& module: modules_) {
+    module->drawOutputFiles(canvas_, &fileList_);
+  }
+
+  if (mongodb_) {
+    pushImagesToDB();
+  }
+
   return AS_OK;
 }
 
 ANLStatus MakeImageFiles::mod_end_run()
 {
-  const int num_modules = moduleList_.size();
-  canvas_ = new TCanvas("c1", "c1", 604, 628);
-  for (int i=0; i<num_modules; i++) {
-    modules_[i]->drawOutputFiles(canvas_, &fileList_);
+  for (auto& module: modules_) {
+    module->drawOutputFiles(canvas_, &fileList_);
   }
 
   if (mongodb_) {

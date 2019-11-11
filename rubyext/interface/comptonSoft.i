@@ -89,6 +89,7 @@
 #include "MakeXrayEventImage.hh"
 #include "ProcessCodedAperture.hh"
 #include "MakeImageFiles.hh"
+#include "GetInputFiles.hh"
 #ifdef USE_FITSIO
 #include "AHRayTracingPrimaryGen.hh"
 #endif
@@ -811,6 +812,13 @@ class MakeImageFiles : public VCSModule
 {
 public:
   MakeImageFiles();
+};
+
+
+class GetInputFiles : public anlnext::BasicModule
+{
+public:
+  GetInputFiles();
 };
 
 

@@ -68,6 +68,7 @@ set(CS_MODULES
   src/MakeXrayEventImage.cc
   src/ProcessCodedAperture.cc
   src/MakeImageFiles.cc
+  src/GetInputFiles.cc
   ### IO
   src/CreateRootFile.cc
   src/SaveData.cc
