@@ -17,48 +17,25 @@
  *                                                                       *
  *************************************************************************/
 
-#ifndef COMPTONSOFT_LoadFrame_H
-#define COMPTONSOFT_LoadFrame_H 1
-
-#include <anlnext/BasicModule.hh>
-#include "VDataReader.hh"
+#ifndef COMPTONSOFT_VDataReader_H
+#define COMPTONSOFT_VDataReader_H 1
 
 namespace comptonsoft {
 
-class ConstructFrame;
-
-
 /**
- * LoadFrame
+ * VDataReader
  *
  * @author Hirokazu Odaka
- * @date 2019-05-23
+ * @date 2019-11-12
  */
-class LoadFrame : public anlnext::BasicModule, public VDataReader
+class VDataReader
 {
-  DEFINE_ANL_MODULE(LoadFrame, 1.0);
-  // ENABLE_PARALLEL_RUN();
 public:
-  LoadFrame();
-  
-protected:
-  LoadFrame(const LoadFrame&);
-
-public:
-  anlnext::ANLStatus mod_define() override;
-  anlnext::ANLStatus mod_initialize() override;
-  anlnext::ANLStatus mod_analyze() override;
-
-  void addFile(const std::string& filename) override;
-  bool hasFile(const std::string& filename) const override;
-  bool isDone() const override;
-
-private:
-  std::vector<std::string> files_;
-
-  ConstructFrame* frame_owner_ = nullptr;
+  virtual void addFile(const std::string& filename) = 0;
+  virtual bool hasFile(const std::string& filename) const = 0;
+  virtual bool isDone() const = 0;
 };
 
 } /* namespace comptonsoft */
 
-#endif /* COMPTONSOFT_LoadFrame_H */
+#endif /* COMPTONSOFT_VDataReader_H */

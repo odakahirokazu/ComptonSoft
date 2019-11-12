@@ -30,13 +30,22 @@ using namespace anlnext;
 namespace comptonsoft {
 
 MakeImageFiles::MakeImageFiles()
+  : canvas_width_(480), canvas_height_(480),
+    collection_("analysis"),
+    directory_("basic"), document_("images")
 {
 }
 
 ANLStatus MakeImageFiles::mod_define()
 {
+  define_parameter("canvas_width", &mod_class::canvas_width_);
+  define_parameter("canvas_height", &mod_class::canvas_height_);
   define_parameter("module_list", &mod_class::moduleList_);
+  define_parameter("collection", &mod_class::collection_);
+  define_parameter("directory", &mod_class::directory_);
+  define_parameter("document", &mod_class::document_);
   define_parameter("period", &mod_class::period_);
+  define_parameter("phase", &mod_class::phase_);
   
   return AS_OK;
 }    
@@ -51,17 +60,21 @@ ANLStatus MakeImageFiles::mod_initialize()
 
   if (exist_module("MongoDBClient")) {
     get_module_NC("MongoDBClient", &mongodb_);
-    mongodb_->createCappedCollection("images", 100*1024*1024);
+    mongodb_->createCappedCollection(collection_, 100*1024*1024);
   }
 
-  canvas_ = new TCanvas("c1", "c1", 604, 628);
+  const std::string canvasName = module_id() + "_canvas";
+  canvas_ = new TCanvas(canvasName.c_str(),
+                        canvasName.c_str(),
+                        canvas_width_+4,
+                        canvas_height_+24);
 
   return AS_OK;
 }
 
 ANLStatus MakeImageFiles::mod_analyze()
 {
-  if ((get_loop_index()+1)%period_ != 0) {
+  if (get_loop_index()%period_ != phase_) {
     return AS_OK;
   }
   
@@ -94,10 +107,10 @@ void MakeImageFiles::pushImagesToDB()
   const std::size_t size = 10*1024*1024;
   static uint8_t buf[size];
 
-  hsquicklook::DocumentBuilder builder("Analysis", "Images");
+  hsquicklook::DocumentBuilder builder(directory_, document_);
   builder.setTimeNow();
 
-  const std::string block_name = "MakeImageFiles";
+  const std::string block_name = module_id();
   auto block_open = bsoncxx::builder::stream::document{};
   block_open << "Index" << static_cast<int64_t>(get_loop_index());
   for (const std::string& filename: fileList_) {
@@ -106,14 +119,12 @@ void MakeImageFiles::pushImagesToDB()
     const std::size_t readSize = fin.gcount();
     fin.close();
 
-    constexpr int ImageWidth = 600;
-    constexpr int ImageHeight = 600;
     const boost::filesystem::path filePath(filename);
     block_open
       << filePath.stem().string() << hsquicklook::make_image_value(buf,
                                                                    readSize,
-                                                                   ImageWidth,
-                                                                   ImageHeight,
+                                                                   canvas_width_,
+                                                                   canvas_height_,
                                                                    filename);
   }
   
@@ -121,7 +132,7 @@ void MakeImageFiles::pushImagesToDB()
   builder.addBlock(block_name, block);
 
   auto doc = builder.generate();
-  mongodb_->push("images", doc);
+  mongodb_->push(collection_, doc);
 }
 
 } /* namespace comptonsoft */

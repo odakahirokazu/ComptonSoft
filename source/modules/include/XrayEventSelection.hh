@@ -17,48 +17,45 @@
  *                                                                       *
  *************************************************************************/
 
-#ifndef COMPTONSOFT_LoadFrame_H
-#define COMPTONSOFT_LoadFrame_H 1
+#ifndef COMPTONSOFT_XrayEventSelection_H
+#define COMPTONSOFT_XrayEventSelection_H 1
 
-#include <anlnext/BasicModule.hh>
-#include "VDataReader.hh"
+#include "XrayEventCollection.hh"
 
 namespace comptonsoft {
-
-class ConstructFrame;
-
-
 /**
- * LoadFrame
- *
  * @author Hirokazu Odaka
- * @date 2019-05-23
+ * @date 2019-10-30
  */
-class LoadFrame : public anlnext::BasicModule, public VDataReader
+class XrayEventSelection : public XrayEventCollection
 {
-  DEFINE_ANL_MODULE(LoadFrame, 1.0);
-  // ENABLE_PARALLEL_RUN();
+  DEFINE_ANL_MODULE(XrayEventSelection, 1.0);
 public:
-  LoadFrame();
-  
-protected:
-  LoadFrame(const LoadFrame&);
+  XrayEventSelection();
+  ~XrayEventSelection();
 
-public:
   anlnext::ANLStatus mod_define() override;
   anlnext::ANLStatus mod_initialize() override;
   anlnext::ANLStatus mod_analyze() override;
 
-  void addFile(const std::string& filename) override;
-  bool hasFile(const std::string& filename) const override;
-  bool isDone() const override;
+protected:
+  virtual bool select(const XrayEvent_sptr& e) const;
 
 private:
-  std::vector<std::string> files_;
-
-  ConstructFrame* frame_owner_ = nullptr;
+  int ixMin_ = 0;
+  int ixMax_ = 100000;
+  int iyMin_ = 0;
+  int iyMax_ = 100000;
+  int rankMin_ = 0;
+  int rankMax_ = 100;
+  int weightMin_ = 0;
+  int weightMax_ = 100;
+  double sumPHMin_ = 0.0;
+  double sumPHMax_ = 100000.0;
+  
+  const XrayEventCollection* collection_;
 };
 
 } /* namespace comptonsoft */
 
-#endif /* COMPTONSOFT_LoadFrame_H */
+#endif /* COMPTONSOFT_XrayEventSelection_H */

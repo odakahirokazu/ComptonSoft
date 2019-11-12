@@ -18,34 +18,34 @@
  *************************************************************************/
 
 /**
- * MakeXrayEventImage
+ * MakeXrayEventSpectrum
  *
  * @author Tsubasa Tamba
- * @date 2019-11-01
+ * @date 2019-11-12
  */
 
-#ifndef COMPTONSOFT_MakeXrayEventImage_H
-#define COMPTONSOFT_MakeXrayEventImage_H 1
+#ifndef COMPTONSOFT_MakeXrayEventSpectrum_H
+#define COMPTONSOFT_MakeXrayEventSpectrum_H 1
 
 #include <anlnext/BasicModule.hh>
 #include "XrayEvent.hh"
 #include "VCSModule.hh"
-class TH2;
+class TH1;
 
 namespace comptonsoft {
 
 class XrayEventCollection;
 class XrayEventTreeIO;
 
-class MakeXrayEventImage : public VCSModule
+class MakeXrayEventSpectrum : public VCSModule
 {
-  DEFINE_ANL_MODULE(MakeXrayEventImage, 1.0);
+  DEFINE_ANL_MODULE(MakeXrayEventSpectrum, 1.0);
   // ENABLE_PARALLEL_RUN();
 public:
-  MakeXrayEventImage();
+  MakeXrayEventSpectrum();
   
 protected:
-  MakeXrayEventImage(const MakeXrayEventImage&);
+  MakeXrayEventSpectrum(const MakeXrayEventSpectrum&);
 
 public:
   anlnext::ANLStatus mod_define() override;
@@ -54,41 +54,32 @@ public:
   anlnext::ANLStatus mod_analyze() override;
   anlnext::ANLStatus mod_end_run() override;
 
-  int NumPixelX() const { return numPixelX_; }
-  int NumPixelY() const { return numPixelY_; }
-  int OffsetX() const { return offsetX_; }
-  int OffsetY() const { return offsetY_; }
-  double RotationCenterX() const { return rotationCenterX_; }
-  double RotationCenterY() const { return rotationCenterY_; }
-  double RotationAngle() const { return rotationAngle_; }
-  image_t& Image() { return image_; }
-  image_t& TotalImage() { return totalImage_; }
+  std::vector<double>& Spectrum() { return spectrum_; }
+  std::vector<double>& TotalSpectrum() { return totalSpectrum_; }
+  double EnergyMin() { return energyMin_; }
+  double EnergyMax() { return energyMax_; }
+  int NumBin() { return numBin_; }
 
   void drawOutputFiles(TCanvas* c1, std::vector<std::string>* filenames) override;
 
 protected:
-  void resetImage(image_t& image) const;
-  void rotateImage(image_t& image) const;
+  void resetSpectrum(std::vector<double>& spectrum) const;
   void fillHistogram();
 
 private:
   std::string collectionModule_;
-  int numPixelX_ = 1;
-  int numPixelY_ = 1;
-  int offsetX_ = 0;
-  int offsetY_ = 0;
-  double rotationAngle_ = 0.0;
-  double rotationCenterX_ = 0.0;
-  double rotationCenterY_ = 0.0;
 
-  image_t image_;
-  image_t totalImage_;
-
+  std::vector<double> spectrum_;
+  std::vector<double> totalSpectrum_;
+  double energyMin_ = 0.0;
+  double energyMax_ = 10000.0;
+  int numBin_ = 1000;
+  
   XrayEventCollection* collection_ = nullptr;
-  TH2* totalHistogram_ = nullptr;
+  TH1* totalHistogram_ = nullptr;
   std::string outputFile_;
 };
 
 } /* namespace comptonsoft */
 
-#endif /* COMPTONSOFT_MakeXrayEventImage_H */
+#endif /* COMPTONSOFT_MakeXrayEventSpectrum_H */

@@ -73,6 +73,7 @@ clMod = [
   ANL::SWIGClass.new("FillFrame"),
   ANL::SWIGClass.new("LoadFrame"),
   ANL::SWIGClass.new("XrayEventCollection"),
+  ANL::SWIGClass.new("XrayEventSelection"),
   ANL::SWIGClass.new("AnalyzeFrame"),
   ANL::SWIGClass.new("WriteXrayEventTree"),
   ANL::SWIGClass.new("ReadXrayEventTree"),
@@ -89,7 +90,9 @@ clMod = [
   ANL::SWIGClass.new("MakeXrayEventImage"),
   ANL::SWIGClass.new("ProcessCodedAperture"),
   ANL::SWIGClass.new("MakeImageFiles"),
-  ANL::SWIGClass.new("GetInputFiles"),
+  ANL::SWIGClass.new("GetInputFilesFromDirectory"),
+  ANL::SWIGClass.new("MakeXrayEventSpectrum"),
+  ANL::SWIGClass.new("MakeXrayEventAzimuthAngle"),
 ]
 
 clSim = [

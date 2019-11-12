@@ -69,6 +69,7 @@
 #include "FillFrame.hh"
 #include "LoadFrame.hh"
 #include "XrayEventCollection.hh"
+#include "XrayEventSelection.hh"
 #include "AnalyzeFrame.hh"
 #include "WriteXrayEventTree.hh"
 #include "ReadXrayEventTree.hh"
@@ -89,7 +90,9 @@
 #include "MakeXrayEventImage.hh"
 #include "ProcessCodedAperture.hh"
 #include "MakeImageFiles.hh"
-#include "GetInputFiles.hh"
+#include "GetInputFilesFromDirectory.hh"
+#include "MakeXrayEventSpectrum.hh"
+#include "MakeXrayEventAzimuthAngle.hh"
 #ifdef USE_FITSIO
 #include "AHRayTracingPrimaryGen.hh"
 #endif
@@ -697,6 +700,14 @@ public:
 };
 
 
+class XrayEventSelection : public XrayEventCollection
+{
+public:
+  XrayEventSelection();
+  ~XrayEventSelection();
+};
+
+
 class AnalyzeFrame : public anlnext::BasicModule
 {
 public:
@@ -815,10 +826,24 @@ public:
 };
 
 
-class GetInputFiles : public anlnext::BasicModule
+class GetInputFilesFromDirectory : public anlnext::BasicModule
 {
 public:
-  GetInputFiles();
+  GetInputFilesFromDirectory();
+};
+
+
+class MakeXrayEventSpectrum : public VCSModule
+{
+public:
+  MakeXrayEventSpectrum();
+};
+
+
+class MakeXrayEventAzimuthAngle : public VCSModule
+{
+public:
+  MakeXrayEventAzimuthAngle();
 };
 
 

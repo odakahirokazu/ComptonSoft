@@ -33,6 +33,7 @@ namespace unit = anlgeant4::unit;
 namespace comptonsoft {
 
 ProcessCodedAperture::ProcessCodedAperture()
+  : outputFile_("decoded.png")
 {
 }
 
@@ -196,6 +197,10 @@ void ProcessCodedAperture::drawOutputFiles(TCanvas* c1, std::vector<std::string>
   
   c1->cd();
   gStyle->SetOptStat(0);
+  gStyle->SetPalette(56);
+  const double zmax = totalHistogram_->GetMaximum();
+  const double zmin = zmax * (-1);
+  totalHistogram_->GetZaxis()->SetRangeUser(zmin, zmax);
   totalHistogram_->Draw("colz");
   c1->SaveAs(outputFile_.c_str());
   filenames->push_back(outputFile_);

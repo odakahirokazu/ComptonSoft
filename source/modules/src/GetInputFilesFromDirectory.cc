@@ -17,7 +17,7 @@
  *                                                                       *
  *************************************************************************/
 
-#include "GetInputFiles.hh"
+#include "GetInputFilesFromDirectory.hh"
 #include <ctime>
 #include <thread>
 #include <chrono>
@@ -29,13 +29,18 @@ using namespace anlnext;
 
 namespace comptonsoft {
 
-GetInputFiles::GetInputFiles()
-  : directory_("."), extension_(".dat"), delay_(5), wait_(10)
+GetInputFilesFromDirectory::GetInputFilesFromDirectory()
+  : reader_module_("LoadFrame"),
+    directory_("."),
+    extension_(".dat"),
+    delay_(5),
+    wait_(10)
 {
 }
 
-ANLStatus GetInputFiles::mod_define()
+ANLStatus GetInputFilesFromDirectory::mod_define()
 {
+  define_parameter("reader_module", &mod_class::reader_module_);
   define_parameter("directory", &mod_class::directory_);
   define_parameter("extension", &mod_class::extension_);
   define_parameter("delay", &mod_class::delay_);
@@ -44,49 +49,49 @@ ANLStatus GetInputFiles::mod_define()
   return AS_OK;
 }
 
-ANLStatus GetInputFiles::mod_initialize()
+ANLStatus GetInputFilesFromDirectory::mod_initialize()
 {
-  get_module_NC("LoadFrame", &data_reader_);
-
+  get_module_IFNC(reader_module_, &data_reader_);
   return AS_OK;
 }
 
-ANLStatus GetInputFiles::mod_analyze()
+ANLStatus GetInputFilesFromDirectory::mod_analyze()
 {
   namespace fs = boost::filesystem;
 
   const std::time_t entryTime = std::time(nullptr);
   const fs::path dir(directory_);
   
-  while (true) {
-    std::list<fs::path> files;
+  std::list<fs::path> files;
+  for (const auto& f: boost::make_iterator_range(fs::directory_iterator(dir), {})) {
+    if (fs::is_directory(f)) { continue; }
     
-    for (const auto& f: boost::make_iterator_range(fs::directory_iterator(dir), {})) {
-      if (fs::is_directory(f)) { continue; }
+    const fs::path file = f.path();
+    
+    if (file.extension() != extension_) { continue; }
+    if (data_reader_->hasFile(file.string())) { continue; }
+    
+    files.push_back(file);
+  }
 
-      const fs::path file = f.path();
-
-      if (file.extension() != extension_) { continue; }
-      if (data_reader_->hasFile(file.string())) { continue; }
-
-      files.push_back(file);
+  files.sort();
+  bool added = false;
+  for (const fs::path& file: files) {
+    const std::time_t timeModified = fs::last_write_time(file);
+    if (timeModified+delay_ < std::time(nullptr)) {
+      data_reader_->addFile(file.string());
+      added = true;
     }
-
-    if (files.empty()) {
-      if (entryTime+wait_ < std::time(nullptr)) {
-        break;
-      }
+  }
+  
+  if (!added && data_reader_->isDone()) {
+    if (entryTime+wait_ < std::time(nullptr)) {
+      std::cout << "[GetInputFilesFromDirectory] timeout" << std::endl;;
     }
-
-    files.sort();
-    for (const fs::path& file: files) {
-      const std::time_t timeModified = fs::last_write_time(file);
-      if (timeModified+delay_ < std::time(nullptr)) {
-        data_reader_->addFile(file.string());
-      }
+    else {
+      std::this_thread::sleep_for(std::chrono::seconds(1));
+      return AS_REDO;
     }
-
-    std::this_thread::sleep_for(std::chrono::seconds(1));
   }
 
   return AS_OK;

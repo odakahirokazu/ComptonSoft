@@ -46,11 +46,11 @@ ANLStatus LoadFrame::mod_initialize()
 
 ANLStatus LoadFrame::mod_analyze()
 {
-  const std::size_t fileIndex = get_loop_index();
-  if (fileIndex == files_.size()) {
+  if (isDone()) {
     return AS_QUIT;
   }
 
+  const std::size_t fileIndex = get_loop_index();
   const std::string filename = files_[fileIndex];
   std::cout << "[LoadFrame] filename: " << filename << std::endl;
 
@@ -72,6 +72,12 @@ void LoadFrame::addFile(const std::string& filename)
 bool LoadFrame::hasFile(const std::string& filename) const
 {
   return (std::find(files_.begin(), files_.end(), filename) != files_.end());
+}
+
+bool LoadFrame::isDone() const
+{
+  const std::size_t fileIndex = get_loop_index();
+  return (fileIndex == files_.size());
 }
 
 } /* namespace comptonsoft */

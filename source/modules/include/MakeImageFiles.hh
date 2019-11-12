@@ -59,8 +59,14 @@ protected:
   void pushImagesToDB();
 
 private:
+  int canvas_width_ = 1;
+  int canvas_height_ = 1;
   std::vector<std::string> moduleList_;
+  std::string collection_;
+  std::string directory_;
+  std::string document_;
   int period_ = 1;
+  int phase_ = 0;
   std::vector<VCSModule*> modules_;
   TCanvas* canvas_;
   std::vector<std::string> fileList_;

@@ -56,8 +56,8 @@ ANLStatus VCSModule::mod_initialize()
 void VCSModule::mkdir(const std::string& name)
 {
   if (name=="") {
-    saveDir_->mkdir(module_name().c_str());
-    saveDir_->cd(module_name().c_str());
+    saveDir_->mkdir(module_id().c_str());
+    saveDir_->cd(module_id().c_str());
   }
   else {
     saveDir_->mkdir(name.c_str());

@@ -93,8 +93,7 @@ private:
   std::string imageOwnerModule_ = "MakeXrayEventImage";
   std::unique_ptr<comptonsoft::CodedAperture> coded_aperture_;
   TH2* totalHistogram_ = nullptr;
-  std::string outputFile_ = "DecodedImage.png";
-
+  std::string outputFile_;
 };
 
 } /* namespace comptonsoft */

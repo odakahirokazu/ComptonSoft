@@ -54,6 +54,7 @@ set(CS_MODULES
   src/FillFrame.cc
   src/LoadFrame.cc
   src/XrayEventCollection.cc
+  src/XrayEventSelection.cc
   src/AnalyzeFrame.cc
   src/WriteXrayEventTree.cc
   src/ReadXrayEventTree.cc
@@ -68,7 +69,9 @@ set(CS_MODULES
   src/MakeXrayEventImage.cc
   src/ProcessCodedAperture.cc
   src/MakeImageFiles.cc
-  src/GetInputFiles.cc
+  src/GetInputFilesFromDirectory.cc
+  src/MakeXrayEventSpectrum.cc
+  src/MakeXrayEventAzimuthAngle.cc
   ### IO
   src/CreateRootFile.cc
   src/SaveData.cc
