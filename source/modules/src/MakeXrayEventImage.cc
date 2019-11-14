@@ -57,8 +57,8 @@ ANLStatus MakeXrayEventImage::mod_initialize()
   get_module_NC(collectionModule_, &collection_);
   const int nx = NumPixelX();
   const int ny = NumPixelY();
-  image_.resize(boost::extents[nx][ny]);
-  totalImage_.resize(boost::extents[nx][ny]);
+  image_.reset(new image_t(boost::extents[nx][ny]));
+  totalImage_.reset(new image_t(boost::extents[nx][ny]));
 
   ANLStatus status = VCSModule::mod_initialize();
   if (status!=AS_OK) {
@@ -87,19 +87,19 @@ ANLStatus MakeXrayEventImage::mod_analyze()
   for (const auto& event: collection_->getEvents()) {
     const int ix = event->X() - OffsetX();
     const int iy = event->Y() - OffsetY();
-    const int nx = image_.shape()[0];
-    const int ny = image_.shape()[1];
+    const int nx = (*image_).shape()[0];
+    const int ny = (*image_).shape()[1];
     if (0<=ix && ix<nx && 0<=iy && iy<ny) {
-      image_[ix][iy] += 1.0;
+      (*image_)[ix][iy] += 1.0;
     }
   }
   rotateImage(image_);
 
-  const int nx = image_.shape()[0];
-  const int ny = image_.shape()[1];
+  const int nx = (*image_).shape()[0];
+  const int ny = (*image_).shape()[1];
   for (int ix=0; ix<nx; ix++) {
     for (int iy=0; iy<ny; iy++) {
-      totalImage_[ix][iy] += image_[ix][iy];
+      (*totalImage_)[ix][iy] += (*image_)[ix][iy];
     }
   }
 
@@ -113,41 +113,41 @@ ANLStatus MakeXrayEventImage::mod_end_run()
   return AS_OK;
 }
 
-void MakeXrayEventImage::resetImage(image_t& image) const
+void MakeXrayEventImage::resetImage(std::shared_ptr<image_t> image)
 {
-  const int nx = image.shape()[0];
-  const int ny = image.shape()[1];
+  const int nx = (*image).shape()[0];
+  const int ny = (*image).shape()[1];
   for (int ix=0; ix<nx; ix++) {
     for (int iy=0; iy<ny; iy++) {
-      image[ix][iy] = 0.0;
+      (*image)[ix][iy] = 0.0;
     }
   }
 }
 
-void MakeXrayEventImage::rotateImage(image_t& image) const
+void MakeXrayEventImage::rotateImage(std::shared_ptr<image_t> image)
 {
   if (rotationAngle_ == 0.0) { return; }
 
-  const int nx = image.shape()[0];
-  const int ny = image.shape()[1];
+  const int nx = (*image).shape()[0];
+  const int ny = (*image).shape()[1];
   const double cx = RotationCenterX();
   const double cy = RotationCenterY();
   const double theta = RotationAngle();
-  image_t new_image(boost::extents[nx][ny]);
+  std::shared_ptr<image_t> new_image(new image_t(boost::extents[nx][ny]));
   resetImage(new_image);
   for (int ix=0; ix<nx; ix++) {
     for (int iy=0; iy<ny; iy++) {
-      const double v = image[ix][iy];
+      const double v = (*image)[ix][iy];
       const double x = ((ix - cx ) * std::cos(theta) - (iy - cy) * std::sin(theta));
       const double y = ((ix - cx ) * std::sin(theta) + (iy - cy) * std::sin(theta));
       const int ixx = static_cast<int>(x+0.5+cx);
       const int iyy = static_cast<int>(y+0.5+cx);
       if (ixx>=0 && ixx<nx && iyy>=0 && iyy<ny){
-        new_image[ixx][iyy] += v;
+        (*new_image)[ixx][iyy] += v;
       }
     }
   }
-  image = std::move(new_image);
+  image = new_image;
 }
 
 void MakeXrayEventImage::fillHistogram()
@@ -156,7 +156,7 @@ void MakeXrayEventImage::fillHistogram()
   const int ny = NumPixelY();
   for (int ix=0; ix<nx; ix++) {
     for (int iy=0; iy<ny; iy++) {
-      const double v = totalImage_[ix][iy];
+      const double v = (*totalImage_)[ix][iy];
       totalHistogram_->SetBinContent(ix+1, iy+1, v);
     }
   }
@@ -167,6 +167,7 @@ void MakeXrayEventImage::drawOutputFiles(TCanvas* c1, std::vector<std::string>* 
   fillHistogram();
   c1->cd();
   gStyle->SetOptStat(0);
+  gStyle->SetPalette(56);
   totalHistogram_->Draw("colz");
   c1->SaveAs(outputFile_.c_str());
   filenames->push_back(outputFile_);

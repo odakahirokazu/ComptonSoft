@@ -28,6 +28,7 @@
 #define COMPTONSOFT_MakeXrayEventImage_H 1
 
 #include <anlnext/BasicModule.hh>
+#include <memory>
 #include "XrayEvent.hh"
 #include "VCSModule.hh"
 class TH2;
@@ -61,14 +62,14 @@ public:
   double RotationCenterX() const { return rotationCenterX_; }
   double RotationCenterY() const { return rotationCenterY_; }
   double RotationAngle() const { return rotationAngle_; }
-  image_t& Image() { return image_; }
-  image_t& TotalImage() { return totalImage_; }
+  std::shared_ptr<image_t> Image() { return image_; }
+  std::shared_ptr<image_t> TotalImage() { return totalImage_; }
 
   void drawOutputFiles(TCanvas* c1, std::vector<std::string>* filenames) override;
 
 protected:
-  void resetImage(image_t& image) const;
-  void rotateImage(image_t& image) const;
+  void resetImage(std::shared_ptr<image_t> image);
+  void rotateImage(std::shared_ptr<image_t> image);
   void fillHistogram();
 
 private:
@@ -81,8 +82,8 @@ private:
   double rotationCenterX_ = 0.0;
   double rotationCenterY_ = 0.0;
 
-  image_t image_;
-  image_t totalImage_;
+  std::shared_ptr<image_t> image_;
+  std::shared_ptr<image_t> totalImage_;
 
   XrayEventCollection* collection_ = nullptr;
   TH2* totalHistogram_ = nullptr;

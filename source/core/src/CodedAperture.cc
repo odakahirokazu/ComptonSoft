@@ -18,140 +18,109 @@
  *************************************************************************/
 
 #include "CodedAperture.hh"
-
-#include <fstream>
 #include <iostream>
-#include <cstdint>
-#include <list>
-#include <algorithm>
-
-#include <TROOT.h>
-#include <TFile.h>
-#include <TTree.h>
-#include <cmath>
 
 namespace comptonsoft
 {
 
+CodedAperture::CodedAperture()
+{
+}
+
 CodedAperture::~CodedAperture() = default;
 
-void CodedAperture::setup()
+void CodedAperture::setAperturePattern(const std::shared_ptr<image_t>& pattern)
 {
-  const int nsx = NumDecodedImageX();
-  const int nsy = NumDecodedImageY();
-  const int ndx = NumEncodedImageX();
-  const int ndy = NumEncodedImageY();
-  const int nmx = NumMaskX();
-  const int nmy = NumMaskY();
-  pattern_.resize(boost::extents[nmx][nmy]);
-  decoder_array_.resize(boost::extents[nmx][nmy]);
-  encoded_image_.resize(boost::extents[ndx][ndy]);
-  decoded_image_.resize(boost::extents[nsx][nsy]);
-  for (int ix=0; ix<nmx; ix++) {
-    for (int iy=0; iy<nmy; iy++) {
-      pattern_[ix][iy] = 0.0;
-      decoder_array_[ix][iy] = 0.0;
-    }
-  }
-  for (int ix=0; ix<ndx; ix++) {
-    for (int iy=0; iy<ndy; iy++) {
-      encoded_image_[ix][iy] = 0.0;
-    }
-  }
-  for (int ix=0; ix<nsx; ix++) {
-    for (int iy=0; iy<nsy; iy++) {
-      decoded_image_[ix][iy] = 0.0;
-    }
-  }
-}
+  aperture_pattern_ = pattern;
 
-void CodedAperture::calculateApertureRatio()
-{
-  const int nmx = NumMaskX();
-  const int nmy = NumMaskY();
-  double num_aperture = 0.0;
-  for (int mx=0; mx<nmx; mx++) {
-    for (int my=0; my<nmy; my++) {
-      if (pattern_[mx][my]>0.0) {
-        num_aperture += 1.0;
+  const int Nmx = (*aperture_pattern_).shape()[0];
+  const int Nmy = (*aperture_pattern_).shape()[1];
+  double integral = 0.0;
+  for (int mx=0; mx<Nmx; mx++) {
+    for (int my=0; my<Nmy; my++) {
+      integral += (*aperture_pattern_)[mx][my];
+    }
+  }
+  const double apertureFraction = integral/(Nmx*Nmy);
+  const double decodingCoefficient = -1.0*apertureFraction/(1.0-apertureFraction);
+  decoder_array_.reset(new image_t(boost::extents[Nmx][Nmy]));
+	for (int mx=0; mx<Nmx; mx++) {
+    for(int my=0; my<Nmy; my++) {
+      if ((*aperture_pattern_)[mx][my] > 0.0) {
+        (*decoder_array_)[mx][my] = 1.0;
+      }
+      else {
+        (*decoder_array_)[mx][my] = decodingCoefficient;
       }
     }
-  }
-  aperture_ratio_ = num_aperture/static_cast<double>(nmx*nmy);
-}
-
-void CodedAperture::makeDecoderArray()
-{	
-  const int nmx = NumMaskX();
-  const int nmy = NumMaskY();
-  const double c = -1.0*ApertureRatio() / ( 1.0 - ApertureRatio());
-	for(int mx=0; mx < nmx; mx++){ 		
-			for(int my=0; my < nmy; my++){
-					if(pattern_[mx][my]>0){
-						decoder_array_[mx][my] = 1.0;
-					}	else{
-						decoder_array_[mx][my] = c;
-					}
-			}
 	}
 }
 
-void CodedAperture::calculateFieldOfView()
+void CodedAperture::setEncodedImage(const std::shared_ptr<image_t>& image)
 {
-  const double l = SourceToMaskDistance();
-  const double h = MaskToDetectorDistance();
-  const double mask_corner_x = 0.5*MaskElementSize()*NumMaskX();
-  const double mask_corner_y = 0.5*MaskElementSize()*NumMaskY();
-  const double detector_corner_x = -0.5*DetectorElementSize()*NumEncodedImageX();
-  const double detector_corner_y = -0.5*DetectorElementSize()*NumEncodedImageY();
-  const double sky_corner_x = detector_corner_x + (mask_corner_x - detector_corner_x) * (l+h) / h;
-  const double sky_corner_y = detector_corner_y + (mask_corner_y - detector_corner_y) * (l+h) / h;
-  sky_element_size_x_ = sky_corner_x * 2.0 / NumDecodedImageX();
-  sky_element_size_y_ = sky_corner_y * 2.0 / NumDecodedImageY();
+  encoded_image_ = image;
+
+  const int Ndx = encoded_image_->shape()[0];
+  const int Ndy = encoded_image_->shape()[1];
+  const int Nmx = decoder_array_->shape()[0];
+  const int Nmy = decoder_array_->shape()[1];
+
+  const double samplingScaleX = aperture_element_size_x_/detector_element_size_x_;
+  const double samplingScaleY = aperture_element_size_y_/detector_element_size_y_;
+  const double NmxScaled = samplingScaleX * Nmx;
+  const double NmyScaled = samplingScaleY * Nmy;
+
+  const int Nsx = desampling_factor_*(Ndx + NmxScaled - 1);
+  const int Nsy = desampling_factor_*(Ndy + NmyScaled - 1);
+  if (decoded_image_) {
+    decoded_image_->resize(boost::extents[Nsx][Nsy]);
+  }
+  else {
+    decoded_image_.reset(new image_t(boost::extents[Nsx][Nsy]));
+  }
 }
 
 void CodedAperture::decode()
 {	
-  const int nsx = NumDecodedImageX();
-  const int nsy = NumDecodedImageY();
-  const int ndx = NumEncodedImageX();
-  const int ndy = NumEncodedImageY();
-  const int nmx = NumMaskX();
-  const int nmy = NumMaskY();
-	for(int sx =0; sx < nsx; sx++){
-			for(int sy =0; sy < nsy; sy++){
-				decoded_image_[sx][sy] = 0.0;  
-			}
-	}
+  const int Nsx = decoded_image_->shape()[0];
+  const int Nsy = decoded_image_->shape()[1];
+  const int Ndx = encoded_image_->shape()[0];
+  const int Ndy = encoded_image_->shape()[1];
+  const int Nmx = decoder_array_->shape()[0];
+  const int Nmy = decoder_array_->shape()[1];
 
-  const double l = SourceToMaskDistance();
-  const double h = MaskToDetectorDistance();
-	for(int dx=0; dx < ndx; dx++){
-			for(int dy=0; dy < ndy; dy++){
-				const double dx0 = dx -  (NumEncodedImageX()-1.0) * 0.5;
-				const double dy0 = dy -  (NumEncodedImageY()-1.0) * 0.5;
-				for (int mx=0; mx < nmx; mx++){
-						for(int my=0; my < nmy; my++){
-								const double mx0 = mx -  (NumMaskX() - 1.0) * 0.5;
-								const double my0 = my -  (NumMaskY() - 1.0) * 0.5;
-                const double x1 = dx0 * DetectorElementSize();
-                const double y1 = dy0 * DetectorElementSize();
-                const double x2 = mx0 * MaskElementSize();
-                const double y2 = my0 * MaskElementSize();
-                const double sx0 = (x1 + (x2-x1) * (l+h) / h) / SkyElementSizeX();
-                const double sy0 = (y1 + (y2-y1) * (l+h) / h) / SkyElementSizeY(); 
-								const double sx = sx0 + (NumDecodedImageX() - 1.0) *0.5;
-								const double sy = sy0 + (NumDecodedImageY() - 1.0) *0.5;
-                if (sx>=0 && sx<NumDecodedImageX() && sy>=0 && sy<NumDecodedImageY()) {
-                    decoded_image_[sx][sy] += encoded_image_[dx][dy] * decoder_array_[mx][my];
-                  }
-						}
-				}
-			}
-	}
+  const double scaleXInverse = detector_element_size_x_/aperture_element_size_x_;
+  const double scaleYInverse = detector_element_size_y_/aperture_element_size_y_;
 
+  image_t& imageD = *decoded_image_;
+  const image_t& imageE = *encoded_image_;
+  const image_t& t = *decoder_array_;
+
+  const double skyOriginalScale = 1.0/desampling_factor_;
+  for (int sx=0; sx<Nsx; sx++) {
+    for (int sy=0; sy<Nsy; sy++) {
+      double pixelValue = 0.0;
+      const double sxOriginal = sx*skyOriginalScale;
+      for (int dx=0; dx<Ndx; dx++) {
+        const int mxScaled = dx + sxOriginal + 1 - Ndx;
+        const int mx = static_cast<int>(scaleXInverse*mxScaled);
+        if (mx<0 || Nmx<=mx) { continue; }
+        for (int dy=0; dy<Ndy; dy++) {
+          const double syOriginal = sy*skyOriginalScale;
+          const int myScaled = dy + syOriginal + 1 - Ndy;
+          const int my = static_cast<int>(scaleYInverse*myScaled);
+          if (my<0 || Nmy<=my) { continue; }
+          if (imageE[dx][dy]>0.0) {
+            pixelValue += imageE[dx][dy]*t[mx][my];
+          }
+        }
+      }
+      imageD[sx][sy] = pixelValue;
+    }
+  }
 }
 
+#if 0
 void CodedAperture::mirrorDecodedImage()
 {
   const int nsx = NumDecodedImageX();
@@ -168,7 +137,7 @@ void CodedAperture::mirrorDecodedImage()
       decoded_image_[ix][iy] = image[nsx-ix-1][iy];
     }
   }
-
 }
+#endif
 
 } /* namespace comptonsoft */

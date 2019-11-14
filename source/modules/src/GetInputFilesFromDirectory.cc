@@ -18,7 +18,6 @@
  *************************************************************************/
 
 #include "GetInputFilesFromDirectory.hh"
-#include <ctime>
 #include <thread>
 #include <chrono>
 #include <boost/filesystem.hpp>
@@ -52,6 +51,8 @@ ANLStatus GetInputFilesFromDirectory::mod_define()
 ANLStatus GetInputFilesFromDirectory::mod_initialize()
 {
   get_module_IFNC(reader_module_, &data_reader_);
+  entry_time_ = std::time(nullptr);
+
   return AS_OK;
 }
 
@@ -59,7 +60,13 @@ ANLStatus GetInputFilesFromDirectory::mod_analyze()
 {
   namespace fs = boost::filesystem;
 
-  const std::time_t entryTime = std::time(nullptr);
+  if (redoing_) {
+    redoing_ = false;
+  }
+  else {
+    entry_time_ = std::time(nullptr);
+  }
+
   const fs::path dir(directory_);
   
   std::list<fs::path> files;
@@ -85,11 +92,12 @@ ANLStatus GetInputFilesFromDirectory::mod_analyze()
   }
   
   if (!added && data_reader_->isDone()) {
-    if (entryTime+wait_ < std::time(nullptr)) {
+    if (entry_time_+wait_ < std::time(nullptr)) {
       std::cout << "[GetInputFilesFromDirectory] timeout" << std::endl;;
     }
     else {
       std::this_thread::sleep_for(std::chrono::seconds(1));
+      redoing_ = true;
       return AS_REDO;
     }
   }

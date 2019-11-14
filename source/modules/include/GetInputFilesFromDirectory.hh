@@ -21,6 +21,7 @@
 #define COMPTONSOFT_GetInputFilesFromDirectory_H 1
 
 #include <anlnext/BasicModule.hh>
+#include <ctime>
 
 namespace comptonsoft {
 
@@ -54,6 +55,8 @@ private:
   int delay_ = 0;
   int wait_ = 0;
   VDataReader* data_reader_ = nullptr;
+  bool redoing_ = false;
+  std::time_t entry_time_ = 0;
 };
 
 } /* namespace comptonsoft */
