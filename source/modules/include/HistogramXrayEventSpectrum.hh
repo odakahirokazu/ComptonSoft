@@ -18,68 +18,51 @@
  *************************************************************************/
 
 /**
- * MakeXrayEventAzimuthAngle
+ * HistogramXrayEventSpectrum
  *
  * @author Tsubasa Tamba
- * @date 2019-11-13
+ * @date 2019-11-12
  */
 
-#ifndef COMPTONSOFT_MakeXrayEventAzimuthAngle_H
-#define COMPTONSOFT_MakeXrayEventAzimuthAngle_H 1
+#ifndef COMPTONSOFT_HistogramXrayEventSpectrum_H
+#define COMPTONSOFT_HistogramXrayEventSpectrum_H 1
 
-#include <anlnext/BasicModule.hh>
-#include "XrayEvent.hh"
 #include "VCSModule.hh"
+
 class TH1;
 
 namespace comptonsoft {
 
 class XrayEventCollection;
-class XrayEventTreeIO;
 
-class MakeXrayEventAzimuthAngle : public VCSModule
+class HistogramXrayEventSpectrum : public VCSModule
 {
-  DEFINE_ANL_MODULE(MakeXrayEventAzimuthAngle, 1.0);
+  DEFINE_ANL_MODULE(HistogramXrayEventSpectrum, 1.0);
   // ENABLE_PARALLEL_RUN();
 public:
-  MakeXrayEventAzimuthAngle();
+  HistogramXrayEventSpectrum();
   
 protected:
-  MakeXrayEventAzimuthAngle(const MakeXrayEventAzimuthAngle&);
+  HistogramXrayEventSpectrum(const HistogramXrayEventSpectrum&);
 
 public:
   anlnext::ANLStatus mod_define() override;
   anlnext::ANLStatus mod_initialize() override;
-  anlnext::ANLStatus mod_begin_run() override;
   anlnext::ANLStatus mod_analyze() override;
-  anlnext::ANLStatus mod_end_run() override;
 
-  std::vector<double>& Distribution() { return distribution_; }
-  std::vector<double>& TotalDistribution() { return totalDistribution_; }
-  double AngleMin() { return angleMin_; }
-  double AngleMax() { return angleMax_; }
-  int NumBin() { return numBin_; }
-
-  void drawOutputFiles(TCanvas* c1, std::vector<std::string>* filenames) override;
-
-protected:
-  void resetDistribution(std::vector<double>& distribution) const;
-  void fillHistogram();
+  void drawCanvas(TCanvas* canvas, std::vector<std::string>* filenames) override;
 
 private:
+  int numBins_ = 1;
+  double energyMin_ = 0.0;
+  double energyMax_ = 1.0;
   std::string collectionModule_;
-
-  std::vector<double> distribution_;
-  std::vector<double> totalDistribution_;
-  double angleMin_ = -180.0-0.5*11.25;
-  double angleMax_ = 180.0+0.5*11.25;
-  int numBin_ = 33;
+  std::string outputName_;
   
   XrayEventCollection* collection_ = nullptr;
-  TH1* totalHistogram_ = nullptr;
-  std::string outputFile_;
+  TH1* histogram_ = nullptr;
 };
 
 } /* namespace comptonsoft */
 
-#endif /* COMPTONSOFT_MakeXrayEventAzimuthAngle_H */
+#endif /* COMPTONSOFT_HistogramXrayEventSpectrum_H */

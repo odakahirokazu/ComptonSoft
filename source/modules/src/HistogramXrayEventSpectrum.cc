@@ -17,11 +17,9 @@
  *                                                                       *
  *************************************************************************/
 
-#include "MakeXrayEventSpectrum.hh"
+#include "HistogramXrayEventSpectrum.hh"
 
-#include "XrayEvent.hh"
 #include "XrayEventCollection.hh"
-#include "XrayEventTreeIO.hh"
 #include "AstroUnits.hh"
 #include "TH1.h"
 #include "TStyle.h"
@@ -31,87 +29,60 @@ namespace unit = anlgeant4::unit;
 
 namespace comptonsoft {
 
-MakeXrayEventSpectrum::MakeXrayEventSpectrum()
-  : collectionModule_("XrayEventCollection"),
-    outputFile_("image.png")
+HistogramXrayEventSpectrum::HistogramXrayEventSpectrum()
+  : numBins_(512), energyMin_(-0.5), energyMax_(4095.5),
+    collectionModule_("XrayEventCollection"), outputName_("spectrum")
 {
 }
 
-ANLStatus MakeXrayEventSpectrum::mod_define()
+ANLStatus HistogramXrayEventSpectrum::mod_define()
 {
-  define_parameter("collection_module", &mod_class::collectionModule_);
+  define_parameter("num_bins", &mod_class::numBins_);
   define_parameter("energy_min", &mod_class::energyMin_);
   define_parameter("energy_max", &mod_class::energyMax_);
-  define_parameter("num_bin", &mod_class::numBin_);
-  define_parameter("output", &mod_class::outputFile_);
+  define_parameter("collection_module", &mod_class::collectionModule_);
+  define_parameter("output_name", &mod_class::outputName_);
   
   return AS_OK;
 }
 
-ANLStatus MakeXrayEventSpectrum::mod_initialize()
+ANLStatus HistogramXrayEventSpectrum::mod_initialize()
 {
   get_module_NC(collectionModule_, &collection_);
-  const int numbin = NumBin();
-  const double emin = EnergyMin();
-  const double emax = EnergyMax();
-  spectrum_.resize(numbin);
-  totalSpectrum_.resize(numbin);
 
   ANLStatus status = VCSModule::mod_initialize();
-  if (status!=AS_OK) {
+  if (status != AS_OK) {
     return status;
   }
+
   mkdir();
-  const std::string name = "Spectrum";
+  const std::string name = "spectrum";
   const std::string title = "Spectrum";
-  totalHistogram_ = new TH1D(name.c_str(), title.c_str(), numbin, emin, emax);
+  histogram_ = new TH1D(name.c_str(), title.c_str(),
+                        numBins_, energyMin_, energyMax_);
 
   return AS_OK;
 }
 
-ANLStatus MakeXrayEventSpectrum::mod_begin_run()
-{
-  resetSpectrum(spectrum_);
-  resetSpectrum(totalSpectrum_);
-  return AS_OK;
-}
-
-ANLStatus MakeXrayEventSpectrum::mod_analyze()
+ANLStatus HistogramXrayEventSpectrum::mod_analyze()
 {
   for (const auto& event: collection_->getEvents()) {
     const double energy = event->SumPH();
-    totalHistogram_->Fill(energy);
+    histogram_->Fill(energy);
   }
 
   return AS_OK;
 }
 
-ANLStatus MakeXrayEventSpectrum::mod_end_run()
+void HistogramXrayEventSpectrum::drawCanvas(TCanvas* canvas, std::vector<std::string>* filenames)
 {
-  return AS_OK;
-}
-
-void MakeXrayEventSpectrum::resetSpectrum(std::vector<double>& spectrum) const
-{
-  const int numbin = spectrum.size();
-  for (int i=0; i<numbin; i++) {
-    spectrum[i] = 0.0;
-  }
-}
-
-
-void MakeXrayEventSpectrum::fillHistogram()
-{
-}
-
-void MakeXrayEventSpectrum::drawOutputFiles(TCanvas* c1, std::vector<std::string>* filenames)
-{
-  c1->cd();
+  const std::string outputFile = outputName_+".png";
+  canvas->cd();
   gStyle->SetOptStat("e");
   gStyle->SetStatH(0.15);
-  totalHistogram_->Draw();
-  c1->SaveAs(outputFile_.c_str());
-  filenames->push_back(outputFile_);
+  histogram_->Draw();
+  canvas->SaveAs(outputFile.c_str());
+  filenames->push_back(outputFile);
 }
 
 } /* namespace comptonsoft */

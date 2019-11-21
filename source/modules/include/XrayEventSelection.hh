@@ -43,17 +43,17 @@ protected:
 
 private:
   int ixMin_ = 0;
-  int ixMax_ = 100000;
+  int ixMax_ = 0;
   int iyMin_ = 0;
-  int iyMax_ = 100000;
+  int iyMax_ = 0;
   int rankMin_ = 0;
-  int rankMax_ = 100;
+  int rankMax_ = 0;
   int weightMin_ = 0;
-  int weightMax_ = 100;
+  int weightMax_ = 0;
   double sumPHMin_ = 0.0;
-  double sumPHMax_ = 100000.0;
+  double sumPHMax_ = 0.0;
   
-  const XrayEventCollection* collection_;
+  const XrayEventCollection* collection_ = nullptr;
 };
 
 } /* namespace comptonsoft */

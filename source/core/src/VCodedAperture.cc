@@ -1,6 +1,6 @@
 /*************************************************************************
  *                                                                       *
- * Copyright (c) 2011 Hirokazu Odaka                                     *
+ * Copyright (c) 2019 Hirokazu Odaka                                     *
  *                                                                       *
  * This program is free software: you can redistribute it and/or modify  *
  * it under the terms of the GNU General Public License as published by  *
@@ -17,50 +17,15 @@
  *                                                                       *
  *************************************************************************/
 
-#ifndef COMPTONSOFT_VCSModule_H
-#define COMPTONSOFT_VCSModule_H 1
+#include "VCodedAperture.hh"
 
-#include <anlnext/BasicModule.hh>
-#include <memory>
-#include "TCanvas.h"
-#include "DetectorSystem.hh"
-#include "VRealDetectorUnit.hh"
-
-class TDirectory;
-
-namespace comptonsoft {
-
-/**
- * class VCSModule
- * @author Hirokazu Odaka
- * @date 2008-08-30
- * @date 2014-11-22
- * @date 2016-08-19 | Add isMCSimulation()
- * @date 2017-07-07 | merge mod_hit() to mod_initialize()
- * @date 2019-11-21 | drawCanvas()
- */
-class VCSModule : public anlnext::BasicModule
+namespace comptonsoft
 {
-  DEFINE_ANL_MODULE(VCSModule, 1.4);
-public:
-  VCSModule();
-  ~VCSModule();
-  
-  virtual anlnext::ANLStatus mod_initialize() override;
 
-  virtual void drawCanvas(TCanvas*, std::vector<std::string>* /* filenames */) {};
+VCodedAperture::VCodedAperture()
+{
+}
 
-protected:
-  void mkdir(const std::string& name="");
-  DetectorSystem* getDetectorManager() { return detectorSystem_; }
-  const DetectorSystem* getDetectorManager() const { return detectorSystem_; }
-  bool isMCSimulation() const { return detectorSystem_->isMCSimulation(); }
-
-private:
-  DetectorSystem* detectorSystem_;
-  TDirectory* saveDir_;
-};
+VCodedAperture::~VCodedAperture() = default;
 
 } /* namespace comptonsoft */
-
-#endif /* COMPTONSOFT_VCSModule_H */

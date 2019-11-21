@@ -87,12 +87,14 @@
 #include "MakeBadFrames.hh"
 #include "SetBadFrames.hh"
 #include "SetPedestalsByMedian.hh"
-#include "MakeXrayEventImage.hh"
+#include "HistogramXrayEventSpectrum.hh"
+#include "HistogramXrayEventAzimuthAngle.hh"
+#include "ExtractXrayEventImage.hh"
 #include "ProcessCodedAperture.hh"
-#include "MakeImageFiles.hh"
+#ifdef USE_HSQUICKLOOK
+#include "PushToQuickLookDB.hh"
+#endif
 #include "GetInputFilesFromDirectory.hh"
-#include "MakeXrayEventSpectrum.hh"
-#include "MakeXrayEventAzimuthAngle.hh"
 #ifdef USE_FITSIO
 #include "AHRayTracingPrimaryGen.hh"
 #endif
@@ -805,10 +807,24 @@ public:
 };
 
 
-class MakeXrayEventImage : public VCSModule
+class HistogramXrayEventSpectrum : public VCSModule
 {
 public:
-  MakeXrayEventImage();
+  HistogramXrayEventSpectrum();
+};
+
+
+class HistogramXrayEventAzimuthAngle : public VCSModule
+{
+public:
+  HistogramXrayEventAzimuthAngle();
+};
+
+
+class ExtractXrayEventImage : public VCSModule
+{
+public:
+  ExtractXrayEventImage();
 };
 
 
@@ -819,31 +835,19 @@ public:
 };
 
 
-class MakeImageFiles : public VCSModule
+#ifdef USE_HSQUICKLOOK
+class PushToQuickLookDB : public anlnext::BasicModule
 {
 public:
-  MakeImageFiles();
+  PushToQuickLookDB();
 };
 
+#endif
 
 class GetInputFilesFromDirectory : public anlnext::BasicModule
 {
 public:
   GetInputFilesFromDirectory();
-};
-
-
-class MakeXrayEventSpectrum : public VCSModule
-{
-public:
-  MakeXrayEventSpectrum();
-};
-
-
-class MakeXrayEventAzimuthAngle : public VCSModule
-{
-public:
-  MakeXrayEventAzimuthAngle();
 };
 
 

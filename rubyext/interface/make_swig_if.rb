@@ -87,12 +87,12 @@ clMod = [
   ANL::SWIGClass.new("MakeBadFrames"),
   ANL::SWIGClass.new("SetBadFrames"),
   ANL::SWIGClass.new("SetPedestalsByMedian"),
-  ANL::SWIGClass.new("MakeXrayEventImage"),
+  ANL::SWIGClass.new("HistogramXrayEventSpectrum"),
+  ANL::SWIGClass.new("HistogramXrayEventAzimuthAngle"),
+  ANL::SWIGClass.new("ExtractXrayEventImage"),
   ANL::SWIGClass.new("ProcessCodedAperture"),
-  ANL::SWIGClass.new("MakeImageFiles"),
+  ANL::SWIGClass.new("PushToQuickLookDB", false, "USE_HSQUICKLOOK"),
   ANL::SWIGClass.new("GetInputFilesFromDirectory"),
-  ANL::SWIGClass.new("MakeXrayEventSpectrum"),
-  ANL::SWIGClass.new("MakeXrayEventAzimuthAngle"),
 ]
 
 clSim = [

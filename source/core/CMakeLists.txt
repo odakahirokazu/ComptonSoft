@@ -78,6 +78,7 @@ set(CS_CORE_CLASSES
   src/XrayEvent.cc
   src/XrayEventTreeIO.cc
   ### coded-aperture
+  src/VCodedAperture.cc
   src/CodedAperture.cc
 )
 

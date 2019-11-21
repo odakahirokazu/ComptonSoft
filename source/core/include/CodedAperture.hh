@@ -26,12 +26,12 @@
 #ifndef COMPTONSOFT_CodedAperture_H
 #define COMPTONSOFT_CodedAperture_H 1
 
-#include "XrayEvent.hh"
+#include "VCodedAperture.hh"
 #include <memory>
 
 namespace comptonsoft {
 
-class CodedAperture
+class CodedAperture : public VCodedAperture
 {
 public:
   CodedAperture();
@@ -48,13 +48,13 @@ public:
     aperture_element_size_y_ = aperture_y;
   }
 
-  void setAperturePattern(const std::shared_ptr<image_t>& pattern);
-  void setEncodedImage(const std::shared_ptr<image_t>& image);
+  void setAperturePattern(const std::shared_ptr<image_t>& pattern) override;
+  void setEncodedImage(const std::shared_ptr<image_t>& image) override;
 
-  virtual void decode();
+  void decode() override;
   // void mirrorDecodedImage();
 
-  std::shared_ptr<image_t> DecodedImage() const { return decoded_image_; }
+  std::shared_ptr<image_t> DecodedImage() const override { return decoded_image_; }
 
 private:
   double detector_element_size_x_ = 1.0;

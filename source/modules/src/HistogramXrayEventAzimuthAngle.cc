@@ -17,11 +17,9 @@
  *                                                                       *
  *************************************************************************/
 
-#include "MakeXrayEventAzimuthAngle.hh"
+#include "HistogramXrayEventAzimuthAngle.hh"
 
-#include "XrayEvent.hh"
 #include "XrayEventCollection.hh"
-#include "XrayEventTreeIO.hh"
 #include "AstroUnits.hh"
 #include "TH1.h"
 #include "TStyle.h"
@@ -31,86 +29,60 @@ namespace unit = anlgeant4::unit;
 
 namespace comptonsoft {
 
-MakeXrayEventAzimuthAngle::MakeXrayEventAzimuthAngle()
-  : collectionModule_("XrayEventCollection"),
-    outputFile_("image.png")
+HistogramXrayEventAzimuthAngle::HistogramXrayEventAzimuthAngle()
+  : numBins_(33), angleMin_(-180.0-0.5*11.25), angleMax_(180.0+0.5*11.25),
+    collectionModule_("XrayEventCollection"), outputName_("angle")
 {
 }
 
-ANLStatus MakeXrayEventAzimuthAngle::mod_define()
+ANLStatus HistogramXrayEventAzimuthAngle::mod_define()
 {
+  define_parameter("num_bins", &mod_class::numBins_);
+  define_parameter("angle_min", &mod_class::angleMin_, 1.0, "degree");
+  define_parameter("angle_max", &mod_class::angleMax_, 1.0, "degree");
   define_parameter("collection_module", &mod_class::collectionModule_);
-  define_parameter("num_bin", &mod_class::numBin_);
-  define_parameter("output", &mod_class::outputFile_);
+  define_parameter("output_name", &mod_class::outputName_);
   
   return AS_OK;
 }
 
-ANLStatus MakeXrayEventAzimuthAngle::mod_initialize()
+ANLStatus HistogramXrayEventAzimuthAngle::mod_initialize()
 {
   get_module_NC(collectionModule_, &collection_);
-  const int numbin = NumBin();
-  const double amin = AngleMin();
-  const double amax = AngleMax();
-  distribution_.resize(numbin);
-  totalDistribution_.resize(numbin);
 
   ANLStatus status = VCSModule::mod_initialize();
-  if (status!=AS_OK) {
+  if (status != AS_OK) {
     return status;
   }
+
   mkdir();
   const std::string name = "azimuth_angle";
-  const std::string title = "Azimuth Angle";
-  totalHistogram_ = new TH1D(name.c_str(), title.c_str(), numbin, amin, amax);
+  const std::string title = "Azimuth angle";
+  histogram_ = new TH1D(name.c_str(), title.c_str(),
+                        numBins_, angleMin_, angleMax_);
 
   return AS_OK;
 }
 
-ANLStatus MakeXrayEventAzimuthAngle::mod_begin_run()
-{
-  resetDistribution(distribution_);
-  resetDistribution(totalDistribution_);
-  return AS_OK;
-}
-
-ANLStatus MakeXrayEventAzimuthAngle::mod_analyze()
+ANLStatus HistogramXrayEventAzimuthAngle::mod_analyze()
 {
   for (const auto& event: collection_->getEvents()) {
-    const double angle = event->Angle()/unit::degree;
-    totalHistogram_->Fill(angle);
+    const double angle = event->Angle();
+    histogram_->Fill(angle/unit::degree);
   }
 
   return AS_OK;
 }
 
-ANLStatus MakeXrayEventAzimuthAngle::mod_end_run()
+void HistogramXrayEventAzimuthAngle::drawCanvas(TCanvas* canvas, std::vector<std::string>* filenames)
 {
-  fillHistogram();
-  return AS_OK;
-}
-
-void MakeXrayEventAzimuthAngle::resetDistribution(std::vector<double>& distribution) const
-{
-  const int numbin = distribution.size();
-  for (int i=0; i<numbin; i++) {
-    distribution[i] = 0.0;
-  }
-}
-
-
-void MakeXrayEventAzimuthAngle::fillHistogram()
-{
-}
-
-void MakeXrayEventAzimuthAngle::drawOutputFiles(TCanvas* c1, std::vector<std::string>* filenames)
-{
-  c1->cd();
+  const std::string outputFile = outputName_+".png";
+  canvas->cd();
   gStyle->SetOptStat("e");
   gStyle->SetStatH(0.15);
-  totalHistogram_->Draw();
-  c1->SaveAs(outputFile_.c_str());
-  filenames->push_back(outputFile_);
+  histogram_->Draw();
+  canvas->SaveAs(outputFile.c_str());
+  filenames->push_back(outputFile);
 }
 
 } /* namespace comptonsoft */

@@ -66,12 +66,11 @@ set(CS_MODULES
   src/MakeBadFrames.cc
   src/SetBadFrames.cc
   src/SetPedestalsByMedian.cc
-  src/MakeXrayEventImage.cc
+  src/HistogramXrayEventSpectrum.cc
+  src/HistogramXrayEventAzimuthAngle.cc
+  src/ExtractXrayEventImage.cc
   src/ProcessCodedAperture.cc
-  src/MakeImageFiles.cc
   src/GetInputFilesFromDirectory.cc
-  src/MakeXrayEventSpectrum.cc
-  src/MakeXrayEventAzimuthAngle.cc
   ### IO
   src/CreateRootFile.cc
   src/SaveData.cc
@@ -129,9 +128,16 @@ if(CS_USE_FITSIO)
     )
 endif()
 
+if(CS_USE_HSQUICKLOOK)
+  set(CS_HSQUICKLOOK_MODULES
+    src/PushToQuickLookDB.cc
+    )
+endif()
+
 add_library(CSModules SHARED
   ${CS_MODULES}
   ${CS_FITSIO_MODULES}
+  ${CS_HSQUICKLOOK_MODULES}
   )
 
 target_link_libraries(CSModules

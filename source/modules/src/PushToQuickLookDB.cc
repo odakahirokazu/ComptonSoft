@@ -17,7 +17,7 @@
  *                                                                       *
  *************************************************************************/
 
-#include "MakeImageFiles.hh"
+#include "PushToQuickLookDB.hh"
 
 #include <fstream>
 #include <boost/filesystem.hpp>
@@ -29,14 +29,14 @@ using namespace anlnext;
 
 namespace comptonsoft {
 
-MakeImageFiles::MakeImageFiles()
+PushToQuickLookDB::PushToQuickLookDB()
   : canvas_width_(480), canvas_height_(480),
     collection_("analysis"),
     directory_("basic"), document_("images")
 {
 }
 
-ANLStatus MakeImageFiles::mod_define()
+ANLStatus PushToQuickLookDB::mod_define()
 {
   define_parameter("canvas_width", &mod_class::canvas_width_);
   define_parameter("canvas_height", &mod_class::canvas_height_);
@@ -50,7 +50,7 @@ ANLStatus MakeImageFiles::mod_define()
   return AS_OK;
 }    
 
-ANLStatus MakeImageFiles::mod_initialize()
+ANLStatus PushToQuickLookDB::mod_initialize()
 {
   const int num_modules = moduleList_.size();
   modules_.resize(num_modules, nullptr);
@@ -72,14 +72,14 @@ ANLStatus MakeImageFiles::mod_initialize()
   return AS_OK;
 }
 
-ANLStatus MakeImageFiles::mod_analyze()
+ANLStatus PushToQuickLookDB::mod_analyze()
 {
   if (get_loop_index()%period_ != phase_) {
     return AS_OK;
   }
   
   for (auto& module: modules_) {
-    module->drawOutputFiles(canvas_, &fileList_);
+    module->drawCanvas(canvas_, &fileList_);
   }
 
   if (mongodb_) {
@@ -89,10 +89,10 @@ ANLStatus MakeImageFiles::mod_analyze()
   return AS_OK;
 }
 
-ANLStatus MakeImageFiles::mod_end_run()
+ANLStatus PushToQuickLookDB::mod_end_run()
 {
   for (auto& module: modules_) {
-    module->drawOutputFiles(canvas_, &fileList_);
+    module->drawCanvas(canvas_, &fileList_);
   }
 
   if (mongodb_) {
@@ -102,7 +102,7 @@ ANLStatus MakeImageFiles::mod_end_run()
   return AS_OK;
 }
 
-void MakeImageFiles::pushImagesToDB()
+void PushToQuickLookDB::pushImagesToDB()
 {
   const std::size_t size = 10*1024*1024;
   static uint8_t buf[size];

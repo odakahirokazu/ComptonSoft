@@ -27,12 +27,12 @@
 #ifndef COMPTONSOFT_ProcessCodedAperture_H
 #define COMPTONSOFT_ProcessCodedAperture_H 1
 
-#include <anlnext/BasicModule.hh>
+#include "VCSModule.hh"
+
 #include <memory>
 #include "XrayEvent.hh"
-#include "CodedAperture.hh"
-#include "MakeXrayEventImage.hh"
-#include "VCSModule.hh"
+#include "VCodedAperture.hh"
+#include "ExtractXrayEventImage.hh"
 
 class TH2;
 
@@ -51,21 +51,20 @@ protected:
 public:
   anlnext::ANLStatus mod_define() override;
   anlnext::ANLStatus mod_initialize() override;
-  anlnext::ANLStatus mod_begin_run() override;
-  anlnext::ANLStatus mod_analyze() override;
   anlnext::ANLStatus mod_end_run() override;
 
-  int NumEncodedImageX() { return numEncodedImageX_; }
-  int NumEncodedImageY() { return numEncodedImageY_; }
-  int NumMaskX() { return numMaskX_; }
-  int NumMaskY() { return numMaskY_; }
-  double DetectorElementSize() { return detectorElementSize_; }
-  double MaskElementSize() { return maskElementSize_; }
+  int NumEncodedImageX() const { return numEncodedImageX_; }
+  int NumEncodedImageY() const { return numEncodedImageY_; }
+  int NumMaskX() const { return numMaskX_; }
+  int NumMaskY() const { return numMaskY_; }
+  double DetectorElementSize() const { return detectorElementSize_; }
+  double MaskElementSize() const { return maskElementSize_; }
 
-  void drawOutputFiles(TCanvas* c1, std::vector<std::string>* filenames) override;
+  void drawCanvas(TCanvas* canvas, std::vector<std::string>* filenames) override;
 
 protected:
-  virtual CodedAperture* createCodedAperture();
+  virtual std::unique_ptr<VCodedAperture> createCodedAperture();
+  virtual void decode();
   void fillHistogram();
 
 private:
@@ -75,17 +74,17 @@ private:
   int numDecodedImageY_ = 1;
   int numMaskX_ = 1;
   int numMaskY_ = 1;
-
   double detectorElementSize_ = 1.0;
   double maskElementSize_ = 1.0;
-
   std::string patternFile_;
-  std::shared_ptr<image_t> decodedImage_;
-  MakeXrayEventImage* image_owner_ = nullptr;
   std::string imageOwnerModule_ = "MakeXrayEventImage";
-  std::unique_ptr<comptonsoft::CodedAperture> coded_aperture_;
-  TH2* totalHistogram_ = nullptr;
-  std::string outputFile_;
+  std::string outputName_;
+
+  std::shared_ptr<image_t> decodedImage_;
+  ExtractXrayEventImage* imageOwner_ = nullptr;
+  std::unique_ptr<VCodedAperture> codedAperture_;
+  TH2* histogram_ = nullptr;
+  bool finalHistogramReady_ = false;
 };
 
 } /* namespace comptonsoft */

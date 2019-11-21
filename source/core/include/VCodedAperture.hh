@@ -1,6 +1,6 @@
 /*************************************************************************
  *                                                                       *
- * Copyright (c) 2011 Hirokazu Odaka                                     *
+ * Copyright (c) 2019 Hirokazu Odaka                                     *
  *                                                                       *
  * This program is free software: you can redistribute it and/or modify  *
  * it under the terms of the GNU General Public License as published by  *
@@ -16,63 +16,33 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>. *
  *                                                                       *
  *************************************************************************/
-
 /**
- * MakeImageFiles
+ * CodedAperture
  *
- * @author Tsubasa Tamba
- * @date 2019-11-05
+ * @author Tsubasa Tamba, Satoshi Takashima, Hirokazu Odaka
+ * @date 2019-11-01
+ * @date 2019-11-15 | H. Odaka | redesign
  */
+#ifndef COMPTONSOFT_VCodedAperture_H
+#define COMPTONSOFT_VCodedAperture_H 1
 
-#ifndef COMPTONSOFT_MakeImageFiles_H
-#define COMPTONSOFT_MakeImageFiles_H 1
-
-#include <anlnext/BasicModule.hh>
-#include "VCSModule.hh"
-#include "TCanvas.h"
-
-class TH2;
-
-namespace hsquicklook {
-class MongoDBClient;
-}
+#include "XrayEvent.hh"
+#include <memory>
 
 namespace comptonsoft {
 
-class MakeImageFiles : public VCSModule
+class VCodedAperture
 {
-  DEFINE_ANL_MODULE(MakeImageFiles, 1.0);
-  // ENABLE_PARALLEL_RUN();
 public:
-  MakeImageFiles();
-  
-protected:
-  MakeImageFiles(const MakeImageFiles&);
+  VCodedAperture();
+  virtual ~VCodedAperture();
 
-public:
-  anlnext::ANLStatus mod_define() override;
-  anlnext::ANLStatus mod_initialize() override;
-  anlnext::ANLStatus mod_analyze() override;
-  anlnext::ANLStatus mod_end_run() override;
-
-protected:
-  void pushImagesToDB();
-
-private:
-  int canvas_width_ = 1;
-  int canvas_height_ = 1;
-  std::vector<std::string> moduleList_;
-  std::string collection_;
-  std::string directory_;
-  std::string document_;
-  int period_ = 1;
-  int phase_ = 0;
-  std::vector<VCSModule*> modules_;
-  TCanvas* canvas_;
-  std::vector<std::string> fileList_;
-  hsquicklook::MongoDBClient* mongodb_ = nullptr;
+  virtual void setAperturePattern(const std::shared_ptr<image_t>& pattern) = 0;
+  virtual void setEncodedImage(const std::shared_ptr<image_t>& image) = 0;
+  virtual void decode() = 0;
+  virtual std::shared_ptr<image_t> DecodedImage() const = 0;
 };
 
 } /* namespace comptonsoft */
 
-#endif /* COMPTONSOFT_MakeImageFiles_H */
+#endif /* COMPTONSOFT_VCodedAperture_H */

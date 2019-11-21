@@ -18,68 +18,61 @@
  *************************************************************************/
 
 /**
- * MakeXrayEventSpectrum
+ * PushToQuickLookDB
  *
- * @author Tsubasa Tamba
- * @date 2019-11-12
+ * @author Tsubasa Tamba, Hirokazu Odaka
+ * @date 2019-11-05
  */
 
-#ifndef COMPTONSOFT_MakeXrayEventSpectrum_H
-#define COMPTONSOFT_MakeXrayEventSpectrum_H 1
+#ifndef COMPTONSOFT_PushToQuickLookDB_H
+#define COMPTONSOFT_PushToQuickLookDB_H 1
 
 #include <anlnext/BasicModule.hh>
-#include "XrayEvent.hh"
 #include "VCSModule.hh"
-class TH1;
+#include "TCanvas.h"
+
+class TH2;
+
+namespace hsquicklook {
+class MongoDBClient;
+}
 
 namespace comptonsoft {
 
-class XrayEventCollection;
-class XrayEventTreeIO;
-
-class MakeXrayEventSpectrum : public VCSModule
+class PushToQuickLookDB : public anlnext::BasicModule
 {
-  DEFINE_ANL_MODULE(MakeXrayEventSpectrum, 1.0);
+  DEFINE_ANL_MODULE(PushToQuickLookDB, 1.0);
   // ENABLE_PARALLEL_RUN();
 public:
-  MakeXrayEventSpectrum();
+  PushToQuickLookDB();
   
 protected:
-  MakeXrayEventSpectrum(const MakeXrayEventSpectrum&);
+  PushToQuickLookDB(const PushToQuickLookDB&);
 
 public:
   anlnext::ANLStatus mod_define() override;
   anlnext::ANLStatus mod_initialize() override;
-  anlnext::ANLStatus mod_begin_run() override;
   anlnext::ANLStatus mod_analyze() override;
   anlnext::ANLStatus mod_end_run() override;
 
-  std::vector<double>& Spectrum() { return spectrum_; }
-  std::vector<double>& TotalSpectrum() { return totalSpectrum_; }
-  double EnergyMin() { return energyMin_; }
-  double EnergyMax() { return energyMax_; }
-  int NumBin() { return numBin_; }
-
-  void drawOutputFiles(TCanvas* c1, std::vector<std::string>* filenames) override;
-
 protected:
-  void resetSpectrum(std::vector<double>& spectrum) const;
-  void fillHistogram();
+  void pushImagesToDB();
 
 private:
-  std::string collectionModule_;
-
-  std::vector<double> spectrum_;
-  std::vector<double> totalSpectrum_;
-  double energyMin_ = 0.0;
-  double energyMax_ = 10000.0;
-  int numBin_ = 1000;
-  
-  XrayEventCollection* collection_ = nullptr;
-  TH1* totalHistogram_ = nullptr;
-  std::string outputFile_;
+  int canvas_width_ = 1;
+  int canvas_height_ = 1;
+  std::vector<std::string> moduleList_;
+  std::string collection_;
+  std::string directory_;
+  std::string document_;
+  int period_ = 1;
+  int phase_ = 0;
+  std::vector<VCSModule*> modules_;
+  TCanvas* canvas_;
+  std::vector<std::string> fileList_;
+  hsquicklook::MongoDBClient* mongodb_ = nullptr;
 };
 
 } /* namespace comptonsoft */
 
-#endif /* COMPTONSOFT_MakeXrayEventSpectrum_H */
+#endif /* COMPTONSOFT_PushToQuickLookDB_H */

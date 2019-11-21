@@ -18,6 +18,7 @@
  *************************************************************************/
 
 #include "XrayEventSelection.hh"
+#include <limits>
 
 using namespace anlnext;
 
@@ -25,6 +26,16 @@ namespace comptonsoft
 {
 
 XrayEventSelection::XrayEventSelection()
+  : ixMin_(std::numeric_limits<decltype(ixMin_)>::min()),
+    ixMax_(std::numeric_limits<decltype(ixMax_)>::max()),
+    iyMin_(std::numeric_limits<decltype(iyMin_)>::min()),
+    iyMax_(std::numeric_limits<decltype(iyMax_)>::max()),
+    rankMin_(std::numeric_limits<decltype(rankMin_)>::min()),
+    rankMax_(std::numeric_limits<decltype(rankMax_)>::max()),
+    weightMin_(std::numeric_limits<decltype(weightMin_)>::min()),
+    weightMax_(std::numeric_limits<decltype(weightMax_)>::max()),
+    sumPHMin_(std::numeric_limits<decltype(sumPHMin_)>::min()),
+    sumPHMax_(std::numeric_limits<decltype(sumPHMax_)>::max())
 {
 }
 

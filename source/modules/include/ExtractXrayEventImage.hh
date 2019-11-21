@@ -18,78 +18,76 @@
  *************************************************************************/
 
 /**
- * MakeXrayEventImage
+ * ExtractXrayEventImage
  *
  * @author Tsubasa Tamba
  * @date 2019-11-01
+ * @date 2019-11-21 | H. Odaka | modify image definition
  */
 
-#ifndef COMPTONSOFT_MakeXrayEventImage_H
-#define COMPTONSOFT_MakeXrayEventImage_H 1
+#ifndef COMPTONSOFT_ExtractXrayEventImage_H
+#define COMPTONSOFT_ExtractXrayEventImage_H 1
 
-#include <anlnext/BasicModule.hh>
-#include <memory>
-#include "XrayEvent.hh"
 #include "VCSModule.hh"
+#include <memory>
+#include <random>
+#include "XrayEvent.hh"
+
 class TH2;
 
 namespace comptonsoft {
 
 class XrayEventCollection;
-class XrayEventTreeIO;
 
-class MakeXrayEventImage : public VCSModule
+class ExtractXrayEventImage : public VCSModule
 {
-  DEFINE_ANL_MODULE(MakeXrayEventImage, 1.0);
+  DEFINE_ANL_MODULE(ExtractXrayEventImage, 1.0);
   // ENABLE_PARALLEL_RUN();
 public:
-  MakeXrayEventImage();
+  ExtractXrayEventImage();
   
 protected:
-  MakeXrayEventImage(const MakeXrayEventImage&);
+  ExtractXrayEventImage(const ExtractXrayEventImage&);
 
 public:
   anlnext::ANLStatus mod_define() override;
   anlnext::ANLStatus mod_initialize() override;
-  anlnext::ANLStatus mod_begin_run() override;
   anlnext::ANLStatus mod_analyze() override;
   anlnext::ANLStatus mod_end_run() override;
 
-  int NumPixelX() const { return numPixelX_; }
-  int NumPixelY() const { return numPixelY_; }
-  int OffsetX() const { return offsetX_; }
-  int OffsetY() const { return offsetY_; }
-  double RotationCenterX() const { return rotationCenterX_; }
-  double RotationCenterY() const { return rotationCenterY_; }
-  double RotationAngle() const { return rotationAngle_; }
   std::shared_ptr<image_t> Image() { return image_; }
-  std::shared_ptr<image_t> TotalImage() { return totalImage_; }
 
-  void drawOutputFiles(TCanvas* c1, std::vector<std::string>* filenames) override;
+  void drawCanvas(TCanvas* canvas, std::vector<std::string>* filenames) override;
 
 protected:
-  void resetImage(std::shared_ptr<image_t> image);
-  void rotateImage(std::shared_ptr<image_t> image);
+  double sampleRandomNumber();
   void fillHistogram();
 
 private:
-  std::string collectionModule_;
-  int numPixelX_ = 1;
-  int numPixelY_ = 1;
-  int offsetX_ = 0;
-  int offsetY_ = 0;
+  int numX_ = 1;
+  int numY_ = 1;
+  double imageCenterX_ = 0.0;
+  double imageCenterY_ = 0.0;
   double rotationAngle_ = 0.0;
-  double rotationCenterX_ = 0.0;
-  double rotationCenterY_ = 0.0;
+  double scale_ = 1.0;
+  double newOriginX_ = 0.0;
+  double newOriginY_ = 0.0;
+  bool randomSampling_ = false;
+  std::string collectionModule_;
+  std::string outputName_;
 
-  std::shared_ptr<image_t> image_;
-  std::shared_ptr<image_t> totalImage_;
+  double axx_ = 1.0;
+  double axy_ = 0.0;
+  double ayx_ = 0.0;
+  double ayy_ = 1.0;
+  std::default_random_engine randomGenerator_;
+  std::uniform_real_distribution<double> distribution_;
 
   XrayEventCollection* collection_ = nullptr;
-  TH2* totalHistogram_ = nullptr;
-  std::string outputFile_;
+  std::shared_ptr<image_t> image_;
+  TH2* histogram_ = nullptr;
 };
 
 } /* namespace comptonsoft */
 
-#endif /* COMPTONSOFT_MakeXrayEventImage_H */
+#endif /* COMPTONSOFT_ExtractXrayEventImage_H */

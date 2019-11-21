@@ -17,50 +17,52 @@
  *                                                                       *
  *************************************************************************/
 
-#ifndef COMPTONSOFT_VCSModule_H
-#define COMPTONSOFT_VCSModule_H 1
+/**
+ * HistogramXrayEventAzimuthAngle
+ *
+ * @author Tsubasa Tamba
+ * @date 2019-11-13
+ */
 
-#include <anlnext/BasicModule.hh>
-#include <memory>
-#include "TCanvas.h"
-#include "DetectorSystem.hh"
-#include "VRealDetectorUnit.hh"
+#ifndef COMPTONSOFT_HistogramXrayEventAzimuthAngle_H
+#define COMPTONSOFT_HistogramXrayEventAzimuthAngle_H 1
 
-class TDirectory;
+#include "VCSModule.hh"
+
+class TH1;
 
 namespace comptonsoft {
 
-/**
- * class VCSModule
- * @author Hirokazu Odaka
- * @date 2008-08-30
- * @date 2014-11-22
- * @date 2016-08-19 | Add isMCSimulation()
- * @date 2017-07-07 | merge mod_hit() to mod_initialize()
- * @date 2019-11-21 | drawCanvas()
- */
-class VCSModule : public anlnext::BasicModule
+class XrayEventCollection;
+
+class HistogramXrayEventAzimuthAngle : public VCSModule
 {
-  DEFINE_ANL_MODULE(VCSModule, 1.4);
+  DEFINE_ANL_MODULE(HistogramXrayEventAzimuthAngle, 1.0);
+  // ENABLE_PARALLEL_RUN();
 public:
-  VCSModule();
-  ~VCSModule();
+  HistogramXrayEventAzimuthAngle();
   
-  virtual anlnext::ANLStatus mod_initialize() override;
-
-  virtual void drawCanvas(TCanvas*, std::vector<std::string>* /* filenames */) {};
-
 protected:
-  void mkdir(const std::string& name="");
-  DetectorSystem* getDetectorManager() { return detectorSystem_; }
-  const DetectorSystem* getDetectorManager() const { return detectorSystem_; }
-  bool isMCSimulation() const { return detectorSystem_->isMCSimulation(); }
+  HistogramXrayEventAzimuthAngle(const HistogramXrayEventAzimuthAngle&);
+
+public:
+  anlnext::ANLStatus mod_define() override;
+  anlnext::ANLStatus mod_initialize() override;
+  anlnext::ANLStatus mod_analyze() override;
+
+  void drawCanvas(TCanvas* canvas, std::vector<std::string>* filenames) override;
 
 private:
-  DetectorSystem* detectorSystem_;
-  TDirectory* saveDir_;
+  int numBins_ = 1;
+  double angleMin_ = 0.0;
+  double angleMax_ = 1.0;
+  std::string collectionModule_;
+  std::string outputName_;
+  
+  XrayEventCollection* collection_ = nullptr;
+  TH1* histogram_ = nullptr;
 };
 
 } /* namespace comptonsoft */
 
-#endif /* COMPTONSOFT_VCSModule_H */
+#endif /* COMPTONSOFT_HistogramXrayEventAzimuthAngle_H */

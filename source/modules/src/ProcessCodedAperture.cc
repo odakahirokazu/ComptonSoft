@@ -19,13 +19,14 @@
 
 #include "ProcessCodedAperture.hh"
 
-#include "XrayEvent.hh"
-#include "AstroUnits.hh"
 #include <fstream>
 #include <sstream>
 #include "TDirectory.h"
 #include "TH2.h"
 #include "TStyle.h"
+#include "AstroUnits.hh"
+#include "XrayEvent.hh"
+#include "CodedAperture.hh"
 
 using namespace anlnext;
 namespace unit = anlgeant4::unit;
@@ -33,7 +34,9 @@ namespace unit = anlgeant4::unit;
 namespace comptonsoft {
 
 ProcessCodedAperture::ProcessCodedAperture()
-  : outputFile_("decoded.png")
+  : patternFile_("pattern.dat"),
+    imageOwnerModule_("ExtractXrayEventImage"),
+    outputName_("decoded")
 {
 }
 
@@ -47,19 +50,16 @@ ANLStatus ProcessCodedAperture::mod_define()
   define_parameter("mask_element_size", &mod_class::maskElementSize_, unit::um, "um");
   define_parameter("pattern_file", &mod_class::patternFile_);
   define_parameter("image_owner_module", &mod_class::imageOwnerModule_);
+  define_parameter("output_name", &mod_class::outputName_);
   
   return AS_OK;
 }    
 
 ANLStatus ProcessCodedAperture::mod_initialize()
 {
-  get_module_NC(imageOwnerModule_, &image_owner_);
-  coded_aperture_.reset(createCodedAperture());
+  get_module_NC(imageOwnerModule_, &imageOwner_);
 
-  coded_aperture_->setElementSizes(DetectorElementSize(),
-                                   DetectorElementSize(),
-                                   MaskElementSize(),
-                                   MaskElementSize());
+  codedAperture_ = createCodedAperture();
   
   const int nx = NumMaskX();
   const int ny = NumMaskY();
@@ -88,11 +88,11 @@ ANLStatus ProcessCodedAperture::mod_initialize()
     iy = 0;
   }
   fin.close();
-  coded_aperture_->setAperturePattern(pattern);
+  codedAperture_->setAperturePattern(pattern);
 
-  std::shared_ptr<image_t> encodedImage = image_owner_->TotalImage();
-  coded_aperture_->setEncodedImage(encodedImage);
-  const std::shared_ptr<image_t> decodedImageDummy = coded_aperture_->DecodedImage();
+  std::shared_ptr<image_t> encodedImage = imageOwner_->Image();
+  codedAperture_->setEncodedImage(encodedImage);
+  const std::shared_ptr<image_t> decodedImageDummy = codedAperture_->DecodedImage();
   const int Nsx = decodedImageDummy->shape()[0];
   const int Nsy = decodedImageDummy->shape()[1];
 
@@ -100,74 +100,80 @@ ANLStatus ProcessCodedAperture::mod_initialize()
   if (status!=AS_OK) {
     return status;
   }
+
   mkdir();
-  const std::string name = "DecodedImage";
-  const std::string title = "Decoded Image";
-  totalHistogram_ = new TH2D(name.c_str(), title.c_str(), Nsx, 0.0, static_cast<double>(Nsx), 
-                             Nsy, 0.0, static_cast<double>(Nsy));
+  const std::string name = "image";
+  const std::string title = "Decoded image";
+  histogram_ = new TH2D(name.c_str(), title.c_str(),
+                        Nsx, 0.0, static_cast<double>(Nsx), 
+                        Nsy, 0.0, static_cast<double>(Nsy));
   
-  return AS_OK;
-}
-
-ANLStatus ProcessCodedAperture::mod_begin_run()
-{
-  return AS_OK;
-}
-
-ANLStatus ProcessCodedAperture::mod_analyze()
-{
   return AS_OK;
 }
 
 ANLStatus ProcessCodedAperture::mod_end_run()
 {
-  std::shared_ptr<image_t> image = image_owner_->TotalImage();
-  coded_aperture_->setEncodedImage(image);
-  std::cout << "ProcessCodedAperture: decoding..." << std::endl;
-  coded_aperture_->decode();
-  // coded_aperture_->mirrorDecodedImage();
-  decodedImage_ = coded_aperture_->DecodedImage();
+  decode();
   fillHistogram();
+  finalHistogramReady_ = true;
 
   return AS_OK;
 }
 
-CodedAperture* ProcessCodedAperture::createCodedAperture()
+std::unique_ptr<VCodedAperture> ProcessCodedAperture::createCodedAperture()
 {
-  return new comptonsoft::CodedAperture;
+  std::unique_ptr<CodedAperture> ca(new CodedAperture);
+  ca->setElementSizes(DetectorElementSize(),
+                      DetectorElementSize(),
+                      MaskElementSize(),
+                      MaskElementSize());
+  return ca;
+}
+
+void ProcessCodedAperture::decode()
+{
+  std::shared_ptr<image_t> image = imageOwner_->Image();
+  codedAperture_->setEncodedImage(image);
+  std::cout << "ProcessCodedAperture: decoding..." << std::endl;
+  codedAperture_->decode();
+  // coded_aperture_->mirrorDecodedImage();
+  decodedImage_ = codedAperture_->DecodedImage();
 }
 
 void ProcessCodedAperture::fillHistogram()
 {
-  const int nx = decodedImage_->shape()[0];
-  const int ny = decodedImage_->shape()[1];
-  for (int ix=0; ix<nx; ix++) {
-    for (int iy=0; iy<ny; iy++) {
-      const double v = (*decodedImage_)[ix][iy];
-      totalHistogram_->SetBinContent(ix+1, iy+1, v);
+  const image_t& image = *decodedImage_;
+  TH2& h = *histogram_;
+
+  const int Nx = image.shape()[0];
+  const int Ny = image.shape()[1];
+  for (int ix=0; ix<Nx; ix++) {
+    for (int iy=0; iy<Ny; iy++) {
+      const double v = image[ix][iy];
+      const int binX = ix + 1;
+      const int binY = iy + 1;
+      h.SetBinContent(binX, binY, v);
     }
   }
 }
 
-void ProcessCodedAperture::drawOutputFiles(TCanvas* c1, std::vector<std::string>* filenames)
+void ProcessCodedAperture::drawCanvas(TCanvas* canvas, std::vector<std::string>* filenames)
 {
-  std::shared_ptr<image_t> image = image_owner_->TotalImage();
-  coded_aperture_->setEncodedImage(image);
-  std::cout << "ProcessCodedAperture: decoding..." << std::endl;
-  coded_aperture_->decode();
-  // coded_aperture_->mirrorDecodedImage();
-  decodedImage_ = coded_aperture_->DecodedImage();
-  fillHistogram();
-  
-  c1->cd();
+  if (!finalHistogramReady_) {
+    decode();
+    fillHistogram();
+  }
+
+  const std::string outputFile = outputName_+".png";
+  canvas->cd();
   gStyle->SetOptStat(0);
   gStyle->SetPalette(56);
-  const double zmax = totalHistogram_->GetMaximum();
+  const double zmax = histogram_->GetMaximum();
   const double zmin = zmax * (-1);
-  totalHistogram_->GetZaxis()->SetRangeUser(zmin, zmax);
-  totalHistogram_->Draw("colz");
-  c1->SaveAs(outputFile_.c_str());
-  filenames->push_back(outputFile_);
+  histogram_->GetZaxis()->SetRangeUser(zmin, zmax);
+  histogram_->Draw("colz");
+  canvas->SaveAs(outputFile.c_str());
+  filenames->push_back(outputFile);
 }
 
 } /* namespace comptonsoft */

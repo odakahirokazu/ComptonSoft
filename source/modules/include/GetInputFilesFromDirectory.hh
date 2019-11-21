@@ -31,7 +31,7 @@ class VDataReader;
  * GetInputFilesFromDirectory
  *
  * @author Hirokazu Odaka
- * @date 2019-05-23
+ * @date 2019-11-13
  */
 class GetInputFilesFromDirectory : public anlnext::BasicModule
 {
