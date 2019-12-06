@@ -93,9 +93,7 @@ module ComptonSoft
     include FrameAnalyzerBase
     include DirectoryInput
 
-    attr_writer :coded_apertures
-    attr_accessor :sumPH_min, :sumPH_max
-    attr_accessor :database
+    attr_writer :coded_apertures ## to be removed
 
     begin
       require "HSQuickLook"
@@ -136,6 +134,40 @@ module ComptonSoft
       with_parameters(filename: @pedestal_file)
       chain :SetHotPixels
       with_parameters(filename: @hotpix_file)
+      chain :WriteXrayEventTree
+
+      append_analysis_modules()
+
+      chain :SaveData
+      with_parameters(output: @output)
+    end
+  end
+
+  class XrayEventAnalyzerFromSimulation < ANL::ANLApp
+    include FrameAnalyzerBase
+
+    def append_analysis_modules()
+    end
+
+    def setup()
+      add_namespace ComptonSoft
+
+      chain :CSHitCollection
+      chain :ReadHitTree
+      with_parameters(file_list: @inputs, trust_num_hits: false)
+
+      chain :XrayEventCollection
+      chain :ConstructFrame
+      with_parameters(num_pixel_x: @num_pixel_x,
+                      num_pixel_y: @num_pixel_y)
+      chain :FillFrame
+      chain :AnalyzeFrame
+      with_parameters(pedestal_level: @pedestal_level,
+                      event_threshold: @event_threshold,
+                      split_threshold: @split_threshold,
+                      event_size: 5,
+                      set_gain: false,
+                      trim_size: 0)
       chain :WriteXrayEventTree
 
       append_analysis_modules()
