@@ -2,8 +2,8 @@
 
 require 'comptonsoft'
 
-class MyApp < ANL::ANLApp
-  attr_accessor :inputs
+class MakeFrameFITSFiles < ANL::ANLApp
+  attr_accessor :inputs, :output
 
   def setup()
     add_namespace ComptonSoft
@@ -13,10 +13,11 @@ class MyApp < ANL::ANLApp
     with_parameters(file_list: @inputs,
                     trust_num_hits: false)
     chain :MakeFrameFITS
-    with_parameters(filename_base: @inputs[0].sub(".root", ""), num_pixelx: 640, num_pixely: 640)
+    with_parameters(filename_base: @output, num_pixelx: 640, num_pixely: 640)
   end
 end
 
-a = MyApp.new
+a = MakeFrameFITSFiles.new
 a.inputs = ["xray_ccd_crab_frame.root"]
+a.output = "xray_ccd_crab"
 a.run(:all, 1)
