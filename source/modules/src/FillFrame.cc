@@ -40,6 +40,8 @@ FillFrame::~FillFrame() = default;
 
 ANLStatus FillFrame::mod_define()
 {
+  define_parameter("offset_x", &mod_class::m_offsetX);
+  define_parameter("offset_y", &mod_class::m_offsetY);
   return AS_OK;
 }
 
@@ -71,14 +73,11 @@ ANLStatus FillFrame::mod_analyze()
   for (int timeGroup=0; timeGroup<NumTimeGroups; timeGroup++) {
     const std::vector<DetectorHit_sptr>& hits = m_HitCollection->getHits(timeGroup);
     for (DetectorHit_sptr hit: hits) {
-      const int ix = hit->PixelX();
-      const int iy = hit->PixelY();
-      if (ix >= nx || iy >= ny) {
-        std::cout << "This hit occurs outside the image area." << std::endl;
-        return AS_ERROR;
-      }
-
-      rawFrame[ix][iy] += hit->EPI()/unit::keV;
+      const int ix = hit->PixelX() - m_offsetX;
+      const int iy = hit->PixelY() - m_offsetY;
+      if (ix>=0 && ix<nx && iy>=0 && iy<ny) {
+          rawFrame[ix][iy] += hit->EPI()/unit::keV;
+        }
     }
   }
   

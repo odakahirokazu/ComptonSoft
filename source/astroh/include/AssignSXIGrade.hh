@@ -17,39 +17,47 @@
  *                                                                       *
  *************************************************************************/
 
-#ifndef COMPTONSOFT_FillFrame_H
-#define COMPTONSOFT_FillFrame_H 1
+#ifndef COMPTONSOFT_AssignSXIGrade_H
+#define COMPTONSOFT_AssignSXIGrade_H 1
 
 #include "VCSModule.hh"
-#include <vector>
+#include <list>
+#include "SXIXrayEvent.hh"
+
 
 namespace comptonsoft {
 
 class CSHitCollection;
-class ConstructFrame;
+
 
 /**
- * @author Hirokazu Odaka
- * @date 2019-06-05
+ * @author Tsubasa Tamba
+ * @date 2019-12-09
  */
-class FillFrame : public VCSModule
+class AssignSXIGrade : public VCSModule
 {
-  DEFINE_ANL_MODULE(FillFrame, 1.0);
+  DEFINE_ANL_MODULE(AssignSXIGrade, 1.0);
 public:
-  FillFrame();
-  ~FillFrame();
+  AssignSXIGrade();
+  ~AssignSXIGrade();
 
   anlnext::ANLStatus mod_define() override;
   anlnext::ANLStatus mod_initialize() override;
   anlnext::ANLStatus mod_analyze() override;
 
+protected:
+  void resetImage(image_t& image);
+
 private:
-  CSHitCollection* m_HitCollection = nullptr;
-  ConstructFrame* m_FrameOwner = nullptr;
-  int m_offsetX = 0;
-  int m_offsetY = 0;
+  CSHitCollection* hitCollection_ = nullptr;
+  image_t image_;
+  const int outerSize_ = 5;
+
+  double eventThreshold_ = 0.0;
+  double splitThreshold_ = 0.0;
+  double outerSplitThreshold_ = 0.0;
 };
 
 } /* namespace comptonsoft */
 
-#endif /* COMPTONSOFT_FillFrame_H */
+#endif /* COMPTONSOFT_AssignSXIGrade_H */

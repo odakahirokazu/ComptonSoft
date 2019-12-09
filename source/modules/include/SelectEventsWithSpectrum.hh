@@ -17,39 +17,50 @@
  *                                                                       *
  *************************************************************************/
 
-#ifndef COMPTONSOFT_FillFrame_H
-#define COMPTONSOFT_FillFrame_H 1
+#ifndef COMPTONSOFT_SelectEventsWithSpectrum_H
+#define COMPTONSOFT_SelectEventsWithSpectrum_H 1
 
 #include "VCSModule.hh"
-#include <vector>
+#include <list>
+#include "ReadEventTree.hh"
 
 namespace comptonsoft {
 
 class CSHitCollection;
-class ConstructFrame;
+
 
 /**
- * @author Hirokazu Odaka
- * @date 2019-06-05
+ * @author Tsubasa Tamba
+ * @date 2019-12-02
  */
-class FillFrame : public VCSModule
+class SelectEventsWithSpectrum : public anlnext::BasicModule
 {
-  DEFINE_ANL_MODULE(FillFrame, 1.0);
+  DEFINE_ANL_MODULE(SelectEventsWithSpectrum, 1.0);
 public:
-  FillFrame();
-  ~FillFrame();
+  SelectEventsWithSpectrum();
+  ~SelectEventsWithSpectrum();
 
   anlnext::ANLStatus mod_define() override;
   anlnext::ANLStatus mod_initialize() override;
   anlnext::ANLStatus mod_analyze() override;
+  anlnext::ANLStatus mod_end_run() override;
+
+  bool isGoodGrade(int grade);
 
 private:
-  CSHitCollection* m_HitCollection = nullptr;
-  ConstructFrame* m_FrameOwner = nullptr;
-  int m_offsetX = 0;
-  int m_offsetY = 0;
+  double exposure_ = 0.0;
+  std::vector<double> energyArray_;
+  std::vector<double> countRateArray_;
+  std::vector<int> countArray_;
+  int numRemainedBin_;
+  std::vector<int> photonStack_;
+  std::vector<int> goodGrade_;
+
+  CSHitCollection* hitCollection_ = nullptr;
+  ReadEventTree* readEventTree_ = nullptr;
+
 };
 
 } /* namespace comptonsoft */
 
-#endif /* COMPTONSOFT_FillFrame_H */
+#endif /* COMPTONSOFT_SelectEventsWithSpectrum_H */

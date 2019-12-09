@@ -93,6 +93,8 @@ clMod = [
   ANL::SWIGClass.new("ProcessCodedAperture"),
   ANL::SWIGClass.new("PushToQuickLookDB", false, "USE_HSQUICKLOOK"),
   ANL::SWIGClass.new("GetInputFilesFromDirectory"),
+  ANL::SWIGClass.new("SelectEventsWithSpectrum"),
+  ANL::SWIGClass.new("AssignSXIGrade"),
 ]
 
 clSim = [

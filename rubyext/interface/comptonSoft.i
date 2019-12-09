@@ -95,6 +95,8 @@
 #include "PushToQuickLookDB.hh"
 #endif
 #include "GetInputFilesFromDirectory.hh"
+#include "SelectEventsWithSpectrum.hh"
+#include "AssignSXIGrade.hh"
 #ifdef USE_FITSIO
 #include "AHRayTracingPrimaryGen.hh"
 #endif
@@ -848,6 +850,22 @@ class GetInputFilesFromDirectory : public anlnext::BasicModule
 {
 public:
   GetInputFilesFromDirectory();
+};
+
+
+class SelectEventsWithSpectrum : public anlnext::BasicModule
+{
+public:
+  SelectEventsWithSpectrum();
+  ~SelectEventsWithSpectrum();
+};
+
+
+class AssignSXIGrade : public VCSModule
+{
+public:
+  AssignSXIGrade();
+  ~AssignSXIGrade();
 };
 
 

@@ -69,7 +69,6 @@ std::vector<XrayEvent_sptr> SXIFrameData::extractEvents()
     outerSplitThreshold_ = SplitThreshold();
     event -> setSplitThreshold(SplitThreshold());
     event -> setOuterSplitThreshold(OuterSplitThreshold());
-    event -> setOuterSplitThreshold(OuterSplitThreshold());
     event -> copyFrom(sxiFrame, ix, iy);
     event -> reduce();
     events.push_back(event);

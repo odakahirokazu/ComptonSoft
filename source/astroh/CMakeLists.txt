@@ -50,6 +50,7 @@ if(CS_USE_FITSIO)
     src/SXIFrameData.cc
     src/SXIXrayEvent.cc
     src/ConstructSXIFrame.cc
+    src/AssignSXIGrade.cc
     )
 endif()
 

@@ -56,11 +56,9 @@ ANLStatus AEObservationPrimaryGen::mod_define()
   register_parameter(&pixelY_, "num_pixel_y");
   register_parameter(&exposure_, "exposure", unit::s, "s");
   register_parameter(&useFlux_, "use_flux");
-  if (useFlux_) {
-    register_parameter(&flux_, "flux", unit::erg/(unit::cm*unit::cm*unit::s), "erg s^-1 cm^-2");
-    register_parameter(&fluxEnergyMin_, "flux_energy_min", unit::keV, "keV");
-    register_parameter(&fluxEnergyMax_, "flux_energy_max", unit::keV, "keV");
-  }
+  register_parameter(&flux_, "flux", unit::erg/(unit::cm*unit::cm*unit::s), "erg s^-1 cm^-2");
+  register_parameter(&fluxEnergyMin_, "flux_energy_min", unit::keV, "keV");
+  register_parameter(&fluxEnergyMax_, "flux_energy_max", unit::keV, "keV");
 
   return AS_OK;
 }
@@ -220,12 +218,12 @@ ANLStatus AEObservationPrimaryGen::mod_analyze()
     return AS_QUIT;
   }
 
-/*
+
   if (sumFlux_ > flux_*percent_/100.0) {
     std::cout << percent_ << "\% completed." << std::endl;
     percent_ += 1;
   }
-*/  
+  
   
   return BasicPrimaryGen::mod_analyze();
 }

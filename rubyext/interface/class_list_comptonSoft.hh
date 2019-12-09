@@ -86,6 +86,8 @@ class ExtractXrayEventImage;
 class ProcessCodedAperture;
 class PushToQuickLookDB;
 class GetInputFilesFromDirectory;
+class SelectEventsWithSpectrum;
+class AssignSXIGrade;
 class AHRayTracingPrimaryGen;
 class SimXPrimaryGen;
 class AHRadiationBackgroundPrimaryGen;

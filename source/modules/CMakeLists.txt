@@ -71,6 +71,7 @@ set(CS_MODULES
   src/ExtractXrayEventImage.cc
   src/ProcessCodedAperture.cc
   src/GetInputFilesFromDirectory.cc
+  src/SelectEventsWithSpectrum.cc
   ### IO
   src/CreateRootFile.cc
   src/SaveData.cc
