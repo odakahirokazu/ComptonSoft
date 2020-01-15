@@ -82,7 +82,7 @@ void SimDetectorUnit2DPixel::simulatePulseHeights()
     }
     else {
       DetectorHit_sptr hit = generateHit(*rawhit, pixel);
-      double energyCharge = hit->EnergyCharge();
+      const double energyCharge = hit->EnergyCharge();
 
       const int numDivision = DiffusionDivisionNumber();
       const double edepDivision = edep/numDivision;
@@ -98,11 +98,9 @@ void SimDetectorUnit2DPixel::simulatePulseHeights()
 
       std::vector<DetectorHit_sptr> diffusionHits;
       for (int l=0; l<numDivision; l++) {
-        double radiusDiffusion = gRandom->Gaus(0.0, diffusionSigma);
-        double thetaDiffusion = gRandom->Uniform(TMath::TwoPi());
-        double dx = radiusDiffusion * TMath::Cos(thetaDiffusion);
-        double dy = radiusDiffusion * TMath::Sin(thetaDiffusion);
-        PixelID pixelDiff = findPixel(localposx+dx, localposy+dy);
+        const double dx = gRandom->Gaus(0.0, diffusionSigma);
+        const double dy = gRandom->Gaus(0.0, diffusionSigma);
+        const PixelID pixelDiff = findPixel(localposx+dx, localposy+dy);
 
         auto itHit = find_if(diffusionHits.begin(), diffusionHits.end(),
                              [&](const DetectorHit_sptr& hit) {
