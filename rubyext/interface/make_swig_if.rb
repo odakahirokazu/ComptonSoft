@@ -69,7 +69,7 @@ clMod = [
   ANL::SWIGClass.new("DefineFrame"),
   ANL::SWIGClass.new("MakeFrameFITS", false, 'USE_FITSIO'),
   ANL::SWIGClass.new("ConstructFrame"),
-  ANL::SWIGClass.new("ConstructSXIFrame"),
+  ANL::SWIGClass.new("ConstructSXIFrame", false, 'USE_FITSIO'),
   ANL::SWIGClass.new("FillFrame"),
   ANL::SWIGClass.new("LoadFrame"),
   ANL::SWIGClass.new("XrayEventCollection"),

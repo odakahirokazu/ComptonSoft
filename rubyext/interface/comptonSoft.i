@@ -65,7 +65,9 @@
 #include "MakeFrameFITS.hh"
 #endif
 #include "ConstructFrame.hh"
+#ifdef USE_FITSIO
 #include "ConstructSXIFrame.hh"
+#endif
 #include "FillFrame.hh"
 #include "LoadFrame.hh"
 #include "XrayEventCollection.hh"
@@ -674,12 +676,14 @@ public:
 };
 
 
+#ifdef USE_FITSIO
 class ConstructSXIFrame : public ConstructFrame
 {
 public:
   ConstructSXIFrame() = default;
 };
 
+#endif
 
 class FillFrame : public VCSModule
 {
