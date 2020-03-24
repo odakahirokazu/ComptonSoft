@@ -99,6 +99,7 @@
 #include "GetInputFilesFromDirectory.hh"
 #include "SelectEventsWithSpectrum.hh"
 #include "AssignSXIGrade.hh"
+#include "AEAttitudeCorrection.hh"
 #ifdef USE_FITSIO
 #include "AHRayTracingPrimaryGen.hh"
 #endif
@@ -870,6 +871,14 @@ class AssignSXIGrade : public VCSModule
 public:
   AssignSXIGrade();
   ~AssignSXIGrade();
+};
+
+
+class AEAttitudeCorrection : public anlnext::BasicModule
+{
+public:
+  AEAttitudeCorrection();
+  ~AEAttitudeCorrection();
 };
 
 

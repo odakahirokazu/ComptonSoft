@@ -88,6 +88,7 @@ class PushToQuickLookDB;
 class GetInputFilesFromDirectory;
 class SelectEventsWithSpectrum;
 class AssignSXIGrade;
+class AEAttitudeCorrection;
 class AHRayTracingPrimaryGen;
 class SimXPrimaryGen;
 class AHRadiationBackgroundPrimaryGen;
