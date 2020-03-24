@@ -172,6 +172,19 @@ void EventTreeIO::fillHits(const int64_t eventID,
   tree_->Fill();
 }
 
+void EventTreeIO::fillUndetectedEvent(const int64_t eventID)
+{
+  num_hits_ = 0;
+  eventid_ = (eventID >= 0) ? eventID : 0;
+  ti_ = 0;
+  instrument_ = 0;
+  flag_data_ = 0;
+  flags_ = 0;
+  grade_ = 0;
+
+  tree_->Fill();
+}
+
 DetectorHit_sptr EventTreeIO::retrieveHit(std::size_t i) const
 {
   DetectorHit_sptr hit(new DetectorHit);

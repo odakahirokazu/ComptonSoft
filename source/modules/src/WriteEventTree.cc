@@ -30,11 +30,14 @@ namespace comptonsoft
 {
 
 WriteEventTree::WriteEventTree()
-  : hitCollection_(nullptr),
-    initialInfo_(nullptr),
-    tree_(nullptr),
-    treeIO_(new EventTreeIOWithInitialInfo)
+  : treeIO_(new EventTreeIOWithInitialInfo)
 {
+}
+
+ANLStatus WriteEventTree::mod_define()
+{
+  define_parameter("notice_undetected", &mod_class::notice_undetected_);
+  return AS_OK;
 }
 
 ANLStatus WriteEventTree::mod_initialize()
@@ -43,6 +46,7 @@ ANLStatus WriteEventTree::mod_initialize()
 
   get_module("CSHitCollection", &hitCollection_);
   define_evs("WriteEventTree:Fill");
+  define_evs("WriteEventTree:FillUndetected");
 
   if (exist_module("InitialInformation")) {
     get_module_IF("InitialInformation", &initialInfo_);
@@ -76,14 +80,23 @@ ANLStatus WriteEventTree::mod_analyze()
     eventID = get_loop_index();
   }
 
+  bool filled = false;
   const int NumTimeGroups = hitCollection_->NumberOfTimeGroups();
   for (int timeGroup=0; timeGroup<NumTimeGroups; timeGroup++) {
     const std::vector<DetectorHit_sptr>& hits
       = hitCollection_->getHits(timeGroup);
     if (hits.size() > 0) {
       treeIO_->fillHits(eventID, hits);
-      set_evs("WriteEventTree:Fill");
+      filled = true;
     }
+  }
+
+  if (filled) {
+    set_evs("WriteEventTree:Fill");
+  }
+  else if (notice_undetected_) {
+    treeIO_->fillUndetectedEvent(eventID);
+    set_evs("WriteEventTree:FillUndetected");
   }
 
   return AS_OK;

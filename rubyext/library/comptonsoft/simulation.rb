@@ -71,6 +71,7 @@ module ComptonSoft
     define_setup_module("user_action")
     define_setup_module("pickup_data", array: true)
     define_setup_module("event_selection")
+    define_setup_module("tree_output")
     define_setup_module("visualization", :VisualizeG4Geom)
     define_setup_module("fits_output")
 
@@ -91,11 +92,11 @@ module ComptonSoft
     end
 
     # Enable event tree output instead of hit tree
-    def use_tree_format(format)
+    def use_tree_format(format, parameters={})
       if format == "hittree" or format == "hit tree"
-        @write_tree_module = :WriteHitTree
+        set_tree_output(:WriteHitTree, parameters)
       elsif format == "eventtree" or format == "event tree"
-        @write_tree_module = :WriteEventTree
+        set_tree_output(:WriteEventTree, parameters)
       else
         raise "Unknown tree format: #{format}"
       end
@@ -155,6 +156,10 @@ module ComptonSoft
         set_event_selection :EventSelection
       end
 
+      unless module_of_tree_output()
+        set_tree_output(:WriteHitTree)
+      end
+
       chain :SaveData
       with_parameters(output: @output)
 
@@ -197,7 +202,7 @@ module ComptonSoft
         chain_with_parameters module_of_event_selection
       end
 
-      chain @write_tree_module
+      chain_with_parameters module_of_tree_output
 
       chain_with_parameters module_of_user_action
 

@@ -41,18 +41,20 @@ class CSHitCollection;
  */
 class WriteEventTree : public VCSModule
 {
-  DEFINE_ANL_MODULE(WriteEventTree, 2.1);
+  DEFINE_ANL_MODULE(WriteEventTree, 2.2);
 public:
   WriteEventTree();
   ~WriteEventTree() = default;
-  
+
+  anlnext::ANLStatus mod_define() override;
   anlnext::ANLStatus mod_initialize() override;
   anlnext::ANLStatus mod_analyze() override;
 
 private:
-  const CSHitCollection* hitCollection_;
-  const anlgeant4::InitialInformation* initialInfo_;
-  TTree* tree_;
+  bool notice_undetected_ = false;
+  const CSHitCollection* hitCollection_ = nullptr;
+  const anlgeant4::InitialInformation* initialInfo_ = nullptr;
+  TTree* tree_ = nullptr;
   std::unique_ptr<EventTreeIOWithInitialInfo> treeIO_;
 };
 

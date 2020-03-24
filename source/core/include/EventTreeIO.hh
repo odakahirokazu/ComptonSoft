@@ -53,6 +53,7 @@ public:
   void fillHits(int64_t eventID, const std::vector<DetectorHit_sptr>& hits);
   void fillHits(const std::vector<DetectorHit_sptr>& hits)
   { fillHits(-1, hits); }
+  void fillUndetectedEvent(int64_t eventID);
 
   int64_t getEventID() const { return eventid_; }
   int64_t getNumberOfHits() const { return num_hits_; }
