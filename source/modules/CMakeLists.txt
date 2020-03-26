@@ -126,6 +126,7 @@ if(CS_USE_FITSIO)
     src/MakeFrameFITS.cc
     src/MakePedestals.cc
     src/SetPedestals.cc
+   src/AEAttitudeCorrection.cc
     )
 endif()
 

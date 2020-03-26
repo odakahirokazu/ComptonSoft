@@ -95,6 +95,7 @@ clMod = [
   ANL::SWIGClass.new("GetInputFilesFromDirectory"),
   ANL::SWIGClass.new("SelectEventsWithSpectrum"),
   ANL::SWIGClass.new("AssignSXIGrade"),
+  ANL::SWIGClass.new("AEAttitudeCorrection"),
 ]
 
 clSim = [
