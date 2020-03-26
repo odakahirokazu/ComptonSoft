@@ -109,18 +109,19 @@ ANLStatus CorrectPHA::mod_initialize()
       }
 
       if (m_GainCorrection && m_GainFile.get()) {
-        std::unique_ptr<GainFunctionSpline> gainFunction(new GainFunctionSpline(NumChannels));
         for (int k=0; k<NumChannels; k++) {
-          std::string gainName = (boost::format("gain_func_r%03d_%03d_%03d") % i % j % k).str();
+          auto gainFunction = std::make_shared<GainFunctionSpline>();
+          const std::string gainName = (boost::format("gain_func_r%03d_%03d_%03d") % i % j % k).str();
           const TSpline* spline = static_cast<const TSpline*>( m_GainFile->Get(gainName.c_str()) );
           if (spline == nullptr) {
             std::cout << "CorrectPHA: gain function is not found: " << gainName << std::endl;
           }
           else {
-            gainFunction->set(k, spline);
+            gainFunction->set(spline);
           }
+
+          mcd->setGainFunction(k, gainFunction);
         }
-        mcd->registerGainFunction(std::move(gainFunction));
       }
     }
   }

@@ -41,6 +41,7 @@
 #include "SimDetectorUnit2DPixel.hh"
 #include "SimDetectorUnit2DStrip.hh"
 #include "MultiChannelData.hh"
+#include "GainFunctionCubic.hh"
 #include "DeviceSimulation.hh"
 #include "CSSensitiveDetector.hh"
 
@@ -816,6 +817,28 @@ void DetectorSystem::setupDetectorParameters(const DetectorSystem::ParametersNod
         if (optional<int> o = channel_properties.disable_status) {
           mcd->resetChannelDisabledVector(*o);
         }
+        if (optional<double> o = channel_properties.pedestal_value) {
+          const double value = (*o);
+          mcd->resetPedestalVector(value);
+        }
+        if (optional<double> o = channel_properties.gain_correction_c0) {
+          const double c0 = (*o);
+          auto gainFunction = std::make_shared<GainFunctionCubic>();
+          double c1 = 0.0;
+          double c2 = 0.0;
+          double c3 = 0.0;
+          if (optional<double> o = channel_properties.gain_correction_c1) {
+            c1 = (*o);
+          }
+          if (optional<double> o = channel_properties.gain_correction_c2) {
+            c2 = (*o);
+          }
+          if (optional<double> o = channel_properties.gain_correction_c3) {
+            c3 = (*o);
+          }
+          gainFunction->set(c0, c1, c2, c3);
+          mcd->resetGainFunctionVector(gainFunction);
+        }
         if (optional<double> o = channel_properties.threshold_value) {
           const double value = (*o)*unit::keV;
           mcd->resetThresholdEnergyVector(value);
@@ -825,6 +848,10 @@ void DetectorSystem::setupDetectorParameters(const DetectorSystem::ParametersNod
         const ChannelNodeContents& channel_properties = parameters.channel_properties_cathode;
         if (optional<int> o = channel_properties.disable_status) {
           mcd->resetChannelDisabledVector(*o);
+        }
+        if (optional<double> o = channel_properties.pedestal_value) {
+          const double value = (*o);
+          mcd->resetPedestalVector(value);
         }
         if (optional<double> o = channel_properties.threshold_value) {
           const double value = (*o)*unit::keV;
@@ -836,6 +863,10 @@ void DetectorSystem::setupDetectorParameters(const DetectorSystem::ParametersNod
       const ChannelNodeContents& channel_properties = parameters.channel_properties;
       if (optional<int> o = channel_properties.disable_status) {
         mcd->resetChannelDisabledVector(*o);
+      }
+      if (optional<double> o = channel_properties.pedestal_value) {
+        const double value = (*o);
+        mcd->resetPedestalVector(value);
       }
       if (optional<double> o = channel_properties.threshold_value) {
         const double value = (*o)*unit::keV;
@@ -1150,6 +1181,21 @@ load(const boost::property_tree::ptree& node)
   }
   if (auto o = node.get_optional<std::string>("compensation.<xmlattr>.function")) {
     compensation_function = o;
+  }
+  if (auto o = node.get_optional<double>("pedestal.<xmlattr>.value")) {
+    pedestal_value = o;
+  }
+  if (auto o = node.get_optional<double>("gain_correction.<xmlattr>.c0")) {
+    gain_correction_c0 = o;
+  }
+  if (auto o = node.get_optional<double>("gain_correction.<xmlattr>.c1")) {
+    gain_correction_c1 = o;
+  }
+  if (auto o = node.get_optional<double>("gain_correction.<xmlattr>.c2")) {
+    gain_correction_c2 = o;
+  }
+  if (auto o = node.get_optional<double>("gain_correction.<xmlattr>.c3")) {
+    gain_correction_c3 = o;
   }
   if (auto o = node.get_optional<double>("threshold.<xmlattr>.value")) {
     threshold_value = o;

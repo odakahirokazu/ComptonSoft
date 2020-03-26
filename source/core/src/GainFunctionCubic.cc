@@ -17,43 +17,45 @@
  *                                                                       *
  *************************************************************************/
 
-#include "GainFunctionLinear.hh"
+#include "GainFunctionCubic.hh"
 #include <limits>
 
 namespace comptonsoft
 {
 
-GainFunctionLinear::GainFunctionLinear()
-  : c0_(0.0), c1_(1.0)
+GainFunctionCubic::GainFunctionCubic()
+  : c0_(0.0), c1_(1.0), c2_(0.0), c3_(0.0)
 {
 }
 
-GainFunctionLinear::GainFunctionLinear(double c0, double c1)
-  : c0_(c0), c1_(c1)
+GainFunctionCubic::GainFunctionCubic(double c0, double c1, double c2, double c3)
+  : c0_(c0), c1_(c1), c2_(c2), c3_(c3)
 {
 }
 
-GainFunctionLinear::~GainFunctionLinear() = default;
+GainFunctionCubic::~GainFunctionCubic() = default;
 
-double GainFunctionLinear::RangeMin() const
+double GainFunctionCubic::RangeMin() const
 {
   return -std::numeric_limits<double>::max();
 }
 
-double GainFunctionLinear::RangeMax() const
+double GainFunctionCubic::RangeMax() const
 {
   return +std::numeric_limits<double>::max();
 }
 
-double GainFunctionLinear::eval(double x) const
+double GainFunctionCubic::eval(double x) const
 {
-  return c0_ + c1_*x;
+  return c0_ + c1_*x + c2_*x*x + c3_*x*x*x;
 }
 
-void GainFunctionLinear::set(double c0, double c1)
+void GainFunctionCubic::set(double c0, double c1, double c2, double c3)
 {
   c0_ = c0;
   c1_ = c1;
+  c2_ = c2;
+  c3_ = c3;
 }
 
 } /* namespace comptonsoft */

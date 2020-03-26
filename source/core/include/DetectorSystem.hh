@@ -66,6 +66,11 @@ public:
     boost::optional<double> noise_level_param2 = boost::none;
     boost::optional<double> compensation_factor = boost::none;
     boost::optional<std::string> compensation_function = boost::none;
+    boost::optional<double> pedestal_value = boost::none;
+    boost::optional<double> gain_correction_c0 = boost::none;
+    boost::optional<double> gain_correction_c1 = boost::none;
+    boost::optional<double> gain_correction_c2 = boost::none;
+    boost::optional<double> gain_correction_c3 = boost::none;
     boost::optional<double> threshold_value = boost::none;
 
     void load(const boost::property_tree::ptree& node);

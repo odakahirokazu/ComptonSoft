@@ -26,15 +26,17 @@
 namespace comptonsoft {
 
 /**
- * A class of a gain correction function using linear functions.
+ * A class of a gain correction function using a linear function.
  *
  * @author Hirokazu Odaka
  * @date 2014-09-12
+ * @date 2020-03-26 | adapt a change of VGainFunction
  */
 class GainFunctionLinear : public VGainFunction
 {
 public:
-  GainFunctionLinear(std::size_t n, double c1);
+  GainFunctionLinear();
+  GainFunctionLinear(double c0, double c1);
   virtual ~GainFunctionLinear();
   
   GainFunctionLinear(const GainFunctionLinear&) = default;
@@ -42,15 +44,15 @@ public:
   GainFunctionLinear& operator=(const GainFunctionLinear&) = default;
   GainFunctionLinear& operator=(GainFunctionLinear&&) = default;
 
-  double RangeMin(std::size_t) const override;
-  double RangeMax(std::size_t) const override;
+  double RangeMin() const override;
+  double RangeMax() const override;
 
-  double eval(std::size_t index, double x) const override;
-  void set(std::size_t index, double c0, double c1);
+  double eval(double x) const override;
+  void set(double c0, double c1);
   
 private:
-  std::vector<double> c0_;
-  std::vector<double> c1_;
+  double c0_;
+  double c1_;
 };
 
 } /* namespace comptonsoft */

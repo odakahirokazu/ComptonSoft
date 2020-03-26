@@ -17,43 +17,45 @@
  *                                                                       *
  *************************************************************************/
 
-#include "GainFunctionLinear.hh"
-#include <limits>
+#ifndef COMPTONSOFT_GainFunctionCubic_H
+#define COMPTONSOFT_GainFunctionCubic_H 1
 
-namespace comptonsoft
+#include "VGainFunction.hh"
+#include <vector>
+
+namespace comptonsoft {
+
+/**
+ * A class of a gain correction function using a cubic function.
+ *
+ * @author Hirokazu Odaka
+ * @date 2020-03-26
+ */
+class GainFunctionCubic : public VGainFunction
 {
+public:
+  GainFunctionCubic();
+  GainFunctionCubic(double c0, double c1, double c2, double c3);
+  virtual ~GainFunctionCubic();
+  
+  GainFunctionCubic(const GainFunctionCubic&) = default;
+  GainFunctionCubic(GainFunctionCubic&&) = default;
+  GainFunctionCubic& operator=(const GainFunctionCubic&) = default;
+  GainFunctionCubic& operator=(GainFunctionCubic&&) = default;
 
-GainFunctionLinear::GainFunctionLinear()
-  : c0_(0.0), c1_(1.0)
-{
-}
+  double RangeMin() const override;
+  double RangeMax() const override;
 
-GainFunctionLinear::GainFunctionLinear(double c0, double c1)
-  : c0_(c0), c1_(c1)
-{
-}
-
-GainFunctionLinear::~GainFunctionLinear() = default;
-
-double GainFunctionLinear::RangeMin() const
-{
-  return -std::numeric_limits<double>::max();
-}
-
-double GainFunctionLinear::RangeMax() const
-{
-  return +std::numeric_limits<double>::max();
-}
-
-double GainFunctionLinear::eval(double x) const
-{
-  return c0_ + c1_*x;
-}
-
-void GainFunctionLinear::set(double c0, double c1)
-{
-  c0_ = c0;
-  c1_ = c1;
-}
+  double eval(double x) const override;
+  void set(double c0, double c1, double c2, double c3);
+  
+private:
+  double c0_;
+  double c1_;
+  double c2_;
+  double c3_;
+};
 
 } /* namespace comptonsoft */
+
+#endif /* COMPTONSOFT_GainFunctionCubic_H */

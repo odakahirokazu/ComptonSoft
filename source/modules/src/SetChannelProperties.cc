@@ -28,6 +28,7 @@
 
 #include "VRealDetectorUnit.hh"
 #include "MultiChannelData.hh"
+#include "GainFunctionCubic.hh"
 #include "VChannelMap.hh"
 #include "SimDetectorUnit2DPixel.hh"
 #include "SimDetectorUnit2DStrip.hh"
@@ -226,6 +227,28 @@ void SetChannelProperties::setupChannelProperties(int section,
 
   if (optional<int> status = properties.disable_status) {
     mcd->setChannelDisabled(channel, *status);
+  }
+  if (optional<double> o = properties.pedestal_value) {
+    const double value = (*o);
+    mcd->setPedestal(channel, value);
+  }
+  if (optional<double> o = properties.gain_correction_c0) {
+    const double c0 = (*o);
+    auto gainFunction = std::make_shared<GainFunctionCubic>();
+    double c1 = 0.0;
+    double c2 = 0.0;
+    double c3 = 0.0;
+    if (optional<double> o = properties.gain_correction_c1) {
+      c1 = (*o);
+    }
+    if (optional<double> o = properties.gain_correction_c2) {
+      c2 = (*o);
+    }
+    if (optional<double> o = properties.gain_correction_c3) {
+      c3 = (*o);
+    }
+    gainFunction->set(c0, c1, c2, c3);
+    mcd->resetGainFunctionVector(gainFunction);
   }
   if (optional<double> o = properties.threshold_value) {
     const double value = (*o) * unit::keV;

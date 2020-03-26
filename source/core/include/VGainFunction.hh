@@ -29,6 +29,7 @@ namespace comptonsoft {
  *
  * @author Hirokazu Odaka
  * @date 2014-09-12
+ * @date 2020-03-26 | of a single channel (previously of a channel array)
  */
 class VGainFunction
 {
@@ -41,9 +42,9 @@ public:
   VGainFunction& operator=(const VGainFunction&) = default;
   VGainFunction& operator=(VGainFunction&&) = default;
   
-  virtual double RangeMin(std::size_t index) const = 0;
-  virtual double RangeMax(std::size_t index) const = 0;
-  virtual double eval(std::size_t index, double x) const = 0;
+  virtual double RangeMin() const = 0;
+  virtual double RangeMax() const = 0;
+  virtual double eval(double x) const = 0;
 };
 
 } /* namespace comptonsoft */

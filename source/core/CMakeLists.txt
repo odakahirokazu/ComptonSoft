@@ -28,6 +28,7 @@ set(CS_CORE_CLASSES
   ### processing/readout
   src/VGainFunction.cc
   src/GainFunctionLinear.cc
+  src/GainFunctionCubic.cc
   src/GainFunctionSpline.cc
   src/MultiChannelData.cc
   src/VChannelMap.cc

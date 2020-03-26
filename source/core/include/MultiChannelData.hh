@@ -44,6 +44,7 @@ namespace comptonsoft {
  * @date 2016-08-19 | threshold: scalar value to vector
  * @date 2016-11-11 | add time and flags
  * @date 2019-10-08 | use shared_ptr for the gain function; delete the assignment operators.
+ * @date 2020-03-26 | adapt a change of VGainFunction
  */
 class MultiChannelData
 {
@@ -117,8 +118,8 @@ public:
     return (status==channel_status::normal) || (status==channel_status::trigger_disable);
   }
 
-  void resetPedestalVector()
-  { std::fill(pedestalVector_.begin(), pedestalVector_.end(), 0.0); }
+  void resetPedestalVector(double v=0.0)
+  { std::fill(pedestalVector_.begin(), pedestalVector_.end(), v); }
   void setPedestal(std::size_t i, double val) { pedestalVector_[i] = val; }
   void setPedestalVector(const std::vector<double>& v) { pedestalVector_ = v; }
   double getPedestal(std::size_t i) const { return pedestalVector_[i]; }
@@ -128,17 +129,20 @@ public:
     std::copy(pedestalVector_.begin(), pedestalVector_.end(), v.begin());
   }
 
-  /**
-   * register a gain function object. The receiver takes ownership of the given
-   * object, so you should not delete it after calling this method.
-   *
-   * @param func a gain function object to register.
-   */
-  void registerGainFunction(std::unique_ptr<VGainFunction>&& func)
-  { gainFunction_ = std::move(func); }
-  void registerGainFunction(VGainFunction* func)
-  { gainFunction_.reset(func); }
-  
+  void resetGainFunctionVector(std::shared_ptr<VGainFunction> p=std::shared_ptr<VGainFunction>())
+  { std::fill(gainFunctionVector_.begin(), gainFunctionVector_.end(), p); }
+  void setGainFunction(std::size_t i, std::shared_ptr<VGainFunction> p)
+  { gainFunctionVector_[i] = p; }
+  void setGainFunctionVector(const std::vector<std::shared_ptr<VGainFunction>>& v)
+  { gainFunctionVector_ = v; }
+  std::shared_ptr<const VGainFunction> getGainFunction(std::size_t i) const
+  { return gainFunctionVector_[i]; }
+  void getGainFunctionVector(std::vector<std::shared_ptr<const VGainFunction>>& v) const
+  {
+    v.resize(NumChannels_);
+    std::copy(gainFunctionVector_.begin(), gainFunctionVector_.end(), v.begin());
+  }
+
   void resetDataValidVector(int valid)
   { std::fill(dataValidVector_.begin(), dataValidVector_.end(), valid); }
   void setDataValid(std::size_t i, int8_t val) { dataValidVector_[i] = val; }
@@ -299,7 +303,7 @@ private:
 
   std::vector<int8_t> channelDisabledVector_;
   std::vector<double> pedestalVector_;
-  std::shared_ptr<VGainFunction> gainFunction_;
+  std::vector<std::shared_ptr<VGainFunction>> gainFunctionVector_;
 
   std::vector<int8_t> dataValidVector_;
   std::vector<int32_t> rawADCVector_;

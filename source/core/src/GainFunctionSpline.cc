@@ -23,31 +23,30 @@
 namespace comptonsoft
 {
 
-GainFunctionSpline::GainFunctionSpline(std::size_t n)
-  : func_(n, nullptr)
+GainFunctionSpline::GainFunctionSpline()
 {
 }
 
 GainFunctionSpline::~GainFunctionSpline() = default;
   
-double GainFunctionSpline::RangeMin(std::size_t index) const
+double GainFunctionSpline::RangeMin() const
 {
-  return func_[index]->GetXmin();
+  return func_->GetXmin();
 }
 
-double GainFunctionSpline::RangeMax(std::size_t index) const
+double GainFunctionSpline::RangeMax() const
 {
-  return func_[index]->GetXmax();
+  return func_->GetXmax();
 }
 
-double GainFunctionSpline::eval(std::size_t index, double x) const
+double GainFunctionSpline::eval(double x) const
 {
-  return func_[index]->Eval(x);
+  return func_->Eval(x);
 }
 
-void GainFunctionSpline::set(std::size_t index, const TSpline* func)
+void GainFunctionSpline::set(const TSpline* func)
 {
-  func_[index] = func;
+  func_ = func;
 }
 
 } /* namespace comptonsoft */

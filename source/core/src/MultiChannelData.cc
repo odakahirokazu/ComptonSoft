@@ -35,7 +35,7 @@ MultiChannelData::MultiChannelData(std::size_t n, ElectrodeSide eside)
     negativeThresholdEnergyVector_(n, 0.0),
     channelDisabledVector_(n, 0),
     pedestalVector_(n, 0.0),
-    gainFunction_(std::make_shared<GainFunctionLinear>(n, 1000.0)),
+    gainFunctionVector_(n, std::make_shared<GainFunctionLinear>(0.0, 1.0)),
     dataValidVector_(n, 1),
     rawADCVector_(n, 0),
     PHAVector_(n, 0.0),
@@ -146,16 +146,17 @@ void MultiChannelData::subtractCommonModeNoise()
 double MultiChannelData::PHA2EPI(std::size_t i, double pha) const
 {
   double vpi = 0.0;
-  const double RangeMin = gainFunction_->RangeMin(i);
-  const double RangeMax = gainFunction_->RangeMax(i);
+  const std::shared_ptr<const VGainFunction> gainFunction = gainFunctionVector_[i];
+  const double RangeMin = gainFunction->RangeMin();
+  const double RangeMax = gainFunction->RangeMax();
   if (pha < RangeMin) {
-    vpi = gainFunction_->eval(i, pha);
+    vpi = gainFunction->eval(pha);
   }
   else if (RangeMax < pha) {
-    vpi = gainFunction_->eval(i, pha);
+    vpi = gainFunction->eval(pha);
   }
   else {
-    vpi = gainFunction_->eval(i, pha);
+    vpi = gainFunction->eval(pha);
   }
   return vpi*unit::keV;
 }

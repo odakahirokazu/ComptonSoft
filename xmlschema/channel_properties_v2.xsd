@@ -1,0 +1,110 @@
+<?xml version="1.0"?>
+
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:element name="channel_properties">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="name" type="xs:string" />
+        <xs:element name="comment" type="xs:string" minOccurs="0" maxOccurs="unbounded" />
+        <xs:element name="data" type="data_type" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:complexType name="data_type">
+    <xs:sequence minOccurs="0" maxOccurs="unbounded">
+      <xs:choice>
+        <xs:element name="detector" type="detector_type"/>
+        <xs:element name="readout_module" type="detector_type" />
+      </xs:choice>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="detector_type">
+    <xs:choise>
+      <xs:sequence minOccurs="0" maxOccurs="unbounded">
+        <xs:element name="section" type="section_type" />
+      </xs:sequence>
+      <xs:element name="frame" type="frame_type" />
+    </xs:choise>
+    <xs:attribute name="id" type="xs:integer" use="required" />
+  </xs:complexType>
+  <xs:complexType name="section_type">
+    <xs:sequence>
+      <xs:element name="common" minOccurs="0" maxOccurs="1">
+        <xs:complexType>
+          <xs:group ref="channel_type_contents" />
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="channel" minOccurs="0" maxOccurs="unbounded">
+        <xs:complexType>
+          <xs:group ref="channel_type_contents" />
+          <xs:attribute name="id" type="xs:integer" use="required" />
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+    <xs:attribute name="id" type="xs:integer" use="required" />
+    <xs:attribute name="all" type="xs:integer" use="optional" />
+  </xs:complexType>
+  <xs:complexType name="frame_type">
+    <xs:sequence>
+      <xs:element name="common" minOccurs="0" maxOccurs="1">
+        <xs:complexType>
+          <xs:group ref="channel_type_contents" />
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="pixel" minOccurs="0" maxOccurs="unbounded">
+        <xs:complexType>
+          <xs:group ref="channel_type_contents" />
+          <xs:attribute name="x" type="xs:integer" use="required" />
+          <xs:attribute name="y" type="xs:integer" use="required" />
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+    <xs:attribute name="id" type="xs:integer" use="required" />
+    <xs:attribute name="all" type="xs:integer" use="optional" />
+  </xs:complexType>
+  <xs:group name="channel_type_contents">
+    <xs:sequence>
+      <xs:element name="disable" minOccurs="0" maxOccurs="1">
+        <xs:complexType>
+          <xs:attribute name="status" type="xs:integer" use="required" />
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="trigger_discrimination" minOccurs="0" maxOccurs="1">
+        <xs:complexType>
+          <xs:attribute name="center" type="xs:double" use="required" />
+          <xs:attribute name="sigma" type="xs:double" use="required" />
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="noise_level" minOccurs="0" maxOccurs="1">
+        <xs:complexType>
+          <xs:attribute name="param0" type="xs:double" use="required" />
+          <xs:attribute name="param1" type="xs:double" use="optional" />
+          <xs:attribute name="param2" type="xs:double" use="optional" />
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="compensation" minOccurs="0" maxOccurs="1">
+        <xs:complexType>
+          <xs:attribute name="factor" type="xs:double" use="required" />
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="pedestal">
+        <xs:complexType>
+          <xs:attribute name="value" type="xs:double" use="optional" />
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="gain_correction">
+        <xs:complexType>
+          <xs:attribute name="c0" type="xs:double" use="optional" />
+          <xs:attribute name="c1" type="xs:double" use="optional" />
+          <xs:attribute name="c2" type="xs:double" use="optional" />
+          <xs:attribute name="c3" type="xs:double" use="optional" />
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="threshold" minOccurs="0" maxOccurs="1">
+        <xs:complexType>
+          <xs:attribute name="value" type="xs:double" use="required" />
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:group>
+</xs:schema>

@@ -28,15 +28,16 @@ class TSpline;
 namespace comptonsoft {
 
 /**
- * A class of a gain correction function using spline functions.
+ * A class of a gain correction function using a spline function.
  *
  * @author Hirokazu Odaka
  * @date 2014-09-12
+ * @date 2020-03-26 | adapt a change of VGainFunction
  */
 class GainFunctionSpline : public VGainFunction
 {
 public:
-  explicit GainFunctionSpline(std::size_t n);
+  GainFunctionSpline();
   virtual ~GainFunctionSpline();
 
   GainFunctionSpline(const GainFunctionSpline&) = default;
@@ -44,13 +45,13 @@ public:
   GainFunctionSpline& operator=(const GainFunctionSpline& r) = default;
   GainFunctionSpline& operator=(GainFunctionSpline& rr) = default;
   
-  double RangeMin(std::size_t index) const override;
-  double RangeMax(std::size_t index) const override;
-  double eval(std::size_t index, double x) const override;
-  void set(std::size_t index, const TSpline* func);
+  double RangeMin() const override;
+  double RangeMax() const override;
+  double eval(double x) const override;
+  void set(const TSpline* func);
 
 private:
-  std::vector<const TSpline*> func_;
+  const TSpline* func_;
 };
 
 } /* namespace comptonsoft */
