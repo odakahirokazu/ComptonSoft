@@ -535,14 +535,14 @@ loadDCDetectorSectionsNode(const boost::property_tree::ptree& SectionsNode,
         }
       }
 
-      MultiChannelData* mcd = new MultiChannelData(numChannels, electrode);
+      auto mcd = std::make_unique<MultiChannelData>(numChannels, electrode);
       if (electrode == priority_side) {
         mcd->setPrioritySide(true);
       }
       else {
         mcd->setPrioritySide(false);
       }
-      detector->registerMultiChannelData(mcd);
+      detector->registerMultiChannelData(std::move(mcd));
     }
   }
 }

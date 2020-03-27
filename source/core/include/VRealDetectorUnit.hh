@@ -31,6 +31,7 @@ namespace comptonsoft {
 
 class VChannelMap;
 class MultiChannelData;
+class FrameData;
 
 /**
  * A virtual class of a detector unit.
@@ -157,7 +158,7 @@ public:
   /**
    * register multi channel data.
    */
-  void registerMultiChannelData(MultiChannelData* data);
+  void registerMultiChannelData(std::unique_ptr<MultiChannelData>&& mcd);
 
   /**
    * set an channel table to this detector object.
@@ -258,6 +259,8 @@ public:
 
   virtual void printDetectorParameters(std::ostream& os) const;
 
+  void registerFrameData(std::unique_ptr<FrameData>&& frame);
+
 protected:
   virtual bool setReconstructionDetails(int /* mode */) { return true; }
   virtual void reconstruct(const DetectorHitVector& hitSignals,
@@ -291,6 +294,7 @@ private:
   std::shared_ptr<const VChannelMap> channelMap_;
   std::vector<DetectorHit_sptr> detectorHits_;
   std::vector<DetectorHit_sptr> reconstructedHits_;
+  std::unique_ptr<FrameData> frame_;
 
 private:
   VRealDetectorUnit(const VRealDetectorUnit&) = delete;

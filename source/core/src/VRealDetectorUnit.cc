@@ -27,6 +27,7 @@
 #include "MultiChannelData.hh"
 #include "VChannelMap.hh"
 #include "DetectorHit.hh"
+#include "FrameData.hh"
 
 namespace unit = anlgeant4::unit;
 
@@ -76,9 +77,9 @@ std::string VRealDetectorUnit::getNamePrefix() const
   return std::string(name, 0, c);
 }
 
-void VRealDetectorUnit::registerMultiChannelData(MultiChannelData* data)
+void VRealDetectorUnit::registerMultiChannelData(std::unique_ptr<MultiChannelData>&& mcd)
 {
-  MCDVector_.emplace_back(data);
+  MCDVector_.push_back(std::move(mcd));
 }
 
 vector3_t VRealDetectorUnit::Position(int pixelX, int pixelY) const
