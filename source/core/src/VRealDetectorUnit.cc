@@ -368,9 +368,15 @@ printDetectorParameters(std::ostream& os) const
      << "  y: " << getZAxisDirectionY() << "\n"
      << "  z: " << getZAxisDirectionZ() << "\n";
   os << "Number of MCD : " << NumberOfMultiChannelData() << '\n';
+  os << "Frame data: " << hasFrameData() << '\n';
   os << "Reconstruction\n"
      << "  Mode : " << ReconstructionMode() << '\n'
      << "  Clustering : " << isClusteringOn() << '\n';
+}
+
+void VRealDetectorUnit::registerFrameData(std::unique_ptr<FrameData>&& frame)
+{
+  frame_ = std::move(frame);
 }
 
 } /* namespace comptonsoft */
