@@ -30,7 +30,6 @@ extern "C" {
 }
 
 using namespace anlnext;
-namespace unit = anlgeant4::unit;
 
 namespace comptonsoft
 {
