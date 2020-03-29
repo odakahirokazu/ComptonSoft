@@ -21,8 +21,8 @@
 #define COMPTONSOFT_AEAttitudeCorrection_H 1
 
 #include "VCSModule.hh"
-#include <list>
-#include "ReadEventTree.hh"
+#include <fstream>
+
 namespace cfitsio
 {
 extern "C" {
@@ -72,6 +72,12 @@ private:
   double currentPixelCenterY_ = 0.0;
   double startTime_ = 0.0;
   int colid_[numColumns_] = {0};
+
+  bool makeLog_ = false;
+  std::string logFilename_ = "log.txt";
+  std::ofstream logFile_;
+  double numEventLowerBound_ = 0.0;
+  double numEventProportionLimit_ = 0.0;
 };
 
 } /* namespace comptonsoft */
