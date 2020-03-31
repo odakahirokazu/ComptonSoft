@@ -121,11 +121,14 @@
       <td><xsl:value-of select="zaxis_direction/@z" /></td>
       <td><xsl:value-of select="energy_priority/@electrode_side" /></td>
       <td><span class="total-num"><xsl:value-of select="count(sections/section)" /></span></td>
-      <td><xsl:apply-templates select="sections/section" /></td>
+      <td><xsl:apply-templates select="sections/section" /><xsl:apply-templates select="sections/frame" /></td>
     </tr>
   </xsl:template>
   <xsl:template match="sections/section">
     <span><xsl:number value="position()-1"/>:(<xsl:value-of select="./@num_channels" />, <xsl:value-of select="./@electrode_side" />) </span>
+  </xsl:template>
+  <xsl:template match="sections/frame">
+    <span>(frame)</span>
   </xsl:template>
   <xsl:template match="readout">
     <h2>Readout Configuration</h2>

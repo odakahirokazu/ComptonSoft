@@ -41,6 +41,7 @@
 #include "SimDetectorUnit2DPixel.hh"
 #include "SimDetectorUnit2DStrip.hh"
 #include "MultiChannelData.hh"
+#include "FrameData.hh"
 #include "GainFunctionCubic.hh"
 #include "DeviceSimulation.hh"
 #include "CSSensitiveDetector.hh"
@@ -543,6 +544,12 @@ loadDCDetectorSectionsNode(const boost::property_tree::ptree& SectionsNode,
         mcd->setPrioritySide(false);
       }
       detector->registerMultiChannelData(std::move(mcd));
+    }
+    if (v.first == "frame") {
+      const int nx = detector->getNumPixelX();
+      const int ny = detector->getNumPixelY();
+      auto frame = std::make_unique<FrameData>(nx, ny);
+      detector->registerFrameData(std::move(frame));
     }
   }
 }

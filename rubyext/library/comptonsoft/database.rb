@@ -5,6 +5,21 @@ module ComptonSoft
   module Database
     class DetectorConfiguration
       class Detector
+        class Section
+          attr_accessor :num_channels, :electrode_side
+          def initialize(nch, electrode)
+            @num_channels = nch
+            @electrode_side = electrode
+          end
+        end
+
+        class Frame
+          attr_accessor :electrode_side
+          def initialize(electrode=nil)
+            @electrode_side = electrode
+          end
+        end
+
         attr_accessor :id, :name, :type
         attr_accessor :geometry_x, :geometry_y, :geometry_z
         attr_accessor :offset_x, :offset_y
@@ -20,7 +35,11 @@ module ComptonSoft
         end
 
         def add_section(num_channels, electrode_side)
-          @sections << [num_channels, electrode_side]
+          @sections << Section.new(num_channels, electrode_side)
+        end
+
+        def add_frame(electrode_side=nil)
+          @sections << Frame.new(electrode_side)
         end
 
         def each_section(&b)
@@ -99,6 +118,9 @@ module ComptonSoft
           d.energy_priority_electrode_side = e.elements["energy_priority/@electrode_side"]&.value
           e.elements.each("sections/section") do |ee|
             d.add_section(ee.attributes["num_channels"], ee.attributes["electrode_side"])
+          end
+          e.elements.each("sections/frame") do |ee|
+            d.add_frame(ee.attributes["electrode_side"])
           end
           @detectors << d
         end
@@ -225,9 +247,14 @@ module ComptonSoft
           ee = nil; make_ee = lambda{ ee ||= e.add_element("sections") }
           d.each_section do |s|
             make_ee.call
-            eee = ee.add_element("section")
-            eee.add_attribute("num_channels", s[0])
-            if v=s[1]; eee.add_attribute("electrode_side", v); end
+            if s.class == Detector::Section
+              eee = ee.add_element("section")
+              eee.add_attribute("num_channels", s.num_channels)
+              if v=s.electrode_side; eee.add_attribute("electrode_side", v); end
+            elsif s.class == Detector::Frame
+              eee = ee.add_element("frame")
+              if v=s.electrode_side; eee.add_attribute("electrode_side", v); end
+            end
           end
         end
         readout_node = root.add_element("readout")
