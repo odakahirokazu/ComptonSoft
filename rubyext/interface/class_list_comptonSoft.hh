@@ -72,7 +72,6 @@ class WriteXrayEventTree;
 class ReadXrayEventTree;
 class SortEventTreeWithTime;
 class SetPedestals;
-class SetHotPixels;
 class MakePedestals;
 class MakeHotPixels;
 class AnalyzeDarkFrame;

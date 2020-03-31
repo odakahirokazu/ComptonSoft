@@ -1158,6 +1158,12 @@ load(const boost::property_tree::ptree& node)
   if (auto o = node.get_optional<int>("<xmlattr>.id")) {
     id = o;
   }
+  if (auto o = node.get_optional<int>("<xmlattr>.x")) {
+    x = o;
+  }
+  if (auto o = node.get_optional<int>("<xmlattr>.y")) {
+    y = o;
+  }
   if (auto o = node.get_optional<int>("disable.<xmlattr>.status")) {
     disable_status = o;
   }

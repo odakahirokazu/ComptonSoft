@@ -79,7 +79,6 @@ clMod = [
   ANL::SWIGClass.new("ReadXrayEventTree"),
   ANL::SWIGClass.new("SortEventTreeWithTime"),
   ANL::SWIGClass.new("SetPedestals", false, 'USE_FITSIO'),
-  ANL::SWIGClass.new("SetHotPixels"),
   ANL::SWIGClass.new("MakePedestals", false, 'USE_FITSIO'),
   ANL::SWIGClass.new("MakeHotPixels"),
   ANL::SWIGClass.new("AnalyzeDarkFrame"),

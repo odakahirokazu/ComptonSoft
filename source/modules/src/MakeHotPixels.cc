@@ -18,7 +18,8 @@
  *************************************************************************/
 
 #include "MakeHotPixels.hh"
-#include <fstream>
+#include <boost/property_tree/ptree.hpp>
+#include <boost/property_tree/xml_parser.hpp>
 #include "FrameData.hh"
 
 using namespace anlnext;
@@ -26,7 +27,7 @@ using namespace anlnext;
 namespace comptonsoft{
 
 MakeHotPixels::MakeHotPixels()
-  : filename_("hotpix.txt")
+  : filename_("hotpix.xml")
 {
 }
 
@@ -44,23 +45,37 @@ ANLStatus MakeHotPixels::mod_initialize()
 
 ANLStatus MakeHotPixels::mod_end_run()
 {
-  const FrameData& frameData = frame_owner_->getFrame();
-  const FrameData::flags_t& hotpixArray = frameData.getHotPixels();
-  const int nx = hotpixArray.shape()[0];
-  const int ny = hotpixArray.shape()[1];
+  namespace xp = boost::property_tree::xml_parser;
+  using boost::property_tree::ptree;
 
-  std::ofstream outputfile(filename_.c_str());
-  for (int ix=0; ix<nx; ix++){
-    for (int iy=0; iy<ny; iy++){
-      if (hotpixArray[ix][iy]){
-        outputfile<<ix;
-        outputfile<<" ";
-        outputfile<<iy;
-        outputfile<<"\n";
+  ptree pt;
+  ptree& pt1 = pt.add("channel_properties", "");
+  pt1.add("name", "");
+  ptree& data_node = pt1.add("data", "");
+  ptree& detector_node = data_node.add("detector", "");
+  detector_node.add("<xmlattr>.id", 1);
+  ptree& frame_node = detector_node.add("frame", "");
+
+  const FrameData& frameData = frame_owner_->getFrame();
+  const int nx = frameData.NumPixelsX();
+  const int ny = frameData.NumPixelsY();
+  for (int ix=0; ix<nx; ix++) {
+    for (int iy=0; iy<ny; iy++) {
+      if (frameData.isDisabledPixel(ix, iy)) {
+        ptree& pixel_node = frame_node.add("pixel", "");
+        pixel_node.add("<xmlattr>.x", ix);
+        pixel_node.add("<xmlattr>.y", iy);
+        pixel_node.add("disable.<xmlattr>.status", 1);
       }
     }
   }
-  outputfile.close();
+
+  const int indent = 2;
+  xp::write_xml(filename_,
+                pt,
+                std::locale(),
+                boost::property_tree::xml_writer_make_settings<std::string>(' ', indent));
+  
   return AS_OK;
 }
 

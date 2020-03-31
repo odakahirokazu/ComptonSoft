@@ -14,7 +14,7 @@
     <xs:sequence minOccurs="0" maxOccurs="unbounded">
       <xs:choice>
         <xs:element name="detector" type="detector_type"/>
-        <xs:element name="readout_module" type="detector_type" />
+        <xs:element name="readout_module" type="readout_module_type" />
       </xs:choice>
     </xs:sequence>
   </xs:complexType>
@@ -25,6 +25,12 @@
       </xs:sequence>
       <xs:element name="frame" type="frame_type" />
     </xs:choise>
+    <xs:attribute name="id" type="xs:integer" use="required" />
+  </xs:complexType>
+  <xs:complexType name="readout_module_type">
+    <xs:sequence minOccurs="0" maxOccurs="unbounded">
+      <xs:element name="section" type="section_type" />
+    </xs:sequence>
     <xs:attribute name="id" type="xs:integer" use="required" />
   </xs:complexType>
   <xs:complexType name="section_type">

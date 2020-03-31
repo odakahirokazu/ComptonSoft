@@ -22,10 +22,14 @@
 
 #include <string>
 #include <vector>
+#include <memory>
 #include "XrayEvent.hh"
 
 namespace comptonsoft
 {
+
+class VGainFunction;
+
 
 /**
  * A class of a frame measured with a frame-readout pixel detector.
@@ -33,11 +37,12 @@ namespace comptonsoft
  * @author Hirokazu Odaka
  * @date 2019-05-22
  * @date 2019-10-08 | delete the assignment operators
+ * @date 2020-03-31 | add gain functions
  */
 class FrameData
 {
 public:
-  using flags_t = boost::multi_array<bool, 2>;
+  using flags_t = boost::multi_array<int, 2>;
 
 public:
   FrameData(int nx, int ny);
@@ -78,6 +83,8 @@ public:
   image_t& getRawFrame() { return rawFrame_; }
   const image_t& getFrame() const { return frame_; }
   image_t& getFrame() { return frame_; }
+
+  void setPedestal(int ix, int iy, double v) { pedestals_[ix][iy] = v; }
   const image_t& getPedestals() const { return pedestals_; }
   image_t& getPedestals() { return pedestals_; }
 
@@ -90,8 +97,11 @@ public:
   const image_t& getDeviationFrame() const { return deviation_; }
   image_t& getDeviationFrame() { return deviation_; }
 
-  const flags_t& getHotPixels() const { return hotPixels_; }
-  flags_t& getHotPixels() { return hotPixels_; }
+  void setDisabledPixel(int ix, int iy, int v) { disabledPixels_[ix][iy] = v; }
+  const flags_t& getDisabledPixels() const { return disabledPixels_; }
+  flags_t& getDisabledPixels() { return disabledPixels_; }
+  bool isDisabledPixel(int ix, int iy) const  { return !isNotDisabledPixel(ix, iy); }
+  bool isNotDisabledPixel(int ix, int iy) const { return disabledPixels_[ix][iy]==0; }
 
   void setBadFrame(bool v) { badFrame_ = v; }
   bool BadFrame() { return badFrame_; }
@@ -101,9 +111,16 @@ public:
   void setTrimSize(int v) { trimSize_ = v; }
   int TrimSize() { return trimSize_; }
 
+  void setCommonGainFunction(const std::shared_ptr<VGainFunction>& f);
+  void setGainFunction(int ix, int iy, const std::shared_ptr<VGainFunction>& f);
+  void resetGainFunctions();
+
 protected:
   bool isMaxPixel(int ix, int iy, int size) const;
-  bool includeHotPixel(int ix, int iy, int size) const;
+  bool includeDisabledPixel(int ix, int iy, int size) const;
+
+  VGainFunction* getGainFunction(int ix, int iy) const;
+  double correctGain(int ix, int iy, double pha) const;
 
 private:
   FrameData& operator=(const FrameData& r) = delete;
@@ -115,6 +132,13 @@ private:
 
   int eventSize_ = 1;
   int trimSize_ = 0;
+  bool badFrame_ = false;
+
+  double eventThreshold_ = 0.0;
+  double splitThreshold_ = 0.0;
+  double hotPixelThreshold_ = 0.0;
+
+  std::vector<char> buf_;
 
   image_t rawFrame_;
   image_t frame_;
@@ -124,14 +148,11 @@ private:
   image_t sum_;
   image_t sum2_;
   image_t deviation_;
-  std::vector<char> buf_;
+  flags_t disabledPixels_;
 
-  double eventThreshold_ = 0.0;
-  double splitThreshold_ = 0.0;
-  double hotPixelThreshold_ = 0.0;
-
-  flags_t hotPixels_;
-  bool badFrame_ = false;
+  bool shareGainFunction_ = true;
+  std::shared_ptr<VGainFunction> commonGainFunction_;
+  std::shared_ptr<boost::multi_array<std::shared_ptr<VGainFunction>, 2>> gainFunctions_;
 };
 
 } /* namespace comptonsoft */

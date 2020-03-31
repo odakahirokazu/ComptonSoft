@@ -79,7 +79,6 @@
 #ifdef USE_FITSIO
 #include "SetPedestals.hh"
 #endif
-#include "SetHotPixels.hh"
 #ifdef USE_FITSIO
 #include "MakePedestals.hh"
 #endif
@@ -755,13 +754,6 @@ public:
 };
 
 #endif
-
-class SetHotPixels : public anlnext::BasicModule
-{
-public:
-  SetHotPixels();
-};
-
 
 #ifdef USE_FITSIO
 class MakePedestals : public anlnext::BasicModule

@@ -50,6 +50,7 @@ class VCSSensitiveDetector;
  * @date 2012-06-29
  * @date 2016-08-22 | new XML scheme (version 4)
  * @date 2018-03-09 | new XML schema (detector config v5, detector parameters v2)
+ * @date 2020-03-30 | new XML schema (channel properties v2, detector parameters v3)
  */
 class DetectorSystem : private boost::noncopyable
 {
@@ -58,6 +59,8 @@ public:
   struct ChannelNodeContents
   {
     boost::optional<int> id = boost::none;
+    boost::optional<int> x = boost::none;
+    boost::optional<int> y = boost::none;
     boost::optional<int> disable_status = boost::none;
     boost::optional<double> trigger_discrimination_center = boost::none;
     boost::optional<double> trigger_discrimination_sigma = boost::none;

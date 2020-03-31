@@ -59,7 +59,6 @@ set(CS_MODULES
   src/WriteXrayEventTree.cc
   src/ReadXrayEventTree.cc
   src/SortEventTreeWithTime.cc
-  src/SetHotPixels.cc
   src/MakeHotPixels.cc
   src/AnalyzeDarkFrame.cc
   src/LoadRootFrame.cc

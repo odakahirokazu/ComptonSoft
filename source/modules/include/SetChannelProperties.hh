@@ -33,7 +33,7 @@ class DeviceSimulation;
 
 class SetChannelProperties : public VCSModule
 {
-  DEFINE_ANL_MODULE(SetChannelProperties, 3.0);
+  DEFINE_ANL_MODULE(SetChannelProperties, 4.0);
 public:
   SetChannelProperties();
   ~SetChannelProperties();
@@ -46,12 +46,24 @@ private:
   void loadRootNode(const boost::property_tree::ptree& rootNode);
   void loadSectionNode(const boost::property_tree::ptree& sectionNode,
                        DetectorBasedChannelID detectorChannelID);
-  void setupChannelProperties(int section,
+  void loadFrameNode(const boost::property_tree::ptree& frameNode,
+                     DetectorBasedChannelID detectorChannelID);
+
+  void setupChannelProperties(SectionChannelPair channelID,
                               const DetectorSystem::ChannelNodeContents& properties,
                               DeviceSimulation* ds);
-  void setupChannelProperties(int section,
+  void setupChannelProperties(PixelID pixelID,
+                              const DetectorSystem::ChannelNodeContents& properties,
+                              DeviceSimulation* ds);
+  void setupChannelProperties(SectionChannelPair channelID,
                               const DetectorSystem::ChannelNodeContents& properties,
                               VRealDetectorUnit* detector);
+  void setupChannelProperties(PixelID pixelID,
+                              const DetectorSystem::ChannelNodeContents& properties,
+                              VRealDetectorUnit* detector);
+  void setupFramePixelProperties(PixelID pixelID,
+                                 const DetectorSystem::ChannelNodeContents& properties,
+                                 VRealDetectorUnit* detector);
   
 private:
   std::string m_Filename;
