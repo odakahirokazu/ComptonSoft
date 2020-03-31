@@ -378,13 +378,21 @@ module ComptonSoft
 
     class ChannelProperties
       attr_accessor :id
+      attr_accessor :x, :y
       attr_accessor :disable_status
       attr_accessor :trigger_discrimination_center, :trigger_discrimination_sigma
       attr_accessor :noise_level_param0, :noise_level_param1, :noise_level_param2
-      attr_accessor :compensation_factor, :threshold_value
+      attr_accessor :compensation_factor
+      attr_accessor :pedestal_value
+      attr_accessor :gain_correction_c0, :gain_correction_c1, :gain_correction_c2, :gain_correction_c3
+      attr_accessor :threshold_value
+
+      def pixel?()
+        return (@x && @y)
+      end
 
       def empty?()
-        if @disable_status || @trigger_discrimination_center || @trigger_discrimination_sigma || @noise_level_param0 || @noise_level_param1 || @noise_level_param2 || @compensation_factor || @threshold_value
+        if @disable_status || @trigger_discrimination_center || @trigger_discrimination_sigma || @noise_level_param0 || @noise_level_param1 || @noise_level_param2 || @compensation_factor || @pedestal_value || @gain_correction_c0 || @gain_correction_c1 || @gain_correction_c2 || @gain_correction_c3 || @threshold_value
           return false
         end
         return true
@@ -398,11 +406,18 @@ module ComptonSoft
         @noise_level_param1 = node.elements["noise_level/@param1"]&.value
         @noise_level_param2 = node.elements["noise_level/@param2"]&.value
         @compensation_factor = node.elements["compensation/@factor"]&.value
+        @pedestal_value = node.elements["pedestal/@value"]&.value
+        @gain_correction_c0 = node.elements["gain_correction/@c0"]&.value
+        @gain_correction_c1 = node.elements["gain_correction/@c1"]&.value
+        @gain_correction_c2 = node.elements["gain_correction/@c2"]&.value
+        @gain_correction_c3 = node.elements["gain_correction/@c3"]&.value
         @threshold_value = node.elements["threshold/@value"]&.value
       end
 
       def output(node)
         if v=@id; node.add_attribute("id", v); end
+        if v=@x; node.add_attribute("x", v); end
+        if v=@y; node.add_attribute("y", v); end
         if v=@disable_status; node.add_element("disable", {"status"=>v}); end
         ee = nil; make_ee = lambda{ ee ||= node.add_element("trigger_discrimination") }
         if v=@trigger_discrimination_center; make_ee.call; ee.add_attribute("center", v); end
@@ -412,6 +427,12 @@ module ComptonSoft
         if v=@noise_level_param1; make_ee.call; ee.add_attribute("param1", v); end
         if v=@noise_level_param2; make_ee.call; ee.add_attribute("param2", v); end
         if v=@compensation_factor; node.add_element("compenstaion", {"factor"=>v}); end
+        if v=@pedestal_value; node.add_element("pedestal", {"value"=>v}); end
+        ee = nil; make_ee = lambda{ ee ||= node.add_element("gain_correction") }
+        if v=@gain_correction_c0; make_ee.call; ee.add_attribute("c0", v); end
+        if v=@gain_correction_c1; make_ee.call; ee.add_attribute("c1", v); end
+        if v=@gain_correction_c2; make_ee.call; ee.add_attribute("c2", v); end
+        if v=@gain_correction_c3; make_ee.call; ee.add_attribute("c3", v); end
         if v=@threshold_value; node.add_element("threshold", {"value"=>v}); end
       end
     end
@@ -419,6 +440,17 @@ module ComptonSoft
     class ChannelPropertiesDB
       class Section
         attr_accessor :id, :all, :common, :data
+        def initialize()
+          @data = []
+        end
+
+        def [](i)
+          @data[i]
+        end
+      end
+
+      class Frame
+        attr_accessor :all, :common, :data
         def initialize()
           @data = []
         end
@@ -509,6 +541,23 @@ module ComptonSoft
               c = ChannelProperties.new
               s.data << c
               c.id = eee.attributes["id"]
+              c.load(eee)
+            end
+          end
+          e.elements.each("frame") do |ee|
+            s = Frame.new
+            sl.list << s
+            s.all = ee.attributes["all"]
+            ee.elements.each("common") do |eee|
+              c = ChannelProperties.new
+              s.common = c
+              c.load(eee)
+            end
+            ee.elements.each("pixel") do |eee|
+              c = ChannelProperties.new
+              s.data << c
+              c.x = eee.attributes["x"]
+              c.y = eee.attributes["y"]
               c.load(eee)
             end
           end
@@ -609,14 +658,24 @@ module ComptonSoft
           e = data_node.add_element(m.type.to_s)
           e.add_attribute("id", m.id)
           m.list.each do |s|
-            ee = e.add_element("section")
-            ee.add_attribute("id", s.id)
+            ee = if s.class == Section then
+                   e.add_element("section")
+                 elsif s.class == Frame then
+                   e.add_element("frame")
+                 else
+                   raise "section list has unknown class object: #{s.class}."
+                 end
+            ee.add_attribute("id", s.id) if s.id
             if v=s.all; ee.add_attribute("all", v); end
             common_node = ee.add_element("common")
             s.common.output(common_node)
             s.data.each do |c|
               unless c.empty?
-                eee =ee.add_element("channel", c.id)
+                eee = if c.pixel? then
+                        ee.add_element("pixel")
+                      else
+                        ee.add_element("channel")
+                      end
                 c.output(eee)
               end
             end
