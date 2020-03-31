@@ -217,12 +217,21 @@ public:
   std::vector<DeviceSimulation*>& getDeviceSimulationVector()
   { return deviceSimulationVector_; }
 
-  // Setup detector system
+  // Setup detector system manually
+  void addDetector(std::unique_ptr<VRealDetectorUnit>&& detector);
+  void addReadoutModule(std::unique_ptr<ReadoutModule>&& detector);
+  void addDetectorGroup(std::unique_ptr<DetectorGroup>&& group);
+  void addHitPattern(const HitPattern& hitpat);
+  void setConstructed();
+  void addSenstiveDetector(VCSSensitiveDetector* sd);
+
+  // Setup detector system by database files
   void readDetectorConfiguration(const std::string& filename);
   bool isConstructed() const { return detectorConstructed_; }
   void readDetectorParameters(const std::string& filename);
   void registerGeant4SensitiveDetectors();
 
+  // for an event loop
   void initializeEvent();
 
 private:

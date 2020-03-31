@@ -148,6 +148,53 @@ void DetectorSystem::initializeEvent()
   }
 }
 
+void DetectorSystem::addDetector(std::unique_ptr<VRealDetectorUnit>&& detector)
+{
+  if (isMCSimulation()) {
+    DeviceSimulation* deviceSimulation = dynamic_cast<DeviceSimulation*>(detector.get());
+    if (deviceSimulation == nullptr) {
+      std::string message
+        = (boost::format("Error: dynamic cast error: VRealDetectorUnit -> DeviceSimulation for Detector ID: %d\n") % detector->getID()).str();
+      BOOST_THROW_EXCEPTION( CSException(message) );
+    }
+    deviceSimulationVector_.push_back(deviceSimulation);
+  }
+
+  const int ID = detector->getID();
+  detectors_.push_back(std::move(detector));
+  const int index = detectors_.size()-1;
+  detectorIDMap_[ID] = index;
+}
+
+void DetectorSystem::addReadoutModule(std::unique_ptr<ReadoutModule>&& rom)
+{
+  const int ID = rom->ID();
+  readoutModules_.push_back(std::move(rom));
+  const int index = readoutModules_.size()-1;
+  readoutModuleIDMap_[ID] = index;
+}
+
+void DetectorSystem::addDetectorGroup(std::unique_ptr<DetectorGroup>&& group)
+{
+  const std::string name = group->Name();
+  detectorGroupMap_[name] = std::move(group);
+}
+
+void DetectorSystem::addHitPattern(const HitPattern& hitpat)
+{
+  hitPatterns_.push_back(hitpat);
+}
+
+void DetectorSystem::setConstructed()
+{
+  detectorConstructed_ = true;
+}
+
+void DetectorSystem::addSenstiveDetector(VCSSensitiveDetector* sd)
+{
+  sensitiveDetectorVector_.push_back(sd);
+}
+
 void DetectorSystem::readDetectorConfiguration(const std::string& filename)
 {
   std::cout << "Loading detector configuration: " << filename << std::endl;
@@ -597,14 +644,14 @@ void DetectorSystem::loadDCGroupsNode(const boost::property_tree::ptree& GroupsN
     if (v.first == "group") {
       const ptree& groupNode = v.second;
       const std::string name = groupNode.get<std::string>("<xmlattr>.name");
-      DetectorGroup* group = new DetectorGroup(name);
-      detectorGroupMap_[name] = std::unique_ptr<DetectorGroup>(group);
+      auto group = std::make_unique<DetectorGroup>(name);
       for (const ptree::value_type& vv: groupNode.get_child("")) {
         if (vv.first == "detector") {
           const int detectorID = vv.second.get<int>("<xmlattr>.id");
           group->add(detectorID);
         }
       }
+      addDetectorGroup(std::move(group));
     }
     else if (v.first=="hit_pattern") {
       HitPattern hitpat;
@@ -618,7 +665,7 @@ void DetectorSystem::loadDCGroupsNode(const boost::property_tree::ptree& GroupsN
           hitpat.add(getDetectorGroup(group));
         }
       }
-      hitPatterns_.push_back(std::move(hitpat));
+      addHitPattern(hitpat);
     }
   }
 }
@@ -761,8 +808,8 @@ void DetectorSystem::loadDPDetectorSetNode(const boost::property_tree::ptree& Se
   
     sensitiveDetectorVector_.push_back(sensitiveDetector);
     sensitiveDetector->SetDetectorSystem(this);
-    if (simAutoPosition_) sensitiveDetector->SetPositionCalculation();
-    if (simSDCheck_) sensitiveDetector->SetSDCheck();
+    if (simAutoPosition_) { sensitiveDetector->SetPositionCalculation(); }
+    if (simSDCheck_) { sensitiveDetector->SetSDCheck(); }
   }
 
   if (optional<const ptree&> detectorListNode = SetNode.get_child_optional("detector_list")) {
