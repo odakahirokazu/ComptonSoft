@@ -32,10 +32,11 @@ class DetectorSystem;
  * @date 2008-08-27
  * @date 2015-10-11
  * @date 2016-08-31
+ * @date 2020-04-01
  */
 class ConstructDetector : public anlnext::BasicModule
 {
-  DEFINE_ANL_MODULE(ConstructDetector, 3.3);
+  DEFINE_ANL_MODULE(ConstructDetector, 3.4);
 public:
   ConstructDetector();
   ~ConstructDetector();
@@ -44,6 +45,7 @@ public:
   anlnext::ANLStatus mod_initialize() override;
   anlnext::ANLStatus mod_analyze() override;
 
+  const DetectorSystem* getDetectorManager() const { return detectorManager_.get(); }
   DetectorSystem* getDetectorManager() { return detectorManager_.get(); }
 
 protected:

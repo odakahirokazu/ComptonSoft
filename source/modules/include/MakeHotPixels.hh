@@ -22,33 +22,30 @@
  *
  * @author Hirokazu Odaka & Tsubasa Tamba
  * @date 2019-05
- * merged to comptonsoft 2019-07-18
- *
+ * @date 2019-07-18 | merged to comptonsoft
+ * @date 2020-04-01 | v1.1
  */
 
 #ifndef COMPTONSOFT_MakeHotPixels_H
 #define COMPTONSOFT_MakeHotPixels_H 1
 
-#include <anlnext/BasicModule.hh>
-#include "ConstructFrame.hh"
+#include "VCSModule.hh"
 
 namespace comptonsoft{
 
-class MakeHotPixels : public anlnext::BasicModule
+class MakeHotPixels : public VCSModule
 {
-  DEFINE_ANL_MODULE(MakeHotPixels, 1.0);
-  ENABLE_PARALLEL_RUN();
+  DEFINE_ANL_MODULE(MakeHotPixels, 1.1);
+  // ENABLE_PARALLEL_RUN();
 public:
   MakeHotPixels();
   
 public:
   anlnext::ANLStatus mod_define() override;
-  anlnext::ANLStatus mod_initialize() override;
   anlnext::ANLStatus mod_end_run() override;
 
 private:
   std::string filename_;
-  const ConstructFrame* frame_owner_ = nullptr;
 };
 
 } /* namespace comptonsoft*/

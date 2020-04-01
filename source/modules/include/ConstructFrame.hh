@@ -20,8 +20,8 @@
 #ifndef COMPTONSOFT_ConstructFrame_H
 #define COMPTONSOFT_ConstructFrame_H 1
 
-#include <anlnext/BasicModule.hh>
-#include <memory>
+#include "ConstructDetector.hh"
+#include "DetectorSystem.hh"
 
 namespace comptonsoft {
 
@@ -33,10 +33,11 @@ class FrameData;
  *
  * @author Hirokazu Odaka
  * @date 2019-06-05
+ * @date 2020-04-01 | v2.0 | based on ConstructDetector
  */
-class ConstructFrame : public anlnext::BasicModule
+class ConstructFrame : public ConstructDetector
 {
-  DEFINE_ANL_MODULE(ConstructFrame, 1.0);
+  DEFINE_ANL_MODULE(ConstructFrame, 2.0);
   // ENABLE_PARALLEL_RUN();
 public:
   ConstructFrame();
@@ -48,26 +49,16 @@ public:
   anlnext::ANLStatus mod_define() override;
   anlnext::ANLStatus mod_initialize() override;
 
-  void setFrameID(int v) { frame_id_ = v; }
-  int FrameID() const { return frame_id_; }
-
-  const comptonsoft::FrameData& getFrame() const
-  { return *frame_; }
-
-  comptonsoft::FrameData& getFrame()
-  { return *frame_; }
-
 protected:
-  virtual FrameData* createFrameData();
-  int NumPixelsX() const { return num_pixel_x_; }
-  int NumPixelsY() const { return num_pixel_y_; }
+  int NumPixelsX() const { return num_pixels_x_; }
+  int NumPixelsY() const { return num_pixels_y_; }
+
+  virtual std::unique_ptr<FrameData> createFrameData();
 
 private:
-  int num_pixel_x_ = 1;
-  int num_pixel_y_ = 1;
-
-  int frame_id_ = 0;
-  std::unique_ptr<comptonsoft::FrameData> frame_;
+  int num_pixels_x_ = 1;
+  int num_pixels_y_ = 1;
+  std::vector<int> ids_;
 };
 
 } /* namespace comptonsoft */

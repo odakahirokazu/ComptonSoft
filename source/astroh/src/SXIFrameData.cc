@@ -55,7 +55,7 @@ std::vector<XrayEvent_sptr> SXIFrameData::extractEvents()
     for (int ix=margin; ix<nx-margin; ix++) {
       const double v = sxiFrame[ix][iy];
       if (v > EventThreshold()) {
-        if (isMaxPixel(ix, iy, innerSize) && !surroundDiscri(sxiFrame, ix, iy, innerSize, SurroundThreshold(), NpixSurroundThreshold()) && !(includeHotPixel(ix, iy, outerSize))) {
+        if (isMaxPixel(ix, iy, innerSize) && !surroundDiscri(sxiFrame, ix, iy, innerSize, SurroundThreshold(), NpixSurroundThreshold()) && !(includeDisabledPixel(ix, iy, outerSize))) {
           hitPixels.emplace_back(ix, iy);
         }
       }

@@ -18,36 +18,48 @@
  *************************************************************************/
 
 #include "MakeBadFrames.hh"
-#include <fstream>
-#include "FrameData.hh"
 
 using namespace anlnext;
 
 namespace comptonsoft{
 
 MakeBadFrames::MakeBadFrames()
-  : filename_("badframes.txt"),
-    thresholdSigma_(3.0)
+  : thresholdSigma_(3.0)
 {
 }
 
 ANLStatus MakeBadFrames::mod_define()
 {
-  define_parameter("filename", &mod_class::filename_);
+  define_parameter("detector_id", &mod_class::detectorID_);
   define_parameter("threshold_sigma", &mod_class::thresholdSigma_);
+  define_result("bad_frames", &mod_class::badFrames_);
   return AS_OK;
 }
 
 ANLStatus MakeBadFrames::mod_initialize()
 {
-  get_module("ConstructFrame", &frame_owner_);
+  VCSModule::mod_initialize();
+
+  VRealDetectorUnit* detector = getDetectorManager()->getDetectorByID(detectorID_);
+  if (detector == nullptr) {
+    std::cout << "Detector " << detectorID_ << " does not exist." << std::endl;
+    return AS_QUIT;
+  }
+
+  if (detector->hasFrameData()) {
+    frame_ = detector->getFrameData();
+  }
+  else {
+    std::cout << "Detector does not have a frame." << std::endl;
+    return AS_QUIT;
+  }
+
   return AS_OK;
 }
 
 ANLStatus MakeBadFrames::mod_analyze()
 {
-  const FrameData& frameData = frame_owner_->getFrame();
-  const double v = frameData.rawFrameMedian();
+  const double v = frame_->rawFrameMedian();
   rawFrameMedian_.push_back(v);
 
   return AS_OK;
@@ -58,14 +70,11 @@ ANLStatus MakeBadFrames::mod_end_run()
   calculateStatistics();
   const double upperTh = average_ + thresholdSigma_*sigma_;
   const double lowerTh = average_ - thresholdSigma_*sigma_;
-  std::ofstream outputfile(filename_.c_str());
-  for (size_t i=0; i<rawFrameMedian_.size(); i++){
-    if (rawFrameMedian_[i]>upperTh || rawFrameMedian_[i]<lowerTh){
-      outputfile<<i;
-      outputfile<<"\n";
+  for (size_t i=0; i<rawFrameMedian_.size(); i++) {
+    if (rawFrameMedian_[i]>upperTh || rawFrameMedian_[i]<lowerTh) {
+      badFrames_.push_back(i);
     }
   }
-  outputfile.close();
   return AS_OK;
 }
 

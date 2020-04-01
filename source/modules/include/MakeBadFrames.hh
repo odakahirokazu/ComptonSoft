@@ -22,21 +22,22 @@
  *
  * @author Tsubasa Tamba
  * @date 2019-07-24
+ * @date 2020-04-01 | Hirokazu Odaka | use module-result | v1.1
  *
  */
 
 #ifndef COMPTONSOFT_MakeBadFrames_H
 #define COMPTONSOFT_MakeBadFrames_H 1
 
-#include <anlnext/BasicModule.hh>
-#include "ConstructFrame.hh"
+#include "VCSModule.hh"
+#include "FrameData.hh"
 
 namespace comptonsoft {
 
-class MakeBadFrames : public anlnext::BasicModule
+class MakeBadFrames : public VCSModule
 {
-  DEFINE_ANL_MODULE(MakeBadFrames, 1.0);
-  ENABLE_PARALLEL_RUN();
+  DEFINE_ANL_MODULE(MakeBadFrames, 1.1);
+  // ENABLE_PARALLEL_RUN();
 public:
   MakeBadFrames();
   
@@ -49,12 +50,13 @@ public:
   void calculateStatistics();
 
 private:
-  std::string filename_;
-  const ConstructFrame* frame_owner_ = nullptr;
+  int detectorID_ = 0;
   double thresholdSigma_;
   std::vector<double> rawFrameMedian_;
+  std::vector<int> badFrames_;
   double average_ = 0.0;
   double sigma_ = 0.0;
+  FrameData* frame_ = nullptr;
 };
 
 } /* namespace comptonsoft*/

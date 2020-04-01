@@ -19,35 +19,50 @@
 
 #include "ConstructFrame.hh"
 #include "FrameData.hh"
+#include <memory>
+#include "RealDetectorUnit2DPixel.hh"
 
 using namespace anlnext;
 
 namespace comptonsoft {
 
 ConstructFrame::ConstructFrame()
+  : ids_{0}
 {
   add_alias("ConstructFrame");
 }
 
 ANLStatus ConstructFrame::mod_define()
 {
-  define_parameter("num_pixel_x", &mod_class::num_pixel_x_);
-  define_parameter("num_pixel_y", &mod_class::num_pixel_y_);
+  ConstructDetector::mod_define();
+  
+  define_parameter("num_pixels_x", &mod_class::num_pixels_x_);
+  define_parameter("num_pixels_y", &mod_class::num_pixels_y_);
+  define_parameter("detector_list", &mod_class::ids_);
   
   return AS_OK;
 }
 
 ANLStatus ConstructFrame::mod_initialize()
 {
-  frame_.reset(createFrameData());
-  frame_->setPedestals(0.0);
+  DetectorSystem* detectorManager = getDetectorManager();
 
-  return AS_OK;
+  for (int i: ids_) {
+    auto detector = std::make_unique<RealDetectorUnit2DPixel>();
+    detector->setID(i);
+    auto frame = createFrameData();
+    frame->setPedestals(0.0);
+    detector->registerFrameData(std::move(frame));
+    detectorManager->addDetector(std::move(detector));
+    detectorManager->setConstructed();
+  }
+  
+  return ConstructDetector::mod_initialize();
 }
 
-FrameData* ConstructFrame::createFrameData()
+std::unique_ptr<FrameData> ConstructFrame::createFrameData()
 {
-  return new comptonsoft::FrameData(num_pixel_x_, num_pixel_y_);
+  return std::make_unique<FrameData>(NumPixelsX(), NumPixelsY());
 }
 
 } /* namespace comptonsoft */

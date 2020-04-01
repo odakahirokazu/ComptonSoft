@@ -37,12 +37,6 @@ ANLStatus MakeHotPixels::mod_define()
   return AS_OK;
 }
 
-ANLStatus MakeHotPixels::mod_initialize()
-{
-  get_module("ConstructFrame", &frame_owner_);
-  return AS_OK;
-}
-
 ANLStatus MakeHotPixels::mod_end_run()
 {
   namespace xp = boost::property_tree::xml_parser;
@@ -52,20 +46,26 @@ ANLStatus MakeHotPixels::mod_end_run()
   ptree& pt1 = pt.add("channel_properties", "");
   pt1.add("name", "");
   ptree& data_node = pt1.add("data", "");
-  ptree& detector_node = data_node.add("detector", "");
-  detector_node.add("<xmlattr>.id", 1);
-  ptree& frame_node = detector_node.add("frame", "");
 
-  const FrameData& frameData = frame_owner_->getFrame();
-  const int nx = frameData.NumPixelsX();
-  const int ny = frameData.NumPixelsY();
-  for (int ix=0; ix<nx; ix++) {
-    for (int iy=0; iy<ny; iy++) {
-      if (frameData.isDisabledPixel(ix, iy)) {
-        ptree& pixel_node = frame_node.add("pixel", "");
-        pixel_node.add("<xmlattr>.x", ix);
-        pixel_node.add("<xmlattr>.y", iy);
-        pixel_node.add("disable.<xmlattr>.status", 1);
+  auto& detectors = getDetectorManager()->getDetectors();
+  for (auto& detector: detectors) {
+    if (detector->hasFrameData()) {
+      ptree& detector_node = data_node.add("detector", "");
+      detector_node.add("<xmlattr>.id", detector->getID());
+      ptree& frame_node = detector_node.add("frame", "");
+
+      const FrameData* frame = detector->getFrameData();
+      const int nx = frame->NumPixelsX();
+      const int ny = frame->NumPixelsY();
+      for (int ix=0; ix<nx; ix++) {
+        for (int iy=0; iy<ny; iy++) {
+          if (frame->isDisabledPixel(ix, iy)) {
+            ptree& pixel_node = frame_node.add("pixel", "");
+            pixel_node.add("<xmlattr>.x", ix);
+            pixel_node.add("<xmlattr>.y", iy);
+            pixel_node.add("disable.<xmlattr>.status", 1);
+          }
+        }
       }
     }
   }

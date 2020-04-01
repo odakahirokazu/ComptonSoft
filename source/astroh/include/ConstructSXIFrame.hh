@@ -29,16 +29,17 @@ namespace comptonsoft {
  *
  * @author Hirokazu Odaka
  * @date 2019-06-05
+ * @date 2020-04-01 | v2.0 | upgrade with ConstructFrame 2.0
  */
 class ConstructSXIFrame : public ConstructFrame
 {
-  DEFINE_ANL_MODULE(ConstructSXIFrame, 1.0);
+  DEFINE_ANL_MODULE(ConstructSXIFrame, 2.0);
   // ENABLE_PARALLEL_RUN();
 public:
   ConstructSXIFrame() = default;
 
 protected:
-  FrameData* createFrameData() override;
+  std::unique_ptr<FrameData> createFrameData() override;
 };
 
 } /* namespace comptonsoft */

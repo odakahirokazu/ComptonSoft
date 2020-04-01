@@ -22,34 +22,33 @@
  *
  * @author Hirokazu Odaka & Tsubasa Tamba
  * @date 2019-05
- * @merged to comptonsoft 2019-07-19
+ * @date 2019-07-19 | merged to comptonsoft
+ * @date 2020-04-01 | v1.1
  *
  */
 
 #ifndef COMPTONSOFT_SetPedestals_H
 #define COMPTONSOFT_SetPedestals_H 1
 
-#include <anlnext/BasicModule.hh>
-#include "LoadFrame.hh"
+#include "VCSModule.hh"
 
 namespace comptonsoft
 {
 
-class SetPedestals : public anlnext::BasicModule
+class SetPedestals : public VCSModule
 {
-  DEFINE_ANL_MODULE(SetPedestals, 1.0);
-  ENABLE_PARALLEL_RUN();
+  DEFINE_ANL_MODULE(SetPedestals, 1.1);
+  // ENABLE_PARALLEL_RUN();
 public:
   SetPedestals();
   
 public:
   anlnext::ANLStatus mod_define() override;
-  anlnext::ANLStatus mod_initialize() override;
   anlnext::ANLStatus mod_begin_run() override;
 
 private:
   std::string filename_;
-  ConstructFrame* frame_owner_ = nullptr;
+  int detector_id_ = 0;
 };
 
 } /* namespace comptonsoft */

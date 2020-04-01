@@ -42,11 +42,24 @@ ANLStatus LoadRootFrame::mod_define()
 
 ANLStatus LoadRootFrame::mod_initialize()
 {
-  get_module_NC("ConstructFrame", &frame_owner_);
+  ConstructDetector* detectorOwner;
+  get_module_NC("ConstructDetector", &detectorOwner);
+  VRealDetectorUnit* detector = detectorOwner->getDetectorManager()->getDetectorByID(detector_id_);
+  if (detector == nullptr) {
+    std::cout << "Detector " << detector_id_ << " does not exist." << std::endl;
+    return AS_QUIT;
+  }
 
-  FrameData& frame = frame_owner_->getFrame();
-  const int nx = frame.NumPixelsX();
-  const int ny = frame.NumPixelsX();
+  if (detector->hasFrameData()) {
+    frame_ = detector->getFrameData();
+  }
+  else {
+    std::cout << "Detector does not have a frame." << std::endl;
+    return AS_QUIT;
+  }
+
+  const int nx = frame_->NumPixelsX();
+  const int ny = frame_->NumPixelsX();
   rawPH_.resize(boost::extents[nx][ny]);
   rawFrame_.resize(boost::extents[nx][ny]);
 
@@ -67,19 +80,18 @@ ANLStatus LoadRootFrame::mod_analyze()
     return AS_QUIT;
   }
 
-  frame_owner_->setFrameID(frameIndex);
-  FrameData& frame = frame_owner_->getFrame();
+  frame_->setFrameID(frameIndex);
   frametree_->GetEntry(frameIndex);
 
-  const int nx = frame.NumPixelsX();
-  const int ny = frame.NumPixelsX();
+  const int nx = frame_->NumPixelsX();
+  const int ny = frame_->NumPixelsX();
   for (int i=0; i<nx; i++) {
     for (int j=0; j<ny; j++) {
       rawFrame_[i][j] = static_cast<double>(rawPH_[i][j]);
     }
   }
 
-  frame.setRawFrame(rawFrame_);
+  frame_->setRawFrame(rawFrame_);
 
   return AS_OK;
 }

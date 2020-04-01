@@ -20,7 +20,9 @@
 #include "LoadFrame.hh"
 #include <algorithm>
 #include "FrameData.hh"
-#include "ConstructFrame.hh"
+#include "ConstructDetector.hh"
+#include "DetectorSystem.hh"
+#include "VRealDetectorUnit.hh"
 
 using namespace anlnext;
 
@@ -32,6 +34,7 @@ LoadFrame::LoadFrame()
 
 ANLStatus LoadFrame::mod_define()
 {
+  define_parameter("detector_id", &mod_class::detector_id_);
   define_parameter("files", &mod_class::files_);
   
   return AS_OK;
@@ -39,7 +42,21 @@ ANLStatus LoadFrame::mod_define()
 
 ANLStatus LoadFrame::mod_initialize()
 {
-  get_module_NC("ConstructFrame", &frame_owner_);
+  ConstructDetector* detectorOwner;
+  get_module_NC("ConstructDetector", &detectorOwner);
+  VRealDetectorUnit* detector = detectorOwner->getDetectorManager()->getDetectorByID(detector_id_);
+  if (detector == nullptr) {
+    std::cout << "Detector " << detector_id_ << " does not exist." << std::endl;
+    return AS_QUIT;
+  }
+
+  if (detector->hasFrameData()) {
+    frame_ = detector->getFrameData();
+  }
+  else {
+    std::cout << "Detector does not have a frame." << std::endl;
+    return AS_QUIT;
+  }
 
   return AS_OK;
 }
@@ -54,9 +71,8 @@ ANLStatus LoadFrame::mod_analyze()
   const std::string filename = files_[fileIndex];
   std::cout << "[LoadFrame] filename: " << filename << std::endl;
 
-  frame_owner_->setFrameID(fileIndex);
-  FrameData& frame = frame_owner_->getFrame();
-  bool status = frame.load(filename);
+  frame_->setFrameID(fileIndex);
+  bool status = frame_->load(filename);
   if (!status) {
     return AS_ERROR;
   }

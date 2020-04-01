@@ -22,35 +22,35 @@
  *
  * @author Tsubasa Tamba
  * @date 2019-07-24
+ * @date 2020-04-01 | Hirokazu Odaka | use module-parameter | v1.1
  *
  */
 
 #ifndef COMPTONSOFT_SetBadFrames_H
 #define COMPTONSOFT_SetBadFrames_H 1
 
-#include <anlnext/BasicModule.hh>
-#include <list>
-#include "ConstructFrame.hh"
+#include "VCSModule.hh"
+#include "FrameData.hh"
 
 namespace comptonsoft {
 
-class SetBadFrames : public anlnext::BasicModule
+class SetBadFrames : public VCSModule
 {
-  DEFINE_ANL_MODULE(SetBadFrames, 1.0);
-  ENABLE_PARALLEL_RUN();
+  DEFINE_ANL_MODULE(SetBadFrames, 1.1);
+  // ENABLE_PARALLEL_RUN();
 public:
   SetBadFrames();
   
 public:
   anlnext::ANLStatus mod_define() override;
   anlnext::ANLStatus mod_initialize() override;
-  anlnext::ANLStatus mod_begin_run() override;
   anlnext::ANLStatus mod_analyze() override;
 
 private:
-  std::string filename_;
-  ConstructFrame* frame_owner_ = nullptr;
-  std::list<int> badFrames_;
+  int detectorID_ = 0;
+  std::vector<int> badFrames_;
+  std::vector<int>::iterator nextBadFrame_;
+  FrameData* frame_ = nullptr;
 };
 
 } /* namespace comptonsoft */

@@ -165,6 +165,19 @@ void FrameData::subtractPedestals()
   }
 }
 
+void FrameData::correctGains()
+{
+  const int nx = NumPixelsX();
+  const int ny = NumPixelsY();
+  for (int i=0; i<nx; i++) {
+    for (int j=0; j<ny; j++) {
+      const double pha = frame_[i][j];
+      const double energy = correctGain(i, j, pha);
+      frame_[i][j] = energy;
+    }
+  }
+}
+
 std::vector<XrayEvent_sptr> FrameData::extractEvents()
 {
   std::vector<XrayEvent_sptr> events;

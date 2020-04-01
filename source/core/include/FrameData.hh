@@ -54,6 +54,9 @@ public:
   int NumPixelsX() const { return num_pixels_x_; }
   int NumPixelsY() const { return num_pixels_y_; }
 
+  void setFrameID(int v) { frameID_ = v; }
+  int FrameID() const { return frameID_; }
+
   void setEventSize(int v) { eventSize_ = v; }
   int EventSize() const { return eventSize_; }
 
@@ -115,6 +118,8 @@ public:
   void setGainFunction(int ix, int iy, const std::shared_ptr<VGainFunction>& f);
   void resetGainFunctions();
 
+  void correctGains();
+
 protected:
   bool isMaxPixel(int ix, int iy, int size) const;
   bool includeDisabledPixel(int ix, int iy, int size) const;
@@ -130,6 +135,7 @@ private:
   const int num_pixels_x_ = 1;
   const int num_pixels_y_ = 1;
 
+  int frameID_ = 0;
   int eventSize_ = 1;
   int trimSize_ = 0;
   bool badFrame_ = false;

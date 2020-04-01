@@ -38,36 +38,45 @@ ANLStatus AnalyzeDarkFrame::mod_define()
   return AS_OK;
 }
 
-ANLStatus AnalyzeDarkFrame::mod_initialize()
-{
-  get_module_NC("ConstructFrame", &frame_owner_);
-
-  return AS_OK;
-}
-
 ANLStatus AnalyzeDarkFrame::mod_begin_run()
 {
-  FrameData& frame = frame_owner_->getFrame();
-  frame.setEventThreshold(event_threshold_);
-  frame.setHotPixelThreshold(hotPixelThreshold_);
-  frame.setPedestals(pedestal_level_);
+  auto& detectors = getDetectorManager()->getDetectors();
+  for (auto& detector: detectors) {
+    if (detector->hasFrameData()) {
+      FrameData* frame = detector->getFrameData();
+      frame->setEventThreshold(event_threshold_);
+      frame->setHotPixelThreshold(hotPixelThreshold_);
+      frame->setPedestals(pedestal_level_);
+    }
+  }
 
   return AS_OK;
 }
 
 ANLStatus AnalyzeDarkFrame::mod_analyze()
 {
-  FrameData& frame = frame_owner_->getFrame();
-  frame.stack();
-  frame.detectHotPixels();
+  auto& detectors = getDetectorManager()->getDetectors();
+  for (auto& detector: detectors) {
+    if (detector->hasFrameData()) {
+      FrameData* frame = detector->getFrameData();
+      frame->stack();
+      frame->detectHotPixels();
+    }
+  }
 
   return AS_OK;
 }
 
 ANLStatus AnalyzeDarkFrame::mod_end_run()
 {
-  FrameData& frame = frame_owner_->getFrame();
-  frame.calculatePedestals();
+  auto& detectors = getDetectorManager()->getDetectors();
+  for (auto& detector: detectors) {
+    if (detector->hasFrameData()) {
+      FrameData* frame = detector->getFrameData();
+      frame->calculatePedestals();
+    }
+  }
+
   return AS_OK;
 }
 

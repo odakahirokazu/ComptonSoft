@@ -43,20 +43,19 @@ ANLStatus SetPedestals::mod_define()
   return AS_OK;
 }
 
-ANLStatus SetPedestals::mod_initialize()
-{
-  get_module_NC("ConstructFrame", &frame_owner_);
-  return AS_OK;
-}
-
 ANLStatus SetPedestals::mod_begin_run()
 {
-  FrameData& frameData = frame_owner_->getFrame();
-
-  image_t& pedestals = frameData.getPedestals();
+  VRealDetectorUnit* detector = getDetectorManager()->getDetectorByID(detector_id_);
+  if (detector == nullptr) {
+    std::cout << "Detector " << detector_id_ << " does not exist." << std::endl;
+    return AS_OK;
+  }
+  
+  FrameData* frame = detector->getFrameData();
+  image_t& pedestals = frame->getPedestals();
   const int nx = pedestals.shape()[0];
   const int ny = pedestals.shape()[1];
-
+  
   cfitsio::fitsfile* fitsFile = nullptr;
   int fitsStatus = 0;
   long StartPixel[2] = {1, 1};
