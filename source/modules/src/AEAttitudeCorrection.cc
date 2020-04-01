@@ -143,7 +143,7 @@ ANLStatus AEAttitudeCorrection::mod_analyze()
       numEventLowerBound_ = numEventProportionLimit_ * (n-startID_);
     }
     if (makeLog_) {
-      logFile_ << n-startID_ << " "  << currentPixelCenterX_ << " " << currentPixelCenterY_ << "\n";
+      logFile_ << n-startID_ << " " << std::fixed << startTime_ << " " << t << " " << currentPixelCenterX_ << " " << currentPixelCenterY_ << "\n";
     }
     for (int i=startID_; i<n; i++) {
       const double dix = G4UniformRand() - 0.5;
