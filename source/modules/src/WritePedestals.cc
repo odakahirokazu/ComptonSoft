@@ -17,7 +17,7 @@
  *                                                                       *
  *************************************************************************/
 
-#include "MakePedestals.hh"
+#include "WritePedestals.hh"
 #include "FrameData.hh"
 #include <string>
 
@@ -33,12 +33,12 @@ using namespace anlnext;
 namespace comptonsoft
 {
 
-MakePedestals::MakePedestals()
+WritePedestals::WritePedestals()
   : filename_("pedestals.fits")
 {
 }
 
-ANLStatus MakePedestals::mod_define()
+ANLStatus WritePedestals::mod_define()
 {
   define_parameter("filename", &mod_class::filename_);
   define_parameter("detector_id", &mod_class::detector_id_);
@@ -46,7 +46,7 @@ ANLStatus MakePedestals::mod_define()
   return AS_OK;
 }
 
-ANLStatus MakePedestals::mod_end_run()
+ANLStatus WritePedestals::mod_end_run()
 {
   VRealDetectorUnit* detector = getDetectorManager()->getDetectorByID(detector_id_);
   if (detector == nullptr) {

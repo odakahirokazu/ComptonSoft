@@ -17,18 +17,18 @@
  *                                                                       *
  *************************************************************************/
 
-#include "MakeBadFrames.hh"
+#include "DetectBadFrames.hh"
 
 using namespace anlnext;
 
 namespace comptonsoft{
 
-MakeBadFrames::MakeBadFrames()
+DetectBadFrames::DetectBadFrames()
   : thresholdSigma_(3.0)
 {
 }
 
-ANLStatus MakeBadFrames::mod_define()
+ANLStatus DetectBadFrames::mod_define()
 {
   define_parameter("detector_id", &mod_class::detectorID_);
   define_parameter("threshold_sigma", &mod_class::thresholdSigma_);
@@ -36,7 +36,7 @@ ANLStatus MakeBadFrames::mod_define()
   return AS_OK;
 }
 
-ANLStatus MakeBadFrames::mod_initialize()
+ANLStatus DetectBadFrames::mod_initialize()
 {
   VCSModule::mod_initialize();
 
@@ -57,7 +57,7 @@ ANLStatus MakeBadFrames::mod_initialize()
   return AS_OK;
 }
 
-ANLStatus MakeBadFrames::mod_analyze()
+ANLStatus DetectBadFrames::mod_analyze()
 {
   const double v = frame_->rawFrameMedian();
   rawFrameMedian_.push_back(v);
@@ -65,7 +65,7 @@ ANLStatus MakeBadFrames::mod_analyze()
   return AS_OK;
 }
 
-ANLStatus MakeBadFrames::mod_end_run()
+ANLStatus DetectBadFrames::mod_end_run()
 {
   calculateStatistics();
   const double upperTh = average_ + thresholdSigma_*sigma_;
@@ -78,7 +78,7 @@ ANLStatus MakeBadFrames::mod_end_run()
   return AS_OK;
 }
 
-void MakeBadFrames::calculateStatistics()
+void DetectBadFrames::calculateStatistics()
 {
   const size_t size = rawFrameMedian_.size();
   double sum = 0.0;

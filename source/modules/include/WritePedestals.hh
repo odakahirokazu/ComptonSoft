@@ -18,7 +18,7 @@
  *************************************************************************/
 
 /**
- * MakePedestals.
+ * WritePedestals.
  *
  * @author Hirokazu Odaka & Tsubasa Tamba
  * @date 2019-05
@@ -27,19 +27,19 @@
  *
  */
 
-#ifndef COMPTONSOFT_MakePedestals_H
-#define COMPTONSOFT_MakePedestals_H 1
+#ifndef COMPTONSOFT_WritePedestals_H
+#define COMPTONSOFT_WritePedestals_H 1
 
 #include "VCSModule.hh"
 
 namespace comptonsoft{
 
-class MakePedestals : public VCSModule
+class WritePedestals : public VCSModule
 {
-  DEFINE_ANL_MODULE(MakePedestals, 1.1);
+  DEFINE_ANL_MODULE(WritePedestals, 1.1);
   // ENABLE_PARALLEL_RUN();
 public:
-  MakePedestals();
+  WritePedestals();
   
 public:
   anlnext::ANLStatus mod_define() override;
@@ -52,4 +52,4 @@ private:
 
 } /* namespace comptonsoft */
 
-#endif /* COMPTONSOFT_MakePedestals_H */
+#endif /* COMPTONSOFT_WritePedestals_H */

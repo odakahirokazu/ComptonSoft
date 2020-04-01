@@ -17,7 +17,7 @@
  *                                                                       *
  *************************************************************************/
 
-#include "MakeHotPixels.hh"
+#include "WriteHotPixels.hh"
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/xml_parser.hpp>
 #include "FrameData.hh"
@@ -26,18 +26,18 @@ using namespace anlnext;
 
 namespace comptonsoft{
 
-MakeHotPixels::MakeHotPixels()
+WriteHotPixels::WriteHotPixels()
   : filename_("hotpix.xml")
 {
 }
 
-ANLStatus MakeHotPixels::mod_define()
+ANLStatus WriteHotPixels::mod_define()
 {
   define_parameter("filename", &mod_class::filename_);
   return AS_OK;
 }
 
-ANLStatus MakeHotPixels::mod_end_run()
+ANLStatus WriteHotPixels::mod_end_run()
 {
   namespace xp = boost::property_tree::xml_parser;
   using boost::property_tree::ptree;

@@ -18,36 +18,47 @@
  *************************************************************************/
 
 /**
- * MakeHotPixels.
+ * DetectBadFrames.
  *
- * @author Hirokazu Odaka & Tsubasa Tamba
- * @date 2019-05
- * @date 2019-07-18 | merged to comptonsoft
- * @date 2020-04-01 | v1.1
+ * @author Tsubasa Tamba
+ * @date 2019-07-24
+ * @date 2020-04-01 | Hirokazu Odaka | use module-result | v1.1
+ *
  */
 
-#ifndef COMPTONSOFT_MakeHotPixels_H
-#define COMPTONSOFT_MakeHotPixels_H 1
+#ifndef COMPTONSOFT_DetectBadFrames_H
+#define COMPTONSOFT_DetectBadFrames_H 1
 
 #include "VCSModule.hh"
+#include "FrameData.hh"
 
-namespace comptonsoft{
+namespace comptonsoft {
 
-class MakeHotPixels : public VCSModule
+class DetectBadFrames : public VCSModule
 {
-  DEFINE_ANL_MODULE(MakeHotPixels, 1.1);
+  DEFINE_ANL_MODULE(DetectBadFrames, 1.1);
   // ENABLE_PARALLEL_RUN();
 public:
-  MakeHotPixels();
+  DetectBadFrames();
   
 public:
   anlnext::ANLStatus mod_define() override;
+  anlnext::ANLStatus mod_initialize() override;
+  anlnext::ANLStatus mod_analyze() override;
   anlnext::ANLStatus mod_end_run() override;
 
+  void calculateStatistics();
+
 private:
-  std::string filename_;
+  int detectorID_ = 0;
+  double thresholdSigma_;
+  std::vector<double> rawFrameMedian_;
+  std::vector<int> badFrames_;
+  double average_ = 0.0;
+  double sigma_ = 0.0;
+  FrameData* frame_ = nullptr;
 };
 
 } /* namespace comptonsoft*/
 
-#endif /* COMPTONSOFT_MakeHotPixels_H */
+#endif /* COMPTONSOFT_DetectBadFrames_H */
