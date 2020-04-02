@@ -54,16 +54,19 @@ ANLStatus ConstructDetector::mod_define()
 
 ANLStatus ConstructDetector::mod_initialize()
 {
-  if (detectorManager_->isMCSimulation() && parametersFile_=="") {
-    std::cout << "Error: detector parameters file should be given." << std::endl;
-    return AS_QUIT;
-  }
-  
   try {
-    detectorManager_->readDetectorConfiguration(configurationFile_);
+    if (!detectorManager_->isConstructed()) {
+      detectorManager_->readDetectorConfiguration(configurationFile_);
+    }
 
     if (parametersFile_ != "") {
       detectorManager_->readDetectorParameters(parametersFile_);
+    }
+    else {
+      if (detectorManager_->isMCSimulation()) {
+        std::cout << "Error: detector parameters file should be given." << std::endl;
+        return AS_QUIT;
+      }
     }
   }
   catch (CSException& e) {

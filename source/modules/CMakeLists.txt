@@ -59,11 +59,10 @@ set(CS_MODULES
   src/WriteXrayEventTree.cc
   src/ReadXrayEventTree.cc
   src/SortEventTreeWithTime.cc
-  src/SetHotPixels.cc
-  src/MakeHotPixels.cc
+  src/WriteHotPixels.cc
   src/AnalyzeDarkFrame.cc
   src/LoadRootFrame.cc
-  src/MakeBadFrames.cc
+  src/DetectBadFrames.cc
   src/SetBadFrames.cc
   src/SetPedestalsByMedian.cc
   src/HistogramXrayEventSpectrum.cc
@@ -124,7 +123,7 @@ if(CS_USE_FITSIO)
   set(CS_FITSIO_MODULES
     ### Frame data processes
     src/MakeFrameFITS.cc
-    src/MakePedestals.cc
+    src/WritePedestals.cc
     src/SetPedestals.cc
    src/AEAttitudeCorrection.cc
     )

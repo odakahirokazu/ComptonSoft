@@ -28,6 +28,8 @@
 #include <TROOT.h>
 #include <TFile.h>
 #include <TTree.h>
+#include "VGainFunction.hh"
+#include "GainFunctionLinear.hh"
 
 namespace comptonsoft
 {
@@ -42,17 +44,19 @@ FrameData::FrameData(const int nx, const int ny)
     sum_(boost::extents[nx][ny]),
     sum2_(boost::extents[nx][ny]),
     deviation_(boost::extents[nx][ny]),
-    hotPixels_(boost::extents[nx][ny])
+    disabledPixels_(boost::extents[nx][ny])
 {
   for (int i=0; i<nx; i++) {
     for (int j=0; j<ny; j++) {
       sum_[i][j] = 0.0;
       sum2_[i][j] = 0.0;
       deviation_[i][j] = 0.0;
-      hotPixels_[i][j] = false;
+      disabledPixels_[i][j] = 0;
     }
   }
   buf_.resize(2*nx*ny);
+
+  commonGainFunction_ = std::make_shared<GainFunctionLinear>(0.0, 1.0);
 }
 
 FrameData::~FrameData() = default;
@@ -161,6 +165,19 @@ void FrameData::subtractPedestals()
   }
 }
 
+void FrameData::correctGains()
+{
+  const int nx = NumPixelsX();
+  const int ny = NumPixelsY();
+  for (int i=0; i<nx; i++) {
+    for (int j=0; j<ny; j++) {
+      const double pha = frame_[i][j];
+      const double energy = correctGain(i, j, pha);
+      frame_[i][j] = energy;
+    }
+  }
+}
+
 std::vector<XrayEvent_sptr> FrameData::extractEvents()
 {
   std::vector<XrayEvent_sptr> events;
@@ -177,8 +194,8 @@ std::vector<XrayEvent_sptr> FrameData::extractEvents()
   for (int ix=margin; ix<nx-margin; ix++) {
     for (int iy=margin; iy<ny-margin; iy++) {
       const double v = frame_[ix][iy];
-      if (!hotPixels_[ix][iy] && v>=EventThreshold()) {
-        if (isMaxPixel(ix, iy, size) && !(includeHotPixel(ix, iy, size))) {
+      if (isNotDisabledPixel(ix, iy) && v>=EventThreshold()) {
+        if (isMaxPixel(ix, iy, size) && !(includeDisabledPixel(ix, iy, size))) {
           hitPixels.emplace_back(ix, iy);
         }
       }
@@ -226,13 +243,13 @@ void FrameData::detectHotPixels()
   for (int ix=0; ix<nx; ix++) {
     for (int iy=0; iy<ny; iy++){
       if (rawFrame_[ix][iy] > threshold){
-        hotPixels_[ix][iy] = true;
+        disabledPixels_[ix][iy] = 1;
       }
     }
   }
 }
 
-bool FrameData::includeHotPixel(int ix, int iy, int size) const
+bool FrameData::includeDisabledPixel(int ix, int iy, int size) const
 {
   const int halfSize = size/2;
   const int ix0 = ix-halfSize;
@@ -240,7 +257,7 @@ bool FrameData::includeHotPixel(int ix, int iy, int size) const
  
   for (int i=0; i<size; i++) {
     for (int j=0; j<size; j++) {
-      if (hotPixels_[ix0+i][iy0+j]) {
+      if (disabledPixels_[ix0+i][iy0+j]) {
         return true;
       }
     }
@@ -266,6 +283,54 @@ double FrameData::rawFrameMedian() const
   else {
     return 0.5*(v[size/2]+v[size/2-1]);
   }
+}
+
+void FrameData::resetGainFunctions()
+{
+  shareGainFunction_ = true;
+  commonGainFunction_ = std::make_shared<GainFunctionLinear>(0.0, 1.0);
+  gainFunctions_.reset();
+}
+
+void FrameData::setCommonGainFunction(const std::shared_ptr<VGainFunction>& f)
+{
+  commonGainFunction_ = f;
+}
+
+void FrameData::setGainFunction(int ix, int iy, const std::shared_ptr<VGainFunction>& f)
+{
+  if (shareGainFunction_) {
+    shareGainFunction_ = false;
+    for (int kx=0; kx<num_pixels_x_; kx++) {
+      for (int ky=0; ky<num_pixels_y_; ky++) {
+        (*gainFunctions_)[kx][ky] = commonGainFunction_;
+      }
+    }
+  }
+
+  (*gainFunctions_)[ix][iy] = f;
+}
+
+VGainFunction* FrameData::getGainFunction(int ix, int iy) const
+{
+  VGainFunction* f = nullptr;
+  if (shareGainFunction_) {
+    return commonGainFunction_.get();
+  }
+  else {
+    if ((f = (*gainFunctions_)[ix][iy].get()) != nullptr) {
+      return f;
+    }
+    else {
+      return commonGainFunction_.get();
+    }
+  }
+  return nullptr;
+}
+
+double FrameData::correctGain(int ix, int iy, double pha) const
+{
+  return getGainFunction(ix, iy)->eval(pha);
 }
 
 } /* namespace comptonsoft */

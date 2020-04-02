@@ -25,7 +25,7 @@
 
 namespace comptonsoft {
 
-class ConstructFrame;
+class FrameData;
 
 
 /**
@@ -33,10 +33,11 @@ class ConstructFrame;
  *
  * @author Hirokazu Odaka
  * @date 2019-05-23
+ * @date 2020-04-01 | upgrade for new ConstructFrame
  */
 class LoadFrame : public anlnext::BasicModule, public VDataReader
 {
-  DEFINE_ANL_MODULE(LoadFrame, 1.0);
+  DEFINE_ANL_MODULE(LoadFrame, 1.1);
   // ENABLE_PARALLEL_RUN();
 public:
   LoadFrame();
@@ -54,9 +55,9 @@ public:
   bool isDone() const override;
 
 private:
+  int detector_id_ = 0;
   std::vector<std::string> files_;
-
-  ConstructFrame* frame_owner_ = nullptr;
+  FrameData* frame_ = nullptr;
 };
 
 } /* namespace comptonsoft */

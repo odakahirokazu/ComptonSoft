@@ -89,6 +89,11 @@
                 <xs:attribute name="electrode_side" type="xs:string" use="required" />
               </xs:complexType>
             </xs:element>
+            <xs:element name="frame" minOccurs="0" maxOccurs="1">
+              <xs:complexType>
+                <xs:attribute name="electrode_side" type="xs:string" use="optional" />
+              </xs:complexType>
+            </xs:element>
           </xs:sequence>
         </xs:complexType>
       </xs:element>

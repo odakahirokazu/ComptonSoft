@@ -79,14 +79,13 @@
 #ifdef USE_FITSIO
 #include "SetPedestals.hh"
 #endif
-#include "SetHotPixels.hh"
 #ifdef USE_FITSIO
-#include "MakePedestals.hh"
+#include "WritePedestals.hh"
 #endif
-#include "MakeHotPixels.hh"
+#include "WriteHotPixels.hh"
 #include "AnalyzeDarkFrame.hh"
 #include "LoadRootFrame.hh"
-#include "MakeBadFrames.hh"
+#include "DetectBadFrames.hh"
 #include "SetBadFrames.hh"
 #include "SetPedestalsByMedian.hh"
 #include "HistogramXrayEventSpectrum.hh"
@@ -670,7 +669,7 @@ public:
 
 #endif
 
-class ConstructFrame : public anlnext::BasicModule
+class ConstructFrame : public ConstructDetector
 {
 public:
   ConstructFrame();
@@ -717,7 +716,7 @@ public:
 };
 
 
-class AnalyzeFrame : public anlnext::BasicModule
+class AnalyzeFrame : public VCSModule
 {
 public:
   AnalyzeFrame();
@@ -748,7 +747,7 @@ public:
 
 
 #ifdef USE_FITSIO
-class SetPedestals : public anlnext::BasicModule
+class SetPedestals : public VCSModule
 {
 public:
   SetPedestals();
@@ -756,30 +755,23 @@ public:
 
 #endif
 
-class SetHotPixels : public anlnext::BasicModule
-{
-public:
-  SetHotPixels();
-};
-
-
 #ifdef USE_FITSIO
-class MakePedestals : public anlnext::BasicModule
+class WritePedestals : public VCSModule
 {
 public:
-  MakePedestals();
+  WritePedestals();
 };
 
 #endif
 
-class MakeHotPixels : public anlnext::BasicModule
+class WriteHotPixels : public VCSModule
 {
 public:
-  MakeHotPixels();
+  WriteHotPixels();
 };
 
 
-class AnalyzeDarkFrame : public anlnext::BasicModule
+class AnalyzeDarkFrame : public VCSModule
 {
 public:
   AnalyzeDarkFrame();
@@ -793,21 +785,21 @@ public:
 };
 
 
-class MakeBadFrames : public anlnext::BasicModule
+class DetectBadFrames : public VCSModule
 {
 public:
-  MakeBadFrames();
+  DetectBadFrames();
 };
 
 
-class SetBadFrames : public anlnext::BasicModule
+class SetBadFrames : public VCSModule
 {
 public:
   SetBadFrames();
 };
 
 
-class SetPedestalsByMedian : public anlnext::BasicModule
+class SetPedestalsByMedian : public VCSModule
 {
 public:
   SetPedestalsByMedian();

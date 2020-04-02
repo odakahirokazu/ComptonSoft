@@ -23,6 +23,7 @@
 #include <list>
 #include <memory>
 #include <boost/multi_array.hpp>
+#include "CSTypes.hh"
 
 namespace comptonsoft
 {
@@ -35,6 +36,7 @@ using image_t = boost::multi_array<double, 2>;
  * @author Hirokazu Odaka
  * @date 2019-05-22
  * @date 2019-10-08 | delete the assignment operators
+ * @date 2020-04-02 | add propeties
  */
 class XrayEvent
 {
@@ -59,10 +61,13 @@ public:
   void setTime(double v) { time_ = v; }
   double Time() const { return time_; }
 
-  void setX(int v) { ix_ = v; }
-  void setY(int v) { iy_ = v; }
-  int X() const { return  ix_;  }
-  int Y() const { return  iy_;  }
+  void setDetectorID(int v) { detectorID_ = v; }
+  int DetectorID() const { return detectorID_; }
+
+  void setPixelX(int v) { ix_ = v; }
+  void setPixelY(int v) { iy_ = v; }
+  int PixelX() const { return  ix_;  }
+  int PixelY() const { return  iy_;  }
 
   void setData(int i, int j, double v) { data_[i][j] = v; }
   image_t& Data() { return data_; }
@@ -82,6 +87,21 @@ public:
   double CenterPH() const { return centerPH_;}
   int Grade() const { return grade_; }
 
+  void setEnergy(double v) { energy_ = v; }
+  void setPositionX(double v) { posx_ = v; }
+  void setPositionY(double v) { posy_ = v; }
+  void setPositionZ(double v) { posz_ = v; }
+  void setPosition(double x, double y, double z)
+  { posx_ = x; posy_ = y; posz_ = z; }
+  void setPosition(const vector3_t v)
+  { posx_ = v.x(); posy_ = v.y(); posz_ = v.z(); }
+
+  double Energy() const { return energy_; }
+  double PositionX() const { return posx_; }
+  double PositionY() const { return posy_; }
+  double PositionZ() const { return posz_; }
+  vector3_t Position() const { return vector3_t(posx_, posy_, posz_); }
+
 protected:
   virtual double calculateEventAngle() const;
 
@@ -95,6 +115,7 @@ private:
 
   int frameID_ = 0;
   double time_ = 0.0;
+  int detectorID_ = 0;
   int ix_ = 0;
   int iy_ = 0;
   image_t data_;
@@ -105,6 +126,11 @@ private:
   int rank_ = 0;
   double angle_ = 0.0;
   int grade_ = -1;
+
+  double energy_ = 0.0;
+  double posx_ = 0.0;
+  double posy_ = 0.0;
+  double posz_ = 0.0;
 };
 
 using XrayEvent_sptr = std::shared_ptr<XrayEvent>;

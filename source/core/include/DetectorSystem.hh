@@ -50,6 +50,7 @@ class VCSSensitiveDetector;
  * @date 2012-06-29
  * @date 2016-08-22 | new XML scheme (version 4)
  * @date 2018-03-09 | new XML schema (detector config v5, detector parameters v2)
+ * @date 2020-03-30 | new XML schema (channel properties v2, detector parameters v3)
  */
 class DetectorSystem : private boost::noncopyable
 {
@@ -58,6 +59,8 @@ public:
   struct ChannelNodeContents
   {
     boost::optional<int> id = boost::none;
+    boost::optional<int> x = boost::none;
+    boost::optional<int> y = boost::none;
     boost::optional<int> disable_status = boost::none;
     boost::optional<double> trigger_discrimination_center = boost::none;
     boost::optional<double> trigger_discrimination_sigma = boost::none;
@@ -214,12 +217,21 @@ public:
   std::vector<DeviceSimulation*>& getDeviceSimulationVector()
   { return deviceSimulationVector_; }
 
-  // Setup detector system
+  // Setup detector system manually
+  void addDetector(std::unique_ptr<VRealDetectorUnit>&& detector);
+  void addReadoutModule(std::unique_ptr<ReadoutModule>&& detector);
+  void addDetectorGroup(std::unique_ptr<DetectorGroup>&& group);
+  void addHitPattern(const HitPattern& hitpat);
+  void setConstructed();
+  void addSenstiveDetector(VCSSensitiveDetector* sd);
+
+  // Setup detector system by database files
   void readDetectorConfiguration(const std::string& filename);
   bool isConstructed() const { return detectorConstructed_; }
   void readDetectorParameters(const std::string& filename);
   void registerGeant4SensitiveDetectors();
 
+  // for an event loop
   void initializeEvent();
 
 private:

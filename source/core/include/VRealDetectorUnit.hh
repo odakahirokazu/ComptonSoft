@@ -31,6 +31,7 @@ namespace comptonsoft {
 
 class VChannelMap;
 class MultiChannelData;
+class FrameData;
 
 /**
  * A virtual class of a detector unit.
@@ -155,9 +156,12 @@ public:
   { return directionZ_.z(); }
 
   /**
-   * register multi channel data.
+   * methods related to multi channel data.
    */
-  void registerMultiChannelData(MultiChannelData* data);
+  void registerMultiChannelData(std::unique_ptr<MultiChannelData>&& mcd);
+  int NumberOfMultiChannelData() const { return MCDVector_.size(); }
+  const MultiChannelData* getMultiChannelData(int i) const { return MCDVector_[i].get(); }
+  MultiChannelData* getMultiChannelData(int i) { return MCDVector_[i].get(); }
 
   /**
    * set an channel table to this detector object.
@@ -189,9 +193,6 @@ public:
   
   PixelID findPixel(double localx, double localy) const override;
 
-  int NumberOfMultiChannelData() const { return MCDVector_.size(); }
-  MultiChannelData* getMultiChannelData(int i) { return MCDVector_[i].get(); }
-  
   PixelID ChannelToPixel(int section, int channel) const override;
   PixelID ChannelToPixel(const SectionChannelPair& sectionChannel) const override
   {
@@ -258,6 +259,14 @@ public:
 
   virtual void printDetectorParameters(std::ostream& os) const;
 
+  /**
+   * methods related to frame data
+   */
+  void registerFrameData(std::unique_ptr<FrameData>&& frame);
+  bool hasFrameData() const { return (frame_.get()!=nullptr); }
+  const FrameData* getFrameData() const { return frame_.get(); }
+  FrameData* getFrameData() { return frame_.get(); }
+
 protected:
   virtual bool setReconstructionDetails(int /* mode */) { return true; }
   virtual void reconstruct(const DetectorHitVector& hitSignals,
@@ -291,6 +300,8 @@ private:
   std::shared_ptr<const VChannelMap> channelMap_;
   std::vector<DetectorHit_sptr> detectorHits_;
   std::vector<DetectorHit_sptr> reconstructedHits_;
+
+  std::unique_ptr<FrameData> frame_;
 
 private:
   VRealDetectorUnit(const VRealDetectorUnit&) = delete;

@@ -17,7 +17,7 @@
  *                                                                       *
  *************************************************************************/
 
-#include "MakePedestals.hh"
+#include "WritePedestals.hh"
 #include "FrameData.hh"
 #include <string>
 
@@ -33,28 +33,29 @@ using namespace anlnext;
 namespace comptonsoft
 {
 
-MakePedestals::MakePedestals()
+WritePedestals::WritePedestals()
   : filename_("pedestals.fits")
 {
 }
 
-ANLStatus MakePedestals::mod_define()
+ANLStatus WritePedestals::mod_define()
 {
   define_parameter("filename", &mod_class::filename_);
-  return AS_OK;
-}
-
-ANLStatus MakePedestals::mod_initialize()
-{
-  get_module("ConstructFrame", &frame_owner_);
+  define_parameter("detector_id", &mod_class::detector_id_);
   
   return AS_OK;
 }
 
-ANLStatus MakePedestals::mod_end_run()
+ANLStatus WritePedestals::mod_end_run()
 {
-  const FrameData& currentFrameData = frame_owner_->getFrame();
-  const image_t& pedestals = currentFrameData.getPedestals();
+  VRealDetectorUnit* detector = getDetectorManager()->getDetectorByID(detector_id_);
+  if (detector == nullptr) {
+    std::cout << "Detector " << detector_id_ << " does not exist." << std::endl;
+    return AS_OK;
+  }
+  
+  const FrameData* frame = detector->getFrameData();
+  const image_t& pedestals = frame->getPedestals();
   const int nx = pedestals.shape()[0];
   const int ny = pedestals.shape()[1];
 

@@ -24,9 +24,9 @@ using namespace anlnext;
 
 namespace comptonsoft {
 
-FrameData* ConstructSXIFrame::createFrameData()
+std::unique_ptr<FrameData> ConstructSXIFrame::createFrameData()
 {
-  return new comptonsoft::SXIFrameData(NumPixelsX(), NumPixelsY());
+  return std::make_unique<SXIFrameData>(NumPixelsX(), NumPixelsY());
 }
 
 } /* namespace comptonsoft */

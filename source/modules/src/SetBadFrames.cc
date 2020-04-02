@@ -18,52 +18,62 @@
  *************************************************************************/
 
 #include "SetBadFrames.hh"
-#include "FrameData.hh"
-#include <fstream>
 
 using namespace anlnext;
 
 namespace comptonsoft{
 
 SetBadFrames::SetBadFrames()
-  : filename_("hotpix.txt")
 {
 }
 
 ANLStatus SetBadFrames::mod_define()
 {
-  define_parameter("filename", &mod_class::filename_);
+  define_parameter("detector_id", &mod_class::detectorID_);
+  define_parameter("bad_frames", &mod_class::badFrames_);
   return AS_OK;
 }
 
 ANLStatus SetBadFrames::mod_initialize()
 {
-  get_module_NC("ConstructFrame", &frame_owner_);
-  return AS_OK;
-}
+  VCSModule::mod_initialize();
 
-ANLStatus SetBadFrames::mod_begin_run()
-{
-  std::ifstream fin(filename_);
-  int x=0;
-  while (fin >> x) {
-    badFrames_.push_back(x);
+  VRealDetectorUnit* detector = getDetectorManager()->getDetectorByID(detectorID_);
+  if (detector == nullptr) {
+    std::cout << "Detector " << detectorID_ << " does not exist." << std::endl;
+    return AS_QUIT;
   }
-  fin.close();
+
+  if (detector->hasFrameData()) {
+    frame_ = detector->getFrameData();
+  }
+  else {
+    std::cout << "Detector does not have a frame." << std::endl;
+    return AS_QUIT;
+  }
+
+  if (badFrames_.empty()) {
+    return AS_QUIT;
+  }
+  
+  nextBadFrame_ = badFrames_.begin();
 
   return AS_OK;
 }
 
 ANLStatus SetBadFrames::mod_analyze()
 {
-  FrameData& frameData = frame_owner_->getFrame();
-  const int frameID = frame_owner_->FrameID();
-  if (frameID==badFrames_.front()) {
-    frameData.setBadFrame(true);
-    badFrames_.pop_front();
+  if (nextBadFrame_ == badFrames_.end()) {
+    return AS_OK;
+  }
+  
+  const int frameID = frame_->FrameID();
+  if (frameID == *nextBadFrame_) {
+    frame_->setBadFrame(true);
+    ++nextBadFrame_;
   } 
   else {
-    frameData.setBadFrame(false);
+    frame_->setBadFrame(false);
   }
 
   return AS_OK;

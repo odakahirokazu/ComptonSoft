@@ -14,7 +14,7 @@ module ComptonSoft
       @split_threshold = 10.0
       @hotpix_threshold = 400.0
       @pedestal_file = "pedestals.fits"
-      @hotpix_file = "hotpix.txt"
+      @hotpix_file = "hotpix.xml"
       @num_pixels_x = 1
       @num_pixels_y = 1
     end
@@ -115,8 +115,8 @@ module ComptonSoft
       add_namespace ComptonSoft
 
       chain :ConstructFrame
-      with_parameters(num_pixel_x: @num_pixels_x,
-                      num_pixel_y: @num_pixels_y)
+      with_parameters(num_pixels_x: @num_pixels_x,
+                      num_pixels_y: @num_pixels_y)
 
       if @inputs.empty?
         chain_directory_input(self)
@@ -128,9 +128,9 @@ module ComptonSoft
       with_parameters(pedestal_level: @pedestal_level,
                       event_threshold: @event_threshold,
                       hotpix_threshold: @hotpix_threshold)
-      chain :MakePedestals
+      chain :WritePedestals
       with_parameters(filename: @pedestal_file)
-      chain :MakeHotPixels
+      chain :WriteHotPixels
       with_parameters(filename: @hotpix_file)
     end
   end
@@ -167,8 +167,8 @@ module ComptonSoft
 
       chain :XrayEventCollection
       chain :ConstructFrame
-      with_parameters(num_pixel_x: @num_pixels_x,
-                      num_pixel_y: @num_pixels_y)
+      with_parameters(num_pixels_x: @num_pixels_x,
+                      num_pixels_y: @num_pixels_y)
 
       if @inputs.empty?
         chain_directory_input(self)
@@ -181,11 +181,11 @@ module ComptonSoft
                       event_threshold: @event_threshold,
                       split_threshold: @split_threshold,
                       event_size: 5,
-                      set_gain: false,
-                      trim_size: 0)
+                      trim_size: 0,
+                      gain_correction: false)
       chain :SetPedestals
       with_parameters(filename: @pedestal_file)
-      chain :SetHotPixels
+      chain :SetChannelProperties
       with_parameters(filename: @hotpix_file)
       chain :WriteXrayEventTree
 
@@ -215,16 +215,16 @@ module ComptonSoft
 
       chain :XrayEventCollection
       chain :ConstructFrame
-      with_parameters(num_pixel_x: @num_pixels_x,
-                      num_pixel_y: @num_pixels_y)
+      with_parameters(num_pixels_x: @num_pixels_x,
+                      num_pixels_y: @num_pixels_y)
       chain :FillFrame
       chain :AnalyzeFrame
       with_parameters(pedestal_level: @pedestal_level,
                       event_threshold: @event_threshold,
                       split_threshold: @split_threshold,
                       event_size: 5,
-                      set_gain: false,
-                      trim_size: 0)
+                      trim_size: 0,
+                      gain_correction: false)
       chain :WriteXrayEventTree
 
       append_analysis_modules()
@@ -304,11 +304,6 @@ module ComptonSoft
         @encoded_image_rotation_center_x = center_x
         @encoded_image_rotation_center_y = center_y
         @encoded_image_rotation_angle = angle
-      end
-
-      def define_decoded_image_shape(nx, ny)
-        @decoded_image_pixel_x = nx
-        @decoded_image_pixel_y = ny
       end
 
       def set_aperture_to_detector_relation(aperture_element_size, detector_element_size)

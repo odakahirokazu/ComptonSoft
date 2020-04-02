@@ -29,8 +29,8 @@
 
 namespace comptonsoft {
 
+class FrameData;
 using raw_image_t = boost::multi_array<uint16_t, 2>;
-class ConstructFrame;
 
 
 /**
@@ -38,10 +38,11 @@ class ConstructFrame;
  *
  * @author Tsubasa Tamba
  * @date 2019-07-22
+ * @date 2020-04-01 | Hirokazu Odaka | upgrade for new ConstrcutFrame
  */
 class LoadRootFrame : public anlnext::BasicModule
 {
-  DEFINE_ANL_MODULE(LoadRootFrame, 1.0);
+  DEFINE_ANL_MODULE(LoadRootFrame, 1.1);
   // ENABLE_PARALLEL_RUN();
 public:
   LoadRootFrame();
@@ -55,13 +56,14 @@ public:
   anlnext::ANLStatus mod_analyze() override;
 
 private:
+  int detector_id_ = 0;
   std::vector<std::string> files_;
   std::string treename_;
   std::string branchname_;
   size_t numEntries_ = 0;
   TChain* frametree_;
 
-  ConstructFrame* frame_owner_ = nullptr;
+  FrameData* frame_ = nullptr;
   raw_image_t rawPH_;
   image_t rawFrame_;
 };

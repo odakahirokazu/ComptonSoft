@@ -22,24 +22,20 @@
  *
  * @author Hirokazu Odaka
  * @date 2019-05-23
+ * @date 2020-04-01 | v1.1
  */
 
 #ifndef COMPTONSOFT_AnalyzeFrame_H
 #define COMPTONSOFT_AnalyzeFrame_H 1
 
-#include <iterator>
-#include <boost/multi_array.hpp>
-#include <tuple>
 #include <anlnext/BasicModule.hh>
-#include "ConstructFrame.hh"
+#include "VCSModule.hh"
 #include "XrayEvent.hh"
 #include "XrayEventCollection.hh"
 
 namespace comptonsoft {
 
-using gain_t = boost::multi_array<std::tuple<double, double, double, double>, 2>;
-
-class AnalyzeFrame : public anlnext::BasicModule
+class AnalyzeFrame : public VCSModule
 {
   DEFINE_ANL_MODULE(AnalyzeFrame, 1.1);
   // ENABLE_PARALLEL_RUN();
@@ -61,13 +57,9 @@ private:
   double event_threshold_ = 0.0;
   double split_threshold_ = 0.0;
   int event_size_ = 1;
-  bool setGain_ = false;
-  std::string gainFile_;
-  int trimSize_ = 0;
-
-  gain_t gainCoefficient_;
+  int trim_size_ = 0;
+  bool gain_correction_ = false;
   
-  ConstructFrame* frame_owner_ = nullptr;
   XrayEventCollection* collection_ = nullptr;
 };
 

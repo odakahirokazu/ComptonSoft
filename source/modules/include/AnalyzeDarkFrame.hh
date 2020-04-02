@@ -21,8 +21,7 @@
 #define COMPTONSOFT_AnalyzeDarkFrame_H 1
 
 #include <iterator>
-#include <anlnext/BasicModule.hh>
-#include "ConstructFrame.hh"
+#include "VCSModule.hh"
 
 namespace comptonsoft {
 
@@ -31,11 +30,12 @@ namespace comptonsoft {
  *
  * @author Hirokazu Odaka & Tsubasa Tamba
  * @date 2019-05-23
- * merged to comptonsoft 2019-07-19
+ * @date 2019-07-19 | merged to comptonsoft
+ * @date 2020-04-01 | v1.1
  */
-class AnalyzeDarkFrame : public anlnext::BasicModule
+class AnalyzeDarkFrame : public VCSModule
 {
-  DEFINE_ANL_MODULE(AnalyzeDarkFrame, 1.0);
+  DEFINE_ANL_MODULE(AnalyzeDarkFrame, 1.1);
   // ENABLE_PARALLEL_RUN();
 public:
   AnalyzeDarkFrame();
@@ -45,7 +45,6 @@ protected:
 
 public:
   anlnext::ANLStatus mod_define() override;
-  anlnext::ANLStatus mod_initialize() override;
   anlnext::ANLStatus mod_begin_run() override;
   anlnext::ANLStatus mod_analyze() override;
   anlnext::ANLStatus mod_end_run() override;
@@ -54,8 +53,6 @@ private:
   double pedestal_level_ = 0.0;
   double event_threshold_ = 0.0;
   double hotPixelThreshold_ = 0.0;
-
-  ConstructFrame* frame_owner_ = nullptr;
 };
 
 } /* namespace comptonsoft */

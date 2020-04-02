@@ -29,6 +29,7 @@ namespace comptonsoft {
  * A class of a detector group.
  * @author Hirokazu Odaka
  * @date 2014-11-18
+ * @date 2020-04-01 | add manually building methods
  */
 class DetectorGroup
 {

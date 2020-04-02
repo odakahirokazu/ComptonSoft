@@ -32,22 +32,29 @@ SetPedestalsByMedian::SetPedestalsByMedian()
 
 ANLStatus SetPedestalsByMedian::mod_define()
 {
+  define_parameter("detector_id", &mod_class::detectorID_);
   define_parameter("frame_bin", &mod_class::frameBin_);
-  return AS_OK;
-}
-
-ANLStatus SetPedestalsByMedian::mod_initialize()
-{
-  get_module_NC("ConstructFrame", &frame_owner_);
   return AS_OK;
 }
 
 ANLStatus SetPedestalsByMedian::mod_begin_run()
 {
-  FrameData& frameData = frame_owner_->getFrame();
-  image_t& pedestals = frameData.getPedestals();
-  nx_ = pedestals.shape()[0];
-  ny_ = pedestals.shape()[1];
+  VRealDetectorUnit* detector = getDetectorManager()->getDetectorByID(detectorID_);
+  if (detector == nullptr) {
+    std::cout << "Detector " << detectorID_ << " does not exist." << std::endl;
+    return AS_QUIT;
+  }
+
+  if (detector->hasFrameData()) {
+    frameData_ = detector->getFrameData();
+  }
+  else {
+    std::cout << "Detector does not have a frame." << std::endl;
+    return AS_QUIT;
+  }
+
+  nx_ = frameData_->NumPixelsX();
+  ny_ = frameData_->NumPixelsY();
   frameStack_.resize(boost::extents[nx_][ny_]);
 
   return AS_OK;
@@ -55,13 +62,12 @@ ANLStatus SetPedestalsByMedian::mod_begin_run()
 
 ANLStatus SetPedestalsByMedian::mod_analyze()
 {
-  const int frameID = frame_owner_->FrameID();
-  FrameData& frameData = frame_owner_->getFrame();
-  image_t& pedestals = frameData.getPedestals();
-  image_t& rawFrame = frameData.getRawFrame();
+  const int frameID = frameData_->FrameID();
+  image_t& pedestals = frameData_->getPedestals();
+  image_t& rawFrame = frameData_->getRawFrame();
 
   if (frameID<frameBin_) {
-    frameData.setBadFrame(true);
+    frameData_->setBadFrame(true);
     for (int ix=0; ix<nx_; ix++){
       for (int iy=0; iy<ny_; iy++){
         frameStack_[ix][iy].emplace_back(frameID, rawFrame[ix][iy]);
@@ -70,7 +76,7 @@ ANLStatus SetPedestalsByMedian::mod_analyze()
   }
 
   if (frameID==frameBin_) {
-    frameData.setBadFrame(false);
+    frameData_->setBadFrame(false);
     for (int ix=0; ix<nx_; ix++){
       for (int iy=0; iy<ny_; iy++){
         auto comp = [](const std::pair<int, double>& a, const std::pair<int, double>& b){

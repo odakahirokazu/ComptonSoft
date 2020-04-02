@@ -1,6 +1,6 @@
 /*************************************************************************
  *                                                                       *
- * Copyright (c) 2011 Hirokazu Odaka                                     *
+ * Copyright (c) 2019 Hirokazu Odaka                                     *
  *                                                                       *
  * This program is free software: you can redistribute it and/or modify  *
  * it under the terms of the GNU General Public License as published by  *
@@ -17,59 +17,37 @@
  *                                                                       *
  *************************************************************************/
 
-#include "SetHotPixels.hh"
-#include "FrameData.hh"
-#include <fstream>
+/**
+ * WriteHotPixels.
+ *
+ * @author Hirokazu Odaka & Tsubasa Tamba
+ * @date 2019-05
+ * @date 2019-07-18 | merged to comptonsoft
+ * @date 2020-04-01 | v1.1
+ */
 
-using namespace anlnext;
+#ifndef COMPTONSOFT_WriteHotPixels_H
+#define COMPTONSOFT_WriteHotPixels_H 1
+
+#include "VCSModule.hh"
 
 namespace comptonsoft{
 
-SetHotPixels::SetHotPixels()
-  : filename_("hotpix.txt")
+class WriteHotPixels : public VCSModule
 {
-}
+  DEFINE_ANL_MODULE(WriteHotPixels, 1.1);
+  // ENABLE_PARALLEL_RUN();
+public:
+  WriteHotPixels();
+  
+public:
+  anlnext::ANLStatus mod_define() override;
+  anlnext::ANLStatus mod_end_run() override;
 
-ANLStatus SetHotPixels::mod_define()
-{
-  define_parameter("filename", &mod_class::filename_);
-  return AS_OK;
-}
+private:
+  std::string filename_;
+};
 
-ANLStatus SetHotPixels::mod_initialize()
-{
-  get_module_NC("ConstructFrame", &frame_owner_);
-  return AS_OK;
-}
+} /* namespace comptonsoft*/
 
-ANLStatus SetHotPixels::mod_begin_run()
-{
-  std::vector<std::pair<int, int>> hotPixels;
-  std::ifstream fin(filename_);
-  int x=0, y=0;
-  while (fin >> x >> y) {
-    hotPixels.emplace_back(x, y);
-  }
-  fin.close();
-
-  FrameData& frameData = frame_owner_->getFrame();
-  FrameData::flags_t& array = frameData.getHotPixels();
-  const int nx = array.shape()[0];
-  const int ny = array.shape()[1];
-
-  for (int ix=0; ix<nx; ix++){
-    for (int iy=0; iy<ny; iy++){
-      array[ix][iy] = false;
-    }
-  }
-
-  for (const auto& pair: hotPixels) {
-    const int x = pair.first;
-    const int y = pair.second;
-    array[x][y] = true;
-  }
-
-  return AS_OK;
-}
-
-} /* namespace comptonsoft */
+#endif /* COMPTONSOFT_WriteHotPixels_H */

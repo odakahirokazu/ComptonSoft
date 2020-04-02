@@ -31,10 +31,11 @@ class ConstructFrame;
 /**
  * @author Hirokazu Odaka
  * @date 2019-06-05
+ * @date 2020-04-01 | v1.1
  */
 class FillFrame : public VCSModule
 {
-  DEFINE_ANL_MODULE(FillFrame, 1.0);
+  DEFINE_ANL_MODULE(FillFrame, 1.1);
 public:
   FillFrame();
   ~FillFrame();
@@ -45,7 +46,6 @@ public:
 
 private:
   CSHitCollection* m_HitCollection = nullptr;
-  ConstructFrame* m_FrameOwner = nullptr;
   int m_offsetX = 0;
   int m_offsetY = 0;
 };

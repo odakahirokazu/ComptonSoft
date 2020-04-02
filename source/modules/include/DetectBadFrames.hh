@@ -1,6 +1,6 @@
 /*************************************************************************
  *                                                                       *
- * Copyright (c) 2011 Hirokazu Odaka                                     *
+ * Copyright (c) 2019 Hirokazu Odaka                                     *
  *                                                                       *
  * This program is free software: you can redistribute it and/or modify  *
  * it under the terms of the GNU General Public License as published by  *
@@ -18,40 +18,47 @@
  *************************************************************************/
 
 /**
- * SetHotPixels.
+ * DetectBadFrames.
  *
- * @author Hirokazu Odaka & Tsubasa Tamba
- * @date 2019-05
- * merged to comptonsoft 2019-07-18
+ * @author Tsubasa Tamba
+ * @date 2019-07-24
+ * @date 2020-04-01 | Hirokazu Odaka | use module-result | v1.1
  *
  */
 
-#ifndef COMPTONSOFT_SetHotPixels_H
-#define COMPTONSOFT_SetHotPixels_H 1
+#ifndef COMPTONSOFT_DetectBadFrames_H
+#define COMPTONSOFT_DetectBadFrames_H 1
 
-#include <anlnext/BasicModule.hh>
-#include "ConstructFrame.hh"
-#include <vector>
+#include "VCSModule.hh"
+#include "FrameData.hh"
 
-namespace comptonsoft{
+namespace comptonsoft {
 
-class SetHotPixels : public anlnext::BasicModule
+class DetectBadFrames : public VCSModule
 {
-  DEFINE_ANL_MODULE(SetHotPixels, 1.0);
-  ENABLE_PARALLEL_RUN();
+  DEFINE_ANL_MODULE(DetectBadFrames, 1.1);
+  // ENABLE_PARALLEL_RUN();
 public:
-  SetHotPixels();
+  DetectBadFrames();
   
 public:
   anlnext::ANLStatus mod_define() override;
   anlnext::ANLStatus mod_initialize() override;
-  anlnext::ANLStatus mod_begin_run() override;
+  anlnext::ANLStatus mod_analyze() override;
+  anlnext::ANLStatus mod_end_run() override;
+
+  void calculateStatistics();
 
 private:
-  std::string filename_;
-  ConstructFrame* frame_owner_ = nullptr;
+  int detectorID_ = 0;
+  double thresholdSigma_;
+  std::vector<double> rawFrameMedian_;
+  std::vector<int> badFrames_;
+  double average_ = 0.0;
+  double sigma_ = 0.0;
+  FrameData* frame_ = nullptr;
 };
 
-} /* namespace comptonsoft */
+} /* namespace comptonsoft*/
 
-#endif /* COMPTONSOFT_SetHotPixels_H */
+#endif /* COMPTONSOFT_DetectBadFrames_H */
