@@ -301,8 +301,11 @@ void FrameData::setGainFunction(int ix, int iy, const std::shared_ptr<VGainFunct
 {
   if (shareGainFunction_) {
     shareGainFunction_ = false;
-    for (int kx=0; kx<num_pixels_x_; kx++) {
-      for (int ky=0; ky<num_pixels_y_; ky++) {
+    const int nx = num_pixels_x_;
+    const int ny = num_pixels_y_;
+    gainFunctions_ = std::make_shared<gain_func_array_t>(boost::extents[nx][ny]);
+    for (int kx=0; kx<nx; kx++) {
+      for (int ky=0; ky<ny; ky++) {
         (*gainFunctions_)[kx][ky] = commonGainFunction_;
       }
     }

@@ -156,9 +156,10 @@ private:
   image_t deviation_;
   flags_t disabledPixels_;
 
+  using gain_func_array_t = boost::multi_array<std::shared_ptr<VGainFunction>, 2>;
   bool shareGainFunction_ = true;
   std::shared_ptr<VGainFunction> commonGainFunction_;
-  std::shared_ptr<boost::multi_array<std::shared_ptr<VGainFunction>, 2>> gainFunctions_;
+  std::shared_ptr<gain_func_array_t> gainFunctions_;
 };
 
 } /* namespace comptonsoft */

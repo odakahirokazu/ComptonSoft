@@ -65,7 +65,6 @@ private:
 
   FrameData* frame_ = nullptr;
   raw_image_t rawPH_;
-  image_t rawFrame_;
 };
 
 } /* namespace comptonsoft */

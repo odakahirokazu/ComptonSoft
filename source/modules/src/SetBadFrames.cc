@@ -52,10 +52,6 @@ ANLStatus SetBadFrames::mod_initialize()
     return AS_QUIT;
   }
 
-  if (badFrames_.empty()) {
-    return AS_QUIT;
-  }
-  
   nextBadFrame_ = badFrames_.begin();
 
   return AS_OK;
@@ -72,9 +68,6 @@ ANLStatus SetBadFrames::mod_analyze()
     frame_->setBadFrame(true);
     ++nextBadFrame_;
   } 
-  else {
-    frame_->setBadFrame(false);
-  }
 
   return AS_OK;
 }

@@ -61,7 +61,6 @@ ANLStatus LoadRootFrame::mod_initialize()
   const int nx = frame_->NumPixelsX();
   const int ny = frame_->NumPixelsX();
   rawPH_.resize(boost::extents[nx][ny]);
-  rawFrame_.resize(boost::extents[nx][ny]);
 
   frametree_ = new TChain(treename_.c_str());
   for (const std::string& filename: files_) {
@@ -85,13 +84,12 @@ ANLStatus LoadRootFrame::mod_analyze()
 
   const int nx = frame_->NumPixelsX();
   const int ny = frame_->NumPixelsX();
+  image_t& rawFrame = frame_->getRawFrame();
   for (int i=0; i<nx; i++) {
     for (int j=0; j<ny; j++) {
-      rawFrame_[i][j] = static_cast<double>(rawPH_[i][j]);
+      rawFrame[i][j] = static_cast<double>(rawPH_[i][j]);
     }
   }
-
-  frame_->setRawFrame(rawFrame_);
 
   return AS_OK;
 }

@@ -692,10 +692,12 @@ module ComptonSoft
                  else
                    raise "section list has unknown class object: #{s.class}."
                  end
-            ee.add_attribute("id", s.id) if s.id
+            if s.class == Section; ee.add_attribute("id", s.id); end
             if v=s.all; ee.add_attribute("all", v); end
-            common_node = ee.add_element("common")
-            s.common.output(common_node)
+            if s.common
+              common_node = ee.add_element("common")
+              s.common.output(common_node)
+            end
             s.data.each do |c|
               unless c.empty?
                 eee = if c.pixel? then
