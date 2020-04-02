@@ -33,6 +33,7 @@ namespace comptonsoft {
  * 
  * @author Hirokazu Odaka
  * @date 2019-06-05
+ * @date 2020-04-02 | add detector_id
  */
 class XrayEventTreeIO
 {
@@ -65,6 +66,7 @@ private:
    */
   int32_t frameID_ = -1;
   double time_ = 0.0;
+  int32_t detectorID_ = 0;
   int32_t ix_ = 0;
   int32_t iy_ = 0;
   double data_[MaxEventSize_][MaxEventSize_];

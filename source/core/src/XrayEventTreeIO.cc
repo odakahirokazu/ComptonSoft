@@ -46,32 +46,34 @@ void XrayEventTreeIO::setEventSize(int v)
 
 void XrayEventTreeIO::defineBranches()
 {
-  tree_->Branch("frameID",  &frameID_,  "frameID/I");
-  tree_->Branch("time",     &time_,     "time/D");
-  tree_->Branch("ix",       &ix_,       "ix/I");
-  tree_->Branch("iy",       &iy_,       "iy/I");
-  tree_->Branch("data",     &data_,     "data[9][9]/D");
-  tree_->Branch("sumPH",    &sumPH_,    "sumPH/D");
-  tree_->Branch("centerPH", &centerPH_, "centerPH/D");
-  tree_->Branch("weight",   &weight_,   "weight/I");
-  tree_->Branch("rank",     &rank_,     "rank/I");
-  tree_->Branch("angle",    &angle_,    "angle/D");
-  tree_->Branch("grade",    &grade_,    "grade/I");
+  tree_->Branch("frameID",    &frameID_,    "frameID/I");
+  tree_->Branch("time",       &time_,       "time/D");
+  tree_->Branch("detectorID", &detectorID_, "detectorID/I");
+  tree_->Branch("ix",         &ix_,         "ix/I");
+  tree_->Branch("iy",         &iy_,         "iy/I");
+  tree_->Branch("data",       &data_,       "data[9][9]/D");
+  tree_->Branch("sumPH",      &sumPH_,      "sumPH/D");
+  tree_->Branch("centerPH",   &centerPH_,   "centerPH/D");
+  tree_->Branch("weight",     &weight_,     "weight/I");
+  tree_->Branch("rank",       &rank_,       "rank/I");
+  tree_->Branch("angle",      &angle_,      "angle/D");
+  tree_->Branch("grade",      &grade_,      "grade/I");
 }
 
 void XrayEventTreeIO::setBranchAddresses()
 {
-  tree_->SetBranchAddress("frameID",  &frameID_);
-  tree_->SetBranchAddress("time",     &time_);
-  tree_->SetBranchAddress("ix",       &ix_);
-  tree_->SetBranchAddress("iy",       &iy_);
-  tree_->SetBranchAddress("data",     &data_);
-  tree_->SetBranchAddress("sumPH",    &sumPH_);
-  tree_->SetBranchAddress("centerPH", &centerPH_);
-  tree_->SetBranchAddress("weight",   &weight_);
-  tree_->SetBranchAddress("rank",     &rank_);
-  tree_->SetBranchAddress("angle",    &angle_);
-  tree_->SetBranchAddress("grade",    &grade_);
+  tree_->SetBranchAddress("frameID",    &frameID_);
+  tree_->SetBranchAddress("time",       &time_);
+  tree_->SetBranchAddress("detectorID", &detectorID_);
+  tree_->SetBranchAddress("ix",         &ix_);
+  tree_->SetBranchAddress("iy",         &iy_);
+  tree_->SetBranchAddress("data",       &data_);
+  tree_->SetBranchAddress("sumPH",      &sumPH_);
+  tree_->SetBranchAddress("centerPH",   &centerPH_);
+  tree_->SetBranchAddress("weight",     &weight_);
+  tree_->SetBranchAddress("rank",       &rank_);
+  tree_->SetBranchAddress("angle",      &angle_);
+  tree_->SetBranchAddress("grade",      &grade_);
 }
 
 int XrayEventTreeIO::fillEvents(const XrayEventContainer& events)
@@ -84,16 +86,17 @@ int XrayEventTreeIO::fillEvents(const XrayEventCIter events_begin, const XrayEve
   int num = 0;
   for (auto it = events_begin; it!=events_end; ++it) {
     const const_XrayEvent_sptr event = *it;
-    frameID_  = event->FrameID();
-    time_     = event->Time();
-    ix_       = event->X();
-    iy_       = event->Y();
-    sumPH_    = event->SumPH();
-    centerPH_ = event->CenterPH();
-    weight_   = event->Weight();
-    rank_     = event->Rank();
-    angle_    = event->Angle();
-    grade_    = event->Grade();
+    frameID_    = event->FrameID();
+    time_       = event->Time();
+    detectorID_ = event->DetectorID();
+    ix_         = event->X();
+    iy_         = event->Y();
+    sumPH_      = event->SumPH();
+    centerPH_   = event->CenterPH();
+    weight_     = event->Weight();
+    rank_       = event->Rank();
+    angle_      = event->Angle();
+    grade_      = event->Grade();
 
     for (int ix=0; ix<MaxEventSize_; ix++) {
       for (int iy=0; iy<MaxEventSize_; iy++) {
@@ -122,6 +125,7 @@ XrayEvent_sptr XrayEventTreeIO::retrieveEvent() const
 
   event->setFrameID(frameID_);
   event->setTime(time_);
+  event->setDetectorID(detectorID_);
   event->setX(ix_);
   event->setY(iy_);
   event->setSumPH(sumPH_);

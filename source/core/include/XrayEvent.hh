@@ -59,6 +59,9 @@ public:
   void setTime(double v) { time_ = v; }
   double Time() const { return time_; }
 
+  void setDetectorID(int v) { detectorID_ = v; }
+  int DetectorID() const { return detectorID_; }
+
   void setX(int v) { ix_ = v; }
   void setY(int v) { iy_ = v; }
   int X() const { return  ix_;  }
@@ -95,6 +98,7 @@ private:
 
   int frameID_ = 0;
   double time_ = 0.0;
+  int detectorID_ = 0;
   int ix_ = 0;
   int iy_ = 0;
   image_t data_;

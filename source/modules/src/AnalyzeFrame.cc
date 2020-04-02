@@ -84,8 +84,10 @@ ANLStatus AnalyzeFrame::mod_analyze()
       }
 
       std::vector<comptonsoft::XrayEvent_sptr> es = frame->extractEvents();
+      const int detectorID = detector->getID();
       for (auto& event: es) {
         event->setFrameID(frameID);
+        event->setDetectorID(detectorID);
         collection_->insertEvent(event);
       }
     }
