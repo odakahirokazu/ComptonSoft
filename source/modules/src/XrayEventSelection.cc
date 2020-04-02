@@ -83,8 +83,8 @@ bool XrayEventSelection::select(const XrayEvent_sptr& e) const
   const double sumPH = e->SumPH();
   const int rank = e->Rank();
   const int weight = e->Weight();
-  const int ix = e->X();
-  const int iy = e->Y();
+  const int ix = e->PixelX();
+  const int iy = e->PixelY();
 
   return (sumPHMin_<=sumPH && sumPH<=sumPHMax_ &&
           rankMin_<=rank && rank<=rankMax_ &&

@@ -111,8 +111,8 @@ ANLStatus ExtractXrayEventImage::mod_analyze()
   const double Oy = newOriginY_;
 
   for (const auto& event: collection_->getEvents()) {
-    double x0 = event->X();
-    double y0 = event->Y();
+    double x0 = event->PixelX();
+    double y0 = event->PixelY();
     if (randomSampling_) {
       x0 += sampleRandomNumber();
       y0 += sampleRandomNumber();

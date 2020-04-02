@@ -17,12 +17,14 @@
  *                                                                       *
  *************************************************************************/
 
-#include <fstream>
+#include "AstroUnits.hh"
 #include "AnalyzeFrame.hh"
 #include "VRealDetectorUnit.hh"
 #include "FrameData.hh"
 
 using namespace anlnext;
+
+namespace unit = anlgeant4::unit;
 
 namespace comptonsoft {
 
@@ -88,6 +90,8 @@ ANLStatus AnalyzeFrame::mod_analyze()
       for (auto& event: es) {
         event->setFrameID(frameID);
         event->setDetectorID(detectorID);
+        event->setEnergy(event->SumPH()*unit::keV);
+        event->setPosition( detector->Position(event->PixelX(), event->PixelY()) );
         collection_->insertEvent(event);
       }
     }

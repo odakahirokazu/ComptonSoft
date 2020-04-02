@@ -39,6 +39,8 @@ ANLStatus ConstructFrame::mod_define()
   define_parameter("num_pixels_x", &mod_class::num_pixels_x_);
   define_parameter("num_pixels_y", &mod_class::num_pixels_y_);
   define_parameter("detector_list", &mod_class::ids_);
+
+  hide_parameter("detector_configuration");
   
   return AS_OK;
 }

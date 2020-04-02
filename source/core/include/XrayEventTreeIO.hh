@@ -76,6 +76,10 @@ private:
   int32_t rank_ = 0;
   double angle_ = 0.0;
   int32_t grade_ = 0;
+  double energy_ = 0.0;
+  double posx_ = 0.0;
+  double posy_ = 0.0;
+  double posz_ = 0.0;
 };
 
 } /* namespace comptonsoft */

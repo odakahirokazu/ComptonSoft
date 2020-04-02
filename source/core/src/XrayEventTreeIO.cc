@@ -58,6 +58,10 @@ void XrayEventTreeIO::defineBranches()
   tree_->Branch("rank",       &rank_,       "rank/I");
   tree_->Branch("angle",      &angle_,      "angle/D");
   tree_->Branch("grade",      &grade_,      "grade/I");
+  tree_->Branch("energy",     &energy_,     "energy/D");
+  tree_->Branch("posx",       &posx_,       "posx/D");
+  tree_->Branch("posy",       &posy_,       "posy/D");
+  tree_->Branch("posz",       &posz_,       "posz/D");
 }
 
 void XrayEventTreeIO::setBranchAddresses()
@@ -74,6 +78,10 @@ void XrayEventTreeIO::setBranchAddresses()
   tree_->SetBranchAddress("rank",       &rank_);
   tree_->SetBranchAddress("angle",      &angle_);
   tree_->SetBranchAddress("grade",      &grade_);
+  tree_->SetBranchAddress("energy",     &energy_);
+  tree_->SetBranchAddress("posx",       &posx_);
+  tree_->SetBranchAddress("posy",       &posy_);
+  tree_->SetBranchAddress("posz",       &posz_);
 }
 
 int XrayEventTreeIO::fillEvents(const XrayEventContainer& events)
@@ -89,14 +97,18 @@ int XrayEventTreeIO::fillEvents(const XrayEventCIter events_begin, const XrayEve
     frameID_    = event->FrameID();
     time_       = event->Time();
     detectorID_ = event->DetectorID();
-    ix_         = event->X();
-    iy_         = event->Y();
+    ix_         = event->PixelX();
+    iy_         = event->PixelY();
     sumPH_      = event->SumPH();
     centerPH_   = event->CenterPH();
     weight_     = event->Weight();
     rank_       = event->Rank();
     angle_      = event->Angle();
     grade_      = event->Grade();
+    energy_     = event->Energy()/unit::keV;
+    posx_       = event->PositionX()/unit::cm;
+    posy_       = event->PositionY()/unit::cm;
+    posz_       = event->PositionZ()/unit::cm;
 
     for (int ix=0; ix<MaxEventSize_; ix++) {
       for (int iy=0; iy<MaxEventSize_; iy++) {
@@ -126,14 +138,19 @@ XrayEvent_sptr XrayEventTreeIO::retrieveEvent() const
   event->setFrameID(frameID_);
   event->setTime(time_);
   event->setDetectorID(detectorID_);
-  event->setX(ix_);
-  event->setY(iy_);
+  event->setPixelX(ix_);
+  event->setPixelY(iy_);
   event->setSumPH(sumPH_);
   event->setCenterPH(centerPH_ );
   event->setWeight(weight_);
   event->setRank(rank_);
   event->setAngle(angle_);
   event->setGrade(grade_);
+  event->setEnergy(energy_*unit::keV);
+  event->setPositionX(posx_*unit::cm);
+  event->setPositionY(posy_*unit::cm);
+  event->setPositionZ(posz_*unit::cm);
+
   for (int ix=0; ix<eventSize; ix++) {
     for (int iy=0; iy<eventSize; iy++){
       event->setData(ix, iy, data_[ix][iy]);
