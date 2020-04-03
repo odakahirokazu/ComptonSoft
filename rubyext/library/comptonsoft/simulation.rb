@@ -28,6 +28,7 @@ module ComptonSoft
   # @author Hirokazu Odaka
   # @author Yuto Ichinohe
   # @date 2016-08-25 (latest) | H. Odaka
+  # @date 2020-04-03 | H. Odaka | support multiple channel properties database
   #
   class Simulation < ANL::ANLApp
     def initialize()
@@ -40,7 +41,7 @@ module ComptonSoft
       @detector_configuration = nil # "detector_configuration.xml"
       @detector_parameters = nil    # "detector_parameters.xml"
       @channel_map = nil            # "channel_map.xml"
-      @channel_properties = nil     # "channel_properties.xml"
+      @channel_properties_list = [] # "channel_properties.xml"
 
       ### Output settings
       @output = "output.root"
@@ -83,7 +84,13 @@ module ComptonSoft
       @detector_configuration = detector_configuration
       @detector_parameters = detector_parameters
       @channel_map = channel_map
-      @channel_properties = channel_properties
+      if channel_properties
+        @channel_properties_list << channel_properties
+      end
+    end
+
+    def add_channel_properties(filename)
+      @channel_properties_list << filename
     end
 
     # Enable detector info print
@@ -174,9 +181,9 @@ module ComptonSoft
         with_parameters(filename: @channel_map)
       end
 
-      if @channel_properties
-        chain :SetChannelProperties
-        with_parameters(filename: @channel_properties)
+      @channel_properties_list.each_with_index do |channel_properties, i|
+        chain :SetChannelProperties, "SetChannelProperties_#{i}"
+        with_parameters(filename: channel_properties)
       end
 
       chain_with_parameters module_of_geometry

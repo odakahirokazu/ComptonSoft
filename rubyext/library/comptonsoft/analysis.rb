@@ -12,9 +12,8 @@ module ComptonSoft
       @pedestal_level = 0.0
       @event_threshold = 100.0
       @split_threshold = 10.0
-      @hotpix_threshold = 400.0
       @pedestal_file = "pedestals.fits"
-      @hotpix_file = "hotpix.xml"
+      @channel_properties_list = [] # "channel_properties.xml"
       @num_pixels_x = 1
       @num_pixels_y = 1
     end
@@ -22,13 +21,16 @@ module ComptonSoft
     attr_accessor :inputs, :output
     attr_accessor :pedestal_level, :event_threshold
     attr_accessor :split_threshold
-    attr_accessor :hotpix_threshold
-    attr_accessor :pedestal_file, :hotpix_file
+    attr_accessor :pedestal_file
     attr_accessor :num_pixels_x, :num_pixels_y
 
     def define_pixels(nx, ny)
       @num_pixels_x = nx
       @num_pixels_y = ny
+    end
+
+    def add_channel_properties(filename)
+      @channel_properties_list << filename
     end
   end
 
@@ -111,6 +113,13 @@ module ComptonSoft
     include FrameAnalyzerBase
     include DirectoryInput
 
+    def initialize()
+      super
+      @hotpix_threshold = 400.0
+      @hotpix_file = "hotpix.xml"
+    end
+    attr_accessor :hotpix_threshold, :hotpix_file
+
     def setup()
       add_namespace ComptonSoft
 
@@ -170,6 +179,11 @@ module ComptonSoft
       with_parameters(num_pixels_x: @num_pixels_x,
                       num_pixels_y: @num_pixels_y)
 
+      @channel_properties_list.each_with_index do |channel_properties, i|
+        chain :SetChannelProperties, "SetChannelProperties_#{i}"
+        with_parameters(filename: channel_properties)
+      end
+
       if @inputs.empty?
         chain_directory_input(self)
       end
@@ -185,8 +199,6 @@ module ComptonSoft
                       gain_correction: false)
       chain :SetPedestals
       with_parameters(filename: @pedestal_file)
-      chain :SetChannelProperties
-      with_parameters(filename: @hotpix_file)
       chain :WriteXrayEventTree
 
       @analysis_list.each do |a|
