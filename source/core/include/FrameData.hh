@@ -109,7 +109,7 @@ public:
   void setBadFrame(bool v) { badFrame_ = v; }
   bool BadFrame() { return badFrame_; }
 
-  double rawFrameMedian() const;
+  double RawFrameMedian() const;
 
   void setTrimSize(int v) { trimSize_ = v; }
   int TrimSize() { return trimSize_; }

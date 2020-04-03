@@ -23,7 +23,7 @@
 
 using namespace anlnext;
 
-namespace comptonsoft{
+namespace comptonsoft {
 
 SetPedestalsByMedian::SetPedestalsByMedian()
   : frameBin_(100)
@@ -79,9 +79,9 @@ ANLStatus SetPedestalsByMedian::mod_analyze()
     frameData_->setBadFrame(false);
     for (int ix=0; ix<nx_; ix++){
       for (int iy=0; iy<ny_; iy++){
-        auto comp = [](const std::pair<int, double>& a, const std::pair<int, double>& b){
-          return a.second < b.second;
-        };
+        auto comp = [](const std::pair<int, double>& a, const std::pair<int, double>& b) {
+                      return a.second < b.second;
+                    };
         std::sort(frameStack_[ix][iy].begin(), frameStack_[ix][iy].end(), comp);          
       }
     }

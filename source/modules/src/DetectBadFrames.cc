@@ -21,7 +21,7 @@
 
 using namespace anlnext;
 
-namespace comptonsoft{
+namespace comptonsoft {
 
 DetectBadFrames::DetectBadFrames()
   : thresholdSigma_(3.0)
@@ -59,8 +59,8 @@ ANLStatus DetectBadFrames::mod_initialize()
 
 ANLStatus DetectBadFrames::mod_analyze()
 {
-  const double v = frame_->rawFrameMedian();
-  rawFrameMedian_.push_back(v);
+  const double v = frame_->RawFrameMedian();
+  rawFrameMedians_.push_back(v);
 
   return AS_OK;
 }
@@ -70,8 +70,9 @@ ANLStatus DetectBadFrames::mod_end_run()
   calculateStatistics();
   const double upperTh = average_ + thresholdSigma_*sigma_;
   const double lowerTh = average_ - thresholdSigma_*sigma_;
-  for (size_t i=0; i<rawFrameMedian_.size(); i++) {
-    if (rawFrameMedian_[i]>upperTh || rawFrameMedian_[i]<lowerTh) {
+  for (size_t i=0; i<rawFrameMedians_.size(); i++) {
+    const double value = rawFrameMedians_[i];
+    if (value<lowerTh || upperTh<value) {
       badFrames_.push_back(i);
     }
   }
@@ -80,12 +81,13 @@ ANLStatus DetectBadFrames::mod_end_run()
 
 void DetectBadFrames::calculateStatistics()
 {
-  const size_t size = rawFrameMedian_.size();
+  const size_t size = rawFrameMedians_.size();
   double sum = 0.0;
   double sum2 = 0.0;
   for (size_t i=0; i<size; i++) {
-    sum += rawFrameMedian_[i];
-    sum2 += rawFrameMedian_[i]*rawFrameMedian_[i];
+    const double v = rawFrameMedians_[i];
+    sum += v;
+    sum2 += v*v;
   }
   average_ = sum/size;
   const double deviation = sum2/size-average_*average_;

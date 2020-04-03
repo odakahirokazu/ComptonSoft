@@ -265,14 +265,16 @@ bool FrameData::includeDisabledPixel(int ix, int iy, int size) const
   return false;
 }
 
-double FrameData::rawFrameMedian() const
+double FrameData::RawFrameMedian() const
 {
   const int nx = NumPixelsX();
   const int ny = NumPixelsY();
   std::vector<double> v;
   for (int ix=0; ix<nx; ix++) {
     for (int iy=0; iy<ny; iy++) {
-      v.push_back(rawFrame_[ix][iy]);
+      if (isNotDisabledPixel(ix, iy)) {
+        v.push_back(rawFrame_[ix][iy]);
+      }
     }
   }
   std::sort(v.begin(), v.end());

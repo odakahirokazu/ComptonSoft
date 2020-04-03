@@ -52,7 +52,7 @@ public:
 private:
   int detectorID_ = 0;
   double thresholdSigma_;
-  std::vector<double> rawFrameMedian_;
+  std::vector<double> rawFrameMedians_;
   std::vector<int> badFrames_;
   double average_ = 0.0;
   double sigma_ = 0.0;
