@@ -1007,7 +1007,7 @@ void DetectorSystem::setupDetectorParameters(const DetectorSystem::ParametersNod
     const int mode = *o;
     ds->setChargeCollectionMode(mode);
 
-    if (auto mapName = parameters.charge_collection_cce_map) {
+    if (auto mapName = parameters.charge_collection_cce_map_name) {
       ds->setCCEMapName(*mapName);
       if (ds->checkType(DetectorType::PixelDetector)) {
         SimDetectorUnit2DPixel* ds1
@@ -1310,8 +1310,8 @@ load(const boost::property_tree::ptree& node)
   if (auto o=node.get_optional<int>("charge_collection.<xmlattr>.mode")) {
     charge_collection_mode = o;
   }
-  if (auto o=node.get_optional<std::string>("charge_collection.<xmlattr>.cce_map")) {
-    charge_collection_cce_map = o;
+  if (auto o=node.get_optional<std::string>("charge_collection.<xmlattr>.cce_map_name")) {
+    charge_collection_cce_map_name = o;
   }
   if (auto o=node.get_optional<double>("charge_collection.mutau.<xmlattr>.electron")) {
     charge_collection_mutau_electron = o;

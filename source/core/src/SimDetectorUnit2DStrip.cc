@@ -21,14 +21,16 @@
 
 #include <iostream>
 #include <memory>
+#include <cmath>
 #include <boost/format.hpp>
-#include "TMath.h"
 #include "TRandom3.h"
 
 #include "AstroUnits.hh"
 #include "FlagDefinition.hh"
 #include "DetectorHit.hh"
 #include "CalcWPStrip.hh"
+
+namespace unit = anlgeant4::unit;
 
 namespace comptonsoft {
 
@@ -55,11 +57,11 @@ void SimDetectorUnit2DStrip::simulatePulseHeights()
   const int N = NumberOfRawHits();
   for (int i=0; i<N; i++) {
     DetectorHit_sptr rawhit = getRawHit(i);
-    double edep = rawhit->EnergyDeposit();
-    double localposx = rawhit->LocalPositionX();
-    double localposy = rawhit->LocalPositionY();
-    double localposz = rawhit->LocalPositionZ();
-    PixelID sp = findPixel(localposx, localposy);
+    const double edep = rawhit->EnergyDeposit();
+    const double localposx = rawhit->LocalPositionX();
+    const double localposy = rawhit->LocalPositionY();
+    const double localposz = rawhit->LocalPositionZ();
+    const PixelID sp = findPixel(localposx, localposy);
     
     if (edep == 0.0) {
       DetectorHit_sptr xhit(new DetectorHit(*rawhit));
@@ -90,25 +92,25 @@ void SimDetectorUnit2DStrip::simulatePulseHeights()
     }
 
     if (DiffusionMode()==0) {
-      PixelID xsp(sp.X(), PixelID::Undefined);
-      PixelID ysp(PixelID::Undefined, sp.Y());
+      const PixelID xsp(sp.X(), PixelID::Undefined);
+      const PixelID ysp(PixelID::Undefined, sp.Y());
       DetectorHit_sptr xhit = generateHit(*rawhit, xsp);
       DetectorHit_sptr yhit = generateHit(*rawhit, ysp);
       insertSimulatedHit(xhit);
       insertSimulatedHit(yhit);
     }
     else {
-      PixelID xsp(sp.X(), PixelID::Undefined);
-      PixelID ysp(PixelID::Undefined, sp.Y());
+      const PixelID xsp(sp.X(), PixelID::Undefined);
+      const PixelID ysp(PixelID::Undefined, sp.Y());
       DetectorHit_sptr xhit = generateHit(*rawhit, xsp);
       DetectorHit_sptr yhit = generateHit(*rawhit, ysp);
-      double xECharge = xhit->EnergyCharge();
-      double yECharge = yhit->EnergyCharge();
+      const double xECharge = xhit->EnergyCharge();
+      const double yECharge = yhit->EnergyCharge();
 
-      int numDivision = DiffusionDivisionNumber();
-      double edepDivision = edep/numDivision;
-      double xEChargeDivision = xECharge/numDivision;
-      double yEChargeDivision = yECharge/numDivision;
+      const int numDivision = DiffusionDivisionNumber();
+      const double edepDivision = edep/numDivision;
+      const double xEChargeDivision = xECharge/numDivision;
+      const double yEChargeDivision = yECharge/numDivision;
       
       double xDiffusionSigma = 0.0;
       double yDiffusionSigma = 0.0;
@@ -282,45 +284,47 @@ DetectorHit_sptr SimDetectorUnit2DStrip::generateHit(const DetectorHit& rawhit,
 
 double SimDetectorUnit2DStrip::
 ChargeCollectionEfficiency(const PixelID& sp,
-                           double x, double y, double z) const
+                           const double x, const double y, const double z) const
 {
   double xPixel, yPixel, zPixel;
   LocalPosition(sp, &xPixel, &yPixel, &zPixel);
   
   double cce = 1.0;
   if (sp.isXStrip()) {
-    double xInPixel = x - xPixel;
-    int ix = CCEMapXStrip_->GetXaxis()->FindBin(xInPixel);
-    int iz = CCEMapXStrip_->GetYaxis()->FindBin(z);
+    const double xInPixel = x - xPixel;
+    const int ix = CCEMapXStrip_->GetXaxis()->FindBin(xInPixel/unit::cm);
+    const int iz = CCEMapXStrip_->GetYaxis()->FindBin(z/unit::cm);
     cce =  CCEMapXStrip_->GetBinContent(ix, iz);
   }
   else if (sp.isYStrip()) {
-    double yInPixel = y - yPixel;
-    int iy = CCEMapYStrip_->GetXaxis()->FindBin(yInPixel);
-    int iz = CCEMapYStrip_->GetYaxis()->FindBin(z);
+    const double yInPixel = y - yPixel;
+    const int iy = CCEMapYStrip_->GetXaxis()->FindBin(yInPixel/unit::cm);
+    const int iz = CCEMapYStrip_->GetYaxis()->FindBin(z/unit::cm);
     cce =  CCEMapYStrip_->GetBinContent(iy, iz);
   }
 
   return cce;
 }
 
-double SimDetectorUnit2DStrip::WeightingPotential(const PixelID& sp, double x, double y, double z)
+double SimDetectorUnit2DStrip::
+WeightingPotential(const PixelID& sp,
+                   const double x, const double y, const double z)
 {
   double xPixel, yPixel, zPixel;
   Position(sp, &xPixel, &yPixel, &zPixel);
   
-  double xInPixel = x - xPixel;
-  double yInPixel = y - yPixel;
+  const double xInPixel = x - xPixel;
+  const double yInPixel = y - yPixel;
 
   double wp = 0.0;
   if (sp.isXStrip()) {
-    int ix = WPMapXStrip_->GetXaxis()->FindBin(xInPixel);
-    int iz = WPMapXStrip_->GetYaxis()->FindBin(z);
+    const int ix = WPMapXStrip_->GetXaxis()->FindBin(xInPixel/unit::cm);
+    const int iz = WPMapXStrip_->GetYaxis()->FindBin(z/unit::cm);
     wp =  WPMapXStrip_->GetBinContent(ix, iz);
   }
   else if (sp.isYStrip()) {
-    int iy = WPMapYStrip_->GetXaxis()->FindBin(yInPixel);
-    int iz = WPMapYStrip_->GetYaxis()->FindBin(z);
+    const int iy = WPMapYStrip_->GetXaxis()->FindBin(yInPixel/unit::cm);
+    const int iz = WPMapYStrip_->GetYaxis()->FindBin(z/unit::cm);
     wp =  WPMapYStrip_->GetBinContent(iy, iz);
   }
 
@@ -368,32 +372,31 @@ void SimDetectorUnit2DStrip::buildWPMap(int nx, int ny, int nz, double pixel_fac
     }
   }
   
-  std::string histname = (boost::format("wp_x_%04d")%getID()).str();
-  WPMapXStrip_ =  new TH2D(histname.c_str(), histname.c_str(),
-                            nx, -0.5*MapSizeX, +0.5*MapSizeX,
-                            nz, -0.5*MapSizeZ, +0.5*MapSizeZ);
-  histname = (boost::format("wp_y_%04d")%getID()).str();
-  WPMapYStrip_ =  new TH2D(histname.c_str(), histname.c_str(),
-                            ny, -0.5*MapSizeY, +0.5*MapSizeY,
-                            nz, -0.5*MapSizeZ, +0.5*MapSizeZ);
+  const std::string histnameX = (boost::format("wp_x_%04d")%getID()).str();
+  WPMapXStrip_ =  new TH2D(histnameX.c_str(), histnameX.c_str(),
+                           nx, -0.5*MapSizeX/unit::cm, +0.5*MapSizeX/unit::cm,
+                           nz, -0.5*MapSizeZ/unit::cm, +0.5*MapSizeZ/unit::cm);
+  const std::string histnameY = (boost::format("wp_y_%04d")%getID()).str();
+  WPMapYStrip_ =  new TH2D(histnameY.c_str(), histnameY.c_str(),
+                           ny, -0.5*MapSizeY/unit::cm, +0.5*MapSizeY/unit::cm,
+                           nz, -0.5*MapSizeZ/unit::cm, +0.5*MapSizeZ/unit::cm);
 
   std::cout << "calculating weighing potential..." << std::endl;
 
-  double x, y, z;
   std::unique_ptr<CalcWPStrip> calc(new CalcWPStrip);
   calc->setGeometry(getPixelPitchX(), getThickness(),
                     NumPixelsInWPCalculation());
   calc->initializeTable();
   for (int ix=1; ix<=nx; ix++) {
     std::cout << '*' << std::flush;
-    x = WPMapXStrip_->GetXaxis()->GetBinCenter(ix);
+    const double x = WPMapXStrip_->GetXaxis()->GetBinCenter(ix) * unit::cm;
     calc->setX(x);
     for (int iz=1; iz<=nz; iz++) {
-      z = WPMapXStrip_->GetYaxis()->GetBinCenter(iz);
+      const double z = WPMapXStrip_->GetYaxis()->GetBinCenter(iz) * unit::cm;
       if (isUpSideXStrip()) {
         double wp = 0.;
         if (iz==nz) {
-          if (TMath::Abs(x)<0.5*getPixelPitchX()) {
+          if (std::abs(x)<0.5*getPixelPitchX()) {
             wp = 1.;
           }
           else {
@@ -411,7 +414,7 @@ void SimDetectorUnit2DStrip::buildWPMap(int nx, int ny, int nz, double pixel_fac
       else {
         double wp = 0.;
         if (iz==1) {
-          if (TMath::Abs(x)<0.5*getPixelPitchX()) {
+          if (std::abs(x)<0.5*getPixelPitchX()) {
             wp = 1.;
           }
           else {
@@ -434,14 +437,14 @@ void SimDetectorUnit2DStrip::buildWPMap(int nx, int ny, int nz, double pixel_fac
   calc->initializeTable();
   for (int iy=1; iy<=ny; iy++) {
     std::cout << '*' << std::flush;
-    y = WPMapYStrip_->GetXaxis()->GetBinCenter(iy);
+    const double y = WPMapYStrip_->GetXaxis()->GetBinCenter(iy) * unit::cm;
     calc->setX(y);
     for (int iz=1; iz<=nz; iz++) {
-      z = WPMapYStrip_->GetYaxis()->GetBinCenter(iz);
+      const double z = WPMapYStrip_->GetYaxis()->GetBinCenter(iz) * unit::cm;
       if (isUpSideYStrip()) {
         double wp = 0.;
         if (iz==nz) {
-          if (TMath::Abs(y)<0.5*getPixelPitchY()) {
+          if (std::abs(y)<0.5*getPixelPitchY()) {
             wp = 1.;
           }
           else {
@@ -459,7 +462,7 @@ void SimDetectorUnit2DStrip::buildWPMap(int nx, int ny, int nz, double pixel_fac
       else {
         double wp = 0.;
         if (iz==1) {
-          if (TMath::Abs(y)<0.5*getPixelPitchY()) {
+          if (std::abs(y)<0.5*getPixelPitchY()) {
             wp = 1.;
           }
           else {
@@ -518,33 +521,33 @@ void SimDetectorUnit2DStrip::buildCCEMap(int nx, int ny, int nz, double pixel_fa
   
   std::string histname = (boost::format("cce_x_%04d")%getID()).str();
   CCEMapXStrip_ =  new TH2D(histname.c_str(), histname.c_str(),
-                             nx, -0.5*MapSizeX, +0.5*MapSizeX,
-                             nz, -0.5*MapSizeZ, +0.5*MapSizeZ);
+                            nx, -0.5*MapSizeX/unit::cm, +0.5*MapSizeX/unit::cm,
+                            nz, -0.5*MapSizeZ/unit::cm, +0.5*MapSizeZ/unit::cm);
   histname = (boost::format("cce_y_%04d")%getID()).str();
   CCEMapYStrip_ =  new TH2D(histname.c_str(), histname.c_str(),
-                             nx, -0.5*MapSizeY, +0.5*MapSizeY,
-                             nz, -0.5*MapSizeZ, +0.5*MapSizeZ);
+                            nx, -0.5*MapSizeY/unit::cm, +0.5*MapSizeY/unit::cm,
+                            nz, -0.5*MapSizeZ/unit::cm, +0.5*MapSizeZ/unit::cm);
   
   std::cout << "calculating charge collection efficiency..." << std::endl;
   
   for (int ix=1; ix<=nx; ix++) {
     std::cout << '*' << std::flush;
     if (!isUsingSymmetry() || ix<=(nx+1)/2) {
-      double x = CCEMapXStrip_->GetXaxis()->GetBinCenter(ix);
-      int binx = WPMapXStrip_->GetXaxis()->FindBin(x);
+      const double x_in_cm = CCEMapXStrip_->GetXaxis()->GetBinCenter(ix);
+      const int binx = WPMapXStrip_->GetXaxis()->FindBin(x_in_cm);
       
-      int numPoints = nz+1;
+      const int numPoints = nz+1;
       boost::shared_array<double> wp(new double[numPoints]);
       for (int k=0; k<numPoints; k++) {
-        double z = CCEMapXStrip_->GetYaxis()->GetBinLowEdge(k+1);
-        int binz = WPMapXStrip_->GetYaxis()->FindBin(z);
+        const double z_in_cm = CCEMapXStrip_->GetYaxis()->GetBinLowEdge(k+1);
+        const int binz = WPMapXStrip_->GetYaxis()->FindBin(z_in_cm);
         wp[k] = WPMapXStrip_->GetBinContent(binx, binz);
       }
       setWeightingPotential(isUpSideXStrip(), wp, numPoints);
       
       for (int iz=1; iz<=nz; iz++) {
-        double z = CCEMapXStrip_->GetYaxis()->GetBinCenter(iz);
-        double cce = calculateCCE(z);
+        const double z = CCEMapXStrip_->GetYaxis()->GetBinCenter(iz) * unit::cm;
+        const double cce = calculateCCE(z);
         // std::cout << cce << std::endl;
         CCEMapXStrip_->SetBinContent(ix, iz, cce);
       }
@@ -555,7 +558,7 @@ void SimDetectorUnit2DStrip::buildCCEMap(int nx, int ny, int nz, double pixel_fa
     for (int ix=1; ix<=nx; ix++) {
       for (int iz=1; iz<=nz; iz++) {
         if (ix>(nx+1)/2) {
-          double cce = CCEMapXStrip_->GetBinContent(nx-ix+1, iz);
+          const double cce = CCEMapXStrip_->GetBinContent(nx-ix+1, iz);
           CCEMapXStrip_->SetBinContent(ix, iz, cce);
         }
       }
@@ -565,21 +568,21 @@ void SimDetectorUnit2DStrip::buildCCEMap(int nx, int ny, int nz, double pixel_fa
   for (int iy=1; iy<=ny; iy++) {
     std::cout << '*' << std::flush;
     if (!isUsingSymmetry() || iy<=(ny+1)/2) {
-      double y = CCEMapYStrip_->GetXaxis()->GetBinCenter(iy);
-      int biny = WPMapYStrip_->GetXaxis()->FindBin(y);
+      const double y_in_cm = CCEMapYStrip_->GetXaxis()->GetBinCenter(iy);
+      const int biny = WPMapYStrip_->GetXaxis()->FindBin(y_in_cm);
       
-      int numPoints = nz+1;
+      const int numPoints = nz+1;
       boost::shared_array<double> wp(new double[numPoints]);
       for (int k=0; k<numPoints; k++) {
-        double z = CCEMapYStrip_->GetYaxis()->GetBinLowEdge(k+1);
-        int binz = WPMapYStrip_->GetYaxis()->FindBin(z);
+        const double z_in_cm = CCEMapYStrip_->GetYaxis()->GetBinLowEdge(k+1);
+        const int binz = WPMapYStrip_->GetYaxis()->FindBin(z_in_cm);
         wp[k] = WPMapYStrip_->GetBinContent(biny, binz);
       }
       setWeightingPotential(isUpSideYStrip(), wp, numPoints);
       
       for (int iz=1; iz<=nz; iz++) {
-        double z = CCEMapYStrip_->GetYaxis()->GetBinCenter(iz);
-        double cce = calculateCCE(z);
+        const double z = CCEMapYStrip_->GetYaxis()->GetBinCenter(iz) * unit::cm;
+        const double cce = calculateCCE(z);
         CCEMapYStrip_->SetBinContent(iy, iz, cce);
       }
     }
@@ -589,7 +592,7 @@ void SimDetectorUnit2DStrip::buildCCEMap(int nx, int ny, int nz, double pixel_fa
     for (int iy=1; iy<=ny; iy++) {
       for (int iz=1; iz<=nz; iz++) {
         if (iy>(ny+1)/2) {
-          double cce = CCEMapYStrip_->GetBinContent(ny-iy+1, iz);
+          const double cce = CCEMapYStrip_->GetBinContent(ny-iy+1, iz);
           CCEMapYStrip_->SetBinContent(iy, iz, cce);
         }
       }

@@ -94,10 +94,16 @@ public:
     boost::optional<double> efield_param1 = boost::none;
     boost::optional<double> efield_param2 = boost::none;
     boost::optional<double> efield_param3 = boost::none;
+    boost::optional<std::string> efield_wp_map_name = boost::none;
+    boost::optional<std::string> efield_efield_map_name = boost::none;
     boost::optional<int> charge_collection_mode = boost::none;
-    boost::optional<std::string> charge_collection_cce_map = boost::none;
+    boost::optional<std::string> charge_collection_cce_map_name = boost::none;
     boost::optional<double> charge_collection_mutau_electron = boost::none;
     boost::optional<double> charge_collection_mutau_hole = boost::none;
+    boost::optional<double> charge_collection_mobility_electron = boost::none;
+    boost::optional<double> charge_collection_mobility_hole = boost::none;
+    boost::optional<double> charge_collection_lifetime_electron = boost::none;
+    boost::optional<double> charge_collection_lifetime_hole = boost::none;
     boost::optional<int> diffusion_mode = boost::none;
     boost::optional<double> diffusion_spread_factor_cathode = boost::none;
     boost::optional<double> diffusion_spread_factor_anode = boost::none;

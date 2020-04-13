@@ -100,8 +100,14 @@
         <col />
         <col />
         <col />
+        <col />
+        <col />
       </colgroup>
       <colgroup class="col_charge_collection">
+        <col />
+        <col />
+        <col />
+        <col />
         <col />
         <col />
         <col />
@@ -205,8 +211,8 @@
         <th colspan="2">Depth sensing</th>
         <th>Quenching</th>
         <th>Temperature</th>
-        <th colspan="6">E-field</th>
-        <th colspan="4">Charge collection</th>
+        <th colspan="8">E-field</th>
+        <th colspan="8">Charge collection</th>
         <th colspan="3">Diffusion</th>
         <th colspan="2">Timing resolution</th>
         <th>Pedestal gen.</th>
@@ -257,10 +263,16 @@
         <th>P1</th>
         <th>P2</th>
         <th>P3</th>
+        <th>WP map</th>
+        <th>EField map</th>
         <th>mode</th>
         <th>CCE map</th>
         <th>MuTau e [cm2/V]</th>
         <th>MuTau h [cm2/V]</th>
+        <th>Mobility e [cm2/V/s]</th>
+        <th>Mobility h [cm2/V/s]</th>
+        <th>Lifetime e [s]</th>
+        <th>Lifetime h [s]</th>
         <th>mode</th>
         <th>anode</th>
         <th>cathode</th>
@@ -449,14 +461,26 @@
       </td>
       <td>
         <xsl:call-template name="display_parameter">
+          <xsl:with-param name="common" select="$common_parameters/efield/@wp_map_name" />
+          <xsl:with-param name="special" select="$parameters/efield/@wp_map_name" />
+        </xsl:call-template>
+      </td>
+      <td>
+        <xsl:call-template name="display_parameter">
+          <xsl:with-param name="common" select="$common_parameters/efield/@efield_map_name" />
+          <xsl:with-param name="special" select="$parameters/efield/@efield_map_name" />
+        </xsl:call-template>
+      </td>
+      <td>
+        <xsl:call-template name="display_parameter">
           <xsl:with-param name="common" select="$common_parameters/charge_collection/@mode" />
           <xsl:with-param name="special" select="$parameters/charge_collection/@mode" />
         </xsl:call-template>
       </td>
       <td>
         <xsl:call-template name="display_parameter">
-          <xsl:with-param name="common" select="$common_parameters/charge_collection/@cce_map" />
-          <xsl:with-param name="special" select="$parameters/charge_collection/@cce_map" />
+          <xsl:with-param name="common" select="$common_parameters/charge_collection/@cce_map_name" />
+          <xsl:with-param name="special" select="$parameters/charge_collection/@cce_map_name" />
         </xsl:call-template>
       </td>
       <td>
@@ -469,6 +493,30 @@
         <xsl:call-template name="display_parameter">
           <xsl:with-param name="common" select="$common_parameters/charge_collection/mutau/@hole" />
           <xsl:with-param name="special" select="$parameters/charge_collection/mutau/@hole" />
+        </xsl:call-template>
+      </td>
+      <td>
+        <xsl:call-template name="display_parameter">
+          <xsl:with-param name="common" select="$common_parameters/charge_collection/mobility/@electron" />
+          <xsl:with-param name="special" select="$parameters/charge_collection/mobility/@electron" />
+        </xsl:call-template>
+      </td>
+      <td>
+        <xsl:call-template name="display_parameter">
+          <xsl:with-param name="common" select="$common_parameters/charge_collection/mobility/@hole" />
+          <xsl:with-param name="special" select="$parameters/charge_collection/mobility/@hole" />
+        </xsl:call-template>
+      </td>
+      <td>
+        <xsl:call-template name="display_parameter">
+          <xsl:with-param name="common" select="$common_parameters/charge_collection/lifetime/@electron" />
+          <xsl:with-param name="special" select="$parameters/charge_collection/lifetime/@electron" />
+        </xsl:call-template>
+      </td>
+      <td>
+        <xsl:call-template name="display_parameter">
+          <xsl:with-param name="common" select="$common_parameters/charge_collection/lifetime/@hole" />
+          <xsl:with-param name="special" select="$parameters/charge_collection/lifetime/@hole" />
         </xsl:call-template>
       </td>
       <xsl:variable name="final_diffusion_mode">

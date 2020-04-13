@@ -44,9 +44,8 @@ void CalcWPStrip::initializeTable()
     alpha_[m-1] = (TMath::Pi()*m)/a;
   }
 
-  double fm;
   for (int m=1; m<=NumGrids; m++) {
-    fm = TMath::Cos(TMath::Pi()*m*(a-U)/(2.0*a)) - TMath::Cos(TMath::Pi()*m*(a+U)/(2.0*a));
+    const double fm = TMath::Cos(TMath::Pi()*m*(a-U)/(2.0*a)) - TMath::Cos(TMath::Pi()*m*(a+U)/(2.0*a));
     a0_[m-1] = 2.0/(TMath::Pi()*m*TMath::SinH(alpha_[m-1]*L))*fm;
   }
 }
@@ -60,8 +59,7 @@ void CalcWPStrip::printTable()
 
 void CalcWPStrip::setX(double x0)
 {
-  double x = 0.5*SizeX() + x0;
-
+  const double x = 0.5*SizeX() + x0;
   for (int m=1; m<=NumGrids; m++) {
     sinAX_[m-1] = TMath::Sin(alpha_[m-1]*x);
   }
@@ -75,12 +73,11 @@ double CalcWPStrip::WeightingPotential(double x0, double z0)
 
 double CalcWPStrip::WeightingPotential(double z0)
 {
-  double z = 0.5*Thickness() + z0;
-  double sinhg;
+  const double z = 0.5*Thickness() + z0;
   double phi = 0.0;
   for (int m=NumGrids; m>=1; m--) {
     if (a0_[m-1]==0.0) continue;
-    sinhg = TMath::SinH(alpha_[m-1]*z);
+    const double sinhg = TMath::SinH(alpha_[m-1]*z);
     phi += sinhg * a0_[m-1] * sinAX_[m-1];
   }
   

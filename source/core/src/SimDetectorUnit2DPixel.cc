@@ -22,16 +22,20 @@
 #include <iostream>
 #include <algorithm>
 #include <memory>
+#include <cmath>
+#include <boost/format.hpp>
 
 #include "CLHEP/Random/RandGauss.h"
 #include "CLHEP/Random/RandFlat.h"
-#include "TMath.h"
 #include "TRandom3.h"
 #include "TH3.h"
 
+#include "AstroUnits.hh"
 #include "FlagDefinition.hh"
 #include "DetectorHit.hh"
 #include "CalcWPPixel.hh"
+
+namespace unit = anlgeant4::unit;
 
 namespace comptonsoft {
 
@@ -55,10 +59,10 @@ void SimDetectorUnit2DPixel::simulatePulseHeights()
   const int N = NumberOfRawHits();
   for (int i=0; i<N; i++) {
     DetectorHit_sptr rawhit = getRawHit(i);
-    double edep = rawhit->EnergyDeposit();
-    double localposx = rawhit->LocalPositionX();
-    double localposy = rawhit->LocalPositionY();
-    double localposz = rawhit->LocalPositionZ();
+    const double edep = rawhit->EnergyDeposit();
+    const double localposx = rawhit->LocalPositionX();
+    const double localposy = rawhit->LocalPositionY();
+    const double localposz = rawhit->LocalPositionZ();
 
     if (edep == 0.0) {
       rawhit->addFlags(flag::PrioritySide);
@@ -74,7 +78,7 @@ void SimDetectorUnit2DPixel::simulatePulseHeights()
       continue;
     }
 
-    PixelID pixel = findPixel(localposx, localposy);
+    const PixelID pixel = findPixel(localposx, localposy);
     
     if (DiffusionMode() == 0) {
       DetectorHit_sptr hit = generateHit(*rawhit, pixel);
@@ -219,12 +223,12 @@ ChargeCollectionEfficiency(const PixelID& pixel,
   double xPixel, yPixel, zPixel;
   LocalPosition(pixel, &xPixel, &yPixel, &zPixel);
   
-  double xInPixel = x - xPixel;
-  double yInPixel = y - yPixel;
+  const double xInPixel = x - xPixel;
+  const double yInPixel = y - yPixel;
   
-  int ix = CCEMap_->GetXaxis()->FindBin(xInPixel);
-  int iy = CCEMap_->GetYaxis()->FindBin(yInPixel);
-  int iz = CCEMap_->GetZaxis()->FindBin(z);
+  const int ix = CCEMap_->GetXaxis()->FindBin(xInPixel/unit::cm);
+  const int iy = CCEMap_->GetYaxis()->FindBin(yInPixel/unit::cm);
+  const int iz = CCEMap_->GetZaxis()->FindBin(z/unit::cm);
 
   return CCEMap_->GetBinContent(ix, iy, iz);
 }
@@ -235,12 +239,12 @@ double SimDetectorUnit2DPixel::WeightingPotential(const PixelID& pixel,
   double xPixel, yPixel, zPixel;
   Position(pixel, &xPixel, &yPixel, &zPixel);
   
-  double xInPixel = x - xPixel;
-  double yInPixel = y - yPixel;
+  const double xInPixel = x - xPixel;
+  const double yInPixel = y - yPixel;
   
-  int ix = WPMap_->GetXaxis()->FindBin(xInPixel);
-  int iy = WPMap_->GetYaxis()->FindBin(yInPixel);
-  int iz = WPMap_->GetZaxis()->FindBin(z);
+  const int ix = WPMap_->GetXaxis()->FindBin(xInPixel/unit::cm);
+  const int iy = WPMap_->GetYaxis()->FindBin(yInPixel/unit::cm);
+  const int iz = WPMap_->GetZaxis()->FindBin(z/unit::cm);
 
   return WPMap_->GetBinContent(ix, iy, iz);
 }
@@ -288,14 +292,12 @@ void SimDetectorUnit2DPixel::buildWPMap(int nx, int ny, int nz,
     }
   }
   
-  char histname[256];
-  sprintf(histname, "wp_%04d", getID());
-  WPMap_ =  new TH3D(histname, histname,
-                     nx, -0.5*MapSizeX, +0.5*MapSizeX,
-                     ny, -0.5*MapSizeY, +0.5*MapSizeY,
-                     nz, -0.5*MapSizeZ, +0.5*MapSizeZ);
+  const std::string histname = (boost::format("wp_%04d")%getID()).str();
+  WPMap_ =  new TH3D(histname.c_str(), histname.c_str(),
+                     nx, -0.5*MapSizeX/unit::cm, +0.5*MapSizeX/unit::cm,
+                     ny, -0.5*MapSizeY/unit::cm, +0.5*MapSizeY/unit::cm,
+                     nz, -0.5*MapSizeZ/unit::cm, +0.5*MapSizeZ/unit::cm);
  
-  double x, y, z;
   std::unique_ptr<CalcWPPixel> calc(new CalcWPPixel);
   calc->setGeometry(getPixelPitchX(), getPixelPitchY(), getThickness(),
                     NumPixelsInWPCalculation());
@@ -303,16 +305,16 @@ void SimDetectorUnit2DPixel::buildWPMap(int nx, int ny, int nz,
   std::cout << "calculating weighing potential..." << std::endl;
   for (int ix=1; ix<=nx; ix++) {
     std::cout << '*' << std::flush;
-    x = WPMap_->GetXaxis()->GetBinCenter(ix);
+    const double x = WPMap_->GetXaxis()->GetBinCenter(ix) * unit::cm;
     for (int iy=1; iy<=ny; iy++) {
-      y = WPMap_->GetYaxis()->GetBinCenter(iy);
+      const double y = WPMap_->GetYaxis()->GetBinCenter(iy) * unit::cm;
       calc->setXY(x, y);
       for (int iz=1; iz<=nz; iz++) {
-        z = WPMap_->GetZaxis()->GetBinCenter(iz);
+        const double z = WPMap_->GetZaxis()->GetBinCenter(iz) * unit::cm;
         if (isUpSideReadout()) {
           double wp = 0.;
           if (iz==nz) {
-            if (TMath::Abs(x)<0.5*getPixelPitchX() && TMath::Abs(y)<0.5*getPixelPitchY()) {
+            if (std::abs(x)<0.5*getPixelPitchX() && std::abs(y)<0.5*getPixelPitchY()) {
               wp = 1.;
             }
             else {
@@ -330,7 +332,7 @@ void SimDetectorUnit2DPixel::buildWPMap(int nx, int ny, int nz,
         else {
           double wp = 0.;
           if (iz==1) {
-            if (TMath::Abs(x)<0.5*getPixelPitchX() && TMath::Abs(y)<0.5*getPixelPitchY()) {
+            if (std::abs(x)<0.5*getPixelPitchX() && std::abs(y)<0.5*getPixelPitchY()) {
               wp = 1.;
             }
             else {
@@ -388,12 +390,11 @@ void SimDetectorUnit2DPixel::buildCCEMap(int nx, int ny, int nz,
     }
   }
   
-  char histname[256];
-  sprintf(histname, "cce_%04d", getID());
-  CCEMap_ =  new TH3D(histname, histname,
-                      nx, -0.5*MapSizeX, +0.5*MapSizeX,
-                      ny, -0.5*MapSizeY, +0.5*MapSizeY,
-                      nz, -0.5*MapSizeZ, +0.5*MapSizeZ);
+  const std::string histname = (boost::format("cce_%04d")%getID()).str();
+  CCEMap_ =  new TH3D(histname.c_str(), histname.c_str(),
+                      nx, -0.5*MapSizeX/unit::cm, +0.5*MapSizeX/unit::cm,
+                      ny, -0.5*MapSizeY/unit::cm, +0.5*MapSizeY/unit::cm,
+                      nz, -0.5*MapSizeZ/unit::cm, +0.5*MapSizeZ/unit::cm);
   
   std::cout << "calculating charge collection efficiency..." << std::endl;
   
@@ -401,23 +402,23 @@ void SimDetectorUnit2DPixel::buildCCEMap(int nx, int ny, int nz,
     std::cout << '*' << std::flush;
     for (int iy=1; iy<=ny; iy++) {
       if (!isUsingSymmetry() || (ix<=(nx+1)/2 && iy<=(ny+1)/2)) {
-        double x = CCEMap_->GetXaxis()->GetBinCenter(ix);
-        double y = CCEMap_->GetYaxis()->GetBinCenter(iy);
-        int binx = WPMap_->GetXaxis()->FindBin(x);
-        int biny = WPMap_->GetYaxis()->FindBin(y);
+        const double x_in_cm = CCEMap_->GetXaxis()->GetBinCenter(ix);
+        const double y_in_cm = CCEMap_->GetYaxis()->GetBinCenter(iy);
+        const int binx = WPMap_->GetXaxis()->FindBin(x_in_cm);
+        const int biny = WPMap_->GetYaxis()->FindBin(y_in_cm);
 
-        int numPoints = nz+1;
+        const int numPoints = nz+1;
         boost::shared_array<double> wp(new double[numPoints]);
         for (int k=0; k<numPoints; k++) {
-          double z = CCEMap_->GetZaxis()->GetBinLowEdge(k+1);
-          int binz = WPMap_->GetZaxis()->FindBin(z);
+          const double z_in_cm = CCEMap_->GetZaxis()->GetBinLowEdge(k+1);
+          const int binz = WPMap_->GetZaxis()->FindBin(z_in_cm);
           wp[k] = WPMap_->GetBinContent(binx, biny, binz);
         }
         setWeightingPotential(isUpSideReadout(), wp, numPoints);
 
         for (int iz=1; iz<=nz; iz++) {
-          double z = CCEMap_->GetZaxis()->GetBinCenter(iz);
-          double cce = calculateCCE(z);
+          const double z = CCEMap_->GetZaxis()->GetBinCenter(iz) * unit::cm;
+          const double cce = calculateCCE(z);
           CCEMap_->SetBinContent(ix, iy, iz, cce);
         }
       }
@@ -429,15 +430,15 @@ void SimDetectorUnit2DPixel::buildCCEMap(int nx, int ny, int nz,
       for (int iy=1; iy<=ny; iy++) {
         for (int iz=1; iz<=nz; iz++) {
           if (ix>(nx+1)/2 && iy<=(ny+1)/2) {
-            double cce = CCEMap_->GetBinContent(nx-ix+1, iy, iz);
+            const double cce = CCEMap_->GetBinContent(nx-ix+1, iy, iz);
             CCEMap_->SetBinContent(ix, iy, iz, cce);
           }
           else if (ix<=(nx+1)/2 && iy>(ny+1)/2) {
-            double cce = CCEMap_->GetBinContent(ix, ny-iy+1, iz);
+            const double cce = CCEMap_->GetBinContent(ix, ny-iy+1, iz);
             CCEMap_->SetBinContent(ix, iy, iz, cce);
           }
           else if (ix>(ny+1)/2 && iy>(ny+1)/2) {
-            double cce = CCEMap_->GetBinContent(nx-ix+1, ny-iy+1, iz);
+            const double cce = CCEMap_->GetBinContent(nx-ix+1, ny-iy+1, iz);
             CCEMap_->SetBinContent(ix, iy, iz, cce);
           }
         }

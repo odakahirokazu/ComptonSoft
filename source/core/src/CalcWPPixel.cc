@@ -50,11 +50,10 @@ void CalcWPPixel::initializeTable()
     beta_[n-1] = (TMath::Pi()*n)/b;
   }
   
-  double fm ,fn;
   for (int m=1; m<=NumGrids; m++) {
-    fm = TMath::Cos(TMath::Pi()*m*(a-U)/(2.0*a)) - TMath::Cos(TMath::Pi()*m*(a+U)/(2.0*a));
+    const double fm = TMath::Cos(TMath::Pi()*m*(a-U)/(2.0*a)) - TMath::Cos(TMath::Pi()*m*(a+U)/(2.0*a));
     for (int n=1; n<=NumGrids; n++) {
-      fn = TMath::Cos(TMath::Pi()*n*(b-V)/(2.0*b)) - TMath::Cos(TMath::Pi()*n*(b+V)/(2.0*b));
+      const double fn = TMath::Cos(TMath::Pi()*n*(b-V)/(2.0*b)) - TMath::Cos(TMath::Pi()*n*(b+V)/(2.0*b));
       gamma_[m-1][n-1] = TMath::Sqrt(alpha_[m-1]*alpha_[m-1]+beta_[n-1]*beta_[n-1]);
       a0_[m-1][n-1] = 4.0/(TMath::Pi()*TMath::Pi()*m*n*TMath::SinH(gamma_[m-1][n-1]*L))*fm*fn;
     }
@@ -72,8 +71,8 @@ void CalcWPPixel::printTable()
 
 void CalcWPPixel::setXY(double x0, double y0)
 {
-  double x = 0.5*SizeX() + x0;
-  double y = 0.5*SizeY() + y0;
+  const double x = 0.5*SizeX() + x0;
+  const double y = 0.5*SizeY() + y0;
 
   for (int m=1; m<=NumGrids; m++) {
     sinAX_[m-1] = TMath::Sin(alpha_[m-1]*x);
@@ -92,13 +91,12 @@ double CalcWPPixel::WeightingPotential(double x0, double y0, double z0)
 
 double CalcWPPixel::WeightingPotential(double z0)
 {
-  double z = 0.5*Thickness() + z0;
-  double sinhg;
+  const double z = 0.5*Thickness() + z0;
   double phi = 0.0;
   for (int m=NumGrids; m>=1; m--) {
     for (int n=NumGrids; n>=1; n--) {
       if (a0_[m-1][n-1]==0.0) continue;
-      sinhg = TMath::SinH(gamma_[m-1][n-1]*z);
+      const double sinhg = TMath::SinH(gamma_[m-1][n-1]*z);
       phi += sinhg * a0_[m-1][n-1] * sinAX_[m-1] * sinBY_[n-1];
     }
   }
