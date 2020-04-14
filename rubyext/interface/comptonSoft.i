@@ -109,6 +109,9 @@
 #ifdef USE_FITSIO
 #include "AEObservationPrimaryGen.hh"
 #endif
+#ifdef USE_FITSIO
+#include "CelestialSourcePrimaryGen.hh"
+#endif
 #include "RadioactiveDecayUserActionAssembly.hh"
 #include "ActivationUserActionAssembly.hh"
 #ifdef USE_SIMX
@@ -906,6 +909,16 @@ class AEObservationPrimaryGen : public anlgeant4::BasicPrimaryGen
 {
 public:
   AEObservationPrimaryGen();
+};
+
+#endif
+
+#ifdef USE_FITSIO
+class CelestialSourcePrimaryGen : public anlgeant4::IsotropicPrimaryGen
+{
+public:
+  CelestialSourcePrimaryGen();
+  ~CelestialSourcePrimaryGen();
 };
 
 #endif

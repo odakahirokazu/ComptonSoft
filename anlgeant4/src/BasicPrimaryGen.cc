@@ -39,9 +39,8 @@ BasicPrimaryGen::BasicPrimaryGen()
     position_(0.0, 0.0, 0.0),
     energy_(0.0), direction_(0.0, 0.0, -1.0),
     polarization_(0.0, 0.0, 0.0),
-    number_(0), totalEnergy_(0.0),
+    number_(0), totalEnergy_(0.0), realTime_(0.0),
     definition_(0),
-    polarizationMode_(-1),
     energyDistributionName_("power law"),
     energyDistribution_(SpectralShape::Undefined),
     energyMin_(0.1*unit::keV), energyMax_(1000.0*unit::keV),
@@ -81,10 +80,9 @@ ANLStatus BasicPrimaryGen::mod_define()
   register_parameter(&spectrumPhotons_, "photons_array");
   set_parameter_description("Photons array of spectral histogram");
 
-  disableDefaultEnergyInput();
+  define_result("real_time", &mod_class::realTime_, unit::s, "s");
 
-  register_parameter(&polarizationMode_, "polarization_mode");
-  set_parameter_description("Polarization mode. -1: polarization disable, 0: unpolarized, 1: linearly polarized (100%), 2: partially linearly polarized");
+  disableDefaultEnergyInput();
 
   return AS_OK;
 }
@@ -135,11 +133,6 @@ ANLStatus BasicPrimaryGen::mod_pre_initialize()
 
 ANLStatus BasicPrimaryGen::mod_initialize()
 {
-  define_evs("Polarization enable");
-  if (PolarizationMode()>=0) {
-    set_evs("Polarization enable");
-  }
-
   if (energyMin_ == 0.0) {
     energyMin_ = 1.0e-9 * unit::keV;
     std::cout << "Energy min is reset to 1.0e-9 keV." << std::endl;

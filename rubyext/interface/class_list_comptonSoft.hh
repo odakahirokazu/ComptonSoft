@@ -92,6 +92,7 @@ class AHRayTracingPrimaryGen;
 class SimXPrimaryGen;
 class AHRadiationBackgroundPrimaryGen;
 class AEObservationPrimaryGen;
+class CelestialSourcePrimaryGen;
 class RadioactiveDecayUserActionAssembly;
 class ActivationUserActionAssembly;
 class AHStandardUserActionAssembly;

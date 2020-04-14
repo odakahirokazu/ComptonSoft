@@ -51,6 +51,9 @@ protected:
   double Radius() const { return m_Radius; }
   double Distance() const { return m_Distance; }
   double CoveringFactor() const { return m_CoveringFactor; }
+  G4ThreeVector CenterDirection() const { return m_CenterDirection; }
+  G4ThreeVector CenterPosition() const { return m_CenterPosition; }
+  void setCoveringFactor (double v) { m_CoveringFactor = v; }
   
 private:
   G4ThreeVector m_CenterPosition;

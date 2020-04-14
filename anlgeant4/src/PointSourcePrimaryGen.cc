@@ -97,10 +97,7 @@ void PointSourcePrimaryGen::makePrimarySetting()
   const double energy = sampleEnergy();
 
   setPrimary(position, energy, direction);
-
-  if (PolarizationMode()==0) {
-    setUnpolarized();
-  }
+  setUnpolarized();
 }
 
 G4ThreeVector PointSourcePrimaryGen::sampleDirection()
@@ -126,6 +123,7 @@ ANLStatus PointSourcePrimaryGen::mod_end_run()
     realTime = (TotalEnergy()/m_CoveringFactor)/m_Luminosity;
     pflux = (Number()/m_CoveringFactor)/realTime;
   }
+  setRealTime(realTime);
 
   std::cout.setf(std::ios::scientific);
   std::cout << "PSPrimaryGen::mod_end_run \n"

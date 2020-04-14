@@ -139,6 +139,8 @@ ANLStatus IsotropicPrimaryGen::mod_end_run()
     realTime = TotalEnergy()/(m_Flux*area*solid);
     pflux = Number()/area/realTime/solid;
   }
+
+  setRealTime(realTime);
   
   std::cout.setf(std::ios::scientific);
   std::cout << "IsotropicPrimaryGen::mod_end_run \n"

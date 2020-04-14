@@ -17,62 +17,70 @@
  *                                                                       *
  *************************************************************************/
 
-#ifndef ANLGEANT4_PlaneWavePrimaryGen_H
-#define ANLGEANT4_PlaneWavePrimaryGen_H 1
+#ifndef COMPTONSOFT_CelestialSourcePrimaryGen_H
+#define COMPTONSOFT_CelestialSourcePrimaryGen_H 1
 
+#include <boost/multi_array.hpp>
 #include "BasicPrimaryGen.hh"
+#include "IsotropicPrimaryGen.hh"
 #include "G4ThreeVector.hh"
 
-namespace anlgeant4 {
+namespace comptonsoft {
 
 
 /**
- * ANLGeant4 PrimaryGen module.
- * The primary particles are generated like a plane wave.
+ * ComptonSoft PrimaryGen module.
+ * Imaging polarimetry realized.
  *
- * @author Hirokazu Odaka
- * @date 2010-02-17
- * @date 2010-04-08 | Hirokazu Odaka | ANLLite
- * @date 2011-04-08 | Hirokazu Odaka | particle name
- * @date 2011-04-11 | Hirokazu Odaka | derived from AHPrimaryGen (BasicPrimaryGen)
- * @date 2012-07-10 | Hirokazu Odaka | add degree of polarization
- * @date 2013-08-18 | Hirokazu Odaka | v1.4: be moved to anlgeant4
- * @date 2017-06-27 | Hirokazu Odaka | 4.1, makePrimarySetting()
+ * @author Tsubasa Tamba
+ * @date 2020-04-01
+ *
  */
-class PlaneWavePrimaryGen : public anlgeant4::BasicPrimaryGen
-{
-  DEFINE_ANL_MODULE(PlaneWavePrimaryGen, 4.1);
-public:
-  PlaneWavePrimaryGen();
-  ~PlaneWavePrimaryGen();
 
+using image_t = boost::multi_array<double, 2>;
+
+class CelestialSourcePrimaryGen : public anlgeant4::IsotropicPrimaryGen
+{
+  DEFINE_ANL_MODULE(CelestialSourcePrimaryGen, 1.0);
+public:
+  CelestialSourcePrimaryGen();
+  ~CelestialSourcePrimaryGen();
+  
   anlnext::ANLStatus mod_define() override;
   anlnext::ANLStatus mod_initialize() override;
   anlnext::ANLStatus mod_end_run() override;
-  
+
   void makePrimarySetting() override;
 
 protected:
-  G4ThreeVector CenterPosition() const { return m_CenterPosition; }
-  G4ThreeVector Direction() const { return m_Direction0; }
-  G4ThreeVector DirectionOrthogonal() const { return m_DirectionOrthogonal; }
-
-  G4ThreeVector samplePosition() override;
-  virtual double GenerationArea();
+  void inputImage(std::string filename, image_t& image, anlnext::ANLStatus* status);
+  void makePolarizationMap(anlnext::ANLStatus* status);
+  void setCoordinate(anlnext::ANLStatus* status);
+  void buildPixelIntegral();
+  std::pair<int, int> samplePixel();
   
 private:
-  G4ThreeVector m_CenterPosition;
-  
-  G4ThreeVector m_Direction0;
-  G4ThreeVector m_DirectionOrthogonal;
-  double m_Radius;
-
-  G4ThreeVector m_Polarization0;
-  double m_PolarizationDegree;
-  
-  double m_Flux;
+  std::string fitsFilenameI_;
+  std::string fitsFilenameQ_;
+  std::string fitsFilenameU_;
+  image_t imageI_;
+  image_t imageQ_;
+  image_t imageU_;
+  int pixelX_ = 1;
+  int pixelY_ = 1;
+  image_t polarizationDegree_;
+  image_t polarizationAngle_;
+  image_t imageRA_;
+  image_t imageDec_;
+  std::vector<double> pixelIntegral_;
+  double inputImageRotationAngle_ = 0.0;
+  double detectorRollAngle_ = 0.0;
+  bool setPolarization_ = false;
+  double degPixelX_ = 0.0;
+  double degPixelY_ = 0.0;
+  double sourceFlux_ = 0.0;
 };
 
-} /* namespace anlgeant4 */
+} /* namespace comptonsoft */
 
-#endif /* ANLGEANT4_PlaneWavePrimaryGen_H */
+#endif /* COMPTONSOFT_CelestialSourcePrimaryGen_H */

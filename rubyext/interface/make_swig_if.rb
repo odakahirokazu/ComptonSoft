@@ -103,6 +103,7 @@ clSim = [
   ANL::SWIGClass.new("SimXPrimaryGen", false, 'USE_SIMX'),
   ANL::SWIGClass.new("AHRadiationBackgroundPrimaryGen"),
   ANL::SWIGClass.new("AEObservationPrimaryGen", false, 'USE_FITSIO'),
+  ANL::SWIGClass.new("CelestialSourcePrimaryGen", false, 'USE_FITSIO'),
   # user action assembly
   ANL::SWIGClass.new("RadioactiveDecayUserActionAssembly"),
   ANL::SWIGClass.new("ActivationUserActionAssembly"),

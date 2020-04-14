@@ -56,20 +56,11 @@ ANLStatus PlaneWavePrimaryGen::mod_define()
   register_parameter(&m_Flux, "flux", unit::erg/unit::s/unit::cm2, "erg/s/cm2");
   set_parameter_description("Energy flux of the plane wave. This parameter is used only for calculating real time correspoing to a simulation.");
   register_parameter(&m_Polarization0, "polarization_vector");
-  set_parameter_description("Polarization vector (if polarization is enable).");
+  set_parameter_description("Polarization vector");
   register_parameter(&m_PolarizationDegree, "degree_of_polarization");
-  set_parameter_description("Degree of polarization (if polarization is enable).");
+  set_parameter_description("Degree of polarization");
  
   return AS_OK;
-}
-
-ANLStatus PlaneWavePrimaryGen::mod_communicate()
-{
-  if (PolarizationMode() < 1) {
-    hide_parameter("polarization_vector");
-  }
-  
-  return BasicPrimaryGen::mod_communicate();
 }
 
 ANLStatus PlaneWavePrimaryGen::mod_initialize()
@@ -101,24 +92,12 @@ void PlaneWavePrimaryGen::makePrimarySetting()
   const G4ThreeVector position = samplePosition();
   const double energy = sampleEnergy();
   
-  if (PolarizationMode()==0) {
-    setPrimary(position, energy, m_Direction0);
-    setUnpolarized();
-  }
-  else if (PolarizationMode()==1) {
+  if (G4UniformRand() < m_PolarizationDegree) {
     setPrimary(position, energy, m_Direction0, m_Polarization0);
-  }
-  else if (PolarizationMode()==2) {
-    if (G4UniformRand() < m_PolarizationDegree) {
-      setPrimary(position, energy, m_Direction0, m_Polarization0);
-    }
-    else {
-      setPrimary(position, energy, m_Direction0);
-      setUnpolarized();
-    }
   }
   else {
     setPrimary(position, energy, m_Direction0);
+    setUnpolarized();
   }
 }
 
@@ -139,6 +118,8 @@ ANLStatus PlaneWavePrimaryGen::mod_end_run()
   const double area = GenerationArea();
   const double realTime = TotalEnergy()/(m_Flux*area);
   const double pflux = Number()/area/realTime;
+
+  setRealTime(realTime);
   
   std::cout.setf(std::ios::scientific);
   std::cout << "PWPrimaryGen::mod_end_run \n"

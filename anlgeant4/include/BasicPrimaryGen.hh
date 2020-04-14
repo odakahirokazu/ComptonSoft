@@ -42,10 +42,11 @@ class VANLGeometry;
  * @date 2014-12-15 | Hirokazu Odaka | histogram spectral distribution
  * @date 2017-07-27 | Hirokazu Odaka | this can transfer its setting function to the generator action, introducing makePrimarySetting().
  * @date 2017-07-03 | 4.2 | Hirokazu Odaka | length unit is fixed to cm
+ * @date 2020-04-13 | 5.0 | Hirokazu Odaka | remove polarization mode
  */
 class BasicPrimaryGen : public VANLPrimaryGen, public InitialInformation
 {
-  DEFINE_ANL_MODULE(BasicPrimaryGen, 4.1);
+  DEFINE_ANL_MODULE(BasicPrimaryGen, 5.0);
 public:
   enum class SpectralShape {
     Undefined, Mono, PowerLaw, Gaussian, BlackBody, Histogram, User,
@@ -64,9 +65,6 @@ public:
   G4int Number() const { return number_; }
   double TotalEnergy() const { return totalEnergy_; }
 
-  void setPolarizationMode(int v) { polarizationMode_ = v; }
-  int PolarizationMode() const { return polarizationMode_; }
-  
   virtual void makePrimarySetting() = 0;
   virtual void confirmPrimarySetting();
   void storeInitialCondition();
@@ -173,6 +171,8 @@ protected:
   std::vector <double>& SpectrumPhotons() { return spectrumPhotons_; }
   const std::vector<double>& SpectrumPhotons() const { return spectrumPhotons_; }
 
+  void setRealTime(double v) { realTime_ = v; }
+
 private:
   BasicPrimaryGeneratorAction* primaryGenerator_ = nullptr;
   const anlgeant4::VANLGeometry* geometry_ = nullptr;
@@ -187,10 +187,9 @@ private:
 
   G4int number_;
   double totalEnergy_;
+  double realTime_;
 
   G4ParticleDefinition* definition_;
-
-  G4int polarizationMode_;
 
   /* properties for the energy distribution */
   std::string energyDistributionName_;
