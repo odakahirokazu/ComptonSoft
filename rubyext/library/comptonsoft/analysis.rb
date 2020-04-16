@@ -150,8 +150,11 @@ module ComptonSoft
 
     def initialize()
       super
+      @event_size = 5
+      @trim_size = 0
       @analysis_list = []
     end
+    attr_accessor :event_size, :trim_size
 
     begin
       require "HSQuickLook"
@@ -194,8 +197,8 @@ module ComptonSoft
       with_parameters(pedestal_level: @pedestal_level,
                       event_threshold: @event_threshold,
                       split_threshold: @split_threshold,
-                      event_size: 5,
-                      trim_size: 0,
+                      event_size: @event_size,
+                      trim_size: @trim_size,
                       gain_correction: false)
       chain :SetPedestals
       with_parameters(filename: @pedestal_file)
