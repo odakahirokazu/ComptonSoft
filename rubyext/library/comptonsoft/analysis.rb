@@ -12,7 +12,7 @@ module ComptonSoft
       @pedestal_level = 0.0
       @event_threshold = 100.0
       @split_threshold = 10.0
-      @pedestal_file = "pedestals.fits"
+      @pedestal_file = nil
       @channel_properties_list = [] # "channel_properties.xml"
       @num_pixels_x = 1
       @num_pixels_y = 1
@@ -200,8 +200,12 @@ module ComptonSoft
                       event_size: @event_size,
                       trim_size: @trim_size,
                       gain_correction: false)
-      chain :SetPedestals
-      with_parameters(filename: @pedestal_file)
+
+      if @pedestal_file
+        chain :SetPedestals
+        with_parameters(filename: @pedestal_file)
+      end
+
       chain :WriteXrayEventTree
 
       @analysis_list.each do |a|
