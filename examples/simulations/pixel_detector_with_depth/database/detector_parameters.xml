@@ -1,5 +1,5 @@
 <?xml version="1.0" ?>
-<?xml-stylesheet type="text/xsl" href="https://raw.githubusercontent.com/odakahirokazu/ComptonSoft/master/xmlstyle/detector_parameters_v2.xsl" ?>
+<?xml-stylesheet type="text/xsl" href="https://raw.githubusercontent.com/odakahirokazu/ComptonSoft/master/xmlstyle/detector_parameters_v3.xsl" ?>
 
 <detector_parameters>
   <name>CdTe pixel detector</name>
