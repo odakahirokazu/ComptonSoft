@@ -28,7 +28,7 @@
 #include "AstroUnits.hh"
 #include "FlagDefinition.hh"
 #include "DetectorHit.hh"
-#include "CalcWPStrip.hh"
+#include "WeightingPotentialStrip.hh"
 
 namespace unit = anlgeant4::unit;
 
@@ -383,14 +383,14 @@ void SimDetectorUnit2DStrip::buildWPMap(int nx, int ny, int nz, double pixel_fac
 
   std::cout << "calculating weighing potential..." << std::endl;
 
-  std::unique_ptr<CalcWPStrip> calc(new CalcWPStrip);
-  calc->setGeometry(getPixelPitchX(), getThickness(),
-                    NumPixelsInWPCalculation());
-  calc->initializeTable();
+  auto wpModel = std::make_unique<WeightingPotentialStrip>();
+  wpModel->setGeometry(getPixelPitchX(), getThickness(),
+                       NumPixelsInWPCalculation());
+  wpModel->initializeTable();
   for (int ix=1; ix<=nx; ix++) {
     std::cout << '*' << std::flush;
     const double x = WPMapXStrip_->GetXaxis()->GetBinCenter(ix) * unit::cm;
-    calc->setX(x);
+    wpModel->setX(x);
     for (int iz=1; iz<=nz; iz++) {
       const double z = WPMapXStrip_->GetYaxis()->GetBinCenter(iz) * unit::cm;
       if (isUpSideXStrip()) {
@@ -407,7 +407,7 @@ void SimDetectorUnit2DStrip::buildWPMap(int nx, int ny, int nz, double pixel_fac
           wp = 0.;
         }
         else {
-          wp = calc->WeightingPotential(z);
+          wp = wpModel->calculateWeightingPotential(z);
         }
         WPMapXStrip_->SetBinContent(ix, iz, wp);
       }
@@ -425,20 +425,19 @@ void SimDetectorUnit2DStrip::buildWPMap(int nx, int ny, int nz, double pixel_fac
           wp = 0.;
         }
         else {
-          wp = calc->WeightingPotential(-z);
+          wp = wpModel->calculateWeightingPotential(-z);
         }
         WPMapXStrip_->SetBinContent(ix, iz, wp);
       }
     }
   }
 
-  calc->setGeometry(getPixelPitchY(), getThickness(),
-                    NumPixelsInWPCalculation());
-  calc->initializeTable();
+  wpModel->setGeometry(getPixelPitchY(), getThickness(), NumPixelsInWPCalculation());
+  wpModel->initializeTable();
   for (int iy=1; iy<=ny; iy++) {
     std::cout << '*' << std::flush;
     const double y = WPMapYStrip_->GetXaxis()->GetBinCenter(iy) * unit::cm;
-    calc->setX(y);
+    wpModel->setX(y);
     for (int iz=1; iz<=nz; iz++) {
       const double z = WPMapYStrip_->GetYaxis()->GetBinCenter(iz) * unit::cm;
       if (isUpSideYStrip()) {
@@ -455,7 +454,7 @@ void SimDetectorUnit2DStrip::buildWPMap(int nx, int ny, int nz, double pixel_fac
           wp = 0.;
         }
         else {
-          wp = calc->WeightingPotential(z);
+          wp = wpModel->calculateWeightingPotential(z);
         }
         WPMapYStrip_->SetBinContent(iy, iz, wp);
       }
@@ -473,7 +472,7 @@ void SimDetectorUnit2DStrip::buildWPMap(int nx, int ny, int nz, double pixel_fac
           wp = 0.;
         }
         else {
-          wp = calc->WeightingPotential(-z);
+          wp = wpModel->calculateWeightingPotential(-z);
         }
         WPMapYStrip_->SetBinContent(iy, iz, wp);
       }

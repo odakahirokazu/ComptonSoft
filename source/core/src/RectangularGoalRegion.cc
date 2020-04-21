@@ -17,65 +17,31 @@
  *                                                                       *
  *************************************************************************/
 
-#ifndef COMPTONSOFT_CalcWPStrip_H
-#define COMPTONSOFT_CalcWPStrip_H 1
-
-#include <array>
+#include "RectangularGoalRegion.hh"
 
 namespace comptonsoft {
 
-/**
- * A class for calculating weighting potentials in a strip detector.
- * @author Hirokazu Odaka
- */
-class CalcWPStrip
+void RectangularGoalRegion::
+addRegion(double x0, double x1, double y0, double y1, double z0, double z1)
 {
-public:
-  CalcWPStrip();
-  virtual ~CalcWPStrip();
-  CalcWPStrip(const CalcWPStrip&) = default;
-  CalcWPStrip(CalcWPStrip&&) = default;
-  CalcWPStrip& operator=(const CalcWPStrip&) = default;
-  CalcWPStrip& operator=(CalcWPStrip&&) = default;
+  regions_.push_back(std::make_tuple(x0, x1, y0, y1, z0, z1));
+}
 
-  /**
-   * set geometry parameters
-   * @param pitch the strip pitch of the detector
-   * @param thickness the thickness of the detector
-   * @param strip_num the number of strips used for the caluculation
-   */
-  void setGeometry(double pitch,
-                   double thickness,
-                   double strip_num=10.0)
-  {
-    sizeX_ = pitch * strip_num;
-    pitchX_ = pitch; 
-    thickness_ = thickness;
-  }
-
-  double SizeX() { return sizeX_; }
-  double PitchX() { return pitchX_; }
-  double Thickness() { return thickness_; }
+bool RectangularGoalRegion::isReached(const vector3_t& position)
+{
+  const double x = position.x();
+  const double y = position.y();
+  const double z = position.z();
   
-  void initializeTable();
-  void printTable();
-  void setX(double x0);
-  double WeightingPotential(double x0, double z0);
-  double WeightingPotential(double z0);
-
-private:
-  static const int NumGrids = 10000;
-
-  double sizeX_;
-  double pitchX_;
-  double thickness_;
-
-  std::array<double, NumGrids> alpha_;
-  std::array<double, NumGrids> a0_;
-
-  std::array<double, NumGrids> sinAX_;
-};
+  for (const region_t& r: regions_) {
+    const double rx0 = std::get<0>(r); const double rx1 = std::get<1>(r);
+    const double ry0 = std::get<2>(r); const double ry1 = std::get<3>(r);
+    const double rz0 = std::get<4>(r); const double rz1 = std::get<5>(r);
+    if (rx0<=x && x<=rx1 && ry0<=y && y<=ry1 && rz0<=z && z<=rz1) {
+      return true;
+    }
+  }
+  return false;
+}
 
 } /* namespace comptonsoft */
-
-#endif /* COMPTONSOFT_CalcWPStrip_H */

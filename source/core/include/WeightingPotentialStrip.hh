@@ -17,76 +17,65 @@
  *                                                                       *
  *************************************************************************/
 
-#ifndef COMPTONSOFT_CalcWPPixel_H
-#define COMPTONSOFT_CalcWPPixel_H 1
+#ifndef COMPTONSOFT_WeightingPotentialStrip_H
+#define COMPTONSOFT_WeightingPotentialStrip_H 1
 
 #include <array>
 
 namespace comptonsoft {
 
 /**
- * A class for calculating weighting potentials in a pixel detector.
+ * A class for calculating weighting potentials in a strip detector.
  * @author Hirokazu Odaka
  */
-class CalcWPPixel
+class WeightingPotentialStrip
 {
 public:
-  CalcWPPixel();
-  virtual ~CalcWPPixel();
-  CalcWPPixel(const CalcWPPixel&) = default;
-  CalcWPPixel(CalcWPPixel&&) = default;
-  CalcWPPixel& operator=(const CalcWPPixel&) = default;
-  CalcWPPixel& operator=(CalcWPPixel&&) = default;
-  
+  WeightingPotentialStrip();
+  virtual ~WeightingPotentialStrip();
+  WeightingPotentialStrip(const WeightingPotentialStrip&) = default;
+  WeightingPotentialStrip(WeightingPotentialStrip&&) = default;
+  WeightingPotentialStrip& operator=(const WeightingPotentialStrip&) = default;
+  WeightingPotentialStrip& operator=(WeightingPotentialStrip&&) = default;
+
   /**
    * set geometry parameters
-   * @param pitch_x the pixel pitch along the x axis of the detector
-   * @param pitch_y the pixel pitch along the y axis of the detector
+   * @param pitch the strip pitch of the detector
    * @param thickness the thickness of the detector
-   * @param pixel_num the number of pixels used for the caluculation
+   * @param strip_num the number of strips used for the caluculation
    */
-  void setGeometry(double pitch_x,
-                   double pitch_y,
+  void setGeometry(double pitch,
                    double thickness,
-                   double pixel_num=5.0)
+                   double strip_num=10.0)
   {
-    sizeX_ = pitch_x * pixel_num;
-    sizeY_ = pitch_y * pixel_num;
-    pitchX_ = pitch_x; 
-    pitchY_ = pitch_y;
+    sizeX_ = pitch * strip_num;
+    pitchX_ = pitch; 
     thickness_ = thickness;
   }
 
   double SizeX() { return sizeX_; }
-  double SizeY() { return sizeY_; }
   double PitchX() { return pitchX_; }
-  double PitchY() { return pitchY_; }
   double Thickness() { return thickness_; }
   
   void initializeTable();
   void printTable();
-  void setXY(double x0, double y0);
-  double WeightingPotential(double x0, double y0, double z0);
-  double WeightingPotential(double z0);
+  void setX(double x0);
+  double calculateWeightingPotential(double x0, double z0);
+  double calculateWeightingPotential(double z0);
 
 private:
-  static const int NumGrids = 500;
+  static const int NumGrids_ = 500;
 
   double sizeX_;
-  double sizeY_;
   double pitchX_;
-  double pitchY_;
   double thickness_;
 
-  std::array<double, NumGrids> alpha_;
-  std::array<double, NumGrids> beta_;
-  std::array<std::array<double, NumGrids>, NumGrids> gamma_;
-  std::array<std::array<double, NumGrids>, NumGrids> a0_;
-  
-  std::array<double, NumGrids> sinAX_;
-  std::array<double, NumGrids> sinBY_;
+  std::array<double, NumGrids_> alpha_;
+  std::array<double, NumGrids_> a0_;
+
+  std::array<double, NumGrids_> sinAX_;
 };
 
 } /* namespace comptonsoft */
 
-#endif /* COMPTONSOFT_CalcWPPixel_H */
+#endif /* COMPTONSOFT_WeightingPotentialStrip_H */

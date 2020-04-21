@@ -44,13 +44,13 @@ set(CS_CORE_CLASSES
   src/RealDetectorUnitScintillator.cc
   ### device simulation
   src/EFieldModel.cc
-  src/CalcWPPixel.cc
-  src/CalcWPStrip.cc
   src/VDeviceSimulation.cc
   src/DeviceSimulation.cc
   src/SimDetectorUnit2DPixel.cc
   src/SimDetectorUnit2DStrip.cc
   src/SimDetectorUnitScintillator.cc
+  src/WeightingPotentialPixel.cc
+  src/WeightingPotentialStrip.cc
   ### detector unit factory
   src/VDetectorUnitFactory.cc
   src/RealDetectorUnitFactory.cc
@@ -78,9 +78,16 @@ set(CS_CORE_CLASSES
   src/FrameData.cc
   src/XrayEvent.cc
   src/XrayEventTreeIO.cc
-  ### coded-aperture
+  ### coded aperture
   src/VCodedAperture.cc
   src/CodedAperture.cc
+  ### charge transport
+  src/VGoalRegion.cc
+  src/RectangularGoalRegion.cc
+  src/SemiconductorModel.cc
+  src/PointCharge.cc
+  src/CCECalculation.cc
+  src/NumericalField.cc
 )
 
 add_library(CSCore SHARED

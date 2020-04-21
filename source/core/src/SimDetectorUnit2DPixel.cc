@@ -33,7 +33,7 @@
 #include "AstroUnits.hh"
 #include "FlagDefinition.hh"
 #include "DetectorHit.hh"
-#include "CalcWPPixel.hh"
+#include "WeightingPotentialPixel.hh"
 
 namespace unit = anlgeant4::unit;
 
@@ -298,17 +298,17 @@ void SimDetectorUnit2DPixel::buildWPMap(int nx, int ny, int nz,
                      ny, -0.5*MapSizeY/unit::cm, +0.5*MapSizeY/unit::cm,
                      nz, -0.5*MapSizeZ/unit::cm, +0.5*MapSizeZ/unit::cm);
  
-  std::unique_ptr<CalcWPPixel> calc(new CalcWPPixel);
-  calc->setGeometry(getPixelPitchX(), getPixelPitchY(), getThickness(),
-                    NumPixelsInWPCalculation());
-  calc->initializeTable();
+  auto wpModel = std::make_unique<WeightingPotentialPixel>();
+  wpModel->setGeometry(getPixelPitchX(), getPixelPitchY(), getThickness(),
+                       NumPixelsInWPCalculation());
+  wpModel->initializeTable();
   std::cout << "calculating weighing potential..." << std::endl;
   for (int ix=1; ix<=nx; ix++) {
     std::cout << '*' << std::flush;
     const double x = WPMap_->GetXaxis()->GetBinCenter(ix) * unit::cm;
     for (int iy=1; iy<=ny; iy++) {
       const double y = WPMap_->GetYaxis()->GetBinCenter(iy) * unit::cm;
-      calc->setXY(x, y);
+      wpModel->setXY(x, y);
       for (int iz=1; iz<=nz; iz++) {
         const double z = WPMap_->GetZaxis()->GetBinCenter(iz) * unit::cm;
         if (isUpSideReadout()) {
@@ -325,7 +325,7 @@ void SimDetectorUnit2DPixel::buildWPMap(int nx, int ny, int nz,
             wp = 0.;
           }
           else {
-            wp = calc->WeightingPotential(z);
+            wp = wpModel->calculateWeightingPotential(z);
           }
           WPMap_->SetBinContent(ix, iy, iz, wp);
         }
@@ -343,7 +343,7 @@ void SimDetectorUnit2DPixel::buildWPMap(int nx, int ny, int nz,
             wp = 0.;
           }
           else {
-            wp = calc->WeightingPotential(-z);
+            wp = wpModel->calculateWeightingPotential(-z);
           }
           WPMap_->SetBinContent(ix, iy, iz, wp);
         }

@@ -21,63 +21,65 @@
 // reference : Zumbiehl et al. NIM A 469 227-239 (2001)
 // reference : Odaka et al. NIM A submitted (2009)
 
-#include "CalcWPStrip.hh"
+#include "WeightingPotentialStrip.hh"
 #include <iostream>
-#include "TMath.h"
+#include <cmath>
+#include <boost/math/constants/constants.hpp>
 
 namespace comptonsoft {
 
-CalcWPStrip::CalcWPStrip()
+WeightingPotentialStrip::WeightingPotentialStrip()
   : sizeX_(1.0), pitchX_(1.0), thickness_(1.0)
 {
 }
 
-CalcWPStrip::~CalcWPStrip() = default;
+WeightingPotentialStrip::~WeightingPotentialStrip() = default;
 
-void CalcWPStrip::initializeTable()
+void WeightingPotentialStrip::initializeTable()
 {
+  constexpr double pi = boost::math::constants::pi<double>();
   const double a = SizeX();
   const double U = PitchX();
   const double L = Thickness();
   
-  for (int m=1; m<=NumGrids; m++) {
-    alpha_[m-1] = (TMath::Pi()*m)/a;
+  for (int m=1; m<=NumGrids_; m++) {
+    alpha_[m-1] = pi*m/a;
   }
 
-  for (int m=1; m<=NumGrids; m++) {
-    const double fm = TMath::Cos(TMath::Pi()*m*(a-U)/(2.0*a)) - TMath::Cos(TMath::Pi()*m*(a+U)/(2.0*a));
-    a0_[m-1] = 2.0/(TMath::Pi()*m*TMath::SinH(alpha_[m-1]*L))*fm;
+  for (int m=1; m<=NumGrids_; m++) {
+    const double fm = std::cos(pi*m*(a-U)/(2.0*a)) - std::cos(pi*m*(a+U)/(2.0*a));
+    a0_[m-1] = 2.0/(pi*m*std::sinh(alpha_[m-1]*L))*fm;
   }
 }
 
-void CalcWPStrip::printTable()
+void WeightingPotentialStrip::printTable()
 {
-  for (int m=0; m<NumGrids; m++) {
+  for (int m=0; m<NumGrids_; m++) {
     printf("%4d   %+10.4e  %+10.4e\n", m, alpha_[m], a0_[m]);
   }
 }
 
-void CalcWPStrip::setX(double x0)
+void WeightingPotentialStrip::setX(double x0)
 {
   const double x = 0.5*SizeX() + x0;
-  for (int m=1; m<=NumGrids; m++) {
-    sinAX_[m-1] = TMath::Sin(alpha_[m-1]*x);
+  for (int m=1; m<=NumGrids_; m++) {
+    sinAX_[m-1] = std::sin(alpha_[m-1]*x);
   }
 }
 
-double CalcWPStrip::WeightingPotential(double x0, double z0)
+double WeightingPotentialStrip::calculateWeightingPotential(double x0, double z0)
 {
   setX(x0);
-  return WeightingPotential(z0);
+  return calculateWeightingPotential(z0);
 }
 
-double CalcWPStrip::WeightingPotential(double z0)
+double WeightingPotentialStrip::calculateWeightingPotential(double z0)
 {
   const double z = 0.5*Thickness() + z0;
   double phi = 0.0;
-  for (int m=NumGrids; m>=1; m--) {
+  for (int m=NumGrids_; m>=1; m--) {
     if (a0_[m-1]==0.0) continue;
-    const double sinhg = TMath::SinH(alpha_[m-1]*z);
+    const double sinhg = std::sinh(alpha_[m-1]*z);
     phi += sinhg * a0_[m-1] * sinAX_[m-1];
   }
   

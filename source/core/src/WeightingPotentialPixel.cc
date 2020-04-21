@@ -21,82 +21,86 @@
 // reference : Zumbiehl et al. NIM A 469 227-239 (2001)
 // reference : Odaka et al. NIM A submitted (2009)
 
-#include "CalcWPPixel.hh"
+#include "WeightingPotentialPixel.hh"
 #include <iostream>
-#include "TMath.h"
+#include <cmath>
+#include <boost/math/constants/constants.hpp>
 
 namespace comptonsoft {
 
-CalcWPPixel::CalcWPPixel()
-  : sizeX_(1.0), sizeY_(1.0), pitchX_(1.0), pitchY_(1.0), thickness_(0.0)
+WeightingPotentialPixel::WeightingPotentialPixel()
+  : sizeX_(1.0), sizeY_(1.0), pitchX_(1.0), pitchY_(1.0), thickness_(0.0),
+    gamma_(boost::extents[NumGrids_][NumGrids_]),
+    a0_(boost::extents[NumGrids_][NumGrids_])
 {
 }
 
-CalcWPPixel::~CalcWPPixel() = default;
+WeightingPotentialPixel::~WeightingPotentialPixel() = default;
 
-void CalcWPPixel::initializeTable()
+void WeightingPotentialPixel::initializeTable()
 {
+  constexpr double pi = boost::math::constants::pi<double>();
   const double a = SizeX();
   const double U = PitchX();
   const double b = SizeY();
   const double V = PitchY();
   const double L = Thickness();
   
-  for (int m=1; m<=NumGrids; m++) {
-    alpha_[m-1] = (TMath::Pi()*m)/a;
+  for (int m=1; m<=NumGrids_; m++) {
+    alpha_[m-1] = pi*m/a;
   }
 
-  for (int n=1; n<=NumGrids; n++) {
-    beta_[n-1] = (TMath::Pi()*n)/b;
+  for (int n=1; n<=NumGrids_; n++) {
+    beta_[n-1] = pi*n/b;
   }
   
-  for (int m=1; m<=NumGrids; m++) {
-    const double fm = TMath::Cos(TMath::Pi()*m*(a-U)/(2.0*a)) - TMath::Cos(TMath::Pi()*m*(a+U)/(2.0*a));
-    for (int n=1; n<=NumGrids; n++) {
-      const double fn = TMath::Cos(TMath::Pi()*n*(b-V)/(2.0*b)) - TMath::Cos(TMath::Pi()*n*(b+V)/(2.0*b));
-      gamma_[m-1][n-1] = TMath::Sqrt(alpha_[m-1]*alpha_[m-1]+beta_[n-1]*beta_[n-1]);
-      a0_[m-1][n-1] = 4.0/(TMath::Pi()*TMath::Pi()*m*n*TMath::SinH(gamma_[m-1][n-1]*L))*fm*fn;
+  for (int m=1; m<=NumGrids_; m++) {
+    const double fm = std::cos(pi*m*(a-U)/(2.0*a)) - std::cos(pi*m*(a+U)/(2.0*a));
+    for (int n=1; n<=NumGrids_; n++) {
+      const double fn = std::cos(pi*n*(b-V)/(2.0*b)) - std::cos(pi*n*(b+V)/(2.0*b));
+      gamma_[m-1][n-1] = std::sqrt(alpha_[m-1]*alpha_[m-1]+beta_[n-1]*beta_[n-1]);
+      a0_[m-1][n-1] = 4.0/(pi*pi*m*n*std::sinh(gamma_[m-1][n-1]*L))*fm*fn;
     }
   }
 }
 
-void CalcWPPixel::printTable()
+void WeightingPotentialPixel::printTable()
 {
-  for (int m=0; m<NumGrids; m++) {
-    for (int n=0; n<NumGrids; n++) {
+  for (int m=0; m<NumGrids_; m++) {
+    for (int n=0; n<NumGrids_; n++) {
       printf("%4d %4d   %+10.4e  %+10.4e  %+10.4e  %+10.4e\n", m, n, alpha_[m], beta_[n], gamma_[m][n], a0_[m][n]);
     }
   }
 }
 
-void CalcWPPixel::setXY(double x0, double y0)
+void WeightingPotentialPixel::setXY(double x0, double y0)
 {
   const double x = 0.5*SizeX() + x0;
   const double y = 0.5*SizeY() + y0;
 
-  for (int m=1; m<=NumGrids; m++) {
-    sinAX_[m-1] = TMath::Sin(alpha_[m-1]*x);
+  for (int m=1; m<=NumGrids_; m++) {
+    sinAX_[m-1] = std::sin(alpha_[m-1]*x);
   }
 
-  for (int n=1; n<=NumGrids; n++) {
-    sinBY_[n-1] = TMath::Sin(beta_[n-1]*y);
+  for (int n=1; n<=NumGrids_; n++) {
+    sinBY_[n-1] = std::sin(beta_[n-1]*y);
   }
 }
 
-double CalcWPPixel::WeightingPotential(double x0, double y0, double z0)
+double WeightingPotentialPixel::calculateWeightingPotential(double x0, double y0, double z0)
 {
   setXY(x0, y0);
-  return WeightingPotential(z0);
+  return calculateWeightingPotential(z0);
 }
 
-double CalcWPPixel::WeightingPotential(double z0)
+double WeightingPotentialPixel::calculateWeightingPotential(double z0)
 {
   const double z = 0.5*Thickness() + z0;
   double phi = 0.0;
-  for (int m=NumGrids; m>=1; m--) {
-    for (int n=NumGrids; n>=1; n--) {
+  for (int m=NumGrids_; m>=1; m--) {
+    for (int n=NumGrids_; n>=1; n--) {
       if (a0_[m-1][n-1]==0.0) continue;
-      const double sinhg = TMath::SinH(gamma_[m-1][n-1]*z);
+      const double sinhg = std::sinh(gamma_[m-1][n-1]*z);
       phi += sinhg * a0_[m-1][n-1] * sinAX_[m-1] * sinBY_[n-1];
     }
   }

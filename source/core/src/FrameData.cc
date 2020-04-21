@@ -25,9 +25,6 @@
 #include <list>
 #include <algorithm>
 
-#include <TROOT.h>
-#include <TFile.h>
-#include <TTree.h>
 #include "VGainFunction.hh"
 #include "GainFunctionLinear.hh"
 
