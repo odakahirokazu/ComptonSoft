@@ -1,7 +1,7 @@
 Compton Soft
 ================================================================
 
-- Version: 5.4.1
+- Version: 5.5.0
 - Author: Hirokazu Odaka
 
 ----
@@ -20,6 +20,13 @@ This software provides
 This software package can be used for wide-range applications of radiation
 measurements: X-/gamma-ray astrophysics, nuclear medicine, and imaging
 search for radioactive sources.
+
+### Version 5.5 (Important!)
+
+A detector parameter database is updated:
+*cce_map* tag is changed to *cce_map_name*.
+Length units in a charge collection effiency (CCE) map is changed
+from mm to cm (ComptonSoft standard).
 
 ### Migration to version 5.2
 
