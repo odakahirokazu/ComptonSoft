@@ -1313,6 +1313,16 @@ load(const boost::property_tree::ptree& node)
   if (auto o=node.get_optional<std::string>("charge_collection.<xmlattr>.cce_map_name")) {
     charge_collection_cce_map_name = o;
   }
+#define CS_ALERT_CCE_MAP_NODE 1
+#if CS_ALERT_CCE_MAP_NODE
+  if (node.get_optional<std::string>("charge_collection.<xmlattr>.cce_map")) {
+    std::ostringstream message;
+    message << "Error: 'cce_map' tag is now obsolete.\n"
+            << "The new tag is 'cce_map_name'.\n"
+            << "Important: length unit in a map is changed from mm to cm (ComptonSoft standard).";
+    BOOST_THROW_EXCEPTION( CSException(message.str()) );
+  }
+#endif
   if (auto o=node.get_optional<double>("charge_collection.mutau.<xmlattr>.electron")) {
     charge_collection_mutau_electron = o;
   }
