@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<?xml-stylesheet type="text/xsl" href="anlmodules.xsl" ?>
+
+<anl_list>
+  <category>Compton Soft modules</category>
+  <anl_module href="cs_modules_detail.xml" />
+	<title>Compton Soft/ANL Modules</title>
+	<css href="design_top.css" />
+</anl_list>
