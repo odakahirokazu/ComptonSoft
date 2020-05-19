@@ -178,14 +178,11 @@
         <description>Photons array of spectral histogram</description>
       </param>
       <param container_type=''>
-        <name>polarization_mode</name>
-        <type>int</type>
-        <unit></unit>
-        <default_value>-1</default_value>
-        <description>
-          Polarization mode. -1: polarization disable, 0: unpolarized, 1:
-          linearly polarized (100%), 2: partially linearly polarized
-        </description>
+        <name>real_time</name>
+        <type>double</type>
+        <unit>s</unit>
+        <default_value>0</default_value>
+        <description></description>
       </param>
       <param container_type=''>
         <name>position</name>
@@ -306,14 +303,11 @@
         <description>Photons array of spectral histogram</description>
       </param>
       <param container_type=''>
-        <name>polarization_mode</name>
-        <type>int</type>
-        <unit></unit>
-        <default_value>-1</default_value>
-        <description>
-          Polarization mode. -1: polarization disable, 0: unpolarized, 1:
-          linearly polarized (100%), 2: partially linearly polarized
-        </description>
+        <name>real_time</name>
+        <type>double</type>
+        <unit>s</unit>
+        <default_value>0</default_value>
+        <description></description>
       </param>
       <param container_type=''>
         <name>position</name>
@@ -351,14 +345,14 @@
         <type>3-vector</type>
         <unit></unit>
         <default_value>1 0 0</default_value>
-        <description>Polarization vector (if polarization is enable).</description>
+        <description>Polarization vector</description>
       </param>
       <param container_type=''>
         <name>degree_of_polarization</name>
         <type>double</type>
         <unit></unit>
         <default_value>0</default_value>
-        <description>Degree of polarization (if polarization is enable).</description>
+        <description>Degree of polarization</description>
       </param>
     </parameters>
   </module>
@@ -441,14 +435,11 @@
         <description>Photons array of spectral histogram</description>
       </param>
       <param container_type=''>
-        <name>polarization_mode</name>
-        <type>int</type>
-        <unit></unit>
-        <default_value>-1</default_value>
-        <description>
-          Polarization mode. -1: polarization disable, 0: unpolarized, 1:
-          linearly polarized (100%), 2: partially linearly polarized
-        </description>
+        <name>real_time</name>
+        <type>double</type>
+        <unit>s</unit>
+        <default_value>0</default_value>
+        <description></description>
       </param>
       <param container_type=''>
         <name>position</name>
@@ -479,14 +470,14 @@
         <type>3-vector</type>
         <unit></unit>
         <default_value>1 0 0</default_value>
-        <description>Polarization vector (if polarization is enable).</description>
+        <description>Polarization vector</description>
       </param>
       <param container_type=''>
         <name>degree_of_polarization</name>
         <type>double</type>
         <unit></unit>
         <default_value>0</default_value>
-        <description>Degree of polarization (if polarization is enable).</description>
+        <description>Degree of polarization</description>
       </param>
       <param container_type=''>
         <name>size_x</name>
@@ -590,14 +581,11 @@
         <description>Photons array of spectral histogram</description>
       </param>
       <param container_type=''>
-        <name>polarization_mode</name>
-        <type>int</type>
-        <unit></unit>
-        <default_value>-1</default_value>
-        <description>
-          Polarization mode. -1: polarization disable, 0: unpolarized, 1:
-          linearly polarized (100%), 2: partially linearly polarized
-        </description>
+        <name>real_time</name>
+        <type>double</type>
+        <unit>s</unit>
+        <default_value>0</default_value>
+        <description></description>
       </param>
       <param container_type=''>
         <name>position</name>
@@ -628,14 +616,14 @@
         <type>3-vector</type>
         <unit></unit>
         <default_value>1 0 0</default_value>
-        <description>Polarization vector (if polarization is enable).</description>
+        <description>Polarization vector</description>
       </param>
       <param container_type=''>
         <name>degree_of_polarization</name>
         <type>double</type>
         <unit></unit>
         <default_value>0</default_value>
-        <description>Degree of polarization (if polarization is enable).</description>
+        <description>Degree of polarization</description>
       </param>
       <param container_type=''>
         <name>radial_sigma</name>
@@ -725,14 +713,11 @@
         <description>Photons array of spectral histogram</description>
       </param>
       <param container_type=''>
-        <name>polarization_mode</name>
-        <type>int</type>
-        <unit></unit>
-        <default_value>-1</default_value>
-        <description>
-          Polarization mode. -1: polarization disable, 0: unpolarized, 1:
-          linearly polarized (100%), 2: partially linearly polarized
-        </description>
+        <name>real_time</name>
+        <type>double</type>
+        <unit>s</unit>
+        <default_value>0</default_value>
+        <description></description>
       </param>
       <param container_type=''>
         <name>center_position</name>
@@ -871,14 +856,11 @@
         <description>Photons array of spectral histogram</description>
       </param>
       <param container_type=''>
-        <name>polarization_mode</name>
-        <type>int</type>
-        <unit></unit>
-        <default_value>-1</default_value>
-        <description>
-          Polarization mode. -1: polarization disable, 0: unpolarized, 1:
-          linearly polarized (100%), 2: partially linearly polarized
-        </description>
+        <name>real_time</name>
+        <type>double</type>
+        <unit>s</unit>
+        <default_value>0</default_value>
+        <description></description>
       </param>
       <param container_type=''>
         <name>position</name>
@@ -1016,14 +998,11 @@
         <description>Photons array of spectral histogram</description>
       </param>
       <param container_type=''>
-        <name>polarization_mode</name>
-        <type>int</type>
-        <unit></unit>
-        <default_value>-1</default_value>
-        <description>
-          Polarization mode. -1: polarization disable, 0: unpolarized, 1:
-          linearly polarized (100%), 2: partially linearly polarized
-        </description>
+        <name>real_time</name>
+        <type>double</type>
+        <unit>s</unit>
+        <default_value>0</default_value>
+        <description></description>
       </param>
       <param container_type=''>
         <name>position</name>
@@ -1138,14 +1117,11 @@
         <description>Photons array of spectral histogram</description>
       </param>
       <param container_type=''>
-        <name>polarization_mode</name>
-        <type>int</type>
-        <unit></unit>
-        <default_value>-1</default_value>
-        <description>
-          Polarization mode. -1: polarization disable, 0: unpolarized, 1:
-          linearly polarized (100%), 2: partially linearly polarized
-        </description>
+        <name>real_time</name>
+        <type>double</type>
+        <unit>s</unit>
+        <default_value>0</default_value>
+        <description></description>
       </param>
       <param container_type=''>
         <name>position</name>
@@ -1276,7 +1252,7 @@
   </module>
   <module>
     <name>ConstructDetector</name>
-    <version>3.3</version>
+    <version>3.4</version>
     <text>Construct a detector system, loading a detector configuration file.</text>
     <parameters>
       <param container_type=''>
@@ -1332,7 +1308,7 @@
   </module>
   <module>
     <name>VCSModule</name>
-    <version>1.3</version>
+    <version>1.4</version>
     <text></text>
     <parameters/>
   </module>
@@ -1470,7 +1446,7 @@
   </module>
   <module>
     <name>SetChannelProperties</name>
-    <version>3.0</version>
+    <version>4.0</version>
     <text></text>
     <parameters>
       <param container_type=''>
@@ -1736,7 +1712,7 @@
   </module>
   <module>
     <name>MakeRawHits</name>
-    <version>2.3</version>
+    <version>2.4</version>
     <text></text>
     <parameters>
       <param container_type='map'>
@@ -2485,9 +2461,17 @@
   </module>
   <module>
     <name>WriteEventTree</name>
-    <version>2.1</version>
+    <version>2.2</version>
     <text></text>
-    <parameters/>
+    <parameters>
+      <param container_type=''>
+        <name>notice_undetected</name>
+        <type>bool</type>
+        <unit></unit>
+        <default_value>0</default_value>
+        <description></description>
+      </param>
+    </parameters>
   </module>
   <module>
     <name>ReadEventTree</name>
@@ -2840,7 +2824,7 @@
   </module>
   <module>
     <name>BackProjection</name>
-    <version>2.2</version>
+    <version>2.3</version>
     <text></text>
     <parameters>
       <param container_type=''>
@@ -3082,11 +3066,39 @@
     <text></text>
     <parameters>
       <param container_type=''>
+        <name>particle</name>
+        <type>string</type>
+        <unit></unit>
+        <default_value>gamma</default_value>
+        <description>Particle name (gamma, e-, e+, proton, neutron, geantino...)</description>
+      </param>
+      <param container_type=''>
         <name>spectral_distribution</name>
         <type>string</type>
         <unit></unit>
         <default_value>power law</default_value>
         <description></description>
+      </param>
+      <param container_type=''>
+        <name>energy_min</name>
+        <type>double</type>
+        <unit>keV</unit>
+        <default_value>0.1</default_value>
+        <description>Minimum value of the energy distribution</description>
+      </param>
+      <param container_type=''>
+        <name>energy_max</name>
+        <type>double</type>
+        <unit>keV</unit>
+        <default_value>1000</default_value>
+        <description>Maximum value of the energy distribution</description>
+      </param>
+      <param container_type=''>
+        <name>photon_index</name>
+        <type>double</type>
+        <unit></unit>
+        <default_value>0</default_value>
+        <description>Power law index of the photon spectrum</description>
       </param>
       <param container_type=''>
         <name>energy_mean</name>
@@ -3124,14 +3136,11 @@
         <description>Photons array of spectral histogram</description>
       </param>
       <param container_type=''>
-        <name>polarization_mode</name>
-        <type>int</type>
-        <unit></unit>
-        <default_value>-1</default_value>
-        <description>
-          Polarization mode. -1: polarization disable, 0: unpolarized, 1:
-          linearly polarized (100%), 2: partially linearly polarized
-        </description>
+        <name>real_time</name>
+        <type>double</type>
+        <unit>s</unit>
+        <default_value>0</default_value>
+        <description></description>
       </param>
       <param container_type=''>
         <name>filename</name>
@@ -3145,6 +3154,13 @@
         <type>3-vector</type>
         <unit>mm</unit>
         <default_value>0 0 0</default_value>
+        <description></description>
+      </param>
+      <param container_type=''>
+        <name>energy_resample</name>
+        <type>bool</type>
+        <unit></unit>
+        <default_value>0</default_value>
         <description></description>
       </param>
     </parameters>
@@ -3225,14 +3241,11 @@
         <description>Photons array of spectral histogram</description>
       </param>
       <param container_type=''>
-        <name>polarization_mode</name>
-        <type>int</type>
-        <unit></unit>
-        <default_value>-1</default_value>
-        <description>
-          Polarization mode. -1: polarization disable, 0: unpolarized, 1:
-          linearly polarized (100%), 2: partially linearly polarized
-        </description>
+        <name>real_time</name>
+        <type>double</type>
+        <unit>s</unit>
+        <default_value>0</default_value>
+        <description></description>
       </param>
       <param container_type=''>
         <name>center_position</name>
