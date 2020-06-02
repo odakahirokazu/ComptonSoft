@@ -69,23 +69,29 @@ ANLStatus AHRadiationBackgroundPrimaryGen::mod_initialize()
   }
 
   m_Hist = new TH1D("spectrum", "spectrum", N-1, &energies[0]);
-  double sum(0.0);
+  double integralParticleIntensity(0.0);
+  double integralEnergyIntensity(0.0);
   std::cout << "** output spectral information of particles **" << std::endl;
   
   for (int bin=1; bin<=N; bin++) {
     const double energy = m_Hist->GetBinCenter(bin);
-    const double differentialFlux = graph->Eval(energy/unit::GeV) * (1.0/unit::s/unit::m2/unit::sr/unit::GeV);
+    const double differentialIntensity = graph->Eval(energy/unit::GeV) * (1.0/unit::s/unit::m2/unit::sr/unit::GeV);
     const double deltaE = m_Hist->GetBinWidth(bin);
-    const double flux = differentialFlux * deltaE;
-    m_Hist->SetBinContent(bin, flux);
-    sum += flux;
-    std::cout << energy/unit::MeV << " [MeV] : " << differentialFlux/(1.0/unit::s/unit::cm2/unit::sr/unit::MeV) << " [#/s/cm2/sr/MeV] " << std::endl;
+    const double particleIntensity = differentialIntensity * deltaE;
+    const double energyIntensity = differentialIntensity * deltaE * energy;
+    m_Hist->SetBinContent(bin, particleIntensity);
+    integralParticleIntensity += particleIntensity;
+    integralEnergyIntensity += energyIntensity;
+    std::cout << energy/unit::MeV << " [MeV] : " << differentialIntensity/(1.0/unit::s/unit::cm2/unit::sr/unit::MeV) << " [#/s/cm2/sr/MeV] " << std::endl;
   }
   
   const double circleArea = Radius()*Radius()*CLHEP::pi;
-  const double norm = sum * circleArea * (4.0*CLHEP::pi*CoveringFactor());
-  std::cout << " -> Normalization factor: " << norm/(1.0/unit::s) << " particles/s\n" << std::endl;
-  
+  const double rate = integralParticleIntensity * circleArea * (4.0*CLHEP::pi*CoveringFactor());
+
+  setIntensity(integralEnergyIntensity);
+
+  std::cout << " -> Normalization factor: " << rate/(1.0/unit::s) << " particles/s\n" << std::endl;
+
   return AS_OK;
 }
 

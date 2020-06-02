@@ -53,7 +53,10 @@ protected:
   double CoveringFactor() const { return m_CoveringFactor; }
   G4ThreeVector CenterDirection() const { return m_CenterDirection; }
   G4ThreeVector CenterPosition() const { return m_CenterPosition; }
+  double Intensity() const { return m_Intensity; }
+
   void setCoveringFactor (double v) { m_CoveringFactor = v; }
+  void setIntensity(double v) { m_Intensity = v; }
   
 private:
   G4ThreeVector m_CenterPosition;
@@ -66,7 +69,7 @@ private:
   double m_CosTheta1;
   double m_CoveringFactor;
 
-  double m_Flux; // energy per unit {time, area, solid angle}
+  double m_Intensity; // energy per unit {time, area, solid angle}
 };
 
 } /* namespace anlgeant4 */

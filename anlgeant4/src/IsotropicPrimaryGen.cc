@@ -32,7 +32,7 @@ IsotropicPrimaryGen::IsotropicPrimaryGen()
     m_CenterDirection(0.0, 0.0, 1.0),
     m_ThetaMin(0.0), m_ThetaMax(CLHEP::pi),
     m_CosTheta0(1.0), m_CosTheta1(-1.0), m_CoveringFactor(1.0),
-    m_Flux(1.0e-9*(unit::erg/unit::s/unit::cm2/unit::sr))
+    m_Intensity(1.0e-9*(unit::erg/unit::s/unit::cm2/unit::sr))
 {
   add_alias("IsotropicPrimaryGen");
 }
@@ -56,8 +56,8 @@ ANLStatus IsotropicPrimaryGen::mod_define()
   set_parameter_description("Minimum angle between the primary direction and the center direction.");
   register_parameter(&m_ThetaMax, "theta_max", 1.0, "radian");
   set_parameter_description("Maximum angle between the primary direction and the center direction.");
-  register_parameter(&m_Flux, "flux", (unit::erg/unit::cm2/unit::s/unit::sr), "erg/cm2/s/sr");
-  set_parameter_description("Energy flux of the primaries. This parameter is used only for calculating real time correspoing to a simulation.");
+  register_parameter(&m_Intensity, "intensity", (unit::erg/unit::cm2/unit::s/unit::sr), "erg/cm2/s/sr");
+  set_parameter_description("Energy intensity of the primaries. This parameter is used only for calculating real time correspoing to a simulation.");
 
   return AS_OK;
 }
@@ -132,12 +132,12 @@ void IsotropicPrimaryGen::makePrimarySetting()
 ANLStatus IsotropicPrimaryGen::mod_end_run()
 {
   const double area = CLHEP::pi*m_Radius*m_Radius;
-  const G4double solid = 4*CLHEP::pi*m_CoveringFactor*unit::sr;
+  const double solidAngle = 4*CLHEP::pi*m_CoveringFactor*unit::sr;
   double realTime = 0.;
-  double pflux = 0.;
+  double particleIntensity = 0.;
   if (m_CoveringFactor != 0.0) {
-    realTime = TotalEnergy()/(m_Flux*area*solid);
-    pflux = Number()/area/realTime/solid;
+    realTime = TotalEnergy()/(m_Intensity*area*solidAngle);
+    particleIntensity = Number()/area/realTime/solidAngle;
   }
 
   setRealTime(realTime);
@@ -145,13 +145,13 @@ ANLStatus IsotropicPrimaryGen::mod_end_run()
   std::cout.setf(std::ios::scientific);
   std::cout << "IsotropicPrimaryGen::mod_end_run \n"
             << "  Number: " << Number() << "\n"
-            << "  Flux: " << m_Flux/(unit::erg/unit::cm2/unit::s/unit::sr) << " erg/cm2/s/sr\n"
+            << "  Intensity: " << m_Intensity/(unit::erg/unit::cm2/unit::s/unit::sr) << " erg/cm2/s/sr\n"
             << "  Total Energy: " << TotalEnergy()/unit::keV << " keV = "
             << TotalEnergy()/unit::erg << " erg\n"
             << "  Covering Factor: " << m_CoveringFactor << "\n"
             << "  Area: " << area/unit::cm2 << " cm2\n"
             << "  Real time: " << realTime/unit::s << " s\n"
-            << "  Photon flux: " << pflux/(1.0/unit::cm2/unit::s/unit::sr) << " photons/cm2/s/sr\n"
+            << "  Particle intensity: " << particleIntensity/(1.0/unit::cm2/unit::s/unit::sr) << " particles/cm2/s/sr\n"
             << std::endl;
   std::cout.unsetf(std::ios::scientific);
 
