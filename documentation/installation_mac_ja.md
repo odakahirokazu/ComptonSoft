@@ -1,6 +1,7 @@
 # ComptonSoftのインストール
 
 文: 2020-05-26 渡邊泰平
+
 Updated: 2020-05-29 小高裕和
 
 本文章はMacにComptonSoftをインストールする標準的な方法を解説する。
@@ -9,12 +10,12 @@ MacOS標準のシェルであるzshを使っていると仮定する。（その
 ## 流れ
 
 1. 開発環境を整える。
-1. 必要なライブラリをHomebrew (Macのソフトウェアパッケージ管理システム) で入れる
-1. Rubyのインストール
-1. Geant4のインストール
-1. ANLNextのインストール
-1. ComptonSoftのインストール
-1. ComptonSoftの例題を実行する
+2. 必要なライブラリをHomebrew (Macのソフトウェアパッケージ管理システム) で入れる
+3. Rubyのインストール
+4. Geant4のインストール
+5. ANLNextのインストール
+6. ComptonSoftのインストール
+7. ComptonSoftの例題を実行する
 
 ## 参考
 
@@ -25,20 +26,20 @@ https://github.com/odakahirokazu/ComptonSoft/blob/master/documentation/installat
 ### 開発環境の整備
 
 1. MacOSを最新版にする。(10.15.5 on 2020-05-29)
-1. Xcode (Mac標準の開発環境) をApp Storeからインストールする。(11.5 on 2020-05-29)
-1. Xcodeのインストールが完了したら、アプリケーションを実行し、自動的に出てくる追加インストールを行う。完了したらXcodeは終了する。
-1. Command Line Toolsをインストールする。(ターミナルから次を実行)
+2. Xcode (Mac標準の開発環境) をApp Storeからインストールする。(11.5 on 2020-05-29)
+3. Xcodeのインストールが完了したら、アプリケーションを実行し、自動的に出てくる追加インストールを行う。完了したらXcodeは終了する。
+4. Command Line Toolsをインストールする。(ターミナルから次を実行)
 ```    
     $ xcode-select --install
 ```
-1. Homebrewをインストールする。
+5. Homebrewをインストールする。
 https://brew.sh
 を参照すること。このページに書いてあるインストールのためのコマンドをターミナルにコピペして実行すれば良い。
-1. Homebrewが既に入っている場合は、情報とソフトウェアを最新にする。
+6. Homebrewが既に入っている場合は、情報とソフトウェアを最新にする。
 ```
     $ brew upgrade
 ```
-1. X11 Window Systemを入れる。https://www.xquartz.org
+7. X11 Window Systemを入れる。https://www.xquartz.org
 
 ### 必要なソフトウェアライブラリのインストール
 
@@ -48,7 +49,7 @@ homebrewを使う。
 ```
     $ brew upgrade
 ```
-1. 必要なライブラリのインストール
+2. 必要なライブラリのインストール
 ```
     $ brew install cmake
     $ brew install boost
@@ -67,12 +68,12 @@ Macには標準でRubyがインストールされているが、システムを�
 ```
     $ brew install ruby@2.6
 ```
-1. 環境変数の設定をする。.zshrcに以下の記述を追加する。
+2. 環境変数の設定をする。.zshrcに以下の記述を追加する。
 ```
     export PATH="/usr/local/opt/ruby@2.6/bin:$PATH"
 ```
-1. シェルを再起動する。（環境変数を反映させるため）
-1. ParallelというRubyの並列化ユーティリティを入れる。
+3. シェルを再起動する。（環境変数を反映させるため）
+4. ParallelというRubyの並列化ユーティリティを入れる。
 ```
     $ gem install parallel
 ```
@@ -83,18 +84,18 @@ Macには標準でRubyがインストールされているが、システムを�
 
 1. http://geant4.web.cern.ch/support/download_archive
 のSource filesからダウンロード(ファイル名: `geant4.10.05.p01.tar.gz`)
-1. Geant4をインストールするディレクトリを作る。例: Software/geant4
+2. Geant4をインストールするディレクトリを作る。例: Software/geant4
 ```
     $ mkdir -p Software/geant4
     $ cd Software/geant4
 ```
-1. ここにソースファイルを持ってきて展開する。`<...>`は適切に置き換えること。
+3. ここにソースファイルを持ってきて展開する。`<...>`は適切に置き換えること。
 ```
     $ mv <somewhere>/geant4.10.05.p01.tar.gz .
     $ tar xfvz geant4.10.05.p01.tar.gz
 ```
 これでディレクトリ`geant4.10.05.p01`ができる。
-1. 以下のようにコマンドで、ビルド・インストールを行う。cmakeのお勧めオプションを付けてある。`make`は`make -jN`としても良い (補足参照)。
+4. 以下のようにコマンドで、ビルド・インストールを行う。cmakeのお勧めオプションを付けてある。`make`は`make -jN`としても良い (補足参照)。
 ```
     $ mkdir geant4.10.05.p01-build
     $ cd geant4.10.05.p01-build
@@ -109,7 +110,7 @@ Macには標準でRubyがインストールされているが、システムを�
     $ make
     $ make install
 ```
-1. データのダウンロードと展開。
+5. データのダウンロードと展開。
 データのディレクトリを作り、そこにData filesの全てのファイルをダウンロードして展開する。
 ```
     $ cd Software/geant4
@@ -117,13 +118,13 @@ Macには標準でRubyがインストールされているが、システムを�
     $ cd data
     (ここにデータファイルを展開)
 ```
-1. データディレクトリへのシンボリックリンクの作成。
+6. データディレクトリへのシンボリックリンクの作成。
 ```
     $ cd Software/geant4
     $ cd geant4.10.05.p01-install/share/Geant4-10.5.1
     $ ln -s ../../../data .
 ```
-1. 環境変数の設定。.zshrcに以下を記述。インストール先が異なる場合は適宜読みかえること。
+7. 環境変数の設定。.zshrcに以下を記述。インストール先が異なる場合は適宜読みかえること。
 ```
     export G4INSTALL=<somewhere>/Software/geant4/geant4.10.05.p01-install
     cd $G4INSTALL/bin
@@ -163,7 +164,7 @@ geant4.10.05.p01.tar.gz
     $ cd <path/to/working-directory>
     $ git clone https://github.com/odakahirokazu/ANLNext.git
 ```
-1. 以下のコマンドを実行し、ビルド・インストールする。`make`は`make -jN`としても良い (上記、Geant4の補足参照)。
+2. 以下のコマンドを実行し、ビルド・インストールする。`make`は`make -jN`としても良い (上記、Geant4の補足参照)。
 ```
     $ cd ANLNext
     $ mkdir build
@@ -172,7 +173,7 @@ geant4.10.05.p01.tar.gz
     $ make
     $ make install
 ```
-1. 環境変数`RUBYLIB`の設定。.zshrcに以下の記述を追加し、シェルを再起動する。
+3. 環境変数`RUBYLIB`の設定。.zshrcに以下の記述を追加し、シェルを再起動する。
 ```
     export RUBYLIB=${HOME}/lib/ruby:${RUBYLIB}
 ```
@@ -196,7 +197,7 @@ ANLNextとほぼ同様の手順でインストールできる。
     $ cd <path/to/working-directory>
     $ git clone https://github.com/odakahirokazu/ComptonSoft.git
 ```
-1. 以下のコマンドを実行し、ビルド・インストールする。`make`は`make -jN`としても良い (上記、Geant4の補足参照)。
+2. 以下のコマンドを実行し、ビルド・インストールする。`make`は`make -jN`としても良い (上記、Geant4の補足参照)。
 ```
     $ cd ComptonSoft
     $ mkdir build
@@ -224,4 +225,3 @@ ANLNextとほぼ同様の手順でインストールできる。
 ```
 これでシミュレーションが走り、出力ファイル`simulation.root`が生成さればOK。
 `visualize_mass_model.rb`を実行すると、Geant4QtのWindowが開き、検出器のジオメトリを見ることができる。sessionに`exit`と打てば終了できる。
-
