@@ -78,7 +78,7 @@ ANLStatus CelestialSourcePrimaryGen::mod_define()
   define_parameter("set_polarization", &mod_class::setPolarization_);
   set_parameter_description("If true, polarization is on.");
 
-  undefine_parameter("flux");
+  undefine_parameter("intensity");
   define_parameter("flux", &mod_class::sourceFlux_, (unit::erg/unit::cm2/unit::s), "erg/cm2/s");
   set_parameter_description("Total flux of the source. This parameter is used only for calculating real time correspoing to a simulation.");
 
