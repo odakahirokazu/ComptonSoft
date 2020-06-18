@@ -18,6 +18,7 @@
  *************************************************************************/
 
 #include "AnalyzeDarkFrame.hh"
+#include <limits>
 #include "FrameData.hh"
 
 using namespace anlnext;
@@ -25,6 +26,10 @@ using namespace anlnext;
 namespace comptonsoft {
 
 AnalyzeDarkFrame::AnalyzeDarkFrame()
+  : good_pixel_mean_min_(std::numeric_limits<double>::lowest()),
+    good_pixel_mean_max_(std::numeric_limits<double>::max()),
+    good_pixel_sigma_min_(std::numeric_limits<double>::lowest()),
+    good_pixel_sigma_max_(std::numeric_limits<double>::max())
 {
   add_alias("AnalyzeDarkFrame");
 }
@@ -32,8 +37,12 @@ AnalyzeDarkFrame::AnalyzeDarkFrame()
 ANLStatus AnalyzeDarkFrame::mod_define()
 {
   define_parameter("pedestal_level", &mod_class::pedestal_level_);
-  define_parameter("event_threshold", &mod_class::event_threshold_);
-  define_parameter("hotpix_threshold", &mod_class::hotPixelThreshold_);
+  define_parameter("num_exclusion_low", &mod_class::num_exclusion_low_);
+  define_parameter("num_exclusion_high", &mod_class::num_exclusion_high_);
+  define_parameter("good_pixel_mean_min", &mod_class::good_pixel_mean_min_);
+  define_parameter("good_pixel_mean_max", &mod_class::good_pixel_mean_max_);
+  define_parameter("good_pixel_sigma_min", &mod_class::good_pixel_sigma_min_);
+  define_parameter("good_pixel_sigma_max", &mod_class::good_pixel_sigma_max_);
   
   return AS_OK;
 }
@@ -44,9 +53,8 @@ ANLStatus AnalyzeDarkFrame::mod_begin_run()
   for (auto& detector: detectors) {
     if (detector->hasFrameData()) {
       FrameData* frame = detector->getFrameData();
-      frame->setEventThreshold(event_threshold_);
-      frame->setHotPixelThreshold(hotPixelThreshold_);
       frame->setPedestals(pedestal_level_);
+      frame->setStatisticsExclusionNumbers(num_exclusion_low_, num_exclusion_high_);
     }
   }
 
@@ -60,7 +68,6 @@ ANLStatus AnalyzeDarkFrame::mod_analyze()
     if (detector->hasFrameData()) {
       FrameData* frame = detector->getFrameData();
       frame->stack();
-      frame->detectHotPixels();
     }
   }
 
@@ -73,7 +80,11 @@ ANLStatus AnalyzeDarkFrame::mod_end_run()
   for (auto& detector: detectors) {
     if (detector->hasFrameData()) {
       FrameData* frame = detector->getFrameData();
-      frame->calculatePedestals();
+      frame->calculateStatistics();
+      frame->selectGoodPixels(good_pixel_mean_min_,
+                              good_pixel_mean_max_,
+                              good_pixel_sigma_min_,
+                              good_pixel_sigma_max_);
     }
   }
 

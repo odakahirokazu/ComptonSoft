@@ -41,7 +41,8 @@ FrameData::FrameData(const int nx, const int ny)
     sum_(boost::extents[nx][ny]),
     sum2_(boost::extents[nx][ny]),
     deviation_(boost::extents[nx][ny]),
-    disabledPixels_(boost::extents[nx][ny])
+    disabledPixels_(boost::extents[nx][ny]),
+    pixelValuesToExclude_(boost::extents[nx][ny])
 {
   for (int i=0; i<nx; i++) {
     for (int j=0; j<ny; j++) {
@@ -49,6 +50,7 @@ FrameData::FrameData(const int nx, const int ny)
       sum2_[i][j] = 0.0;
       deviation_[i][j] = 0.0;
       disabledPixels_[i][j] = 0;
+      pixelValuesToExclude_[i][j] = std::make_unique<OutlierStore>();
     }
   }
   buf_.resize(2*nx*ny);
@@ -57,6 +59,17 @@ FrameData::FrameData(const int nx, const int ny)
 }
 
 FrameData::~FrameData() = default;
+
+void FrameData::setStatisticsExclusionNumbers(int num_low, int num_high)
+{
+  const int nx = NumPixelsX();
+  const int ny = NumPixelsY();
+  for (int i=0; i<nx; i++) {
+    for (int j=0; j<ny; j++) {
+      pixelValuesToExclude_[i][j]->set_capacities(num_low, num_high);
+    }
+  }
+}
 
 void FrameData::resetRawFrame()
 {
@@ -102,12 +115,10 @@ void FrameData::stack()
   for (int i=0; i<nx; i++) {
     for (int j=0; j<ny; j++) {
       const double v = rawFrame_[i][j];
-      const double threshold = pedestals_[i][j]+EventThreshold();
-      if (v < threshold) {
-        weight_[i][j] += 1.0;
-        sum_[i][j] += v;
-        sum2_[i][j] += v*v;
-      }
+      weight_[i][j] += 1.0;
+      sum_[i][j] += v;
+      sum2_[i][j] += v*v;
+      pixelValuesToExclude_[i][j]->propose(v);
     }
   }
 }
@@ -123,29 +134,18 @@ void FrameData::setPedestals(const double v)
   }
 }
 
-void FrameData::calculateDeviation()
+void FrameData::calculateStatistics()
 {
   const int nx = NumPixelsX();
   const int ny = NumPixelsY();
   for (int i=0; i<nx; i++) {
     for (int j=0; j<ny; j++) {
-      const double w = weight_[i][j];
+      const double w = weight_[i][j] - pixelValuesToExclude_[i][j]->num();
+      const double sum = sum_[i][j] - pixelValuesToExclude_[i][j]->sum();
+      const double sum2 = sum2_[i][j] - pixelValuesToExclude_[i][j]->sum2();
       if (w != 0.0) {
-        deviation_[i][j] = sqrt(sum2_[i][j]/w - (sum_[i][j]*sum_[i][j])/(w*w));
-      }
-    }
-  }
-}
-
-void FrameData::calculatePedestals()
-{
-  const int nx = NumPixelsX();
-  const int ny = NumPixelsY();
-  for (int i=0; i<nx; i++) {
-    for (int j=0; j<ny; j++) {
-      const double w = weight_[i][j];
-      if (w != 0.0) {
-        pedestals_[i][j] = sum_[i][j]/w;
+        pedestals_[i][j] = sum/w;
+        deviation_[i][j] = sqrt(sum2/w - (sum*sum)/(w*w));
       }
     }
   }
@@ -232,15 +232,21 @@ bool FrameData::isMaxPixel(int ix, int iy, int size) const
   return true;
 }
 
-void FrameData::detectHotPixels()
+void FrameData::selectGoodPixels(const double mean_min, const double mean_max,
+                                 const double sigma_min, const double sigma_max)
 {
-  const double threshold = HotPixelThreshold();
   const int nx = NumPixelsX();
   const int ny = NumPixelsY();
   for (int ix=0; ix<nx; ix++) {
     for (int iy=0; iy<ny; iy++){
-      if (rawFrame_[ix][iy] > threshold){
+      const double mean = pedestals_[ix][iy];
+      const double sigma = deviation_[ix][iy];
+      if (mean<mean_min || mean_max<mean
+          || sigma<sigma_min || sigma_max<sigma) {
         disabledPixels_[ix][iy] = 1;
+      }
+      else {
+        disabledPixels_[ix][iy] = 0;
       }
     }
   }

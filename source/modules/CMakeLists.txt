@@ -59,12 +59,13 @@ set(CS_MODULES
   src/WriteXrayEventTree.cc
   src/ReadXrayEventTree.cc
   src/SortEventTreeWithTime.cc
-  src/WriteHotPixels.cc
+  src/WriteBadPixels.cc
   src/AnalyzeDarkFrame.cc
   src/LoadRootFrame.cc
   src/DetectBadFrames.cc
   src/SetBadFrames.cc
   src/SetPedestalsByMedian.cc
+  src/HistogramFramePedestal.cc
   src/HistogramXrayEventSpectrum.cc
   src/HistogramXrayEventAzimuthAngle.cc
   src/ExtractXrayEventImage.cc

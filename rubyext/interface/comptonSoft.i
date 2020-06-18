@@ -82,12 +82,13 @@
 #ifdef USE_FITSIO
 #include "WritePedestals.hh"
 #endif
-#include "WriteHotPixels.hh"
+#include "WriteBadPixels.hh"
 #include "AnalyzeDarkFrame.hh"
 #include "LoadRootFrame.hh"
 #include "DetectBadFrames.hh"
 #include "SetBadFrames.hh"
 #include "SetPedestalsByMedian.hh"
+#include "HistogramFramePedestal.hh"
 #include "HistogramXrayEventSpectrum.hh"
 #include "HistogramXrayEventAzimuthAngle.hh"
 #include "ExtractXrayEventImage.hh"
@@ -767,10 +768,10 @@ public:
 
 #endif
 
-class WriteHotPixels : public VCSModule
+class WriteBadPixels : public VCSModule
 {
 public:
-  WriteHotPixels();
+  WriteBadPixels();
 };
 
 
@@ -806,6 +807,13 @@ class SetPedestalsByMedian : public VCSModule
 {
 public:
   SetPedestalsByMedian();
+};
+
+
+class HistogramFramePedestal : public VCSModule
+{
+public:
+  HistogramFramePedestal();
 };
 
 

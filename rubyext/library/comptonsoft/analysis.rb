@@ -115,10 +115,39 @@ module ComptonSoft
 
     def initialize()
       super
-      @hotpix_threshold = 400.0
-      @hotpix_file = "hotpix.xml"
+      @bad_pixels_file = "bad_pixels.xml"
+      @append_pedestal_histogram_modules = nil
     end
-    attr_accessor :hotpix_threshold, :hotpix_file
+    attr_accessor :bad_pixels_file
+
+    def set_statistics_exclusion_numbers(low, high)
+      @num_exclusion_low = low
+      @num_exclusion_high = high
+    end
+
+    def set_good_pixel_conditions(mean_min, mean_max, sigma_min, sigma_max)
+      @good_pixel_mean_min = mean_min
+      @good_pixel_mean_max = mean_max
+      @good_pixel_sigma_min = sigma_min
+      @good_pixel_sigma_max = sigma_max
+    end
+
+    def save_pedestal_histograms(mean_num_bins, mean_min, mean_max,
+                                 sigma_num_bins, sigma_min, sigma_max,
+                                 filename: nil)
+      @output = filename if filename
+      @append_pedestal_histogram_modules = lambda do |app|
+        app.chain :HistogramFramePedestal
+        app.with_parameters(mean_num_bins: mean_num_bins,
+                            mean_min: mean_min,
+                            mean_max: mean_max,
+                            sigma_num_bins: sigma_num_bins,
+                            sigma_min: sigma_min,
+                            sigma_max: sigma_max)
+        app.chain :SaveData
+        app.with_parameters(output: @output)
+      end
+    end
 
     def setup()
       add_namespace ComptonSoft
@@ -135,12 +164,20 @@ module ComptonSoft
       with_parameters(files: @inputs)
       chain :AnalyzeDarkFrame
       with_parameters(pedestal_level: @pedestal_level,
-                      event_threshold: @event_threshold,
-                      hotpix_threshold: @hotpix_threshold)
+                      num_exclusion_low: @num_exclusion_low,
+                      num_exclusion_high: @num_exclusion_high,
+                      good_pixel_mean_min: @good_pixel_mean_min,
+                      good_pixel_mean_max: @good_pixel_mean_max,
+                      good_pixel_sigma_min: @good_pixel_sigma_min,
+                      good_pixel_sigma_max: @good_pixel_sigma_max)
       chain :WritePedestals
       with_parameters(filename: @pedestal_file)
-      chain :WriteHotPixels
-      with_parameters(filename: @hotpix_file)
+      chain :WriteBadPixels
+      with_parameters(filename: @bad_pixels_file)
+
+      if @append_pedestal_histogram_modules
+        @append_pedestal_histogram_modules.(self)
+      end
     end
   end
 

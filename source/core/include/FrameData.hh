@@ -24,6 +24,7 @@
 #include <vector>
 #include <memory>
 #include "XrayEvent.hh"
+#include "OutlierStore.hh"
 
 namespace comptonsoft
 {
@@ -38,6 +39,7 @@ class VGainFunction;
  * @date 2019-05-22
  * @date 2019-10-08 | delete the assignment operators
  * @date 2020-03-31 | add gain functions
+ * @date 2020-05-28 | Kosuke Hatauchi & Hirokazu odaka | revise pedestal statistics
  */
 class FrameData
 {
@@ -64,21 +66,20 @@ public:
   void setSplitThreshold(double v) { splitThreshold_ = v; }
   double EventThreshold() const { return eventThreshold_; }
   double SplitThreshold() const { return splitThreshold_; }
-  void setHotPixelThreshold(double v) { hotPixelThreshold_ = v; }
-  double HotPixelThreshold() { return hotPixelThreshold_; }
 
+  void setStatisticsExclusionNumbers(int num_low, int num_high);
+  
   void resetRawFrame();
   virtual bool load(const std::string& filename);
   void stack();
 
   void setPedestals(double v);
-  virtual void calculatePedestals();
-  virtual void calculateDeviation();
-
+  virtual void calculateStatistics();
   virtual void subtractPedestals();
   virtual std::vector<XrayEvent_sptr> extractEvents();
 
-  void detectHotPixels();
+  void selectGoodPixels(double mean_min, double mean_max,
+                        double sigma_min, double sigma_max);
 
   void setRawFrame(const image_t& v) { rawFrame_ = v; }
   void setFrame(const image_t& v) { frame_ = v; }
@@ -142,7 +143,6 @@ private:
 
   double eventThreshold_ = 0.0;
   double splitThreshold_ = 0.0;
-  double hotPixelThreshold_ = 0.0;
 
   std::vector<char> buf_;
 
@@ -155,6 +155,7 @@ private:
   image_t sum2_;
   image_t deviation_;
   flags_t disabledPixels_;
+  boost::multi_array<std::unique_ptr<OutlierStore>, 2> pixelValuesToExclude_;
 
   using gain_func_array_t = boost::multi_array<std::shared_ptr<VGainFunction>, 2>;
   bool shareGainFunction_ = true;

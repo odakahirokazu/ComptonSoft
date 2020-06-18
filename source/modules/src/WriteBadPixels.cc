@@ -17,7 +17,7 @@
  *                                                                       *
  *************************************************************************/
 
-#include "WriteHotPixels.hh"
+#include "WriteBadPixels.hh"
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/xml_parser.hpp>
 #include "FrameData.hh"
@@ -26,18 +26,18 @@ using namespace anlnext;
 
 namespace comptonsoft{
 
-WriteHotPixels::WriteHotPixels()
-  : filename_("hotpix.xml")
+WriteBadPixels::WriteBadPixels()
+  : filename_("bad_pixels.xml")
 {
 }
 
-ANLStatus WriteHotPixels::mod_define()
+ANLStatus WriteBadPixels::mod_define()
 {
   define_parameter("filename", &mod_class::filename_);
   return AS_OK;
 }
 
-ANLStatus WriteHotPixels::mod_end_run()
+ANLStatus WriteBadPixels::mod_end_run()
 {
   namespace xp = boost::property_tree::xml_parser;
   using boost::property_tree::ptree;

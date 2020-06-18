@@ -33,6 +33,31 @@ using namespace anlnext;
 namespace comptonsoft
 {
 
+void write_image_to_fits(const image_t& image,
+                         cfitsio::fitsfile* fitsFile,
+                         int* fitsStatus)
+{
+  const int nx = image.shape()[0];
+  const int ny = image.shape()[1];
+
+  std::vector<double> array;
+  array.reserve(nx*ny);
+  for (int iy=0; iy<ny; iy++) {
+    for (int ix=0; ix<nx; ix++) {
+      array.push_back(image[ix][iy]);
+    }
+  }
+
+  long NumPixelsArray[2] = {nx, ny};
+  const long NumPixels = nx*ny;
+  long StartPixel[2] = {1, 1};
+  
+  cfitsio::fits_create_img(fitsFile, DOUBLE_IMG, 2, NumPixelsArray, fitsStatus);
+  if (*fitsStatus) { return; }
+
+  cfitsio::fits_write_pix(fitsFile, TDOUBLE, StartPixel, NumPixels, &array[0], fitsStatus);
+}
+
 WritePedestals::WritePedestals()
   : filename_("pedestals.fits")
 {
@@ -56,43 +81,36 @@ ANLStatus WritePedestals::mod_end_run()
   
   const FrameData* frame = detector->getFrameData();
   const image_t& pedestals = frame->getPedestals();
-  const int nx = pedestals.shape()[0];
-  const int ny = pedestals.shape()[1];
-
-  std::vector<double> array;
-  array.reserve(nx*ny);
-  for (int iy=0; iy<ny; iy++) {
-    for (int ix=0; ix<nx; ix++) {
-      array.push_back(pedestals[ix][iy]);
-    }
-  }
+  const image_t& frameDeviation = frame->getDeviationFrame();
 
   cfitsio::fitsfile* fitsFile = nullptr;
   int fitsStatus = 0;
-  long StartPixel[2] = {1, 1};
-  long NumPixelsArray[2]= {nx, ny};
-  const long NumPixels = nx*ny;
-
+  
   cfitsio::fits_create_file(&fitsFile, filename_.c_str(), &fitsStatus);
   if (fitsStatus) {
     cfitsio::fits_report_error(stderr, fitsStatus);
     return AS_ERROR;
   }
 
-  cfitsio::fits_create_img(fitsFile, DOUBLE_IMG, 2, NumPixelsArray, &fitsStatus);
+  write_image_to_fits(pedestals, fitsFile, &fitsStatus);
   if (fitsStatus) {
     cfitsio::fits_report_error(stderr, fitsStatus);
     return AS_ERROR;
   }
 
-  cfitsio::fits_write_pix(fitsFile, TDOUBLE, StartPixel, NumPixels, &array[0], &fitsStatus);
-  if (fitsStatus){
+  write_image_to_fits(frameDeviation, fitsFile, &fitsStatus);
+  if (fitsStatus) {
+    cfitsio::fits_report_error(stderr, fitsStatus);
+    return AS_ERROR;
+  }
+  cfitsio::fits_write_key(fitsFile, TSTRING, "EXTNAME", (char*)"Sigma", "Standard deviation of the pedestal values", &fitsStatus);
+  if (fitsStatus) {
     cfitsio::fits_report_error(stderr, fitsStatus);
     return AS_ERROR;
   }
 
   cfitsio::fits_close_file(fitsFile, &fitsStatus);
-  if (fitsStatus){
+  if (fitsStatus) {
     cfitsio::fits_report_error (stderr, fitsStatus);
     return AS_ERROR;
   }

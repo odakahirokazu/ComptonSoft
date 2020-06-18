@@ -76,6 +76,7 @@ set(CS_CORE_CLASSES
   src/EventTreeIOWithInitialInfo.cc
   ### frame readout
   src/FrameData.cc
+  src/OutlierStore.cc
   src/XrayEvent.cc
   src/XrayEventTreeIO.cc
   ### coded aperture

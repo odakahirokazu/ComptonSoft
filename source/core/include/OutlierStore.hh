@@ -1,6 +1,6 @@
 /*************************************************************************
  *                                                                       *
- * Copyright (c) 2011 Hirokazu Odaka                                     *
+ * Copyright (c) 2019 Hirokazu Odaka                                     *
  *                                                                       *
  * This program is free software: you can redistribute it and/or modify  *
  * it under the terms of the GNU General Public License as published by  *
@@ -17,49 +17,44 @@
  *                                                                       *
  *************************************************************************/
 
-#ifndef COMPTONSOFT_AnalyzeDarkFrame_H
-#define COMPTONSOFT_AnalyzeDarkFrame_H 1
+#ifndef COMPTONSOFT_OutlierStore_H
+#define COMPTONSOFT_OutlierStore_H 1
 
-#include <iterator>
-#include "VCSModule.hh"
+#include <vector>
 
-namespace comptonsoft {
+namespace comptonsoft
+{
 
 /**
- * AnalyzeDarkFrame
+ * A class of an outlier store for basic statistics
  *
- * @author Hirokazu Odaka & Tsubasa Tamba
- * @date 2019-05-23
- * @date 2019-07-19 | merged to comptonsoft
- * @date 2020-04-01 | v1.1
- * @date 2020-05-28 | v2.0, revise pedestal statistics
+ * @author Hirokazu Odaka
+ * @date 2020-05-28
  */
-class AnalyzeDarkFrame : public VCSModule
+class OutlierStore
 {
-  DEFINE_ANL_MODULE(AnalyzeDarkFrame, 2.0);
-  // ENABLE_PARALLEL_RUN();
 public:
-  AnalyzeDarkFrame();
+  OutlierStore();
+  OutlierStore(int capacity_low, int capacity_high);
+  ~OutlierStore();
+
+  void set_capacities(int low, int high);
+  int capacity_low() const { return capacity_low_; }
+  int capacity_high() const { return capacity_high_; }
+  int capacity() const { return capacity_low_ + capacity_high_; }
   
-protected:
-  AnalyzeDarkFrame(const AnalyzeDarkFrame&);
-
-public:
-  anlnext::ANLStatus mod_define() override;
-  anlnext::ANLStatus mod_begin_run() override;
-  anlnext::ANLStatus mod_analyze() override;
-  anlnext::ANLStatus mod_end_run() override;
-
+  int num() const { return num_; }
+  double sum() const;
+  double sum2() const;
+  void propose(double x);
+  
 private:
-  double pedestal_level_ = 0.0;
-  int num_exclusion_low_ = 0;
-  int num_exclusion_high_ = 0;
-  double good_pixel_mean_min_ = 0.0;
-  double good_pixel_mean_max_ = 0.0;
-  double good_pixel_sigma_min_ = 0.0;
-  double good_pixel_sigma_max_ = 0.0;
+  int capacity_low_ = 0;
+  int capacity_high_ = 0;
+  int num_ = 0;
+  std::vector<double> xs_;
 };
 
 } /* namespace comptonsoft */
 
-#endif /* COMPTONSOFT_AnalyzeDarkFrame_H */
+#endif /* COMPTONSOFT_OutlierStore_H */

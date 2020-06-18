@@ -106,7 +106,7 @@ ANLStatus AnalyzeFrame::mod_end_run()
   for (auto& detector: detectors) {
     if (detector->hasFrameData()) {
       FrameData* frame = detector->getFrameData();
-      frame->calculatePedestals();
+      frame->calculateStatistics();
     }
   }
 

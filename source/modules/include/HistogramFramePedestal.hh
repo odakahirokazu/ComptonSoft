@@ -1,6 +1,6 @@
 /*************************************************************************
  *                                                                       *
- * Copyright (c) 2019 Hirokazu Odaka                                     *
+ * Copyright (c) 2011 Hirokazu Odaka                                     *
  *                                                                       *
  * This program is free software: you can redistribute it and/or modify  *
  * it under the terms of the GNU General Public License as published by  *
@@ -18,36 +18,54 @@
  *************************************************************************/
 
 /**
- * WriteHotPixels.
+ * HistogramFramePedestal
  *
- * @author Hirokazu Odaka & Tsubasa Tamba
- * @date 2019-05
- * @date 2019-07-18 | merged to comptonsoft
- * @date 2020-04-01 | v1.1
+ * @author Hirokazu Odaka
+ * @date 2020-06-17
  */
 
-#ifndef COMPTONSOFT_WriteHotPixels_H
-#define COMPTONSOFT_WriteHotPixels_H 1
+#ifndef COMPTONSOFT_HistogramFramePedestal_H
+#define COMPTONSOFT_HistogramFramePedestal_H 1
 
 #include "VCSModule.hh"
 
-namespace comptonsoft{
+class TH2;
 
-class WriteHotPixels : public VCSModule
+namespace comptonsoft {
+
+class XrayEventCollection;
+
+class HistogramFramePedestal : public VCSModule
 {
-  DEFINE_ANL_MODULE(WriteHotPixels, 1.1);
+  DEFINE_ANL_MODULE(HistogramFramePedestal, 1.0);
   // ENABLE_PARALLEL_RUN();
 public:
-  WriteHotPixels();
+  HistogramFramePedestal();
   
+protected:
+  HistogramFramePedestal(const HistogramFramePedestal&);
+
 public:
   anlnext::ANLStatus mod_define() override;
+  anlnext::ANLStatus mod_initialize() override;
   anlnext::ANLStatus mod_end_run() override;
 
+  void drawCanvas(TCanvas* canvas, std::vector<std::string>* filenames) override;
+
 private:
-  std::string filename_;
+  int detectorID_ = 0;
+  int meanNumBins_ = 1;
+  double meanMin_ = 0.0;
+  double meanMax_ = 0.0;
+  int sigmaNumBins_ = 1;
+  double sigmaMin_ = 0.0;
+  double sigmaMax_ = 0.0;
+
+  std::string outputName_;
+  
+  TH2* histogram_ = nullptr;
 };
 
-} /* namespace comptonsoft*/
+} /* namespace comptonsoft */
 
-#endif /* COMPTONSOFT_WriteHotPixels_H */
+#endif /* COMPTONSOFT_HistogramFramePedestal_H */
