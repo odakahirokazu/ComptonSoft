@@ -86,7 +86,7 @@ class ExtractXrayEventImage;
 class ProcessCodedAperture;
 class PushToQuickLookDB;
 class GetInputFilesFromDirectory;
-class SelectEventsWithSpectrum;
+class SelectEventsWithDetectorSpectrum;
 class AssignSXIGrade;
 class AEAttitudeCorrection;
 class AHRayTracingPrimaryGen;

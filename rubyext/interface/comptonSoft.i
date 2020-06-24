@@ -97,7 +97,7 @@
 #include "PushToQuickLookDB.hh"
 #endif
 #include "GetInputFilesFromDirectory.hh"
-#include "SelectEventsWithSpectrum.hh"
+#include "SelectEventsWithDetectorSpectrum.hh"
 #include "AssignSXIGrade.hh"
 #include "AEAttitudeCorrection.hh"
 #ifdef USE_FITSIO
@@ -861,11 +861,11 @@ public:
 };
 
 
-class SelectEventsWithSpectrum : public anlnext::BasicModule
+class SelectEventsWithDetectorSpectrum : public anlnext::BasicModule
 {
 public:
-  SelectEventsWithSpectrum();
-  ~SelectEventsWithSpectrum();
+  SelectEventsWithDetectorSpectrum();
+  ~SelectEventsWithDetectorSpectrum();
 };
 
 
