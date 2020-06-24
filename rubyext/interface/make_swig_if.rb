@@ -96,6 +96,7 @@ clMod = [
   ANL::SWIGClass.new("SelectEventsWithDetectorSpectrum"),
   ANL::SWIGClass.new("AssignSXIGrade"),
   ANL::SWIGClass.new("AEAttitudeCorrection"),
+  ANL::SWIGClass.new("SelectEventsWithCelestialSpectrum"),
 ]
 
 clSim = [

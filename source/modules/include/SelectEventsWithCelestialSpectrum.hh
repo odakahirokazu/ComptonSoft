@@ -17,12 +17,13 @@
  *                                                                       *
  *************************************************************************/
 
-#ifndef COMPTONSOFT_SelectEventsWithSpectrum_H
-#define COMPTONSOFT_SelectEventsWithSpectrum_H 1
+#ifndef COMPTONSOFT_SelectEventsWithCelestialSpectrum_H
+#define COMPTONSOFT_SelectEventsWithCelestialSpectrum_H 1
 
 #include "VCSModule.hh"
 #include <list>
 #include "ReadEventTree.hh"
+#include "XrayEvent.hh"
 
 namespace comptonsoft {
 
@@ -31,30 +32,45 @@ class CSHitCollection;
 
 /**
  * @author Tsubasa Tamba
- * @date 2019-12-02
+ * @date 2020-06-24
  */
-class SelectEventsWithSpectrum : public anlnext::BasicModule
+class SelectEventsWithCelestialSpectrum : public anlnext::BasicModule
 {
-  DEFINE_ANL_MODULE(SelectEventsWithSpectrum, 1.0);
+  DEFINE_ANL_MODULE(SelectEventsWithCelestialSpectrum, 1.0);
+
 public:
-  SelectEventsWithSpectrum();
-  ~SelectEventsWithSpectrum();
+  SelectEventsWithCelestialSpectrum();
+  ~SelectEventsWithCelestialSpectrum();
 
   anlnext::ANLStatus mod_define() override;
   anlnext::ANLStatus mod_initialize() override;
   anlnext::ANLStatus mod_analyze() override;
   anlnext::ANLStatus mod_end_run() override;
 
-  bool isGoodGrade(int grade);
+  struct Effarea {
+    double emin, emax, area;
+    Effarea(double emin=0.0, double emax=0.0, double area=0.0): emin(emin), emax(emax), area(area) {}
+  };
+
+  void inputImage(std::string filename, image_t& image, anlnext::ANLStatus* status);
+  void inputEffectiveArea(std::string filename, std::vector<Effarea>& effarea, anlnext::ANLStatus* status);
+  void buildPositionIntegral();
+  void setPosition();
+  std::pair<int, int> samplePixel();
 
 private:
   double exposure_ = 0.0;
   std::vector<double> energyArray_;
-  std::vector<double> countRateArray_;
+  std::vector<double> photonsArray_;
+  std::string arfFilename_;
+  bool assignPosition_ = true;
+
+  image_t image_;
+  std::vector<Effarea> effectiveArea_;
+  std::vector<double> positionIntegral_;
   std::vector<int> countArray_;
   int numRemainedBin_;
   std::vector<int> photonStack_;
-  std::vector<int> goodGrade_;
 
   CSHitCollection* hitCollection_ = nullptr;
   ReadEventTree* readEventTree_ = nullptr;
@@ -63,4 +79,4 @@ private:
 
 } /* namespace comptonsoft */
 
-#endif /* COMPTONSOFT_SelectEventsWithSpectrum_H */
+#endif /* COMPTONSOFT_SelectEventsWithCelestialSpectrum_H */
