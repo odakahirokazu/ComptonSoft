@@ -25,7 +25,7 @@ This package uses CMake to generate building scripts such as Makefiles.
 *We recommend version 1.61.0 or later*
 
 ### (4) [ANL Next framework](http://www.astro.isas.jaxa.jp/~odaka/anlnext/)
-*version 2.0 or later*
+*version 2.1.0 or later*
 
 Compton Soft uses the ANL Next framework. ANL Next is a framework for
 constructing software that performs event-by-event analysis, which usually
@@ -42,7 +42,7 @@ You can find
 of ANL Next.
 
 ### (5) [Geant4](http://geant4.cern.ch/)
-*version 10.3 or later*
+*version 10.5*
 
 A toolkit library for Monte Carlo simulations.
 Following building options are required:

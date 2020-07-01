@@ -1,8 +1,8 @@
 # ComptonSoftのインストール
 
-文: 2020-05-26 渡邊泰平
-
-Updated: 2020-05-29 小高裕和
+- 文: 2020-05-26 渡邊泰平
+- Updated: 2020-05-29 小高裕和
+- Updated: 2020-07-01 小高裕和
 
 本文章はMacにComptonSoftをインストールする標準的な方法を解説する。
 MacOS標準のシェルであるzshを使っていると仮定する。（その他のシェルを使う場合は、適宜同等の操作に読みかえること）
@@ -63,14 +63,13 @@ homebrewを使う。
 
 Macには標準でRubyがインストールされているが、システムを汚さずに関連パッケージを入れるために、新規でインストールする。基本的にはhomebrewで入れれば良い。
 
-1. Ruby version 2.6を入れる。
-注意: 現時点では、最新版の2.7にはSWIGが対応していないため、１つ前のバージョンである2.6を入れる必要がある。
+1. Ruby version 2.7を入れる。
 ```
-    $ brew install ruby@2.6
+    $ brew install ruby
 ```
 2. 環境変数の設定をする。.zshrcに以下の記述を追加する。
 ```
-    export PATH="/usr/local/opt/ruby@2.6/bin:$PATH"
+    export PATH="/usr/local/opt/ruby/bin:$PATH"
 ```
 3. シェルを再起動する。（環境変数を反映させるため）
 4. ParallelというRubyの並列化ユーティリティを入れる。
