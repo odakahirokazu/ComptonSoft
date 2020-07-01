@@ -55,7 +55,7 @@ SelectEventsWithCelestialSpectrum::~SelectEventsWithCelestialSpectrum() = defaul
 
 ANLStatus SelectEventsWithCelestialSpectrum::mod_define()
 {
-  define_parameter("exposure", &mod_class::exposure_);
+  define_parameter("exposure", &mod_class::exposure_, unit::s, "s");
   define_parameter("energy_array", &mod_class::energyArray_, unit::keV, "keV");
   define_parameter("photons_array", &mod_class::photonsArray_, 1.0/(unit::s*unit::cm*unit::cm), "1.0/(s*cm*cm)");
   define_parameter("arf_filename", &mod_class::arfFilename_);
@@ -262,7 +262,7 @@ void SelectEventsWithCelestialSpectrum::inputEffectiveArea(std::string filename,
       *status = AS_QUIT_ERROR;
       return;
     }
-    for (int j=0; i<numPlot; i++) {
+    for (int j=0; j<numPlot; j++) {
       if (i==0) effarea[j].emin = v[j];
       else if (i==1) effarea[j].emax = v[j];
       else if (i==2) effarea[j].area = v[j];

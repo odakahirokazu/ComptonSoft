@@ -89,6 +89,7 @@ class GetInputFilesFromDirectory;
 class SelectEventsWithDetectorSpectrum;
 class AssignSXIGrade;
 class AEAttitudeCorrection;
+class SelectEventsWithCelestialSpectrum;
 class AHRayTracingPrimaryGen;
 class SimXPrimaryGen;
 class AHRadiationBackgroundPrimaryGen;

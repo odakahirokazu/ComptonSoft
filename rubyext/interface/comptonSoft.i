@@ -101,6 +101,9 @@
 #include "AssignSXIGrade.hh"
 #include "AEAttitudeCorrection.hh"
 #ifdef USE_FITSIO
+#include "SelectEventsWithCelestialSpectrum.hh"
+#endif
+#ifdef USE_FITSIO
 #include "AHRayTracingPrimaryGen.hh"
 #endif
 #ifdef USE_SIMX
@@ -884,6 +887,16 @@ public:
   ~AEAttitudeCorrection();
 };
 
+
+#ifdef USE_FITSIO
+class SelectEventsWithCelestialSpectrum : public anlnext::BasicModule
+{
+public:
+  SelectEventsWithCelestialSpectrum();
+  ~SelectEventsWithCelestialSpectrum();
+};
+
+#endif
 
 #ifdef USE_FITSIO
 class AHRayTracingPrimaryGen : public anlgeant4::BasicPrimaryGen
