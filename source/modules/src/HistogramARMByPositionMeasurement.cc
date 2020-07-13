@@ -55,64 +55,68 @@ ANLStatus HistogramARMByPositionMeasurement::mod_analyze()
     return AS_OK;
   }
 
-  const BasicComptonEvent& event = eventReconstruction_->getComptonEvent();
-  const double cosThetaE = event.CosThetaE();
-  if (cosThetaE < -1.0 || +1.0 < cosThetaE) {
-    return AS_OK;
-  }
+  const std::vector<BasicComptonEvent_sptr> events = eventReconstruction_->getReconstructedEvents();
+  for (const auto& event: events) {
+    const double fraction = event->ReconstructionFraction();
 
-  const int hit1DetectorID = event.Hit1DetectorID();
-  const VRealDetectorUnit* hit1Detector = getDetectorManager()->getDetectorByID(hit1DetectorID);
-  const vector3_t hit1Position = event.Hit1Position();
-  const double hit1HalfWidthX = hit1Detector->getPixelPitchX() * 0.5;
-  const double hit1HalfWidthY = hit1Detector->getPixelPitchY() * 0.5;
-  const double hit1HalfWidthZ = hit1Detector->getThickness() * 0.5;
-  const vector3_t hit1DetectorDirX = hit1Detector->getXAxisDirection();
-  const vector3_t hit1DetectorDirY = hit1Detector->getYAxisDirection();
-  const vector3_t hit1DetectorDirZ = hit1DetectorDirX.cross(hit1DetectorDirY);
+    const double cosThetaE = event->CosThetaE();
+    if (cosThetaE < -1.0 || +1.0 < cosThetaE) {
+      return AS_OK;
+    }
 
-  const int hit2DetectorID = event.Hit2DetectorID();
-  const VRealDetectorUnit* hit2Detector = getDetectorManager()->getDetectorByID(hit2DetectorID);
-  const vector3_t hit2Position = event.Hit2Position();
-  const double hit2HalfWidthX = hit2Detector->getPixelPitchX() * 0.5;
-  const double hit2HalfWidthY = hit2Detector->getPixelPitchY() * 0.5;
-  const double hit2HalfWidthZ = hit2Detector->getThickness() * 0.5;
-  const vector3_t hit2DetectorDirX = hit2Detector->getXAxisDirection();
-  const vector3_t hit2DetectorDirY = hit2Detector->getYAxisDirection();
-  const vector3_t hit2DetectorDirZ = hit2DetectorDirX.cross(hit2DetectorDirY);
+    const int hit1DetectorID = event->Hit1DetectorID();
+    const VRealDetectorUnit* hit1Detector = getDetectorManager()->getDetectorByID(hit1DetectorID);
+    const vector3_t hit1Position = event->Hit1Position();
+    const double hit1HalfWidthX = hit1Detector->getPixelPitchX() * 0.5;
+    const double hit1HalfWidthY = hit1Detector->getPixelPitchY() * 0.5;
+    const double hit1HalfWidthZ = hit1Detector->getThickness() * 0.5;
+    const vector3_t hit1DetectorDirX = hit1Detector->getXAxisDirection();
+    const vector3_t hit1DetectorDirY = hit1Detector->getYAxisDirection();
+    const vector3_t hit1DetectorDirZ = hit1DetectorDirX.cross(hit1DetectorDirY);
 
-  const vector3_t sourceDirection = eventReconstruction_->SourceDirection();
-  const vector3_t coneAxis = event.ConeAxis();
-  const double thetaG = sourceDirection.angle(coneAxis);
+    const int hit2DetectorID = event->Hit2DetectorID();
+    const VRealDetectorUnit* hit2Detector = getDetectorManager()->getDetectorByID(hit2DetectorID);
+    const vector3_t hit2Position = event->Hit2Position();
+    const double hit2HalfWidthX = hit2Detector->getPixelPitchX() * 0.5;
+    const double hit2HalfWidthY = hit2Detector->getPixelPitchY() * 0.5;
+    const double hit2HalfWidthZ = hit2Detector->getThickness() * 0.5;
+    const vector3_t hit2DetectorDirX = hit2Detector->getXAxisDirection();
+    const vector3_t hit2DetectorDirY = hit2Detector->getYAxisDirection();
+    const vector3_t hit2DetectorDirZ = hit2DetectorDirX.cross(hit2DetectorDirY);
 
-  const int NumSamples = m_NumSamples;
-  const double FillWeight = 1.0/static_cast<double>(NumSamples);
-  TRandom* randgen = m_RandomGenerator.get();
+    const vector3_t sourceDirection = eventReconstruction_->SourceDirection();
+    const vector3_t coneAxis = event->ConeAxis();
+    const double thetaG = sourceDirection.angle(coneAxis);
 
-  for (int t=0; t<NumSamples; t++) {
-    const double hit1DeltaLocalX = randgen->Uniform(-hit1HalfWidthX, +hit1HalfWidthX);
-    const double hit1DeltaLocalY = randgen->Uniform(-hit1HalfWidthY, +hit1HalfWidthY);
-    const double hit1DeltaLocalZ = randgen->Uniform(-hit1HalfWidthZ, +hit1HalfWidthZ);
-    const double hit2DeltaLocalX = randgen->Uniform(-hit2HalfWidthX, +hit2HalfWidthX);
-    const double hit2DeltaLocalY = randgen->Uniform(-hit2HalfWidthY, +hit2HalfWidthY);
-    const double hit2DeltaLocalZ = randgen->Uniform(-hit2HalfWidthZ, +hit2HalfWidthZ);
+    const int NumSamples = m_NumSamples;
+    const double FillWeight = fraction/static_cast<double>(NumSamples);
+    TRandom* randgen = m_RandomGenerator.get();
 
-    const vector3_t hit1Position1 = hit1Position
-      + hit1DeltaLocalX * hit1DetectorDirX
-      + hit1DeltaLocalY * hit1DetectorDirY
-      + hit1DeltaLocalZ * hit1DetectorDirZ;
-    const vector3_t hit2Position1 = hit2Position
-      + hit2DeltaLocalX * hit2DetectorDirX
-      + hit2DeltaLocalY * hit2DetectorDirY
-      + hit2DeltaLocalZ * hit2DetectorDirZ;
+    for (int t=0; t<NumSamples; t++) {
+      const double hit1DeltaLocalX = randgen->Uniform(-hit1HalfWidthX, +hit1HalfWidthX);
+      const double hit1DeltaLocalY = randgen->Uniform(-hit1HalfWidthY, +hit1HalfWidthY);
+      const double hit1DeltaLocalZ = randgen->Uniform(-hit1HalfWidthZ, +hit1HalfWidthZ);
+      const double hit2DeltaLocalX = randgen->Uniform(-hit2HalfWidthX, +hit2HalfWidthX);
+      const double hit2DeltaLocalY = randgen->Uniform(-hit2HalfWidthY, +hit2HalfWidthY);
+      const double hit2DeltaLocalZ = randgen->Uniform(-hit2HalfWidthZ, +hit2HalfWidthZ);
+      
+      const vector3_t hit1Position1 = hit1Position
+        + hit1DeltaLocalX * hit1DetectorDirX
+        + hit1DeltaLocalY * hit1DetectorDirY
+        + hit1DeltaLocalZ * hit1DetectorDirZ;
+      const vector3_t hit2Position1 = hit2Position
+        + hit2DeltaLocalX * hit2DetectorDirX
+        + hit2DeltaLocalY * hit2DetectorDirY
+        + hit2DeltaLocalZ * hit2DetectorDirZ;
 
-    const vector3_t coneAxis1 = hit1Position1 - hit2Position1;
-    const double thetaG1 = sourceDirection.angle(coneAxis1);
-    const double ARMValueByPosition = (thetaG1 - thetaG)/unit::degree;
-    hist_all_->Fill(ARMValueByPosition, FillWeight);
-    for (std::size_t i=0; i<hist_vec_.size(); i++) {
-      if (eventReconstruction_->HitPatternFlag(i)) {
-        hist_vec_[i]->Fill(ARMValueByPosition, FillWeight);
+      const vector3_t coneAxis1 = hit1Position1 - hit2Position1;
+      const double thetaG1 = sourceDirection.angle(coneAxis1);
+      const double ARMValueByPosition = (thetaG1 - thetaG)/unit::degree;
+      hist_all_->Fill(ARMValueByPosition, FillWeight);
+      for (std::size_t i=0; i<hist_vec_.size(); i++) {
+        if (eventReconstruction_->HitPatternFlag(i)) {
+          hist_vec_[i]->Fill(ARMValueByPosition, FillWeight);
+        }
       }
     }
   }

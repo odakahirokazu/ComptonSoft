@@ -41,6 +41,7 @@ ANLStatus ComptonModeFilter::mod_initialize()
 {
   VCSModule::mod_initialize();
 
+  define_evs("ComptonMode:Exception");
   define_evs("ComptonMode:DeltaTheta:02");
   define_evs("ComptonMode:DeltaTheta:04");
   define_evs("ComptonMode:DeltaTheta:06");
@@ -64,11 +65,16 @@ ANLStatus ComptonModeFilter::mod_analyze()
   if (!evs("EventReconstruction:OK")) {
     return AS_OK;
   }
+
+  if (m_EventReconstruction->NumberOfReconstructedEvents()!=1) {
+    set_evs("ComptonMode:Exception");
+    return AS_OK;
+  }
   
   const BasicComptonEvent& ComptonEvent
-    = m_EventReconstruction->getComptonEvent();
+    = *(m_EventReconstruction->getReconstructedEvents()[0]);
   const double dtheta = std::abs(ComptonEvent.DeltaTheta());
-  const double e_gamma = ComptonEvent.TotalEnergy();
+  const double e_gamma = ComptonEvent.IncidentEnergy();
 
   if (dtheta < 2.0*unit::degree) {
     set_evs("ComptonMode:DeltaTheta:02");

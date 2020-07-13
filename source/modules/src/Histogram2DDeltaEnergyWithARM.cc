@@ -101,30 +101,34 @@ ANLStatus Histogram2DDeltaEnergyWithARM::mod_analyze()
     return AS_OK;
   }
   
-  const BasicComptonEvent& event = eventReconstruction_->getComptonEvent();
-  const double cosThetaE = event.CosThetaE();
-  if (cosThetaE < -1.0 || +1.0 < cosThetaE) {
-    return AS_OK;
-  }
+  const std::vector<BasicComptonEvent_sptr> events = eventReconstruction_->getReconstructedEvents();
+  for (const auto& event: events) {
+    const double fraction = event->ReconstructionFraction();
 
-  const double energy = event.TotalEnergy() / unit::keV;
-  const double ini_energy = initialInfo_->InitialEnergy() / unit::keV;
-  const double de = energy - ini_energy;
-  const double arm = event.DeltaTheta() / unit::degree;
-  const unsigned int hit1Process = event.Hit1Process();
-
-  hist_all_->Fill(de, arm);
-  for (std::size_t i=0; i<hist_vec_.size(); i++) {
-    if (eventReconstruction_->HitPatternFlag(i)) {
-      hist_vec_[i]->Fill(de, arm);
+    const double cosThetaE = event->CosThetaE();
+    if (cosThetaE < -1.0 || +1.0 < cosThetaE) {
+      return AS_OK;
     }
-  }
 
-  if (hit1Process==process::ComptonScattering) {
-    hist_compton_all_->Fill(de, arm);
+    const double energy = event->IncidentEnergy() / unit::keV;
+    const double ini_energy = initialInfo_->InitialEnergy() / unit::keV;
+    const double de = energy - ini_energy;
+    const double arm = event->DeltaTheta() / unit::degree;
+    const unsigned int hit1Process = event->Hit1Process();
+
+    hist_all_->Fill(de, arm, fraction);
     for (std::size_t i=0; i<hist_vec_.size(); i++) {
       if (eventReconstruction_->HitPatternFlag(i)) {
-        hist_compton_vec_[i]->Fill(de, arm);
+        hist_vec_[i]->Fill(de, arm, fraction);
+      }
+    }
+
+    if (hit1Process==process::ComptonScattering) {
+      hist_compton_all_->Fill(de, arm, fraction);
+      for (std::size_t i=0; i<hist_vec_.size(); i++) {
+        if (eventReconstruction_->HitPatternFlag(i)) {
+          hist_compton_vec_[i]->Fill(de, arm, fraction);
+        }
       }
     }
   }

@@ -44,7 +44,7 @@ EventReconstruction::EventReconstruction()
     m_SourceDistant(true),
     m_SourceDirection(0.0, 0.0, 1.0), m_SourcePosition(0.0, 0.0, 0.0),
     m_HitCollection(nullptr),
-    m_ComptonEvent(new BasicComptonEvent),
+    m_BaseEvent(new BasicComptonEvent),
     m_Reconstruction(new StandardEventReconstructionAlgorithm)
 {
   add_alias("EventReconstruction");
@@ -97,12 +97,12 @@ ANLStatus EventReconstruction::mod_initialize()
 
 ANLStatus EventReconstruction::mod_analyze()
 {
-  resetComptonEvent();
-  resetHitPatternFlags();
+  initializeEvent();
 
   const std::vector<DetectorHit_sptr> hits = m_HitCollection->getHits();
   determineHitPatterns(hits);
-  const bool result = m_Reconstruction->reconstruct(hits, *m_ComptonEvent);
+  const bool result = m_Reconstruction->reconstruct(hits, *m_BaseEvent, m_ReconstructedEvents);
+
   if (result) {
     set_evs("EventReconstruction:OK");
   }
@@ -124,10 +124,10 @@ ANLStatus EventReconstruction::mod_end_run()
 void EventReconstruction::assignSourceInformation()
 {
   if (m_SourceDistant) {
-    m_ComptonEvent->setSourceDirection(m_SourceDirection);
+    m_BaseEvent->setSourceDirection(m_SourceDirection);
   }
   else {
-    m_ComptonEvent->setSourcePosition(m_SourcePosition);
+    m_BaseEvent->setSourcePosition(m_SourcePosition);
   }
 }
 
@@ -146,10 +146,11 @@ void EventReconstruction::initializeHitPatternData()
   }
 }
 
-void EventReconstruction::resetHitPatternFlags()
+void EventReconstruction::initializeEvent()
 {
-  const std::size_t n = m_HitPatternFlags.size();
-  m_HitPatternFlags.assign(n, 0);
+  m_BaseEvent->setHitPattern(0u);
+  m_HitPatternFlags.assign(m_HitPatternFlags.size(), 0);
+  m_ReconstructedEvents.clear();
 }
 
 void EventReconstruction::determineHitPatterns(const std::vector<DetectorHit_sptr>& hits)
@@ -186,12 +187,14 @@ void EventReconstruction::determineHitPatterns(const std::vector<int>& detectorI
     }
   }
 
-  m_ComptonEvent->setHitPattern(flags);
+  m_BaseEvent->setHitPattern(flags);
 }
 
 void EventReconstruction::retrieveHitPatterns()
 {
-  const uint64_t flags = m_ComptonEvent->HitPattern();
+  if (NumberOfReconstructedEvents() == 0) { return; }
+
+  const uint64_t flags = m_ReconstructedEvents[0]->HitPattern();
 
   const std::vector<HitPattern>& hitPatterns
     = getDetectorManager()->getHitPatterns();
@@ -226,14 +229,9 @@ void EventReconstruction::printHitPatternData()
   }
 }
 
-void EventReconstruction::resetComptonEvent()
+void EventReconstruction::pushReconstructedEvent(const BasicComptonEvent_sptr& event)
 {
-  m_ComptonEvent.reset(new BasicComptonEvent);
-}
-
-void EventReconstruction::resetComptonEvent(BasicComptonEvent* event)
-{
-  m_ComptonEvent.reset(event);
+  m_ReconstructedEvents.push_back(event);
 }
 
 void EventReconstruction::clearAllHitPatternEVS()

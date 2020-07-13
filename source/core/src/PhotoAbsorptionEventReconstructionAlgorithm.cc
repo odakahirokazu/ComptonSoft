@@ -34,7 +34,8 @@ void PhotoAbsorptionEventReconstructionAlgorithm::initializeEvent()
 
 bool PhotoAbsorptionEventReconstructionAlgorithm::
 reconstruct(const std::vector<DetectorHit_sptr>& hits,
-            BasicComptonEvent& eventReconstructed)
+            const BasicComptonEvent& baseEvent,
+            std::vector<BasicComptonEvent_sptr>& eventsReconstructed)
 {
   const int NumHits = hits.size();
   if (NumHits > MaxHits()) {
@@ -46,9 +47,12 @@ reconstruct(const std::vector<DetectorHit_sptr>& hits,
     mergedHit->merge(*hit);
   }
 
-  eventReconstructed.setHit1(0, mergedHit);
-  eventReconstructed.setNumberOfHits(NumHits);
+  auto event = std::make_shared<BasicComptonEvent>(baseEvent);
+  event->setHit1(0, mergedHit);
+  event->setNumberOfHits(NumHits);
+  event->setTotalEnergyDeposit(total_energy_deposits(hits));
 
+  eventsReconstructed.push_back(event);
   return true;
 }
 

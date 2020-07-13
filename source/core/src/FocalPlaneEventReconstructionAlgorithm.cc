@@ -39,17 +39,22 @@ void FocalPlaneEventReconstructionAlgorithm::initializeEvent()
 
 bool FocalPlaneEventReconstructionAlgorithm::
 reconstruct(const std::vector<DetectorHit_sptr>& hits,
-            BasicComptonEvent& eventReconstructed)
+            const BasicComptonEvent& baseEvent,
+            std::vector<BasicComptonEvent_sptr>& eventsReconstructed)
 {
   const int NumHits = hits.size();
   if (NumHits > MaxHits()) {
     return false;
   }
 
+  bool result = false;
+  auto eventReconstructed = std::make_shared<BasicComptonEvent>(baseEvent);
+  eventReconstructed->setTotalEnergyDeposit(total_energy_deposits(hits));
+
   if (NumHits == 1) {
-    eventReconstructed.setHit1(0, hits[0]);
-    eventReconstructed.setNumberOfHits(1);
-    return true;
+    eventReconstructed->setHit1(0, hits[0]);
+    eventReconstructed->setNumberOfHits(1);
+    result = true;
   }
   else if (NumHits == 2) {
     const bool hit0LowZ = hits[0]->isFlags(flag::LowZHit);
@@ -58,29 +63,27 @@ reconstruct(const std::vector<DetectorHit_sptr>& hits,
     const bool hit1HighZ = hits[1]->isFlags(flag::HighZHit);
 
     if (hit0LowZ && hit1LowZ) {
-      return reconstruct2HitsLL(hits, eventReconstructed);
+      result = reconstruct2HitsLL(hits, *eventReconstructed);
     }
     else if (hit0HighZ && hit1HighZ) {
-      return reconstruct2HitsHH(hits, eventReconstructed);
+      result = reconstruct2HitsHH(hits, *eventReconstructed);
     }
     else if (hit0LowZ && hit1HighZ) {
-      return reconstruct2HitsLH(hits, eventReconstructed);
+      result = reconstruct2HitsLH(hits, *eventReconstructed);
     }
     else if (hit0HighZ && hit1LowZ) {
       std::vector<DetectorHit_sptr> hitsOrdered(2);
       hitsOrdered[0] = hits[1];
       hitsOrdered[1] = hits[0];
-      return reconstruct2HitsLH(hitsOrdered, eventReconstructed);
+      result = reconstruct2HitsLH(hitsOrdered, *eventReconstructed);
     }
-    else {
-      return false;
-    }
-  }
-  else {
-    return false;
   }
 
-  return false;
+  if (result) {
+    eventsReconstructed.push_back(eventReconstructed);
+  }
+  
+  return result;
 }
 
 bool FocalPlaneEventReconstructionAlgorithm::

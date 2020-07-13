@@ -21,6 +21,7 @@
 #define COMPTONSOFT_VEventReconstructionAlgorithm_H 1
 
 #include <vector>
+#include <memory>
 #include "DetectorHit_sptr.hh"
 #include "BasicComptonEvent.hh"
 
@@ -31,6 +32,7 @@ namespace comptonsoft {
  * @author Hirokazu Odaka
  * @date 2011-02-16
  * @date 2014-11-17
+ * @date 2020-07-02 | multiple reconstructed events
  */
 class VEventReconstructionAlgorithm
 {
@@ -50,15 +52,19 @@ public:
   /**
    * perform the event reconstruction.
    * @param hits vector of hits to reconstruct.
-   * @param eventReconstructed event reconstructed.
+   * @param baseEvent event based for new reconstructed events.
+   * @param eventsReconstructed event vector reconstructed.
    * @return true if the reconstruction is successful.
    */
   virtual bool reconstruct(const std::vector<DetectorHit_sptr>& hits,
-                           BasicComptonEvent& eventReconstructed) = 0;
+                           const BasicComptonEvent& baseEvent,
+                           std::vector<BasicComptonEvent_sptr>& eventsReconstructed) = 0;
 
 private:
   int maxHits_;
 };
+
+double total_energy_deposits(const std::vector<DetectorHit_sptr>& hits);
 
 } /* namespace comptonsoft */
 

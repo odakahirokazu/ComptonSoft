@@ -44,11 +44,13 @@ public:
   /**
    * perform the event reconstruction.
    * @param hits vector of hits to reconstruct.
-   * @param eventReconstructed event reconstructed.
+   * @param baseEvent event based for new reconstructed events.
+   * @param eventsReconstructed events reconstructed.
    * @return true if the reconstruction is successful.
    */
   bool reconstruct(const std::vector<DetectorHit_sptr>& hits,
-                   BasicComptonEvent& eventReconstructed) override;
+                   const BasicComptonEvent& baseEvent,
+                   std::vector<BasicComptonEvent_sptr>& eventsReconstructed) override;
 };
 
 } /* namespace comptonsoft */

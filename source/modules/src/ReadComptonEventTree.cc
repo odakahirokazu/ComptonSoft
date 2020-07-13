@@ -78,8 +78,10 @@ ANLStatus ReadComptonEventTree::mod_analyze()
     return AS_QUIT;
   }
 
+  initializeEvent();
+
   cetree_->GetEntry(entryIndex_);
-  
+    
   const int64_t EventID = treeIO_->getEventID();
   setEventID(EventID);
 
@@ -95,14 +97,20 @@ ANLStatus ReadComptonEventTree::mod_analyze()
     setWeight(treeIO_->getWeight());
   }
 
-  BasicComptonEvent* event = new BasicComptonEvent;
-  treeIO_->retrieveEvent(*event);
-  resetComptonEvent(event);
-  resetHitPatternFlags();
-  retrieveHitPatterns();
-  set_evs("EventReconstruction:OK");
+  do {
+    auto event = std::make_shared<BasicComptonEvent>();
+    treeIO_->retrieveEvent(*event);
+    pushReconstructedEvent(event);
+    retrieveHitPatterns();
+    set_evs("EventReconstruction:OK");
+    ++entryIndex_;
 
-  ++entryIndex_;
+    if (entryIndex_ == numEntries_) {
+      return AS_QUIT;
+    }
+    cetree_->GetEntry(entryIndex_);
+  } while (treeIO_->getEventID() == EventID);
+
   return AS_OK;
 }
 

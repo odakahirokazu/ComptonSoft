@@ -78,17 +78,20 @@ ANLStatus HistogramARM::mod_analyze()
     return AS_OK;
   }
   
-  const BasicComptonEvent& event = eventReconstruction_->getComptonEvent();
-  const double cosThetaE = event.CosThetaE();
-  if (cosThetaE < -1.0 || +1.0 < cosThetaE) {
-    return AS_OK;
-  }
+  const std::vector<BasicComptonEvent_sptr> events = eventReconstruction_->getReconstructedEvents();
+  for (const auto& event: events) {
+    const double fraction = event->ReconstructionFraction();
+    const double cosThetaE = event->CosThetaE();
+    if (cosThetaE < -1.0 || +1.0 < cosThetaE) {
+      return AS_OK;
+    }
 
-  const double ARMValue = event.DeltaTheta()/unit::degree;
-  hist_all_->Fill(ARMValue);
-  for (std::size_t i=0; i<hist_vec_.size(); i++) {
-    if (eventReconstruction_->HitPatternFlag(i)) {
-      hist_vec_[i]->Fill(ARMValue);
+    const double ARMValue = event->DeltaTheta()/unit::degree;
+    hist_all_->Fill(ARMValue, fraction);
+    for (std::size_t i=0; i<hist_vec_.size(); i++) {
+      if (eventReconstruction_->HitPatternFlag(i)) {
+        hist_vec_[i]->Fill(ARMValue, fraction);
+      }
     }
   }
 

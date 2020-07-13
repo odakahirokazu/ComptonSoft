@@ -100,37 +100,40 @@ ANLStatus HistogramAzimuthAngle::mod_analyze()
     return AS_OK;
   }
   
-  const BasicComptonEvent& event = eventReconstruction_->getComptonEvent();
-  const double thetaE = event.ThetaE();
+  const std::vector<BasicComptonEvent_sptr> events = eventReconstruction_->getReconstructedEvents();
+  for (const auto& event: events) {
+    const double fraction = event->ReconstructionFraction();
+    const double thetaE = event->ThetaE();
 
-  if (thetaE < theta_min_) {
-    return AS_OK;
-  }
+    if (thetaE < theta_min_) {
+      return AS_OK;
+    }
 
-  if (thetaE > theta_max_) {
-    return AS_OK;
-  }
+    if (thetaE > theta_max_) {
+      return AS_OK;
+    }
 
-  const double phi0 = (event.PhiG()/unit::degree) - phi_origin_;
-  const double phi0a = sky_ ? (-phi0) : phi0;
-  const int n_phi = std::floor((phi0a+180.0)/360.0);
-  const double phi1 = phi0a - n_phi*360.0;
+    const double phi0 = (event->PhiG()/unit::degree) - phi_origin_;
+    const double phi0a = sky_ ? (-phi0) : phi0;
+    const int n_phi = std::floor((phi0a+180.0)/360.0);
+    const double phi1 = phi0a - n_phi*360.0;
 
-  hist_all_->Fill(phi1);
+    hist_all_->Fill(phi1, fraction);
 
-  const int bin = hist_delta_all_->FindBin(phi1);
-  const double binCenter = hist_delta_all_->GetBinCenter(bin);
-  const double delta = phi1 - binCenter;
-  hist_delta_all_->AddBinContent(bin, delta);
+    const int bin = hist_delta_all_->FindBin(phi1);
+    const double binCenter = hist_delta_all_->GetBinCenter(bin);
+    const double delta = phi1 - binCenter;
+    hist_delta_all_->AddBinContent(bin, delta*fraction);
 
-  for (std::size_t i=0; i<hist_vec_.size(); i++) {
-    if (eventReconstruction_->HitPatternFlag(i)) {
-      hist_vec_[i]->Fill(phi1);
+    for (std::size_t i=0; i<hist_vec_.size(); i++) {
+      if (eventReconstruction_->HitPatternFlag(i)) {
+        hist_vec_[i]->Fill(phi1, fraction);
 
-      const int bin = hist_delta_vec_[i]->FindBin(phi1);
-      const double binCenter = hist_delta_vec_[i]->GetBinCenter(bin);
-      const double delta = phi1 - binCenter;
-      hist_delta_vec_[i]->AddBinContent(bin, delta);
+        const int bin = hist_delta_vec_[i]->FindBin(phi1);
+        const double binCenter = hist_delta_vec_[i]->GetBinCenter(bin);
+        const double delta = phi1 - binCenter;
+        hist_delta_vec_[i]->AddBinContent(bin, delta*fraction);
+      }
     }
   }
 

@@ -58,6 +58,8 @@ ANLStatus SelectEventsOnFocalPlane::mod_initialize()
  
   get_module("EventReconstruction", &m_EventReconstruction);
 
+  define_evs("SelectEventsOnFocalPlane:Exception");
+
   if (m_RegionTypeString=="rectangle") {
     m_RegionType = Region_t::Rectangle;
   }
@@ -76,14 +78,19 @@ ANLStatus SelectEventsOnFocalPlane::mod_initialize()
 
 ANLStatus SelectEventsOnFocalPlane::mod_analyze()
 {
-  const BasicComptonEvent& comptonEvent = m_EventReconstruction->getComptonEvent();
+  if (m_EventReconstruction->NumberOfReconstructedEvents()!=1) {
+    set_evs("SelectEventsOnFocalPlane:Exception");
+    return AS_SKIP;
+  }
 
-  if (comptonEvent.Hit1DetectorID() != m_DetectorID) {
+  const_BasicComptonEvent_sptr comptonEvent = m_EventReconstruction->getReconstructedEvents()[0];
+
+  if (comptonEvent->Hit1DetectorID() != m_DetectorID) {
     return AS_OK;
   }
   
-  const double x = comptonEvent.Hit1PositionX();
-  const double y = comptonEvent.Hit1PositionY();
+  const double x = comptonEvent->Hit1PositionX();
+  const double y = comptonEvent->Hit1PositionY();
 
   if (m_RegionType==Region_t::Rectangle) {
     const double x0 = m_Center.x() - 0.5*m_SizeX;

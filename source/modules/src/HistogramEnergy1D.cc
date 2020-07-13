@@ -78,17 +78,17 @@ ANLStatus HistogramEnergy1D::mod_analyze()
   if (!evs("EventReconstruction:OK")) {
     return AS_OK;
   }
-  
-  const BasicComptonEvent& event = eventReconstruction_->getComptonEvent();
-  const double energy1 = event.Hit1Energy() / unit::keV;
-  const double energy2 = event.Hit2Energy() / unit::keV;
-  const double energy = energy1+energy2;
 
-  hist_all_->Fill(energy);
-  
-  for (std::size_t i=0; i<hist_vec_.size(); i++) {
-    if (eventReconstruction_->HitPatternFlag(i)) {
-      hist_vec_[i]->Fill(energy);
+  const std::vector<BasicComptonEvent_sptr> events = eventReconstruction_->getReconstructedEvents();
+  for (const auto& event: events) {
+    const double fraction = event->ReconstructionFraction();
+    const double energy = event->IncidentEnergy() / unit::keV;
+    
+    hist_all_->Fill(energy, fraction);
+    for (std::size_t i=0; i<hist_vec_.size(); i++) {
+      if (eventReconstruction_->HitPatternFlag(i)) {
+        hist_vec_[i]->Fill(energy, fraction);
+      }
     }
   }
 

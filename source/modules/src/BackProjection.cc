@@ -85,44 +85,42 @@ ANLStatus BackProjection::mod_initialize()
 
 ANLStatus BackProjection::mod_analyze()
 {
-  const BasicComptonEvent& compton_event = getComptonEvent();
+  const std::vector<BasicComptonEvent_sptr> events = getEventReconstructionModule()->getReconstructedEvents();
+  for (const auto& event: events) {
+    const double fraction = event->ReconstructionFraction();
 
-  static TRandom3 randgen;
-  const int Times = 1000;
-  const double FillWeight = 1.0/double(Times);
+    static TRandom3 randgen;
+    const int Times = 1000;
+    const double FillWeight = fraction/double(Times);
   
-  const vector3_t coneVertex = compton_event.ConeVertex();
-  const vector3_t coneAxis = compton_event.ConeAxis();
-  const vector3_t coneAxisOrtho = coneAxis.orthogonal();
-  const double cosThetaE = compton_event.CosThetaE();
+    const vector3_t coneVertex = event->ConeVertex();
+    const vector3_t coneAxis = event->ConeAxis();
+    const vector3_t coneAxisOrtho = coneAxis.orthogonal();
+    const double cosThetaE = event->CosThetaE();
 
-  vector3_t cone1(coneAxis);
-  double thetaE = TMath::ACos(cosThetaE);
-  cone1.rotate(thetaE, coneAxisOrtho);
+    vector3_t cone1(coneAxis);
+    double thetaE = TMath::ACos(cosThetaE);
+    cone1.rotate(thetaE, coneAxisOrtho);
 
-  vector3_t coneSample;
-  double phi;
-  vector3_t coneProjected;
+    vector3_t coneSample;
+    double phi;
+    vector3_t coneProjected;
 
-  for (int t=0; t<Times; t++) {
-    coneSample = cone1;
-    phi = randgen.Uniform(0.0, TMath::TwoPi());
-    coneSample.rotate(phi, coneAxis);
-    bool bPositive = sectionConeAndPlane(coneVertex, coneSample, coneProjected);
+    for (int t=0; t<Times; t++) {
+      coneSample = cone1;
+      phi = randgen.Uniform(0.0, TMath::TwoPi());
+      coneSample.rotate(phi, coneAxis);
+      bool bPositive = sectionConeAndPlane(coneVertex, coneSample, coneProjected);
   
-    if (bPositive == false) {
-      continue;
+      if (bPositive == false) {
+        continue;
+      }
+
+      fillImage(coneProjected.x()/m_PixelUnit, coneProjected.y()/m_PixelUnit, FillWeight);
     }
-
-    fillImage(coneProjected.x()/m_PixelUnit, coneProjected.y()/m_PixelUnit, FillWeight);
   }
   
   return AS_OK;
-}
-
-const BasicComptonEvent& BackProjection::getComptonEvent()
-{
-  return m_EventReconstruction->getComptonEvent();
 }
 
 void BackProjection::fillImage(double x, double y, double weight)

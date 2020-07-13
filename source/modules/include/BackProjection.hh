@@ -55,9 +55,11 @@ protected:
 
   double PixelUnit() { return m_PixelUnit; }
 
-  const comptonsoft::BasicComptonEvent& getComptonEvent();
   void fillImage(double x, double y, double weight);
   bool sectionConeAndPlane(const vector3_t& vertex, const vector3_t& cone, vector3_t& coneProjected);
+
+  EventReconstruction* getEventReconstructionModule()
+  { return m_EventReconstruction; }
   
 private:
   EventReconstruction* m_EventReconstruction;

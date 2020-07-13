@@ -18,6 +18,7 @@
  *************************************************************************/
 
 #include "VEventReconstructionAlgorithm.hh"
+#include "DetectorHit.hh"
 
 namespace comptonsoft {
 
@@ -27,5 +28,12 @@ VEventReconstructionAlgorithm::VEventReconstructionAlgorithm()
 }
 
 VEventReconstructionAlgorithm::~VEventReconstructionAlgorithm() = default;
+
+double total_energy_deposits(const std::vector<DetectorHit_sptr>& hits)
+{
+  double sum = 0.0;
+  for (const auto& hit: hits) { sum += hit->Energy(); }
+  return sum;
+}
 
 } /* namespace comptonsoft */

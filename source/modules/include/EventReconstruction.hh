@@ -25,11 +25,11 @@
 #include <vector>
 #include "CSTypes.hh"
 #include "DetectorHit_sptr.hh"
+#include "BasicComptonEvent.hh"
 #include "VCSModule.hh"
 
 namespace comptonsoft {
 
-class BasicComptonEvent;
 class VEventReconstructionAlgorithm;
 class CSHitCollection;
 
@@ -39,10 +39,11 @@ class CSHitCollection;
  * @date 2008-12-15
  * @date 2014-11-25
  * @date 2015-10-10 | derived from VCSModule
+ * @date 2020-07-02 | 3.0 | multiple reconstruction event cases
  */
 class EventReconstruction : public VCSModule
 {
-  DEFINE_ANL_MODULE(EventReconstruction, 2.1)
+  DEFINE_ANL_MODULE(EventReconstruction, 3.0)
 public:
   EventReconstruction();
   ~EventReconstruction() = default;
@@ -52,8 +53,13 @@ public:
   anlnext::ANLStatus mod_analyze() override;
   anlnext::ANLStatus mod_end_run() override;
 
-  const BasicComptonEvent& getComptonEvent() const
-  { return *m_ComptonEvent; }
+  std::size_t NumberOfReconstructedEvents() const
+  { return m_ReconstructedEvents.size(); }
+  
+  const std::vector<BasicComptonEvent_sptr>& getReconstructedEvents() const
+  { return m_ReconstructedEvents; }
+  std::vector<BasicComptonEvent_sptr>& getReconstructedEvents()
+  { return m_ReconstructedEvents; }
   
   int HitPatternFlag(int index) const { return m_HitPatternFlags[index]; }
   void clearAllHitPatternEVS();
@@ -66,16 +72,16 @@ protected:
   std::string ReconstructionMethodName() const { return m_ReconstructionMethodName; }
   
   void assignSourceInformation();
-
   void initializeHitPatternData();
-  void resetHitPatternFlags();
+
+  void initializeEvent();
+
   void determineHitPatterns(const std::vector<DetectorHit_sptr>& hitvec);
   void determineHitPatterns(const std::vector<int>& idvec);
   void retrieveHitPatterns();
   void printHitPatternData();
   
-  void resetComptonEvent();
-  void resetComptonEvent(BasicComptonEvent* event);
+  void pushReconstructedEvent(const BasicComptonEvent_sptr& event);
   
 private:
   int m_MaxHits;
@@ -86,7 +92,8 @@ private:
 
   CSHitCollection* m_HitCollection;
 
-  std::unique_ptr<BasicComptonEvent> m_ComptonEvent;
+  std::unique_ptr<BasicComptonEvent> m_BaseEvent;
+  std::vector<BasicComptonEvent_sptr> m_ReconstructedEvents;
   std::unique_ptr<VEventReconstructionAlgorithm> m_Reconstruction;
 
   std::vector<int> m_HitPatternFlags;

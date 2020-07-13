@@ -40,7 +40,11 @@ BasicComptonEvent::BasicComptonEvent()
     phiG_(0.0),
     coneAxis_(0.0, 0.0, 1.0),
     sourceDistant_(true), sourceDirection_(0.0, 0.0, 1.0),
-    sourcePosition_(0.0, 0.0, 0.0)
+    sourcePosition_(0.0, 0.0, 0.0),
+    escapeFlag_(false),
+    totalEnergyDeposit_(0.0),
+    reconstructedOrder_(0),
+    reconstructionFraction_(1.0)
 {
 }
 

@@ -81,11 +81,9 @@ ANLStatus WriteComptonEventTree::mod_analyze()
   else {
     eventID = get_loop_index();
   }
-  
-  const BasicComptonEvent& event
-    = eventReconstruction_->getComptonEvent();
-  treeIO_->fillEvent(eventID, event);
 
+  treeIO_->fillEvents(eventID, eventReconstruction_->getReconstructedEvents());
+  
   return AS_OK;
 }
 

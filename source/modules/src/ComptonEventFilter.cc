@@ -45,6 +45,7 @@ ANLStatus ComptonEventFilter::mod_initialize()
   VCSModule::mod_initialize();
   
   define_evs("ComptonEventFilter:Selected");
+  define_evs("ComptonEventFilter:Exception");
   
   get_module_NC("EventReconstruction", &m_EventReconstruction);
 
@@ -72,7 +73,12 @@ ANLStatus ComptonEventFilter::mod_initialize()
 
 ANLStatus ComptonEventFilter::mod_analyze()
 {
-  const BasicComptonEvent& comptonEvent = m_EventReconstruction->getComptonEvent();
+  if (m_EventReconstruction->NumberOfReconstructedEvents()!=1) {
+    set_evs("ComptonEventFilter:Exception");
+    return AS_SKIP;
+  }
+
+  const_BasicComptonEvent_sptr comptonEvent = m_EventReconstruction->getReconstructedEvents()[0];
 
   if (m_ConditionsVector.empty()) {
     set_evs("ComptonEventFilter:Selected");
@@ -107,7 +113,7 @@ ANLStatus ComptonEventFilter::mod_analyze()
     bool goodCondition = true;
     const std::vector<std::function<bool (const BasicComptonEvent&)>>& conditions = eventSelection.get_conditions();
     for (auto& condition: conditions) {
-      if ( !condition(comptonEvent) ) {
+      if ( !condition(*comptonEvent) ) {
         goodCondition = false;
         break;
       }
@@ -182,7 +188,7 @@ void ComptonEventFilter::add_condition(const std::string& type,
   }
   else if (type == "E1+E2") {
     condition = std::bind(filter_compton<double>,
-                          &BasicComptonEvent::TotalEnergy,
+                          &BasicComptonEvent::IncidentEnergy,
                           arg::_1, min_value*unit::keV, max_value*unit::keV);
   }
   else if (type == "theta K") {

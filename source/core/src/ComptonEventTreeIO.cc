@@ -69,6 +69,8 @@ void ComptonEventTreeIO::defineBranches()
   cetree_->Branch("hit2_posz", &hit2_posz_, "hit2_posz/F");
   cetree_->Branch("hit2_energy", &hit2_energy_, "hit2_energy/F");
 
+  cetree_->Branch("energy_reconstructed", &energy_reconstructed_, "energy_reconstructed/F");
+
   cetree_->Branch("flags", &flags_, "flags/l");
   cetree_->Branch("costheta", &costheta_, "costheta/F");
   cetree_->Branch("dtheta", &dtheta_, "dtheta_/F");
@@ -77,6 +79,11 @@ void ComptonEventTreeIO::defineBranches()
   cetree_->Branch("hitpattern", &hitpattern_, "hitpattern/l");
   cetree_->Branch("grade", &grade_, "grade/I");
   cetree_->Branch("likelihood", &likelihood_, "likelihood/F");
+
+  cetree_->Branch("escape_flag", &escape_flag_, "escape_flag/O");
+  cetree_->Branch("total_energy_deposit", &total_energy_deposit_, "total_energy_deposit/F");
+  cetree_->Branch("reconstructed_order", &reconstructed_order_, "reconstructed_order/I");
+  cetree_->Branch("reconstruction_fraction", &reconstruction_fraction_, "reconstruction_fraction/F");
 }
 
 void ComptonEventTreeIO::setBranchAddresses()
@@ -114,6 +121,8 @@ void ComptonEventTreeIO::setBranchAddresses()
   cetree_->SetBranchAddress("hit2_posz", &hit2_posz_);
   cetree_->SetBranchAddress("hit2_energy", &hit2_energy_);
 
+  cetree_->SetBranchAddress("energy_reconstructed", &energy_reconstructed_);
+
   cetree_->SetBranchAddress("flags", &flags_);
   cetree_->SetBranchAddress("costheta", &costheta_);
   cetree_->SetBranchAddress("dtheta", &dtheta_);
@@ -122,6 +131,11 @@ void ComptonEventTreeIO::setBranchAddresses()
   cetree_->SetBranchAddress("hitpattern", &hitpattern_);
   cetree_->SetBranchAddress("grade", &grade_);
   cetree_->SetBranchAddress("likelihood", &likelihood_);
+
+  cetree_->SetBranchAddress("escape_flag", &escape_flag_);
+  cetree_->SetBranchAddress("total_energy_deposit", &total_energy_deposit_);
+  cetree_->SetBranchAddress("reconstructed_order", &reconstructed_order_);
+  cetree_->SetBranchAddress("reconstruction_fraction", &reconstruction_fraction_);
 }
 
 void ComptonEventTreeIO::fillEvent(const int64_t eventID,
@@ -166,6 +180,8 @@ void ComptonEventTreeIO::fillEvent(const int64_t eventID,
   hit2_posz_ = hit2Position.z() / unit::cm;
   hit2_energy_ = event.Hit2Energy() / unit::keV;
 
+  energy_reconstructed_ = event.IncidentEnergy() / unit::keV;
+
   flags_ = event.Flags();
   costheta_ = event.CosThetaE();
   dtheta_ = event.DeltaTheta();
@@ -173,8 +189,21 @@ void ComptonEventTreeIO::fillEvent(const int64_t eventID,
   hitpattern_ = event.HitPattern();
   grade_ = event.Grade();
   likelihood_ = event.Likelihood();
+
+  escape_flag_ = event.EscapeFlag();
+  total_energy_deposit_ = event.TotalEnergyDeposit() / unit::keV;
+  reconstructed_order_ = event.ReconstructedOrder();
+  reconstruction_fraction_ = event.ReconstructionFraction();
   
   cetree_->Fill();
+}
+
+void ComptonEventTreeIO::fillEvents(const int64_t eventID,
+                                    const std::vector<BasicComptonEvent_sptr>& events)
+{
+  for (const auto& e: events) {
+    fillEvent(eventID, *e);
+  }
 }
 
 BasicComptonEvent ComptonEventTreeIO::retrieveEvent() const
@@ -210,11 +239,19 @@ void ComptonEventTreeIO::retrieveEvent(BasicComptonEvent& event) const
   event.setHit2Time(hit2_time_ * unit::second);
   event.setHit2Position(hit2_posx_ * unit::cm, hit2_posy_ * unit::cm, hit2_posz_ * unit::cm);
   event.setHit2Energy(hit2_energy_ * unit::keV);
+
+  // Currently, BasicComptonEvent does not have a correspoing property
+  // event.setEnergyReconstructed(energy_reconstructed_ * unit::keV);
   
   event.setFlags(flags_);
   event.setHitPattern(hitpattern_);
   event.setGrade(grade_);
   event.setLikelihood(likelihood_);
+
+  event.setEscapeFlag(escape_flag_);
+  event.setTotalEnergyDeposit(total_energy_deposit_ * unit::keV);
+  event.setReconstructedOrder(reconstructed_order_);
+  event.setReconstructionFraction(reconstruction_fraction_);
 }
 
 } /* namespace comptonsoft */

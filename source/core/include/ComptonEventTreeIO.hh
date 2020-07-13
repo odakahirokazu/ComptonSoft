@@ -22,18 +22,19 @@
 
 #include <cstdint>
 #include "DetectorHit_sptr.hh"
+#include "BasicComptonEvent.hh"
 
 class TTree;
 
 namespace comptonsoft {
 
-class BasicComptonEvent;
 
 /**
  * 
  * @author Hirokazu Odaka
  * @date 2014-12-02
  * @date 2015-10-10
+ * @date 2020-07-09 | new properties
  */
 class ComptonEventTreeIO
 {
@@ -51,7 +52,12 @@ public:
                  const BasicComptonEvent& event);
   void fillEvent(const BasicComptonEvent& event)
   { fillEvent(-1, event); }
-  
+
+  void fillEvents(int64_t eventID,
+                  const std::vector<BasicComptonEvent_sptr>& events);
+  void fillEvents(const std::vector<BasicComptonEvent_sptr>& events)
+  { fillEvents(-1, events); }
+
   BasicComptonEvent retrieveEvent() const;
   void retrieveEvent(BasicComptonEvent& event) const;
 
@@ -94,6 +100,8 @@ private:
   float hit2_posz_ = 0.0;
   float hit2_energy_ = 0.0;
 
+  float energy_reconstructed_ = 0.0;
+
   uint64_t flags_ = 0ul;
 
   float costheta_ = 0.0;
@@ -103,6 +111,11 @@ private:
   uint64_t hitpattern_ = 0ul;
   int32_t grade_ = 0;
   float likelihood_ = 1.0;
+
+  bool escape_flag_ = false;
+  float total_energy_deposit_ = 0.0;
+  int32_t reconstructed_order_ = 0;
+  float reconstruction_fraction_ = 1.0;
 };
 
 } /* namespace comptonsoft */

@@ -81,14 +81,17 @@ ANLStatus ResponseMatrix::mod_analyze()
   const double weight = m_InitialInfo->Weight();
   const double initialEnergy = m_InitialInfo->InitialEnergy();
 
-  const BasicComptonEvent& event = m_EventReconstruction->getComptonEvent();
-  const double energy = event.TotalEnergy();
+  const std::vector<BasicComptonEvent_sptr> events = m_EventReconstruction->getReconstructedEvents();
+  for (const auto& event: events) {
+    const double energy = event->IncidentEnergy();
+    const double eventWeight = event->ReconstructionFraction() * weight;
   
-  for (auto& pair: m_Responses) {
-    const std::string& evsName = pair.first;
-    TH2* hist = pair.second;
-    if (evs(evsName)) {
-      hist->Fill(initialEnergy/unit::keV, energy/unit::keV, weight);
+    for (auto& pair: m_Responses) {
+      const std::string& evsName = pair.first;
+      TH2* hist = pair.second;
+      if (evs(evsName)) {
+        hist->Fill(initialEnergy/unit::keV, energy/unit::keV, eventWeight);
+      }
     }
   }
 

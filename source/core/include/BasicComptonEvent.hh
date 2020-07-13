@@ -21,6 +21,7 @@
 #define COMPTONSOFT_BasicComptonEvent_H 1
 
 #include <cstdint>
+#include <memory>
 #include "CSTypes.hh"
 #include "ChannelID.hh"
 #include "PixelID.hh"
@@ -33,6 +34,8 @@ namespace comptonsoft {
  * @author Hirokazu Odaka
  * @date 2014-11-15
  * @date 2015-11-14
+ * @date 2020-07-02 | add properties: total energy deposit, escape flag, reconstructed order, reconstruction fraction
+ * @date 2020-07-08 | rename TotalEnergy() -> IncidentEnergy()
  */
 class BasicComptonEvent
 {
@@ -128,7 +131,7 @@ public:
   double DeltaTheta() const { refresh(); return deltaTheta_; }
   double PhiG() const { refresh(); return phiG_; }
 
-  double TotalEnergy()  const { return Hit1Energy()+Hit2Energy(); }
+  double IncidentEnergy()  const { return Hit1Energy()+Hit2Energy(); }
   bool TimeOrder() const { return (Hit1Time() <= Hit2Time()); }
   bool EnergyOrder() const { return (Hit1Energy() <= Hit2Energy()); }
 
@@ -155,7 +158,19 @@ public:
   vector3_t SourcePosition() const { return sourcePosition_; }
 
   double DistanceBetweenTheHits() const;
-  
+
+  void setEscapeFlag(bool f) { escapeFlag_ = f; }
+  bool EscapeFlag() const { return escapeFlag_; }
+
+  void setTotalEnergyDeposit(double v) { totalEnergyDeposit_ = v; }
+  double TotalEnergyDeposit() const { return totalEnergyDeposit_; }
+
+  void setReconstructedOrder(int i) { reconstructedOrder_ = i; }
+  int ReconstructedOrder() const { return reconstructedOrder_; }
+
+  void setReconstructionFraction(double v) { reconstructionFraction_ = v; }
+  double ReconstructionFraction() const { return reconstructionFraction_; }
+
 private:
   void refresh() const { if (!bCalc_) { calc(); } }
   void calc() const;
@@ -199,6 +214,11 @@ private:
   bool sourceDistant_;
   vector3_t sourceDirection_;
   vector3_t sourcePosition_;
+
+  bool escapeFlag_;
+  double totalEnergyDeposit_;
+  int reconstructedOrder_;
+  double reconstructionFraction_;
 };
 
 template <typename T>
@@ -208,6 +228,10 @@ bool filter_compton(T (BasicComptonEvent::*getter)() const,
 {
   return min <= (event.*getter)() && (event.*getter)() <= max;
 }
+
+using BasicComptonEvent_sptr = std::shared_ptr<BasicComptonEvent>;
+using const_BasicComptonEvent_sptr = std::shared_ptr<const BasicComptonEvent>;
+using BasicComptonEventVector = std::vector<std::shared_ptr<BasicComptonEvent>>;
 
 } /* namespace comptonsoft */
 

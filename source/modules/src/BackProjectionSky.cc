@@ -63,35 +63,38 @@ ANLStatus BackProjectionSky::mod_initialize()
 
 ANLStatus BackProjectionSky::mod_analyze()
 {
-  const BasicComptonEvent& compton_event = getComptonEvent();
+  const std::vector<BasicComptonEvent_sptr> events = getEventReconstructionModule()->getReconstructedEvents();
+  for (const auto& event: events) {
+    const double fraction = event->ReconstructionFraction();
 
-  static TRandom3 randgen;
-  const int Times = 1000;
-  const double FillWeight = 1.0/Times;
+    static TRandom3 randgen;
+    const int Times = 1000;
+    const double FillWeight = fraction/Times;
   
-  const vector3_t coneVertex = compton_event.ConeVertex();
-  const vector3_t coneAxis = compton_event.ConeAxis();
-  const vector3_t coneAxisOrtho = coneAxis.orthogonal();
-  const double cosThetaE = compton_event.CosThetaE();
+    const vector3_t coneVertex = event->ConeVertex();
+    const vector3_t coneAxis = event->ConeAxis();
+    const vector3_t coneAxisOrtho = coneAxis.orthogonal();
+    const double cosThetaE = event->CosThetaE();
 
-  vector3_t cone1(coneAxis);
-  double thetaE = TMath::ACos(cosThetaE);
-  cone1.rotate(thetaE, coneAxisOrtho);
+    vector3_t cone1(coneAxis);
+    double thetaE = TMath::ACos(cosThetaE);
+    cone1.rotate(thetaE, coneAxisOrtho);
 
-  vector3_t coneSample;
-  double phi;
+    vector3_t coneSample;
+    double phi;
   
-  for (int t=0; t<Times; t++) {
-    coneSample = cone1;
-    phi = randgen.Uniform(0.0, TMath::TwoPi());
-    coneSample.rotate(phi, coneAxis);
-    double ux = coneSample.dot(m_XAxis);
-    double uy = coneSample.dot(m_YAxis);
-    double uz = coneSample.dot(m_ZAxis);
-    double x = std::atan2(ux, uz);
-    double y = 0.5*CLHEP::pi - std::acos(uy);
+    for (int t=0; t<Times; t++) {
+      coneSample = cone1;
+      phi = randgen.Uniform(0.0, TMath::TwoPi());
+      coneSample.rotate(phi, coneAxis);
+      double ux = coneSample.dot(m_XAxis);
+      double uy = coneSample.dot(m_YAxis);
+      double uz = coneSample.dot(m_ZAxis);
+      double x = std::atan2(ux, uz);
+      double y = 0.5*CLHEP::pi - std::acos(uy);
 
-    fillImage(x/PixelUnit(), y/PixelUnit(), FillWeight);
+      fillImage(x/PixelUnit(), y/PixelUnit(), FillWeight);
+    }
   }
   
   return AS_OK;

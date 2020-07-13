@@ -43,12 +43,17 @@ void SGDEventReconstructionAlgorithm::initializeEvent()
 
 bool SGDEventReconstructionAlgorithm::
 reconstruct(const std::vector<DetectorHit_sptr>& hits,
-            BasicComptonEvent& eventReconstructed)
+            const BasicComptonEvent& baseEvent,
+            std::vector<BasicComptonEvent_sptr>& eventsReconstructed)
 {
   const int NumHits = hits.size();
   if (NumHits>MaxHits()) {
     return false;
   }
+
+  bool result = false;
+  auto eventReconstructed = std::make_shared<BasicComptonEvent>(baseEvent);
+  eventReconstructed->setTotalEnergyDeposit(total_energy_deposits(hits));
 
   if (NumHits==2) {
     const bool hit0Si = hits[0]->isFlags(flag::LowZHit);
@@ -57,19 +62,19 @@ reconstruct(const std::vector<DetectorHit_sptr>& hits,
     const bool hit1CdTe = hits[1]->isFlags(flag::HighZHit);
 
     if (hit0Si && hit1Si) {
-      return reconstruct2HitsSameMaterial(hits, eventReconstructed);
+      result = reconstruct2HitsSameMaterial(hits, *eventReconstructed);
     }
     else if (hit0CdTe && hit1CdTe) {
-      return reconstruct2HitsSameMaterial(hits, eventReconstructed);
+      result = reconstruct2HitsSameMaterial(hits, *eventReconstructed);
     }
     else if (hit0Si && hit1CdTe) {
-      return reconstruct2HitsSiCdTe(hits, eventReconstructed);
+      result = reconstruct2HitsSiCdTe(hits, *eventReconstructed);
     }
     else if (hit0CdTe && hit1Si) {
       std::vector<DetectorHit_sptr> hitsOrdered(2);
       hitsOrdered[0] = hits[1];
       hitsOrdered[1] = hits[0];
-      return reconstruct2HitsSiCdTe(hitsOrdered, eventReconstructed);
+      result = reconstruct2HitsSiCdTe(hitsOrdered, *eventReconstructed);
     }
     else {
       return false;
@@ -84,51 +89,43 @@ reconstruct(const std::vector<DetectorHit_sptr>& hits,
     const bool hit2CdTe = hits[2]->isFlags(flag::HighZHit);
 
     if (hit0Si && hit1Si && hit2CdTe) {
-      return reconstruct3HitsSiSiCdTe(hits, eventReconstructed);
+      result = reconstruct3HitsSiSiCdTe(hits, *eventReconstructed);
     }
     else if (hit0Si && hit1CdTe && hit2Si) {
       std::vector<DetectorHit_sptr> hitsOrdered(3);
       hitsOrdered[0] = hits[0];
       hitsOrdered[1] = hits[2];
       hitsOrdered[2] = hits[1];
-      return reconstruct3HitsSiSiCdTe(hitsOrdered, eventReconstructed);
+      result = reconstruct3HitsSiSiCdTe(hitsOrdered, *eventReconstructed);
     }
     else if (hit0CdTe && hit1Si && hit2Si) {
       std::vector<DetectorHit_sptr> hitsOrdered(3);
       hitsOrdered[0] = hits[1];
       hitsOrdered[1] = hits[2];
       hitsOrdered[2] = hits[0];
-      return reconstruct3HitsSiSiCdTe(hitsOrdered, eventReconstructed);
+      result = reconstruct3HitsSiSiCdTe(hitsOrdered, *eventReconstructed);
     }
     else if (hit0Si && hit1CdTe && hit2CdTe) {
-      return reconstruct3HitsSiCdTeCdTeByFOM(hits, eventReconstructed);
+      result = reconstruct3HitsSiCdTeCdTeByFOM(hits, *eventReconstructed);
     }
     else if (hit0CdTe && hit1Si && hit2CdTe) {
       std::vector<DetectorHit_sptr> hitsOrdered(3);
       hitsOrdered[0] = hits[1];
       hitsOrdered[1] = hits[0];
       hitsOrdered[2] = hits[2];
-      return reconstruct3HitsSiCdTeCdTeByFOM(hitsOrdered, eventReconstructed);
+      result = reconstruct3HitsSiCdTeCdTeByFOM(hitsOrdered, *eventReconstructed);
     }
     else if (hit0CdTe && hit1CdTe && hit2Si) {
       std::vector<DetectorHit_sptr> hitsOrdered(3);
       hitsOrdered[0] = hits[2];
       hitsOrdered[1] = hits[0];
       hitsOrdered[2] = hits[1];
-      return reconstruct3HitsSiCdTeCdTeByFOM(hitsOrdered, eventReconstructed);
-    }
-    else {
-      // to be implemented
-      return false;
+      result = reconstruct3HitsSiCdTeCdTeByFOM(hitsOrdered, *eventReconstructed);
     }
   }
-  else {
-    // to be implemented
-    return false;
-  }
-  std::cout << "DEBUG 10 ===> " << std::endl;
-
-  return false;
+  
+  eventsReconstructed.push_back(eventReconstructed);
+  return result;
 }
 
 bool SGDEventReconstructionAlgorithm::
@@ -148,7 +145,7 @@ reconstruct2HitsSameMaterial(const std::vector<DetectorHit_sptr>& hits,
   eventReconstructed.setHit1(0, hits[0]);
   eventReconstructed.setHit2(1, hits[1]);
 
-  if (eventReconstructed.TotalEnergy() < 0.5*CLHEP::electron_mass_c2) {
+  if (eventReconstructed.IncidentEnergy() < 0.5*CLHEP::electron_mass_c2) {
     if (!eventReconstructed.EnergyOrder()) {
       eventReconstructed.swap();
     }
