@@ -72,7 +72,6 @@ set(CS_MODULES
   src/ProcessCodedAperture.cc
   src/GetInputFilesFromDirectory.cc
   src/SelectEventsWithDetectorSpectrum.cc
-  src/SelectEventsWithCelestialSpectrum.cc
   ### IO
   src/CreateRootFile.cc
   src/SaveData.cc
@@ -127,7 +126,8 @@ if(CS_USE_FITSIO)
     src/MakeFrameFITS.cc
     src/WritePedestals.cc
     src/SetPedestals.cc
-   src/AEAttitudeCorrection.cc
+    src/AEAttitudeCorrection.cc
+    src/SelectEventsWithCelestialSpectrum.cc
     )
 endif()
 
