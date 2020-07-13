@@ -278,7 +278,7 @@ G4ThreeVector AEObservationPrimaryGen::samplePosition()
   const std::vector<double>& integrals = positionIntegral_;
   const double r = G4UniformRand();
   const std::vector<double>::const_iterator it = std::upper_bound(std::begin(integrals), std::end(integrals), r);
-  const int r0 = it - integrals.begin();
+  const int r0 = it - integrals.begin() - 1;
   const int ix = r0%nx;
   const int iy = r0/nx;
   const double dix = G4UniformRand();

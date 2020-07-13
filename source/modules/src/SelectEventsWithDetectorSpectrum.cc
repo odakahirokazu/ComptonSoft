@@ -17,7 +17,7 @@
  *                                                                       *
  *************************************************************************/
 
-#include "SelectEventsWithSpectrum.hh"
+#include "SelectEventsWithDetectorSpectrum.hh"
 
 #include <random>
 #include "AstroUnits.hh"
@@ -30,13 +30,13 @@ namespace unit = anlgeant4::unit;
 namespace comptonsoft
 {
 
-SelectEventsWithSpectrum::SelectEventsWithSpectrum()
+SelectEventsWithDetectorSpectrum::SelectEventsWithDetectorSpectrum()
 {
 }
 
-SelectEventsWithSpectrum::~SelectEventsWithSpectrum() = default;
+SelectEventsWithDetectorSpectrum::~SelectEventsWithDetectorSpectrum() = default;
 
-ANLStatus SelectEventsWithSpectrum::mod_define()
+ANLStatus SelectEventsWithDetectorSpectrum::mod_define()
 {
   define_parameter("exposure", &mod_class::exposure_);
   define_parameter("energy_array", &mod_class::energyArray_, unit::keV, "keV");
@@ -46,7 +46,7 @@ ANLStatus SelectEventsWithSpectrum::mod_define()
   return AS_OK;
 }
 
-ANLStatus SelectEventsWithSpectrum::mod_initialize()
+ANLStatus SelectEventsWithDetectorSpectrum::mod_initialize()
 {
   get_module_NC("CSHitCollection", &hitCollection_);
   get_module_NC("ReadEventTree", &readEventTree_);
@@ -71,7 +71,7 @@ ANLStatus SelectEventsWithSpectrum::mod_initialize()
   return AS_OK;
 }
 
-ANLStatus SelectEventsWithSpectrum::mod_analyze()
+ANLStatus SelectEventsWithDetectorSpectrum::mod_analyze()
 {  
   if (numRemainedBin_==0) {
     return AS_QUIT;
@@ -106,7 +106,7 @@ ANLStatus SelectEventsWithSpectrum::mod_analyze()
   return AS_OK;
 }
 
-ANLStatus SelectEventsWithSpectrum::mod_end_run()
+ANLStatus SelectEventsWithDetectorSpectrum::mod_end_run()
 {
   std::cout << "Remained bin: " << numRemainedBin_ << std::endl;
   const int n = photonStack_.size();
@@ -119,7 +119,7 @@ ANLStatus SelectEventsWithSpectrum::mod_end_run()
   return AS_OK;
 }
 
-bool SelectEventsWithSpectrum::isGoodGrade(int grade)
+bool SelectEventsWithDetectorSpectrum::isGoodGrade(int grade)
 {
   const int n = goodGrade_.size();
   for (int i=0; i<n; i++) {

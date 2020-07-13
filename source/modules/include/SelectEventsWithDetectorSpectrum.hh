@@ -17,8 +17,8 @@
  *                                                                       *
  *************************************************************************/
 
-#ifndef COMPTONSOFT_SelectEventsWithSpectrum_H
-#define COMPTONSOFT_SelectEventsWithSpectrum_H 1
+#ifndef COMPTONSOFT_SelectEventsWithDetectorSpectrum_H
+#define COMPTONSOFT_SelectEventsWithDetectorSpectrum_H 1
 
 #include "VCSModule.hh"
 #include <list>
@@ -33,12 +33,12 @@ class CSHitCollection;
  * @author Tsubasa Tamba
  * @date 2019-12-02
  */
-class SelectEventsWithSpectrum : public anlnext::BasicModule
+class SelectEventsWithDetectorSpectrum : public anlnext::BasicModule
 {
-  DEFINE_ANL_MODULE(SelectEventsWithSpectrum, 1.0);
+  DEFINE_ANL_MODULE(SelectEventsWithDetectorSpectrum, 1.0);
 public:
-  SelectEventsWithSpectrum();
-  ~SelectEventsWithSpectrum();
+  SelectEventsWithDetectorSpectrum();
+  ~SelectEventsWithDetectorSpectrum();
 
   anlnext::ANLStatus mod_define() override;
   anlnext::ANLStatus mod_initialize() override;
@@ -63,4 +63,4 @@ private:
 
 } /* namespace comptonsoft */
 
-#endif /* COMPTONSOFT_SelectEventsWithSpectrum_H */
+#endif /* COMPTONSOFT_SelectEventsWithDetectorSpectrum_H */
