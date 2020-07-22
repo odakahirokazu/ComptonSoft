@@ -180,7 +180,7 @@ void EventTreeIO::fillUndetectedEvent(const int64_t eventID)
   instrument_ = 0;
   flag_data_ = 0;
   flags_ = 0;
-  grade_ = 0;
+  grade_ = -1;
 
   tree_->Fill();
 }
