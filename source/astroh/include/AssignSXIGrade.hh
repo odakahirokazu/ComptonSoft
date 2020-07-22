@@ -47,6 +47,7 @@ public:
 
 protected:
   void resetImage(image_t& image);
+  bool isGoodGrade(int grade);
 
 private:
   CSHitCollection* hitCollection_ = nullptr;
@@ -56,6 +57,7 @@ private:
   double eventThreshold_ = 0.0;
   double splitThreshold_ = 0.0;
   double outerSplitThreshold_ = 0.0;
+  std::vector<int> goodGrade_;
 };
 
 } /* namespace comptonsoft */
