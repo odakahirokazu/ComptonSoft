@@ -37,6 +37,7 @@ ComptonEventTreeIO::~ComptonEventTreeIO() = default;
 void ComptonEventTreeIO::defineBranches()
 {
   cetree_->Branch("eventid", &eventid_, "eventid/l");
+  cetree_->Branch("num_reconstruction_cases", &num_reconstruction_cases_, "num_reconstruction_cases/S");
   cetree_->Branch("num_hits", &num_hits_, "num_hits/S");
 
   cetree_->Branch("hit1_id", &hit1_id_, "hit1_id/S");
@@ -89,6 +90,7 @@ void ComptonEventTreeIO::defineBranches()
 void ComptonEventTreeIO::setBranchAddresses()
 {
   cetree_->SetBranchAddress("eventid", &eventid_);
+  cetree_->SetBranchAddress("num_reconstruction_cases", &num_reconstruction_cases_);
   cetree_->SetBranchAddress("num_hits", &num_hits_);
 
   cetree_->SetBranchAddress("hit1_id", &hit1_id_);
@@ -139,9 +141,11 @@ void ComptonEventTreeIO::setBranchAddresses()
 }
 
 void ComptonEventTreeIO::fillEvent(const int64_t eventID,
+                                   const int numCases,
                                    const BasicComptonEvent& event)
 {
   eventid_ = (eventID >= 0) ? eventID : event.EventID();
+  num_reconstruction_cases_ = numCases;
   num_hits_ = event.NumberOfHits();
 
   hit1_id_ = event.Hit1ID();
@@ -201,8 +205,9 @@ void ComptonEventTreeIO::fillEvent(const int64_t eventID,
 void ComptonEventTreeIO::fillEvents(const int64_t eventID,
                                     const std::vector<BasicComptonEvent_sptr>& events)
 {
+  const int numCases = events.size();
   for (const auto& e: events) {
-    fillEvent(eventID, *e);
+    fillEvent(eventID, numCases, *e);
   }
 }
 

@@ -29,6 +29,7 @@
 #include "PhotoAbsorptionEventReconstructionAlgorithm.hh"
 #include "FocalPlaneEventReconstructionAlgorithm.hh"
 #include "SGDEventReconstructionAlgorithm.hh"
+#include "HY2017EventReconstructionAlgorithm.hh"
 #include "CSHitCollection.hh"
 
 using namespace anlnext;
@@ -83,6 +84,9 @@ ANLStatus EventReconstruction::mod_initialize()
   }
   else if (ReconstructionMethodName()=="SGD") {
     m_Reconstruction.reset(new SGDEventReconstructionAlgorithm);
+  }
+  else if (ReconstructionMethodName()=="HY2017") {
+    m_Reconstruction.reset(new HY2017EventReconstructionAlgorithm);
   }
   else {
     std::cout << "Unknown reconstruction method is given: " << ReconstructionMethodName()

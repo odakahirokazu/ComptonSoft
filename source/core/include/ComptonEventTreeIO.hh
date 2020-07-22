@@ -49,14 +49,11 @@ public:
   virtual void setBranchAddresses();
 
   void fillEvent(int64_t eventID,
+                 int numCases,
                  const BasicComptonEvent& event);
-  void fillEvent(const BasicComptonEvent& event)
-  { fillEvent(-1, event); }
 
   void fillEvents(int64_t eventID,
                   const std::vector<BasicComptonEvent_sptr>& events);
-  void fillEvents(const std::vector<BasicComptonEvent_sptr>& events)
-  { fillEvents(-1, events); }
 
   BasicComptonEvent retrieveEvent() const;
   void retrieveEvent(BasicComptonEvent& event) const;
@@ -70,6 +67,7 @@ private:
    * tree contents
    */
   uint64_t eventid_ = 0u;
+  int16_t num_reconstruction_cases_ = 0;
   int16_t num_hits_ = 0;
 
   int16_t hit1_id_ = 0;

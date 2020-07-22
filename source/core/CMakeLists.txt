@@ -62,6 +62,8 @@ set(CS_CORE_CLASSES
   src/PhotoAbsorptionEventReconstructionAlgorithm.cc
   src/FocalPlaneEventReconstructionAlgorithm.cc
   src/SGDEventReconstructionAlgorithm.cc
+  src/ComptonConstraints.cc
+  src/HY2017EventReconstructionAlgorithm.cc
   ### sensitive detector
   src/VCSSensitiveDetector.cc
   ### manager
