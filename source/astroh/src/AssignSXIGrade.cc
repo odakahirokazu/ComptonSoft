@@ -41,6 +41,7 @@ ANLStatus AssignSXIGrade::mod_define()
 {
   define_parameter("event_threshold", &mod_class::eventThreshold_, unit::keV, "keV");
   define_parameter("split_threshold", &mod_class::splitThreshold_, unit::keV, "keV");
+  define_parameter("good_grade", &mod_class::goodGrade_);
 
   return AS_OK;
 }
@@ -65,22 +66,23 @@ ANLStatus AssignSXIGrade::mod_analyze()
   const int timeGroup = 0;
 
   std::vector<DetectorHit_sptr>& hits = hitCollection_->getHits(timeGroup);
+  if (hits.size()==0) {
+    return AS_OK;
+  }
+  auto comp = [](DetectorHit_sptr a, DetectorHit_sptr b) {
+                return a->EPI() > b->EPI();
+              };
+  std::sort(hits.begin(), hits.end(), comp);
+  
   int grade = -1;
   double sumPH = 0.0;
-  double maxPH = 0.0;
-  int cx = 0;
-  int cy = 0;
-  for (DetectorHit_sptr hit: hits) {
-    const double ph = hit->EPI();
-    if (ph>maxPH) {
-      cx = hit->PixelX();
-      cy = hit->PixelY();
-      maxPH = ph;
-    }
-  }
+  double maxPH = hits[0]->EPI();
+  const int cx = hits[0]->PixelX();
+  const int cy = hits[0]->PixelY();
+
   if (maxPH>eventThreshold_) {
     image_[halfSize][halfSize] = maxPH;
-    for (DetectorHit_sptr hit:hits) {
+    for (DetectorHit_sptr hit: hits) {
       const double ph = hit->EPI();
       const int ix = hit->PixelX();
       const int iy = hit->PixelY();
@@ -95,11 +97,11 @@ ANLStatus AssignSXIGrade::mod_analyze()
     grade = event->Grade();
     sumPH = event->SumPH();
   }
-  for (DetectorHit_sptr hit:hits) {
-    hit->setGrade(grade);
-    hit->setEnergy(sumPH);
+
+  hits[0]->setGrade(grade);
+  if (isGoodGrade(grade)) {
+    hits[0]->setEnergy(sumPH);
   }
-  
   return AS_OK;
 }
 
@@ -112,6 +114,13 @@ void AssignSXIGrade::resetImage(image_t& image)
       image[ix][iy] = 0.0;
     }
   }
+}
+
+bool AssignSXIGrade::isGoodGrade(int grade) {
+  for (int g: goodGrade_) {
+    if (grade==g) return true;
+  }
+  return false;
 }
 
 } /* namespace comptonsoft */
