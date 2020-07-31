@@ -17,70 +17,59 @@
  *                                                                       *
  *************************************************************************/
 
-#ifndef COMPTONSOFT_SelectEventsWithCelestialSpectrum_H
-#define COMPTONSOFT_SelectEventsWithCelestialSpectrum_H 1
+#ifndef COMPTONSOFT_AEAssignWeightWithResponseMatrix_H
+#define COMPTONSOFT_AEAssignWeightWithResponseMatrix_H 1
 
 #include "VCSModule.hh"
-#include <list>
-#include "XrayEvent.hh"
+#include "CSHitCollection.hh"
 
+class TH2;
 namespace anlgeant4 { class InitialInformation; }
 
 namespace comptonsoft {
 
-class CSHitCollection;
-
 
 /**
  * @author Tsubasa Tamba
- * @date 2020-06-24
+ * @date 2020-07-27
  */
-class SelectEventsWithCelestialSpectrum : public anlnext::BasicModule
+class AEAssignWeightWithResponseMatrix : public anlnext::BasicModule
 {
-  DEFINE_ANL_MODULE(SelectEventsWithCelestialSpectrum, 1.0);
-
+  DEFINE_ANL_MODULE(AEAssignWeightWithResponseMatrix, 2.0);
 public:
-  SelectEventsWithCelestialSpectrum();
-  ~SelectEventsWithCelestialSpectrum();
+  AEAssignWeightWithResponseMatrix();
+  ~AEAssignWeightWithResponseMatrix();
 
   anlnext::ANLStatus mod_define() override;
   anlnext::ANLStatus mod_initialize() override;
   anlnext::ANLStatus mod_analyze() override;
-  anlnext::ANLStatus mod_end_run() override;
 
-  struct Effarea {
-    double emin, emax, area;
-    Effarea(double emin=0.0, double emax=0.0, double area=0.0): emin(emin), emax(emax), area(area) {}
-  };
-
-  void inputImage(std::string filename, image_t& image, anlnext::ANLStatus* status);
-  void inputEffectiveArea(std::string filename, std::vector<Effarea>& effarea, anlnext::ANLStatus* status);
-  void buildPositionIntegral();
-  void setPosition();
-  std::pair<int, int> samplePixel();
-
+protected:
+  void readRootResponse();
+  void initializeHistogram();
+  anlnext::ANLStatus readFitsResponse();
+  void calculateUndetectedProbability();
+  void fillRefResponseHistogram();
+  void calculateWeight();
+  void normalizeResponseHistogram(TH2* resp);
+  
 private:
-  double exposure_ = 0.0;
-  std::vector<double> energyArray_;
-  std::vector<double> photonsArray_;
-  std::string arfFilename_;
-  double defaultSampleProb_ = 0.0;
-  bool assignPosition_ = true;
-  int pixelOffsetX_ = 0;
-  int pixelOffsetY_ = 0;
-
-  image_t image_;
-  std::vector<Effarea> effectiveArea_;
-  std::vector<double> positionIntegral_;
-  std::vector<int> countArray_;
-  int numRemainedBin_;
-  std::vector<int> photonStack_;
-
+  std::string rootFilename_;
+  std::string fitsFilename_;
+  std::string histName_;
+  
   CSHitCollection* hitCollection_ = nullptr;
-  anlgeant4::InitialInformation* initialInfo_ = nullptr;
-
+  anlgeant4::InitialInformation* initialInfo_;
+  TH2* response_;
+  TH2* refResponse_;
+  TH2* weightHist_;
+  std::vector<std::vector<double>> refResponseArray_;
+  std::vector<std::pair<double, double>> energyRange_;
+  std::vector<double> firstChannel_;
+  std::vector<std::pair<double, double>> pulseRange_;
+  std::vector<double> undetectedProb_;
 };
 
 } /* namespace comptonsoft */
 
-#endif /* COMPTONSOFT_SelectEventsWithCelestialSpectrum_H */
+#endif /* COMPTONSOFT_AEAssignWeightWithResponseMatrix_H */

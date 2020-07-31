@@ -90,6 +90,7 @@ class SelectEventsWithDetectorSpectrum;
 class AssignSXIGrade;
 class AEAttitudeCorrection;
 class SelectEventsWithCelestialSpectrum;
+class AEAssignWeightWithResponseMatrix;
 class AHRayTracingPrimaryGen;
 class SimXPrimaryGen;
 class AHRadiationBackgroundPrimaryGen;

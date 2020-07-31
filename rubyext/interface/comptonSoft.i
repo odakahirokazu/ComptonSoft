@@ -104,6 +104,9 @@
 #include "SelectEventsWithCelestialSpectrum.hh"
 #endif
 #ifdef USE_FITSIO
+#include "AEAssignWeightWithResponseMatrix.hh"
+#endif
+#ifdef USE_FITSIO
 #include "AHRayTracingPrimaryGen.hh"
 #endif
 #ifdef USE_SIMX
@@ -894,6 +897,16 @@ class SelectEventsWithCelestialSpectrum : public anlnext::BasicModule
 public:
   SelectEventsWithCelestialSpectrum();
   ~SelectEventsWithCelestialSpectrum();
+};
+
+#endif
+
+#ifdef USE_FITSIO
+class AEAssignWeightWithResponseMatrix : public anlnext::BasicModule
+{
+public:
+  AEAssignWeightWithResponseMatrix();
+  ~AEAssignWeightWithResponseMatrix();
 };
 
 #endif

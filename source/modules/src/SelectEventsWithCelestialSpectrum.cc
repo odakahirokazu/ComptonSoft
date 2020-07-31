@@ -23,6 +23,7 @@
 #include "CSHitCollection.hh"
 #include "DetectorHit.hh"
 #include "Randomize.hh"
+#include "InitialInformation.hh"
 
 namespace cfitsio
 {
@@ -48,6 +49,7 @@ namespace comptonsoft
 {
 
 SelectEventsWithCelestialSpectrum::SelectEventsWithCelestialSpectrum()
+  : defaultSampleProb_(0.5)
 {
 }
 
@@ -59,7 +61,10 @@ ANLStatus SelectEventsWithCelestialSpectrum::mod_define()
   define_parameter("energy_array", &mod_class::energyArray_, unit::keV, "keV");
   define_parameter("photons_array", &mod_class::photonsArray_, 1.0/(unit::s*unit::cm*unit::cm), "1.0/(s*cm*cm)");
   define_parameter("arf_filename", &mod_class::arfFilename_);
+  define_parameter("default_sample_probability", &mod_class::defaultSampleProb_);
   define_parameter("assign_position", &mod_class::assignPosition_);
+  define_parameter("pixel_offset_x", &mod_class::pixelOffsetX_);
+  define_parameter("pixel_offset_y", &mod_class::pixelOffsetY_);
 
   return AS_OK;
 }
@@ -67,7 +72,8 @@ ANLStatus SelectEventsWithCelestialSpectrum::mod_define()
 ANLStatus SelectEventsWithCelestialSpectrum::mod_initialize()
 {
   get_module_NC("CSHitCollection", &hitCollection_);
-  get_module_NC("ReadEventTree", &readEventTree_);
+  get_module_IFNC("InitialInformation", &initialInfo_);
+  initialInfo_->setWeightStored(true);
 
   ANLStatus status = AS_OK;
   if (assignPosition_) {
@@ -80,7 +86,7 @@ ANLStatus SelectEventsWithCelestialSpectrum::mod_initialize()
   const int n = photonsArray_.size();
   const int m = energyArray_.size();
   if (m!=n+1) {
-    std::cout << "ERROR, photons_array size is " << n << " and energy_array size is " << m << std::endl;
+    std::cerr << "ERROR, photons_array size is " << n << " and energy_array size is " << m << std::endl;
     return AS_ERROR;
   }
 
@@ -98,14 +104,14 @@ ANLStatus SelectEventsWithCelestialSpectrum::mod_initialize()
     for (int j=0; j<numPlot; j++){
       v += photonsArray_[i] * effectiveArea_[j].area * overlap(energyArray_[i], energyArray_[i+1], effectiveArea_[j].emin, effectiveArea_[j].emax)/dE;
     }
-    countArray_[i] = static_cast<int>(v * exposure_ + 0.5);
+    countArray_[i] = static_cast<int>(v * exposure_+0.5);
   }
 
   photonStack_.resize(n, 0);
   numRemainedBin_ = n;
 
   for (int i=0; i<n; i++) {
-    if (countArray_[i]==0) {
+    if (countArray_[i]<=photonStack_[i]) {
       numRemainedBin_ -= 1;
     }
   }
@@ -121,10 +127,19 @@ ANLStatus SelectEventsWithCelestialSpectrum::mod_analyze()
     return AS_QUIT;
   }
  
-  double initialEnergy = readEventTree_->InitialEnergy();
+  double initialEnergy = initialInfo_->InitialEnergy();
 
   const std::vector<double>::const_iterator it = std::upper_bound(energyArray_.begin(), energyArray_.end(), initialEnergy);
   const int bin = it - energyArray_.begin() - 1;
+  const double weight = initialInfo_->Weight();
+  const double r = G4UniformRand();
+  const double th = defaultSampleProb_ * weight;
+
+  if (r>th) {
+    hitCollection_->initializeEvent();
+    return AS_OK;
+  }
+  
   if (it==energyArray_.begin() || it==energyArray_.end()) {
     hitCollection_->initializeEvent();
   }
@@ -133,7 +148,7 @@ ANLStatus SelectEventsWithCelestialSpectrum::mod_analyze()
   }
   else {
     photonStack_[bin] += 1;
-    if (photonStack_[bin]==countArray_[bin]) {
+    if (photonStack_[bin]>=countArray_[bin]) {
       numRemainedBin_ -= 1;
     }
     if (assignPosition_) {
@@ -196,7 +211,7 @@ void SelectEventsWithCelestialSpectrum::inputImage(std::string filename, image_t
   int i = 0;
   for (int ix=0; ix<naxes[0]; ix++) {
     for (int iy=0; iy<naxes[1]; iy++) {
-      image[ix][iy] = array[i];
+      if (array[i]>0.0) image[ix][iy] = array[i];
       i++;
     }
   }
@@ -337,6 +352,8 @@ std::pair<int, int> SelectEventsWithCelestialSpectrum::samplePixel()
   const int r0 = it - positionIntegral_.begin() - 1;
   res.first = r0%nx;
   res.second = r0/nx;
+  res.first -= pixelOffsetX_;
+  res.second -= pixelOffsetY_;
 
   return res;
 }

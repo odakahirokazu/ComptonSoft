@@ -51,6 +51,7 @@ if(CS_USE_FITSIO)
     src/SXIXrayEvent.cc
     src/ConstructSXIFrame.cc
     src/AssignSXIGrade.cc
+    src/AEAssignWeightWithResponseMatrix.cc
     )
 endif()
 

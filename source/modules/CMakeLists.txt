@@ -72,7 +72,6 @@ set(CS_MODULES
   src/ProcessCodedAperture.cc
   src/GetInputFilesFromDirectory.cc
   src/SelectEventsWithDetectorSpectrum.cc
-  src/SelectEventsWithCelestialSpectrum.cc
   ### IO
   src/CreateRootFile.cc
   src/SaveData.cc

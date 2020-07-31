@@ -97,6 +97,7 @@ clMod = [
   ANL::SWIGClass.new("AssignSXIGrade"),
   ANL::SWIGClass.new("AEAttitudeCorrection"),
   ANL::SWIGClass.new("SelectEventsWithCelestialSpectrum", false, 'USE_FITSIO'),
+  ANL::SWIGClass.new("AEAssignWeightWithResponseMatrix", false, 'USE_FITSIO'),
 ]
 
 clSim = [
