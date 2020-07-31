@@ -56,6 +56,7 @@ public:
 
 private:
   bool byte_order_ = true;
+  int odd_row_pixel_shift_ = 0;
   int detector_id_ = 0;
   std::vector<std::string> files_;
   FrameData* frame_ = nullptr;

@@ -89,12 +89,15 @@ bool FrameData::load(const std::string& filename)
 
   infile.open(filename);
   if (!infile) {
-    std::cerr << " cannot open file "<< std::endl;
+    std::cerr << " cannot open file: " << filename << std::endl;
     return false;
   }
 
   infile.read(&buf_[0], length);
   infile.close();
+
+  const int odd_row_pixel_shift = OddRowPixelShift();
+  const bool regular_pixel_arrangement = (odd_row_pixel_shift == 0);
 
   const int nx = NumPixelsX();
   const int ny = NumPixelsY();
@@ -108,7 +111,17 @@ bool FrameData::load(const std::string& filename)
       else {
         v = ((static_cast<uint16_t>(buf_[2*t+1])&0xff)<<8) + (static_cast<uint16_t>(buf_[2*t])&0xff);
       }
-      rawFrame_[i][j] = v;
+
+      if (regular_pixel_arrangement) {
+        rawFrame_[i][j] = v;
+      }
+      else {
+        const int pixel_shift = (i%2==0) ? 0 : odd_row_pixel_shift;
+        const int j_shifted = j + pixel_shift;
+        if (0<=j_shifted && j_shifted<ny) {
+          rawFrame_[i][j_shifted] = v;
+        }
+      }
     }
   }
   return true;

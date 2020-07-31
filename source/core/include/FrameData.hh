@@ -40,6 +40,8 @@ class VGainFunction;
  * @date 2019-10-08 | delete the assignment operators
  * @date 2020-03-31 | add gain functions
  * @date 2020-05-28 | Kosuke Hatauchi & Hirokazu odaka | revise pedestal statistics
+ * @date 2020-07-31 | Hirokazu odaka | byte order of raw data
+ * @date 2020-08-01 | Hirokazu odaka | pixel shift at odd rows
  */
 class FrameData
 {
@@ -58,6 +60,9 @@ public:
 
   void setByteOrder(bool v) { byte_order_ = v; }
   bool ByteOrder() const { return byte_order_; }
+
+  void setOddRowPixelShift(int v) { odd_row_pixel_shift_ = v; }
+  int OddRowPixelShift() const { return odd_row_pixel_shift_; }
 
   void setFrameID(int v) { frameID_ = v; }
   int FrameID() const { return frameID_; }
@@ -140,6 +145,7 @@ private:
   const int num_pixels_y_ = 1;
 
   bool byte_order_ = true; // big/little endian for true/false
+  int odd_row_pixel_shift_ = 0;
 
   int frameID_ = 0;
   int eventSize_ = 1;
