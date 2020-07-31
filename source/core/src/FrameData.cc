@@ -101,7 +101,13 @@ bool FrameData::load(const std::string& filename)
   for (int i=0; i<nx; i++) {
     for (int j=0; j<ny; j++) {
       const int t = i*ny+j;
-      const unsigned int v = ((static_cast<uint16_t>(buf_[2*t])&0xff)<<8) + (static_cast<uint16_t>(buf_[2*t+1])&0xff);
+      unsigned int v = 0u;
+      if (ByteOrder()) {
+        v = ((static_cast<uint16_t>(buf_[2*t])&0xff)<<8) + (static_cast<uint16_t>(buf_[2*t+1])&0xff);
+      }
+      else {
+        v = ((static_cast<uint16_t>(buf_[2*t+1])&0xff)<<8) + (static_cast<uint16_t>(buf_[2*t])&0xff);
+      }
       rawFrame_[i][j] = v;
     }
   }

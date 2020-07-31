@@ -34,6 +34,7 @@ LoadFrame::LoadFrame()
 
 ANLStatus LoadFrame::mod_define()
 {
+  define_parameter("byte_order", &mod_class::byte_order_);
   define_parameter("detector_id", &mod_class::detector_id_);
   define_parameter("files", &mod_class::files_);
   
@@ -52,6 +53,7 @@ ANLStatus LoadFrame::mod_initialize()
 
   if (detector->hasFrameData()) {
     frame_ = detector->getFrameData();
+    frame_->setByteOrder(byte_order_);
   }
   else {
     std::cout << "Detector does not have a frame." << std::endl;

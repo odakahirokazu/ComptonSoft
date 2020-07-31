@@ -55,6 +55,7 @@ public:
   bool isDone() const override;
 
 private:
+  bool byte_order_ = true;
   int detector_id_ = 0;
   std::vector<std::string> files_;
   FrameData* frame_ = nullptr;

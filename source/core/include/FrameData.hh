@@ -56,6 +56,9 @@ public:
   int NumPixelsX() const { return num_pixels_x_; }
   int NumPixelsY() const { return num_pixels_y_; }
 
+  void setByteOrder(bool v) { byte_order_ = v; }
+  bool ByteOrder() const { return byte_order_; }
+
   void setFrameID(int v) { frameID_ = v; }
   int FrameID() const { return frameID_; }
 
@@ -135,6 +138,8 @@ private:
 private:
   const int num_pixels_x_ = 1;
   const int num_pixels_y_ = 1;
+
+  bool byte_order_ = true; // big/little endian for true/false
 
   int frameID_ = 0;
   int eventSize_ = 1;

@@ -9,6 +9,7 @@ module ComptonSoft
       super
       @inputs = []
       @output = "output.root"
+      @byte_order = true
       @pedestal_level = 0.0
       @event_threshold = 100.0
       @split_threshold = 10.0
@@ -19,6 +20,7 @@ module ComptonSoft
     end
 
     attr_accessor :inputs, :output
+    attr_accessor :byte_order
     attr_accessor :pedestal_level, :event_threshold
     attr_accessor :split_threshold
     attr_accessor :pedestal_file
@@ -161,7 +163,8 @@ module ComptonSoft
       end
 
       chain :LoadFrame
-      with_parameters(files: @inputs)
+      with_parameters(files: @inputs,
+                      byte_order: @byte_order)
       chain :AnalyzeDarkFrame
       with_parameters(pedestal_level: @pedestal_level,
                       num_exclusion_low: @num_exclusion_low,
@@ -229,7 +232,8 @@ module ComptonSoft
       end
 
       chain :LoadFrame
-      with_parameters(files: @inputs)
+      with_parameters(files: @inputs,
+                      byte_order: @byte_order)
       chain :AnalyzeFrame
       with_parameters(pedestal_level: @pedestal_level,
                       event_threshold: @event_threshold,
