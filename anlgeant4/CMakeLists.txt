@@ -6,7 +6,8 @@ if(ANLG4_USE_GDML)
     src/GDMLDetectorConstruction.cc
     src/WriteGDML.cc
     )
-  set(GDML_LIB xerces-c)
+  set(GDML_INC_DIR ${XercesC_INC_DIRS})
+  set(GDML_LIB ${XercesC_LIBRARIES})
 endif(ANLG4_USE_GDML)
 
 if(ANLG4_USE_VIS OR ANLG4_USE_VIS_QT)
@@ -35,6 +36,7 @@ include_directories(include
   ${ANLNEXT_INC_DIR}
   ${QT_INC_DIR}
   ${BOOST_INC_DIR}
+  ${GDML_INC_DIR}
   )
 
 link_directories(

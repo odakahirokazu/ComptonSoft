@@ -95,3 +95,10 @@ if(CS_USE_HSQUICKLOOK)
   message("-- LIBMONGOCXX_INCLUDE_DIRS: ${LIBMONGOCXX_INCLUDE_DIRS}")
   message("-- LIBMONGOCXX_LIBRARIES: ${LIBMONGOCXX_LIBRARIES}")
 endif(CS_USE_HSQUICKLOOK)
+
+### Xerces-C ###
+if(CS_USE_GDML)
+  find_package(XercesC REQUIRED)
+  message("-- XercesC_INCLUDE_DIRS: ${XercesC_INCLUDE_DIRS}")
+  message("-- XercesC_LIBRARIES: ${XercesC_LIBRARIES}")
+endif(CS_USE_GDML)
