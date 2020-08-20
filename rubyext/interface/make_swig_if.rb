@@ -95,7 +95,7 @@ clMod = [
   ANL::SWIGClass.new("GetInputFilesFromDirectory"),
   ANL::SWIGClass.new("SelectEventsWithDetectorSpectrum"),
   ANL::SWIGClass.new("AssignSXIGrade"),
-  ANL::SWIGClass.new("AEAttitudeCorrection"),
+  ANL::SWIGClass.new("AEAttitudeCorrection", false, "USE_FITSIO"),
   ANL::SWIGClass.new("SelectEventsWithCelestialSpectrum", false, 'USE_FITSIO'),
   ANL::SWIGClass.new("AEAssignWeightWithResponseMatrix", false, 'USE_FITSIO'),
 ]

@@ -99,7 +99,9 @@
 #include "GetInputFilesFromDirectory.hh"
 #include "SelectEventsWithDetectorSpectrum.hh"
 #include "AssignSXIGrade.hh"
+#ifdef USE_FITSIO
 #include "AEAttitudeCorrection.hh"
+#endif
 #ifdef USE_FITSIO
 #include "SelectEventsWithCelestialSpectrum.hh"
 #endif
@@ -883,6 +885,7 @@ public:
 };
 
 
+#ifdef USE_FITSIO
 class AEAttitudeCorrection : public anlnext::BasicModule
 {
 public:
@@ -890,6 +893,7 @@ public:
   ~AEAttitudeCorrection();
 };
 
+#endif
 
 #ifdef USE_FITSIO
 class SelectEventsWithCelestialSpectrum : public anlnext::BasicModule
