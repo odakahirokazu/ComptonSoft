@@ -116,6 +116,7 @@ set(CS_MODULES
   src/BackProjection.cc
   src/BackProjectionSky.cc
   src/EfficiencyMapSky.cc
+  src/ExtractPhotoelectronTrajectory.cc
   ### others
   src/QuickAnalysisForDSD.cc
   )

@@ -91,6 +91,7 @@ class AssignSXIGrade;
 class AEAttitudeCorrection;
 class SelectEventsWithCelestialSpectrum;
 class AEAssignWeightWithResponseMatrix;
+class ExtractPhotoelectronTrajectory;
 class AHRayTracingPrimaryGen;
 class SimXPrimaryGen;
 class AHRadiationBackgroundPrimaryGen;

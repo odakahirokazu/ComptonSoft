@@ -108,6 +108,7 @@
 #ifdef USE_FITSIO
 #include "AEAssignWeightWithResponseMatrix.hh"
 #endif
+#include "ExtractPhotoelectronTrajectory.hh"
 #ifdef USE_FITSIO
 #include "AHRayTracingPrimaryGen.hh"
 #endif
@@ -914,6 +915,14 @@ public:
 };
 
 #endif
+
+class ExtractPhotoelectronTrajectory : public VCSModule
+{
+public:
+  ExtractPhotoelectronTrajectory();
+  ~ExtractPhotoelectronTrajectory() = default;
+};
+
 
 #ifdef USE_FITSIO
 class AHRayTracingPrimaryGen : public anlgeant4::BasicPrimaryGen
