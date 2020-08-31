@@ -52,7 +52,7 @@ if(CS_ALL_OFF)
   set(CS_USE_VIS_QT OFF)
   set(CS_USE_FITSIO OFF)
   set(CS_USE_HSQUICKLOOK OFF)
-endif(CS_ALL)
+endif(CS_ALL_OFF)
 
 if(CS_HARD_ALL)
   set(CS_USE_GDML ON)
