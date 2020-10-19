@@ -47,6 +47,7 @@ class FrameData
 {
 public:
   using flags_t = boost::multi_array<int, 2>;
+  enum class CornerID { BottomLeft=0, UpperLeft=1, BottomRight=2, UpperRight=3 };
 
 public:
   FrameData(int nx, int ny);
@@ -63,6 +64,12 @@ public:
 
   void setOddRowPixelShift(int v) { odd_row_pixel_shift_ = v; }
   int OddRowPixelShift() const { return odd_row_pixel_shift_; }
+
+  void setStartPosition(CornerID id) { startPosition_ = id; }
+  CornerID StartPosition() { return startPosition_; }
+
+  void setReadDirectionX(bool v) { readDirectionX_ = v; }
+  bool ReadDirectionX() { return readDirectionX_; }
 
   void setFrameID(int v) { frameID_ = v; }
   int FrameID() const { return frameID_; }
@@ -146,6 +153,8 @@ private:
 
   bool byte_order_ = true; // big/little endian for true/false
   int odd_row_pixel_shift_ = 0;
+  CornerID startPosition_;
+  bool readDirectionX_ = false;
 
   int frameID_ = 0;
   int eventSize_ = 1;

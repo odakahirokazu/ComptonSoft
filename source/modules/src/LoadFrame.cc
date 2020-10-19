@@ -36,6 +36,8 @@ ANLStatus LoadFrame::mod_define()
 {
   define_parameter("byte_order", &mod_class::byte_order_);
   define_parameter("odd_row_pixel_shift", &mod_class::odd_row_pixel_shift_);
+  define_parameter("start_position", &mod_class::start_position_);
+  define_parameter("read_direction_x", &mod_class::read_direction_x_);
   define_parameter("detector_id", &mod_class::detector_id_);
   define_parameter("files", &mod_class::files_);
   
@@ -56,6 +58,8 @@ ANLStatus LoadFrame::mod_initialize()
     frame_ = detector->getFrameData();
     frame_->setByteOrder(byte_order_);
     frame_->setOddRowPixelShift(odd_row_pixel_shift_);
+    frame_->setStartPosition(FrameData::CornerID(start_position_));
+    frame_->setReadDirectionX(read_direction_x_);
   }
   else {
     std::cout << "Detector does not have a frame." << std::endl;

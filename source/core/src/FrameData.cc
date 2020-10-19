@@ -34,6 +34,7 @@ namespace comptonsoft
 FrameData::FrameData(const int nx, const int ny)
   : num_pixels_x_(nx),
     num_pixels_y_(ny),
+    startPosition_(CornerID::BottomLeft),
     rawFrame_(boost::extents[nx][ny]),
     frame_(boost::extents[nx][ny]),
     pedestals_(boost::extents[nx][ny]),
@@ -44,13 +45,13 @@ FrameData::FrameData(const int nx, const int ny)
     disabledPixels_(boost::extents[nx][ny]),
     pixelValuesToExclude_(boost::extents[nx][ny])
 {
-  for (int i=0; i<nx; i++) {
-    for (int j=0; j<ny; j++) {
-      sum_[i][j] = 0.0;
-      sum2_[i][j] = 0.0;
-      deviation_[i][j] = 0.0;
-      disabledPixels_[i][j] = 0;
-      pixelValuesToExclude_[i][j] = std::make_unique<OutlierStore>();
+  for (int ix=0; ix<nx; ix++) {
+    for (int iy=0; iy<ny; iy++) {
+      sum_[ix][iy] = 0.0;
+      sum2_[ix][iy] = 0.0;
+      deviation_[ix][iy] = 0.0;
+      disabledPixels_[ix][iy] = 0;
+      pixelValuesToExclude_[ix][iy] = std::make_unique<OutlierStore>();
     }
   }
   buf_.resize(2*nx*ny);
@@ -64,9 +65,9 @@ void FrameData::setStatisticsExclusionNumbers(int num_low, int num_high)
 {
   const int nx = NumPixelsX();
   const int ny = NumPixelsY();
-  for (int i=0; i<nx; i++) {
-    for (int j=0; j<ny; j++) {
-      pixelValuesToExclude_[i][j]->set_capacities(num_low, num_high);
+  for (int ix=0; ix<nx; ix++) {
+    for (int iy=0; iy<ny; iy++) {
+      pixelValuesToExclude_[ix][iy]->set_capacities(num_low, num_high);
     }
   }
 }
@@ -75,9 +76,9 @@ void FrameData::resetRawFrame()
 {
   const int nx = NumPixelsX();
   const int ny = NumPixelsY();
-  for (int i=0; i<nx; i++) {
-    for (int j=0; j<ny; j++) {
-      rawFrame_[i][j] = 0.0;
+  for (int ix=0; ix<nx; ix++) {
+    for (int iy=0; iy<ny; iy++) {
+      rawFrame_[ix][iy] = 0.0;
     }
   }
 }
@@ -101,9 +102,22 @@ bool FrameData::load(const std::string& filename)
 
   const int nx = NumPixelsX();
   const int ny = NumPixelsY();
-  for (int i=0; i<nx; i++) {
-    for (int j=0; j<ny; j++) {
-      const int t = i*ny+j;
+  for (int ix=0; ix<nx; ix++) {
+    for (int iy=0; iy<ny; iy++) {
+      int t = -1;
+      if (!readDirectionX_) {
+        if (startPosition_==CornerID::BottomLeft)  { t = ix*ny+iy; }
+        if (startPosition_==CornerID::UpperLeft)   { t = ix*ny+(ny-1-iy); }
+        if (startPosition_==CornerID::BottomRight) { t = (nx-1-ix)*ny+iy; }
+        if (startPosition_==CornerID::UpperRight)  { t = (nx-1-ix)*ny+(ny-1-iy); }
+      }
+      else {
+        if (startPosition_==CornerID::BottomLeft)  { t = iy*nx+ix; }
+        if (startPosition_==CornerID::UpperLeft)   { t = (ny-1-iy)*nx+ix; }
+        if (startPosition_==CornerID::BottomRight) { t = iy*nx+(nx-1-ix); }
+        if (startPosition_==CornerID::UpperRight)  { t = (ny-1-iy)*nx+(nx-1-ix); }
+      }
+
       unsigned int v = 0u;
       if (ByteOrder()) {
         v = ((static_cast<uint16_t>(buf_[2*t])&0xff)<<8) + (static_cast<uint16_t>(buf_[2*t+1])&0xff);
@@ -113,13 +127,13 @@ bool FrameData::load(const std::string& filename)
       }
 
       if (regular_pixel_arrangement) {
-        rawFrame_[i][j] = v;
+        rawFrame_[ix][iy] = v;
       }
       else {
-        const int pixel_shift = (i%2==0) ? 0 : odd_row_pixel_shift;
-        const int j_shifted = j + pixel_shift;
-        if (0<=j_shifted && j_shifted<ny) {
-          rawFrame_[i][j_shifted] = v;
+        const int pixel_shift = (iy%2==0) ? 0 : odd_row_pixel_shift;
+        const int ix_shifted = ix + pixel_shift;
+        if (0<=ix_shifted && ix_shifted<ny) {
+          rawFrame_[ix_shifted][iy] = v;
         }
       }
     }
@@ -131,13 +145,13 @@ void FrameData::stack()
 {
   const int nx = NumPixelsX();
   const int ny = NumPixelsY();
-  for (int i=0; i<nx; i++) {
-    for (int j=0; j<ny; j++) {
-      const double v = rawFrame_[i][j];
-      weight_[i][j] += 1.0;
-      sum_[i][j] += v;
-      sum2_[i][j] += v*v;
-      pixelValuesToExclude_[i][j]->propose(v);
+  for (int ix=0; ix<nx; ix++) {
+    for (int iy=0; iy<ny; iy++) {
+      const double v = rawFrame_[ix][iy];
+      weight_[ix][iy] += 1.0;
+      sum_[ix][iy] += v;
+      sum2_[ix][iy] += v*v;
+      pixelValuesToExclude_[ix][iy]->propose(v);
     }
   }
 }
@@ -146,9 +160,9 @@ void FrameData::setPedestals(const double v)
 {
   const int nx = NumPixelsX();
   const int ny = NumPixelsY();
-  for (int i=0; i<nx; i++) {
-    for (int j=0; j<ny; j++) {
-      pedestals_[i][j] = v;
+  for (int ix=0; ix<nx; ix++) {
+    for (int iy=0; iy<ny; iy++) {
+      pedestals_[ix][iy] = v;
     }
   }
 }
@@ -157,14 +171,14 @@ void FrameData::calculateStatistics()
 {
   const int nx = NumPixelsX();
   const int ny = NumPixelsY();
-  for (int i=0; i<nx; i++) {
-    for (int j=0; j<ny; j++) {
-      const double w = weight_[i][j] - pixelValuesToExclude_[i][j]->num();
-      const double sum = sum_[i][j] - pixelValuesToExclude_[i][j]->sum();
-      const double sum2 = sum2_[i][j] - pixelValuesToExclude_[i][j]->sum2();
+  for (int ix=0; ix<nx; ix++) {
+    for (int iy=0; iy<ny; iy++) {
+      const double w = weight_[ix][iy] - pixelValuesToExclude_[ix][iy]->num();
+      const double sum = sum_[ix][iy] - pixelValuesToExclude_[ix][iy]->sum();
+      const double sum2 = sum2_[ix][iy] - pixelValuesToExclude_[ix][iy]->sum2();
       if (w != 0.0) {
-        pedestals_[i][j] = sum/w;
-        deviation_[i][j] = sqrt(sum2/w - (sum*sum)/(w*w));
+        pedestals_[ix][iy] = sum/w;
+        deviation_[ix][iy] = sqrt(sum2/w - (sum*sum)/(w*w));
       }
     }
   }
@@ -174,9 +188,9 @@ void FrameData::subtractPedestals()
 {
   const int nx = NumPixelsX();
   const int ny = NumPixelsY();
-  for (int i=0; i<nx; i++) {
-    for (int j=0; j<ny; j++) {
-      frame_[i][j] = rawFrame_[i][j] - pedestals_[i][j];
+  for (int ix=0; ix<nx; ix++) {
+    for (int iy=0; iy<ny; iy++) {
+      frame_[ix][iy] = rawFrame_[ix][iy] - pedestals_[ix][iy];
     }
   }
 }
@@ -185,11 +199,11 @@ void FrameData::correctGains()
 {
   const int nx = NumPixelsX();
   const int ny = NumPixelsY();
-  for (int i=0; i<nx; i++) {
-    for (int j=0; j<ny; j++) {
-      const double pha = frame_[i][j];
-      const double energy = correctGain(i, j, pha);
-      frame_[i][j] = energy;
+  for (int ix=0; ix<nx; ix++) {
+    for (int iy=0; iy<ny; iy++) {
+      const double pha = frame_[ix][iy];
+      const double energy = correctGain(ix, iy, pha);
+      frame_[ix][iy] = energy;
     }
   }
 }
@@ -238,10 +252,10 @@ bool FrameData::isMaxPixel(int ix, int iy, int size) const
   const int iy0 = iy-halfSize;
 
   const double vCenter = frame_[ix][iy];
-  for (int i=0; i<size; i++) {
-    for (int j=0; j<size; j++) {
-      const double v = frame_[ix0+i][iy0+j];
-      if (ix0+i!=ix || iy0+j!=iy) {
+  for (int jx=0; jx<size; jx++) {
+    for (int jy=0; jy<size; jy++) {
+      const double v = frame_[ix0+jx][iy0+jy];
+      if (ix0+jx!=ix || iy0+jy!=iy) {
         if (v >= vCenter) {
           return false;
         }
@@ -277,9 +291,9 @@ bool FrameData::includeDisabledPixel(int ix, int iy, int size) const
   const int ix0 = ix-halfSize;
   const int iy0 = iy-halfSize;
  
-  for (int i=0; i<size; i++) {
-    for (int j=0; j<size; j++) {
-      if (disabledPixels_[ix0+i][iy0+j]) {
+  for (int jx=0; jx<size; jx++) {
+    for (int jy=0; jy<size; jy++) {
+      if (disabledPixels_[ix0+jx][iy0+jy]) {
         return true;
       }
     }
