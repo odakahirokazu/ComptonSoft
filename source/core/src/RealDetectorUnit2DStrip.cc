@@ -211,6 +211,7 @@ reconstructWithOneByOneMethod(const DetectorHitVector& hitsCathode,
     }
     
     merged->setEnergy(merged->EPI());
+    merged->setEnergyError(merged->EPIError());
     hitReconstructed.push_back(merged);
   }
 }
@@ -247,6 +248,8 @@ mergeDoubleSides(const DetectorHit_sptr hitCathode,
   hit->setPosition(position);
   hit->setLocalPosition(localPosition);
   hit->setPixel(pixel);
+  hit->setPositionError(PositionError(hit->LocalPositionError()));
+  
   return hit;
 }
 

@@ -22,6 +22,7 @@
 
 #include "VDeviceSimulation.hh"
 #include <memory>
+#include <tuple>
 #include "EFieldModel.hh"
 
 class TSpline;
@@ -38,7 +39,8 @@ class DetectorHit;
  * @date 2008-07-xx
  * @date 2012-07-01
  * @date 2014-11-07
- * @date 2015-05-14 | EPI compensation.
+ * @date 2015-05-14 | introduce EPI compensation.
+ * @date 2020-09-02 | treat EPI as a tuple of its value and error
  */
 class DeviceSimulation : public VDeviceSimulation
 {
@@ -147,8 +149,8 @@ public:
   void resetEPICompensationFactorVector(double v)
   { resetTable(&DeviceSimulation::EPICompensationFactorVector_, v); }
 
-  double compensateEPI(const PixelID& sp, double ePI) const;
-  double compensateEPI(int chip, int channel, double ePI) const;
+  std::tuple<double, double> compensateEPI(const PixelID& sp, std::tuple<double, double> ePI) const;
+  std::tuple<double, double> compensateEPI(int chip, int channel, std::tuple<double, double> ePI) const;
 
   virtual double ChargeCollectionEfficiency(const PixelID& /* sp */,
                                             double /* x */,
@@ -164,7 +166,7 @@ public:
   double calculateEnergyCharge(const PixelID& pixel,
                                double energyDeposit,
                                double x, double y, double z) const override;
-  double calculateEPI(double energyCharge, const PixelID& pixel) const override;
+  std::tuple<double, double> calculateEPI(double energyCharge, const PixelID& pixel) const override;
 
   virtual double DiffusionSigmaAnode(double z);
   virtual double DiffusionSigmaCathode(double z);
@@ -208,7 +210,8 @@ private:
 };
 
 inline
-double DeviceSimulation::compensateEPI(int group, int channel, double ePI) const
+std::tuple<double, double> DeviceSimulation::
+compensateEPI(int group, int channel, std::tuple<double, double> ePI) const
 {
   return compensateEPI(ChannelToPixel(group,channel), ePI);
 }

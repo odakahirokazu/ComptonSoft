@@ -30,10 +30,11 @@ class CSHitCollection;
  * @author Hirokazu Odaka
  * @date 2015-05-14 | rename from SetSimGainCorrection.
  * @date 2016-10-07 | for version 5.2
+ * @date 2020-09-02 | 3.1 | treat EPI as a tuple of its value and error
  */
 class ApplyEPICompensation : public VCSModule
 {
-  DEFINE_ANL_MODULE(ApplyEPICompensation, 3.0);
+  DEFINE_ANL_MODULE(ApplyEPICompensation, 3.1);
 public:
   ApplyEPICompensation();
   ~ApplyEPICompensation();

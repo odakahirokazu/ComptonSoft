@@ -36,6 +36,7 @@ namespace comptonsoft {
  * @date 2015-11-14
  * @date 2020-07-02 | add properties: total energy deposit, escape flag, reconstructed order, reconstruction fraction
  * @date 2020-07-08 | rename TotalEnergy() -> IncidentEnergy()
+ * @date 2020-09-02 | add errors of energy/position
  */
 class BasicComptonEvent
 {
@@ -65,6 +66,12 @@ public:
   double Hit1PositionY() const { return hit1Position_.y(); }
   double Hit1PositionZ() const { return hit1Position_.z(); }
   double Hit1Energy() const { return hit1Energy_; }
+  double Hit1TimeError() const { return hit1TimeError_; }
+  vector3_t Hit1PositionError() const { return hit1PositionError_; }
+  double Hit1PositionErrorX() const { return hit1PositionError_.x(); }
+  double Hit1PositionErrorY() const { return hit1PositionError_.y(); }
+  double Hit1PositionErrorZ() const { return hit1PositionError_.z(); }
+  double Hit1EnergyError() const { return hit1EnergyError_; }
 
   int Hit2ID() const { return hit2ID_; }
   uint32_t Hit2Process() const { return hit2Process_; }
@@ -78,6 +85,12 @@ public:
   double Hit2PositionY() const { return hit2Position_.y(); }
   double Hit2PositionZ() const { return hit2Position_.z(); }
   double Hit2Energy() const { return hit2Energy_; }
+  double Hit2TimeError() const { return hit2TimeError_; }
+  vector3_t Hit2PositionError() const { return hit2PositionError_; }
+  double Hit2PositionErrorX() const { return hit2PositionError_.x(); }
+  double Hit2PositionErrorY() const { return hit2PositionError_.y(); }
+  double Hit2PositionErrorZ() const { return hit2PositionError_.z(); }
+  double Hit2EnergyError() const { return hit2EnergyError_; }
 
   void setHit1(int hitID, const DetectorHit_sptr& hit);
   void setHit1ID(int v) { hit1ID_ = v; bCalc_ = false; }
@@ -93,6 +106,11 @@ public:
   void setHit1Position(double x, double y, double z)
   { hit1Position_.set(x, y, z); bCalc_ = false; }
   void setHit1Energy(double v) { hit1Energy_ = v; bCalc_ = false; }
+  void setHit1TimeError(double v) { hit1TimeError_ = v; bCalc_ = false; }
+  void setHit1PositionError(const vector3_t& v) { hit1PositionError_ = v; bCalc_ = false; }
+  void setHit1PositionError(double x, double y, double z)
+  { hit1PositionError_.set(x, y, z); bCalc_ = false; }
+  void setHit1EnergyError(double v) { hit1EnergyError_ = v; bCalc_ = false; }
 
   void setHit2(int hitID, const DetectorHit_sptr& hit);
   void setHit2ID(int v) { hit2ID_ = v; bCalc_ = false; }
@@ -108,6 +126,11 @@ public:
   void setHit2Position(double x, double y, double z)
   { hit2Position_.set(x, y, z); bCalc_ = false; }
   void setHit2Energy(double v) { hit2Energy_ = v; bCalc_ = false; }
+  void setHit2TimeError(double v) { hit2TimeError_ = v; bCalc_ = false; }
+  void setHit2PositionError(const vector3_t& v) { hit2PositionError_ = v; bCalc_ = false; }
+  void setHit2PositionError(double x, double y, double z)
+  { hit2PositionError_.set(x, y, z); bCalc_ = false; }
+  void setHit2EnergyError(double v) { hit2EnergyError_ = v; bCalc_ = false; }
 
   uint64_t Flags() const { return flags_; }
   void setFlags(uint64_t v) { flags_ = v; }
@@ -176,49 +199,55 @@ private:
   void calc() const;
 
 private:
-  int64_t eventID_;
-  int numHits_;
+  int64_t eventID_ = 0;
+  int numHits_ = 0;
   
-  int hit1ID_;
-  uint32_t hit1Process_;
+  int hit1ID_ = 0;
+  uint32_t hit1Process_ = 0;
   DetectorBasedChannelID hit1DetectorChannelID_;
   ReadoutBasedChannelID hit1ReadoutChannelID_;
-  PixelID hit1Pixel_;
-  double hit1Time_;
-  vector3_t hit1Position_;
-  double hit1Energy_;
+  PixelID hit1Pixel_{0, 0};
+  double hit1Time_ = 0.0;
+  vector3_t hit1Position_{0.0, 0.0, 0.0};
+  double hit1Energy_ = 0.0;
+  double hit1TimeError_ = 0.0;
+  vector3_t hit1PositionError_{0.0, 0.0, 0.0};
+  double hit1EnergyError_ = 0.0;
 
-  int hit2ID_;
-  uint32_t hit2Process_;
+  int hit2ID_ = 0;
+  uint32_t hit2Process_ = 0;
   DetectorBasedChannelID hit2DetectorChannelID_;
   ReadoutBasedChannelID hit2ReadoutChannelID_;
-  PixelID hit2Pixel_;
-  double hit2Time_;
-  vector3_t hit2Position_;
-  double hit2Energy_;
+  PixelID hit2Pixel_{0, 0};
+  double hit2Time_ = 0.0;
+  vector3_t hit2Position_{0.0, 0.0, 0.0};
+  double hit2Energy_ = 0.0;
+  double hit2TimeError_ = 0.0;
+  vector3_t hit2PositionError_{0.0, 0.0, 0.0};
+  double hit2EnergyError_ = 0.0;
 
-  uint64_t flags_;
+  uint64_t flags_ = 0ul;
 
-  uint64_t hitpattern_;
-  int32_t grade_;
-  double likelihood_;
+  uint64_t hitpattern_ = 0ul;
+  int32_t grade_ = 0;
+  double likelihood_ = 0.0;
 
-  mutable bool bCalc_;
-  mutable double cosThetaE_;
-  mutable double thetaE_;
-  mutable double thetaG_;
-  mutable double deltaTheta_;
-  mutable double phiG_;
-  mutable vector3_t coneAxis_;
+  mutable bool bCalc_ = false;
+  mutable double cosThetaE_ = 1.0;
+  mutable double thetaE_ = 0.0;
+  mutable double thetaG_ = 0.0;
+  mutable double deltaTheta_ = 0.0;
+  mutable double phiG_ = 0.0;
+  mutable vector3_t coneAxis_{0.0, 0.0, 1.0};
 
-  bool sourceDistant_;
-  vector3_t sourceDirection_;
-  vector3_t sourcePosition_;
+  bool sourceDistant_ = true;
+  vector3_t sourceDirection_{0.0, 0.0, 1.0};
+  vector3_t sourcePosition_{0.0, 0.0, 0.0};
 
-  bool escapeFlag_;
-  double totalEnergyDeposit_;
-  int reconstructedOrder_;
-  double reconstructionFraction_;
+  bool escapeFlag_ = false;
+  double totalEnergyDeposit_ = 0.0;
+  int reconstructedOrder_ = 0;
+  double reconstructionFraction_ = 1.0;
 };
 
 template <typename T>

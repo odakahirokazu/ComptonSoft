@@ -49,11 +49,8 @@ ANLStatus RecalculateSimulationNoise::mod_analyze()
     std::vector<DetectorHit_sptr>& hits = m_HitCollection->getHits(timeGroup);
     for (DetectorHit_sptr& hit: hits) {
       const int detectorID = hit->DetectorID();
-      const PixelID pixel = hit->Pixel();
-      const double pha = hit->PHA();
       DeviceSimulation* ds = detectorManager->getDeviceSimulationByID(detectorID);
-      const double epi = ds->calculateEPI(pha, pixel);
-      hit->setEPI(epi);
+      ds->makeEPI(hit);
     }
   }
   

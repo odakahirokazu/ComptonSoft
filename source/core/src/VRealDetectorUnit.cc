@@ -121,6 +121,23 @@ vector3_t VRealDetectorUnit::LocalPositionWithDepth(int pixelX, int pixelY, doub
   return pos;
 }
 
+vector3_t VRealDetectorUnit::LocalPositionError() const
+{
+  const double conversionToSigma = 1.0/std::sqrt(12.0);
+  const double dx = getPixelPitchX()*conversionToSigma;
+  const double dy = getPixelPitchY()*conversionToSigma;
+  const double dz = getThickness()*conversionToSigma;
+  return vector3_t(dx, dy, dz);
+}
+
+vector3_t VRealDetectorUnit::PositionError(const vector3_t& localError) const
+{
+  const vector3_t v = localError.x() * directionX_
+    + localError.y() * directionY_
+    + localError.z() * directionZ_;
+  return v;
+}
+
 PixelID
 VRealDetectorUnit::findPixel(double localx, double localy) const
 {
@@ -208,6 +225,7 @@ void VRealDetectorUnit::selectHits()
         hit->setEPI( mcd->getEPI(channel) );
         hit->setDetectorChannelID(this->getID(), section, channel);
         hit->setPixel(pixel);
+        hit->setLocalPositionError(LocalPositionError());
         ReadoutBasedChannelID readout = mcd->ReadoutID();
         hit->setReadoutChannelID(readout.ReadoutModule(),
                                  readout.Section(),

@@ -50,8 +50,10 @@ ANLStatus ApplyEPICompensation::mod_analyze()
     for (DetectorHit_sptr hit: hits) {
       const int detectorID = hit->DetectorID();
       const DeviceSimulation* ds = detectorManager->getDeviceSimulationByID(detectorID);
-      const double EPICompensated = ds->compensateEPI(hit->Pixel(), hit->EPI());
-      hit->setEPI(EPICompensated);
+      double EPI_value(0.0), EPI_error(0.0);
+      std::tie(EPI_value, EPI_error) = ds->compensateEPI(hit->Pixel(), std::make_tuple(hit->EPI(), hit->EPIError()));
+      hit->setEPI(EPI_value);
+      hit->setEPIError(EPI_error);
     }
   }
 

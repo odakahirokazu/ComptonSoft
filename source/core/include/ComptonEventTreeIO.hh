@@ -35,6 +35,7 @@ namespace comptonsoft {
  * @date 2014-12-02
  * @date 2015-10-10
  * @date 2020-07-09 | new properties
+ * @date 2020-09-02 | add error branches
  */
 class ComptonEventTreeIO
 {
@@ -83,6 +84,11 @@ private:
   float hit1_posy_ = 0.0;
   float hit1_posz_ = 0.0;
   float hit1_energy_ = 0.0;
+  float hit1_time_error_ = 0.0;
+  float hit1_posx_error_ = 0.0;
+  float hit1_posy_error_ = 0.0;
+  float hit1_posz_error_ = 0.0;
+  float hit1_energy_error_ = 0.0;
 
   int16_t hit2_id_ = 0;
   uint32_t hit2_process_ = 0;
@@ -97,6 +103,11 @@ private:
   float hit2_posy_ = 0.0;
   float hit2_posz_ = 0.0;
   float hit2_energy_ = 0.0;
+  float hit2_time_error_ = 0.0;
+  float hit2_posx_error_ = 0.0;
+  float hit2_posy_error_ = 0.0;
+  float hit2_posz_error_ = 0.0;
+  float hit2_energy_error_ = 0.0;
 
   float energy_reconstructed_ = 0.0;
 

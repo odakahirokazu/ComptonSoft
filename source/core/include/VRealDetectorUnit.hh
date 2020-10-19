@@ -190,6 +190,9 @@ public:
 
   vector3_t LocalPositionWithDepth(int pixelX, int pixelY, double localz) const override;
   vector3_t LocalPositionWithDepth(const PixelID& pixel, double localz) const override;
+
+  vector3_t LocalPositionError() const;
+  vector3_t PositionError(const vector3_t& localError) const;
   
   PixelID findPixel(double localx, double localy) const override;
 

@@ -63,6 +63,11 @@ DetectorHit& DetectorHit::merge(const DetectorHit& r)
     setLocalPosition(r.LocalPosition());
     setRealPosition(r.RealPosition());
   }
+
+  if (edep1 > edep0) {
+    setPositionError(r.PositionError());
+    setLocalPositionError(r.LocalPositionError());
+  }
   
   setEnergyDeposit(EnergyDeposit()+r.EnergyDeposit());
   setEnergyCharge(EnergyCharge()+r.EnergyCharge());
@@ -144,20 +149,30 @@ DetectorHit& DetectorHit::mergeAdjacentSignal(const DetectorHit& r,
       setPosition( 0.5*(Position()+r.Position()) );
       setLocalPosition( 0.5*(LocalPosition()+r.LocalPosition()) );
       setRealPosition( 0.5*(RealPosition()+r.RealPosition()) );
-      if (epi0 < epi1) { setPixel(r.Pixel()); }
+      if (epi0 < epi1) {
+        setPixel(r.Pixel());
+        setPositionError(r.PositionError());
+        setLocalPositionError(r.LocalPositionError());
+      }
     }
     else if (mergedPosition==MergedPosition::EnergyWeighted) {
       const double sumE = epi0 + epi1;
       setPosition( (Position()*epi0+r.Position()*epi1)/sumE );
       setLocalPosition( (LocalPosition()*epi0 + r.LocalPosition()*epi1)/sumE );
       setRealPosition( (RealPosition()*epi0 + r.RealPosition()*epi1)/sumE );
-      if (epi0 < epi1) { setPixel(r.Pixel()); }
+      if (epi0 < epi1) {
+        setPixel(r.Pixel());
+        setPositionError(r.PositionError());
+        setLocalPositionError(r.LocalPositionError());
+      }
     }
     else if (mergedPosition==MergedPosition::CopyRight) {
       setPosition(r.Position());
       setLocalPosition(r.LocalPosition());
       setRealPosition(r.RealPosition());
       setPixel(r.Pixel());
+      setPositionError(r.PositionError());
+      setLocalPositionError(r.LocalPositionError());
     }
   }
 

@@ -31,10 +31,11 @@ class CSHitCollection;
  * @author Hirokazu Odaka
  * @date 2011-02-16
  * @date 2014-11-26
+ * @date 2020-09-02 | 3.0 | fix; treat EPI as a tuple of its value and error
  */
 class RecalculateSimulationNoise : public VCSModule
 {
-  DEFINE_ANL_MODULE(RecalculateSimulationNoise, 2.1);
+  DEFINE_ANL_MODULE(RecalculateSimulationNoise, 3.0);
 public:
   RecalculateSimulationNoise();
   ~RecalculateSimulationNoise() = default;

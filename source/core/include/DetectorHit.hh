@@ -47,6 +47,7 @@ namespace comptonsoft {
  * @date 2012-06-29 | rename DetectorID; add Instrument ID
  * @date 2014-09-18 | redesign.
  * @date 2016-08-19 | add trigger information, change channel ID classes
+ * @date 2020-09-02 | add errors of energy/position/time
  */
 class DetectorHit
 {
@@ -110,6 +111,8 @@ public:
   double PHA() const { return PHA_; }
   void setEPI(double v) { EPI_ = v; }
   double EPI() const { return EPI_; }
+  void setEPIError(double v) { EPIError_ = v; }
+  double EPIError() const { return EPIError_; }
 
   void setFlagData(uint64_t v) { flagData_ = v; }
   uint64_t FlagData() const { return flagData_; }
@@ -161,6 +164,8 @@ public:
 
   void setEnergy(double v) { energy_ = v; }
   double Energy() const { return energy_; }
+  void setEnergyError(double v) { energyError_ = v; }
+  double EnergyError() const { return energyError_; }
 
   void setPosition(double x, double y, double z) { position_.set(x, y, z); }
   void setPosition(const vector3_t& v) { position_ = v; }
@@ -169,17 +174,31 @@ public:
   double PositionZ() const { return position_.z(); }
   vector3_t Position() const { return position_; }
 
-  void setLocalPosition(double x, double y, double z)
-  { localPosition_.set(x, y, z); }
-  void setLocalPosition(const vector3_t& v)
-  { localPosition_ = v; }
+  void setPositionError(double x, double y, double z) { positionError_.set(x, y, z); }
+  void setPositionError(const vector3_t& v) { positionError_ = v; }
+  double PositionErrorX() const { return positionError_.x(); }
+  double PositionErrorY() const { return positionError_.y(); }
+  double PositionErrorZ() const { return positionError_.z(); }
+  vector3_t PositionError() const { return positionError_; }
+
+  void setLocalPosition(double x, double y, double z) { localPosition_.set(x, y, z); }
+  void setLocalPosition(const vector3_t& v) { localPosition_ = v; }
   double LocalPositionX() const { return localPosition_.x(); }
   double LocalPositionY() const { return localPosition_.y(); }
   double LocalPositionZ() const { return localPosition_.z(); }
   vector3_t LocalPosition() const { return localPosition_; }
 
+  void setLocalPositionError(double x, double y, double z) { localPositionError_.set(x, y, z); }
+  void setLocalPositionError(const vector3_t& v) { localPositionError_ = v; }
+  double LocalPositionErrorX() const { return localPositionError_.x(); }
+  double LocalPositionErrorY() const { return localPositionError_.y(); }
+  double LocalPositionErrorZ() const { return localPositionError_.z(); }
+  vector3_t LocalPositionError() const { return localPositionError_; }
+
   void setTime(double v) { time_ = v; }
   double Time() const { return time_; }
+  void setTimeError(double v) { time_error_ = v; }
+  double TimeError() const { return time_error_; }
 
   void setGrade(int v) { grade_ = v; }
   int Grade() const { return grade_; }
@@ -254,6 +273,7 @@ private:
   int32_t rawPHA_ = 0;
   double PHA_ = 0.0;
   double EPI_ = 0.0;
+  double EPIError_ = 0.0;
   uint64_t flagData_ = 0ul;
   uint64_t flags_ = 0ul;
   // simulation
@@ -268,9 +288,13 @@ private:
   double triggeredTime_ = 0.0;
   // reconstructed
   double energy_ = 0.0;
+  double energyError_ = 0.0;
   vector3_t position_{0.0, 0.0, 0.0};
+  vector3_t positionError_{0.0, 0.0, 0.0};
   vector3_t localPosition_{0.0, 0.0, 0.0};
+  vector3_t localPositionError_{0.0, 0.0, 0.0};
   double time_ = 0.0;
+  double time_error_ = 0.0;
   int grade_ = 0;
   int depthSensingMode_ = 0;
 };

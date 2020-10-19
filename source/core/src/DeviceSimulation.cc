@@ -124,25 +124,29 @@ double DeviceSimulation::DiffusionSigmaCathode(double z)
   return sigma;
 }
 
-double DeviceSimulation::
-compensateEPI(const PixelID& sp, double ePI) const
+std::tuple<double, double> DeviceSimulation::
+compensateEPI(const PixelID& sp, std::tuple<double, double> ePI) const
 {
+  const double ePI_value = std::get<0>(ePI);
+  const double ePI_error = std::get<1>(ePI);
+
   double factor = 1.0;
   const TSpline* function = getEPICompensationFunction(sp);
   if (function) {
-    factor = function->Eval(ePI);
+    factor = function->Eval(ePI_value);
   }
   else {
     factor = getEPICompensationFactor(sp);
   }
-  return factor * ePI;
+
+  return std::make_tuple(factor*ePI_value, factor*ePI_error);
 }
 
-double DeviceSimulation::
+std::tuple<double, double> DeviceSimulation::
 calculateEPI(double energyCharge, const PixelID& pixel) const
 {
-  const double EPI = VDeviceSimulation::calculateEPI(energyCharge, pixel);
-  const double EPICompensated = compensateEPI(pixel, EPI);
+  const std::tuple<double, double> EPI = VDeviceSimulation::calculateEPI(energyCharge, pixel);
+  const std::tuple<double, double> EPICompensated = compensateEPI(pixel, EPI);
   return EPICompensated;
 }
 

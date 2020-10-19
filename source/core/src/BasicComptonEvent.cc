@@ -25,28 +25,7 @@
 
 namespace comptonsoft {
 
-BasicComptonEvent::BasicComptonEvent()
-  : eventID_(0), numHits_(0),
-    hit1ID_(0), hit1Process_(0),
-    hit1Pixel_(0, 0), hit1Time_(0.0), hit1Position_(0.0, 0.0, 0.0),
-    hit1Energy_(0.0),
-    hit2ID_(0), hit2Process_(0),
-    hit2Pixel_(0, 0), hit2Time_(0.0), hit2Position_(0.0, 0.0, 0.0),
-    hit2Energy_(0.0),
-    flags_(0ul), hitpattern_(0ul),
-    grade_(0), likelihood_(1.0),
-    bCalc_(false),
-    cosThetaE_(1.0), thetaE_(0.0), thetaG_(0.0), deltaTheta_(0.0),
-    phiG_(0.0),
-    coneAxis_(0.0, 0.0, 1.0),
-    sourceDistant_(true), sourceDirection_(0.0, 0.0, 1.0),
-    sourcePosition_(0.0, 0.0, 0.0),
-    escapeFlag_(false),
-    totalEnergyDeposit_(0.0),
-    reconstructedOrder_(0),
-    reconstructionFraction_(1.0)
-{
-}
+BasicComptonEvent::BasicComptonEvent() = default;
 
 BasicComptonEvent::~BasicComptonEvent() = default;
 
@@ -60,6 +39,9 @@ void BasicComptonEvent::setHit1(int hitID, const DetectorHit_sptr& hit)
   hit1Time_ = hit->Time();
   hit1Position_ = hit->Position();
   hit1Energy_ = hit->Energy();
+  hit1TimeError_ = hit->TimeError();
+  hit1PositionError_ = hit->PositionError();
+  hit1EnergyError_ = hit->EnergyError();
   bCalc_ = false;
 }
 
@@ -73,6 +55,9 @@ void BasicComptonEvent::setHit2(int hitID, const DetectorHit_sptr& hit)
   hit2Time_ = hit->Time();
   hit2Position_ = hit->Position();
   hit2Energy_ = hit->Energy();
+  hit2TimeError_ = hit->TimeError();
+  hit2PositionError_ = hit->PositionError();
+  hit2EnergyError_ = hit->EnergyError();
   bCalc_ = false;
 }
 
@@ -95,6 +80,9 @@ void BasicComptonEvent::swap()
   std::swap(hit1Time_, hit2Time_);
   std::swap(hit1Position_, hit2Position_);
   std::swap(hit1Energy_, hit2Energy_);
+  std::swap(hit1TimeError_, hit2TimeError_);
+  std::swap(hit1PositionError_, hit2PositionError_);
+  std::swap(hit1EnergyError_, hit2EnergyError_);
 }
 
 double BasicComptonEvent::DistanceBetweenTheHits() const

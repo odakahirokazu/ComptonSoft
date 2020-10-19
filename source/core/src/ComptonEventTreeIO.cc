@@ -54,6 +54,11 @@ void ComptonEventTreeIO::defineBranches()
   cetree_->Branch("hit1_posy", &hit1_posy_, "hit1_posy/F");
   cetree_->Branch("hit1_posz", &hit1_posz_, "hit1_posz/F");
   cetree_->Branch("hit1_energy", &hit1_energy_, "hit1_energy/F");
+  cetree_->Branch("hit1_time_error", &hit1_time_error_, "hit1_time_error/F");
+  cetree_->Branch("hit1_posx_error", &hit1_posx_error_, "hit1_posx_error/F");
+  cetree_->Branch("hit1_posy_error", &hit1_posy_error_, "hit1_posy_error/F");
+  cetree_->Branch("hit1_posz_error", &hit1_posz_error_, "hit1_posz_error/F");
+  cetree_->Branch("hit1_energy_error", &hit1_energy_error_, "hit1_energy_error/F");
   
   cetree_->Branch("hit2_id", &hit2_id_, "hit2_id/S");
   cetree_->Branch("hit2_process", &hit2_process_, "hit2_process/i");
@@ -69,6 +74,11 @@ void ComptonEventTreeIO::defineBranches()
   cetree_->Branch("hit2_posy", &hit2_posy_, "hit2_posy/F");
   cetree_->Branch("hit2_posz", &hit2_posz_, "hit2_posz/F");
   cetree_->Branch("hit2_energy", &hit2_energy_, "hit2_energy/F");
+  cetree_->Branch("hit2_time_error", &hit2_time_error_, "hit2_time_error/F");
+  cetree_->Branch("hit2_posx_error", &hit2_posx_error_, "hit2_posx_error/F");
+  cetree_->Branch("hit2_posy_error", &hit2_posy_error_, "hit2_posy_error/F");
+  cetree_->Branch("hit2_posz_error", &hit2_posz_error_, "hit2_posz_error/F");
+  cetree_->Branch("hit2_energy_error", &hit2_energy_error_, "hit2_energy_error/F");
 
   cetree_->Branch("energy_reconstructed", &energy_reconstructed_, "energy_reconstructed/F");
 
@@ -107,6 +117,11 @@ void ComptonEventTreeIO::setBranchAddresses()
   cetree_->SetBranchAddress("hit1_posy", &hit1_posy_);
   cetree_->SetBranchAddress("hit1_posz", &hit1_posz_);
   cetree_->SetBranchAddress("hit1_energy", &hit1_energy_);
+  cetree_->SetBranchAddress("hit1_time_error", &hit1_time_error_);
+  cetree_->SetBranchAddress("hit1_posx_error", &hit1_posx_error_);
+  cetree_->SetBranchAddress("hit1_posy_error", &hit1_posy_error_);
+  cetree_->SetBranchAddress("hit1_posz_error", &hit1_posz_error_);
+  cetree_->SetBranchAddress("hit1_energy_error", &hit1_energy_error_);
   
   cetree_->SetBranchAddress("hit2_id", &hit2_id_);
   cetree_->SetBranchAddress("hit2_process", &hit2_process_);
@@ -122,6 +137,11 @@ void ComptonEventTreeIO::setBranchAddresses()
   cetree_->SetBranchAddress("hit2_posy", &hit2_posy_);
   cetree_->SetBranchAddress("hit2_posz", &hit2_posz_);
   cetree_->SetBranchAddress("hit2_energy", &hit2_energy_);
+  cetree_->SetBranchAddress("hit2_time_error", &hit2_time_error_);
+  cetree_->SetBranchAddress("hit2_posx_error", &hit2_posx_error_);
+  cetree_->SetBranchAddress("hit2_posy_error", &hit2_posy_error_);
+  cetree_->SetBranchAddress("hit2_posz_error", &hit2_posz_error_);
+  cetree_->SetBranchAddress("hit2_energy_error", &hit2_energy_error_);
 
   cetree_->SetBranchAddress("energy_reconstructed", &energy_reconstructed_);
 
@@ -166,6 +186,13 @@ void ComptonEventTreeIO::fillEvent(const int64_t eventID,
   hit1_posz_ = hit1Position.z() / unit::cm;
   hit1_energy_ = event.Hit1Energy() / unit::keV;
 
+  hit1_time_error_ = event.Hit1TimeError() / unit::second;
+  const vector3_t hit1PositionError = event.Hit1PositionError();
+  hit1_posx_error_ = hit1PositionError.x() / unit::cm;
+  hit1_posy_error_ = hit1PositionError.y() / unit::cm;
+  hit1_posz_error_ = hit1PositionError.z() / unit::cm;
+  hit1_energy_error_ = event.Hit1EnergyError() / unit::keV;
+
   hit2_id_ = event.Hit2ID();
   hit2_process_ = event.Hit2Process();
   hit2_detector_ = event.Hit2DetectorID();
@@ -183,6 +210,13 @@ void ComptonEventTreeIO::fillEvent(const int64_t eventID,
   hit2_posy_ = hit2Position.y() / unit::cm;
   hit2_posz_ = hit2Position.z() / unit::cm;
   hit2_energy_ = event.Hit2Energy() / unit::keV;
+
+  hit2_time_error_ = event.Hit2TimeError() / unit::second;
+  const vector3_t hit2PositionError = event.Hit2PositionError();
+  hit2_posx_error_ = hit2PositionError.x() / unit::cm;
+  hit2_posy_error_ = hit2PositionError.y() / unit::cm;
+  hit2_posz_error_ = hit2PositionError.z() / unit::cm;
+  hit2_energy_error_ = event.Hit2EnergyError() / unit::keV;
 
   energy_reconstructed_ = event.IncidentEnergy() / unit::keV;
 
@@ -233,6 +267,9 @@ void ComptonEventTreeIO::retrieveEvent(BasicComptonEvent& event) const
   event.setHit1Time(hit1_time_ * unit::second);
   event.setHit1Position(hit1_posx_ * unit::cm, hit1_posy_ * unit::cm, hit1_posz_ * unit::cm);
   event.setHit1Energy(hit1_energy_ * unit::keV);
+  event.setHit1TimeError(hit1_time_error_ * unit::second);
+  event.setHit1PositionError(hit1_posx_error_ * unit::cm, hit1_posy_error_ * unit::cm, hit1_posz_error_ * unit::cm);
+  event.setHit1EnergyError(hit1_energy_error_ * unit::keV);
 
   event.setHit2ID(hit2_id_);
   event.setHit2Process(hit2_process_);
@@ -244,6 +281,9 @@ void ComptonEventTreeIO::retrieveEvent(BasicComptonEvent& event) const
   event.setHit2Time(hit2_time_ * unit::second);
   event.setHit2Position(hit2_posx_ * unit::cm, hit2_posy_ * unit::cm, hit2_posz_ * unit::cm);
   event.setHit2Energy(hit2_energy_ * unit::keV);
+  event.setHit2TimeError(hit2_time_error_ * unit::second);
+  event.setHit2PositionError(hit2_posx_error_ * unit::cm, hit2_posy_error_ * unit::cm, hit2_posz_error_ * unit::cm);
+  event.setHit2EnergyError(hit2_energy_error_ * unit::keV);
 
   // Currently, BasicComptonEvent does not have a correspoing property
   // event.setEnergyReconstructed(energy_reconstructed_ * unit::keV);

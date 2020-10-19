@@ -84,7 +84,7 @@ void VDeviceSimulation::makeDetectorHits()
   removeHitsAtChannelsDisabled(SimulatedHits_);
 
   for (auto& hit: SimulatedHits_) {
-    hit->setEPI( calculateEPI(hit->EnergyCharge(), hit->Pixel()) );
+    makeEPI(hit);
   }
   removeHitsBelowThresholds(SimulatedHits_);
   
@@ -95,6 +95,7 @@ void VDeviceSimulation::makeDetectorHits()
     hit->setSelfTriggeredTime(hit->RealTime());
     hit->setTriggeredTime(hit->RealTime());
     assignLocalDepth(hit);
+    assignLocalPositionError(hit);
     insertDetectorHit(hit);
   }
   SimulatedHits_.clear();
@@ -195,7 +196,7 @@ calculateEnergyCharge(const PixelID& ,
   return energyDeposit;
 }
 
-double VDeviceSimulation::
+std::tuple<double, double> VDeviceSimulation::
 calculateEPI(double energyCharge, const PixelID& pixel) const
 {
   // y^2 = param0^2 + (param1*x^(1/2))^2 + (param2*x)^2
@@ -209,7 +210,15 @@ calculateEPI(double energyCharge, const PixelID& pixel) const
   const double y2 = param0*param0 + param1*param1*x + param2*param2*x*x; // in keV2
   const double sigma = std::sqrt(y2) * unit::keV;
   const double ePI = CLHEP::RandGauss::shoot(energyCharge, sigma);
-  return ePI;
+  return std::make_tuple(ePI, sigma);
+}
+
+void VDeviceSimulation::makeEPI(DetectorHit_sptr hit)
+{
+  double ePI(0.0), ePIError(0.0);
+  std::tie(ePI, ePIError) = calculateEPI(hit->EnergyCharge(), hit->Pixel());
+  hit->setEPI(ePI);
+  hit->setEPIError(ePIError);
 }
 
 bool VDeviceSimulation::
@@ -318,7 +327,7 @@ void VDeviceSimulation::makeDetectorHitsAtTime(double time_triggered, int time_g
   removeHitsAtChannelsDisabled(hits);
 
   for (auto& hit: hits) {
-    hit->setEPI( calculateEPI(hit->EnergyCharge(), hit->Pixel()) );
+    makeEPI(hit);
   }
   removeHitsBelowThresholds(hits);
   
@@ -327,6 +336,7 @@ void VDeviceSimulation::makeDetectorHitsAtTime(double time_triggered, int time_g
     hit->setTriggered(true);
     hit->setTriggeredTime(time_triggered);
     assignLocalDepth(hit);
+    assignLocalPositionError(hit);
     insertDetectorHit(hit);
   }
 }
@@ -368,6 +378,15 @@ void VDeviceSimulation::assignLocalDepth(DetectorHit_sptr hit) const
     hit->setDepthSensingMode(DepthSensingMode());
     hit->setLocalPosition(localposx, localposy, zMeasured);
   }
+}
+
+void VDeviceSimulation::assignLocalPositionError(DetectorHit_sptr hit) const
+{
+  const double conversionToSigma = 1.0/std::sqrt(12.0);
+  const double dx = getPixelPitchX()*conversionToSigma;
+  const double dy = getPixelPitchY()*conversionToSigma;
+  const double dz = (DepthSensingMode()==1) ? DepthResolution() : (getThickness()*conversionToSigma);
+  hit->setLocalPositionError(dx, dy, dz);
 }
 
 } /* namespace comptonsoft */

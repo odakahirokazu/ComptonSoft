@@ -32,6 +32,7 @@ namespace comptonsoft {
  * @author Hirokazu Odaka
  * @date 2014-12-02
  * @date 2016-09-07
+ * @date 2020-09-02 | add error branches
  */
 class HitTreeIO
 {
@@ -77,6 +78,7 @@ private:
   int32_t rawpha_ = 0;
   float pha_ = 0.0;
   float epi_ = 0.0;
+  float epi_error_ = 0.0;
   uint64_t flag_data_ = 0ul;
   uint64_t flags_ = 0ul;
   // simulation
@@ -91,13 +93,21 @@ private:
   uint32_t process_ = 0u;
   // reconstructed
   float energy_ = 0.0;
+  float energy_error_ = 0.0;
   float posx_ = 0.0;
   float posy_ = 0.0;
   float posz_ = 0.0;
+  float posx_error_ = 0.0;
+  float posy_error_ = 0.0;
+  float posz_error_ = 0.0;
   float local_posx_ = 0.0;
   float local_posy_ = 0.0;
   float local_posz_ = 0.0;
+  float local_posx_error_ = 0.0;
+  float local_posy_error_ = 0.0;
+  float local_posz_error_ = 0.0;
   double time_ = 0.0;
+  double time_error_ = 0.0;
   int32_t grade_ = 0;
 };
 

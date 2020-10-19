@@ -41,6 +41,7 @@ namespace comptonsoft {
  * @date 2009-10-26 
  * @date 2012-07-01 | VDeviceSimulation 
  * @date 2014-10-08 | VDeviceSimulation 
+ * @date 2020-09-02 | treat EPI as a tuple of its value and error
  */
 class VDeviceSimulation : virtual public VDetectorUnit
 {
@@ -194,7 +195,9 @@ public:
   virtual double calculateEnergyCharge(const PixelID& pixel,
                                        double energyDeposit,
                                        double x, double y, double z) const = 0;
-  virtual double calculateEPI(double energyCharge, const PixelID& pixel) const = 0;
+  virtual std::tuple<double, double> calculateEPI(double energyCharge, const PixelID& pixel) const = 0;
+  void makeEPI(DetectorHit_sptr hit);
+
   bool checkTriggerDiscrimination(double energyCharge, const PixelID& pixel) const;
 
   void fillPixel(DetectorHit_sptr hit) const;
@@ -204,6 +207,7 @@ public:
   void insertRawHit(DetectorHit_sptr hit) { RawHits_.push_back(hit); }
 
   void assignLocalDepth(DetectorHit_sptr hit) const;
+  void assignLocalPositionError(DetectorHit_sptr hit) const;
 
 protected:
   virtual bool checkRange(const PixelID& pixel) const = 0;

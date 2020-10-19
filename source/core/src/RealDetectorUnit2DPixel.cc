@@ -58,6 +58,7 @@ void RealDetectorUnit2DPixel::reconstruct(const DetectorHitVector& hitSignals,
                  [](const DetectorHit_sptr& hit) {
                    auto hit2 = hit->clone();
                    hit2->setEnergy(hit->EPI());
+                   hit2->setEnergyError(hit->EPIError());
                    return hit2;
                  });
   determinePosition(hitsReconstructed);
@@ -76,6 +77,7 @@ void RealDetectorUnit2DPixel::determinePosition(DetectorHitVector& hits) const
       hit->setPosition(Position(pixel));
       hit->setLocalPosition(LocalPosition(pixel));
     }
+    hit->setPositionError(PositionError(hit->LocalPositionError()));
   }
 }
 
