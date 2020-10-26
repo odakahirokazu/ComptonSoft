@@ -89,8 +89,11 @@
 #include "SetBadFrames.hh"
 #include "SetPedestalsByMedian.hh"
 #include "HistogramFramePedestal.hh"
+#include "HistogramFramePedestalMean.hh"
+#include "HistogramFramePedestalSigma.hh"
 #include "HistogramXrayEventSpectrum.hh"
 #include "HistogramXrayEventAzimuthAngle.hh"
+#include "HistogramXrayEventWeight.hh"
 #include "ExtractXrayEventImage.hh"
 #include "ProcessCodedAperture.hh"
 #ifdef USE_HSQUICKLOOK
@@ -826,6 +829,17 @@ public:
   HistogramFramePedestal();
 };
 
+class HistogramFramePedestalMean : public VCSModule
+{
+public:
+  HistogramFramePedestalMean();
+};
+
+class HistogramFramePedestalSigma : public VCSModule
+{
+public:
+  HistogramFramePedestalSigma();
+};
 
 class HistogramXrayEventSpectrum : public VCSModule
 {
@@ -840,6 +854,11 @@ public:
   HistogramXrayEventAzimuthAngle();
 };
 
+class HistogramXrayEventWeight : public VCSModule
+{
+public:
+  HistogramXrayEventWeight();
+};
 
 class ExtractXrayEventImage : public VCSModule
 {

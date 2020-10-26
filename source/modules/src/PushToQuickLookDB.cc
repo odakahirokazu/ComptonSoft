@@ -57,7 +57,6 @@ ANLStatus PushToQuickLookDB::mod_initialize()
   for (int i=0; i<num_modules; i++) {
     get_module_NC(moduleList_[i], &modules_[i]);
   }
-
   if (exist_module("MongoDBClient")) {
     get_module_NC("MongoDBClient", &mongodb_);
     mongodb_->createCappedCollection(collection_, 100*1024*1024);
