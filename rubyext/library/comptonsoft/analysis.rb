@@ -120,12 +120,24 @@ module ComptonSoft
       super
       @bad_pixels_file = "bad_pixels.xml"
       @append_pedestal_histogram_modules = nil
+      @analysis_list = []
     end
     attr_accessor :bad_pixels_file
+
+    begin
+      require "HSQuickLook"
+      define_setup_module("mdb_client", HSQuickLook::MongoDBClient)
+    rescue LoadError
+      define_setup_module("mdb_client")
+    end
 
     def set_statistics_exclusion_numbers(low, high)
       @num_exclusion_low = low
       @num_exclusion_high = high
+    end
+
+    def add_analysis(a)
+      @analysis_list << a
     end
 
     def set_good_pixel_conditions(mean_min, mean_max, sigma_min, sigma_max)
@@ -155,6 +167,10 @@ module ComptonSoft
     def setup()
       add_namespace ComptonSoft
 
+      if module_of_mdb_client()
+        chain_with_parameters module_of_mdb_client
+      end
+
       chain :ConstructFrame
       with_parameters(num_pixels_x: @num_pixels_x,
                       num_pixels_y: @num_pixels_y)
@@ -179,6 +195,10 @@ module ComptonSoft
       with_parameters(filename: @pedestal_file)
       chain :WriteBadPixels
       with_parameters(filename: @bad_pixels_file)
+
+      @analysis_list.each do |a|
+        a.insert_modules(self)
+      end
 
       if @append_pedestal_histogram_modules
         @append_pedestal_histogram_modules.(self)
@@ -297,7 +317,7 @@ module ComptonSoft
     end
   end
 
-  module XrayEventAnalysis
+  module XrayDataEvaluationItems
     class SpectrumAndPolarization
       include QuickLookBase
 
@@ -335,6 +355,39 @@ module ComptonSoft
         app.chain :HistogramXrayEventAzimuthAngle, "HistogramXrayEventAzimuthAngle_Basic_#{@name}_2"
         app.with_parameters(collection_module: "XrayEventSelection_Basic_#{@name}_2")
         add_quick_look_module("HistogramXrayEventAzimuthAngle_Basic_#{@name}_2")
+        append_quick_look(app)
+      end
+    end
+
+    class EventWeight
+      include QuickLookBase
+
+      def initialize()
+        super
+        @name = ""
+        @num_bins = 30
+        @weight_min = 0.5
+        @weight_max = 29.5
+        @event_selector = {}
+        set_quick_look_canvas(600, 400)
+      end
+      attr_accessor :name, :event_selector
+
+      def define_weight(num_bins, weight_min, weight_max)
+        @num_bins = num_bins
+        @weight_min = weight_min
+        @weight_max = weight_max
+      end
+
+      def insert_modules(app)
+        app.chain :XrayEventSelection, "XrayEventSelection_Weight_#{@name}"
+        app.with_parameters(**@event_selector)
+        app.chain :HistogramXrayEventWeight, "HistogramXrayEventWeight_Basic_#{@name}"
+        app.with_parameters(collection_module: "XrayEventSelection_Weight_#{@name}",
+                            num_bins: @num_bins,
+                            weight_min: @weight_min,
+                            weight_max: @weight_max)
+        add_quick_look_module("HistogramXrayEventWeight_Basic_#{@name}")
         append_quick_look(app)
       end
     end
@@ -429,6 +482,65 @@ module ComptonSoft
         add_quick_look_module("ExtractXrayEventImage_Image_#{@name}")
         append_quick_look(app)
       end
+    end
+
+    class RawPixelPropreties
+      include QuickLookBase
+
+      def initialize()
+        super
+        @name = ""
+        @mean_num_bins = 100
+        @mean_min = 0.0
+        @mean_max = 400.0
+        @sigma_num_bins = 100
+        @sigma_min = 0.0
+        @sigma_max = 40.0
+        @output = nil
+        set_quick_look_canvas(600, 400)
+      end
+      attr_accessor :name, :output
+
+      def define_mean(num_bins, min, max)
+        @mean_num_bins = num_bins
+        @mean_min = min
+        @mean_max = max
+      end
+
+      def define_sigma(num_bins, min, max)
+        @sigma_num_bins = num_bins
+        @sigma_min = min
+        @sigma_max = max
+      end
+
+      def insert_modules(app)
+        app.chain :HistogramFramePedestal, "HistogramFramePedestal_Dark_#{@name}_1"
+        app.with_parameters(mean_num_bins: @mean_num_bins,
+                            mean_min: @mean_min,
+                            mean_max: @mean_max,
+                            sigma_num_bins: @sigma_num_bins,
+                            sigma_min: @sigma_min,
+                            sigma_max: @sigma_max)
+        add_quick_look_module("HistogramFramePedestal_Dark_#{@name}_1")
+
+        app.chain :HistogramFramePedestalMean, "HistogramFramePedestalMean_Dark_#{@name}_1"
+        app.with_parameters(num_bins: @mean_num_bins,
+                            min: @mean_min,
+                            max: @mean_max)
+        add_quick_look_module("HistogramFramePedestalMean_Dark_#{@name}_1")
+
+        app.chain :HistogramFramePedestalSigma, "HistogramFramePedestalSigma_Dark_#{@name}_1"
+        app.with_parameters(num_bins: @sigma_num_bins,
+                            min: @sigma_min,
+                            max: @sigma_max)
+        add_quick_look_module("HistogramFramePedestalSigma_Dark_#{@name}_1")
+
+        app.chain :SaveData
+        app.with_parameters(output: @output)
+
+        append_quick_look(app)
+      end
+
     end
   end
 end # module ComptonSoft

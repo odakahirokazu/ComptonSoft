@@ -18,32 +18,32 @@
  *************************************************************************/
 
 /**
- * HistogramFramePedestal
+ * HistogramFramePedestalMean
  *
- * @author Hirokazu Odaka
- * @date 2020-06-17
+ * @author Taihei Watanabe
+ * @date 2020-10-23
  */
 
-#ifndef COMPTONSOFT_HistogramFramePedestal_H
-#define COMPTONSOFT_HistogramFramePedestal_H 1
+#ifndef COMPTONSOFT_HistogramFramePedestalMean_H
+#define COMPTONSOFT_HistogramFramePedestalMean_H 1
 
 #include "VCSModule.hh"
 
-class TH2;
+class TH1;
 
 namespace comptonsoft {
 
 class XrayEventCollection;
 
-class HistogramFramePedestal : public VCSModule
+class HistogramFramePedestalMean : public VCSModule
 {
-  DEFINE_ANL_MODULE(HistogramFramePedestal, 1.0);
+  DEFINE_ANL_MODULE(HistogramFramePedestalMean, 1.0);
   // ENABLE_PARALLEL_RUN();
 public:
-  HistogramFramePedestal();
+  HistogramFramePedestalMean();
   
 protected:
-  HistogramFramePedestal(const HistogramFramePedestal&);
+  HistogramFramePedestalMean(const HistogramFramePedestalMean&);
 
 public:
   anlnext::ANLStatus mod_define() override;
@@ -55,16 +55,13 @@ public:
 
 private:
   int detectorID_ = 0;
-  int meanNumBins_ = 1;
-  double meanMin_ = 0.0;
-  double meanMax_ = 0.0;
-  int sigmaNumBins_ = 1;
-  double sigmaMin_ = 0.0;
-  double sigmaMax_ = 0.0;
+  int numBins_ = 1;
+  double min_ = 0.0;
+  double max_ = 0.0;
 
   std::string outputName_;
   
-  TH2* histogram_ = nullptr;
+  TH1* histogram_ = nullptr;
   FrameData* frame_;
 
   void fillInHistogram();
@@ -72,4 +69,4 @@ private:
 
 } /* namespace comptonsoft */
 
-#endif /* COMPTONSOFT_HistogramFramePedestal_H */
+#endif /* COMPTONSOFT_HistogramFramePedestalMean_H */

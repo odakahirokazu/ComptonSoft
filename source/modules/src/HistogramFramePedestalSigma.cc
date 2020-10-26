@@ -17,10 +17,10 @@
  *                                                                       *
  *************************************************************************/
 
-#include "HistogramFramePedestal.hh"
+#include "HistogramFramePedestalSigma.hh"
 
 #include "AstroUnits.hh"
-#include "TH2.h"
+#include "TH1.h"
 #include "TStyle.h"
 #include "FrameData.hh"
 
@@ -29,28 +29,24 @@ namespace unit = anlgeant4::unit;
 
 namespace comptonsoft {
 
-HistogramFramePedestal::HistogramFramePedestal()
-  : meanNumBins_(64), meanMin_(-64.0), meanMax_(64.0),
-    sigmaNumBins_(64), sigmaMin_(0.0), sigmaMax_(64.0),
-    outputName_("pedestal")
+HistogramFramePedestalSigma::HistogramFramePedestalSigma()
+  : numBins_(64), min_(-64.0), max_(64.0),
+    outputName_("pedestal_sigma")
 {
 }
 
-ANLStatus HistogramFramePedestal::mod_define()
+ANLStatus HistogramFramePedestalSigma::mod_define()
 {
   define_parameter("detector_id", &mod_class::detectorID_);
-  define_parameter("mean_num_bins", &mod_class::meanNumBins_);
-  define_parameter("mean_min", &mod_class::meanMin_);
-  define_parameter("mean_max", &mod_class::meanMax_);
-  define_parameter("sigma_num_bins", &mod_class::sigmaNumBins_);
-  define_parameter("sigma_min", &mod_class::sigmaMin_);
-  define_parameter("sigma_max", &mod_class::sigmaMax_);
+  define_parameter("num_bins", &mod_class::numBins_);
+  define_parameter("min", &mod_class::min_);
+  define_parameter("max", &mod_class::max_);
   define_parameter("output_name", &mod_class::outputName_);
   
   return AS_OK;
 }
 
-ANLStatus HistogramFramePedestal::mod_initialize()
+ANLStatus HistogramFramePedestalSigma::mod_initialize()
 {
   ANLStatus status = VCSModule::mod_initialize();
   if (status != AS_OK) {
@@ -58,20 +54,19 @@ ANLStatus HistogramFramePedestal::mod_initialize()
   }
 
   mkdir();
-  const std::string name = "pedestal";
-  const std::string title = "pedestal";
-  histogram_ = new TH2D(name.c_str(), title.c_str(),
-                        sigmaNumBins_, sigmaMin_, sigmaMax_,
-                        meanNumBins_, meanMin_, meanMax_);
+  const std::string name = "pedestal_sigma";
+  const std::string title = "pedestal sigma";
+  histogram_ = new TH1D(name.c_str(), title.c_str(),
+                        numBins_, min_, max_);
   return AS_OK;
 }
 
-ANLStatus HistogramFramePedestal::mod_analyze()
+ANLStatus HistogramFramePedestalSigma::mod_analyze()
 {
   return AS_OK;
 }
 
-ANLStatus HistogramFramePedestal::mod_end_run()
+ANLStatus HistogramFramePedestalSigma::mod_end_run()
 {
   VRealDetectorUnit* detector = getDetectorManager()->getDetectorByID(detectorID_);
   if (detector == nullptr) {
@@ -82,38 +77,35 @@ ANLStatus HistogramFramePedestal::mod_end_run()
   return AS_OK;
 }
 
-void HistogramFramePedestal::fillInHistogram()
+void HistogramFramePedestalSigma::fillInHistogram()
 {
   histogram_->Reset();
   
   VRealDetectorUnit* detector = getDetectorManager()->getDetectorByID(detectorID_);
   frame_ = detector->getFrameData();
   frame_->calculateStatistics();
-  const image_t& pedestals = frame_->getPedestals();
   const image_t& frameDeviation = frame_->getDeviationFrame();
 
-  const int nx = pedestals.shape()[0];
-  const int ny = pedestals.shape()[1];
+  const int nx = frameDeviation.shape()[0];
+  const int ny = frameDeviation.shape()[1];
   for (int ix=0; ix<nx; ix++) {
     for (int iy=0; iy<ny; iy++) {
-      const double mean = pedestals[ix][iy];
       const double sigma = frameDeviation[ix][iy];
-      histogram_->Fill(sigma, mean);
+      histogram_->Fill(sigma);
     }
   }
   std::cout << std::endl;
 }
 
 
-void HistogramFramePedestal::drawCanvas(TCanvas* canvas, std::vector<std::string>* filenames)
+void HistogramFramePedestalSigma::drawCanvas(TCanvas* canvas, std::vector<std::string>* filenames)
 {
   fillInHistogram();
   const std::string outputFile = outputName_+".png";
   canvas->cd();
-  canvas->SetLogz(1);
-  gStyle->SetOptStat(0);
-  gStyle->SetPalette(56);
-  histogram_->Draw("colz");
+  gStyle->SetOptStat("e");
+  gStyle->SetStatH(0.15);
+  histogram_->Draw();
   canvas->SaveAs(outputFile.c_str());
   filenames->push_back(outputFile);
 }

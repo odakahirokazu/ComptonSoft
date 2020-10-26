@@ -18,58 +18,51 @@
  *************************************************************************/
 
 /**
- * HistogramFramePedestal
+ * HistogramXrayEventWeight
  *
- * @author Hirokazu Odaka
- * @date 2020-06-17
+ * @author Taihei Watanabe
+ * @date 2020-10-26
  */
 
-#ifndef COMPTONSOFT_HistogramFramePedestal_H
-#define COMPTONSOFT_HistogramFramePedestal_H 1
+#ifndef COMPTONSOFT_HistogramXrayEventWeight_H
+#define COMPTONSOFT_HistogramXrayEventWeight_H 1
 
 #include "VCSModule.hh"
 
-class TH2;
+class TH1;
 
 namespace comptonsoft {
 
 class XrayEventCollection;
 
-class HistogramFramePedestal : public VCSModule
+class HistogramXrayEventWeight : public VCSModule
 {
-  DEFINE_ANL_MODULE(HistogramFramePedestal, 1.0);
+  DEFINE_ANL_MODULE(HistogramXrayEventWeight, 1.0);
   // ENABLE_PARALLEL_RUN();
 public:
-  HistogramFramePedestal();
+  HistogramXrayEventWeight();
   
 protected:
-  HistogramFramePedestal(const HistogramFramePedestal&);
+  HistogramXrayEventWeight(const HistogramXrayEventWeight&);
 
 public:
   anlnext::ANLStatus mod_define() override;
   anlnext::ANLStatus mod_initialize() override;
-  anlnext::ANLStatus mod_end_run() override;
   anlnext::ANLStatus mod_analyze() override;
 
   void drawCanvas(TCanvas* canvas, std::vector<std::string>* filenames) override;
 
 private:
-  int detectorID_ = 0;
-  int meanNumBins_ = 1;
-  double meanMin_ = 0.0;
-  double meanMax_ = 0.0;
-  int sigmaNumBins_ = 1;
-  double sigmaMin_ = 0.0;
-  double sigmaMax_ = 0.0;
-
+  int numBins_ = 1;
+  double weightMin_ = 0.0;
+  double weightMax_ = 1.0;
+  std::string collectionModule_;
   std::string outputName_;
   
-  TH2* histogram_ = nullptr;
-  FrameData* frame_;
-
-  void fillInHistogram();
+  XrayEventCollection* collection_ = nullptr;
+  TH1* histogram_ = nullptr;
 };
 
 } /* namespace comptonsoft */
 
-#endif /* COMPTONSOFT_HistogramFramePedestal_H */
+#endif /* COMPTONSOFT_HistogramXrayEventWeight_H */
