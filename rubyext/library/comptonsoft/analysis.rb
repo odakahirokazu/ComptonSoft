@@ -11,6 +11,8 @@ module ComptonSoft
       @output = "output.root"
       @byte_order = true
       @odd_row_pixel_shift = 0
+      @start_position = 0
+      @read_direction_x = false
       @pedestal_level = 0.0
       @event_threshold = 100.0
       @split_threshold = 10.0
@@ -21,7 +23,7 @@ module ComptonSoft
     end
 
     attr_accessor :inputs, :output
-    attr_accessor :byte_order, :odd_row_pixel_shift
+    attr_accessor :byte_order, :odd_row_pixel_shift, :start_position, :read_direction_x
     attr_accessor :pedestal_level, :event_threshold
     attr_accessor :split_threshold
     attr_accessor :pedestal_file
@@ -182,7 +184,9 @@ module ComptonSoft
       chain :LoadFrame
       with_parameters(files: @inputs,
                       byte_order: @byte_order,
-                      odd_row_pixel_shift: @odd_row_pixel_shift)
+                      odd_row_pixel_shift: @odd_row_pixel_shift,
+                      start_position: @start_position,
+                      read_direction_x: @read_direction_x)
       chain :AnalyzeDarkFrame
       with_parameters(pedestal_level: @pedestal_level,
                       num_exclusion_low: @num_exclusion_low,
@@ -256,7 +260,9 @@ module ComptonSoft
       chain :LoadFrame
       with_parameters(files: @inputs,
                       byte_order: @byte_order,
-                      odd_row_pixel_shift: @odd_row_pixel_shift)
+                      odd_row_pixel_shift: @odd_row_pixel_shift,
+                      start_position: @start_position,
+                      read_direction_x: @read_direction_x)
       chain :AnalyzeFrame
       with_parameters(pedestal_level: @pedestal_level,
                       event_threshold: @event_threshold,
