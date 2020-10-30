@@ -499,33 +499,38 @@ module ComptonSoft
       def initialize()
         super
         @name = ""
-        @encoded_image_num_pixels_x = 5120
-        @encoded_image_num_pixels_y = 5120
-        @num_aperture_x = 37
-        @num_aperture_y = 37
-        @num_sky_x = 11
-        @num_sky_y = 11
-        @detector_element_size = 2.5
-        @aperture_element_size = 39.0
-        @sky_image_angle_x = 150.0
-        @sky_image_angle_y = 150.0
-        @detector_to_aperture_distance = 25.0
+        @num_encoded_image_x = 1
+        @num_encoded_image_y = 1
+        @num_aperture_x = 1
+        @num_aperture_y = 1
+        @num_sky_x = 1
+        @num_sky_y = 1
+        @detector_element_size = 1.0
+        @aperture_element_size = 1.0
+        @sky_image_angle_x = 0.0
+        @sky_image_angle_y = 0.0
+        @detector_to_aperture_distance = 1.0
         @detector_roll_angle = 0.0
-        @aperture_roll_angle = 90.0
+        @aperture_roll_angle = 0.0
         @aperture_offset_x = 0.0
         @aperture_offset_y = 0.0
         @sky_offset_angle_x = 0.0
         @sky_offset_angle_y = 0.0
-        @num_decode_iteration = 1
-        @decode_mode = 2
-        @pattern_file = "pattern.dat"
-        @output_name = "decoded"
+        @num_decoding_iteration = 1
+        @decoding_mode = 1
+        @pattern_file = "pattern.txt"
+        @output_name = "decoded_image.png"
+        @encoded_image_offset_x = 0
+        @encoded_image_offset_y = 0
+        @encoded_image_rotation_center_x = 0
+        @encoded_image_rotation_center_y = 0
+        @encoded_image_rotation_angle = 0.0
         @event_selector = {}
         set_quick_look_canvas(300, 300)
       end
       attr_accessor :name, :event_selector,
-      :encoded_image_num_pixels_x,
-      :encoded_image_num_pixels_y,
+      :num_encoded_image_x,
+      :num_encoded_image_y,
       :num_aperture_x,
       :num_aperture_y,
       :num_sky_x,
@@ -541,34 +546,76 @@ module ComptonSoft
       :aperture_offset_y,
       :sky_offset_angle_x,
       :sky_offset_angle_y,
-      :num_decode_iteration,
-      :decode_mode,
+      :num_decoding_iteration,
+      :decoding_mode,
       :pattern_file,
+      :image_owner_module
       :output_name
+      :encoded_image_offset_x
+      :encoded_image_offset_y
+      :encoded_image_rotation_center_x
+      :encoded_image_rotation_center_y
+      :encoded_image_rotation_angle
 
+      def define_encoded_image_shape(nx, ny, ox, oy)
+        @num_encoded_image_x = nx
+        @num_encoded_image_y = ny
+        @encoded_image_offset_x = ox
+        @encoded_image_offset_y = oy
+      end
 
-      def define_pattern(nx, ny, pattern_file)
+      def define_encoded_image_rotation(cx, cy, angle)
+        @encoded_image_rotation_center_x = cx
+        @encoded_image_rotation_center_y = cy
+        @encoded_image_rotation_angle = angle
+      end
+
+      def define_aperture_shape(nx, ny, pattern_file)
         @num_aperture_x = nx
         @num_aperture_y = ny
         @pattern_file = pattern_file
       end
 
-      def define_encoded_image_shape(nx, ny, offset_x, offset_y)
-        @encoded_image_num_pixels_x = nx
-        @encoded_image_num_pixels_y = ny
-        @encoded_image_offset_x = offset_x
-        @encoded_image_offset_y = offset_y
+      def define_sky_shape(nx, ny)
+        @num_sky_x = nx
+        @num_sky_y = ny
       end
 
-      def define_encoded_image_rotation(center_x, center_y, angle)
-        @encoded_image_rotation_center_x = center_x
-        @encoded_image_rotation_center_y = center_y
-        @encoded_image_rotation_angle = angle
+      def define_element_size(dx, mx)
+        @detector_element_size = dx
+        @aperture_element_size = mx
       end
 
-      def set_aperture_to_detector_relation(aperture_element_size, detector_element_size)
-        @aperture_element_size = aperture_element_size
-        @detector_element_size = detector_element_size
+      def define_field_of_view(vx, vy)
+        @sky_image_angle_x = vx
+        @sky_image_angle_y = vy
+      end
+
+      def define_distance(d)
+        @detector_to_aperture_distance = d
+      end
+
+      def define_roll_angle(droll, mroll)
+        @detector_roll_angle = droll
+        @aperture_roll_angle = mroll
+      end
+
+      def define_aperture_offset(ox, oy)
+        @aperture_offset_x = ox
+        @aperture_offset_y = oy
+      end
+
+      def define_sky_offset(ox, oy)
+        @sky_offset_angle_x = ox
+        @sky_offset_angle_y = oy
+      end
+
+      def define_iteration(v)
+        @num_decoding_iteration = v
+      end
+
+      def define_decoding_mode(mode)
+        @decoding_mode = mode
       end
 
       def insert_modules(app)
@@ -576,8 +623,8 @@ module ComptonSoft
         app.with_parameters(**@event_selector)
         app.chain :ExtractXrayEventImage, "ExtractXrayEventImage_CA_#{@name}"
         app.with_parameters(collection_module: "XrayEventSelection_CA_#{@name}",
-                            num_x: @encoded_image_num_pixels_x,
-                            num_y: @encoded_image_num_pixels_y,
+                            num_x: @num_encoded_image_x,
+                            num_y: @num_encoded_image_y,
                             new_origin_x: @encoded_image_offset_x,
                             new_origin_y: @encoded_image_offset_y,
                             rotation_angle: @encoded_image_rotation_angle,
@@ -585,16 +632,16 @@ module ComptonSoft
                             image_center_y: @encoded_image_rotation_center_y)
         add_quick_look_module("ExtractXrayEventImage_CA_#{@name}")
         app.chain :ProcessCodedAperture, "ProcessCodedAperture_CA_#{@name}"
-        app.with_parameters(num_encoded_image_x: @encoded_image_num_pixels_x,
-                            num_encoded_image_y: @encoded_image_num_pixels_y,
+        app.with_parameters(num_encoded_image_x: @num_encoded_image_x,
+                            num_encoded_image_y: @num_encoded_image_y,
                             num_aperture_x: @num_aperture_x,
                             num_aperture_y: @num_aperture_y,
                             num_sky_x: @num_sky_x,
                             num_sky_y: @num_sky_y,
                             detector_element_size: @detector_element_size,
                             aperture_element_size: @aperture_element_size,
-                            sky_offset_angle_x: @sky_offset_angle_x,
-                            sky_offset_angle_y: @sky_offset_angle_y,
+                            sky_image_angle_x: @sky_image_angle_x,
+                            sky_image_angle_y: @sky_image_angle_y
                             detector_to_aperture_distance: @detector_to_aperture_distance,
                             detector_roll_angle: @detector_roll_angle,
                             aperture_roll_angle: @aperture_roll_angle,
@@ -602,10 +649,11 @@ module ComptonSoft
                             aperture_offset_y: @aperture_offset_y,
                             sky_offset_angle_x: @sky_offset_angle_x,
                             sky_offset_angle_y: @sky_offset_angle_y,
-                            num_decode_iteration: @num_decode_iteration,
-                            decode_mode: @decode_mode,
+                            num_decoding_iteration: @num_decoding_iteration,
+                            decoding_mode: @decoding_mode,
                             pattern_file: @pattern_file,
-                            image_owner_module: "ExtractXrayEventImage_CA_#{@name}")
+                            image_owner_module: "ExtractXrayEventImage_CA_#{@name}",
+                            output_name: @output_name)
         add_quick_look_module("ProcessCodedAperture_CA_#{@name}")
         append_quick_look(app)
       end
