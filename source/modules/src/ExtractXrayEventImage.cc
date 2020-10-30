@@ -86,7 +86,6 @@ ANLStatus ExtractXrayEventImage::mod_initialize()
   if (status!=AS_OK) {
     return status;
   }
-
   mkdir();
   const std::string name = "image";
   const std::string title = "Image";
