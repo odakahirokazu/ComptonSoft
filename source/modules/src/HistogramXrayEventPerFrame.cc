@@ -17,7 +17,7 @@
  *                                                                       *
  *************************************************************************/
 
-#include "HistogramXrayEventWeight.hh"
+#include "HistogramXrayEventPerFrame.hh"
 
 #include "XrayEventCollection.hh"
 #include "AstroUnits.hh"
@@ -29,24 +29,24 @@ namespace unit = anlgeant4::unit;
 
 namespace comptonsoft {
 
-HistogramXrayEventWeight::HistogramXrayEventWeight()
-  : numBins_(31), weightMin_(-0.5), weightMax_(30.5),
-    collectionModule_("XrayEventCollection"), outputName_("weight")
+HistogramXrayEventPerFrame::HistogramXrayEventPerFrame()
+  : numBins_(512), frameMin_(-0.5), frameMax_(4095.5),
+    collectionModule_("XrayEventCollection"), outputName_("eventPerFrame")
 {
 }
 
-ANLStatus HistogramXrayEventWeight::mod_define()
+ANLStatus HistogramXrayEventPerFrame::mod_define()
 {
   define_parameter("num_bins", &mod_class::numBins_);
-  define_parameter("weight_min", &mod_class::weightMin_);
-  define_parameter("weight_max", &mod_class::weightMax_);
+  define_parameter("frame_min", &mod_class::frameMin_);
+  define_parameter("frame_max", &mod_class::frameMax_);
   define_parameter("collection_module", &mod_class::collectionModule_);
   define_parameter("output_name", &mod_class::outputName_);
-
+  
   return AS_OK;
 }
 
-ANLStatus HistogramXrayEventWeight::mod_initialize()
+ANLStatus HistogramXrayEventPerFrame::mod_initialize()
 {
   get_module_NC(collectionModule_, &collection_);
 
@@ -56,25 +56,26 @@ ANLStatus HistogramXrayEventWeight::mod_initialize()
   }
 
   mkdir();
-  const std::string name = "weight";
-  const std::string title = "Weight";
+  const std::string name = "eventPerFrame";
+  const std::string title = "event per frame";
   histogram_ = new TH1D(name.c_str(), title.c_str(),
-                        numBins_, weightMin_, weightMax_);
+                        numBins_, frameMin_, frameMax_);
 
   return AS_OK;
 }
 
-ANLStatus HistogramXrayEventWeight::mod_analyze()
+ANLStatus HistogramXrayEventPerFrame::mod_analyze()
 {
+  const double framePerBin = (frameMax_ - frameMin_) / numBins_;
   for (const auto& event: collection_->getEvents()) {
-    const double weight = event->Weight();
-    histogram_->Fill(weight);
+    const double frame = event->FrameID();
+    histogram_->Fill(frame, 1.0/framePerBin);
   }
 
   return AS_OK;
 }
 
-void HistogramXrayEventWeight::drawCanvas(TCanvas* canvas, std::vector<std::string>* filenames)
+void HistogramXrayEventPerFrame::drawCanvas(TCanvas* canvas, std::vector<std::string>* filenames)
 {
   const std::string outputFile = outputName_+".png";
   canvas->cd();

@@ -18,14 +18,14 @@
  *************************************************************************/
 
 /**
- * HistogramXrayEventWeight
+ * HistogramXrayEventProfile
  *
  * @author Taihei Watanabe
  * @date 2020-10-26
  */
 
-#ifndef COMPTONSOFT_HistogramXrayEventWeight_H
-#define COMPTONSOFT_HistogramXrayEventWeight_H 1
+#ifndef COMPTONSOFT_HistogramXrayEventProfile_H
+#define COMPTONSOFT_HistogramXrayEventProfile_H 1
 
 #include "VCSModule.hh"
 
@@ -35,15 +35,15 @@ namespace comptonsoft {
 
 class XrayEventCollection;
 
-class HistogramXrayEventWeight : public VCSModule
+class HistogramXrayEventProfile : public VCSModule
 {
-  DEFINE_ANL_MODULE(HistogramXrayEventWeight, 1.0);
+  DEFINE_ANL_MODULE(HistogramXrayEventProfile, 1.0);
   // ENABLE_PARALLEL_RUN();
 public:
-  HistogramXrayEventWeight();
+  HistogramXrayEventProfile();
 
 protected:
-  HistogramXrayEventWeight(const HistogramXrayEventWeight&);
+  HistogramXrayEventProfile(const HistogramXrayEventProfile&);
 
 public:
   anlnext::ANLStatus mod_define() override;
@@ -54,8 +54,9 @@ public:
 
 private:
   int numBins_ = 1;
-  double weightMin_ = 0.0;
-  double weightMax_ = 1.0;
+  double min_ = 0.0;
+  double max_ = 1.0;
+  int axis_ = 0;
   std::string collectionModule_;
   std::string outputName_;
 
@@ -65,4 +66,4 @@ private:
 
 } /* namespace comptonsoft */
 
-#endif /* COMPTONSOFT_HistogramXrayEventWeight_H */
+#endif /* COMPTONSOFT_HistogramXrayEventProfile_H */

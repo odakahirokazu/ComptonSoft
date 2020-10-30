@@ -17,7 +17,7 @@
  *                                                                       *
  *************************************************************************/
 
-#include "HistogramXrayEventWeight.hh"
+#include "HistogramXrayEventProfile.hh"
 
 #include "XrayEventCollection.hh"
 #include "AstroUnits.hh"
@@ -29,24 +29,25 @@ namespace unit = anlgeant4::unit;
 
 namespace comptonsoft {
 
-HistogramXrayEventWeight::HistogramXrayEventWeight()
-  : numBins_(31), weightMin_(-0.5), weightMax_(30.5),
-    collectionModule_("XrayEventCollection"), outputName_("weight")
+HistogramXrayEventProfile::HistogramXrayEventProfile()
+  : numBins_(100), min_(0.0), max_(5120.0), axis_(0),
+    collectionModule_("XrayEventCollection"), outputName_("profile")
 {
 }
 
-ANLStatus HistogramXrayEventWeight::mod_define()
+ANLStatus HistogramXrayEventProfile::mod_define()
 {
   define_parameter("num_bins", &mod_class::numBins_);
-  define_parameter("weight_min", &mod_class::weightMin_);
-  define_parameter("weight_max", &mod_class::weightMax_);
+  define_parameter("min", &mod_class::min_);
+  define_parameter("max", &mod_class::max_);
+  define_parameter("axis", &mod_class::axis_);
   define_parameter("collection_module", &mod_class::collectionModule_);
   define_parameter("output_name", &mod_class::outputName_);
 
   return AS_OK;
 }
 
-ANLStatus HistogramXrayEventWeight::mod_initialize()
+ANLStatus HistogramXrayEventProfile::mod_initialize()
 {
   get_module_NC(collectionModule_, &collection_);
 
@@ -56,25 +57,38 @@ ANLStatus HistogramXrayEventWeight::mod_initialize()
   }
 
   mkdir();
-  const std::string name = "weight";
-  const std::string title = "Weight";
+  std::string name = "profile";
+  std::string title = "profile";
+  if (axis_ == 0) {
+    name = "ix";
+    title = "ix";
+  } else if (axis_ == 1) {
+    name = "iy";
+    title = "iy";
+  }
+
   histogram_ = new TH1D(name.c_str(), title.c_str(),
-                        numBins_, weightMin_, weightMax_);
+                        numBins_, min_, max_);
 
   return AS_OK;
 }
 
-ANLStatus HistogramXrayEventWeight::mod_analyze()
+ANLStatus HistogramXrayEventProfile::mod_analyze()
 {
   for (const auto& event: collection_->getEvents()) {
-    const double weight = event->Weight();
-    histogram_->Fill(weight);
+    if (axis_ == 0) {
+      const int ix = event->PixelX();
+      histogram_->Fill(ix);
+    } else if (axis_ == 1) {
+      const int ix = event->PixelY();
+      histogram_->Fill(ix);
+    }
   }
 
   return AS_OK;
 }
 
-void HistogramXrayEventWeight::drawCanvas(TCanvas* canvas, std::vector<std::string>* filenames)
+void HistogramXrayEventProfile::drawCanvas(TCanvas* canvas, std::vector<std::string>* filenames)
 {
   const std::string outputFile = outputName_+".png";
   canvas->cd();

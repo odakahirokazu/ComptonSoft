@@ -42,7 +42,7 @@ ANLStatus HistogramFramePedestalSigma::mod_define()
   define_parameter("min", &mod_class::min_);
   define_parameter("max", &mod_class::max_);
   define_parameter("output_name", &mod_class::outputName_);
-  
+
   return AS_OK;
 }
 
@@ -80,7 +80,7 @@ ANLStatus HistogramFramePedestalSigma::mod_end_run()
 void HistogramFramePedestalSigma::fillInHistogram()
 {
   histogram_->Reset();
-  
+
   VRealDetectorUnit* detector = getDetectorManager()->getDetectorByID(detectorID_);
   frame_ = detector->getFrameData();
   frame_->calculateStatistics();

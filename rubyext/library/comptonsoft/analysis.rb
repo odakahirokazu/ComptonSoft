@@ -334,6 +334,9 @@ module ComptonSoft
         @spectrum_num_bins = 512
         @spectrum_min = 0.0
         @spectrum_max = 4096.0
+        @angle_num_bins = 40
+        @angle_min = -210.0
+        @angle_max = 210.0
         set_quick_look_canvas(600, 400)
       end
       attr_accessor :name, :event_selector
@@ -342,6 +345,12 @@ module ComptonSoft
         @spectrum_num_bins = num_bins
         @spectrum_min = energy_min
         @spectrum_max = energy_max
+      end
+
+      def define_angle(num_bins, angle_min, angle_max)
+        @angle_num_bins = num_bins
+        @angle_min = angle_min
+        @angle_max = angle_max
       end
 
       def insert_modules(app)
@@ -359,7 +368,10 @@ module ComptonSoft
         app.chain :XrayEventSelection, "XrayEventSelection_Basic_#{@name}_2"
         app.with_parameters(**@event_selector)
         app.chain :HistogramXrayEventAzimuthAngle, "HistogramXrayEventAzimuthAngle_Basic_#{@name}_2"
-        app.with_parameters(collection_module: "XrayEventSelection_Basic_#{@name}_2")
+        app.with_parameters(collection_module: "XrayEventSelection_Basic_#{@name}_2",
+                            num_bins: @angle_num_bins,
+                            angle_min: @angle_min,
+                            angle_max: @angle_max)
         add_quick_look_module("HistogramXrayEventAzimuthAngle_Basic_#{@name}_2")
         append_quick_look(app)
       end
@@ -398,20 +410,146 @@ module ComptonSoft
       end
     end
 
+    class EventProfile
+      include QuickLookBase
+
+      def initialize()
+        super
+        @name = ""
+        @num_bins = 100
+        @profile_min = 0.0
+        @profile_max = 5120.0
+        @output_ix = "ix"
+        @output_iy = "iy"
+        @event_selector = {}
+        set_quick_look_canvas(600, 400)
+      end
+      attr_accessor :name, :event_selector
+
+      def define_profile(num_bins, profile_min, profile_max)
+        @num_bins = num_bins
+        @profile_min = profile_min
+        @profile_max = profile_max
+      end
+
+      def define_output(output_ix, output_iy)
+        @output_ix = output_ix
+        @output_iy = output_iy
+      end
+
+      def insert_modules(app)
+        app.chain :XrayEventSelection, "XrayEventSelection_Profile_#{@name}"
+        app.with_parameters(**@event_selector)
+        app.chain :HistogramXrayEventProfile, "HistogramXrayEventProfile_X_#{@name}"
+        app.with_parameters(collection_module: "XrayEventSelection_Profile_#{@name}",
+                            num_bins: @num_bins,
+                            min: @profile_min,
+                            max: @profile_max,
+                            output_name: @output_ix,
+                            axis: 0)
+        add_quick_look_module("HistogramXrayEventProfile_X_#{@name}")
+        app.chain :HistogramXrayEventProfile, "HistogramXrayEventProfile_Y_#{@name}"
+        app.with_parameters(collection_module: "XrayEventSelection_Profile_#{@name}",
+                            num_bins: @num_bins,
+                            min: @profile_min,
+                            max: @profile_max,
+                            output_name: @output_iy,
+                            axis: 1)
+        add_quick_look_module("HistogramXrayEventProfile_Y_#{@name}")
+        append_quick_look(app)
+      end
+    end
+
+    class EventPerFrame
+      include QuickLookBase
+
+      def initialize()
+        super
+        @name = ""
+        @num_bins = 100
+        @frame_min = 0.0
+        @frame_max = 500.0
+        @event_selector = {}
+        set_quick_look_canvas(600, 400)
+      end
+      attr_accessor :name, :event_selector
+
+      def define_output(num_bins, frame_min, frame_max)
+        @num_bins = num_bins
+        @frame_min = frame_min
+        @frame_max = frame_max
+      end
+
+      def insert_modules(app)
+        app.chain :XrayEventSelection, "XrayEventSelection_PerFrame_#{@name}"
+        app.with_parameters(**@event_selector)
+        app.chain :HistogramXrayEventPerFrame, "HistogramXrayEventPerFrame_#{@name}"
+        app.with_parameters(collection_module: "XrayEventSelection_PerFrame_#{@name}",
+                            num_bins: @num_bins,
+                            frame_min: @frame_min,
+                            frame_max: @frame_max)
+        add_quick_look_module("HistogramXrayEventPerFrame_#{@name}")
+        append_quick_look(app)
+      end
+    end
+
     class CodedApertureImaging
       include QuickLookBase
 
       def initialize()
         super
         @name = ""
+        @encoded_image_num_pixels_x = 5120
+        @encoded_image_num_pixels_y = 5120
+        @num_aperture_x = 37
+        @num_aperture_y = 37
+        @num_sky_x = 11
+        @num_sky_y = 11
+        @detector_element_size = 2.5
+        @aperture_element_size = 39.0
+        @sky_image_angle_x = 150.0
+        @sky_image_angle_y = 150.0
+        @detector_to_aperture_distance = 25.0
+        @detector_roll_angle = 0.0
+        @aperture_roll_angle = 90.0
+        @aperture_offset_x = 0.0
+        @aperture_offset_y = 0.0
+        @sky_offset_angle_x = 0.0
+        @sky_offset_angle_y = 0.0
+        @num_decode_iteration = 1
+        @decode_mode = 2
+        @pattern_file = "pattern.dat"
+        @output_name = "decoded"
         @event_selector = {}
         set_quick_look_canvas(300, 300)
       end
-      attr_accessor :name, :event_selector
+      attr_accessor :name, :event_selector,
+      :encoded_image_num_pixels_x,
+      :encoded_image_num_pixels_y,
+      :num_aperture_x,
+      :num_aperture_y,
+      :num_sky_x,
+      :num_sky_y,
+      :detector_element_size,
+      :aperture_element_size,
+      :sky_image_angle_x,
+      :sky_image_angle_y,
+      :detector_to_aperture_distance,
+      :detector_roll_angle,
+      :aperture_roll_angle,
+      :aperture_offset_x,
+      :aperture_offset_y,
+      :sky_offset_angle_x,
+      :sky_offset_angle_y,
+      :num_decode_iteration,
+      :decode_mode,
+      :pattern_file,
+      :output_name
+
 
       def define_pattern(nx, ny, pattern_file)
-        @aperture_nx = nx
-        @aperture_ny = ny
+        @num_aperture_x = nx
+        @num_aperture_y = ny
         @pattern_file = pattern_file
       end
 
@@ -420,7 +558,7 @@ module ComptonSoft
         @encoded_image_num_pixels_y = ny
         @encoded_image_offset_x = offset_x
         @encoded_image_offset_y = offset_y
-       end
+      end
 
       def define_encoded_image_rotation(center_x, center_y, angle)
         @encoded_image_rotation_center_x = center_x
@@ -449,10 +587,23 @@ module ComptonSoft
         app.chain :ProcessCodedAperture, "ProcessCodedAperture_CA_#{@name}"
         app.with_parameters(num_encoded_image_x: @encoded_image_num_pixels_x,
                             num_encoded_image_y: @encoded_image_num_pixels_y,
-                            num_mask_x: @aperture_nx,
-                            num_mask_y: @aperture_ny,
+                            num_aperture_x: @num_aperture_x,
+                            num_aperture_y: @num_aperture_y,
+                            num_sky_x: @num_sky_x,
+                            num_sky_y: @num_sky_y,
                             detector_element_size: @detector_element_size,
-                            mask_element_size: @aperture_element_size,
+                            aperture_element_size: @aperture_element_size,
+                            sky_offset_angle_x: @sky_offset_angle_x,
+                            sky_offset_angle_y: @sky_offset_angle_y,
+                            detector_to_aperture_distance: @detector_to_aperture_distance,
+                            detector_roll_angle: @detector_roll_angle,
+                            aperture_roll_angle: @aperture_roll_angle,
+                            aperture_offset_x: @aperture_offset_x,
+                            aperture_offset_y: @aperture_offset_y,
+                            sky_offset_angle_x: @sky_offset_angle_x,
+                            sky_offset_angle_y: @sky_offset_angle_y,
+                            num_decode_iteration: @num_decode_iteration,
+                            decode_mode: @decode_mode,
                             pattern_file: @pattern_file,
                             image_owner_module: "ExtractXrayEventImage_CA_#{@name}")
         add_quick_look_module("ProcessCodedAperture_CA_#{@name}")
@@ -490,7 +641,7 @@ module ComptonSoft
       end
     end
 
-    class RawPixelPropreties
+    class RawPixelProperties
       include QuickLookBase
 
       def initialize()

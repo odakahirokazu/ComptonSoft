@@ -94,6 +94,8 @@
 #include "HistogramXrayEventSpectrum.hh"
 #include "HistogramXrayEventAzimuthAngle.hh"
 #include "HistogramXrayEventWeight.hh"
+#include "HistogramXrayEventProfile.hh"
+#include "HistogramXrayEventPerFrame.hh"
 #include "ExtractXrayEventImage.hh"
 #include "ProcessCodedAperture.hh"
 #ifdef USE_HSQUICKLOOK
@@ -857,6 +859,18 @@ class HistogramXrayEventWeight : public VCSModule
 {
 public:
   HistogramXrayEventWeight();
+};
+
+class HistogramXrayEventProfile : public VCSModule
+{
+public:
+  HistogramXrayEventProfile();
+};
+
+class HistogramXrayEventPerFrame : public VCSModule
+{
+public:
+  HistogramXrayEventPerFrame();
 };
 
 class ExtractXrayEventImage : public VCSModule
