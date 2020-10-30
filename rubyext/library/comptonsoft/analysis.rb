@@ -641,7 +641,7 @@ module ComptonSoft
                             detector_element_size: @detector_element_size,
                             aperture_element_size: @aperture_element_size,
                             sky_image_angle_x: @sky_image_angle_x,
-                            sky_image_angle_y: @sky_image_angle_y
+                            sky_image_angle_y: @sky_image_angle_y,
                             detector_to_aperture_distance: @detector_to_aperture_distance,
                             detector_roll_angle: @detector_roll_angle,
                             aperture_roll_angle: @aperture_roll_angle,
