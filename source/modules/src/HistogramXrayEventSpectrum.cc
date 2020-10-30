@@ -78,6 +78,7 @@ void HistogramXrayEventSpectrum::drawCanvas(TCanvas* canvas, std::vector<std::st
 {
   const std::string outputFile = outputName_+".png";
   canvas->cd();
+  canvas->SetLogy();
   gStyle->SetOptStat("e");
   gStyle->SetStatH(0.15);
   histogram_->Draw();

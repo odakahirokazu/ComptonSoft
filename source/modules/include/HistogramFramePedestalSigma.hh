@@ -41,7 +41,7 @@ class HistogramFramePedestalSigma : public VCSModule
   // ENABLE_PARALLEL_RUN();
 public:
   HistogramFramePedestalSigma();
-  
+
 protected:
   HistogramFramePedestalSigma(const HistogramFramePedestalSigma&);
 
@@ -60,7 +60,7 @@ private:
   double max_ = 0.0;
 
   std::string outputName_;
-  
+
   TH1* histogram_ = nullptr;
   FrameData* frame_;
 

@@ -85,6 +85,8 @@ class HistogramFramePedestalSigma;
 class HistogramXrayEventSpectrum;
 class HistogramXrayEventAzimuthAngle;
 class HistogramXrayEventWeight;
+class HistogramXrayEventProfile;
+class HistogramXrayEventPerFrame;
 class ExtractXrayEventImage;
 class ProcessCodedAperture;
 class PushToQuickLookDB;

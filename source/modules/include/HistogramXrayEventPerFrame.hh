@@ -18,14 +18,14 @@
  *************************************************************************/
 
 /**
- * HistogramXrayEventWeight
+ * HistogramXrayEventPerFrame
  *
  * @author Taihei Watanabe
  * @date 2020-10-26
  */
 
-#ifndef COMPTONSOFT_HistogramXrayEventWeight_H
-#define COMPTONSOFT_HistogramXrayEventWeight_H 1
+#ifndef COMPTONSOFT_HistogramXrayEventPerFrame_H
+#define COMPTONSOFT_HistogramXrayEventPerFrame_H 1
 
 #include "VCSModule.hh"
 
@@ -35,15 +35,15 @@ namespace comptonsoft {
 
 class XrayEventCollection;
 
-class HistogramXrayEventWeight : public VCSModule
+class HistogramXrayEventPerFrame : public VCSModule
 {
-  DEFINE_ANL_MODULE(HistogramXrayEventWeight, 1.0);
+  DEFINE_ANL_MODULE(HistogramXrayEventPerFrame, 1.0);
   // ENABLE_PARALLEL_RUN();
 public:
-  HistogramXrayEventWeight();
-
+  HistogramXrayEventPerFrame();
+  
 protected:
-  HistogramXrayEventWeight(const HistogramXrayEventWeight&);
+  HistogramXrayEventPerFrame(const HistogramXrayEventPerFrame&);
 
 public:
   anlnext::ANLStatus mod_define() override;
@@ -54,15 +54,15 @@ public:
 
 private:
   int numBins_ = 1;
-  double weightMin_ = 0.0;
-  double weightMax_ = 1.0;
+  double frameMin_ = 0.0;
+  double frameMax_ = 1.0;
   std::string collectionModule_;
   std::string outputName_;
-
+  
   XrayEventCollection* collection_ = nullptr;
   TH1* histogram_ = nullptr;
 };
 
 } /* namespace comptonsoft */
 
-#endif /* COMPTONSOFT_HistogramXrayEventWeight_H */
+#endif /* COMPTONSOFT_HistogramXrayEventPerFrame_H */
