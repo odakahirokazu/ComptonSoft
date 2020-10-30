@@ -39,8 +39,11 @@ public:
 
   virtual void setAperturePattern(const std::shared_ptr<image_t>& pattern) = 0;
   virtual void setEncodedImage(const std::shared_ptr<image_t>& image) = 0;
+  virtual bool setSkyImage() = 0;
   virtual void decode() = 0;
   virtual std::shared_ptr<image_t> DecodedImage() const = 0;
+  virtual double SkyElementAngleX() const = 0;
+  virtual double SkyElementAngleY() const = 0;
 };
 
 } /* namespace comptonsoft */

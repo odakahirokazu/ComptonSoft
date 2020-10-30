@@ -94,6 +94,9 @@ using CLHEP::rad;
 using CLHEP::steradian;
 using CLHEP::sr;
 
+constexpr double arcminute = degree/60.0;
+constexpr double arcsecond = degree/3600.0;
+
 using CLHEP::newton;
 
 constexpr double pascal = newton/m2;

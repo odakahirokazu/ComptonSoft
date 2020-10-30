@@ -22,6 +22,7 @@
  *
  * @author Tsubasa Tamba
  * @date 2019-11-01
+ * update 2020-10-27
  */
 
 #ifndef COMPTONSOFT_ProcessCodedAperture_H
@@ -55,10 +56,23 @@ public:
 
   int NumEncodedImageX() const { return numEncodedImageX_; }
   int NumEncodedImageY() const { return numEncodedImageY_; }
-  int NumMaskX() const { return numMaskX_; }
-  int NumMaskY() const { return numMaskY_; }
+  int NumApertureX() const { return numApertureX_; }
+  int NumApertureY() const { return numApertureY_; }
+  int NumSkyX() const { return numSkyX_; }
+  int NumSkyY() const { return numSkyY_; }
   double DetectorElementSize() const { return detectorElementSize_; }
-  double MaskElementSize() const { return maskElementSize_; }
+  double ApertureElementSize() const { return apertureElementSize_; }
+  double SkyImageAngleX() const { return skyImageAngleX_; }
+  double SkyImageAngleY() const { return skyImageAngleY_; }
+  double DetectorToApertureDistance() const { return detectorToApertureDistance_; }
+  double DetectorRollAngle() const { return detectorRollAngle_; }
+  double ApertureRollAngle() const { return apertureRollAngle_; }
+  double ApertureOffsetX() const { return apertureOffsetX_; }
+  double ApertureOffsetY() const { return apertureOffsetY_; }
+  double SkyOffsetAngleX() const { return skyOffsetAngleX_; }
+  double SkyOffsetAngleY() const { return skyOffsetAngleY_; }
+  int NumDecodingIteration() const { return numDecodingIteration_; }
+  int DecodingMode() const { return decodingMode_; }
 
   void drawCanvas(TCanvas* canvas, std::vector<std::string>* filenames) override;
 
@@ -70,12 +84,24 @@ protected:
 private:
   int numEncodedImageX_ = 1;
   int numEncodedImageY_ = 1;
-  int numDecodedImageX_ = 1;
-  int numDecodedImageY_ = 1;
-  int numMaskX_ = 1;
-  int numMaskY_ = 1;
+  int numApertureX_ = 1;
+  int numApertureY_ = 1;
+  int numSkyX_ = 1;
+  int numSkyY_ = 1;
   double detectorElementSize_ = 1.0;
-  double maskElementSize_ = 1.0;
+  double apertureElementSize_ = 1.0;
+  double skyImageAngleX_ = 0.0;
+  double skyImageAngleY_ = 0.0;
+  double detectorToApertureDistance_ = 1.0;
+  double detectorRollAngle_ = 0.0;
+  double apertureRollAngle_ = 0.0;
+  double apertureOffsetX_ = 0.0;
+  double apertureOffsetY_ = 0.0;
+  double skyOffsetAngleX_ = 0.0;
+  double skyOffsetAngleY_ = 0.0;
+  int numDecodingIteration_ = 1;
+  int decodingMode_ = 1;
+  
   std::string patternFile_;
   std::string imageOwnerModule_ = "MakeXrayEventImage";
   std::string outputName_;
