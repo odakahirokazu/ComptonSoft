@@ -56,7 +56,6 @@ ANLStatus HistogramFramePedestal::mod_initialize()
   if (status != AS_OK) {
     return status;
   }
-
   mkdir();
   const std::string name = "pedestal";
   const std::string title = "pedestal";

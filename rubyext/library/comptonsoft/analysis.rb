@@ -161,8 +161,6 @@ module ComptonSoft
                             sigma_num_bins: sigma_num_bins,
                             sigma_min: sigma_min,
                             sigma_max: sigma_max)
-        app.chain :SaveData
-        app.with_parameters(output: @output)
       end
     end
 
@@ -207,6 +205,9 @@ module ComptonSoft
       if @append_pedestal_histogram_modules
         @append_pedestal_histogram_modules.(self)
       end
+
+      chain :SaveData
+      with_parameters(output: @output)
     end
   end
 
@@ -519,7 +520,7 @@ module ComptonSoft
         @num_decoding_iteration = 1
         @decoding_mode = 1
         @pattern_file = "pattern.txt"
-        @output_name = "decoded_image.png"
+        @output_name = "decoded_image"
         @encoded_image_offset_x = 0
         @encoded_image_offset_y = 0
         @encoded_image_rotation_center_x = 0
@@ -689,6 +690,24 @@ module ComptonSoft
       end
     end
 
+    class RawPixelImage
+      include QuickLookBase
+
+      def initialize()
+        super
+        @name = ""
+        @output = "image"
+        set_quick_look_canvas(400, 400)
+      end
+      attr_accessor :name, :output
+
+      def insert_modules(app)
+        app.chain :HistogramRawFrameImage, "HistogramRawFrameImage_#{@name}_1"
+        add_quick_look_module("HistogramRawFrameImage_#{@name}_1")
+        append_quick_look(app)
+      end
+    end
+
     class RawPixelProperties
       include QuickLookBase
 
@@ -739,9 +758,6 @@ module ComptonSoft
                             min: @sigma_min,
                             max: @sigma_max)
         add_quick_look_module("HistogramFramePedestalSigma_Dark_#{@name}_1")
-
-        app.chain :SaveData
-        app.with_parameters(output: @output)
 
         append_quick_look(app)
       end

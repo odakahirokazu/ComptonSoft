@@ -73,6 +73,7 @@ set(CS_MODULES
   src/HistogramXrayEventAzimuthAngle.cc
   src/HistogramXrayEventWeight.cc
   src/HistogramXrayEventPerFrame.cc
+  src/HistogramRawFrameImage.cc
   src/ExtractXrayEventImage.cc
   src/ProcessCodedAperture.cc
   src/GetInputFilesFromDirectory.cc
