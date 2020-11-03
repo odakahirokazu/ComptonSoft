@@ -17,96 +17,94 @@
  *                                                                       *
  *************************************************************************/
 
-#include "HistogramFramePedestalMean.hh"
+#include "HistogramRawFrameImage.hh"
 
-#include "AstroUnits.hh"
-#include "TH1.h"
-#include "TStyle.h"
 #include "FrameData.hh"
+#include "TH2.h"
+#include "TStyle.h"
 
 using namespace anlnext;
-namespace unit = anlgeant4::unit;
+
 
 namespace comptonsoft {
 
-HistogramFramePedestalMean::HistogramFramePedestalMean()
-  : numBins_(64), min_(-64.0), max_(64.0),
-    outputName_("pedestal_mean")
+HistogramRawFrameImage::HistogramRawFrameImage()
+  : outputName_("rawimage")
 {
 }
 
-ANLStatus HistogramFramePedestalMean::mod_define()
+ANLStatus HistogramRawFrameImage::mod_define()
 {
   define_parameter("detector_id", &mod_class::detectorID_);
-  define_parameter("num_bins", &mod_class::numBins_);
-  define_parameter("min", &mod_class::min_);
-  define_parameter("max", &mod_class::max_);
   define_parameter("output_name", &mod_class::outputName_);
-
+  
   return AS_OK;
 }
 
-ANLStatus HistogramFramePedestalMean::mod_initialize()
+ANLStatus HistogramRawFrameImage::mod_initialize()
 {
   ANLStatus status = VCSModule::mod_initialize();
-  if (status != AS_OK) {
+  if (status!=AS_OK) {
     return status;
   }
+  
+  VRealDetectorUnit* detector = getDetectorManager()->getDetectorByID(detectorID_);
+  frame_ = detector->getFrameData();
+  const image_t image = frame_->getRawFrame();
 
   mkdir();
-  const std::string name = "pedestal_mean";
-  const std::string title = "pedestal mean";
-  histogram_ = new TH1D(name.c_str(), title.c_str(),
-                        numBins_, min_, max_);
+  const std::string name = "rawimage";
+  const std::string title = "RawImage";
+  const int numx = image.shape()[0];
+  const int numy = image.shape()[1];
+  histogram_ = new TH2D(name.c_str(), title.c_str(),
+                        numx, 0.0, static_cast<double>(numx),
+                        numy, 0.0, static_cast<double>(numy));
+
   return AS_OK;
 }
 
-ANLStatus HistogramFramePedestalMean::mod_analyze()
-{
-  return AS_OK;
-}
 
-ANLStatus HistogramFramePedestalMean::mod_end_run()
+ANLStatus HistogramRawFrameImage::mod_end_run()
 {
   VRealDetectorUnit* detector = getDetectorManager()->getDetectorByID(detectorID_);
   if (detector == nullptr) {
     std::cout << "Detector " << detectorID_ << " does not exist." << std::endl;
     return AS_OK;
   }
-  fillInHistogram();
+  fillHistogram();
+
   return AS_OK;
 }
 
-void HistogramFramePedestalMean::fillInHistogram()
+
+void HistogramRawFrameImage::fillHistogram()
 {
   histogram_->Reset();
-
+  
   VRealDetectorUnit* detector = getDetectorManager()->getDetectorByID(detectorID_);
   frame_ = detector->getFrameData();
-  frame_->calculateStatistics();
-  const image_t& pedestals = frame_->getPedestals();
-
-  const int nx = pedestals.shape()[0];
-  const int ny = pedestals.shape()[1];
-  for (int ix=0; ix<nx; ix++) {
-    for (int iy=0; iy<ny; iy++) {
-      const double mean = pedestals[ix][iy];
-      histogram_->Fill(mean);
+  const image_t image = frame_->getRawFrame();
+  
+  const int Nx = image.shape()[0];
+  const int Ny = image.shape()[1];
+  for (int ix=0; ix<Nx; ix++) {
+    for (int iy=0; iy<Ny; iy++) {
+      const double v = image[ix][iy];
+      histogram_->Fill(ix, iy, v);
     }
   }
-  std::cout << std::endl;
 }
 
-
-void HistogramFramePedestalMean::drawCanvas(TCanvas* canvas, std::vector<std::string>* filenames)
+void HistogramRawFrameImage::drawCanvas(TCanvas* canvas, std::vector<std::string>* filenames)
 {
-  fillInHistogram();
+  fillHistogram();
+
   const std::string outputFile = outputName_+".png";
   canvas->cd();
-  canvas->SetLogy();
-  gStyle->SetOptStat("e");
-  gStyle->SetStatH(0.15);
-  histogram_->Draw();
+  gStyle->SetOptStat(0);
+  gStyle->SetPalette(56);
+  histogram_->Draw("colz");
   canvas->SaveAs(outputFile.c_str());
   filenames->push_back(outputFile);
 }
