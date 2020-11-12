@@ -557,6 +557,8 @@ module ComptonSoft
       :encoded_image_rotation_center_x
       :encoded_image_rotation_center_y
       :encoded_image_rotation_angle
+      :display_rebin_x
+      :display_rebin_y
 
       def define_encoded_image_shape(nx, ny, ox, oy)
         @num_encoded_image_x = nx
@@ -619,6 +621,11 @@ module ComptonSoft
         @decoding_mode = mode
       end
 
+      def define_display_rebin(x, y)
+        @display_rebin_x = x
+        @display_rebin_y = y
+      end
+
       def insert_modules(app)
         app.chain :XrayEventSelection, "XrayEventSelection_CA_#{@name}"
         app.with_parameters(**@event_selector)
@@ -630,7 +637,9 @@ module ComptonSoft
                             new_origin_y: @encoded_image_offset_y,
                             rotation_angle: @encoded_image_rotation_angle,
                             image_center_x: @encoded_image_rotation_center_x,
-                            image_center_y: @encoded_image_rotation_center_y)
+                            image_center_y: @encoded_image_rotation_center_y,
+                            rebin_x: @display_rebin_x,
+                            rebin_y: @display_rebin_y)
         add_quick_look_module("ExtractXrayEventImage_CA_#{@name}")
         app.chain :ProcessCodedAperture, "ProcessCodedAperture_CA_#{@name}"
         app.with_parameters(num_encoded_image_x: @num_encoded_image_x,
@@ -669,9 +678,10 @@ module ComptonSoft
         @event_selector = {}
         @nx = 1024
         @ny = 1024
+        @output_name = "image"
         set_quick_look_canvas(600, 600)
       end
-      attr_accessor :name, :event_selector
+      attr_accessor :name, :event_selector, :output_name
 
       def define_image(num_x, num_y)
         @nx = num_x
@@ -684,7 +694,8 @@ module ComptonSoft
         app.chain :ExtractXrayEventImage, "ExtractXrayEventImage_Image_#{@name}"
         app.with_parameters(collection_module: "XrayEventSelection_Image_#{@name}",
                             num_x: @nx,
-                            num_y: @ny)
+                            num_y: @ny,
+                            output_name: @output_name)
         add_quick_look_module("ExtractXrayEventImage_Image_#{@name}")
         append_quick_look(app)
       end
@@ -696,13 +707,22 @@ module ComptonSoft
       def initialize()
         super
         @name = ""
+        @rebin_x = 1
+        @rebin_y = 1
         @output = "image"
         set_quick_look_canvas(400, 400)
       end
       attr_accessor :name, :output
 
+      def define_rebin(rebin_x, rebin_y)
+        @rebin_x = rebin_x
+        @rebin_y = rebin_y
+      end
+
       def insert_modules(app)
         app.chain :HistogramRawFrameImage, "HistogramRawFrameImage_#{@name}_1"
+        app.with_parameters(rebin_x: @rebin_x,
+                            rebin_y: @rebin_y)
         add_quick_look_module("HistogramRawFrameImage_#{@name}_1")
         append_quick_look(app)
       end

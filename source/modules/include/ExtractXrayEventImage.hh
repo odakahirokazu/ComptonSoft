@@ -72,6 +72,8 @@ private:
   double scale_ = 1.0;
   double newOriginX_ = 0.0;
   double newOriginY_ = 0.0;
+  int rebinX_ = 1;
+  int rebinY_ = 1;
   bool randomSampling_ = false;
   std::string collectionModule_;
   std::string outputName_;

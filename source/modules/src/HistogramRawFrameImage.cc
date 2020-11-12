@@ -37,6 +37,8 @@ ANLStatus HistogramRawFrameImage::mod_define()
 {
   define_parameter("detector_id", &mod_class::detectorID_);
   define_parameter("output_name", &mod_class::outputName_);
+  define_parameter("rebin_x", &mod_class::rebinX_);
+  define_parameter("rebin_y", &mod_class::rebinY_);
   
   return AS_OK;
 }
@@ -47,6 +49,13 @@ ANLStatus HistogramRawFrameImage::mod_initialize()
   if (status!=AS_OK) {
     return status;
   }
+
+  if (rebinX_<=0) {
+    rebinX_ = 1;
+  }
+  if (rebinY_<=0) {
+    rebinY_ = 1;
+  }
   
   VRealDetectorUnit* detector = getDetectorManager()->getDetectorByID(detectorID_);
   frame_ = detector->getFrameData();
@@ -55,11 +64,13 @@ ANLStatus HistogramRawFrameImage::mod_initialize()
   mkdir();
   const std::string name = "rawimage";
   const std::string title = "RawImage";
-  const int numx = image.shape()[0];
-  const int numy = image.shape()[1];
+  const int nx = image.shape()[0];
+  const int ny = image.shape()[1];
+  const int numx = nx/rebinX_;
+  const int numy = ny/rebinY_;
   histogram_ = new TH2D(name.c_str(), title.c_str(),
-                        numx, 0.0, static_cast<double>(numx),
-                        numy, 0.0, static_cast<double>(numy));
+                        numx, 0.0, static_cast<double>(nx),
+                        numy, 0.0, static_cast<double>(ny));
 
   return AS_OK;
 }
@@ -91,7 +102,7 @@ void HistogramRawFrameImage::fillHistogram()
   for (int ix=0; ix<Nx; ix++) {
     for (int iy=0; iy<Ny; iy++) {
       const double v = image[ix][iy];
-      histogram_->Fill(ix, iy, v);
+      histogram_->Fill(ix, iy, v/(rebinX_*rebinY_));
     }
   }
 }
