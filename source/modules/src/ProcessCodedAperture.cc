@@ -174,6 +174,7 @@ void ProcessCodedAperture::fillHistogram()
 {
   const image_t& image = *decodedImage_;
   TH2& h = *histogram_;
+  h.Reset();
 
   const int Nx = image.shape()[0];
   const int Ny = image.shape()[1];
@@ -198,8 +199,8 @@ void ProcessCodedAperture::drawCanvas(TCanvas* canvas, std::vector<std::string>*
   canvas->cd();
   gStyle->SetOptStat(0);
   gStyle->SetPalette(56);
-  const double zmax = histogram_->GetMaximum();
-  const double zmin = zmax * (-1);
+  const double zmax = histogram_->GetBinContent(histogram_->GetMaximumBin());
+  const double zmin = 0;
   histogram_->GetZaxis()->SetRangeUser(zmin, zmax);
   histogram_->Draw("colz");
   canvas->SaveAs(outputFile.c_str());

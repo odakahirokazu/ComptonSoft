@@ -66,10 +66,11 @@ ANLStatus HistogramXrayEventPerFrame::mod_initialize()
 
 ANLStatus HistogramXrayEventPerFrame::mod_analyze()
 {
-  const double framePerBin = (frameMax_ - frameMin_) / numBins_;
+  // const double framePerBin = (frameMax_ - frameMin_) / numBins_;
   for (const auto& event: collection_->getEvents()) {
     const double frame = event->FrameID();
-    histogram_->Fill(frame, 1.0/framePerBin);
+    // histogram_->Fill(frame, 1.0/framePerBin);
+    histogram_->Fill(frame);
   }
 
   return AS_OK;

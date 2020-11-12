@@ -62,6 +62,8 @@ ANLStatus ExtractXrayEventImage::mod_define()
   define_parameter("scale", &mod_class::scale_);
   define_parameter("new_origin_x", &mod_class::newOriginX_);
   define_parameter("new_origin_y", &mod_class::newOriginY_);
+  define_parameter("rebin_x", &mod_class::rebinX_);
+  define_parameter("rebin_y", &mod_class::rebinY_);
   define_parameter("random_sampling", &mod_class::randomSampling_);
   define_parameter("collection_module", &mod_class::collectionModule_);
   define_parameter("output_name", &mod_class::outputName_);
@@ -89,9 +91,11 @@ ANLStatus ExtractXrayEventImage::mod_initialize()
   mkdir();
   const std::string name = "image";
   const std::string title = "Image";
+  const int nx = numX_/rebinX_;
+  const int ny = numY_/rebinY_;
   histogram_ = new TH2D(name.c_str(), title.c_str(),
-                        numX_, 0.0, static_cast<double>(numX_),
-                        numY_, 0.0, static_cast<double>(numY_));
+                        nx, 0.0, static_cast<double>(numX_),
+                        ny, 0.0, static_cast<double>(numY_));
 
   return AS_OK;
 }
@@ -152,9 +156,7 @@ void ExtractXrayEventImage::fillHistogram()
   for (int ix=0; ix<Nx; ix++) {
     for (int iy=0; iy<Ny; iy++) {
       const double v = image[ix][iy];
-      const int binX = ix + 1;
-      const int binY = iy + 1;
-      h.SetBinContent(binX, binY, v);
+      h.Fill(ix, iy, v);
     }
   }
 }

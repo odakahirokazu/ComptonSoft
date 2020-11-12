@@ -56,6 +56,8 @@ protected:
 private:
   int detectorID_ = 0;
   std::string outputName_;
+  int rebinX_ = 1;
+  int rebinY_ = 1;
 
   FrameData* frame_ = nullptr;
   TH2* histogram_ = nullptr;
