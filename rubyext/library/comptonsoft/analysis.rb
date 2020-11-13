@@ -766,22 +766,8 @@ module ComptonSoft
                             sigma_min: @sigma_min,
                             sigma_max: @sigma_max)
         add_quick_look_module("HistogramFramePedestal_Dark_#{@name}_1")
-
-        app.chain :HistogramFramePedestalMean, "HistogramFramePedestalMean_Dark_#{@name}_1"
-        app.with_parameters(num_bins: @mean_num_bins,
-                            min: @mean_min,
-                            max: @mean_max)
-        add_quick_look_module("HistogramFramePedestalMean_Dark_#{@name}_1")
-
-        app.chain :HistogramFramePedestalSigma, "HistogramFramePedestalSigma_Dark_#{@name}_1"
-        app.with_parameters(num_bins: @sigma_num_bins,
-                            min: @sigma_min,
-                            max: @sigma_max)
-        add_quick_look_module("HistogramFramePedestalSigma_Dark_#{@name}_1")
-
         append_quick_look(app)
       end
-
     end
   end
 end # module ComptonSoft

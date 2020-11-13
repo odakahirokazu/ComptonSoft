@@ -80,8 +80,6 @@ class DetectBadFrames;
 class SetBadFrames;
 class SetPedestalsByMedian;
 class HistogramFramePedestal;
-class HistogramFramePedestalMean;
-class HistogramFramePedestalSigma;
 class HistogramXrayEventSpectrum;
 class HistogramXrayEventAzimuthAngle;
 class HistogramXrayEventWeight;

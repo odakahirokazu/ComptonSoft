@@ -87,8 +87,6 @@ clMod = [
   ANL::SWIGClass.new("SetBadFrames"),
   ANL::SWIGClass.new("SetPedestalsByMedian"),
   ANL::SWIGClass.new("HistogramFramePedestal"),
-  ANL::SWIGClass.new("HistogramFramePedestalMean"),
-  ANL::SWIGClass.new("HistogramFramePedestalSigma"),
   ANL::SWIGClass.new("HistogramXrayEventSpectrum"),
   ANL::SWIGClass.new("HistogramXrayEventAzimuthAngle"),
   ANL::SWIGClass.new("HistogramXrayEventWeight"),

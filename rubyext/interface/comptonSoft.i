@@ -89,8 +89,6 @@
 #include "SetBadFrames.hh"
 #include "SetPedestalsByMedian.hh"
 #include "HistogramFramePedestal.hh"
-#include "HistogramFramePedestalMean.hh"
-#include "HistogramFramePedestalSigma.hh"
 #include "HistogramXrayEventSpectrum.hh"
 #include "HistogramXrayEventAzimuthAngle.hh"
 #include "HistogramXrayEventWeight.hh"
@@ -830,20 +828,6 @@ class HistogramFramePedestal : public VCSModule
 {
 public:
   HistogramFramePedestal();
-};
-
-
-class HistogramFramePedestalMean : public VCSModule
-{
-public:
-  HistogramFramePedestalMean();
-};
-
-
-class HistogramFramePedestalSigma : public VCSModule
-{
-public:
-  HistogramFramePedestalSigma();
 };
 
 
