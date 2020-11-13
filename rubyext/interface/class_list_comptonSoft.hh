@@ -83,8 +83,6 @@ class HistogramFramePedestal;
 class HistogramXrayEventSpectrum;
 class HistogramXrayEventAzimuthAngle;
 class HistogramXrayEventWeight;
-class HistogramXrayEventProfile;
-class HistogramXrayEventPerFrame;
 class HistogramRawFrameImage;
 class ExtractXrayEventImage;
 class ProcessCodedAperture;

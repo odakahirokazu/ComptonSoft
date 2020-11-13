@@ -67,10 +67,8 @@ set(CS_MODULES
   src/SetPedestalsByMedian.cc
   src/HistogramFramePedestal.cc
   src/HistogramXrayEventSpectrum.cc
-  src/HistogramXrayEventProfile.cc
   src/HistogramXrayEventAzimuthAngle.cc
   src/HistogramXrayEventWeight.cc
-  src/HistogramXrayEventPerFrame.cc
   src/HistogramRawFrameImage.cc
   src/ExtractXrayEventImage.cc
   src/ProcessCodedAperture.cc
