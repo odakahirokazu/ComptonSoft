@@ -18,14 +18,14 @@
  *************************************************************************/
 
 /**
- * HistogramXrayEventWeight
+ * HistogramXrayEventProperties
  *
  * @author Taihei Watanabe
  * @date 2020-10-26
  */
 
-#ifndef COMPTONSOFT_HistogramXrayEventWeight_H
-#define COMPTONSOFT_HistogramXrayEventWeight_H 1
+#ifndef COMPTONSOFT_HistogramXrayEventProperties_H
+#define COMPTONSOFT_HistogramXrayEventProperties_H 1
 
 #include "VCSModule.hh"
 
@@ -35,15 +35,15 @@ namespace comptonsoft {
 
 class XrayEventCollection;
 
-class HistogramXrayEventWeight : public VCSModule
+class HistogramXrayEventProperties : public VCSModule
 {
-  DEFINE_ANL_MODULE(HistogramXrayEventWeight, 1.0);
+  DEFINE_ANL_MODULE(HistogramXrayEventProperties, 1.0);
   // ENABLE_PARALLEL_RUN();
 public:
-  HistogramXrayEventWeight();
+  HistogramXrayEventProperties();
 
 protected:
-  HistogramXrayEventWeight(const HistogramXrayEventWeight&);
+  HistogramXrayEventProperties(const HistogramXrayEventProperties&);
 
 public:
   anlnext::ANLStatus mod_define() override;
@@ -65,4 +65,4 @@ private:
 
 } /* namespace comptonsoft */
 
-#endif /* COMPTONSOFT_HistogramXrayEventWeight_H */
+#endif /* COMPTONSOFT_HistogramXrayEventProperties_H */

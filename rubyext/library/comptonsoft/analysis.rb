@@ -378,7 +378,7 @@ module ComptonSoft
       end
     end
 
-    class EventWeight
+    class EventProperties
       include QuickLookBase
 
       def initialize()
@@ -401,12 +401,12 @@ module ComptonSoft
       def insert_modules(app)
         app.chain :XrayEventSelection, "XrayEventSelection_Weight_#{@name}"
         app.with_parameters(**@event_selector)
-        app.chain :HistogramXrayEventWeight, "HistogramXrayEventWeight_Basic_#{@name}"
-        app.with_parameters(collection_module: "XrayEventSelection_Weight_#{@name}",
+        app.chain :HistogramXrayEventProperties, "HistogramXrayEventProperties_Basic_#{@name}"
+        app.with_parameters(collection_module: "XrayEventSelection_Properties_#{@name}",
                             num_bins: @num_bins,
                             weight_min: @weight_min,
                             weight_max: @weight_max)
-        add_quick_look_module("HistogramXrayEventWeight_Basic_#{@name}")
+        add_quick_look_module("HistogramXrayEventProperties_Basic_#{@name}")
         append_quick_look(app)
       end
     end

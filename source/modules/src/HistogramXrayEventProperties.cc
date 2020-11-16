@@ -17,7 +17,7 @@
  *                                                                       *
  *************************************************************************/
 
-#include "HistogramXrayEventWeight.hh"
+#include "HistogramXrayEventProperties.hh"
 
 #include "XrayEventCollection.hh"
 #include "AstroUnits.hh"
@@ -29,13 +29,13 @@ namespace unit = anlgeant4::unit;
 
 namespace comptonsoft {
 
-HistogramXrayEventWeight::HistogramXrayEventWeight()
+HistogramXrayEventProperties::HistogramXrayEventProperties()
   : numBins_(31), weightMin_(-0.5), weightMax_(30.5),
     collectionModule_("XrayEventCollection"), outputName_("weight")
 {
 }
 
-ANLStatus HistogramXrayEventWeight::mod_define()
+ANLStatus HistogramXrayEventProperties::mod_define()
 {
   define_parameter("num_bins", &mod_class::numBins_);
   define_parameter("weight_min", &mod_class::weightMin_);
@@ -46,7 +46,7 @@ ANLStatus HistogramXrayEventWeight::mod_define()
   return AS_OK;
 }
 
-ANLStatus HistogramXrayEventWeight::mod_initialize()
+ANLStatus HistogramXrayEventProperties::mod_initialize()
 {
   get_module_NC(collectionModule_, &collection_);
 
@@ -64,7 +64,7 @@ ANLStatus HistogramXrayEventWeight::mod_initialize()
   return AS_OK;
 }
 
-ANLStatus HistogramXrayEventWeight::mod_analyze()
+ANLStatus HistogramXrayEventProperties::mod_analyze()
 {
   for (const auto& event: collection_->getEvents()) {
     const double weight = event->Weight();
@@ -74,7 +74,7 @@ ANLStatus HistogramXrayEventWeight::mod_analyze()
   return AS_OK;
 }
 
-void HistogramXrayEventWeight::drawCanvas(TCanvas* canvas, std::vector<std::string>* filenames)
+void HistogramXrayEventProperties::drawCanvas(TCanvas* canvas, std::vector<std::string>* filenames)
 {
   const std::string outputFile = outputName_+".png";
   canvas->cd();
