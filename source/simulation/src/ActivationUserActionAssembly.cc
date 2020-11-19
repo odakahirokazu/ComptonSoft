@@ -86,6 +86,7 @@ void ActivationUserActionAssembly::RunActionAtBeginning(const G4Run*)
   m_AnalysisManager->CreateNtupleFColumn("posy");
   m_AnalysisManager->CreateNtupleFColumn("posz");
   m_AnalysisManager->CreateNtupleDColumn("ini_energy");
+  m_AnalysisManager->FinishNtuple();
 }
 
 void ActivationUserActionAssembly::RunActionAtEnd(const G4Run* run)
