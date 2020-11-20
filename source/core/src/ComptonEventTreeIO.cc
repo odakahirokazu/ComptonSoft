@@ -89,12 +89,12 @@ void ComptonEventTreeIO::defineBranches()
 
   cetree_->Branch("hitpattern", &hitpattern_, "hitpattern/l");
   cetree_->Branch("grade", &grade_, "grade/I");
-  cetree_->Branch("likelihood", &likelihood_, "likelihood/F");
+  cetree_->Branch("likelihood", &likelihood_, "likelihood/D");
 
   cetree_->Branch("escape_flag", &escape_flag_, "escape_flag/O");
   cetree_->Branch("total_energy_deposit", &total_energy_deposit_, "total_energy_deposit/F");
   cetree_->Branch("reconstructed_order", &reconstructed_order_, "reconstructed_order/I");
-  cetree_->Branch("reconstruction_fraction", &reconstruction_fraction_, "reconstruction_fraction/F");
+  cetree_->Branch("reconstruction_fraction", &reconstruction_fraction_, "reconstruction_fraction/D");
 }
 
 void ComptonEventTreeIO::setBranchAddresses()

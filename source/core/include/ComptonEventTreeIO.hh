@@ -36,6 +36,7 @@ namespace comptonsoft {
  * @date 2015-10-10
  * @date 2020-07-09 | new properties
  * @date 2020-09-02 | add error branches
+ * @date 2020-11-20 | change the types of reconstruction_fraction and likelihood
  */
 class ComptonEventTreeIO
 {
@@ -119,12 +120,12 @@ private:
 
   uint64_t hitpattern_ = 0ul;
   int32_t grade_ = 0;
-  float likelihood_ = 1.0;
+  double likelihood_ = 1.0;
 
   bool escape_flag_ = false;
   float total_energy_deposit_ = 0.0;
   int32_t reconstructed_order_ = 0;
-  float reconstruction_fraction_ = 1.0;
+  double reconstruction_fraction_ = 1.0;
 };
 
 } /* namespace comptonsoft */
