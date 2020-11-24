@@ -76,6 +76,7 @@ DetectorHit& DetectorHit::merge(const DetectorHit& r)
 
   if (RealTime() > r.RealTime()) {
     setRealTime(r.RealTime());
+    setParticle(r.Particle());
   }
 
   if (SelfTriggered()) {
@@ -182,7 +183,10 @@ DetectorHit& DetectorHit::mergeAdjacentSignal(const DetectorHit& r,
   setPHA(PHA()+r.PHA());
   setEPI(EPI()+r.EPI());
 
-  if (RealTime() > r.RealTime()) { setRealTime(r.RealTime()); }
+  if (RealTime() > r.RealTime()) {
+    setRealTime(r.RealTime());
+    setParticle(r.Particle());
+  }
 
   if (SelfTriggered()) {
     if (r.SelfTriggered() && (SelfTriggeredTime() > r.SelfTriggeredTime())) {

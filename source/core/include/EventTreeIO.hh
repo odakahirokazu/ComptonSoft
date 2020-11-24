@@ -34,6 +34,7 @@ namespace comptonsoft {
  * @author Hirokazu Odaka
  * @date 2015-10-11
  * @date 2016-09-07
+ * @date 2020-11-24 | add the particle branch
  */
 class EventTreeIO
 {
@@ -84,6 +85,7 @@ private:
   uint64_t flag_data_ = 0ul;
   uint64_t flags_ = 0ul;
   // simulation
+  std::array<double, MaxHits> particle_;
   std::array<double, MaxHits> real_time_;
   std::array<double, MaxHits> time_trig_;
   std::array<int16_t, MaxHits> time_group_;

@@ -33,6 +33,7 @@ namespace comptonsoft {
  * @date 2014-12-02
  * @date 2016-09-07
  * @date 2020-09-02 | add error branches
+ * @date 2020-11-24 | add the particle branch
  */
 class HitTreeIO
 {
@@ -82,6 +83,7 @@ private:
   uint64_t flag_data_ = 0ul;
   uint64_t flags_ = 0ul;
   // simulation
+  int particle_ = 0;
   double real_time_ = 0.0;
   double time_trig_ = 0.0;
   int16_t time_group_ = 0;

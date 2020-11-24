@@ -73,16 +73,18 @@ VCSSensitiveDetector::ProcessHits(G4Step* aStep, G4TouchableHistory* )
     }
   }
 
-  if (aTrack->GetDefinition()->GetParticleType() == "nucleus") {
+  const G4ParticleDefinition* particleDefinition = aTrack->GetDefinition();
+  if (particleDefinition->GetParticleType() == "nucleus") {
     processFlag |= process::NucleusHit;
   }
     
-  if (edep==0.0 && processFlag==0) return true;
+  if (edep==0.0 && processFlag==0) { return true; }
   
   comptonsoft::DetectorHit_sptr hit(new comptonsoft::DetectorHit);
   hit->setDetectorID(DetectorID);
   hit->setEnergyDeposit(edep);
   hit->setProcess(processFlag);
+  hit->setParticle(particleDefinition->GetPDGEncoding());
 
   G4ThreeVector position;
   switch (aStep->GetPostStepPoint()->GetStepStatus()) 

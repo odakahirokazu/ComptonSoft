@@ -48,6 +48,7 @@ namespace comptonsoft {
  * @date 2014-09-18 | redesign.
  * @date 2016-08-19 | add trigger information, change channel ID classes
  * @date 2020-09-02 | add errors of energy/position/time
+ * @date 2020-11-24 | add particle type
  */
 class DetectorHit
 {
@@ -125,6 +126,9 @@ public:
   void addFlags(uint64_t f) { flags_ |= f; }
   void clearFlags(uint64_t f) { flags_ &= ~f; }
   bool isFlags(uint64_t f) const { return (flags_&f)==f; }
+
+  void setParticle(int v) { particle_ = v; }
+  int Particle() const { return particle_; }
 
   void setRealTime(double v) { realTime_ = v; }
   double RealTime() const { return realTime_; }
@@ -277,6 +281,7 @@ private:
   uint64_t flagData_ = 0ul;
   uint64_t flags_ = 0ul;
   // simulation
+  int particle_ = 0;
   double realTime_ = 0.0;
   int timeGroup_ = 0;
   vector3_t realPosition_{0.0, 0.0, 0.0};

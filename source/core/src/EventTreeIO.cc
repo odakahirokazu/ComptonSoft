@@ -56,6 +56,7 @@ void EventTreeIO::defineBranches()
   tree_->Branch("flags",          &flags_,                "flags/l");
   
   // simulation
+  tree_->Branch("particle",       particle_.data(),       "particle[num_hits]/I");
   tree_->Branch("real_time",      real_time_.data(),      "real_time[num_hits]/D");
   tree_->Branch("time_trig",      time_trig_.data(),      "time_trig[num_hits]/D");
   tree_->Branch("time_group",     time_group_.data(),     "time_group[num_hits]/S");
@@ -100,6 +101,7 @@ void EventTreeIO::setBranchAddresses()
   tree_->SetBranchAddress("flags",          &flags_);
 
   // simulation
+  tree_->SetBranchAddress("particle",       particle_.data());
   tree_->SetBranchAddress("real_time",      real_time_.data());
   tree_->SetBranchAddress("time_trig",      time_trig_.data());
   tree_->SetBranchAddress("time_group",     time_group_.data());
