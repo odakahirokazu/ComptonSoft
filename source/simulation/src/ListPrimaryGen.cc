@@ -6,6 +6,8 @@
 using namespace anlnext;
 using namespace anlgeant4;
 
+namespace unit = anlgeant4::unit;
+
 namespace comptonsoft
 {
 
@@ -52,9 +54,9 @@ void ListPrimaryGen::makePrimarySetting()
 {
   tree_->GetEntry(index_++);
 
-  const G4double energy = energy_;
+  const G4double energy = energy_ * unit::keV;
   const G4ThreeVector direction(dirx_, diry_, dirz_);
-  const G4ThreeVector position(x_, y_, z_);
+  const G4ThreeVector position(x_*unit::cm, y_*unit::cm, z_*unit::cm);
   setPrimary(position, energy, direction);
   setUnpolarized();
 }
