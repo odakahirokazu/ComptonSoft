@@ -112,6 +112,7 @@
 #ifdef USE_FITSIO
 #include "AHRayTracingPrimaryGen.hh"
 #endif
+#include "ListPrimaryGen.hh"
 #ifdef USE_SIMX
 #include "SimXPrimaryGen.hh"
 #endif
@@ -932,6 +933,13 @@ public:
 };
 
 #endif
+
+class ListPrimaryGen : public anlgeant4::BasicPrimaryGen
+{
+public:
+  ListPrimaryGen();
+};
+
 
 #ifdef USE_SIMX
 class SimXPrimaryGen : public anlgeant4::BasicPrimaryGen

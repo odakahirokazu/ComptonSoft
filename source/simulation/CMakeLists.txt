@@ -29,6 +29,7 @@ link_directories(
 
 set(CS_SIMULATION_CLASSES_BASIC
   # primary geneator
+  src/ListPrimaryGen.cc
   src/AHRadiationBackgroundPrimaryGen.cc
   # user actions
   src/RadioactiveDecayUserActionAssembly.cc

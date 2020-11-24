@@ -104,6 +104,7 @@ clMod = [
 clSim = [
   # primary generator
   ANL::SWIGClass.new("AHRayTracingPrimaryGen", false, 'USE_FITSIO'),
+  ANL::SWIGClass.new("ListPrimaryGen"),
   ANL::SWIGClass.new("SimXPrimaryGen", false, 'USE_SIMX'),
   ANL::SWIGClass.new("AHRadiationBackgroundPrimaryGen"),
   ANL::SWIGClass.new("AEObservationPrimaryGen", false, 'USE_FITSIO'),
