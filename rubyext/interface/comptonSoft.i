@@ -91,7 +91,7 @@
 #include "HistogramFramePedestal.hh"
 #include "HistogramXrayEventSpectrum.hh"
 #include "HistogramXrayEventAzimuthAngle.hh"
-#include "HistogramXrayEventWeight.hh"
+#include "HistogramXrayEventProperties.hh"
 #include "HistogramRawFrameImage.hh"
 #include "ExtractXrayEventImage.hh"
 #include "ProcessCodedAperture.hh"
@@ -843,10 +843,10 @@ public:
 };
 
 
-class HistogramXrayEventWeight : public VCSModule
+class HistogramXrayEventProperties : public VCSModule
 {
 public:
-  HistogramXrayEventWeight();
+  HistogramXrayEventProperties();
 };
 
 

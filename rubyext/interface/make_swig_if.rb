@@ -89,7 +89,7 @@ clMod = [
   ANL::SWIGClass.new("HistogramFramePedestal"),
   ANL::SWIGClass.new("HistogramXrayEventSpectrum"),
   ANL::SWIGClass.new("HistogramXrayEventAzimuthAngle"),
-  ANL::SWIGClass.new("HistogramXrayEventWeight"),
+  ANL::SWIGClass.new("HistogramXrayEventProperties"),
   ANL::SWIGClass.new("HistogramRawFrameImage"),
   ANL::SWIGClass.new("ExtractXrayEventImage"),
   ANL::SWIGClass.new("ProcessCodedAperture"),
