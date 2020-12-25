@@ -359,7 +359,11 @@ module ComptonSoft
         event_selector_for_spectrum = @event_selector.clone
         event_selector_for_spectrum.delete(:sumPH_min)
         event_selector_for_spectrum.delete(:sumPH_max)
-        app.with_parameters(**event_selector_for_spectrum)
+        app.with_parameters() do |m|
+          event_selector_for_spectrum.each do |k, v|
+            m.add_condition(k.to_s, v)
+          end
+        end
         app.chain :HistogramXrayEventSpectrum, "HistogramXrayEventSpectrum_Basic_#{@name}_1"
         app.with_parameters(collection_module: "XrayEventSelection_Basic_#{@name}_1",
                             num_bins: @spectrum_num_bins,
@@ -367,7 +371,11 @@ module ComptonSoft
                             energy_max: @spectrum_max)
         add_quick_look_module("HistogramXrayEventSpectrum_Basic_#{@name}_1")
         app.chain :XrayEventSelection, "XrayEventSelection_Basic_#{@name}_2"
-        app.with_parameters(**@event_selector)
+        app.with_parameters() do |m|
+          event_selector_for_spectrum.each do |k, v|
+            m.add_condition(k.to_s, v)
+          end
+        end
         app.chain :HistogramXrayEventAzimuthAngle, "HistogramXrayEventAzimuthAngle_Basic_#{@name}_2"
         app.with_parameters(collection_module: "XrayEventSelection_Basic_#{@name}_2",
                             num_bins: @angle_num_bins,
@@ -399,8 +407,12 @@ module ComptonSoft
       end
 
       def insert_modules(app)
-        app.chain :XrayEventSelection, "XrayEventSelection_Weight_#{@name}"
-        app.with_parameters(**@event_selector)
+        app.chain :XrayEventSelection, "XrayEventSelection_Properties_#{@name}"
+        app.with_parameters() do |m|
+          event_selector.each do |k, v|
+            m.add_condition(k.to_s, v)
+          end
+        end
         app.chain :HistogramXrayEventProperties, "HistogramXrayEventProperties_Basic_#{@name}"
         app.with_parameters(collection_module: "XrayEventSelection_Properties_#{@name}",
                             num_bins: @num_bins,
@@ -545,7 +557,11 @@ module ComptonSoft
 
       def insert_modules(app)
         app.chain :XrayEventSelection, "XrayEventSelection_CA_#{@name}"
-        app.with_parameters(**@event_selector)
+        app.with_parameters() do |m|
+          event_selector.each do |k, v|
+            m.add_condition(k.to_s, v)
+          end
+        end
         app.chain :ExtractXrayEventImage, "ExtractXrayEventImage_CA_#{@name}"
         app.with_parameters(collection_module: "XrayEventSelection_CA_#{@name}",
                             num_x: @num_encoded_image_x,
@@ -607,7 +623,11 @@ module ComptonSoft
 
       def insert_modules(app)
         app.chain :XrayEventSelection, "XrayEventSelection_Image_#{@name}"
-        app.with_parameters(**@event_selector)
+        app.with_parameters() do |m|
+          event_selector.each do |k, v|
+            m.add_condition(k.to_s, v)
+          end
+        end
         app.chain :ExtractXrayEventImage, "ExtractXrayEventImage_Image_#{@name}"
         app.with_parameters(collection_module: "XrayEventSelection_Image_#{@name}",
                             num_x: @nx,

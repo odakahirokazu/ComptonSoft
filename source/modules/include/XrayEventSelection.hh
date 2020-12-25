@@ -21,38 +21,55 @@
 #define COMPTONSOFT_XrayEventSelection_H 1
 
 #include "XrayEventCollection.hh"
+#include <functional>
 
 namespace comptonsoft {
+
+class XrayEvent;
+
+class XrayEventSelectionCondition
+{
+public:
+  void add_key(const std::string& key) { key_ = key; }
+  std::string& Key() { return key_; }
+  std::vector<std::function<bool (const XrayEvent&)>>& Conditions() { return conditions_; }
+  void add_condition(const std::function<bool (const XrayEvent&)>& condition)
+  { conditions_.push_back(condition); }
+
+private:
+  std::string key_;
+  std::vector<std::function<bool (const XrayEvent&)>> conditions_;
+};
+
 /**
  * @author Hirokazu Odaka
  * @date 2019-10-30
+ * @date 2020-12-08 | 2.0 | by Tsubasa Tamba
  */
 class XrayEventSelection : public XrayEventCollection
 {
-  DEFINE_ANL_MODULE(XrayEventSelection, 1.0);
+  DEFINE_ANL_MODULE(XrayEventSelection, 2.0);
 public:
   XrayEventSelection();
   ~XrayEventSelection();
 
   anlnext::ANLStatus mod_define() override;
+  anlnext::ANLStatus mod_pre_initialize() override;
   anlnext::ANLStatus mod_initialize() override;
   anlnext::ANLStatus mod_analyze() override;
+
+  void add_condition(const std::string& key, const std::vector<std::pair<int, int>>& ranges);
+  void add_condition(const std::string& key, const std::vector<std::pair<double, double>>& ranges);
+
+  template <typename T>
+  void add_condition(const std::string& key, const std::vector<std::pair<T, T>>& ranges);
 
 protected:
   virtual bool select(const XrayEvent_sptr& e) const;
 
 private:
-  int ixMin_ = 0;
-  int ixMax_ = 0;
-  int iyMin_ = 0;
-  int iyMax_ = 0;
-  int rankMin_ = 0;
-  int rankMax_ = 0;
-  int weightMin_ = 0;
-  int weightMax_ = 0;
-  double sumPHMin_ = 0.0;
-  double sumPHMax_ = 0.0;
-  
+  anlnext::ANLStatus status_ = anlnext::AS_OK;
+  std::vector<XrayEventSelectionCondition> conditionsVector_;
   const XrayEventCollection* collection_ = nullptr;
 };
 

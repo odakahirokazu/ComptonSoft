@@ -440,7 +440,7 @@ class ComptonEventFilter : public anlnext::BasicModule
 {
 public:
   ComptonEventFilter();
-  ~ComptonEventFilter() {}
+  ~ComptonEventFilter();
 
   void define_condition();
   void add_hit_pattern(const std::string& name);
@@ -724,11 +724,14 @@ public:
 };
 
 
-class XrayEventSelection : public XrayEventCollection
+class XrayEventSelection : public anlnext::BasicModule
 {
 public:
   XrayEventSelection();
   ~XrayEventSelection();
+
+  void add_condition(const std::string& key, std::vector<std::pair<int, int>>& range);
+  void add_condition(const std::string& key, std::vector<std::pair<double, double>>& range);
 };
 
 

@@ -73,7 +73,7 @@ clMod = [
   ANL::SWIGClass.new("FillFrame"),
   ANL::SWIGClass.new("LoadFrame"),
   ANL::SWIGClass.new("XrayEventCollection"),
-  ANL::SWIGClass.new("XrayEventSelection"),
+  ANL::SWIGClass.new("XrayEventSelection", true),
   ANL::SWIGClass.new("AnalyzeFrame"),
   ANL::SWIGClass.new("WriteXrayEventTree"),
   ANL::SWIGClass.new("ReadXrayEventTree"),

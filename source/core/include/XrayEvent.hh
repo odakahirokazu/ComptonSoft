@@ -133,6 +133,14 @@ private:
   double posz_ = 0.0;
 };
 
+template <typename T>
+bool filterXrayEvent(T (XrayEvent::*getter)() const,
+                    const XrayEvent& event,
+                    T min, T max)
+{
+  return min <= (event.*getter)() && (event.*getter)() <= max;
+}
+
 using XrayEvent_sptr = std::shared_ptr<XrayEvent>;
 using const_XrayEvent_sptr = std::shared_ptr<const XrayEvent>;
 using XrayEventContainer = std::list<XrayEvent_sptr>;
