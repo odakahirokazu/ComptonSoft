@@ -77,6 +77,7 @@ DetectorHit& DetectorHit::merge(const DetectorHit& r)
   if (RealTime() > r.RealTime()) {
     setRealTime(r.RealTime());
     setParticle(r.Particle());
+    setTrackID(r.TrackID());
   }
 
   if (SelfTriggered()) {
@@ -186,6 +187,7 @@ DetectorHit& DetectorHit::mergeAdjacentSignal(const DetectorHit& r,
   if (RealTime() > r.RealTime()) {
     setRealTime(r.RealTime());
     setParticle(r.Particle());
+    setTrackID(r.TrackID());
   }
 
   if (SelfTriggered()) {

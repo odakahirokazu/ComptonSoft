@@ -49,6 +49,7 @@ namespace comptonsoft {
  * @date 2016-08-19 | add trigger information, change channel ID classes
  * @date 2020-09-02 | add errors of energy/position/time
  * @date 2020-11-24 | add particle type
+ * @date 2020-12-25 | add track ID
  */
 class DetectorHit
 {
@@ -71,6 +72,9 @@ public:
   
   void setEventID(int64_t v) { eventID_ = v; }
   int64_t EventID() const { return eventID_; }
+
+  void setTrackID(int v) { trackID_ = v; }
+  int TrackID() const { return trackID_; }
 
   void setTimeIndicator(int64_t v) { ti_ = v; }
   int64_t TimeIndicator() const { return ti_; }
@@ -266,8 +270,9 @@ public:
 #endif
 
 private:
-  // Event ID
+  // Event/track ID
   int64_t eventID_ = 0l;
+  int trackID_ = 0;
   // measured data
   int64_t ti_ = 0l;
   int instrumentID_ = 0;

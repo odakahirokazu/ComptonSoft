@@ -60,6 +60,7 @@ void HitTreeIO::defineBranches()
   hittree_->Branch("flags",            &flags_,            "flags/l");
   
   // simulation
+  hittree_->Branch("trackid",          &trackid_,          "trackid/I");
   hittree_->Branch("particle",         &particle_,         "particle/I");
   hittree_->Branch("real_time",        &real_time_,        "real_time/D");
   hittree_->Branch("time_trig",        &time_trig_,        "time_trig/D");
@@ -115,6 +116,7 @@ void HitTreeIO::setBranchAddresses()
   hittree_->SetBranchAddress("flags",            &flags_);
 
   // simulation
+  hittree_->SetBranchAddress("trackid",          &trackid_);
   hittree_->SetBranchAddress("particle",         &particle_);
   hittree_->SetBranchAddress("real_time",        &real_time_);
   hittree_->SetBranchAddress("time_trig",        &time_trig_);
@@ -172,6 +174,7 @@ void HitTreeIO::fillHits(const int64_t eventID,
     epi_error_ = hit->EPIError() / unit::keV;
     flag_data_ = hit->FlagData();
     flags_ = hit->Flags();
+    trackid_ = hit->TrackID();
     particle_ = hit->Particle();
     real_time_ = hit->RealTime() / unit::second;
     time_trig_ = hit->TriggeredTime() / unit::second;
@@ -219,6 +222,7 @@ DetectorHit_sptr HitTreeIO::retrieveHit() const
   hit->setEPIError(epi_error_ * unit::keV);
   hit->setFlagData(flag_data_);
   hit->setFlags(flags_);
+  hit->setTrackID(trackid_);
   hit->setParticle(particle_);
   hit->setRealTime(real_time_ * unit::second);
   hit->setTriggeredTime(time_trig_ * unit::second);

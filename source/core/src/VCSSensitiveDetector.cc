@@ -81,6 +81,7 @@ VCSSensitiveDetector::ProcessHits(G4Step* aStep, G4TouchableHistory* )
   if (edep==0.0 && processFlag==0) { return true; }
   
   comptonsoft::DetectorHit_sptr hit(new comptonsoft::DetectorHit);
+  hit->setTrackID(aTrack->GetTrackID());
   hit->setDetectorID(DetectorID);
   hit->setEnergyDeposit(edep);
   hit->setProcess(processFlag);
