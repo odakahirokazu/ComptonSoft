@@ -64,17 +64,17 @@ void CodedAperture::setEncodedImage(const std::shared_ptr<image_t>& image)
   encoded_image_ = image;
 }
 
-bool CodedAperture::setSkyImage()
+bool CodedAperture::buildSkyImage()
 {
-  const int Nsx = num_sky_x_;
-  const int Nsy = num_sky_y_;
-  const double sizex = sky_size_angle_x_;
-  const double sizey = sky_size_angle_y_;
+  const int Nsx = sky_num_x_;
+  const int Nsy = sky_num_y_;
+  const double sizex = sky_fov_x_;
+  const double sizey = sky_fov_y_;
 
   const bool number_determined = (Nsx>0) && (Nsy>0);
   const bool size_determined = (sizex>0.0) && (sizey>0.0);
   if (!number_determined) {
-    std::cerr << "sky_num_x and sky_num_y should be determined by user." << std::endl;
+    std::cerr << "num_sky_x and num_sky_y should be determined by user." << std::endl;
     return false;
   }
 
@@ -160,7 +160,7 @@ void CodedAperture::decode_based_on_sky_coordinate()
           if (imageE[dx][dy]<=0.0) {
             continue;
           }
-          for (int ti=0; ti<num_decoding_iteration_; ti++) {
+          for (int ti=0; ti<num_decoding_iterations_; ti++) {
             CodedAperture::ID sky_id = CodedAperture::ID(sx, sy);
             CodedAperture::ID detector_id = CodedAperture::ID(dx, dy);
             vector2_t sky_angle = SkyAngle(sky_id, rand);
@@ -202,7 +202,7 @@ void CodedAperture::decode_based_on_aperture_coordinate()
           if (imageE[dx][dy]<=0.0) {
             continue;
           }
-          for (int ti=0; ti<num_decoding_iteration_; ti++) {
+          for (int ti=0; ti<num_decoding_iterations_; ti++) {
             CodedAperture::ID id1 = CodedAperture::ID(dx, dy);
             CodedAperture::ID id2 = CodedAperture::ID(mx, my);
             vector2_t v1 = DetectorPosition(id1, rand);
@@ -359,7 +359,7 @@ vector2_t CodedAperture::ApertureToDetector(vector2_t v)
 
 vector2_t CodedAperture::DetectedAngleToSkyAngle(vector2_t v)
 {
-  v -= sky_offset_angle_;
+  v -= sky_offset_;
   const double ang = -detector_roll_angle_;
   v.rotate(ang);
   vector2_t res;
@@ -370,7 +370,7 @@ vector2_t CodedAperture::DetectedAngleToSkyAngle(vector2_t v)
 
 vector2_t CodedAperture::SkyAngleToDetectedAngle(vector2_t v)
 {
-  v += sky_offset_angle_;
+  v += sky_offset_;
   const double ang = -detector_roll_angle_;
   v.rotate(ang);
   vector2_t res;

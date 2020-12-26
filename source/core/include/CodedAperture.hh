@@ -28,9 +28,7 @@
 #define COMPTONSOFT_CodedAperture_H 1
 
 #include "VCodedAperture.hh"
-//#include <memory>
 #include <random>
-//#include "TH2.h"
 #include "CSTypes.hh"
 
 namespace comptonsoft {
@@ -54,18 +52,18 @@ public:
 
   void setAperturePattern(const std::shared_ptr<image_t>& pattern) override;
   void setEncodedImage(const std::shared_ptr<image_t>& image) override;
-  bool setSkyImage() override;
+  bool buildSkyImage() override;
 
   void decode() override;
 
   std::shared_ptr<image_t> DecodedImage() const override { return decoded_image_; }
 
-  void setNumSky(int x, int y) { num_sky_x_ = x; num_sky_y_ = y; }
-  int NumSkyX() { return num_sky_x_; }
-  int NumSkyY() { return num_sky_y_; }
-  void setSkySizeAngle(double x, double y) { sky_size_angle_x_ = x; sky_size_angle_y_ = y; }
-  double SkySizeAngleX() { return sky_size_angle_x_; }
-  double SkySizeAngleY() { return sky_size_angle_y_; }
+  void setSkyNum(int x, int y) { sky_num_x_ = x; sky_num_y_ = y; }
+  int SkyNumX() { return sky_num_x_; }
+  int SkyNumY() { return sky_num_y_; }
+  void setSkyFov(double x, double y) { sky_fov_x_ = x; sky_fov_y_ = y; }
+  double SkyFovX() { return sky_fov_x_; }
+  double SkyFovY() { return sky_fov_y_; }
   void setDetectorToApertureDistance(double v) { detector_to_aperture_distance_ = v; }
   double DetectorToApertureDistance() { return detector_to_aperture_distance_; }
 
@@ -78,10 +76,10 @@ public:
   double ApertureRollAngle() { return aperture_roll_angle_; }
   void setApertureOffset(double x, double y) { aperture_offset_.setX(x); aperture_offset_.setY(y); }
   vector2_t ApertureOffset() { return aperture_offset_; }
-  void setSkyOffsetAngle(double x, double y) { sky_offset_angle_.setX(x); sky_offset_angle_.setY(y); }
-  vector2_t SkyOffsetAngle() { return sky_offset_angle_; }
-  void setNumDecodingIteration(int v) { num_decoding_iteration_ = v; }
-  int NumDecodingIteration() { return num_decoding_iteration_; }
+  void setSkyOffset(double x, double y) { sky_offset_.setX(x); sky_offset_.setY(y); }
+  vector2_t SkyOffset() { return sky_offset_; }
+  void setNumDecodingIterations(int v) { num_decoding_iterations_ = v; }
+  int NumDecodingIterations() { return num_decoding_iterations_; }
   void setDecodingMode(int v) { decoding_mode_ = v; }
   int DecodingMode() { return decoding_mode_; }
   
@@ -117,17 +115,17 @@ private:
   double sky_element_angle_x_ = 1.0;
   double sky_element_angle_y_ = 1.0;
 
-  int num_sky_x_ = 0;
-  int num_sky_y_ = 0;
-  double sky_size_angle_x_ = 0.0;
-  double sky_size_angle_y_ = 0.0;
+  int sky_num_x_ = 0;
+  int sky_num_y_ = 0;
+  double sky_fov_x_ = 0.0;
+  double sky_fov_y_ = 0.0;
   double detector_to_aperture_distance_ = 1.0;
 
   double detector_roll_angle_ = 0.0;
   double aperture_roll_angle_ = 0.0;
   vector2_t aperture_offset_ = vector2_t(0.0, 0.0);
-  vector2_t sky_offset_angle_ = vector2_t(0.0, 0.0);
-  int num_decoding_iteration_ = 1;
+  vector2_t sky_offset_ = vector2_t(0.0, 0.0);
+  int num_decoding_iterations_ = 1;
   int decoding_mode_ = 1;
 
   std::shared_ptr<image_t> aperture_pattern_;
