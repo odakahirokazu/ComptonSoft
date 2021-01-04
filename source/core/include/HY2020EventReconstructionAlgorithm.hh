@@ -30,8 +30,8 @@ namespace comptonsoft {
 /**
  * A class of a standard Compton event reconstuction algorithm.
  * @author Hiroki Yoneda
- * @date 2020-07-10 | Hiroki Yoneda
- * @date 2020-07-15 | Hirokazu Odaka | code cleanup
+ * @date 2020-11-18 | Hiroki Yoneda
+ * @date 2021-01-04 | Hirokazu Odaka | code cleanup
  */
 class HY2020EventReconstructionAlgorithm : public VEventReconstructionAlgorithm
 {
@@ -55,7 +55,10 @@ public:
   bool reconstruct(const std::vector<DetectorHit_sptr>& hits,
                    const BasicComptonEvent& baseEvent,
                    std::vector<BasicComptonEvent_sptr>& eventsReconstructed) override;
+
 protected:
+  bool loadParameters(boost::property_tree::ptree& pt) override;
+
   bool reconstructFullDepositEvent(const std::vector<DetectorHit_sptr>& hits,
                                    const BasicComptonEvent& baseEvent,
                                    std::vector<BasicComptonEvent_sptr>& eventsReconstructed);
@@ -86,8 +89,6 @@ private:
   double probEscape(double gammaray_energy_before_lasthit, double energy_deposit_lasthit);
 
 private:
-  std::string parfilename = "parfile_HY2020.json";
-
   double sigma_level_energy_margin_for_checkScatteringAngle_;
   int process_mode;
   bool assume_initial_gammaray_energy;

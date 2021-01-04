@@ -22,6 +22,8 @@
 
 #include <vector>
 #include <memory>
+#include <string>
+#include <boost/property_tree/ptree.hpp>
 #include "DetectorHit_sptr.hh"
 #include "BasicComptonEvent.hh"
 
@@ -33,6 +35,7 @@ namespace comptonsoft {
  * @date 2011-02-16
  * @date 2014-11-17
  * @date 2020-07-02 | multiple reconstructed events
+ * @date 2021-01-04 | add parameter file
  */
 class VEventReconstructionAlgorithm
 {
@@ -47,6 +50,11 @@ public:
   void setMaxHits(int v) { maxHits_ = v; }
   int MaxHits() const { return maxHits_; }
 
+  void setParameterFile(const std::string& filename)
+  { parameterFile_ = filename; }
+  std::string ParameterFile() const { return parameterFile_; }
+  bool readParameterFile();
+
   virtual void initializeEvent() = 0;
   
   /**
@@ -60,8 +68,13 @@ public:
                            const BasicComptonEvent& baseEvent,
                            std::vector<BasicComptonEvent_sptr>& eventsReconstructed) = 0;
 
+protected:
+  virtual bool loadParameters(boost::property_tree::ptree&)
+  { return true; }
+
 private:
   int maxHits_;
+  std::string parameterFile_;
 };
 
 double total_energy_deposits(const std::vector<DetectorHit_sptr>& hits);

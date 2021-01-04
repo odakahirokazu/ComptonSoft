@@ -30,6 +30,7 @@
 #include "FocalPlaneEventReconstructionAlgorithm.hh"
 #include "SGDEventReconstructionAlgorithm.hh"
 #include "HY2017EventReconstructionAlgorithm.hh"
+#include "HY2020EventReconstructionAlgorithm.hh"
 #include "CSHitCollection.hh"
 
 using namespace anlnext;
@@ -43,7 +44,9 @@ EventReconstruction::EventReconstruction()
   : m_MaxHits(2),
     m_ReconstructionMethodName("standard"),
     m_SourceDistant(true),
-    m_SourceDirection(0.0, 0.0, 1.0), m_SourcePosition(0.0, 0.0, 0.0),
+    m_SourceDirection(0.0, 0.0, 1.0),
+    m_SourcePosition(0.0, 0.0, 0.0),
+    m_ParameterFile(""),
     m_HitCollection(nullptr),
     m_BaseEvent(new BasicComptonEvent),
     m_Reconstruction(new StandardEventReconstructionAlgorithm)
@@ -53,11 +56,12 @@ EventReconstruction::EventReconstruction()
 
 ANLStatus EventReconstruction::mod_define()
 {
-  register_parameter(&m_MaxHits, "max_hits");
-  register_parameter(&m_ReconstructionMethodName, "reconstruction_method");
-  register_parameter(&m_SourceDistant, "source_distant");
-  register_parameter(&m_SourceDirection, "source_direction");
-  register_parameter(&m_SourcePosition, "source_position", unit::cm, "cm");
+  define_parameter("max_hits", &mod_class::m_MaxHits);
+  define_parameter("reconstruction_method", &mod_class::m_ReconstructionMethodName);
+  define_parameter("source_distant", &mod_class::m_SourceDistant);
+  define_parameter("source_direction", &mod_class::m_SourceDirection);
+  define_parameter("source_position", &mod_class::m_SourcePosition, unit::cm, "cm");
+  define_parameter("parameter_file", &mod_class::m_ParameterFile);
 
   return AS_OK;
 }
@@ -88,6 +92,9 @@ ANLStatus EventReconstruction::mod_initialize()
   else if (ReconstructionMethodName()=="HY2017") {
     m_Reconstruction.reset(new HY2017EventReconstructionAlgorithm);
   }
+  else if (ReconstructionMethodName()=="HY2020") {
+    m_Reconstruction.reset(new HY2020EventReconstructionAlgorithm);
+  }
   else {
     std::cout << "Unknown reconstruction method is given: " << ReconstructionMethodName()
               << std::endl;
@@ -95,7 +102,15 @@ ANLStatus EventReconstruction::mod_initialize()
   }
 
   m_Reconstruction->setMaxHits(m_MaxHits);
-  
+
+  if (m_ParameterFile != "") {
+    m_Reconstruction->setParameterFile(m_ParameterFile);
+    const bool paramLoaded = m_Reconstruction->readParameterFile();
+    if (!paramLoaded) {
+      return AS_QUIT_ERROR;
+    }
+  }
+
   return AS_OK;
 }
 

@@ -18,6 +18,7 @@
  *************************************************************************/
 
 #include "VEventReconstructionAlgorithm.hh"
+#include <boost/property_tree/json_parser.hpp>
 #include "DetectorHit.hh"
 
 namespace comptonsoft {
@@ -28,6 +29,13 @@ VEventReconstructionAlgorithm::VEventReconstructionAlgorithm()
 }
 
 VEventReconstructionAlgorithm::~VEventReconstructionAlgorithm() = default;
+
+bool VEventReconstructionAlgorithm::readParameterFile()
+{
+  boost::property_tree::ptree pt;
+  boost::property_tree::json_parser::read_json(ParameterFile().c_str(), pt);
+  return loadParameters(pt);
+}
 
 double total_energy_deposits(const std::vector<DetectorHit_sptr>& hits)
 {

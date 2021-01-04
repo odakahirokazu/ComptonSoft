@@ -89,6 +89,7 @@ private:
   bool m_SourceDistant;
   vector3_t m_SourceDirection;
   vector3_t m_SourcePosition;
+  std::string m_ParameterFile;
 
   CSHitCollection* m_HitCollection;
 

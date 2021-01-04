@@ -137,7 +137,7 @@ bool estimateAveragedEscapedEnergy(const std::vector<DetectorHit_sptr>& ordered_
   if (num_hits < 3) {
     return false;
   }
- 
+
   double sum_escaped_energy = 0.0;
   for(int i_hit = 2; i_hit < num_hits; ++i_hit){
     const vector3_t incident_direction_at_lastsecondpoint = ordered_hits[i_hit - 1]->Position() - ordered_hits[i_hit - 2]->Position();

@@ -36,15 +36,15 @@ double energyDeposit(double incident_energy, double cos_theta);
 
 double cosThetaGeometry(const vector3_t& incident_direction, const vector3_t& scattering_direction);
 double cosThetaKinematics(double incident_energy, double energy_deposit);
-  
-bool checkEdepIsPhysicallyAcceptable(double incident_energy, 
-                                     double energy_deposit, 
+
+bool checkEdepIsPhysicallyAcceptable(double incident_energy,
+                                     double energy_deposit,
                                      double delta_energy = 0.0);
-bool checkScatteringAngle(const DetectorHit_sptr& hit1, 
+bool checkScatteringAngle(const DetectorHit_sptr& hit1,
                           const DetectorHit_sptr& hit2,
                           const DetectorHit_sptr& hit3,
-                          const double incident_energy_at_secondpoint,
-                          const double delta_energy);
+                          double incident_energy_at_secondpoint,
+                          double delta_energy);
 
 bool estimateEscapedEnergy(const std::vector<DetectorHit_sptr>& ordered_hits, double& escaped_energy);
 
