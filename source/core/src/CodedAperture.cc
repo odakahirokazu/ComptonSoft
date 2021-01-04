@@ -224,7 +224,7 @@ void CodedAperture::decode_based_on_aperture_coordinate()
 
 }
 
-CodedAperture::ID CodedAperture::DetectorID(vector2_t& v)
+CodedAperture::ID CodedAperture::DetectorID(const vector2_t& v) const
 {
   const int nx = encoded_image_->shape()[0];
   const int ny = encoded_image_->shape()[1];
@@ -235,11 +235,11 @@ CodedAperture::ID CodedAperture::DetectorID(vector2_t& v)
   CodedAperture::ID id;
   id.ix = static_cast<int>(std::floor(cx+v.x()/dx+0.5));
   id.iy = static_cast<int>(std::floor(cy+v.y()/dy+0.5));
-  if (id.ix<0 || id.ix>=nx || id.iy<0 || id.iy>=ny) id.invalid = true;
+  if (id.ix<0 || id.ix>=nx || id.iy<0 || id.iy>=ny) { id.invalid = true; }
   return id;
 }
 
-vector2_t CodedAperture::DetectorPosition(CodedAperture::ID& id, bool random/*=false*/)
+vector2_t CodedAperture::DetectorPosition(const CodedAperture::ID& id, bool random/*=false*/)
 {
   const int nx = encoded_image_->shape()[0];
   const int ny = encoded_image_->shape()[1];
@@ -253,15 +253,12 @@ vector2_t CodedAperture::DetectorPosition(CodedAperture::ID& id, bool random/*=f
     rx = UniformDistribution(-0.5, 0.5);
     ry = UniformDistribution(-0.5, 0.5);
   }
-  vector2_t v;
   const double vx = (id.ix-cx+rx)*dx;
   const double vy = (id.iy-cy+ry)*dy;
-  v.setX(vx);
-  v.setY(vy);
-  return v;
+  return vector2_t(vx, vy);
 }
 
-CodedAperture::ID CodedAperture::ApertureID(vector2_t& v)
+CodedAperture::ID CodedAperture::ApertureID(const vector2_t& v) const
 {
   const int nx = aperture_pattern_->shape()[0];
   const int ny = aperture_pattern_->shape()[1];
@@ -272,11 +269,11 @@ CodedAperture::ID CodedAperture::ApertureID(vector2_t& v)
   CodedAperture::ID id;
   id.ix = static_cast<int>(std::floor(cx+v.x()/dx+0.5));
   id.iy = static_cast<int>(std::floor(cy+v.y()/dy+0.5));
-  if (id.ix<0 || id.ix>=nx || id.iy<0 || id.iy>=ny) id.invalid = true;
+  if (id.ix<0 || id.ix>=nx || id.iy<0 || id.iy>=ny) { id.invalid = true; }
   return id;
 }
 
-vector2_t CodedAperture::AperturePosition(CodedAperture::ID& id, bool random/*=false*/)
+vector2_t CodedAperture::AperturePosition(const CodedAperture::ID& id, bool random/*=false*/)
 {
   const int nx = aperture_pattern_->shape()[0];
   const int ny = aperture_pattern_->shape()[1];
@@ -290,15 +287,12 @@ vector2_t CodedAperture::AperturePosition(CodedAperture::ID& id, bool random/*=f
     rx = UniformDistribution(-0.5, 0.5);
     ry = UniformDistribution(-0.5, 0.5);
   }
-  vector2_t v;
   const double vx = (id.ix-cx+rx)*dx;
   const double vy = (id.iy-cy+ry)*dy;
-  v.setX(vx);
-  v.setY(vy);
-  return v;
+  return vector2_t(vx, vy);
 }
 
-CodedAperture::ID CodedAperture::SkyID(vector2_t& v)
+CodedAperture::ID CodedAperture::SkyID(const vector2_t& v) const
 {
   const int nx = decoded_image_->shape()[0];
   const int ny = decoded_image_->shape()[1];
@@ -313,7 +307,7 @@ CodedAperture::ID CodedAperture::SkyID(vector2_t& v)
   return id;
 }
 
-vector2_t CodedAperture::SkyAngle(CodedAperture::ID& id, bool random/*=false*/)
+vector2_t CodedAperture::SkyAngle(const CodedAperture::ID& id, bool random/*=false*/)
 {
   const int nx = decoded_image_->shape()[0];
   const int ny = decoded_image_->shape()[1];
@@ -327,12 +321,9 @@ vector2_t CodedAperture::SkyAngle(CodedAperture::ID& id, bool random/*=false*/)
     rx = UniformDistribution(-0.5, 0.5);
     ry = UniformDistribution(-0.5, 0.5);
   }
-  vector2_t v;
   const double vx = (id.ix-cx+rx)*dx;
   const double vy = (id.iy-cy+ry)*dy;
-  v.setX(vx);
-  v.setY(vy);
-  return v;
+  return vector2_t(vx, vy);
 }
 
 vector2_t CodedAperture::DetectorToAperture(vector2_t v)

@@ -59,29 +59,29 @@ public:
   std::shared_ptr<image_t> DecodedImage() const override { return decoded_image_; }
 
   void setSkyNum(int x, int y) { sky_num_x_ = x; sky_num_y_ = y; }
-  int SkyNumX() { return sky_num_x_; }
-  int SkyNumY() { return sky_num_y_; }
+  int SkyNumX() const { return sky_num_x_; }
+  int SkyNumY() const { return sky_num_y_; }
   void setSkyFov(double x, double y) { sky_fov_x_ = x; sky_fov_y_ = y; }
-  double SkyFovX() { return sky_fov_x_; }
-  double SkyFovY() { return sky_fov_y_; }
+  double SkyFovX() const { return sky_fov_x_; }
+  double SkyFovY() const { return sky_fov_y_; }
   void setDetectorToApertureDistance(double v) { detector_to_aperture_distance_ = v; }
-  double DetectorToApertureDistance() { return detector_to_aperture_distance_; }
+  double DetectorToApertureDistance() const { return detector_to_aperture_distance_; }
 
   double SkyElementAngleX() const override { return sky_element_angle_x_; }
   double SkyElementAngleY() const override { return sky_element_angle_y_; }
 
   void setDetectorRollAngle(double v) { detector_roll_angle_ = v; }
-  double DetectorRollAngle() { return detector_roll_angle_; }
+  double DetectorRollAngle() const { return detector_roll_angle_; }
   void setApertureRollAngle(double v) { aperture_roll_angle_ = v; }
-  double ApertureRollAngle() { return aperture_roll_angle_; }
+  double ApertureRollAngle() const { return aperture_roll_angle_; }
   void setApertureOffset(double x, double y) { aperture_offset_.setX(x); aperture_offset_.setY(y); }
-  vector2_t ApertureOffset() { return aperture_offset_; }
+  vector2_t ApertureOffset() const { return aperture_offset_; }
   void setSkyOffset(double x, double y) { sky_offset_.setX(x); sky_offset_.setY(y); }
-  vector2_t SkyOffset() { return sky_offset_; }
+  vector2_t SkyOffset() const { return sky_offset_; }
   void setNumDecodingIterations(int v) { num_decoding_iterations_ = v; }
-  int NumDecodingIterations() { return num_decoding_iterations_; }
+  int NumDecodingIterations() const { return num_decoding_iterations_; }
   void setDecodingMode(int v) { decoding_mode_ = v; }
-  int DecodingMode() { return decoding_mode_; }
+  int DecodingMode() const { return decoding_mode_; }
   
   struct ID {
     int ix = 0;
@@ -92,12 +92,12 @@ public:
     ID(bool invalid): invalid(invalid) {}
   };
 
-  ID DetectorID(vector2_t& v);
-  ID ApertureID(vector2_t& v);
-  ID SkyID(vector2_t& v);
-  vector2_t DetectorPosition(ID& id, bool random = false);
-  vector2_t AperturePosition(ID& id, bool random = false);
-  vector2_t SkyAngle(ID& id, bool random = false);
+  ID DetectorID(const vector2_t& v) const;
+  ID ApertureID(const vector2_t& v) const;
+  ID SkyID(const vector2_t& v) const;
+  vector2_t DetectorPosition(const ID& id, bool random = false);
+  vector2_t AperturePosition(const ID& id, bool random = false);
+  vector2_t SkyAngle(const ID& id, bool random = false);
   
   vector2_t DetectorToAperture(vector2_t v);
   vector2_t ApertureToDetector(vector2_t v);
@@ -105,7 +105,6 @@ public:
   vector2_t SkyAngleToDetectedAngle(vector2_t v);
 
   double UniformDistribution(double x1, double x2);
-
 
 private:
   double detector_element_size_x_ = 1.0;
