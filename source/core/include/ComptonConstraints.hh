@@ -28,23 +28,27 @@ namespace comptonsoft {
 namespace compton_constraints {
 
 double differentialCrossSection(double incident_energy, double cos_theta);
+double ComptonCrossSection(double incident_energy);
+double normalized_differentialCrossSection(double incident_energy, double cos_theta);
 double scatteredGammarayEnergy(double incident_energy, double cos_theta);
 double scatteredGammarayEnergyFromEdep(double energy_deposit, double cos_theta);
 double energyDeposit(double incident_energy, double cos_theta);
 
 double cosThetaGeometry(const vector3_t& incident_direction, const vector3_t& scattering_direction);
 double cosThetaKinematics(double incident_energy, double energy_deposit);
-
-bool checkEdepIsPhysicallyAcceptable(double incident_energy,
-                                     double energy_deposit,
+  
+bool checkEdepIsPhysicallyAcceptable(double incident_energy, 
+                                     double energy_deposit, 
                                      double delta_energy = 0.0);
-bool checkScatteringAngle(const DetectorHit_sptr& hit1,
+bool checkScatteringAngle(const DetectorHit_sptr& hit1, 
                           const DetectorHit_sptr& hit2,
                           const DetectorHit_sptr& hit3,
-                          double incident_energy_at_secondpoint,
-                          double delta_energy);
+                          const double incident_energy_at_secondpoint,
+                          const double delta_energy);
 
 bool estimateEscapedEnergy(const std::vector<DetectorHit_sptr>& ordered_hits, double& escaped_energy);
+
+bool estimateAveragedEscapedEnergy(const std::vector<DetectorHit_sptr>& ordered_hits, double& escaped_energy);
 
 } /* namespace compton_constraints */
 } /* namespace comptonsoft */
