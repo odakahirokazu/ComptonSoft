@@ -36,21 +36,36 @@ namespace comptonsoft {
 ProcessCodedAperture::ProcessCodedAperture()
   : patternFile_("pattern.dat"),
     imageOwnerModule_("ExtractXrayEventImage"),
-    outputName_("decoded")
+    outputName_("decoded"),
+    outputAngleUnit_("degree")
 {
 }
 
 ANLStatus ProcessCodedAperture::mod_define()
 {
-  define_parameter("num_encoded_image_x", &mod_class::numEncodedImageX_);
-  define_parameter("num_encoded_image_y", &mod_class::numEncodedImageY_);
-  define_parameter("num_mask_x", &mod_class::numMaskX_);
-  define_parameter("num_mask_y", &mod_class::numMaskY_);
-  define_parameter("detector_element_size", &mod_class::detectorElementSize_, unit::um, "um");
-  define_parameter("mask_element_size", &mod_class::maskElementSize_, unit::um, "um");
+  define_parameter("aperture_num_x", &mod_class::apertureNumX_);
+  define_parameter("aperture_num_y", &mod_class::apertureNumY_);
+  define_parameter("sky_num_x", &mod_class::skyNumX_);
+  define_parameter("sky_num_y", &mod_class::skyNumY_);
+  define_parameter("detector_element_size", &mod_class::detectorElementSize_, unit::cm, "cm");
+  define_parameter("aperture_element_size", &mod_class::apertureElementSize_, unit::cm, "cm");
+  define_parameter("sky_fov_x", &mod_class::skyFovX_, unit::degree, "degree");
+  define_parameter("sky_fov_y", &mod_class::skyFovY_, unit::degree, "degree");
+  define_parameter("detector_to_aperture_distance", &mod_class::detectorToApertureDistance_, unit::cm, "cm");
+  define_parameter("detector_roll_angle", &mod_class::detectorRollAngle_, unit::degree, "degree");
+  set_parameter_description("Roll angle of the detector with respect to the sky coordinate.");
+  define_parameter("aperture_roll_angle", &mod_class::apertureRollAngle_, unit::degree, "degree");
+  set_parameter_description("Roll angle of the aperture with respect to the detector coordinate.");
+  define_parameter("aperture_offset_x", &mod_class::apertureOffsetX_, unit::cm, "cm");
+  define_parameter("aperture_offset_y", &mod_class::apertureOffsetY_, unit::cm, "cm");
+  define_parameter("sky_offset_x", &mod_class::skyOffsetX_, unit::degree, "degree");
+  define_parameter("sky_offset_y", &mod_class::skyOffsetY_, unit::degree, "degree");
+  define_parameter("num_decoding_iterations", &mod_class::numDecodingIterations_);
+  define_parameter("decoding_mode", &mod_class::decodingMode_);
   define_parameter("pattern_file", &mod_class::patternFile_);
   define_parameter("image_owner_module", &mod_class::imageOwnerModule_);
   define_parameter("output_name", &mod_class::outputName_);
+  define_parameter("output_angle_unit", &mod_class::outputAngleUnit_);
   
   return AS_OK;
 }    
@@ -60,13 +75,12 @@ ANLStatus ProcessCodedAperture::mod_initialize()
   get_module_NC(imageOwnerModule_, &imageOwner_);
 
   codedAperture_ = createCodedAperture();
-  
-  const int nx = NumMaskX();
-  const int ny = NumMaskY();
+  const int nx = ApertureNumX();
+  const int ny = ApertureNumY();
   std::shared_ptr<image_t> pattern(new image_t(boost::extents[nx][ny]));
   std::ifstream fin(patternFile_);
   if(!fin) {
-    std::cout << "cannnot open file" << std::endl;
+    std::cerr << "cannnot open pattern file: " << patternFile_ << std::endl;
     return AS_ERROR;
   }
   std::string reading_line_buffer;
@@ -77,9 +91,9 @@ ANLStatus ProcessCodedAperture::mod_initialize()
     std::istringstream is(reading_line_buffer);
     int num = 0;
     while(is >> num) {
-      if (ix>=NumMaskX() || iy>=NumMaskY()) {
-        std::cout << "Input pattern does not match pixel number of masks." << std::endl;
-        return AS_ERROR;
+      if (ix>=ApertureNumX() || iy>=ApertureNumY()) {
+        std::cerr << "Input pattern does not match pixel number of apertures." << std::endl;
+        return AS_QUIT_ERROR;
       }
       (*pattern)[ix][iy] = num;
       iy += 1;
@@ -89,25 +103,53 @@ ANLStatus ProcessCodedAperture::mod_initialize()
   }
   fin.close();
   codedAperture_->setAperturePattern(pattern);
-
   std::shared_ptr<image_t> encodedImage = imageOwner_->Image();
   codedAperture_->setEncodedImage(encodedImage);
+  bool sky_image_status = codedAperture_->buildSkyImage();
+  if (!sky_image_status) {
+    std::cerr << "Sky image was not set appropriately." << std::endl;
+    return AS_QUIT_ERROR;
+  }
   const std::shared_ptr<image_t> decodedImageDummy = codedAperture_->DecodedImage();
   const int Nsx = decodedImageDummy->shape()[0];
   const int Nsy = decodedImageDummy->shape()[1];
+
+  double output_angle_unit_value = 0.0;
+  if (outputAngleUnit_=="degree") {
+    output_angle_unit_value = unit::degree;
+  }
+  else if (outputAngleUnit_=="radian") {
+    output_angle_unit_value = unit::radian;
+  }
+  else if (outputAngleUnit_=="arcminute") {
+    output_angle_unit_value = unit::arcminute;
+  }
+  else if (outputAngleUnit_=="arcsecond") {
+    output_angle_unit_value = unit::arcsecond;
+  }
+  else {
+    std::cerr << "Invalid output_angle_unit: " << outputAngleUnit_ << std::endl;
+    return AS_QUIT_ERROR;
+  }
 
   ANLStatus status = VCSModule::mod_initialize();
   if (status!=AS_OK) {
     return status;
   }
-
   mkdir();
   const std::string name = "image";
   const std::string title = "Decoded image";
+  const double dsx = codedAperture_->SkyElementAngleX();
+  const double dsy = codedAperture_->SkyElementAngleY();
+  const double xmin = -dsx*Nsx*0.5/output_angle_unit_value;
+  const double xmax = dsx*Nsx*0.5/output_angle_unit_value;
+  const double ymin = -dsy*Nsy*0.5/output_angle_unit_value;
+  const double ymax = dsy*Nsy*0.5/output_angle_unit_value;
   histogram_ = new TH2D(name.c_str(), title.c_str(),
-                        Nsx, 0.0, static_cast<double>(Nsx), 
-                        Nsy, 0.0, static_cast<double>(Nsy));
-  
+                        Nsx, xmin, xmax,
+                        Nsy, ymin, ymax);
+  histogram_->GetXaxis()->SetTitle(outputAngleUnit_.c_str());
+  histogram_->GetYaxis()->SetTitle(outputAngleUnit_.c_str());
   return AS_OK;
 }
 
@@ -125,8 +167,17 @@ std::unique_ptr<VCodedAperture> ProcessCodedAperture::createCodedAperture()
   std::unique_ptr<CodedAperture> ca(new CodedAperture);
   ca->setElementSizes(DetectorElementSize(),
                       DetectorElementSize(),
-                      MaskElementSize(),
-                      MaskElementSize());
+                      ApertureElementSize(),
+                      ApertureElementSize());
+  ca->setSkyNum(SkyNumX(), SkyNumY());
+  ca->setSkyFov(SkyFovX(), SkyFovY());
+  ca->setDetectorToApertureDistance(detectorToApertureDistance_);
+  ca->setDetectorRollAngle(DetectorRollAngle());
+  ca->setApertureRollAngle(ApertureRollAngle());
+  ca->setApertureOffset(ApertureOffsetX(), ApertureOffsetY());
+  ca->setSkyOffset(SkyOffsetX(), SkyOffsetY());
+  ca->setNumDecodingIterations(NumDecodingIterations());
+  ca->setDecodingMode(DecodingMode());
   return ca;
 }
 
@@ -136,7 +187,6 @@ void ProcessCodedAperture::decode()
   codedAperture_->setEncodedImage(image);
   std::cout << "ProcessCodedAperture: decoding..." << std::endl;
   codedAperture_->decode();
-  // coded_aperture_->mirrorDecodedImage();
   decodedImage_ = codedAperture_->DecodedImage();
 }
 
@@ -144,6 +194,7 @@ void ProcessCodedAperture::fillHistogram()
 {
   const image_t& image = *decodedImage_;
   TH2& h = *histogram_;
+  h.Reset();
 
   const int Nx = image.shape()[0];
   const int Ny = image.shape()[1];
@@ -168,8 +219,8 @@ void ProcessCodedAperture::drawCanvas(TCanvas* canvas, std::vector<std::string>*
   canvas->cd();
   gStyle->SetOptStat(0);
   gStyle->SetPalette(56);
-  const double zmax = histogram_->GetMaximum();
-  const double zmin = zmax * (-1);
+  const double zmax = histogram_->GetBinContent(histogram_->GetMaximumBin());
+  const double zmin = 0;
   histogram_->GetZaxis()->SetRangeUser(zmin, zmax);
   histogram_->Draw("colz");
   canvas->SaveAs(outputFile.c_str());

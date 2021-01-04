@@ -30,15 +30,23 @@ namespace comptonsoft
 {
 
 WriteXrayEventTree::WriteXrayEventTree()
-  : treeIO_(new XrayEventTreeIO)
+  : collectionModule_("XrayEventCollection"),
+    treeIO_(new XrayEventTreeIO)
 {
+}
+
+ANLStatus WriteXrayEventTree::mod_define()
+{
+  define_parameter("collection_module", &mod_class::collectionModule_);
+  
+  return AS_OK;
 }
 
 ANLStatus WriteXrayEventTree::mod_initialize()
 {
   VCSModule::mod_initialize();
 
-  get_module("XrayEventCollection", &collection_);
+  get_module(collectionModule_, &collection_);
   define_evs("WriteXrayEventTree:Fill");
 
   tree_ = new TTree("xetree", "xetree");

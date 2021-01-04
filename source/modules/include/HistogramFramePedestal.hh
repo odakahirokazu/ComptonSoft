@@ -49,6 +49,7 @@ public:
   anlnext::ANLStatus mod_define() override;
   anlnext::ANLStatus mod_initialize() override;
   anlnext::ANLStatus mod_end_run() override;
+  anlnext::ANLStatus mod_analyze() override;
 
   void drawCanvas(TCanvas* canvas, std::vector<std::string>* filenames) override;
 
@@ -64,6 +65,9 @@ private:
   std::string outputName_;
   
   TH2* histogram_ = nullptr;
+  FrameData* frame_;
+
+  void fillInHistogram();
 };
 
 } /* namespace comptonsoft */

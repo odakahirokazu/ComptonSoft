@@ -1,6 +1,6 @@
 /*************************************************************************
  *                                                                       *
- * Copyright (c) 2019 Hirokazu Odaka                                     *
+ * Copyright (c) 2011 Hirokazu Odaka                                     *
  *                                                                       *
  * This program is free software: you can redistribute it and/or modify  *
  * it under the terms of the GNU General Public License as published by  *
@@ -16,36 +16,53 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>. *
  *                                                                       *
  *************************************************************************/
-/**
- * CodedAperture
- *
- * @author Tsubasa Tamba, Satoshi Takashima, Hirokazu Odaka
- * @date 2019-11-01
- * @date 2019-11-15 | H. Odaka | redesign
- */
-#ifndef COMPTONSOFT_VCodedAperture_H
-#define COMPTONSOFT_VCodedAperture_H 1
 
-#include "XrayEvent.hh"
+/**
+ * HistogramRawFrameImage
+ *
+ * @author Tsubasa Tamba
+ * @date 2020-11-02
+ */
+
+#ifndef COMPTONSOFT_HistogramRawFrameImage_H
+#define COMPTONSOFT_HistogramRawFrameImage_H 1
+
+#include "VCSModule.hh"
 #include <memory>
+#include "FrameData.hh"
+#include "XrayEvent.hh"
+
+class TH2;
 
 namespace comptonsoft {
 
-class VCodedAperture
+class HistogramRawFrameImage : public VCSModule
 {
+  DEFINE_ANL_MODULE(HistogramRawFrameImage, 1.0);
+  // ENABLE_PARALLEL_RUN();
 public:
-  VCodedAperture();
-  virtual ~VCodedAperture();
+  HistogramRawFrameImage();
 
-  virtual void setAperturePattern(const std::shared_ptr<image_t>& pattern) = 0;
-  virtual void setEncodedImage(const std::shared_ptr<image_t>& image) = 0;
-  virtual bool buildSkyImage() = 0;
-  virtual void decode() = 0;
-  virtual std::shared_ptr<image_t> DecodedImage() const = 0;
-  virtual double SkyElementAngleX() const = 0;
-  virtual double SkyElementAngleY() const = 0;
+public:
+  anlnext::ANLStatus mod_define() override;
+  anlnext::ANLStatus mod_initialize() override;
+  anlnext::ANLStatus mod_end_run() override;
+
+  void drawCanvas(TCanvas* canvas, std::vector<std::string>* filenames) override;
+
+protected:
+  void fillHistogram();
+
+private:
+  int detectorID_ = 0;
+  std::string outputName_;
+  int rebinX_ = 1;
+  int rebinY_ = 1;
+
+  FrameData* frame_ = nullptr;
+  TH2* histogram_ = nullptr;
 };
 
 } /* namespace comptonsoft */
 
-#endif /* COMPTONSOFT_VCodedAperture_H */
+#endif /* COMPTONSOFT_HistogramRawFrameImage_H */

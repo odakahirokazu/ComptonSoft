@@ -1,6 +1,6 @@
 /*************************************************************************
  *                                                                       *
- * Copyright (c) 2019 Hirokazu Odaka                                     *
+ * Copyright (c) 2011 Hirokazu Odaka                                     *
  *                                                                       *
  * This program is free software: you can redistribute it and/or modify  *
  * it under the terms of the GNU General Public License as published by  *
@@ -16,36 +16,53 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>. *
  *                                                                       *
  *************************************************************************/
-/**
- * CodedAperture
- *
- * @author Tsubasa Tamba, Satoshi Takashima, Hirokazu Odaka
- * @date 2019-11-01
- * @date 2019-11-15 | H. Odaka | redesign
- */
-#ifndef COMPTONSOFT_VCodedAperture_H
-#define COMPTONSOFT_VCodedAperture_H 1
 
-#include "XrayEvent.hh"
-#include <memory>
+/**
+ * HistogramXrayEventProperties
+ *
+ * @author Taihei Watanabe
+ * @date 2020-10-26
+ */
+
+#ifndef COMPTONSOFT_HistogramXrayEventProperties_H
+#define COMPTONSOFT_HistogramXrayEventProperties_H 1
+
+#include "VCSModule.hh"
+
+class TH1;
 
 namespace comptonsoft {
 
-class VCodedAperture
-{
-public:
-  VCodedAperture();
-  virtual ~VCodedAperture();
+class XrayEventCollection;
 
-  virtual void setAperturePattern(const std::shared_ptr<image_t>& pattern) = 0;
-  virtual void setEncodedImage(const std::shared_ptr<image_t>& image) = 0;
-  virtual bool buildSkyImage() = 0;
-  virtual void decode() = 0;
-  virtual std::shared_ptr<image_t> DecodedImage() const = 0;
-  virtual double SkyElementAngleX() const = 0;
-  virtual double SkyElementAngleY() const = 0;
+class HistogramXrayEventProperties : public VCSModule
+{
+  DEFINE_ANL_MODULE(HistogramXrayEventProperties, 1.0);
+  // ENABLE_PARALLEL_RUN();
+public:
+  HistogramXrayEventProperties();
+
+protected:
+  HistogramXrayEventProperties(const HistogramXrayEventProperties&);
+
+public:
+  anlnext::ANLStatus mod_define() override;
+  anlnext::ANLStatus mod_initialize() override;
+  anlnext::ANLStatus mod_analyze() override;
+
+  void drawCanvas(TCanvas* canvas, std::vector<std::string>* filenames) override;
+
+private:
+  int numBins_ = 1;
+  double weightMin_ = 0.0;
+  double weightMax_ = 1.0;
+  std::string collectionModule_;
+  std::string outputName_;
+
+  XrayEventCollection* collection_ = nullptr;
+  TH1* histogram_ = nullptr;
 };
 
 } /* namespace comptonsoft */
 
-#endif /* COMPTONSOFT_VCodedAperture_H */
+#endif /* COMPTONSOFT_HistogramXrayEventProperties_H */

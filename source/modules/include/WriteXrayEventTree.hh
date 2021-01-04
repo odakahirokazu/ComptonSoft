@@ -46,11 +46,13 @@ class WriteXrayEventTree : public VCSModule
 public:
   WriteXrayEventTree();
   ~WriteXrayEventTree() = default;
-  
+
+  anlnext::ANLStatus mod_define() override;
   anlnext::ANLStatus mod_initialize() override;
   anlnext::ANLStatus mod_analyze() override;
 
 private:
+  std::string collectionModule_;
   const XrayEventCollection* collection_ = nullptr;
   TTree* tree_ = nullptr;
   std::unique_ptr<XrayEventTreeIO> treeIO_ = nullptr;

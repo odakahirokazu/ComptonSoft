@@ -2,7 +2,7 @@ class ComptonEventFilter : public anlnext::BasicModule
 {
 public:
   ComptonEventFilter();
-  ~ComptonEventFilter() {}
+  ~ComptonEventFilter();
 
   void define_condition();
   void add_hit_pattern(const std::string& name);

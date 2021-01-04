@@ -17,99 +17,102 @@
  *                                                                       *
  *************************************************************************/
 
-#include "HistogramFramePedestal.hh"
+#include "HistogramRawFrameImage.hh"
 
-#include "AstroUnits.hh"
+#include "FrameData.hh"
 #include "TH2.h"
 #include "TStyle.h"
-#include "FrameData.hh"
 
 using namespace anlnext;
-namespace unit = anlgeant4::unit;
+
 
 namespace comptonsoft {
 
-HistogramFramePedestal::HistogramFramePedestal()
-  : meanNumBins_(64), meanMin_(-64.0), meanMax_(64.0),
-    sigmaNumBins_(64), sigmaMin_(0.0), sigmaMax_(64.0),
-    outputName_("pedestal")
+HistogramRawFrameImage::HistogramRawFrameImage()
+  : outputName_("rawimage")
 {
 }
 
-ANLStatus HistogramFramePedestal::mod_define()
+ANLStatus HistogramRawFrameImage::mod_define()
 {
   define_parameter("detector_id", &mod_class::detectorID_);
-  define_parameter("mean_num_bins", &mod_class::meanNumBins_);
-  define_parameter("mean_min", &mod_class::meanMin_);
-  define_parameter("mean_max", &mod_class::meanMax_);
-  define_parameter("sigma_num_bins", &mod_class::sigmaNumBins_);
-  define_parameter("sigma_min", &mod_class::sigmaMin_);
-  define_parameter("sigma_max", &mod_class::sigmaMax_);
   define_parameter("output_name", &mod_class::outputName_);
+  define_parameter("rebin_x", &mod_class::rebinX_);
+  define_parameter("rebin_y", &mod_class::rebinY_);
   
   return AS_OK;
 }
 
-ANLStatus HistogramFramePedestal::mod_initialize()
+ANLStatus HistogramRawFrameImage::mod_initialize()
 {
   ANLStatus status = VCSModule::mod_initialize();
-  if (status != AS_OK) {
+  if (status!=AS_OK) {
     return status;
   }
+
+  if (rebinX_<=0) {
+    rebinX_ = 1;
+  }
+  if (rebinY_<=0) {
+    rebinY_ = 1;
+  }
+  
+  VRealDetectorUnit* detector = getDetectorManager()->getDetectorByID(detectorID_);
+  frame_ = detector->getFrameData();
+  const image_t image = frame_->getRawFrame();
+
   mkdir();
-  const std::string name = "pedestal";
-  const std::string title = "pedestal";
+  const std::string name = "rawimage";
+  const std::string title = "RawImage";
+  const int nx = image.shape()[0];
+  const int ny = image.shape()[1];
+  const int numx = nx/rebinX_;
+  const int numy = ny/rebinY_;
   histogram_ = new TH2D(name.c_str(), title.c_str(),
-                        sigmaNumBins_, sigmaMin_, sigmaMax_,
-                        meanNumBins_, meanMin_, meanMax_);
+                        numx, 0.0, static_cast<double>(nx),
+                        numy, 0.0, static_cast<double>(ny));
+
   return AS_OK;
 }
 
-ANLStatus HistogramFramePedestal::mod_analyze()
-{
-  return AS_OK;
-}
 
-ANLStatus HistogramFramePedestal::mod_end_run()
+ANLStatus HistogramRawFrameImage::mod_end_run()
 {
   VRealDetectorUnit* detector = getDetectorManager()->getDetectorByID(detectorID_);
   if (detector == nullptr) {
     std::cout << "Detector " << detectorID_ << " does not exist." << std::endl;
     return AS_OK;
   }
-  fillInHistogram();
+  fillHistogram();
+
   return AS_OK;
 }
 
-void HistogramFramePedestal::fillInHistogram()
+
+void HistogramRawFrameImage::fillHistogram()
 {
   histogram_->Reset();
   
   VRealDetectorUnit* detector = getDetectorManager()->getDetectorByID(detectorID_);
   frame_ = detector->getFrameData();
-  frame_->calculateStatistics();
-  const image_t& pedestals = frame_->getPedestals();
-  const image_t& frameDeviation = frame_->getDeviationFrame();
-
-  const int nx = pedestals.shape()[0];
-  const int ny = pedestals.shape()[1];
-  for (int ix=0; ix<nx; ix++) {
-    for (int iy=0; iy<ny; iy++) {
-      const double mean = pedestals[ix][iy];
-      const double sigma = frameDeviation[ix][iy];
-      histogram_->Fill(sigma, mean);
+  const image_t image = frame_->getRawFrame();
+  
+  const int Nx = image.shape()[0];
+  const int Ny = image.shape()[1];
+  for (int ix=0; ix<Nx; ix++) {
+    for (int iy=0; iy<Ny; iy++) {
+      const double v = image[ix][iy];
+      histogram_->Fill(ix, iy, v/(rebinX_*rebinY_));
     }
   }
-  std::cout << std::endl;
 }
 
-
-void HistogramFramePedestal::drawCanvas(TCanvas* canvas, std::vector<std::string>* filenames)
+void HistogramRawFrameImage::drawCanvas(TCanvas* canvas, std::vector<std::string>* filenames)
 {
-  fillInHistogram();
+  fillHistogram();
+
   const std::string outputFile = outputName_+".png";
   canvas->cd();
-  canvas->SetLogz(1);
   gStyle->SetOptStat(0);
   gStyle->SetPalette(56);
   histogram_->Draw("colz");
