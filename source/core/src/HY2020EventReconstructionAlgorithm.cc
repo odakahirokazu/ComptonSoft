@@ -40,7 +40,12 @@ HY2020EventReconstructionAlgorithm::HY2020EventReconstructionAlgorithm()
     par0_energy_resolution_(5.0),
     par1_energy_resolution_(0.5),
     par2_energy_resolution_(0.0),
-    detector_length_scale(15.0), //cm
+    detector_length_scale(15.0), // cm
+    consider_position_resolution(true),
+    position_resolution_x_(0.2 * unit::cm),
+    position_resolution_y_(0.2 * unit::cm),
+    position_resolution_z_(0.2 * unit::cm),
+    escape_weight_(1.0),
     cross_section_filename_("crosssection.root")
 {
   setParameterFile("parfile_HY2020.json");
@@ -59,6 +64,11 @@ bool HY2020EventReconstructionAlgorithm::loadParameters(boost::property_tree::pt
   par0_energy_resolution_ = pt.get<double>("HY2020.energy_resolution.par0");
   par1_energy_resolution_ = pt.get<double>("HY2020.energy_resolution.par1");
   par2_energy_resolution_ = pt.get<double>("HY2020.energy_resolution.par2");
+  consider_position_resolution = pt.get<bool>("HY2020.consider_position_resolution");
+  position_resolution_x_ = pt.get<double>("HY2020.position_resolution.x") * unit::cm;
+  position_resolution_y_ = pt.get<double>("HY2020.position_resolution.y") * unit::cm;
+  position_resolution_z_ = pt.get<double>("HY2020.position_resolution.z") * unit::cm;
+  escape_weight_ = pt.get<double>("HY2020.escape_weight");
   cross_section_filename_ = pt.get<std::string>("HY2020.cross_section_filename");
   
   cross_section_file_ = new TFile(cross_section_filename_.c_str(), "r");
@@ -72,13 +82,22 @@ bool HY2020EventReconstructionAlgorithm::loadParameters(boost::property_tree::pt
   std::cout << "sigma_level_energy_margin_for_checkScatteringAngle_ : " << sigma_level_energy_margin_for_checkScatteringAngle_ << std::endl;
   std::cout << "process_mode : " << process_mode << std::endl;
   std::cout << "assume_initial_gammaray_energy : " << assume_initial_gammaray_energy << std::endl;
-  std::cout << "known_initial_gammaray_energy (keV) : " << known_initial_gammaray_energy << std::endl;
+  if (assume_initial_gammaray_energy) {
+    std::cout << "known_initial_gammaray_energy (keV) : " << known_initial_gammaray_energy / unit::keV << std::endl;
+  }
   std::cout << "use_averaged_escaped_energy : " << use_averaged_escaped_energy << std::endl;
   std::cout << "detector_length_scale (cm) : " << detector_length_scale << std::endl;
   std::cout << "par0_energy_resolution_ : " << par0_energy_resolution_ << std::endl;
   std::cout << "par1_energy_resolution_ : " << par1_energy_resolution_ << std::endl;
   std::cout << "par2_energy_resolution_ : " << par2_energy_resolution_ << std::endl;
   std::cout << "cross_section_filename_ : " << cross_section_filename_ << std::endl;
+  std::cout << "consider_position_resolution : " << consider_position_resolution << std::endl;
+  if (consider_position_resolution) {
+    std::cout << "position_resolution_x_ (cm) : " << position_resolution_x_ / unit::cm << std::endl;
+    std::cout << "position_resolution_y_ (cm) : " << position_resolution_y_ / unit::cm << std::endl;
+    std::cout << "position_resolution_z_ (cm) : " << position_resolution_z_ / unit::cm << std::endl;
+  }
+  std::cout << "escape_weight: " << escape_weight_ << std::endl;
 
   return true;
 }
@@ -99,15 +118,15 @@ reconstruct(const std::vector<DetectorHit_sptr>& hits,
   }
 
   bool result = false;
-  if(process_mode == 0 || process_mode == 1 || process_mode == 2){
+  if (process_mode == 0 || process_mode == 1 || process_mode == 2) {
     result = reconstructFullDepositEvent(hits, baseEvent, eventsReconstructed);
   }
 
-  if(process_mode == 0 || (process_mode == 1 && !result) || process_mode == 3){
+  if (process_mode == 0 || (process_mode == 1 && !result) || process_mode == 3) {
     result |= reconstructEscapeEvent(hits, baseEvent, eventsReconstructed);
   }
 
-  if(result == true){
+  if (result == true) {
     normalizeReconstructionFraction(eventsReconstructed);
     return true;
   }
@@ -257,10 +276,11 @@ calLikelihood(const std::vector<DetectorHit_sptr>& ordered_hits,
         likelihood_ = 0.0;
         break;
       }
-
+      
+      double sigma_energy = getEnergyResolution(ordered_hits[0]->Energy());
       likelihood_ *= probComptonFirst(gammaray_energy_before_ihit);
       likelihood_ *= normalized_differentialCrossSection( incident_energy, cos_theta_first_scattering );
-      likelihood_ *= probEnergyDetection( ordered_hits[0]->Energy(), ordered_hits[0]->Energy() ); 
+      likelihood_ *= probEnergyDetection( ordered_hits[0]->Energy(), ordered_hits[0]->Energy(), sigma_energy);
 
       gammaray_energy_before_ihit -= ordered_hits[0]->Energy();
     }
@@ -271,23 +291,35 @@ calLikelihood(const std::vector<DetectorHit_sptr>& ordered_hits,
         likelihood_ *= probEscape(gammaray_energy_before_ihit, ordered_hits[i_hit]->Energy());
       }
       else {
+        double sigma_energy = getEnergyResolution(gammaray_energy_before_ihit);
         likelihood_ *= probAbsorption(gammaray_energy_before_ihit, path_length);
-        likelihood_ *= probEnergyDetection( gammaray_energy_before_ihit, ordered_hits[i_hit]->Energy() ); 
+        likelihood_ *= probEnergyDetection( gammaray_energy_before_ihit, ordered_hits[i_hit]->Energy(), sigma_energy); 
       }
     }
     else {
       double path_length = (ordered_hits[i_hit]->Position() - ordered_hits[i_hit - 1]->Position()).mag() / unit::cm;
-      double cos_theta_geom = cosThetaGeometry( ordered_hits[i_hit]->Position() - ordered_hits[i_hit - 1]->Position(),
-                                                ordered_hits[i_hit + 1]->Position() - ordered_hits[i_hit]->Position() );
-      double energy_deposit = energyDeposit( gammaray_energy_before_ihit, cos_theta_geom );
+      double cos_theta_geom = cosThetaGeometry(ordered_hits[i_hit]->Position() - ordered_hits[i_hit - 1]->Position(),
+                                               ordered_hits[i_hit + 1]->Position() - ordered_hits[i_hit]->Position());
+      double energy_deposit = energyDeposit(gammaray_energy_before_ihit, cos_theta_geom);
+
+      double sigma_energy = getEnergyResolution(energy_deposit);
+      if (consider_position_resolution) {
+        double sigma_energy_by_position_error = std::pow(gammaray_energy_before_ihit - energy_deposit, 2) / CLHEP::electron_mass_c2
+                                              * getErrorCosThetaGeom(ordered_hits[i_hit]->Position() - ordered_hits[i_hit - 1]->Position(),
+                                                                     ordered_hits[i_hit + 1]->Position() - ordered_hits[i_hit]->Position());
+        sigma_energy = std::sqrt(std::pow(sigma_energy, 2) + std::pow(sigma_energy_by_position_error, 2));
+      }
 
       likelihood_ *= probCompton(gammaray_energy_before_ihit, path_length);
-      likelihood_ *= normalized_differentialCrossSection( gammaray_energy_before_ihit, cos_theta_geom );
-      likelihood_ *= probEnergyDetection( energy_deposit, ordered_hits[i_hit]->Energy() ); 
+      likelihood_ *= normalized_differentialCrossSection(gammaray_energy_before_ihit, cos_theta_geom);
+      likelihood_ *= probEnergyDetection(energy_deposit, ordered_hits[i_hit]->Energy(), sigma_energy); 
 
       gammaray_energy_before_ihit -= energy_deposit;
     }
   }
+  
+  if (is_escape_event) { likelihood_ *= escape_weight_; }
+
   return likelihood_;
 }
 
@@ -315,10 +347,30 @@ double HY2020EventReconstructionAlgorithm::getEnergyResolution(double energy)
                     + std::pow(par2_energy_resolution_, 2) * std::pow(energy / unit::keV, 2) ) * unit::keV; //MeV
 }
 
-double HY2020EventReconstructionAlgorithm::
-probEnergyDetection(double energy_real, double energy_detected)
+double HY2020EventReconstructionAlgorithm::getErrorCosThetaGeom(const vector3_t& incident_direction, const vector3_t& scattering_direction)
 {
-  const double sigma_energy_2 = std::pow( getEnergyResolution(energy_real), 2);
+  const double cos_theta_ = cosThetaGeometry(incident_direction, scattering_direction);
+  const double dcos_dx = (scattering_direction.x() - incident_direction.x())/scattering_direction.mag()/incident_direction.mag()
+                       + scattering_direction.x()/scattering_direction.mag2() * cos_theta_
+                       - incident_direction.x()/incident_direction.mag2() * cos_theta_;
+  const double dcos_dy = (scattering_direction.y() - incident_direction.y())/scattering_direction.mag()/incident_direction.mag()
+                       + scattering_direction.y()/scattering_direction.mag2() * cos_theta_
+                       - incident_direction.y()/incident_direction.mag2() * cos_theta_;
+  const double dcos_dz = (scattering_direction.z() - incident_direction.z())/scattering_direction.mag()/incident_direction.mag()
+                       + scattering_direction.z()/scattering_direction.mag2() * cos_theta_
+                       - incident_direction.z()/incident_direction.mag2() * cos_theta_;
+
+  const double error2 = std::pow(dcos_dx * position_resolution_x_, 2) 
+                      + std::pow(dcos_dy * position_resolution_y_, 2) 
+                      + std::pow(dcos_dz * position_resolution_z_, 2);
+
+  return std::sqrt(error2);
+}
+
+double HY2020EventReconstructionAlgorithm::
+probEnergyDetection(double energy_real, double energy_detected, double sigma_energy)
+{
+  const double sigma_energy_2 = std::pow(sigma_energy, 2);
   const double prob = 1.0 / std::sqrt( 2 * CLHEP::pi * sigma_energy_2)
     * std::exp( - std::pow(energy_real - energy_detected, 2) / 2.0 / sigma_energy_2 );
   return prob;

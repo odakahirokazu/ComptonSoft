@@ -82,7 +82,8 @@ private:
   void setTotalEnergyDepositsAndNumHits(const std::vector<DetectorHit_sptr>& hits);
   double getEnergyResolution(double energy);
 
-  double probEnergyDetection(double energy_real, double energy_detected);
+  double getErrorCosThetaGeom(const vector3_t& incident_direction, const vector3_t& scattering_direction);
+  double probEnergyDetection(double energy_real, double energy_detected, double sigma_energy);
   double probCompton(double gammaray_energy_before_hit, double path_length);
   double probComptonFirst(double gammaray_energy_before_hit);
   double probAbsorption(double gammaray_energy_before_hit, double path_length);
@@ -103,6 +104,14 @@ private:
   double par2_energy_resolution_;
 
   double detector_length_scale; //cm
+
+  bool consider_position_resolution;
+  
+  double position_resolution_x_;
+  double position_resolution_y_;
+  double position_resolution_z_;
+
+  double escape_weight_;
 
   std::string cross_section_filename_;
   TFile* cross_section_file_;
