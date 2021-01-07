@@ -222,6 +222,8 @@ ANLStatus Geant4Body::mod_finalize()
     CLHEP::HepRandom::saveEngineStatus(m_RandomFinalStatusFileName.c_str());
   }
 
+  m_G4RunManager.reset(nullptr);
+
   return AS_OK;
 }
 
