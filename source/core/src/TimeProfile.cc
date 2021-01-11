@@ -9,7 +9,9 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
-#include "CLHEP/Units/SystemOfUnits.h"
+#include "AstroUnits.hh"
+
+namespace unit = anlgeant4::unit;
 
 namespace comptonsoft
 {
@@ -43,9 +45,9 @@ bool TimeProfile::readFile(const std::string& filename)
 
     std::istringstream iss(buf);
     iss >> x1 >> x2 >> x3;
-    const double time1 = x1 * CLHEP::second;
-    const double time2 = x2 * CLHEP::second;
-    const double rate = x3 / CLHEP::second;
+    const double time1 = x1 * unit::second;
+    const double time2 = x2 * unit::second;
+    const double rate = x3 / unit::second;
     push(time1, time2, rate);
   }
 

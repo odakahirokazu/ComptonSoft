@@ -9,7 +9,6 @@
 
 #include <iostream>
 
-#include "CLHEP/Units/SystemOfUnits.h"
 #include "G4RunManager.hh"
 #include "Shielding.hh"
 #include "DummyDetectorConstruction.hh"
@@ -19,10 +18,13 @@
 #include "G4Ions.hh"
 #include "G4RadioactiveDecay.hh"
 
+#include "AstroUnits.hh"
 #include "TimeProfile.hh"
 #include "RateData.hh"
 #include "RIDecayProperties.hh"
 #include "RIDecayChains.hh"
+
+namespace unit = anlgeant4::unit;
 
 namespace comptonsoft
 {
@@ -49,38 +51,38 @@ RIDecayCalculation::~RIDecayCalculation() = default;
 void RIDecayCalculation::setMeasurementTime(double t)
 {
   average_mode_ = false;
-  measurement_time_ = t*CLHEP::second;
+  measurement_time_ = t*unit::second;
 }
 
 double RIDecayCalculation::MeasurememtTime() const
 {
-  return measurement_time_/CLHEP::second;
+  return measurement_time_/unit::second;
 }
 
 void RIDecayCalculation::addMeasurementWindow(double t1, double t2)
 {
   average_mode_ = true;
-  measurement_windows_.emplace_back(t1*CLHEP::second, t2*CLHEP::second);
+  measurement_windows_.emplace_back(t1*unit::second, t2*unit::second);
 }
 
 double RIDecayCalculation::getStartingTimeOfWindow(std::size_t i) const
 {
-  return measurement_windows_[i].first/CLHEP::second;
+  return measurement_windows_[i].first/unit::second;
 }
 
 double RIDecayCalculation::getEndingTimeOfWindow(std::size_t i) const
 {
-  return measurement_windows_[i].second/CLHEP::second;
+  return measurement_windows_[i].second/unit::second;
 }
 
 void RIDecayCalculation::setDecayConstantThreshold(double v)
 {
-  decay_constant_threshold_ = v * (1.0/CLHEP::second);
+  decay_constant_threshold_ = v * (1.0/unit::second);
 }
 
 double RIDecayCalculation::DecayConstantThreshold() const
 {
-  return decay_constant_threshold_/(1.0/CLHEP::second);
+  return decay_constant_threshold_/(1.0/unit::second);
 }
 
 bool RIDecayCalculation::initialize()

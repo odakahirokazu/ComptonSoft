@@ -11,7 +11,9 @@
 #include <fstream>
 #include <sstream>
 #include <boost/format.hpp>
-#include "CLHEP/Units/SystemOfUnits.h"
+#include "AstroUnits.hh"
+
+namespace unit = anlgeant4::unit;
 
 namespace comptonsoft
 {
@@ -82,7 +84,7 @@ bool RateData::readFile(const std::string& filename)
       }
 
       if (count >= CountThreshold()) {
-        IsotopeInfo isotope(z, a, energy*CLHEP::keV, floatingLevel);
+        IsotopeInfo isotope(z, a, energy*unit::keV, floatingLevel);
         isotope.setRate(productionEfficiency);
         data_.back().second.push_back(isotope);
       }
@@ -114,9 +116,9 @@ bool RateData::writeFile(const std::string& filename)
         % isotope.IsotopeID()
         % isotope.Z()
         % isotope.A()
-        % (isotope.Energy()/CLHEP::keV)
+        % (isotope.Energy()/unit::keV)
         % isotope.FloatingLevel()
-        % (isotope.Rate()*CLHEP::second);
+        % (isotope.Rate()*unit::second);
     }
     fout << std::endl;
   }

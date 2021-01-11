@@ -92,6 +92,15 @@ set(CS_CORE_CLASSES
   src/PointCharge.cc
   src/CCECalculation.cc
   src/NumericalField.cc
+  ### radioactivation step 2 (RDChains)
+  src/DummyDetectorConstruction.cc
+  src/IsotopeDatabaseAccess.cc
+  src/RateData.cc
+  src/TimeProfile.cc
+  src/BatemanSolution.cc
+  src/RIDecayProperties.cc
+  src/RIDecayChains.cc
+  src/RIDecayCalculation.cc
 )
 
 add_library(CSCore SHARED

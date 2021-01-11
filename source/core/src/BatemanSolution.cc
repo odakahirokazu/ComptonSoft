@@ -13,10 +13,12 @@
 #include <numeric>
 #include <iostream>
 #include <boost/format.hpp>
-#include "G4SystemOfUnits.hh"
 
+#include "AstroUnits.hh"
 #include "RIDecayChains.hh"
 
+
+namespace unit = anlgeant4::unit;
 
 namespace {
 
@@ -57,7 +59,7 @@ void modify_lambda_if_same_values(std::vector<comptonsoft::longer_float_t>& xs,
           const comptonsoft::IsotopeInfo isotope = chain[j-1].Isotope();
           std::cout << "lambda modified at " << j << " : "
                     << "(" << isotope.Z() << "," << isotope.A() << ") : "
-                    << xs[j]*CLHEP::s << " -> " << l_modified*CLHEP::s << std::endl;
+                    << xs[j]*unit::s << " -> " << l_modified*unit::s << std::endl;
         }
         xs[j] = l_modified;
         changed = true;

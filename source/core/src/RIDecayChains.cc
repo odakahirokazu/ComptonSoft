@@ -15,7 +15,6 @@
 #include <iostream>
 #include <boost/format.hpp>
 
-#include "CLHEP/Units/SystemOfUnits.h"
 #include "G4ParticleDefinition.hh"
 #include "G4Ions.hh"
 #include "G4ParticleTable.hh"
@@ -26,6 +25,10 @@
 #include "G4NuclearLevelData.hh"
 #include "G4LevelManager.hh"
 #include "G4NucLevel.hh"
+
+#include "AstroUnits.hh"
+
+namespace unit = anlgeant4::unit;
 
 namespace {
 
@@ -58,7 +61,7 @@ double invert_lifetime(double lifetime)
 {
   const double decay_constant =
     (lifetime<0.0) ? 0.0 :
-    (lifetime==0.0) ? (1.0/(1.0e-15*CLHEP::s)) :
+    (lifetime==0.0) ? (1.0/(1.0e-15*unit::s)) :
     (1.0/lifetime);
   return decay_constant;
 }
@@ -67,9 +70,9 @@ RIDecayChains::RIDecayChains(const IsotopeInfo& isotope)
   : verbose_level_(0),
     use_photon_evaporation_data_(true),
     decay_constant_threshold_(0.0),
-    lifetime_threshold_(1.0e-3*CLHEP::second),
+    lifetime_threshold_(1.0e-3*unit::second),
     branching_ratio_threshold_(1.0e-6),
-    low_energy_limit_(0.5*CLHEP::keV),
+    low_energy_limit_(0.5*unit::keV),
     isotope_(isotope)
 {
 }
@@ -85,7 +88,7 @@ void RIDecayChains::build()
   if (verbose_level_ >= 2) {
     std::cout << '\n'
               << "Decay chains for isotope "
-              << (boost::format("(%d,%d,%.1f)") % Z % A % (ExcitationEnergy/CLHEP::keV))
+              << (boost::format("(%d,%d,%.1f)") % Z % A % (ExcitationEnergy/unit::keV))
               << std::endl;
   }
 
@@ -121,13 +124,13 @@ void RIDecayChains::buildChain(const IsotopeInfo& parentIsotope, int depth)
 
   if (verbose_level_ >= 6) {
     std::cout << boost::format("buildChain(): depth = %d, ") % depth
-              << boost::format("isotope = (%d,%d,%.1f)") % ParentZ % ParentA % (ParentExcitationEnergy/CLHEP::keV)
+              << boost::format("isotope = (%d,%d,%.1f)") % ParentZ % ParentA % (ParentExcitationEnergy/unit::keV)
               << std::endl;
   }
 
   if (ParentA <= 4) {
     std::cout << "Skips this isotope as A <= 4. "
-              << boost::format("isotope = (%d,%d,%.1f)") % ParentZ % ParentA % (ParentExcitationEnergy/CLHEP::keV)
+              << boost::format("isotope = (%d,%d,%.1f)") % ParentZ % ParentA % (ParentExcitationEnergy/unit::keV)
               << std::endl;
     return;
   }
@@ -135,7 +138,7 @@ void RIDecayChains::buildChain(const IsotopeInfo& parentIsotope, int depth)
 #if STOP_DECAY_FOR_FLOATING_LEVEL
   if (parentIsotope.FloatingLevel() != 0) {
     std::cout << "This decay stops here for floating level. "
-              << boost::format("isotope = (%d,%d,%.1f)") % ParentZ % ParentA % (ParentExcitationEnergy/CLHEP::keV)
+              << boost::format("isotope = (%d,%d,%.1f)") % ParentZ % ParentA % (ParentExcitationEnergy/unit::keV)
               << '\n'
               << boost::format("floating level = %d") % parentIsotope.FloatingLevel()
               << std::endl;
@@ -164,7 +167,7 @@ void RIDecayChains::buildChain(const IsotopeInfo& parentIsotope, int depth)
   for (const RIDecayProperties& decayProperties: decayProducts) {
     if (verbose_level_ >= 7) {
       std::cout << boost::format("Product: depth = %d, ") % depth
-                << boost::format("isotope = (%d,%d,%.1f)") % (decayProperties.Isotope().Z()) % (decayProperties.Isotope().A()) % (decayProperties.Isotope().Energy()/CLHEP::keV)
+                << boost::format("isotope = (%d,%d,%.1f)") % (decayProperties.Isotope().Z()) % (decayProperties.Isotope().A()) % (decayProperties.Isotope().Energy()/unit::keV)
                 << std::endl;
     }
 
@@ -306,9 +309,9 @@ RIDecayChains::collectInternalTransitionProducts(const G4Ions* parent)
 
     if (verbose_level_>=8) {
       std::cout << boost::format("Transition in %3d %3d %12.6f : %3d [%12.6f] -> %3d [%12.6f] | floating = %d")
-        % parentZ % parentA % (parentE/CLHEP::keV)
-        % upperLevelIndex % (levelManager->LevelEnergy(upperLevelIndex)/CLHEP::keV)
-        % lowerLevelIndex % (levelManager->LevelEnergy(lowerLevelIndex)/CLHEP::keV)
+        % parentZ % parentA % (parentE/unit::keV)
+        % upperLevelIndex % (levelManager->LevelEnergy(upperLevelIndex)/unit::keV)
+        % lowerLevelIndex % (levelManager->LevelEnergy(lowerLevelIndex)/unit::keV)
         % levelManager->FloatingLevel(lowerLevelIndex) << std::endl;
     }
 
@@ -530,7 +533,7 @@ void RIDecayChains::solveChain(const BatemanSolution& solution,
       const double s = solution.getConvolution(i, interval.time1, interval.time2, t);
       if (verbose_level_ >= 6) {
         std::cout << boost::format("Solution for %14d = %.9e at t = %.9e from %.9e %.9e")
-          % chain[i].Isotope().IsotopeID() % s % (t/CLHEP::second) % (interval.time1/CLHEP::second) % (interval.time2/CLHEP::second) << std::endl;
+          % chain[i].Isotope().IsotopeID() % s % (t/unit::second) % (interval.time1/unit::second) % (interval.time2/unit::second) << std::endl;
       }
       sum += s * interval.rate;
     }
@@ -557,7 +560,7 @@ void RIDecayChains::solveChain(const BatemanSolution& solution,
       const double s = solution.getIntegralConvolution(i, interval.time1, interval.time2, t1, t2);
       if (verbose_level_ >= 6) {
         std::cout << boost::format("Solution for %14d = %.9e at t = %.9e %.9e from %.9e %.9e")
-          % chain[i].Isotope().IsotopeID() % s % (t1/CLHEP::second) % (t2/CLHEP::second) % (interval.time1/CLHEP::second) % (interval.time2/CLHEP::second) << std::endl;
+          % chain[i].Isotope().IsotopeID() % s % (t1/unit::second) % (t2/unit::second) % (interval.time1/unit::second) % (interval.time2/unit::second) << std::endl;
       }
       sum += s * interval.rate;
     }
@@ -636,10 +639,10 @@ void RIDecayChains::printChains() const
       std::cout <<
         boost::format("(%.3f,%.2e|%d,%d,%.1f,%d|%s)")
         % decay.BranchingRatio()
-        % (decay.DecayConstant()*CLHEP::second)
+        % (decay.DecayConstant()*unit::second)
         % decay.Isotope().Z()
         % decay.Isotope().A()
-        % (decay.Isotope().Energy()/CLHEP::keV)
+        % (decay.Isotope().Energy()/unit::keV)
         % decay.Isotope().FloatingLevel()
         % flags;
     }
