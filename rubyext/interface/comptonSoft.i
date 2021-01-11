@@ -174,6 +174,7 @@
 
 %}
 
+%include "decayChains.i"
 
 %import(module="anlnext/ANL") "anlnext/ruby/ANL.i"
 %import(module="anlgeant4/anlGeant4") "anlGeant4.i"

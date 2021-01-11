@@ -156,7 +156,7 @@ m.importModules = [
   {name: 'anlnext/ANL', file: 'anlnext/ruby/ANL.i'},
   {name: 'anlgeant4/anlGeant4', file: 'anlGeant4.i'},
 ]
-m.includeModules = []
+m.includeModules = ["decayChains.i"]
 
 if ARGV.include? '-l'
   m.print_class_list
