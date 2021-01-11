@@ -18,69 +18,64 @@
  *************************************************************************/
 
 /**
- * @file IsotopeInfo.hh
- * @brief header file of class IsotopeInfo
+ * @file TimeProfile.hh
+ * @brief header file of class TimeProfile
  * @author Hirokazu Odaka
  * @date 2016-05-04
  */
 
-#ifndef COMPTONSOFT_IsotopeInfo_H
-#define COMPTONSOFT_IsotopeInfo_H 1
+#ifndef COMPTONSOFT_TimeProfile_H
+#define COMPTONSOFT_TimeProfile_H 1
 
-#include <cstdint>
+#include <vector>
+#include <string>
 
-namespace comptonsoft {
+namespace comptonsoft
+{
 
-/**
- * Isotope class.
- *
- * @author Hirokazu Odaka
- * @date 2012-02-06
- * @date 2016-05-08
- * @date 2017-07-26 | add property floating level
- */
-class IsotopeInfo
+struct TimeInterval
+{
+  double time1;
+  double time2;
+  double rate;
+};
+
+class TimeProfile
 {
 public:
-  static int64_t makeID(int z, int a, double energy, int floating_level=0);
+  TimeProfile() = default;
+  ~TimeProfile();
+  TimeProfile(const TimeProfile&) = default;
+  TimeProfile(TimeProfile&&) = default;
+  TimeProfile& operator=(const TimeProfile&) = default;
+  TimeProfile& operator=(TimeProfile&&) = default;
 
-public:
-  IsotopeInfo();
-  explicit IsotopeInfo(int64_t isotopeID);
-  IsotopeInfo(int z, int a, double energy, int floating_level=0);
-  ~IsotopeInfo();
+  void clear()
+  {
+    time1_.clear();
+    time2_.clear();
+    rate_.clear();
+  }
+
+  void push(double t1, double t2, double rate)
+  {
+    time1_.push_back(t1);
+    time2_.push_back(t2);
+    rate_.push_back(rate);
+  }
   
-  IsotopeInfo(const IsotopeInfo&) = default;
-  IsotopeInfo(IsotopeInfo&&) = default;
-  IsotopeInfo& operator=(const IsotopeInfo&) = default;
-  IsotopeInfo& operator=(IsotopeInfo&&) = default;
+  bool readFile(const std::string& filename);
+
+  std::size_t NumberOfIntervals() const { return time1_.size(); }
+  TimeInterval getInterval(std::size_t i) const
+  { return TimeInterval{time1_[i], time2_[i], rate_[i]}; }
   
-  int Z() const { return Z_; }
-  int A() const { return A_; }
-  double Energy() const { return energy_; }
-  int FloatingLevel() const { return floating_level_; }
-  int Counts() const { return counts_; }
-  double Rate() const { return rate_; }
-
-  void setFloatingLevel(int v) { floating_level_ = v; }
-  
-  void setCounts(int v) { counts_ = v; }
-  void add1() { counts_++; }
-
-  void setRate(double v) { rate_ = v; }
-  void addRate(double v) { rate_ += v; }
-
-  int64_t IsotopeID() const;
-
 private:
-  int Z_;
-  int A_;
-  double energy_;
-  int floating_level_;
-  int counts_;
-  double rate_;
+  std::vector<double> time1_;
+  std::vector<double> time2_;
+  std::vector<double> rate_;
 };
 
 } /* namespace comptonsoft */
 
-#endif /* COMPTONSOFT_IsotopeInfo_H */
+#endif /* COMPTONSOFT_TimeProfile_H */

@@ -18,69 +18,58 @@
  *************************************************************************/
 
 /**
- * @file IsotopeInfo.hh
- * @brief header file of class IsotopeInfo
+ * @file RateData.hh
+ * @brief header file of class RateData
  * @author Hirokazu Odaka
  * @date 2016-05-04
  */
 
-#ifndef COMPTONSOFT_IsotopeInfo_H
-#define COMPTONSOFT_IsotopeInfo_H 1
+#ifndef COMPTONSOFT_RateData_H
+#define COMPTONSOFT_RateData_H 1
 
-#include <cstdint>
+#include <vector>
+#include <string>
+#include "IsotopeInfo.hh"
 
-namespace comptonsoft {
+namespace comptonsoft
+{
 
-/**
- * Isotope class.
- *
- * @author Hirokazu Odaka
- * @date 2012-02-06
- * @date 2016-05-08
- * @date 2017-07-26 | add property floating level
- */
-class IsotopeInfo
+using RateVector = std::vector<IsotopeInfo>;
+
+
+class RateData
 {
 public:
-  static int64_t makeID(int z, int a, double energy, int floating_level=0);
+  RateData() = default;
+  ~RateData();
+  RateData(const RateData&) = default;
+  RateData(RateData&&) = default;
+  RateData& operator=(const RateData&) = default;
+  RateData& operator=(RateData&&) = default;
 
-public:
-  IsotopeInfo();
-  explicit IsotopeInfo(int64_t isotopeID);
-  IsotopeInfo(int z, int a, double energy, int floating_level=0);
-  ~IsotopeInfo();
+  bool readFile(const std::string& filename);
+  bool writeFile(const std::string& filename);
+
+  void setCountThreshold(double v) { count_threshold_ = v; }
+  double CountThreshold() const { return count_threshold_; }
+
+  std::size_t NumberOfVolumes() const
+  { return data_.size(); }
+
+  std::string getVolumeName(std::size_t i) const
+  { return data_[i].first; }
+
+  RateVector getRateVector(std::size_t i) const
+  { return data_[i].second; }
+
+  void pushData(const std::string volumeName, const RateVector& rateVector)
+  { data_.push_back(std::make_pair(volumeName, rateVector)); }
   
-  IsotopeInfo(const IsotopeInfo&) = default;
-  IsotopeInfo(IsotopeInfo&&) = default;
-  IsotopeInfo& operator=(const IsotopeInfo&) = default;
-  IsotopeInfo& operator=(IsotopeInfo&&) = default;
-  
-  int Z() const { return Z_; }
-  int A() const { return A_; }
-  double Energy() const { return energy_; }
-  int FloatingLevel() const { return floating_level_; }
-  int Counts() const { return counts_; }
-  double Rate() const { return rate_; }
-
-  void setFloatingLevel(int v) { floating_level_ = v; }
-  
-  void setCounts(int v) { counts_ = v; }
-  void add1() { counts_++; }
-
-  void setRate(double v) { rate_ = v; }
-  void addRate(double v) { rate_ += v; }
-
-  int64_t IsotopeID() const;
-
 private:
-  int Z_;
-  int A_;
-  double energy_;
-  int floating_level_;
-  int counts_;
-  double rate_;
+  std::vector<std::pair<std::string, RateVector>> data_;
+  double count_threshold_ = 0.0;
 };
 
 } /* namespace comptonsoft */
 
-#endif /* COMPTONSOFT_IsotopeInfo_H */
+#endif /* COMPTONSOFT_RateData_H */
