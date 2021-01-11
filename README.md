@@ -1,7 +1,7 @@
 Compton Soft
 ================================================================
 
-- Version: 5.8.0
+- Version: 5.9.0
 - Author: Hirokazu Odaka
 
 ----
@@ -20,6 +20,10 @@ This software provides
 This software package can be used for wide-range applications of radiation
 measurements: X-/gamma-ray astrophysics, nuclear medicine, and imaging
 search for radioactive sources.
+
+### Version 5.9
+
+Simulation output format (hittree/eventtree) has changed since version 5.9. It has new branches: trackid and particle, which are useful to analyze detailed physical processes when the output format is set to raw hit mode.
 
 ### Version 5.5 (Important!)
 
@@ -99,11 +103,12 @@ Information
 
 ### Contributions
 
-- Shin Watanabe
-- Shin'ichiro Takeda
-- Tamotsu Sato
 - Yuto Ichinohe
+- Tamotsu Sato
+- Shin'ichiro Takeda
 - Tsubasa Tamba
+- Shin Watanabe
+- Hiroki Yoneda
 
 ### GitHub
 
@@ -115,6 +120,7 @@ Information
 
 ### History
 
+- 5.9 | 2021-01-12 | H. Odaka, T. Tamba, H. Yoneda | hittree format changed; new coded aperture imaging algorithm; new Compton reconstruction algorithm; radioactivation step 2
 - 5.3.8 | 2019-08-23 | H. Odaka, T. Tamba | data analysis of CMOS/CCD imagers (RC for 5.4)
 - 5.3 | 2017-08-28 | H. Odaka | migration to ANL Next 2.0
 - 5.2 | 2016-09-07 | H. Odaka | New design of XML database. Timing process.
