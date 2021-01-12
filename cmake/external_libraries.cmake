@@ -91,9 +91,8 @@ if(CS_USE_HSQUICKLOOK)
   message("-- HSQUICKLOOK_INC_DIR: ${HSQUICKLOOK_INC_DIR}")
   message("-- HSQUICKLOOK_LIB: ${HSQUICKLOOK_LIB}")
 
-  find_package(libmongocxx REQUIRED)
-  message("-- LIBMONGOCXX_INCLUDE_DIRS: ${LIBMONGOCXX_INCLUDE_DIRS}")
-  message("-- LIBMONGOCXX_LIBRARIES: ${LIBMONGOCXX_LIBRARIES}")
+  find_package(mongocxx REQUIRED)
+  set(MONGOCXX_LIB mongo::mongocxx_shared)
 endif(CS_USE_HSQUICKLOOK)
 
 ### Xerces-C ###

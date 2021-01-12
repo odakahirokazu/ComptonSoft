@@ -11,7 +11,6 @@ include_directories(
   ${G4_INC_DIR}
   ${CLHEP_INC_DIR}
   ${CFITSIO_INC_DIR}
-  ${LIBMONGOCXX_INCLUDE_DIRS}
   ${HSQUICKLOOK_INC_DIR}
   ${SIMX_INC_DIR}
   ${ADD_INC_DIR}
@@ -154,7 +153,7 @@ target_link_libraries(CSModules
   ${G4_LIB}
   ${CLHEP_LIB}
   ${CFITSIO_LIB}
-  ${LIBMONGOCXX_LIBRARIES}
+  ${MONGOCXX_LIB}
   ${HSQUICKLOOK_LIB}
   ${SIMX_LIB}
   ${ADD_LIB}
