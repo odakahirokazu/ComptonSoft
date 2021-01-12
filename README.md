@@ -97,9 +97,9 @@ Information
 
 ### Contact
 
-- Hirokazu Odaka 
-- KIPAC, Stanford University
-- hodaka(AT)stanford.edu
+- Hirokazu Odaka
+- Department of Physics, Faculty of Science, University of Tokyo
+- hirokazu.odaka(AT)phys.s.u-tokyo.ac.jp
 
 ### Contributions
 
@@ -108,6 +108,7 @@ Information
 - Shin'ichiro Takeda
 - Tsubasa Tamba
 - Shin Watanabe
+- Taihei Watanabe
 - Hiroki Yoneda
 
 ### GitHub
@@ -116,7 +117,8 @@ Information
 
 ### References (academic)
 
-- Odaka et al. (2010) NIM A, 624, 303
+- Odaka et al., "Development of an integrated response generator for Si/CdTe semiconductor Compton cameras", NIM-A, 624, 303, 2010
+- Odaka et al., "Modeling of proton-induced radioactivation background in hard X-ray telescopes: Geant4-based simulation and its demonstration by Hitomi's measurement in a low Earth orbit", NIM-A, 891, 92, 2018
 
 ### History
 
