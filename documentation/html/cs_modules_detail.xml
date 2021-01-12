@@ -766,12 +766,12 @@
         <description>Maximum angle between the primary direction and the center direction.</description>
       </param>
       <param container_type=''>
-        <name>flux</name>
+        <name>intensity</name>
         <type>double</type>
         <unit>erg/cm2/s/sr</unit>
         <default_value>1e-09</default_value>
         <description>
-          Energy flux of the primaries. This parameter is used only for
+          Energy intensity of the primaries. This parameter is used only for
           calculating real time correspoing to a simulation.
         </description>
       </param>
@@ -1880,7 +1880,7 @@
   </module>
   <module>
     <name>ApplyEPICompensation</name>
-    <version>3.0</version>
+    <version>3.1</version>
     <text></text>
     <parameters/>
   </module>
@@ -1921,7 +1921,7 @@
   </module>
   <module>
     <name>EventReconstruction</name>
-    <version>2.1</version>
+    <version>3.0</version>
     <text></text>
     <parameters>
       <param container_type=''>
@@ -1957,6 +1957,13 @@
         <type>3-vector</type>
         <unit>cm</unit>
         <default_value>0 0 0</default_value>
+        <description></description>
+      </param>
+      <param container_type=''>
+        <name>parameter_file</name>
+        <type>string</type>
+        <unit></unit>
+        <default_value></default_value>
         <description></description>
       </param>
     </parameters>
@@ -2270,7 +2277,7 @@
   </module>
   <module>
     <name>RecalculateSimulationNoise</name>
-    <version>2.1</version>
+    <version>3.0</version>
     <text></text>
     <parameters/>
   </module>
@@ -3294,12 +3301,12 @@
         <description>Maximum angle between the primary direction and the center direction.</description>
       </param>
       <param container_type=''>
-        <name>flux</name>
+        <name>intensity</name>
         <type>double</type>
         <unit>erg/cm2/s/sr</unit>
         <default_value>1e-09</default_value>
         <description>
-          Energy flux of the primaries. This parameter is used only for
+          Energy intensity of the primaries. This parameter is used only for
           calculating real time correspoing to a simulation.
         </description>
       </param>
