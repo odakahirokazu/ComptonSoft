@@ -2,6 +2,7 @@
 set(TARGET_EXT_LIBRARY comptonSoft)
 set(EXT_LIB_INSTALL_DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/ruby/comptonsoft)
 set(SWIG_IF_FILE interface/${TARGET_EXT_LIBRARY}.i)
+set(ADDITIONAL_SWIG_IF_FILE interface/decayChains.i)
 set(CLASS_LIST_FILE interface/class_list_${TARGET_EXT_LIBRARY}.hh)
 set(RUBY_EXT_INCLUDE_DIRS
   ../source/core/include
@@ -57,7 +58,7 @@ add_definitions(${cxx_definitions})
 ########################################################
 include(CreateSwigRuby)
 
-install(FILES ${SWIG_IF_FILE} ${CLASS_LIST_FILE}
+install(FILES ${SWIG_IF_FILE} ${ADDITIONAL_SWIG_IF_FILE} ${CLASS_LIST_FILE}
   DESTINATION ${CMAKE_INSTALL_PREFIX}/include/comptonsoft/ruby)
 
 ########################################################
