@@ -89,8 +89,8 @@ Documentation
 
 - [Installation](documentation/installation.md)
 - [Data format](documentation/data_format.md)
-- [Class library references](http://odakahirokazu.github.io/ComptonSoft/documentation/html/doxygen/index.html)
-- [ANL module references](http://odakahirokazu.github.io/ComptonSoft/documentation/html/cs_modules.xml)
+- [Class library references](http://odakahirokazu.github.io/ComptonSoft/doxygen/)
+- [ANL module references](http://odakahirokazu.github.io/ComptonSoft/cs_modules.xml)
 
 Information
 ----------------------------------------------------------------
