@@ -282,8 +282,8 @@ void CelestialSourcePrimaryGen::inputImage(std::string filename, image_t& image,
   }
 
   int i = 0;
-  for (int ix=0; ix<naxes[0]; ix++) {
-    for (int iy=0; iy<naxes[1]; iy++) {
+  for (int iy=0; iy<naxes[1]; iy++) {
+    for (int ix=0; ix<naxes[0]; ix++) {
       image[ix][iy] = array[i];
       i++;
     }
@@ -316,8 +316,6 @@ void CelestialSourcePrimaryGen::makePolarizationMap(ANLStatus* status)
       const double U = imageU_[ix][iy];
       if (I*I+eps<Q*Q+U*U) {
         *status = AS_QUIT_ERROR;
-        std::cout << "x=" << ix << " y=" << iy << std::endl;
-        std::cout << "I=" << I << " Q=" << Q << " U=" << U << std::endl;
         return;
       }
       if (I==0.0) continue;
@@ -409,9 +407,9 @@ std::pair<int, int> CelestialSourcePrimaryGen::samplePixel()
   std::pair<int, int> p;
   const double r = G4UniformRand();
   const std::vector<double>::const_iterator it = std::upper_bound(pixelIntegral_.begin(), pixelIntegral_.end(), r);
-  const int r0 = it - pixelIntegral_.begin();
-  p.first = r0%pixelX_;
-  p.second = r0/pixelX_;
+  const int r0 = it - pixelIntegral_.begin() - 1;
+  p.first = r0/pixelY_;
+  p.second = r0%pixelY_;
   return p;
 }
 
