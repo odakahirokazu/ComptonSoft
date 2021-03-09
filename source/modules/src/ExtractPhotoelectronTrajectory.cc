@@ -48,6 +48,7 @@ ANLStatus ExtractPhotoelectronTrajectory::mod_define()
   define_parameter("weight_min", &mod_class::weightMin_);
   define_parameter("pixel_threshold", &mod_class::pixelThreshold_, unit::keV, "keV");
   define_parameter("random_center", &mod_class::randomCenter_);
+  define_parameter("diffusion_sigma", &mod_class::diffusionSigma_, unit::cm, "cm");
 
   return AS_OK;
 }
@@ -107,7 +108,19 @@ ANLStatus ExtractPhotoelectronTrajectory::mod_analyze()
     for (const auto& hit: hits) {
       const vector3_t position = hit->RealPosition()-center;
       const double energy = hit->EnergyDeposit();
-      image.Fill(position.x()/unit::cm, position.y()/unit::cm, energy/unit::keV);
+      if (diffusionSigma_==0.0) {
+        image.Fill(position.x()/unit::cm, position.y()/unit::cm, energy/unit::keV);
+      }
+      else {
+        std::normal_distribution<> diffusionDist(0.0, diffusionSigma_);
+        const int numSplits = 1000;
+        const double energySplit = energy/numSplits;
+        for (int i=0; i<numSplits; i++) {
+          const double diffusionX = diffusionDist(*randomEngine_);
+          const double diffusionY = diffusionDist(*randomEngine_);
+          image.Fill((position.x()+diffusionX)/unit::cm, (position.y()+diffusionY)/unit::cm, energySplit/unit::keV);
+        }
+      }
     }
 
     copyImage(&image);

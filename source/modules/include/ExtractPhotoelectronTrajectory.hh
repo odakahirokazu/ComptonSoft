@@ -72,6 +72,7 @@ private:
   int weightMin_ = 0;
   double pixelThreshold_ = 0.0;
   bool randomCenter_ = false;
+  double diffusionSigma_ = 0.0;
 
   std::unique_ptr<std::mt19937> randomEngine_;
 };
