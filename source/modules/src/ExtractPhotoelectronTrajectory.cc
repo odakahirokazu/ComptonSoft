@@ -36,7 +36,8 @@ namespace comptonsoft
 
 ExtractPhotoelectronTrajectory::ExtractPhotoelectronTrajectory()
   : pixelNumber_(64), pixelSize_(0.25*unit::um),
-    weightMin_(2), pixelThreshold_(1.0*unit::eV)
+    weightMin_(2), pixelThreshold_(1.0*unit::eV),
+    randomEngine_(new std::mt19937)
 {
 }
 
@@ -46,6 +47,7 @@ ANLStatus ExtractPhotoelectronTrajectory::mod_define()
   define_parameter("pixel_size", &mod_class::pixelSize_, unit::cm, "cm");
   define_parameter("weight_min", &mod_class::weightMin_);
   define_parameter("pixel_threshold", &mod_class::pixelThreshold_, unit::keV, "keV");
+  define_parameter("random_center", &mod_class::randomCenter_);
 
   return AS_OK;
 }
@@ -81,7 +83,14 @@ ANLStatus ExtractPhotoelectronTrajectory::mod_analyze()
     return AS_SKIP;
   }
 
-  const vector3_t center = initialInfo_->InitialPosition();
+  vector3_t center = initialInfo_->InitialPosition();
+  if (randomCenter_) {
+    std::uniform_real_distribution<> centerDistribution(-0.5*pixelSize_, +0.5*pixelSize_);
+    const double shiftX = centerDistribution(*randomEngine_);
+    const double shiftY = centerDistribution(*randomEngine_);
+    center += vector3_t(shiftX, shiftY, 0.0);
+  }
+
   const std::vector<DetectorHit_sptr>& hits = hitCollection_->getHits(0);
   if (hits.size() >= 2) {
     const vector3_t hit0Position = hits[0]->RealPosition();

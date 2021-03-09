@@ -22,6 +22,7 @@
 
 #include "VCSModule.hh"
 #include <memory>
+#include <random>
 #include <boost/multi_array.hpp>
 
 class TTree;
@@ -70,6 +71,9 @@ private:
   double pixelSize_ = 0.0;
   int weightMin_ = 0;
   double pixelThreshold_ = 0.0;
+  bool randomCenter_ = false;
+
+  std::unique_ptr<std::mt19937> randomEngine_;
 };
 
 } /* namespace comptonsoft */
