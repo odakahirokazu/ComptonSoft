@@ -84,7 +84,6 @@ a1.count_rate = count_rate
 a1.time_start = time_start
 a1.run(:all, 100000)
 
-
 a2 = DefineFrames.new
 a2.inputs = [a1.output]
 a2.output = "#{filename_base}_frame.root"
@@ -92,9 +91,7 @@ a2.time_start = time_start
 a2.frame_exposure = frame_exposure
 a2.run(:all, 100000)
 
-
 a3 = AnalyzeFrameData.new
 a3.inputs = [a2.output]
 a3.output = "#{filename_base}_xetree.root"
 a3.run(:all, 1000)
-

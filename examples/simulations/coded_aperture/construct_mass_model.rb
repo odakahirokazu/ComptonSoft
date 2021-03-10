@@ -4,12 +4,12 @@ require "rexml/document"
 
 def read_aperture_pattern(filename)
   arr = []
-  File.open(filename, mode="rt") {|f|
-    f.each_line {|line|
+  File.open(filename, mode="rt") do |f|
+    f.each_line do |line|
       s = line.strip.split(/\s/).map!(&:to_i)
       arr << s
-    }
-  }
+    end
+  end
   return arr
 end
 
@@ -59,7 +59,7 @@ def make_gdml_file(output_file, aperture_pattern_file, aperture_element_size)
   doc = REXML::Document.new(File.new("database/mass_model_base.gdml"))
   doc_mask = REXML::Document.new(File.new("database/mass_model_base_mask.gdml"))
   doc_world = REXML::Document.new(File.new("database/mass_model_base_world.gdml"))
-  
+
   aperture_pattern = read_aperture_pattern(aperture_pattern_file)
 
   structure = doc.elements["gdml/structure"]
