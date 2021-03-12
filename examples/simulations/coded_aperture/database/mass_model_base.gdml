@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<gdml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://service-spi.web.cern.ch/service-spi/app/releases/GDML/schema/gdml.xsd">
+<define />
+<materials>
+  <material Z="1" name="Vacuum" state="gas">
+    <D unit="g/cm3" value="1e-12" />
+    <atom unit="g/mole" value="1"/>
+  </material>
+  <material Z="14" name="Si" state="solid">
+    <D unit="g/cm3" value="2.33" />
+    <atom unit="g/mole" value="28"/>
+  </material>
+  <element Z="7" formula="N" name="Nitrogen" >
+    <atom value="14.01" />
+  </element>
+  <element Z="8" formula="O" name="Oxygen" >
+    <atom value="16" />
+  </element>
+  <material formula=" " name="Air" >
+    <D unit="g/cm3" value="0.001293" />
+    <fraction n="0.8" ref="Nitrogen" />
+    <fraction n="0.2" ref="Oxygen" />
+  </material>
+  <material Z="74" name="W" state="solid">
+    <D unit="g/cm3" value="19.25" />
+    <atom unit="g/mole" value="183.84"/>
+  </material>
+</materials>
+
+<solids>
+  <box lunit="mm" name="Si.box" x="2.48" y="2.48" z="1.0" />
+  <box lunit="mm" name="World.box" x="2000.0" y="2000.0" z="2000.0" />
+  <box lunit="mm" name="Mask.box" x="10.0" y="10.0" z="0.1"/>
+  <eltube lunit="mm" name="Hole.eltube" dx="0.040" dy="0.040" dz="0.1" />
+</solids>
+
+<structure>
+  <volume name="SiDetector.log">
+    <materialref ref="Si" />
+    <solidref ref="Si.box" />
+  </volume>
+  
+  <volume name="Hole.log">
+    <materialref ref="Vacuum" />
+    <solidref ref="Hole.eltube" />
+  </volume>
+  
+</structure>
+
+<setup name="Default" version="1.0">
+  <world ref="World.log" />
+</setup>
+</gdml>

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+
+<volume name="World.log">
+  <materialref ref="Vacuum" />
+  <solidref ref="World.box" />
+  <physvol name="SiDetector">
+    <volumeref ref="SiDetector.log" />
+    <position name="SiDetector.pos" unit="mm" x="0.0" y="0.0" z="-0.5" />
+  </physvol>
+  <physvol name="Mask">
+    <volumeref ref="Mask.log" />
+    <position name="Mask.pos" unit="mm" x="0.0" y="0.0" z="223.0" />
+  </physvol>
+</volume>
+
