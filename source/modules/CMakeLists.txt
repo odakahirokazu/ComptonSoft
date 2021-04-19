@@ -63,6 +63,7 @@ set(CS_MODULES
   src/LoadRootFrame.cc
   src/DetectBadFrames.cc
   src/SetBadFrames.cc
+  src/SetDynamicPedestals.cc
   src/SetPedestalsByMedian.cc
   src/HistogramFramePedestal.cc
   src/HistogramXrayEventSpectrum.cc

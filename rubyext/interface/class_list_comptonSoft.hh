@@ -78,6 +78,7 @@ class AnalyzeDarkFrame;
 class LoadRootFrame;
 class DetectBadFrames;
 class SetBadFrames;
+class SetDynamicPedestals;
 class SetPedestalsByMedian;
 class HistogramFramePedestal;
 class HistogramXrayEventSpectrum;

@@ -87,6 +87,7 @@
 #include "LoadRootFrame.hh"
 #include "DetectBadFrames.hh"
 #include "SetBadFrames.hh"
+#include "SetDynamicPedestals.hh"
 #include "SetPedestalsByMedian.hh"
 #include "HistogramFramePedestal.hh"
 #include "HistogramXrayEventSpectrum.hh"
@@ -818,6 +819,11 @@ public:
   SetBadFrames();
 };
 
+class SetDynamicPedestals : public VCSModule
+{
+public:
+  SetDynamicPedestals();
+};
 
 class SetPedestalsByMedian : public VCSModule
 {
