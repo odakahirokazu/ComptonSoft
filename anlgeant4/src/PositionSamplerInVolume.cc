@@ -160,7 +160,7 @@ G4ThreeVector PositionSamplerInVolume::samplePosition()
     goto position_sampling_start;
   }
   
-  for (G4int i=0; i<logvol->GetNoDaughters(); i++) {
+  for (std::size_t i=0; i<logvol->GetNoDaughters(); i++) {
     G4VPhysicalVolume* daughter = logvol->GetDaughter(i);
     G4ThreeVector posInDaughter = position;
     posInDaughter += daughter->GetFrameTranslation();
