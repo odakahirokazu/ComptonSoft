@@ -77,7 +77,7 @@ protected:
                        bool is_escape_event);
 
   void normalizeReconstructionFraction(std::vector<BasicComptonEvent_sptr>& eventsReconstructed);
-  void extractOnlyMLorder(std::vector<BasicComptonEvent_sptr>& eventsReconstructed);
+  void selectMaximumLikelihoodOrder(std::vector<BasicComptonEvent_sptr>& eventsReconstructed);
 
 private:
   void setTotalEnergyDepositsAndNumHits(const std::vector<DetectorHit_sptr>& hits);
@@ -121,7 +121,7 @@ private:
   TGraph* tg_cross_section_pair_;
   TGraph* tg_cross_section_tot_;
 
-  bool do_extract_only_maximumlikelihood_order = true;
+  bool selecting_maximum_likelihood_order_ = true;
 };
 
 } /* namespace comptonsoft */

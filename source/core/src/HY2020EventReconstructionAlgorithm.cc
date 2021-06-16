@@ -128,8 +128,8 @@ reconstruct(const std::vector<DetectorHit_sptr>& hits,
 
   if (result == true) {
     normalizeReconstructionFraction(eventsReconstructed);
-    if(do_extract_only_maximumlikelihood_order){
-        extractOnlyMLorder(eventsReconstructed);
+    if (selecting_maximum_likelihood_order_) {
+      selectMaximumLikelihoodOrder(eventsReconstructed);
     }
     return true;
   }
@@ -343,19 +343,17 @@ void HY2020EventReconstructionAlgorithm::normalizeReconstructionFraction(std::ve
   }
 }
 
-void HY2020EventReconstructionAlgorithm::extractOnlyMLorder(std::vector<BasicComptonEvent_sptr>& eventsReconstructed)
+void HY2020EventReconstructionAlgorithm::selectMaximumLikelihoodOrder(std::vector<BasicComptonEvent_sptr>& eventsReconstructed)
 {
-  std::size_t index_MLorder = 0;
-  double value_ML = 0;
-  for (std::size_t i = 0; i < eventsReconstructed.size(); ++i) {
-      double this_likelihood = eventsReconstructed[i]->Likelihood();
-      if(this_likelihood > value_ML){
-        value_ML = this_likelihood;
-        index_MLorder = i;
-      }
-  }
-  eventsReconstructed.erase(eventsReconstructed.begin() + index_MLorder + 1, eventsReconstructed.end());
-  eventsReconstructed.erase(eventsReconstructed.begin(), eventsReconstructed.begin() + index_MLorder);
+  using event_t = BasicComptonEvent_sptr;
+  const event_t event_yielding_maximum_likelihood =
+    *std::max_element(eventsReconstructed.begin(),
+                      eventsReconstructed.end(),
+                      [](const event_t& a, const event_t& b) {
+                        return a->Likelihood() < b->Likelihood();
+                      });
+  eventsReconstructed.clear();
+  eventsReconstructed.push_back(event_yielding_maximum_likelihood);
 }
 
 double HY2020EventReconstructionAlgorithm::getEnergyResolution(double energy)
