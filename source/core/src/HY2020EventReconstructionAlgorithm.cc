@@ -128,6 +128,9 @@ reconstruct(const std::vector<DetectorHit_sptr>& hits,
 
   if (result == true) {
     normalizeReconstructionFraction(eventsReconstructed);
+    if (selecting_maximum_likelihood_order_) {
+      selectMaximumLikelihoodOrder(eventsReconstructed);
+    }
     return true;
   }
   return false;
@@ -338,6 +341,19 @@ void HY2020EventReconstructionAlgorithm::normalizeReconstructionFraction(std::ve
   for (std::size_t i = 0; i < eventsReconstructed.size(); ++i) {
     eventsReconstructed[i]->setReconstructionFraction(eventsReconstructed[i]->ReconstructionFraction() / sum_reconstruction_fraction);
   }
+}
+
+void HY2020EventReconstructionAlgorithm::selectMaximumLikelihoodOrder(std::vector<BasicComptonEvent_sptr>& eventsReconstructed)
+{
+  using event_t = BasicComptonEvent_sptr;
+  const event_t event_yielding_maximum_likelihood =
+    *std::max_element(eventsReconstructed.begin(),
+                      eventsReconstructed.end(),
+                      [](const event_t& a, const event_t& b) {
+                        return a->Likelihood() < b->Likelihood();
+                      });
+  eventsReconstructed.clear();
+  eventsReconstructed.push_back(event_yielding_maximum_likelihood);
 }
 
 double HY2020EventReconstructionAlgorithm::getEnergyResolution(double energy)
