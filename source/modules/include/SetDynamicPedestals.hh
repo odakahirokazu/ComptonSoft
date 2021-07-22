@@ -17,27 +17,46 @@
  *                                                                       *
  *************************************************************************/
 
-#ifndef COMPTONSOFT_CSTypes_H
-#define COMPTONSOFT_CSTypes_H 1
+/**
+ * SetDynamicPedestals.
+ *
+ * @author Taihei Watanabe
+ * @date 2021-04-02
+ */
 
-#include <tuple>
+#ifndef COMPTONSOFT_SetDynamicPedestals_H
+#define COMPTONSOFT_SetDynamicPedestals_H 1
+
+#include "VCSModule.hh"
+#include <deque>
 #include <boost/multi_array.hpp>
-#include <CLHEP/Vector/TwoVector.h>
-#include <CLHEP/Vector/ThreeVector.h>
-#include <CLHEP/Vector/LorentzVector.h>
+#include "CSTypes.hh"
 
 namespace comptonsoft {
 
-typedef CLHEP::Hep2Vector vector2_t;
-typedef CLHEP::Hep3Vector vector3_t;
-typedef CLHEP::HepLorentzVector vector4_t;
+class SetDynamicPedestals : public VCSModule
+{
+  DEFINE_ANL_MODULE(SetDynamicPedestals, 1.1);
+  // ENABLE_PARALLEL_RUN();
+public:
+  SetDynamicPedestals();
+  
+public:
+  anlnext::ANLStatus mod_define() override;
+  anlnext::ANLStatus mod_initialize() override;
+  anlnext::ANLStatus mod_begin_run() override;
+  anlnext::ANLStatus mod_analyze() override;
 
-enum class ElectrodeSide { Undefined, Anode, Cathode };
-
-enum class DetectorType : int { PixelDetector=1, DoubleSidedStripDetector=2, Scintillator=3 };
-
-using image_t = boost::multi_array<double, 2>;
+private:
+  int detectorID_ = 0;
+  int frameStoreCapacity_ = 1;
+  std::deque<image_t> frameStore_;
+  image_t frameSum_;
+  int nx_ = 1;
+  int ny_ = 1;
+  FrameData* frameData_ = nullptr;
+};
 
 } /* namespace comptonsoft */
 
-#endif /* COMPTONSOFT_CSTypes_H */
+#endif /* COMPTONSOFT_SetDynamicPedestals_H */

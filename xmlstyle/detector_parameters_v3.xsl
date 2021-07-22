@@ -186,14 +186,14 @@
       <tr>
         <th colspan="3"></th>
         <th></th>
-        <th colspan="20">Sensor device simulation</th>
+        <th colspan="26">Sensor device simulation</th>
         <xsl:choose>
           <xsl:when test="$detector_type='2DStrip'">
-            <th colspan="19">Channel properties (cathode)</th>
-            <th colspan="19">Channel properties (anode)</th>
+            <th colspan="13">Channel properties (cathode)</th>
+            <th colspan="13">Channel properties (anode)</th>
           </xsl:when>
           <xsl:otherwise>
-            <th colspan="19">Channel properties</th>
+            <th colspan="13">Channel properties</th>
           </xsl:otherwise>
         </xsl:choose>
         <xsl:choose>
@@ -288,6 +288,11 @@
             <th>param1</th>
             <th>param2</th>
             <th>factor</th>
+            <th>value</th>
+            <th>c0</th>
+            <th>c1</th>
+            <th>c2</th>
+            <th>c3</th>
             <th>value</th>
             <th>status</th>
             <th>center</th>

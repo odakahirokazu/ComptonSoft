@@ -28,8 +28,6 @@
 namespace comptonsoft
 {
 
-using image_t = boost::multi_array<double, 2>;
-
 /**
  * A class of an X-ray event measured with a pixel detector.
  *

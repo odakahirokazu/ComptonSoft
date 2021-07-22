@@ -85,6 +85,7 @@ clMod = [
   ANL::SWIGClass.new("LoadRootFrame"),
   ANL::SWIGClass.new("DetectBadFrames"),
   ANL::SWIGClass.new("SetBadFrames"),
+  ANL::SWIGClass.new("SetDynamicPedestals"),
   ANL::SWIGClass.new("SetPedestalsByMedian"),
   ANL::SWIGClass.new("HistogramFramePedestal"),
   ANL::SWIGClass.new("HistogramXrayEventSpectrum"),
