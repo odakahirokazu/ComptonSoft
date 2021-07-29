@@ -70,6 +70,7 @@
 #endif
 #include "FillFrame.hh"
 #include "LoadFrame.hh"
+#include "LoadReductedFrame.hh"
 #include "XrayEventCollection.hh"
 #include "XrayEventSelection.hh"
 #include "AnalyzeFrame.hh"
@@ -717,6 +718,11 @@ public:
   LoadFrame();
 };
 
+class LoadReductedFrame : public anlnext::BasicModule
+{
+public:
+  LoadReductedFrame();
+};
 
 class XrayEventCollection : public anlnext::BasicModule
 {

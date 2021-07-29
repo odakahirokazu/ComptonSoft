@@ -65,6 +65,7 @@ class ConstructFrame;
 class ConstructSXIFrame;
 class FillFrame;
 class LoadFrame;
+class LoadReductedFrame;
 class XrayEventCollection;
 class XrayEventSelection;
 class AnalyzeFrame;
