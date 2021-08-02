@@ -17,8 +17,8 @@ def set_position(aperture_pattern, aperture_element_size)
   num_aperture_x = aperture_pattern.size()
   num_aperture_y = aperture_pattern[0].size()
   arr = []
-  x0 = aperture_element_size*num_aperture_x*0.5
-  y0 = aperture_element_size*num_aperture_y*0.5
+  x0 = aperture_element_size*(num_aperture_x-1.0)*0.5
+  y0 = aperture_element_size*(num_aperture_y-1.0)*0.5
   aperture_pattern.each_with_index do |line, i|
     now = []
     line.each_with_index do |val, j|

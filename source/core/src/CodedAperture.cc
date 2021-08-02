@@ -166,7 +166,7 @@ void CodedAperture::decode_based_on_sky_coordinate()
             vector2_t sky_angle = SkyAngle(sky_id, rand);
             vector2_t detected_angle = SkyAngleToDetectedAngle(sky_angle);
             vector2_t v1 = DetectorPosition(detector_id, rand);
-            vector2_t v2 = vector2_t(std::tan(dist*detected_angle.x()), std::tan(dist*detected_angle.y()));
+            vector2_t v2 = vector2_t(dist*std::tan(detected_angle.x()), dist*std::tan(detected_angle.y()));
             vector2_t v3 = v1 + v2;
             vector2_t aperture_pos = DetectorToAperture(v3);
             CodedAperture::ID aperture_id = ApertureID(aperture_pos);

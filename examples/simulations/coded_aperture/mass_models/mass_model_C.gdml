@@ -46,1927 +46,1927 @@
       <solidref ref='Mask.box'/>
       <physvol name='Hole_0_0'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_0_0.pos' unit='mm' x='1.24' y='-1.24' z='0.0'/>
+        <position name='Hole_0_0.pos' unit='mm' x='1.2' y='-1.2' z='0.0'/>
       </physvol>
       <physvol name='Hole_0_2'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_0_2.pos' unit='mm' x='1.24' y='-1.08' z='0.0'/>
+        <position name='Hole_0_2.pos' unit='mm' x='1.2' y='-1.04' z='0.0'/>
       </physvol>
       <physvol name='Hole_0_3'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_0_3.pos' unit='mm' x='1.24' y='-1.0' z='0.0'/>
+        <position name='Hole_0_3.pos' unit='mm' x='1.2' y='-0.96' z='0.0'/>
       </physvol>
       <physvol name='Hole_0_4'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_0_4.pos' unit='mm' x='1.24' y='-0.9199999999999999' z='0.0'/>
+        <position name='Hole_0_4.pos' unit='mm' x='1.2' y='-0.8799999999999999' z='0.0'/>
       </physvol>
       <physvol name='Hole_0_5'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_0_5.pos' unit='mm' x='1.24' y='-0.84' z='0.0'/>
+        <position name='Hole_0_5.pos' unit='mm' x='1.2' y='-0.7999999999999999' z='0.0'/>
       </physvol>
       <physvol name='Hole_0_6'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_0_6.pos' unit='mm' x='1.24' y='-0.76' z='0.0'/>
+        <position name='Hole_0_6.pos' unit='mm' x='1.2' y='-0.72' z='0.0'/>
       </physvol>
       <physvol name='Hole_0_9'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_0_9.pos' unit='mm' x='1.24' y='-0.52' z='0.0'/>
+        <position name='Hole_0_9.pos' unit='mm' x='1.2' y='-0.48' z='0.0'/>
       </physvol>
       <physvol name='Hole_0_10'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_0_10.pos' unit='mm' x='1.24' y='-0.43999999999999995' z='0.0'/>
+        <position name='Hole_0_10.pos' unit='mm' x='1.2' y='-0.3999999999999999' z='0.0'/>
       </physvol>
       <physvol name='Hole_0_12'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_0_12.pos' unit='mm' x='1.24' y='-0.28' z='0.0'/>
+        <position name='Hole_0_12.pos' unit='mm' x='1.2' y='-0.24' z='0.0'/>
       </physvol>
       <physvol name='Hole_0_13'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_0_13.pos' unit='mm' x='1.24' y='-0.19999999999999996' z='0.0'/>
+        <position name='Hole_0_13.pos' unit='mm' x='1.2' y='-0.15999999999999992' z='0.0'/>
       </physvol>
       <physvol name='Hole_0_16'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_0_16.pos' unit='mm' x='1.24' y='0.040000000000000036' z='0.0'/>
+        <position name='Hole_0_16.pos' unit='mm' x='1.2' y='0.08000000000000007' z='0.0'/>
       </physvol>
       <physvol name='Hole_0_20'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_0_20.pos' unit='mm' x='1.24' y='0.3600000000000001' z='0.0'/>
+        <position name='Hole_0_20.pos' unit='mm' x='1.2' y='0.40000000000000013' z='0.0'/>
       </physvol>
       <physvol name='Hole_0_21'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_0_21.pos' unit='mm' x='1.24' y='0.43999999999999995' z='0.0'/>
+        <position name='Hole_0_21.pos' unit='mm' x='1.2' y='0.48' z='0.0'/>
       </physvol>
       <physvol name='Hole_0_22'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_0_22.pos' unit='mm' x='1.24' y='0.52' z='0.0'/>
+        <position name='Hole_0_22.pos' unit='mm' x='1.2' y='0.56' z='0.0'/>
       </physvol>
       <physvol name='Hole_0_24'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_0_24.pos' unit='mm' x='1.24' y='0.6799999999999999' z='0.0'/>
+        <position name='Hole_0_24.pos' unit='mm' x='1.2' y='0.72' z='0.0'/>
       </physvol>
       <physvol name='Hole_0_25'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_0_25.pos' unit='mm' x='1.24' y='0.76' z='0.0'/>
+        <position name='Hole_0_25.pos' unit='mm' x='1.2' y='0.8' z='0.0'/>
       </physvol>
       <physvol name='Hole_0_28'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_0_28.pos' unit='mm' x='1.24' y='1.0000000000000002' z='0.0'/>
+        <position name='Hole_0_28.pos' unit='mm' x='1.2' y='1.0400000000000003' z='0.0'/>
       </physvol>
       <physvol name='Hole_1_0'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_1_0.pos' unit='mm' x='1.16' y='-1.24' z='0.0'/>
+        <position name='Hole_1_0.pos' unit='mm' x='1.1199999999999999' y='-1.2' z='0.0'/>
       </physvol>
       <physvol name='Hole_1_1'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_1_1.pos' unit='mm' x='1.16' y='-1.16' z='0.0'/>
+        <position name='Hole_1_1.pos' unit='mm' x='1.1199999999999999' y='-1.1199999999999999' z='0.0'/>
       </physvol>
       <physvol name='Hole_1_3'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_1_3.pos' unit='mm' x='1.16' y='-1.0' z='0.0'/>
+        <position name='Hole_1_3.pos' unit='mm' x='1.1199999999999999' y='-0.96' z='0.0'/>
       </physvol>
       <physvol name='Hole_1_4'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_1_4.pos' unit='mm' x='1.16' y='-0.9199999999999999' z='0.0'/>
+        <position name='Hole_1_4.pos' unit='mm' x='1.1199999999999999' y='-0.8799999999999999' z='0.0'/>
       </physvol>
       <physvol name='Hole_1_5'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_1_5.pos' unit='mm' x='1.16' y='-0.84' z='0.0'/>
+        <position name='Hole_1_5.pos' unit='mm' x='1.1199999999999999' y='-0.7999999999999999' z='0.0'/>
       </physvol>
       <physvol name='Hole_1_6'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_1_6.pos' unit='mm' x='1.16' y='-0.76' z='0.0'/>
+        <position name='Hole_1_6.pos' unit='mm' x='1.1199999999999999' y='-0.72' z='0.0'/>
       </physvol>
       <physvol name='Hole_1_7'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_1_7.pos' unit='mm' x='1.16' y='-0.6799999999999999' z='0.0'/>
+        <position name='Hole_1_7.pos' unit='mm' x='1.1199999999999999' y='-0.6399999999999999' z='0.0'/>
       </physvol>
       <physvol name='Hole_1_10'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_1_10.pos' unit='mm' x='1.16' y='-0.43999999999999995' z='0.0'/>
+        <position name='Hole_1_10.pos' unit='mm' x='1.1199999999999999' y='-0.3999999999999999' z='0.0'/>
       </physvol>
       <physvol name='Hole_1_11'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_1_11.pos' unit='mm' x='1.16' y='-0.36' z='0.0'/>
+        <position name='Hole_1_11.pos' unit='mm' x='1.1199999999999999' y='-0.31999999999999995' z='0.0'/>
       </physvol>
       <physvol name='Hole_1_12'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_1_12.pos' unit='mm' x='1.16' y='-0.28' z='0.0'/>
+        <position name='Hole_1_12.pos' unit='mm' x='1.1199999999999999' y='-0.24' z='0.0'/>
       </physvol>
       <physvol name='Hole_1_13'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_1_13.pos' unit='mm' x='1.16' y='-0.19999999999999996' z='0.0'/>
+        <position name='Hole_1_13.pos' unit='mm' x='1.1199999999999999' y='-0.15999999999999992' z='0.0'/>
       </physvol>
       <physvol name='Hole_1_16'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_1_16.pos' unit='mm' x='1.16' y='0.040000000000000036' z='0.0'/>
+        <position name='Hole_1_16.pos' unit='mm' x='1.1199999999999999' y='0.08000000000000007' z='0.0'/>
       </physvol>
       <physvol name='Hole_1_19'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_1_19.pos' unit='mm' x='1.16' y='0.28' z='0.0'/>
+        <position name='Hole_1_19.pos' unit='mm' x='1.1199999999999999' y='0.32000000000000006' z='0.0'/>
       </physvol>
       <physvol name='Hole_1_21'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_1_21.pos' unit='mm' x='1.16' y='0.43999999999999995' z='0.0'/>
+        <position name='Hole_1_21.pos' unit='mm' x='1.1199999999999999' y='0.48' z='0.0'/>
       </physvol>
       <physvol name='Hole_1_22'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_1_22.pos' unit='mm' x='1.16' y='0.52' z='0.0'/>
+        <position name='Hole_1_22.pos' unit='mm' x='1.1199999999999999' y='0.56' z='0.0'/>
       </physvol>
       <physvol name='Hole_1_27'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_1_27.pos' unit='mm' x='1.16' y='0.9200000000000002' z='0.0'/>
+        <position name='Hole_1_27.pos' unit='mm' x='1.1199999999999999' y='0.9600000000000002' z='0.0'/>
       </physvol>
       <physvol name='Hole_2_1'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_2_1.pos' unit='mm' x='1.08' y='-1.16' z='0.0'/>
+        <position name='Hole_2_1.pos' unit='mm' x='1.04' y='-1.1199999999999999' z='0.0'/>
       </physvol>
       <physvol name='Hole_2_3'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_2_3.pos' unit='mm' x='1.08' y='-1.0' z='0.0'/>
+        <position name='Hole_2_3.pos' unit='mm' x='1.04' y='-0.96' z='0.0'/>
       </physvol>
       <physvol name='Hole_2_4'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_2_4.pos' unit='mm' x='1.08' y='-0.9199999999999999' z='0.0'/>
+        <position name='Hole_2_4.pos' unit='mm' x='1.04' y='-0.8799999999999999' z='0.0'/>
       </physvol>
       <physvol name='Hole_2_11'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_2_11.pos' unit='mm' x='1.08' y='-0.36' z='0.0'/>
+        <position name='Hole_2_11.pos' unit='mm' x='1.04' y='-0.31999999999999995' z='0.0'/>
       </physvol>
       <physvol name='Hole_2_12'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_2_12.pos' unit='mm' x='1.08' y='-0.28' z='0.0'/>
+        <position name='Hole_2_12.pos' unit='mm' x='1.04' y='-0.24' z='0.0'/>
       </physvol>
       <physvol name='Hole_2_13'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_2_13.pos' unit='mm' x='1.08' y='-0.19999999999999996' z='0.0'/>
+        <position name='Hole_2_13.pos' unit='mm' x='1.04' y='-0.15999999999999992' z='0.0'/>
       </physvol>
       <physvol name='Hole_2_15'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_2_15.pos' unit='mm' x='1.08' y='-0.040000000000000036' z='0.0'/>
+        <position name='Hole_2_15.pos' unit='mm' x='1.04' y='0.0' z='0.0'/>
       </physvol>
       <physvol name='Hole_2_17'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_2_17.pos' unit='mm' x='1.08' y='0.1200000000000001' z='0.0'/>
+        <position name='Hole_2_17.pos' unit='mm' x='1.04' y='0.16000000000000014' z='0.0'/>
       </physvol>
       <physvol name='Hole_2_19'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_2_19.pos' unit='mm' x='1.08' y='0.28' z='0.0'/>
+        <position name='Hole_2_19.pos' unit='mm' x='1.04' y='0.32000000000000006' z='0.0'/>
       </physvol>
       <physvol name='Hole_2_20'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_2_20.pos' unit='mm' x='1.08' y='0.3600000000000001' z='0.0'/>
+        <position name='Hole_2_20.pos' unit='mm' x='1.04' y='0.40000000000000013' z='0.0'/>
       </physvol>
       <physvol name='Hole_2_22'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_2_22.pos' unit='mm' x='1.08' y='0.52' z='0.0'/>
+        <position name='Hole_2_22.pos' unit='mm' x='1.04' y='0.56' z='0.0'/>
       </physvol>
       <physvol name='Hole_2_24'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_2_24.pos' unit='mm' x='1.08' y='0.6799999999999999' z='0.0'/>
+        <position name='Hole_2_24.pos' unit='mm' x='1.04' y='0.72' z='0.0'/>
       </physvol>
       <physvol name='Hole_2_26'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_2_26.pos' unit='mm' x='1.08' y='0.8400000000000001' z='0.0'/>
+        <position name='Hole_2_26.pos' unit='mm' x='1.04' y='0.8800000000000001' z='0.0'/>
       </physvol>
       <physvol name='Hole_2_27'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_2_27.pos' unit='mm' x='1.08' y='0.9200000000000002' z='0.0'/>
+        <position name='Hole_2_27.pos' unit='mm' x='1.04' y='0.9600000000000002' z='0.0'/>
       </physvol>
       <physvol name='Hole_3_2'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_3_2.pos' unit='mm' x='1.0' y='-1.08' z='0.0'/>
+        <position name='Hole_3_2.pos' unit='mm' x='0.96' y='-1.04' z='0.0'/>
       </physvol>
       <physvol name='Hole_3_3'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_3_3.pos' unit='mm' x='1.0' y='-1.0' z='0.0'/>
+        <position name='Hole_3_3.pos' unit='mm' x='0.96' y='-0.96' z='0.0'/>
       </physvol>
       <physvol name='Hole_3_5'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_3_5.pos' unit='mm' x='1.0' y='-0.84' z='0.0'/>
+        <position name='Hole_3_5.pos' unit='mm' x='0.96' y='-0.7999999999999999' z='0.0'/>
       </physvol>
       <physvol name='Hole_3_6'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_3_6.pos' unit='mm' x='1.0' y='-0.76' z='0.0'/>
+        <position name='Hole_3_6.pos' unit='mm' x='0.96' y='-0.72' z='0.0'/>
       </physvol>
       <physvol name='Hole_3_7'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_3_7.pos' unit='mm' x='1.0' y='-0.6799999999999999' z='0.0'/>
+        <position name='Hole_3_7.pos' unit='mm' x='0.96' y='-0.6399999999999999' z='0.0'/>
       </physvol>
       <physvol name='Hole_3_11'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_3_11.pos' unit='mm' x='1.0' y='-0.36' z='0.0'/>
+        <position name='Hole_3_11.pos' unit='mm' x='0.96' y='-0.31999999999999995' z='0.0'/>
       </physvol>
       <physvol name='Hole_3_13'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_3_13.pos' unit='mm' x='1.0' y='-0.19999999999999996' z='0.0'/>
+        <position name='Hole_3_13.pos' unit='mm' x='0.96' y='-0.15999999999999992' z='0.0'/>
       </physvol>
       <physvol name='Hole_3_14'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_3_14.pos' unit='mm' x='1.0' y='-0.11999999999999988' z='0.0'/>
+        <position name='Hole_3_14.pos' unit='mm' x='0.96' y='-0.07999999999999985' z='0.0'/>
       </physvol>
       <physvol name='Hole_3_20'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_3_20.pos' unit='mm' x='1.0' y='0.3600000000000001' z='0.0'/>
+        <position name='Hole_3_20.pos' unit='mm' x='0.96' y='0.40000000000000013' z='0.0'/>
       </physvol>
       <physvol name='Hole_3_21'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_3_21.pos' unit='mm' x='1.0' y='0.43999999999999995' z='0.0'/>
+        <position name='Hole_3_21.pos' unit='mm' x='0.96' y='0.48' z='0.0'/>
       </physvol>
       <physvol name='Hole_3_22'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_3_22.pos' unit='mm' x='1.0' y='0.52' z='0.0'/>
+        <position name='Hole_3_22.pos' unit='mm' x='0.96' y='0.56' z='0.0'/>
       </physvol>
       <physvol name='Hole_3_23'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_3_23.pos' unit='mm' x='1.0' y='0.6000000000000001' z='0.0'/>
+        <position name='Hole_3_23.pos' unit='mm' x='0.96' y='0.6400000000000001' z='0.0'/>
       </physvol>
       <physvol name='Hole_3_24'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_3_24.pos' unit='mm' x='1.0' y='0.6799999999999999' z='0.0'/>
+        <position name='Hole_3_24.pos' unit='mm' x='0.96' y='0.72' z='0.0'/>
       </physvol>
       <physvol name='Hole_3_26'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_3_26.pos' unit='mm' x='1.0' y='0.8400000000000001' z='0.0'/>
+        <position name='Hole_3_26.pos' unit='mm' x='0.96' y='0.8800000000000001' z='0.0'/>
       </physvol>
       <physvol name='Hole_3_30'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_3_30.pos' unit='mm' x='1.0' y='1.16' z='0.0'/>
+        <position name='Hole_3_30.pos' unit='mm' x='0.96' y='1.2' z='0.0'/>
       </physvol>
       <physvol name='Hole_4_0'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_4_0.pos' unit='mm' x='0.9199999999999999' y='-1.24' z='0.0'/>
+        <position name='Hole_4_0.pos' unit='mm' x='0.8799999999999999' y='-1.2' z='0.0'/>
       </physvol>
       <physvol name='Hole_4_2'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_4_2.pos' unit='mm' x='0.9199999999999999' y='-1.08' z='0.0'/>
+        <position name='Hole_4_2.pos' unit='mm' x='0.8799999999999999' y='-1.04' z='0.0'/>
       </physvol>
       <physvol name='Hole_4_3'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_4_3.pos' unit='mm' x='0.9199999999999999' y='-1.0' z='0.0'/>
+        <position name='Hole_4_3.pos' unit='mm' x='0.8799999999999999' y='-0.96' z='0.0'/>
       </physvol>
       <physvol name='Hole_4_4'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_4_4.pos' unit='mm' x='0.9199999999999999' y='-0.9199999999999999' z='0.0'/>
+        <position name='Hole_4_4.pos' unit='mm' x='0.8799999999999999' y='-0.8799999999999999' z='0.0'/>
       </physvol>
       <physvol name='Hole_4_7'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_4_7.pos' unit='mm' x='0.9199999999999999' y='-0.6799999999999999' z='0.0'/>
+        <position name='Hole_4_7.pos' unit='mm' x='0.8799999999999999' y='-0.6399999999999999' z='0.0'/>
       </physvol>
       <physvol name='Hole_4_12'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_4_12.pos' unit='mm' x='0.9199999999999999' y='-0.28' z='0.0'/>
+        <position name='Hole_4_12.pos' unit='mm' x='0.8799999999999999' y='-0.24' z='0.0'/>
       </physvol>
       <physvol name='Hole_4_13'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_4_13.pos' unit='mm' x='0.9199999999999999' y='-0.19999999999999996' z='0.0'/>
+        <position name='Hole_4_13.pos' unit='mm' x='0.8799999999999999' y='-0.15999999999999992' z='0.0'/>
       </physvol>
       <physvol name='Hole_4_14'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_4_14.pos' unit='mm' x='0.9199999999999999' y='-0.11999999999999988' z='0.0'/>
+        <position name='Hole_4_14.pos' unit='mm' x='0.8799999999999999' y='-0.07999999999999985' z='0.0'/>
       </physvol>
       <physvol name='Hole_4_15'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_4_15.pos' unit='mm' x='0.9199999999999999' y='-0.040000000000000036' z='0.0'/>
+        <position name='Hole_4_15.pos' unit='mm' x='0.8799999999999999' y='0.0' z='0.0'/>
       </physvol>
       <physvol name='Hole_4_16'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_4_16.pos' unit='mm' x='0.9199999999999999' y='0.040000000000000036' z='0.0'/>
+        <position name='Hole_4_16.pos' unit='mm' x='0.8799999999999999' y='0.08000000000000007' z='0.0'/>
       </physvol>
       <physvol name='Hole_4_17'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_4_17.pos' unit='mm' x='0.9199999999999999' y='0.1200000000000001' z='0.0'/>
+        <position name='Hole_4_17.pos' unit='mm' x='0.8799999999999999' y='0.16000000000000014' z='0.0'/>
       </physvol>
       <physvol name='Hole_4_18'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_4_18.pos' unit='mm' x='0.9199999999999999' y='0.19999999999999996' z='0.0'/>
+        <position name='Hole_4_18.pos' unit='mm' x='0.8799999999999999' y='0.24' z='0.0'/>
       </physvol>
       <physvol name='Hole_4_21'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_4_21.pos' unit='mm' x='0.9199999999999999' y='0.43999999999999995' z='0.0'/>
+        <position name='Hole_4_21.pos' unit='mm' x='0.8799999999999999' y='0.48' z='0.0'/>
       </physvol>
       <physvol name='Hole_4_26'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_4_26.pos' unit='mm' x='0.9199999999999999' y='0.8400000000000001' z='0.0'/>
+        <position name='Hole_4_26.pos' unit='mm' x='0.8799999999999999' y='0.8800000000000001' z='0.0'/>
       </physvol>
       <physvol name='Hole_4_27'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_4_27.pos' unit='mm' x='0.9199999999999999' y='0.9200000000000002' z='0.0'/>
+        <position name='Hole_4_27.pos' unit='mm' x='0.8799999999999999' y='0.9600000000000002' z='0.0'/>
       </physvol>
       <physvol name='Hole_4_29'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_4_29.pos' unit='mm' x='0.9199999999999999' y='1.0799999999999998' z='0.0'/>
+        <position name='Hole_4_29.pos' unit='mm' x='0.8799999999999999' y='1.1199999999999999' z='0.0'/>
       </physvol>
       <physvol name='Hole_5_0'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_5_0.pos' unit='mm' x='0.84' y='-1.24' z='0.0'/>
+        <position name='Hole_5_0.pos' unit='mm' x='0.7999999999999999' y='-1.2' z='0.0'/>
       </physvol>
       <physvol name='Hole_5_1'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_5_1.pos' unit='mm' x='0.84' y='-1.16' z='0.0'/>
+        <position name='Hole_5_1.pos' unit='mm' x='0.7999999999999999' y='-1.1199999999999999' z='0.0'/>
       </physvol>
       <physvol name='Hole_5_4'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_5_4.pos' unit='mm' x='0.84' y='-0.9199999999999999' z='0.0'/>
+        <position name='Hole_5_4.pos' unit='mm' x='0.7999999999999999' y='-0.8799999999999999' z='0.0'/>
       </physvol>
       <physvol name='Hole_5_5'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_5_5.pos' unit='mm' x='0.84' y='-0.84' z='0.0'/>
+        <position name='Hole_5_5.pos' unit='mm' x='0.7999999999999999' y='-0.7999999999999999' z='0.0'/>
       </physvol>
       <physvol name='Hole_5_8'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_5_8.pos' unit='mm' x='0.84' y='-0.6' z='0.0'/>
+        <position name='Hole_5_8.pos' unit='mm' x='0.7999999999999999' y='-0.5599999999999999' z='0.0'/>
       </physvol>
       <physvol name='Hole_5_9'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_5_9.pos' unit='mm' x='0.84' y='-0.52' z='0.0'/>
+        <position name='Hole_5_9.pos' unit='mm' x='0.7999999999999999' y='-0.48' z='0.0'/>
       </physvol>
       <physvol name='Hole_5_11'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_5_11.pos' unit='mm' x='0.84' y='-0.36' z='0.0'/>
+        <position name='Hole_5_11.pos' unit='mm' x='0.7999999999999999' y='-0.31999999999999995' z='0.0'/>
       </physvol>
       <physvol name='Hole_5_12'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_5_12.pos' unit='mm' x='0.84' y='-0.28' z='0.0'/>
+        <position name='Hole_5_12.pos' unit='mm' x='0.7999999999999999' y='-0.24' z='0.0'/>
       </physvol>
       <physvol name='Hole_5_15'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_5_15.pos' unit='mm' x='0.84' y='-0.040000000000000036' z='0.0'/>
+        <position name='Hole_5_15.pos' unit='mm' x='0.7999999999999999' y='0.0' z='0.0'/>
       </physvol>
       <physvol name='Hole_5_16'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_5_16.pos' unit='mm' x='0.84' y='0.040000000000000036' z='0.0'/>
+        <position name='Hole_5_16.pos' unit='mm' x='0.7999999999999999' y='0.08000000000000007' z='0.0'/>
       </physvol>
       <physvol name='Hole_5_17'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_5_17.pos' unit='mm' x='0.84' y='0.1200000000000001' z='0.0'/>
+        <position name='Hole_5_17.pos' unit='mm' x='0.7999999999999999' y='0.16000000000000014' z='0.0'/>
       </physvol>
       <physvol name='Hole_5_20'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_5_20.pos' unit='mm' x='0.84' y='0.3600000000000001' z='0.0'/>
+        <position name='Hole_5_20.pos' unit='mm' x='0.7999999999999999' y='0.40000000000000013' z='0.0'/>
       </physvol>
       <physvol name='Hole_5_24'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_5_24.pos' unit='mm' x='0.84' y='0.6799999999999999' z='0.0'/>
+        <position name='Hole_5_24.pos' unit='mm' x='0.7999999999999999' y='0.72' z='0.0'/>
       </physvol>
       <physvol name='Hole_5_25'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_5_25.pos' unit='mm' x='0.84' y='0.76' z='0.0'/>
+        <position name='Hole_5_25.pos' unit='mm' x='0.7999999999999999' y='0.8' z='0.0'/>
       </physvol>
       <physvol name='Hole_5_26'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_5_26.pos' unit='mm' x='0.84' y='0.8400000000000001' z='0.0'/>
+        <position name='Hole_5_26.pos' unit='mm' x='0.7999999999999999' y='0.8800000000000001' z='0.0'/>
       </physvol>
       <physvol name='Hole_5_30'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_5_30.pos' unit='mm' x='0.84' y='1.16' z='0.0'/>
+        <position name='Hole_5_30.pos' unit='mm' x='0.7999999999999999' y='1.2' z='0.0'/>
       </physvol>
       <physvol name='Hole_6_1'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_6_1.pos' unit='mm' x='0.76' y='-1.16' z='0.0'/>
+        <position name='Hole_6_1.pos' unit='mm' x='0.72' y='-1.1199999999999999' z='0.0'/>
       </physvol>
       <physvol name='Hole_6_5'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_6_5.pos' unit='mm' x='0.76' y='-0.84' z='0.0'/>
+        <position name='Hole_6_5.pos' unit='mm' x='0.72' y='-0.7999999999999999' z='0.0'/>
       </physvol>
       <physvol name='Hole_6_10'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_6_10.pos' unit='mm' x='0.76' y='-0.43999999999999995' z='0.0'/>
+        <position name='Hole_6_10.pos' unit='mm' x='0.72' y='-0.3999999999999999' z='0.0'/>
       </physvol>
       <physvol name='Hole_6_11'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_6_11.pos' unit='mm' x='0.76' y='-0.36' z='0.0'/>
+        <position name='Hole_6_11.pos' unit='mm' x='0.72' y='-0.31999999999999995' z='0.0'/>
       </physvol>
       <physvol name='Hole_6_12'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_6_12.pos' unit='mm' x='0.76' y='-0.28' z='0.0'/>
+        <position name='Hole_6_12.pos' unit='mm' x='0.72' y='-0.24' z='0.0'/>
       </physvol>
       <physvol name='Hole_6_13'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_6_13.pos' unit='mm' x='0.76' y='-0.19999999999999996' z='0.0'/>
+        <position name='Hole_6_13.pos' unit='mm' x='0.72' y='-0.15999999999999992' z='0.0'/>
       </physvol>
       <physvol name='Hole_6_14'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_6_14.pos' unit='mm' x='0.76' y='-0.11999999999999988' z='0.0'/>
+        <position name='Hole_6_14.pos' unit='mm' x='0.72' y='-0.07999999999999985' z='0.0'/>
       </physvol>
       <physvol name='Hole_6_16'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_6_16.pos' unit='mm' x='0.76' y='0.040000000000000036' z='0.0'/>
+        <position name='Hole_6_16.pos' unit='mm' x='0.72' y='0.08000000000000007' z='0.0'/>
       </physvol>
       <physvol name='Hole_6_20'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_6_20.pos' unit='mm' x='0.76' y='0.3600000000000001' z='0.0'/>
+        <position name='Hole_6_20.pos' unit='mm' x='0.72' y='0.40000000000000013' z='0.0'/>
       </physvol>
       <physvol name='Hole_6_21'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_6_21.pos' unit='mm' x='0.76' y='0.43999999999999995' z='0.0'/>
+        <position name='Hole_6_21.pos' unit='mm' x='0.72' y='0.48' z='0.0'/>
       </physvol>
       <physvol name='Hole_6_22'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_6_22.pos' unit='mm' x='0.76' y='0.52' z='0.0'/>
+        <position name='Hole_6_22.pos' unit='mm' x='0.72' y='0.56' z='0.0'/>
       </physvol>
       <physvol name='Hole_6_23'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_6_23.pos' unit='mm' x='0.76' y='0.6000000000000001' z='0.0'/>
+        <position name='Hole_6_23.pos' unit='mm' x='0.72' y='0.6400000000000001' z='0.0'/>
       </physvol>
       <physvol name='Hole_6_25'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_6_25.pos' unit='mm' x='0.76' y='0.76' z='0.0'/>
+        <position name='Hole_6_25.pos' unit='mm' x='0.72' y='0.8' z='0.0'/>
       </physvol>
       <physvol name='Hole_6_26'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_6_26.pos' unit='mm' x='0.76' y='0.8400000000000001' z='0.0'/>
+        <position name='Hole_6_26.pos' unit='mm' x='0.72' y='0.8800000000000001' z='0.0'/>
       </physvol>
       <physvol name='Hole_6_28'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_6_28.pos' unit='mm' x='0.76' y='1.0000000000000002' z='0.0'/>
+        <position name='Hole_6_28.pos' unit='mm' x='0.72' y='1.0400000000000003' z='0.0'/>
       </physvol>
       <physvol name='Hole_6_29'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_6_29.pos' unit='mm' x='0.76' y='1.0799999999999998' z='0.0'/>
+        <position name='Hole_6_29.pos' unit='mm' x='0.72' y='1.1199999999999999' z='0.0'/>
       </physvol>
       <physvol name='Hole_6_30'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_6_30.pos' unit='mm' x='0.76' y='1.16' z='0.0'/>
+        <position name='Hole_6_30.pos' unit='mm' x='0.72' y='1.2' z='0.0'/>
       </physvol>
       <physvol name='Hole_7_3'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_7_3.pos' unit='mm' x='0.6799999999999999' y='-1.0' z='0.0'/>
+        <position name='Hole_7_3.pos' unit='mm' x='0.6399999999999999' y='-0.96' z='0.0'/>
       </physvol>
       <physvol name='Hole_7_4'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_7_4.pos' unit='mm' x='0.6799999999999999' y='-0.9199999999999999' z='0.0'/>
+        <position name='Hole_7_4.pos' unit='mm' x='0.6399999999999999' y='-0.8799999999999999' z='0.0'/>
       </physvol>
       <physvol name='Hole_7_5'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_7_5.pos' unit='mm' x='0.6799999999999999' y='-0.84' z='0.0'/>
+        <position name='Hole_7_5.pos' unit='mm' x='0.6399999999999999' y='-0.7999999999999999' z='0.0'/>
       </physvol>
       <physvol name='Hole_7_6'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_7_6.pos' unit='mm' x='0.6799999999999999' y='-0.76' z='0.0'/>
+        <position name='Hole_7_6.pos' unit='mm' x='0.6399999999999999' y='-0.72' z='0.0'/>
       </physvol>
       <physvol name='Hole_7_7'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_7_7.pos' unit='mm' x='0.6799999999999999' y='-0.6799999999999999' z='0.0'/>
+        <position name='Hole_7_7.pos' unit='mm' x='0.6399999999999999' y='-0.6399999999999999' z='0.0'/>
       </physvol>
       <physvol name='Hole_7_8'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_7_8.pos' unit='mm' x='0.6799999999999999' y='-0.6' z='0.0'/>
+        <position name='Hole_7_8.pos' unit='mm' x='0.6399999999999999' y='-0.5599999999999999' z='0.0'/>
       </physvol>
       <physvol name='Hole_7_9'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_7_9.pos' unit='mm' x='0.6799999999999999' y='-0.52' z='0.0'/>
+        <position name='Hole_7_9.pos' unit='mm' x='0.6399999999999999' y='-0.48' z='0.0'/>
       </physvol>
       <physvol name='Hole_7_10'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_7_10.pos' unit='mm' x='0.6799999999999999' y='-0.43999999999999995' z='0.0'/>
+        <position name='Hole_7_10.pos' unit='mm' x='0.6399999999999999' y='-0.3999999999999999' z='0.0'/>
       </physvol>
       <physvol name='Hole_7_13'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_7_13.pos' unit='mm' x='0.6799999999999999' y='-0.19999999999999996' z='0.0'/>
+        <position name='Hole_7_13.pos' unit='mm' x='0.6399999999999999' y='-0.15999999999999992' z='0.0'/>
       </physvol>
       <physvol name='Hole_7_15'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_7_15.pos' unit='mm' x='0.6799999999999999' y='-0.040000000000000036' z='0.0'/>
+        <position name='Hole_7_15.pos' unit='mm' x='0.6399999999999999' y='0.0' z='0.0'/>
       </physvol>
       <physvol name='Hole_7_16'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_7_16.pos' unit='mm' x='0.6799999999999999' y='0.040000000000000036' z='0.0'/>
+        <position name='Hole_7_16.pos' unit='mm' x='0.6399999999999999' y='0.08000000000000007' z='0.0'/>
       </physvol>
       <physvol name='Hole_7_19'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_7_19.pos' unit='mm' x='0.6799999999999999' y='0.28' z='0.0'/>
+        <position name='Hole_7_19.pos' unit='mm' x='0.6399999999999999' y='0.32000000000000006' z='0.0'/>
       </physvol>
       <physvol name='Hole_7_20'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_7_20.pos' unit='mm' x='0.6799999999999999' y='0.3600000000000001' z='0.0'/>
+        <position name='Hole_7_20.pos' unit='mm' x='0.6399999999999999' y='0.40000000000000013' z='0.0'/>
       </physvol>
       <physvol name='Hole_7_24'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_7_24.pos' unit='mm' x='0.6799999999999999' y='0.6799999999999999' z='0.0'/>
+        <position name='Hole_7_24.pos' unit='mm' x='0.6399999999999999' y='0.72' z='0.0'/>
       </physvol>
       <physvol name='Hole_7_25'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_7_25.pos' unit='mm' x='0.6799999999999999' y='0.76' z='0.0'/>
+        <position name='Hole_7_25.pos' unit='mm' x='0.6399999999999999' y='0.8' z='0.0'/>
       </physvol>
       <physvol name='Hole_7_26'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_7_26.pos' unit='mm' x='0.6799999999999999' y='0.8400000000000001' z='0.0'/>
+        <position name='Hole_7_26.pos' unit='mm' x='0.6399999999999999' y='0.8800000000000001' z='0.0'/>
       </physvol>
       <physvol name='Hole_7_27'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_7_27.pos' unit='mm' x='0.6799999999999999' y='0.9200000000000002' z='0.0'/>
+        <position name='Hole_7_27.pos' unit='mm' x='0.6399999999999999' y='0.9600000000000002' z='0.0'/>
       </physvol>
       <physvol name='Hole_7_29'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_7_29.pos' unit='mm' x='0.6799999999999999' y='1.0799999999999998' z='0.0'/>
+        <position name='Hole_7_29.pos' unit='mm' x='0.6399999999999999' y='1.1199999999999999' z='0.0'/>
       </physvol>
       <physvol name='Hole_8_0'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_8_0.pos' unit='mm' x='0.6' y='-1.24' z='0.0'/>
+        <position name='Hole_8_0.pos' unit='mm' x='0.5599999999999999' y='-1.2' z='0.0'/>
       </physvol>
       <physvol name='Hole_8_1'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_8_1.pos' unit='mm' x='0.6' y='-1.16' z='0.0'/>
+        <position name='Hole_8_1.pos' unit='mm' x='0.5599999999999999' y='-1.1199999999999999' z='0.0'/>
       </physvol>
       <physvol name='Hole_8_3'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_8_3.pos' unit='mm' x='0.6' y='-1.0' z='0.0'/>
+        <position name='Hole_8_3.pos' unit='mm' x='0.5599999999999999' y='-0.96' z='0.0'/>
       </physvol>
       <physvol name='Hole_8_5'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_8_5.pos' unit='mm' x='0.6' y='-0.84' z='0.0'/>
+        <position name='Hole_8_5.pos' unit='mm' x='0.5599999999999999' y='-0.7999999999999999' z='0.0'/>
       </physvol>
       <physvol name='Hole_8_6'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_8_6.pos' unit='mm' x='0.6' y='-0.76' z='0.0'/>
+        <position name='Hole_8_6.pos' unit='mm' x='0.5599999999999999' y='-0.72' z='0.0'/>
       </physvol>
       <physvol name='Hole_8_7'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_8_7.pos' unit='mm' x='0.6' y='-0.6799999999999999' z='0.0'/>
+        <position name='Hole_8_7.pos' unit='mm' x='0.5599999999999999' y='-0.6399999999999999' z='0.0'/>
       </physvol>
       <physvol name='Hole_8_12'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_8_12.pos' unit='mm' x='0.6' y='-0.28' z='0.0'/>
+        <position name='Hole_8_12.pos' unit='mm' x='0.5599999999999999' y='-0.24' z='0.0'/>
       </physvol>
       <physvol name='Hole_8_14'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_8_14.pos' unit='mm' x='0.6' y='-0.11999999999999988' z='0.0'/>
+        <position name='Hole_8_14.pos' unit='mm' x='0.5599999999999999' y='-0.07999999999999985' z='0.0'/>
       </physvol>
       <physvol name='Hole_8_16'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_8_16.pos' unit='mm' x='0.6' y='0.040000000000000036' z='0.0'/>
+        <position name='Hole_8_16.pos' unit='mm' x='0.5599999999999999' y='0.08000000000000007' z='0.0'/>
       </physvol>
       <physvol name='Hole_8_19'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_8_19.pos' unit='mm' x='0.6' y='0.28' z='0.0'/>
+        <position name='Hole_8_19.pos' unit='mm' x='0.5599999999999999' y='0.32000000000000006' z='0.0'/>
       </physvol>
       <physvol name='Hole_8_23'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_8_23.pos' unit='mm' x='0.6' y='0.6000000000000001' z='0.0'/>
+        <position name='Hole_8_23.pos' unit='mm' x='0.5599999999999999' y='0.6400000000000001' z='0.0'/>
       </physvol>
       <physvol name='Hole_8_27'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_8_27.pos' unit='mm' x='0.6' y='0.9200000000000002' z='0.0'/>
+        <position name='Hole_8_27.pos' unit='mm' x='0.5599999999999999' y='0.9600000000000002' z='0.0'/>
       </physvol>
       <physvol name='Hole_9_3'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_9_3.pos' unit='mm' x='0.52' y='-1.0' z='0.0'/>
+        <position name='Hole_9_3.pos' unit='mm' x='0.48' y='-0.96' z='0.0'/>
       </physvol>
       <physvol name='Hole_9_8'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_9_8.pos' unit='mm' x='0.52' y='-0.6' z='0.0'/>
+        <position name='Hole_9_8.pos' unit='mm' x='0.48' y='-0.5599999999999999' z='0.0'/>
       </physvol>
       <physvol name='Hole_9_9'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_9_9.pos' unit='mm' x='0.52' y='-0.52' z='0.0'/>
+        <position name='Hole_9_9.pos' unit='mm' x='0.48' y='-0.48' z='0.0'/>
       </physvol>
       <physvol name='Hole_9_11'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_9_11.pos' unit='mm' x='0.52' y='-0.36' z='0.0'/>
+        <position name='Hole_9_11.pos' unit='mm' x='0.48' y='-0.31999999999999995' z='0.0'/>
       </physvol>
       <physvol name='Hole_9_12'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_9_12.pos' unit='mm' x='0.52' y='-0.28' z='0.0'/>
+        <position name='Hole_9_12.pos' unit='mm' x='0.48' y='-0.24' z='0.0'/>
       </physvol>
       <physvol name='Hole_9_14'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_9_14.pos' unit='mm' x='0.52' y='-0.11999999999999988' z='0.0'/>
+        <position name='Hole_9_14.pos' unit='mm' x='0.48' y='-0.07999999999999985' z='0.0'/>
       </physvol>
       <physvol name='Hole_9_21'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_9_21.pos' unit='mm' x='0.52' y='0.43999999999999995' z='0.0'/>
+        <position name='Hole_9_21.pos' unit='mm' x='0.48' y='0.48' z='0.0'/>
       </physvol>
       <physvol name='Hole_9_23'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_9_23.pos' unit='mm' x='0.52' y='0.6000000000000001' z='0.0'/>
+        <position name='Hole_9_23.pos' unit='mm' x='0.48' y='0.6400000000000001' z='0.0'/>
       </physvol>
       <physvol name='Hole_9_24'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_9_24.pos' unit='mm' x='0.52' y='0.6799999999999999' z='0.0'/>
+        <position name='Hole_9_24.pos' unit='mm' x='0.48' y='0.72' z='0.0'/>
       </physvol>
       <physvol name='Hole_9_28'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_9_28.pos' unit='mm' x='0.52' y='1.0000000000000002' z='0.0'/>
+        <position name='Hole_9_28.pos' unit='mm' x='0.48' y='1.0400000000000003' z='0.0'/>
       </physvol>
       <physvol name='Hole_10_4'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_10_4.pos' unit='mm' x='0.43999999999999995' y='-0.9199999999999999' z='0.0'/>
+        <position name='Hole_10_4.pos' unit='mm' x='0.3999999999999999' y='-0.8799999999999999' z='0.0'/>
       </physvol>
       <physvol name='Hole_10_7'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_10_7.pos' unit='mm' x='0.43999999999999995' y='-0.6799999999999999' z='0.0'/>
+        <position name='Hole_10_7.pos' unit='mm' x='0.3999999999999999' y='-0.6399999999999999' z='0.0'/>
       </physvol>
       <physvol name='Hole_10_8'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_10_8.pos' unit='mm' x='0.43999999999999995' y='-0.6' z='0.0'/>
+        <position name='Hole_10_8.pos' unit='mm' x='0.3999999999999999' y='-0.5599999999999999' z='0.0'/>
       </physvol>
       <physvol name='Hole_10_10'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_10_10.pos' unit='mm' x='0.43999999999999995' y='-0.43999999999999995' z='0.0'/>
+        <position name='Hole_10_10.pos' unit='mm' x='0.3999999999999999' y='-0.3999999999999999' z='0.0'/>
       </physvol>
       <physvol name='Hole_10_11'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_10_11.pos' unit='mm' x='0.43999999999999995' y='-0.36' z='0.0'/>
+        <position name='Hole_10_11.pos' unit='mm' x='0.3999999999999999' y='-0.31999999999999995' z='0.0'/>
       </physvol>
       <physvol name='Hole_10_12'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_10_12.pos' unit='mm' x='0.43999999999999995' y='-0.28' z='0.0'/>
+        <position name='Hole_10_12.pos' unit='mm' x='0.3999999999999999' y='-0.24' z='0.0'/>
       </physvol>
       <physvol name='Hole_10_13'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_10_13.pos' unit='mm' x='0.43999999999999995' y='-0.19999999999999996' z='0.0'/>
+        <position name='Hole_10_13.pos' unit='mm' x='0.3999999999999999' y='-0.15999999999999992' z='0.0'/>
       </physvol>
       <physvol name='Hole_10_14'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_10_14.pos' unit='mm' x='0.43999999999999995' y='-0.11999999999999988' z='0.0'/>
+        <position name='Hole_10_14.pos' unit='mm' x='0.3999999999999999' y='-0.07999999999999985' z='0.0'/>
       </physvol>
       <physvol name='Hole_10_15'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_10_15.pos' unit='mm' x='0.43999999999999995' y='-0.040000000000000036' z='0.0'/>
+        <position name='Hole_10_15.pos' unit='mm' x='0.3999999999999999' y='0.0' z='0.0'/>
       </physvol>
       <physvol name='Hole_10_23'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_10_23.pos' unit='mm' x='0.43999999999999995' y='0.6000000000000001' z='0.0'/>
+        <position name='Hole_10_23.pos' unit='mm' x='0.3999999999999999' y='0.6400000000000001' z='0.0'/>
       </physvol>
       <physvol name='Hole_10_24'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_10_24.pos' unit='mm' x='0.43999999999999995' y='0.6799999999999999' z='0.0'/>
+        <position name='Hole_10_24.pos' unit='mm' x='0.3999999999999999' y='0.72' z='0.0'/>
       </physvol>
       <physvol name='Hole_10_25'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_10_25.pos' unit='mm' x='0.43999999999999995' y='0.76' z='0.0'/>
+        <position name='Hole_10_25.pos' unit='mm' x='0.3999999999999999' y='0.8' z='0.0'/>
       </physvol>
       <physvol name='Hole_10_27'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_10_27.pos' unit='mm' x='0.43999999999999995' y='0.9200000000000002' z='0.0'/>
+        <position name='Hole_10_27.pos' unit='mm' x='0.3999999999999999' y='0.9600000000000002' z='0.0'/>
       </physvol>
       <physvol name='Hole_11_0'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_11_0.pos' unit='mm' x='0.36' y='-1.24' z='0.0'/>
+        <position name='Hole_11_0.pos' unit='mm' x='0.31999999999999995' y='-1.2' z='0.0'/>
       </physvol>
       <physvol name='Hole_11_4'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_11_4.pos' unit='mm' x='0.36' y='-0.9199999999999999' z='0.0'/>
+        <position name='Hole_11_4.pos' unit='mm' x='0.31999999999999995' y='-0.8799999999999999' z='0.0'/>
       </physvol>
       <physvol name='Hole_11_5'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_11_5.pos' unit='mm' x='0.36' y='-0.84' z='0.0'/>
+        <position name='Hole_11_5.pos' unit='mm' x='0.31999999999999995' y='-0.7999999999999999' z='0.0'/>
       </physvol>
       <physvol name='Hole_11_6'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_11_6.pos' unit='mm' x='0.36' y='-0.76' z='0.0'/>
+        <position name='Hole_11_6.pos' unit='mm' x='0.31999999999999995' y='-0.72' z='0.0'/>
       </physvol>
       <physvol name='Hole_11_7'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_11_7.pos' unit='mm' x='0.36' y='-0.6799999999999999' z='0.0'/>
+        <position name='Hole_11_7.pos' unit='mm' x='0.31999999999999995' y='-0.6399999999999999' z='0.0'/>
       </physvol>
       <physvol name='Hole_11_8'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_11_8.pos' unit='mm' x='0.36' y='-0.6' z='0.0'/>
+        <position name='Hole_11_8.pos' unit='mm' x='0.31999999999999995' y='-0.5599999999999999' z='0.0'/>
       </physvol>
       <physvol name='Hole_11_9'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_11_9.pos' unit='mm' x='0.36' y='-0.52' z='0.0'/>
+        <position name='Hole_11_9.pos' unit='mm' x='0.31999999999999995' y='-0.48' z='0.0'/>
       </physvol>
       <physvol name='Hole_11_11'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_11_11.pos' unit='mm' x='0.36' y='-0.36' z='0.0'/>
+        <position name='Hole_11_11.pos' unit='mm' x='0.31999999999999995' y='-0.31999999999999995' z='0.0'/>
       </physvol>
       <physvol name='Hole_11_14'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_11_14.pos' unit='mm' x='0.36' y='-0.11999999999999988' z='0.0'/>
+        <position name='Hole_11_14.pos' unit='mm' x='0.31999999999999995' y='-0.07999999999999985' z='0.0'/>
       </physvol>
       <physvol name='Hole_11_15'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_11_15.pos' unit='mm' x='0.36' y='-0.040000000000000036' z='0.0'/>
+        <position name='Hole_11_15.pos' unit='mm' x='0.31999999999999995' y='0.0' z='0.0'/>
       </physvol>
       <physvol name='Hole_11_16'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_11_16.pos' unit='mm' x='0.36' y='0.040000000000000036' z='0.0'/>
+        <position name='Hole_11_16.pos' unit='mm' x='0.31999999999999995' y='0.08000000000000007' z='0.0'/>
       </physvol>
       <physvol name='Hole_11_18'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_11_18.pos' unit='mm' x='0.36' y='0.19999999999999996' z='0.0'/>
+        <position name='Hole_11_18.pos' unit='mm' x='0.31999999999999995' y='0.24' z='0.0'/>
       </physvol>
       <physvol name='Hole_11_19'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_11_19.pos' unit='mm' x='0.36' y='0.28' z='0.0'/>
+        <position name='Hole_11_19.pos' unit='mm' x='0.31999999999999995' y='0.32000000000000006' z='0.0'/>
       </physvol>
       <physvol name='Hole_11_21'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_11_21.pos' unit='mm' x='0.36' y='0.43999999999999995' z='0.0'/>
+        <position name='Hole_11_21.pos' unit='mm' x='0.31999999999999995' y='0.48' z='0.0'/>
       </physvol>
       <physvol name='Hole_11_22'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_11_22.pos' unit='mm' x='0.36' y='0.52' z='0.0'/>
+        <position name='Hole_11_22.pos' unit='mm' x='0.31999999999999995' y='0.56' z='0.0'/>
       </physvol>
       <physvol name='Hole_11_25'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_11_25.pos' unit='mm' x='0.36' y='0.76' z='0.0'/>
+        <position name='Hole_11_25.pos' unit='mm' x='0.31999999999999995' y='0.8' z='0.0'/>
       </physvol>
       <physvol name='Hole_11_29'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_11_29.pos' unit='mm' x='0.36' y='1.0799999999999998' z='0.0'/>
+        <position name='Hole_11_29.pos' unit='mm' x='0.31999999999999995' y='1.1199999999999999' z='0.0'/>
       </physvol>
       <physvol name='Hole_11_30'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_11_30.pos' unit='mm' x='0.36' y='1.16' z='0.0'/>
+        <position name='Hole_11_30.pos' unit='mm' x='0.31999999999999995' y='1.2' z='0.0'/>
       </physvol>
       <physvol name='Hole_12_8'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_12_8.pos' unit='mm' x='0.28' y='-0.6' z='0.0'/>
+        <position name='Hole_12_8.pos' unit='mm' x='0.24' y='-0.5599999999999999' z='0.0'/>
       </physvol>
       <physvol name='Hole_12_9'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_12_9.pos' unit='mm' x='0.28' y='-0.52' z='0.0'/>
+        <position name='Hole_12_9.pos' unit='mm' x='0.24' y='-0.48' z='0.0'/>
       </physvol>
       <physvol name='Hole_12_10'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_12_10.pos' unit='mm' x='0.28' y='-0.43999999999999995' z='0.0'/>
+        <position name='Hole_12_10.pos' unit='mm' x='0.24' y='-0.3999999999999999' z='0.0'/>
       </physvol>
       <physvol name='Hole_12_11'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_12_11.pos' unit='mm' x='0.28' y='-0.36' z='0.0'/>
+        <position name='Hole_12_11.pos' unit='mm' x='0.24' y='-0.31999999999999995' z='0.0'/>
       </physvol>
       <physvol name='Hole_12_13'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_12_13.pos' unit='mm' x='0.28' y='-0.19999999999999996' z='0.0'/>
+        <position name='Hole_12_13.pos' unit='mm' x='0.24' y='-0.15999999999999992' z='0.0'/>
       </physvol>
       <physvol name='Hole_12_16'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_12_16.pos' unit='mm' x='0.28' y='0.040000000000000036' z='0.0'/>
+        <position name='Hole_12_16.pos' unit='mm' x='0.24' y='0.08000000000000007' z='0.0'/>
       </physvol>
       <physvol name='Hole_12_17'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_12_17.pos' unit='mm' x='0.28' y='0.1200000000000001' z='0.0'/>
+        <position name='Hole_12_17.pos' unit='mm' x='0.24' y='0.16000000000000014' z='0.0'/>
       </physvol>
       <physvol name='Hole_12_19'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_12_19.pos' unit='mm' x='0.28' y='0.28' z='0.0'/>
+        <position name='Hole_12_19.pos' unit='mm' x='0.24' y='0.32000000000000006' z='0.0'/>
       </physvol>
       <physvol name='Hole_12_20'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_12_20.pos' unit='mm' x='0.28' y='0.3600000000000001' z='0.0'/>
+        <position name='Hole_12_20.pos' unit='mm' x='0.24' y='0.40000000000000013' z='0.0'/>
       </physvol>
       <physvol name='Hole_12_21'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_12_21.pos' unit='mm' x='0.28' y='0.43999999999999995' z='0.0'/>
+        <position name='Hole_12_21.pos' unit='mm' x='0.24' y='0.48' z='0.0'/>
       </physvol>
       <physvol name='Hole_12_24'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_12_24.pos' unit='mm' x='0.28' y='0.6799999999999999' z='0.0'/>
+        <position name='Hole_12_24.pos' unit='mm' x='0.24' y='0.72' z='0.0'/>
       </physvol>
       <physvol name='Hole_12_25'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_12_25.pos' unit='mm' x='0.28' y='0.76' z='0.0'/>
+        <position name='Hole_12_25.pos' unit='mm' x='0.24' y='0.8' z='0.0'/>
       </physvol>
       <physvol name='Hole_12_27'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_12_27.pos' unit='mm' x='0.28' y='0.9200000000000002' z='0.0'/>
+        <position name='Hole_12_27.pos' unit='mm' x='0.24' y='0.9600000000000002' z='0.0'/>
       </physvol>
       <physvol name='Hole_12_29'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_12_29.pos' unit='mm' x='0.28' y='1.0799999999999998' z='0.0'/>
+        <position name='Hole_12_29.pos' unit='mm' x='0.24' y='1.1199999999999999' z='0.0'/>
       </physvol>
       <physvol name='Hole_12_30'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_12_30.pos' unit='mm' x='0.28' y='1.16' z='0.0'/>
+        <position name='Hole_12_30.pos' unit='mm' x='0.24' y='1.2' z='0.0'/>
       </physvol>
       <physvol name='Hole_13_4'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_13_4.pos' unit='mm' x='0.19999999999999996' y='-0.9199999999999999' z='0.0'/>
+        <position name='Hole_13_4.pos' unit='mm' x='0.15999999999999992' y='-0.8799999999999999' z='0.0'/>
       </physvol>
       <physvol name='Hole_13_5'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_13_5.pos' unit='mm' x='0.19999999999999996' y='-0.84' z='0.0'/>
+        <position name='Hole_13_5.pos' unit='mm' x='0.15999999999999992' y='-0.7999999999999999' z='0.0'/>
       </physvol>
       <physvol name='Hole_13_6'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_13_6.pos' unit='mm' x='0.19999999999999996' y='-0.76' z='0.0'/>
+        <position name='Hole_13_6.pos' unit='mm' x='0.15999999999999992' y='-0.72' z='0.0'/>
       </physvol>
       <physvol name='Hole_13_7'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_13_7.pos' unit='mm' x='0.19999999999999996' y='-0.6799999999999999' z='0.0'/>
+        <position name='Hole_13_7.pos' unit='mm' x='0.15999999999999992' y='-0.6399999999999999' z='0.0'/>
       </physvol>
       <physvol name='Hole_13_9'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_13_9.pos' unit='mm' x='0.19999999999999996' y='-0.52' z='0.0'/>
+        <position name='Hole_13_9.pos' unit='mm' x='0.15999999999999992' y='-0.48' z='0.0'/>
       </physvol>
       <physvol name='Hole_13_10'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_13_10.pos' unit='mm' x='0.19999999999999996' y='-0.43999999999999995' z='0.0'/>
+        <position name='Hole_13_10.pos' unit='mm' x='0.15999999999999992' y='-0.3999999999999999' z='0.0'/>
       </physvol>
       <physvol name='Hole_13_11'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_13_11.pos' unit='mm' x='0.19999999999999996' y='-0.36' z='0.0'/>
+        <position name='Hole_13_11.pos' unit='mm' x='0.15999999999999992' y='-0.31999999999999995' z='0.0'/>
       </physvol>
       <physvol name='Hole_13_13'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_13_13.pos' unit='mm' x='0.19999999999999996' y='-0.19999999999999996' z='0.0'/>
+        <position name='Hole_13_13.pos' unit='mm' x='0.15999999999999992' y='-0.15999999999999992' z='0.0'/>
       </physvol>
       <physvol name='Hole_13_14'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_13_14.pos' unit='mm' x='0.19999999999999996' y='-0.11999999999999988' z='0.0'/>
+        <position name='Hole_13_14.pos' unit='mm' x='0.15999999999999992' y='-0.07999999999999985' z='0.0'/>
       </physvol>
       <physvol name='Hole_13_18'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_13_18.pos' unit='mm' x='0.19999999999999996' y='0.19999999999999996' z='0.0'/>
+        <position name='Hole_13_18.pos' unit='mm' x='0.15999999999999992' y='0.24' z='0.0'/>
       </physvol>
       <physvol name='Hole_13_20'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_13_20.pos' unit='mm' x='0.19999999999999996' y='0.3600000000000001' z='0.0'/>
+        <position name='Hole_13_20.pos' unit='mm' x='0.15999999999999992' y='0.40000000000000013' z='0.0'/>
       </physvol>
       <physvol name='Hole_13_23'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_13_23.pos' unit='mm' x='0.19999999999999996' y='0.6000000000000001' z='0.0'/>
+        <position name='Hole_13_23.pos' unit='mm' x='0.15999999999999992' y='0.6400000000000001' z='0.0'/>
       </physvol>
       <physvol name='Hole_13_25'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_13_25.pos' unit='mm' x='0.19999999999999996' y='0.76' z='0.0'/>
+        <position name='Hole_13_25.pos' unit='mm' x='0.15999999999999992' y='0.8' z='0.0'/>
       </physvol>
       <physvol name='Hole_13_27'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_13_27.pos' unit='mm' x='0.19999999999999996' y='0.9200000000000002' z='0.0'/>
+        <position name='Hole_13_27.pos' unit='mm' x='0.15999999999999992' y='0.9600000000000002' z='0.0'/>
       </physvol>
       <physvol name='Hole_13_29'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_13_29.pos' unit='mm' x='0.19999999999999996' y='1.0799999999999998' z='0.0'/>
+        <position name='Hole_13_29.pos' unit='mm' x='0.15999999999999992' y='1.1199999999999999' z='0.0'/>
       </physvol>
       <physvol name='Hole_14_0'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_14_0.pos' unit='mm' x='0.11999999999999988' y='-1.24' z='0.0'/>
+        <position name='Hole_14_0.pos' unit='mm' x='0.07999999999999985' y='-1.2' z='0.0'/>
       </physvol>
       <physvol name='Hole_14_1'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_14_1.pos' unit='mm' x='0.11999999999999988' y='-1.16' z='0.0'/>
+        <position name='Hole_14_1.pos' unit='mm' x='0.07999999999999985' y='-1.1199999999999999' z='0.0'/>
       </physvol>
       <physvol name='Hole_14_2'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_14_2.pos' unit='mm' x='0.11999999999999988' y='-1.08' z='0.0'/>
+        <position name='Hole_14_2.pos' unit='mm' x='0.07999999999999985' y='-1.04' z='0.0'/>
       </physvol>
       <physvol name='Hole_14_3'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_14_3.pos' unit='mm' x='0.11999999999999988' y='-1.0' z='0.0'/>
+        <position name='Hole_14_3.pos' unit='mm' x='0.07999999999999985' y='-0.96' z='0.0'/>
       </physvol>
       <physvol name='Hole_14_4'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_14_4.pos' unit='mm' x='0.11999999999999988' y='-0.9199999999999999' z='0.0'/>
+        <position name='Hole_14_4.pos' unit='mm' x='0.07999999999999985' y='-0.8799999999999999' z='0.0'/>
       </physvol>
       <physvol name='Hole_14_6'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_14_6.pos' unit='mm' x='0.11999999999999988' y='-0.76' z='0.0'/>
+        <position name='Hole_14_6.pos' unit='mm' x='0.07999999999999985' y='-0.72' z='0.0'/>
       </physvol>
       <physvol name='Hole_14_7'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_14_7.pos' unit='mm' x='0.11999999999999988' y='-0.6799999999999999' z='0.0'/>
+        <position name='Hole_14_7.pos' unit='mm' x='0.07999999999999985' y='-0.6399999999999999' z='0.0'/>
       </physvol>
       <physvol name='Hole_14_9'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_14_9.pos' unit='mm' x='0.11999999999999988' y='-0.52' z='0.0'/>
+        <position name='Hole_14_9.pos' unit='mm' x='0.07999999999999985' y='-0.48' z='0.0'/>
       </physvol>
       <physvol name='Hole_14_11'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_14_11.pos' unit='mm' x='0.11999999999999988' y='-0.36' z='0.0'/>
+        <position name='Hole_14_11.pos' unit='mm' x='0.07999999999999985' y='-0.31999999999999995' z='0.0'/>
       </physvol>
       <physvol name='Hole_14_13'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_14_13.pos' unit='mm' x='0.11999999999999988' y='-0.19999999999999996' z='0.0'/>
+        <position name='Hole_14_13.pos' unit='mm' x='0.07999999999999985' y='-0.15999999999999992' z='0.0'/>
       </physvol>
       <physvol name='Hole_14_15'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_14_15.pos' unit='mm' x='0.11999999999999988' y='-0.040000000000000036' z='0.0'/>
+        <position name='Hole_14_15.pos' unit='mm' x='0.07999999999999985' y='0.0' z='0.0'/>
       </physvol>
       <physvol name='Hole_14_17'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_14_17.pos' unit='mm' x='0.11999999999999988' y='0.1200000000000001' z='0.0'/>
+        <position name='Hole_14_17.pos' unit='mm' x='0.07999999999999985' y='0.16000000000000014' z='0.0'/>
       </physvol>
       <physvol name='Hole_14_18'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_14_18.pos' unit='mm' x='0.11999999999999988' y='0.19999999999999996' z='0.0'/>
+        <position name='Hole_14_18.pos' unit='mm' x='0.07999999999999985' y='0.24' z='0.0'/>
       </physvol>
       <physvol name='Hole_14_19'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_14_19.pos' unit='mm' x='0.11999999999999988' y='0.28' z='0.0'/>
+        <position name='Hole_14_19.pos' unit='mm' x='0.07999999999999985' y='0.32000000000000006' z='0.0'/>
       </physvol>
       <physvol name='Hole_14_20'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_14_20.pos' unit='mm' x='0.11999999999999988' y='0.3600000000000001' z='0.0'/>
+        <position name='Hole_14_20.pos' unit='mm' x='0.07999999999999985' y='0.40000000000000013' z='0.0'/>
       </physvol>
       <physvol name='Hole_14_26'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_14_26.pos' unit='mm' x='0.11999999999999988' y='0.8400000000000001' z='0.0'/>
+        <position name='Hole_14_26.pos' unit='mm' x='0.07999999999999985' y='0.8800000000000001' z='0.0'/>
       </physvol>
       <physvol name='Hole_14_27'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_14_27.pos' unit='mm' x='0.11999999999999988' y='0.9200000000000002' z='0.0'/>
+        <position name='Hole_14_27.pos' unit='mm' x='0.07999999999999985' y='0.9600000000000002' z='0.0'/>
       </physvol>
       <physvol name='Hole_14_30'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_14_30.pos' unit='mm' x='0.11999999999999988' y='1.16' z='0.0'/>
+        <position name='Hole_14_30.pos' unit='mm' x='0.07999999999999985' y='1.2' z='0.0'/>
       </physvol>
       <physvol name='Hole_15_0'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_15_0.pos' unit='mm' x='0.040000000000000036' y='-1.24' z='0.0'/>
+        <position name='Hole_15_0.pos' unit='mm' x='-0.0' y='-1.2' z='0.0'/>
       </physvol>
       <physvol name='Hole_15_2'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_15_2.pos' unit='mm' x='0.040000000000000036' y='-1.08' z='0.0'/>
+        <position name='Hole_15_2.pos' unit='mm' x='-0.0' y='-1.04' z='0.0'/>
       </physvol>
       <physvol name='Hole_15_3'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_15_3.pos' unit='mm' x='0.040000000000000036' y='-1.0' z='0.0'/>
+        <position name='Hole_15_3.pos' unit='mm' x='-0.0' y='-0.96' z='0.0'/>
       </physvol>
       <physvol name='Hole_15_9'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_15_9.pos' unit='mm' x='0.040000000000000036' y='-0.52' z='0.0'/>
+        <position name='Hole_15_9.pos' unit='mm' x='-0.0' y='-0.48' z='0.0'/>
       </physvol>
       <physvol name='Hole_15_10'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_15_10.pos' unit='mm' x='0.040000000000000036' y='-0.43999999999999995' z='0.0'/>
+        <position name='Hole_15_10.pos' unit='mm' x='-0.0' y='-0.3999999999999999' z='0.0'/>
       </physvol>
       <physvol name='Hole_15_11'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_15_11.pos' unit='mm' x='0.040000000000000036' y='-0.36' z='0.0'/>
+        <position name='Hole_15_11.pos' unit='mm' x='-0.0' y='-0.31999999999999995' z='0.0'/>
       </physvol>
       <physvol name='Hole_15_12'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_15_12.pos' unit='mm' x='0.040000000000000036' y='-0.28' z='0.0'/>
+        <position name='Hole_15_12.pos' unit='mm' x='-0.0' y='-0.24' z='0.0'/>
       </physvol>
       <physvol name='Hole_15_13'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_15_13.pos' unit='mm' x='0.040000000000000036' y='-0.19999999999999996' z='0.0'/>
+        <position name='Hole_15_13.pos' unit='mm' x='-0.0' y='-0.15999999999999992' z='0.0'/>
       </physvol>
       <physvol name='Hole_15_14'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_15_14.pos' unit='mm' x='0.040000000000000036' y='-0.11999999999999988' z='0.0'/>
+        <position name='Hole_15_14.pos' unit='mm' x='-0.0' y='-0.07999999999999985' z='0.0'/>
       </physvol>
       <physvol name='Hole_15_15'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_15_15.pos' unit='mm' x='0.040000000000000036' y='-0.040000000000000036' z='0.0'/>
+        <position name='Hole_15_15.pos' unit='mm' x='-0.0' y='0.0' z='0.0'/>
       </physvol>
       <physvol name='Hole_15_16'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_15_16.pos' unit='mm' x='0.040000000000000036' y='0.040000000000000036' z='0.0'/>
+        <position name='Hole_15_16.pos' unit='mm' x='-0.0' y='0.08000000000000007' z='0.0'/>
       </physvol>
       <physvol name='Hole_15_18'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_15_18.pos' unit='mm' x='0.040000000000000036' y='0.19999999999999996' z='0.0'/>
+        <position name='Hole_15_18.pos' unit='mm' x='-0.0' y='0.24' z='0.0'/>
       </physvol>
       <physvol name='Hole_15_19'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_15_19.pos' unit='mm' x='0.040000000000000036' y='0.28' z='0.0'/>
+        <position name='Hole_15_19.pos' unit='mm' x='-0.0' y='0.32000000000000006' z='0.0'/>
       </physvol>
       <physvol name='Hole_15_21'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_15_21.pos' unit='mm' x='0.040000000000000036' y='0.43999999999999995' z='0.0'/>
+        <position name='Hole_15_21.pos' unit='mm' x='-0.0' y='0.48' z='0.0'/>
       </physvol>
       <physvol name='Hole_15_22'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_15_22.pos' unit='mm' x='0.040000000000000036' y='0.52' z='0.0'/>
+        <position name='Hole_15_22.pos' unit='mm' x='-0.0' y='0.56' z='0.0'/>
       </physvol>
       <physvol name='Hole_15_24'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_15_24.pos' unit='mm' x='0.040000000000000036' y='0.6799999999999999' z='0.0'/>
+        <position name='Hole_15_24.pos' unit='mm' x='-0.0' y='0.72' z='0.0'/>
       </physvol>
       <physvol name='Hole_15_27'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_15_27.pos' unit='mm' x='0.040000000000000036' y='0.9200000000000002' z='0.0'/>
+        <position name='Hole_15_27.pos' unit='mm' x='-0.0' y='0.9600000000000002' z='0.0'/>
       </physvol>
       <physvol name='Hole_15_30'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_15_30.pos' unit='mm' x='0.040000000000000036' y='1.16' z='0.0'/>
+        <position name='Hole_15_30.pos' unit='mm' x='-0.0' y='1.2' z='0.0'/>
       </physvol>
       <physvol name='Hole_16_0'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_16_0.pos' unit='mm' x='-0.040000000000000036' y='-1.24' z='0.0'/>
+        <position name='Hole_16_0.pos' unit='mm' x='-0.08000000000000007' y='-1.2' z='0.0'/>
       </physvol>
       <physvol name='Hole_16_1'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_16_1.pos' unit='mm' x='-0.040000000000000036' y='-1.16' z='0.0'/>
+        <position name='Hole_16_1.pos' unit='mm' x='-0.08000000000000007' y='-1.1199999999999999' z='0.0'/>
       </physvol>
       <physvol name='Hole_16_5'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_16_5.pos' unit='mm' x='-0.040000000000000036' y='-0.84' z='0.0'/>
+        <position name='Hole_16_5.pos' unit='mm' x='-0.08000000000000007' y='-0.7999999999999999' z='0.0'/>
       </physvol>
       <physvol name='Hole_16_8'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_16_8.pos' unit='mm' x='-0.040000000000000036' y='-0.6' z='0.0'/>
+        <position name='Hole_16_8.pos' unit='mm' x='-0.08000000000000007' y='-0.5599999999999999' z='0.0'/>
       </physvol>
       <physvol name='Hole_16_9'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_16_9.pos' unit='mm' x='-0.040000000000000036' y='-0.52' z='0.0'/>
+        <position name='Hole_16_9.pos' unit='mm' x='-0.08000000000000007' y='-0.48' z='0.0'/>
       </physvol>
       <physvol name='Hole_16_12'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_16_12.pos' unit='mm' x='-0.040000000000000036' y='-0.28' z='0.0'/>
+        <position name='Hole_16_12.pos' unit='mm' x='-0.08000000000000007' y='-0.24' z='0.0'/>
       </physvol>
       <physvol name='Hole_16_15'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_16_15.pos' unit='mm' x='-0.040000000000000036' y='-0.040000000000000036' z='0.0'/>
+        <position name='Hole_16_15.pos' unit='mm' x='-0.08000000000000007' y='0.0' z='0.0'/>
       </physvol>
       <physvol name='Hole_16_17'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_16_17.pos' unit='mm' x='-0.040000000000000036' y='0.1200000000000001' z='0.0'/>
+        <position name='Hole_16_17.pos' unit='mm' x='-0.08000000000000007' y='0.16000000000000014' z='0.0'/>
       </physvol>
       <physvol name='Hole_16_18'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_16_18.pos' unit='mm' x='-0.040000000000000036' y='0.19999999999999996' z='0.0'/>
+        <position name='Hole_16_18.pos' unit='mm' x='-0.08000000000000007' y='0.24' z='0.0'/>
       </physvol>
       <physvol name='Hole_16_22'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_16_22.pos' unit='mm' x='-0.040000000000000036' y='0.52' z='0.0'/>
+        <position name='Hole_16_22.pos' unit='mm' x='-0.08000000000000007' y='0.56' z='0.0'/>
       </physvol>
       <physvol name='Hole_16_23'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_16_23.pos' unit='mm' x='-0.040000000000000036' y='0.6000000000000001' z='0.0'/>
+        <position name='Hole_16_23.pos' unit='mm' x='-0.08000000000000007' y='0.6400000000000001' z='0.0'/>
       </physvol>
       <physvol name='Hole_16_24'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_16_24.pos' unit='mm' x='-0.040000000000000036' y='0.6799999999999999' z='0.0'/>
+        <position name='Hole_16_24.pos' unit='mm' x='-0.08000000000000007' y='0.72' z='0.0'/>
       </physvol>
       <physvol name='Hole_16_26'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_16_26.pos' unit='mm' x='-0.040000000000000036' y='0.8400000000000001' z='0.0'/>
+        <position name='Hole_16_26.pos' unit='mm' x='-0.08000000000000007' y='0.8800000000000001' z='0.0'/>
       </physvol>
       <physvol name='Hole_16_27'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_16_27.pos' unit='mm' x='-0.040000000000000036' y='0.9200000000000002' z='0.0'/>
+        <position name='Hole_16_27.pos' unit='mm' x='-0.08000000000000007' y='0.9600000000000002' z='0.0'/>
       </physvol>
       <physvol name='Hole_16_29'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_16_29.pos' unit='mm' x='-0.040000000000000036' y='1.0799999999999998' z='0.0'/>
+        <position name='Hole_16_29.pos' unit='mm' x='-0.08000000000000007' y='1.1199999999999999' z='0.0'/>
       </physvol>
       <physvol name='Hole_17_0'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_17_0.pos' unit='mm' x='-0.1200000000000001' y='-1.24' z='0.0'/>
+        <position name='Hole_17_0.pos' unit='mm' x='-0.16000000000000014' y='-1.2' z='0.0'/>
       </physvol>
       <physvol name='Hole_17_1'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_17_1.pos' unit='mm' x='-0.1200000000000001' y='-1.16' z='0.0'/>
+        <position name='Hole_17_1.pos' unit='mm' x='-0.16000000000000014' y='-1.1199999999999999' z='0.0'/>
       </physvol>
       <physvol name='Hole_17_4'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_17_4.pos' unit='mm' x='-0.1200000000000001' y='-0.9199999999999999' z='0.0'/>
+        <position name='Hole_17_4.pos' unit='mm' x='-0.16000000000000014' y='-0.8799999999999999' z='0.0'/>
       </physvol>
       <physvol name='Hole_17_11'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_17_11.pos' unit='mm' x='-0.1200000000000001' y='-0.36' z='0.0'/>
+        <position name='Hole_17_11.pos' unit='mm' x='-0.16000000000000014' y='-0.31999999999999995' z='0.0'/>
       </physvol>
       <physvol name='Hole_17_12'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_17_12.pos' unit='mm' x='-0.1200000000000001' y='-0.28' z='0.0'/>
+        <position name='Hole_17_12.pos' unit='mm' x='-0.16000000000000014' y='-0.24' z='0.0'/>
       </physvol>
       <physvol name='Hole_17_13'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_17_13.pos' unit='mm' x='-0.1200000000000001' y='-0.19999999999999996' z='0.0'/>
+        <position name='Hole_17_13.pos' unit='mm' x='-0.16000000000000014' y='-0.15999999999999992' z='0.0'/>
       </physvol>
       <physvol name='Hole_17_17'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_17_17.pos' unit='mm' x='-0.1200000000000001' y='0.1200000000000001' z='0.0'/>
+        <position name='Hole_17_17.pos' unit='mm' x='-0.16000000000000014' y='0.16000000000000014' z='0.0'/>
       </physvol>
       <physvol name='Hole_17_18'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_17_18.pos' unit='mm' x='-0.1200000000000001' y='0.19999999999999996' z='0.0'/>
+        <position name='Hole_17_18.pos' unit='mm' x='-0.16000000000000014' y='0.24' z='0.0'/>
       </physvol>
       <physvol name='Hole_17_19'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_17_19.pos' unit='mm' x='-0.1200000000000001' y='0.28' z='0.0'/>
+        <position name='Hole_17_19.pos' unit='mm' x='-0.16000000000000014' y='0.32000000000000006' z='0.0'/>
       </physvol>
       <physvol name='Hole_17_21'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_17_21.pos' unit='mm' x='-0.1200000000000001' y='0.43999999999999995' z='0.0'/>
+        <position name='Hole_17_21.pos' unit='mm' x='-0.16000000000000014' y='0.48' z='0.0'/>
       </physvol>
       <physvol name='Hole_17_22'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_17_22.pos' unit='mm' x='-0.1200000000000001' y='0.52' z='0.0'/>
+        <position name='Hole_17_22.pos' unit='mm' x='-0.16000000000000014' y='0.56' z='0.0'/>
       </physvol>
       <physvol name='Hole_17_26'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_17_26.pos' unit='mm' x='-0.1200000000000001' y='0.8400000000000001' z='0.0'/>
+        <position name='Hole_17_26.pos' unit='mm' x='-0.16000000000000014' y='0.8800000000000001' z='0.0'/>
       </physvol>
       <physvol name='Hole_17_27'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_17_27.pos' unit='mm' x='-0.1200000000000001' y='0.9200000000000002' z='0.0'/>
+        <position name='Hole_17_27.pos' unit='mm' x='-0.16000000000000014' y='0.9600000000000002' z='0.0'/>
       </physvol>
       <physvol name='Hole_17_28'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_17_28.pos' unit='mm' x='-0.1200000000000001' y='1.0000000000000002' z='0.0'/>
+        <position name='Hole_17_28.pos' unit='mm' x='-0.16000000000000014' y='1.0400000000000003' z='0.0'/>
       </physvol>
       <physvol name='Hole_17_29'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_17_29.pos' unit='mm' x='-0.1200000000000001' y='1.0799999999999998' z='0.0'/>
+        <position name='Hole_17_29.pos' unit='mm' x='-0.16000000000000014' y='1.1199999999999999' z='0.0'/>
       </physvol>
       <physvol name='Hole_17_30'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_17_30.pos' unit='mm' x='-0.1200000000000001' y='1.16' z='0.0'/>
+        <position name='Hole_17_30.pos' unit='mm' x='-0.16000000000000014' y='1.2' z='0.0'/>
       </physvol>
       <physvol name='Hole_18_3'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_18_3.pos' unit='mm' x='-0.19999999999999996' y='-1.0' z='0.0'/>
+        <position name='Hole_18_3.pos' unit='mm' x='-0.24' y='-0.96' z='0.0'/>
       </physvol>
       <physvol name='Hole_18_4'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_18_4.pos' unit='mm' x='-0.19999999999999996' y='-0.9199999999999999' z='0.0'/>
+        <position name='Hole_18_4.pos' unit='mm' x='-0.24' y='-0.8799999999999999' z='0.0'/>
       </physvol>
       <physvol name='Hole_18_5'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_18_5.pos' unit='mm' x='-0.19999999999999996' y='-0.84' z='0.0'/>
+        <position name='Hole_18_5.pos' unit='mm' x='-0.24' y='-0.7999999999999999' z='0.0'/>
       </physvol>
       <physvol name='Hole_18_9'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_18_9.pos' unit='mm' x='-0.19999999999999996' y='-0.52' z='0.0'/>
+        <position name='Hole_18_9.pos' unit='mm' x='-0.24' y='-0.48' z='0.0'/>
       </physvol>
       <physvol name='Hole_18_10'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_18_10.pos' unit='mm' x='-0.19999999999999996' y='-0.43999999999999995' z='0.0'/>
+        <position name='Hole_18_10.pos' unit='mm' x='-0.24' y='-0.3999999999999999' z='0.0'/>
       </physvol>
       <physvol name='Hole_18_14'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_18_14.pos' unit='mm' x='-0.19999999999999996' y='-0.11999999999999988' z='0.0'/>
+        <position name='Hole_18_14.pos' unit='mm' x='-0.24' y='-0.07999999999999985' z='0.0'/>
       </physvol>
       <physvol name='Hole_18_15'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_18_15.pos' unit='mm' x='-0.19999999999999996' y='-0.040000000000000036' z='0.0'/>
+        <position name='Hole_18_15.pos' unit='mm' x='-0.24' y='0.0' z='0.0'/>
       </physvol>
       <physvol name='Hole_18_17'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_18_17.pos' unit='mm' x='-0.19999999999999996' y='0.1200000000000001' z='0.0'/>
+        <position name='Hole_18_17.pos' unit='mm' x='-0.24' y='0.16000000000000014' z='0.0'/>
       </physvol>
       <physvol name='Hole_18_18'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_18_18.pos' unit='mm' x='-0.19999999999999996' y='0.19999999999999996' z='0.0'/>
+        <position name='Hole_18_18.pos' unit='mm' x='-0.24' y='0.24' z='0.0'/>
       </physvol>
       <physvol name='Hole_18_19'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_18_19.pos' unit='mm' x='-0.19999999999999996' y='0.28' z='0.0'/>
+        <position name='Hole_18_19.pos' unit='mm' x='-0.24' y='0.32000000000000006' z='0.0'/>
       </physvol>
       <physvol name='Hole_18_24'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_18_24.pos' unit='mm' x='-0.19999999999999996' y='0.6799999999999999' z='0.0'/>
+        <position name='Hole_18_24.pos' unit='mm' x='-0.24' y='0.72' z='0.0'/>
       </physvol>
       <physvol name='Hole_18_25'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_18_25.pos' unit='mm' x='-0.19999999999999996' y='0.76' z='0.0'/>
+        <position name='Hole_18_25.pos' unit='mm' x='-0.24' y='0.8' z='0.0'/>
       </physvol>
       <physvol name='Hole_18_26'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_18_26.pos' unit='mm' x='-0.19999999999999996' y='0.8400000000000001' z='0.0'/>
+        <position name='Hole_18_26.pos' unit='mm' x='-0.24' y='0.8800000000000001' z='0.0'/>
       </physvol>
       <physvol name='Hole_18_30'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_18_30.pos' unit='mm' x='-0.19999999999999996' y='1.16' z='0.0'/>
+        <position name='Hole_18_30.pos' unit='mm' x='-0.24' y='1.2' z='0.0'/>
       </physvol>
       <physvol name='Hole_19_2'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_19_2.pos' unit='mm' x='-0.28' y='-1.08' z='0.0'/>
+        <position name='Hole_19_2.pos' unit='mm' x='-0.32000000000000006' y='-1.04' z='0.0'/>
       </physvol>
       <physvol name='Hole_19_3'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_19_3.pos' unit='mm' x='-0.28' y='-1.0' z='0.0'/>
+        <position name='Hole_19_3.pos' unit='mm' x='-0.32000000000000006' y='-0.96' z='0.0'/>
       </physvol>
       <physvol name='Hole_19_4'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_19_4.pos' unit='mm' x='-0.28' y='-0.9199999999999999' z='0.0'/>
+        <position name='Hole_19_4.pos' unit='mm' x='-0.32000000000000006' y='-0.8799999999999999' z='0.0'/>
       </physvol>
       <physvol name='Hole_19_5'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_19_5.pos' unit='mm' x='-0.28' y='-0.84' z='0.0'/>
+        <position name='Hole_19_5.pos' unit='mm' x='-0.32000000000000006' y='-0.7999999999999999' z='0.0'/>
       </physvol>
       <physvol name='Hole_19_8'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_19_8.pos' unit='mm' x='-0.28' y='-0.6' z='0.0'/>
+        <position name='Hole_19_8.pos' unit='mm' x='-0.32000000000000006' y='-0.5599999999999999' z='0.0'/>
       </physvol>
       <physvol name='Hole_19_13'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_19_13.pos' unit='mm' x='-0.28' y='-0.19999999999999996' z='0.0'/>
+        <position name='Hole_19_13.pos' unit='mm' x='-0.32000000000000006' y='-0.15999999999999992' z='0.0'/>
       </physvol>
       <physvol name='Hole_19_17'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_19_17.pos' unit='mm' x='-0.28' y='0.1200000000000001' z='0.0'/>
+        <position name='Hole_19_17.pos' unit='mm' x='-0.32000000000000006' y='0.16000000000000014' z='0.0'/>
       </physvol>
       <physvol name='Hole_19_19'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_19_19.pos' unit='mm' x='-0.28' y='0.28' z='0.0'/>
+        <position name='Hole_19_19.pos' unit='mm' x='-0.32000000000000006' y='0.32000000000000006' z='0.0'/>
       </physvol>
       <physvol name='Hole_19_21'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_19_21.pos' unit='mm' x='-0.28' y='0.43999999999999995' z='0.0'/>
+        <position name='Hole_19_21.pos' unit='mm' x='-0.32000000000000006' y='0.48' z='0.0'/>
       </physvol>
       <physvol name='Hole_19_23'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_19_23.pos' unit='mm' x='-0.28' y='0.6000000000000001' z='0.0'/>
+        <position name='Hole_19_23.pos' unit='mm' x='-0.32000000000000006' y='0.6400000000000001' z='0.0'/>
       </physvol>
       <physvol name='Hole_19_24'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_19_24.pos' unit='mm' x='-0.28' y='0.6799999999999999' z='0.0'/>
+        <position name='Hole_19_24.pos' unit='mm' x='-0.32000000000000006' y='0.72' z='0.0'/>
       </physvol>
       <physvol name='Hole_19_30'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_19_30.pos' unit='mm' x='-0.28' y='1.16' z='0.0'/>
+        <position name='Hole_19_30.pos' unit='mm' x='-0.32000000000000006' y='1.2' z='0.0'/>
       </physvol>
       <physvol name='Hole_20_0'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_20_0.pos' unit='mm' x='-0.3600000000000001' y='-1.24' z='0.0'/>
+        <position name='Hole_20_0.pos' unit='mm' x='-0.40000000000000013' y='-1.2' z='0.0'/>
       </physvol>
       <physvol name='Hole_20_4'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_20_4.pos' unit='mm' x='-0.3600000000000001' y='-0.9199999999999999' z='0.0'/>
+        <position name='Hole_20_4.pos' unit='mm' x='-0.40000000000000013' y='-0.8799999999999999' z='0.0'/>
       </physvol>
       <physvol name='Hole_20_6'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_20_6.pos' unit='mm' x='-0.3600000000000001' y='-0.76' z='0.0'/>
+        <position name='Hole_20_6.pos' unit='mm' x='-0.40000000000000013' y='-0.72' z='0.0'/>
       </physvol>
       <physvol name='Hole_20_11'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_20_11.pos' unit='mm' x='-0.3600000000000001' y='-0.36' z='0.0'/>
+        <position name='Hole_20_11.pos' unit='mm' x='-0.40000000000000013' y='-0.31999999999999995' z='0.0'/>
       </physvol>
       <physvol name='Hole_20_12'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_20_12.pos' unit='mm' x='-0.3600000000000001' y='-0.28' z='0.0'/>
+        <position name='Hole_20_12.pos' unit='mm' x='-0.40000000000000013' y='-0.24' z='0.0'/>
       </physvol>
       <physvol name='Hole_20_13'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_20_13.pos' unit='mm' x='-0.3600000000000001' y='-0.19999999999999996' z='0.0'/>
+        <position name='Hole_20_13.pos' unit='mm' x='-0.40000000000000013' y='-0.15999999999999992' z='0.0'/>
       </physvol>
       <physvol name='Hole_20_15'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_20_15.pos' unit='mm' x='-0.3600000000000001' y='-0.040000000000000036' z='0.0'/>
+        <position name='Hole_20_15.pos' unit='mm' x='-0.40000000000000013' y='0.0' z='0.0'/>
       </physvol>
       <physvol name='Hole_20_18'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_20_18.pos' unit='mm' x='-0.3600000000000001' y='0.19999999999999996' z='0.0'/>
+        <position name='Hole_20_18.pos' unit='mm' x='-0.40000000000000013' y='0.24' z='0.0'/>
       </physvol>
       <physvol name='Hole_20_19'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_20_19.pos' unit='mm' x='-0.3600000000000001' y='0.28' z='0.0'/>
+        <position name='Hole_20_19.pos' unit='mm' x='-0.40000000000000013' y='0.32000000000000006' z='0.0'/>
       </physvol>
       <physvol name='Hole_20_22'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_20_22.pos' unit='mm' x='-0.3600000000000001' y='0.52' z='0.0'/>
+        <position name='Hole_20_22.pos' unit='mm' x='-0.40000000000000013' y='0.56' z='0.0'/>
       </physvol>
       <physvol name='Hole_20_23'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_20_23.pos' unit='mm' x='-0.3600000000000001' y='0.6000000000000001' z='0.0'/>
+        <position name='Hole_20_23.pos' unit='mm' x='-0.40000000000000013' y='0.6400000000000001' z='0.0'/>
       </physvol>
       <physvol name='Hole_20_24'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_20_24.pos' unit='mm' x='-0.3600000000000001' y='0.6799999999999999' z='0.0'/>
+        <position name='Hole_20_24.pos' unit='mm' x='-0.40000000000000013' y='0.72' z='0.0'/>
       </physvol>
       <physvol name='Hole_20_25'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_20_25.pos' unit='mm' x='-0.3600000000000001' y='0.76' z='0.0'/>
+        <position name='Hole_20_25.pos' unit='mm' x='-0.40000000000000013' y='0.8' z='0.0'/>
       </physvol>
       <physvol name='Hole_20_26'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_20_26.pos' unit='mm' x='-0.3600000000000001' y='0.8400000000000001' z='0.0'/>
+        <position name='Hole_20_26.pos' unit='mm' x='-0.40000000000000013' y='0.8800000000000001' z='0.0'/>
       </physvol>
       <physvol name='Hole_20_27'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_20_27.pos' unit='mm' x='-0.3600000000000001' y='0.9200000000000002' z='0.0'/>
+        <position name='Hole_20_27.pos' unit='mm' x='-0.40000000000000013' y='0.9600000000000002' z='0.0'/>
       </physvol>
       <physvol name='Hole_20_28'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_20_28.pos' unit='mm' x='-0.3600000000000001' y='1.0000000000000002' z='0.0'/>
+        <position name='Hole_20_28.pos' unit='mm' x='-0.40000000000000013' y='1.0400000000000003' z='0.0'/>
       </physvol>
       <physvol name='Hole_20_29'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_20_29.pos' unit='mm' x='-0.3600000000000001' y='1.0799999999999998' z='0.0'/>
+        <position name='Hole_20_29.pos' unit='mm' x='-0.40000000000000013' y='1.1199999999999999' z='0.0'/>
       </physvol>
       <physvol name='Hole_21_0'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_21_0.pos' unit='mm' x='-0.43999999999999995' y='-1.24' z='0.0'/>
+        <position name='Hole_21_0.pos' unit='mm' x='-0.48' y='-1.2' z='0.0'/>
       </physvol>
       <physvol name='Hole_21_1'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_21_1.pos' unit='mm' x='-0.43999999999999995' y='-1.16' z='0.0'/>
+        <position name='Hole_21_1.pos' unit='mm' x='-0.48' y='-1.1199999999999999' z='0.0'/>
       </physvol>
       <physvol name='Hole_21_5'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_21_5.pos' unit='mm' x='-0.43999999999999995' y='-0.84' z='0.0'/>
+        <position name='Hole_21_5.pos' unit='mm' x='-0.48' y='-0.7999999999999999' z='0.0'/>
       </physvol>
       <physvol name='Hole_21_7'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_21_7.pos' unit='mm' x='-0.43999999999999995' y='-0.6799999999999999' z='0.0'/>
+        <position name='Hole_21_7.pos' unit='mm' x='-0.48' y='-0.6399999999999999' z='0.0'/>
       </physvol>
       <physvol name='Hole_21_10'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_21_10.pos' unit='mm' x='-0.43999999999999995' y='-0.43999999999999995' z='0.0'/>
+        <position name='Hole_21_10.pos' unit='mm' x='-0.48' y='-0.3999999999999999' z='0.0'/>
       </physvol>
       <physvol name='Hole_21_11'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_21_11.pos' unit='mm' x='-0.43999999999999995' y='-0.36' z='0.0'/>
+        <position name='Hole_21_11.pos' unit='mm' x='-0.48' y='-0.31999999999999995' z='0.0'/>
       </physvol>
       <physvol name='Hole_21_12'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_21_12.pos' unit='mm' x='-0.43999999999999995' y='-0.28' z='0.0'/>
+        <position name='Hole_21_12.pos' unit='mm' x='-0.48' y='-0.24' z='0.0'/>
       </physvol>
       <physvol name='Hole_21_13'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_21_13.pos' unit='mm' x='-0.43999999999999995' y='-0.19999999999999996' z='0.0'/>
+        <position name='Hole_21_13.pos' unit='mm' x='-0.48' y='-0.15999999999999992' z='0.0'/>
       </physvol>
       <physvol name='Hole_21_14'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_21_14.pos' unit='mm' x='-0.43999999999999995' y='-0.11999999999999988' z='0.0'/>
+        <position name='Hole_21_14.pos' unit='mm' x='-0.48' y='-0.07999999999999985' z='0.0'/>
       </physvol>
       <physvol name='Hole_21_17'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_21_17.pos' unit='mm' x='-0.43999999999999995' y='0.1200000000000001' z='0.0'/>
+        <position name='Hole_21_17.pos' unit='mm' x='-0.48' y='0.16000000000000014' z='0.0'/>
       </physvol>
       <physvol name='Hole_21_25'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_21_25.pos' unit='mm' x='-0.43999999999999995' y='0.76' z='0.0'/>
+        <position name='Hole_21_25.pos' unit='mm' x='-0.48' y='0.8' z='0.0'/>
       </physvol>
       <physvol name='Hole_21_26'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_21_26.pos' unit='mm' x='-0.43999999999999995' y='0.8400000000000001' z='0.0'/>
+        <position name='Hole_21_26.pos' unit='mm' x='-0.48' y='0.8800000000000001' z='0.0'/>
       </physvol>
       <physvol name='Hole_21_27'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_21_27.pos' unit='mm' x='-0.43999999999999995' y='0.9200000000000002' z='0.0'/>
+        <position name='Hole_21_27.pos' unit='mm' x='-0.48' y='0.9600000000000002' z='0.0'/>
       </physvol>
       <physvol name='Hole_21_30'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_21_30.pos' unit='mm' x='-0.43999999999999995' y='1.16' z='0.0'/>
+        <position name='Hole_21_30.pos' unit='mm' x='-0.48' y='1.2' z='0.0'/>
       </physvol>
       <physvol name='Hole_22_0'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_22_0.pos' unit='mm' x='-0.52' y='-1.24' z='0.0'/>
+        <position name='Hole_22_0.pos' unit='mm' x='-0.56' y='-1.2' z='0.0'/>
       </physvol>
       <physvol name='Hole_22_1'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_22_1.pos' unit='mm' x='-0.52' y='-1.16' z='0.0'/>
+        <position name='Hole_22_1.pos' unit='mm' x='-0.56' y='-1.1199999999999999' z='0.0'/>
       </physvol>
       <physvol name='Hole_22_5'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_22_5.pos' unit='mm' x='-0.52' y='-0.84' z='0.0'/>
+        <position name='Hole_22_5.pos' unit='mm' x='-0.56' y='-0.7999999999999999' z='0.0'/>
       </physvol>
       <physvol name='Hole_22_8'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_22_8.pos' unit='mm' x='-0.52' y='-0.6' z='0.0'/>
+        <position name='Hole_22_8.pos' unit='mm' x='-0.56' y='-0.5599999999999999' z='0.0'/>
       </physvol>
       <physvol name='Hole_22_12'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_22_12.pos' unit='mm' x='-0.52' y='-0.28' z='0.0'/>
+        <position name='Hole_22_12.pos' unit='mm' x='-0.56' y='-0.24' z='0.0'/>
       </physvol>
       <physvol name='Hole_22_14'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_22_14.pos' unit='mm' x='-0.52' y='-0.11999999999999988' z='0.0'/>
+        <position name='Hole_22_14.pos' unit='mm' x='-0.56' y='-0.07999999999999985' z='0.0'/>
       </physvol>
       <physvol name='Hole_22_15'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_22_15.pos' unit='mm' x='-0.52' y='-0.040000000000000036' z='0.0'/>
+        <position name='Hole_22_15.pos' unit='mm' x='-0.56' y='0.0' z='0.0'/>
       </physvol>
       <physvol name='Hole_22_16'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_22_16.pos' unit='mm' x='-0.52' y='0.040000000000000036' z='0.0'/>
+        <position name='Hole_22_16.pos' unit='mm' x='-0.56' y='0.08000000000000007' z='0.0'/>
       </physvol>
       <physvol name='Hole_22_17'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_22_17.pos' unit='mm' x='-0.52' y='0.1200000000000001' z='0.0'/>
+        <position name='Hole_22_17.pos' unit='mm' x='-0.56' y='0.16000000000000014' z='0.0'/>
       </physvol>
       <physvol name='Hole_22_20'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_22_20.pos' unit='mm' x='-0.52' y='0.3600000000000001' z='0.0'/>
+        <position name='Hole_22_20.pos' unit='mm' x='-0.56' y='0.40000000000000013' z='0.0'/>
       </physvol>
       <physvol name='Hole_22_21'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_22_21.pos' unit='mm' x='-0.52' y='0.43999999999999995' z='0.0'/>
+        <position name='Hole_22_21.pos' unit='mm' x='-0.56' y='0.48' z='0.0'/>
       </physvol>
       <physvol name='Hole_22_22'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_22_22.pos' unit='mm' x='-0.52' y='0.52' z='0.0'/>
+        <position name='Hole_22_22.pos' unit='mm' x='-0.56' y='0.56' z='0.0'/>
       </physvol>
       <physvol name='Hole_22_23'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_22_23.pos' unit='mm' x='-0.52' y='0.6000000000000001' z='0.0'/>
+        <position name='Hole_22_23.pos' unit='mm' x='-0.56' y='0.6400000000000001' z='0.0'/>
       </physvol>
       <physvol name='Hole_22_26'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_22_26.pos' unit='mm' x='-0.52' y='0.8400000000000001' z='0.0'/>
+        <position name='Hole_22_26.pos' unit='mm' x='-0.56' y='0.8800000000000001' z='0.0'/>
       </physvol>
       <physvol name='Hole_22_29'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_22_29.pos' unit='mm' x='-0.52' y='1.0799999999999998' z='0.0'/>
+        <position name='Hole_22_29.pos' unit='mm' x='-0.56' y='1.1199999999999999' z='0.0'/>
       </physvol>
       <physvol name='Hole_23_1'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_23_1.pos' unit='mm' x='-0.6000000000000001' y='-1.16' z='0.0'/>
+        <position name='Hole_23_1.pos' unit='mm' x='-0.6400000000000001' y='-1.1199999999999999' z='0.0'/>
       </physvol>
       <physvol name='Hole_23_2'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_23_2.pos' unit='mm' x='-0.6000000000000001' y='-1.08' z='0.0'/>
+        <position name='Hole_23_2.pos' unit='mm' x='-0.6400000000000001' y='-1.04' z='0.0'/>
       </physvol>
       <physvol name='Hole_23_5'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_23_5.pos' unit='mm' x='-0.6000000000000001' y='-0.84' z='0.0'/>
+        <position name='Hole_23_5.pos' unit='mm' x='-0.6400000000000001' y='-0.7999999999999999' z='0.0'/>
       </physvol>
       <physvol name='Hole_23_6'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_23_6.pos' unit='mm' x='-0.6000000000000001' y='-0.76' z='0.0'/>
+        <position name='Hole_23_6.pos' unit='mm' x='-0.6400000000000001' y='-0.72' z='0.0'/>
       </physvol>
       <physvol name='Hole_23_7'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_23_7.pos' unit='mm' x='-0.6000000000000001' y='-0.6799999999999999' z='0.0'/>
+        <position name='Hole_23_7.pos' unit='mm' x='-0.6400000000000001' y='-0.6399999999999999' z='0.0'/>
       </physvol>
       <physvol name='Hole_23_8'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_23_8.pos' unit='mm' x='-0.6000000000000001' y='-0.6' z='0.0'/>
+        <position name='Hole_23_8.pos' unit='mm' x='-0.6400000000000001' y='-0.5599999999999999' z='0.0'/>
       </physvol>
       <physvol name='Hole_23_9'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_23_9.pos' unit='mm' x='-0.6000000000000001' y='-0.52' z='0.0'/>
+        <position name='Hole_23_9.pos' unit='mm' x='-0.6400000000000001' y='-0.48' z='0.0'/>
       </physvol>
       <physvol name='Hole_23_10'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_23_10.pos' unit='mm' x='-0.6000000000000001' y='-0.43999999999999995' z='0.0'/>
+        <position name='Hole_23_10.pos' unit='mm' x='-0.6400000000000001' y='-0.3999999999999999' z='0.0'/>
       </physvol>
       <physvol name='Hole_23_11'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_23_11.pos' unit='mm' x='-0.6000000000000001' y='-0.36' z='0.0'/>
+        <position name='Hole_23_11.pos' unit='mm' x='-0.6400000000000001' y='-0.31999999999999995' z='0.0'/>
       </physvol>
       <physvol name='Hole_23_13'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_23_13.pos' unit='mm' x='-0.6000000000000001' y='-0.19999999999999996' z='0.0'/>
+        <position name='Hole_23_13.pos' unit='mm' x='-0.6400000000000001' y='-0.15999999999999992' z='0.0'/>
       </physvol>
       <physvol name='Hole_23_14'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_23_14.pos' unit='mm' x='-0.6000000000000001' y='-0.11999999999999988' z='0.0'/>
+        <position name='Hole_23_14.pos' unit='mm' x='-0.6400000000000001' y='-0.07999999999999985' z='0.0'/>
       </physvol>
       <physvol name='Hole_23_17'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_23_17.pos' unit='mm' x='-0.6000000000000001' y='0.1200000000000001' z='0.0'/>
+        <position name='Hole_23_17.pos' unit='mm' x='-0.6400000000000001' y='0.16000000000000014' z='0.0'/>
       </physvol>
       <physvol name='Hole_23_18'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_23_18.pos' unit='mm' x='-0.6000000000000001' y='0.19999999999999996' z='0.0'/>
+        <position name='Hole_23_18.pos' unit='mm' x='-0.6400000000000001' y='0.24' z='0.0'/>
       </physvol>
       <physvol name='Hole_23_19'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_23_19.pos' unit='mm' x='-0.6000000000000001' y='0.28' z='0.0'/>
+        <position name='Hole_23_19.pos' unit='mm' x='-0.6400000000000001' y='0.32000000000000006' z='0.0'/>
       </physvol>
       <physvol name='Hole_23_20'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_23_20.pos' unit='mm' x='-0.6000000000000001' y='0.3600000000000001' z='0.0'/>
+        <position name='Hole_23_20.pos' unit='mm' x='-0.6400000000000001' y='0.40000000000000013' z='0.0'/>
       </physvol>
       <physvol name='Hole_23_21'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_23_21.pos' unit='mm' x='-0.6000000000000001' y='0.43999999999999995' z='0.0'/>
+        <position name='Hole_23_21.pos' unit='mm' x='-0.6400000000000001' y='0.48' z='0.0'/>
       </physvol>
       <physvol name='Hole_23_27'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_23_27.pos' unit='mm' x='-0.6000000000000001' y='0.9200000000000002' z='0.0'/>
+        <position name='Hole_23_27.pos' unit='mm' x='-0.6400000000000001' y='0.9600000000000002' z='0.0'/>
       </physvol>
       <physvol name='Hole_23_28'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_23_28.pos' unit='mm' x='-0.6000000000000001' y='1.0000000000000002' z='0.0'/>
+        <position name='Hole_23_28.pos' unit='mm' x='-0.6400000000000001' y='1.0400000000000003' z='0.0'/>
       </physvol>
       <physvol name='Hole_23_30'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_23_30.pos' unit='mm' x='-0.6000000000000001' y='1.16' z='0.0'/>
+        <position name='Hole_23_30.pos' unit='mm' x='-0.6400000000000001' y='1.2' z='0.0'/>
       </physvol>
       <physvol name='Hole_24_0'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_24_0.pos' unit='mm' x='-0.6799999999999999' y='-1.24' z='0.0'/>
+        <position name='Hole_24_0.pos' unit='mm' x='-0.72' y='-1.2' z='0.0'/>
       </physvol>
       <physvol name='Hole_24_2'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_24_2.pos' unit='mm' x='-0.6799999999999999' y='-1.08' z='0.0'/>
+        <position name='Hole_24_2.pos' unit='mm' x='-0.72' y='-1.04' z='0.0'/>
       </physvol>
       <physvol name='Hole_24_3'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_24_3.pos' unit='mm' x='-0.6799999999999999' y='-1.0' z='0.0'/>
+        <position name='Hole_24_3.pos' unit='mm' x='-0.72' y='-0.96' z='0.0'/>
       </physvol>
       <physvol name='Hole_24_4'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_24_4.pos' unit='mm' x='-0.6799999999999999' y='-0.9199999999999999' z='0.0'/>
+        <position name='Hole_24_4.pos' unit='mm' x='-0.72' y='-0.8799999999999999' z='0.0'/>
       </physvol>
       <physvol name='Hole_24_6'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_24_6.pos' unit='mm' x='-0.6799999999999999' y='-0.76' z='0.0'/>
+        <position name='Hole_24_6.pos' unit='mm' x='-0.72' y='-0.72' z='0.0'/>
       </physvol>
       <physvol name='Hole_24_9'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_24_9.pos' unit='mm' x='-0.6799999999999999' y='-0.52' z='0.0'/>
+        <position name='Hole_24_9.pos' unit='mm' x='-0.72' y='-0.48' z='0.0'/>
       </physvol>
       <physvol name='Hole_24_10'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_24_10.pos' unit='mm' x='-0.6799999999999999' y='-0.43999999999999995' z='0.0'/>
+        <position name='Hole_24_10.pos' unit='mm' x='-0.72' y='-0.3999999999999999' z='0.0'/>
       </physvol>
       <physvol name='Hole_24_12'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_24_12.pos' unit='mm' x='-0.6799999999999999' y='-0.28' z='0.0'/>
+        <position name='Hole_24_12.pos' unit='mm' x='-0.72' y='-0.24' z='0.0'/>
       </physvol>
       <physvol name='Hole_24_14'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_24_14.pos' unit='mm' x='-0.6799999999999999' y='-0.11999999999999988' z='0.0'/>
+        <position name='Hole_24_14.pos' unit='mm' x='-0.72' y='-0.07999999999999985' z='0.0'/>
       </physvol>
       <physvol name='Hole_24_15'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_24_15.pos' unit='mm' x='-0.6799999999999999' y='-0.040000000000000036' z='0.0'/>
+        <position name='Hole_24_15.pos' unit='mm' x='-0.72' y='0.0' z='0.0'/>
       </physvol>
       <physvol name='Hole_24_16'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_24_16.pos' unit='mm' x='-0.6799999999999999' y='0.040000000000000036' z='0.0'/>
+        <position name='Hole_24_16.pos' unit='mm' x='-0.72' y='0.08000000000000007' z='0.0'/>
       </physvol>
       <physvol name='Hole_24_18'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_24_18.pos' unit='mm' x='-0.6799999999999999' y='0.19999999999999996' z='0.0'/>
+        <position name='Hole_24_18.pos' unit='mm' x='-0.72' y='0.24' z='0.0'/>
       </physvol>
       <physvol name='Hole_24_20'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_24_20.pos' unit='mm' x='-0.6799999999999999' y='0.3600000000000001' z='0.0'/>
+        <position name='Hole_24_20.pos' unit='mm' x='-0.72' y='0.40000000000000013' z='0.0'/>
       </physvol>
       <physvol name='Hole_24_27'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_24_27.pos' unit='mm' x='-0.6799999999999999' y='0.9200000000000002' z='0.0'/>
+        <position name='Hole_24_27.pos' unit='mm' x='-0.72' y='0.9600000000000002' z='0.0'/>
       </physvol>
       <physvol name='Hole_24_28'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_24_28.pos' unit='mm' x='-0.6799999999999999' y='1.0000000000000002' z='0.0'/>
+        <position name='Hole_24_28.pos' unit='mm' x='-0.72' y='1.0400000000000003' z='0.0'/>
       </physvol>
       <physvol name='Hole_24_29'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_24_29.pos' unit='mm' x='-0.6799999999999999' y='1.0799999999999998' z='0.0'/>
+        <position name='Hole_24_29.pos' unit='mm' x='-0.72' y='1.1199999999999999' z='0.0'/>
       </physvol>
       <physvol name='Hole_24_30'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_24_30.pos' unit='mm' x='-0.6799999999999999' y='1.16' z='0.0'/>
+        <position name='Hole_24_30.pos' unit='mm' x='-0.72' y='1.2' z='0.0'/>
       </physvol>
       <physvol name='Hole_25_0'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_25_0.pos' unit='mm' x='-0.76' y='-1.24' z='0.0'/>
+        <position name='Hole_25_0.pos' unit='mm' x='-0.8' y='-1.2' z='0.0'/>
       </physvol>
       <physvol name='Hole_25_1'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_25_1.pos' unit='mm' x='-0.76' y='-1.16' z='0.0'/>
+        <position name='Hole_25_1.pos' unit='mm' x='-0.8' y='-1.1199999999999999' z='0.0'/>
       </physvol>
       <physvol name='Hole_25_3'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_25_3.pos' unit='mm' x='-0.76' y='-1.0' z='0.0'/>
+        <position name='Hole_25_3.pos' unit='mm' x='-0.8' y='-0.96' z='0.0'/>
       </physvol>
       <physvol name='Hole_25_4'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_25_4.pos' unit='mm' x='-0.76' y='-0.9199999999999999' z='0.0'/>
+        <position name='Hole_25_4.pos' unit='mm' x='-0.8' y='-0.8799999999999999' z='0.0'/>
       </physvol>
       <physvol name='Hole_25_5'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_25_5.pos' unit='mm' x='-0.76' y='-0.84' z='0.0'/>
+        <position name='Hole_25_5.pos' unit='mm' x='-0.8' y='-0.7999999999999999' z='0.0'/>
       </physvol>
       <physvol name='Hole_25_6'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_25_6.pos' unit='mm' x='-0.76' y='-0.76' z='0.0'/>
+        <position name='Hole_25_6.pos' unit='mm' x='-0.8' y='-0.72' z='0.0'/>
       </physvol>
       <physvol name='Hole_25_7'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_25_7.pos' unit='mm' x='-0.76' y='-0.6799999999999999' z='0.0'/>
+        <position name='Hole_25_7.pos' unit='mm' x='-0.8' y='-0.6399999999999999' z='0.0'/>
       </physvol>
       <physvol name='Hole_25_8'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_25_8.pos' unit='mm' x='-0.76' y='-0.6' z='0.0'/>
+        <position name='Hole_25_8.pos' unit='mm' x='-0.8' y='-0.5599999999999999' z='0.0'/>
       </physvol>
       <physvol name='Hole_25_10'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_25_10.pos' unit='mm' x='-0.76' y='-0.43999999999999995' z='0.0'/>
+        <position name='Hole_25_10.pos' unit='mm' x='-0.8' y='-0.3999999999999999' z='0.0'/>
       </physvol>
       <physvol name='Hole_25_11'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_25_11.pos' unit='mm' x='-0.76' y='-0.36' z='0.0'/>
+        <position name='Hole_25_11.pos' unit='mm' x='-0.8' y='-0.31999999999999995' z='0.0'/>
       </physvol>
       <physvol name='Hole_25_15'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_25_15.pos' unit='mm' x='-0.76' y='-0.040000000000000036' z='0.0'/>
+        <position name='Hole_25_15.pos' unit='mm' x='-0.8' y='0.0' z='0.0'/>
       </physvol>
       <physvol name='Hole_25_22'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_25_22.pos' unit='mm' x='-0.76' y='0.52' z='0.0'/>
+        <position name='Hole_25_22.pos' unit='mm' x='-0.8' y='0.56' z='0.0'/>
       </physvol>
       <physvol name='Hole_25_25'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_25_25.pos' unit='mm' x='-0.76' y='0.76' z='0.0'/>
+        <position name='Hole_25_25.pos' unit='mm' x='-0.8' y='0.8' z='0.0'/>
       </physvol>
       <physvol name='Hole_25_29'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_25_29.pos' unit='mm' x='-0.76' y='1.0799999999999998' z='0.0'/>
+        <position name='Hole_25_29.pos' unit='mm' x='-0.8' y='1.1199999999999999' z='0.0'/>
       </physvol>
       <physvol name='Hole_25_30'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_25_30.pos' unit='mm' x='-0.76' y='1.16' z='0.0'/>
+        <position name='Hole_25_30.pos' unit='mm' x='-0.8' y='1.2' z='0.0'/>
       </physvol>
       <physvol name='Hole_26_0'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_26_0.pos' unit='mm' x='-0.8400000000000001' y='-1.24' z='0.0'/>
+        <position name='Hole_26_0.pos' unit='mm' x='-0.8800000000000001' y='-1.2' z='0.0'/>
       </physvol>
       <physvol name='Hole_26_1'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_26_1.pos' unit='mm' x='-0.8400000000000001' y='-1.16' z='0.0'/>
+        <position name='Hole_26_1.pos' unit='mm' x='-0.8800000000000001' y='-1.1199999999999999' z='0.0'/>
       </physvol>
       <physvol name='Hole_26_2'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_26_2.pos' unit='mm' x='-0.8400000000000001' y='-1.08' z='0.0'/>
+        <position name='Hole_26_2.pos' unit='mm' x='-0.8800000000000001' y='-1.04' z='0.0'/>
       </physvol>
       <physvol name='Hole_26_4'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_26_4.pos' unit='mm' x='-0.8400000000000001' y='-0.9199999999999999' z='0.0'/>
+        <position name='Hole_26_4.pos' unit='mm' x='-0.8800000000000001' y='-0.8799999999999999' z='0.0'/>
       </physvol>
       <physvol name='Hole_26_12'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_26_12.pos' unit='mm' x='-0.8400000000000001' y='-0.28' z='0.0'/>
+        <position name='Hole_26_12.pos' unit='mm' x='-0.8800000000000001' y='-0.24' z='0.0'/>
       </physvol>
       <physvol name='Hole_26_13'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_26_13.pos' unit='mm' x='-0.8400000000000001' y='-0.19999999999999996' z='0.0'/>
+        <position name='Hole_26_13.pos' unit='mm' x='-0.8800000000000001' y='-0.15999999999999992' z='0.0'/>
       </physvol>
       <physvol name='Hole_26_17'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_26_17.pos' unit='mm' x='-0.8400000000000001' y='0.1200000000000001' z='0.0'/>
+        <position name='Hole_26_17.pos' unit='mm' x='-0.8800000000000001' y='0.16000000000000014' z='0.0'/>
       </physvol>
       <physvol name='Hole_26_18'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_26_18.pos' unit='mm' x='-0.8400000000000001' y='0.19999999999999996' z='0.0'/>
+        <position name='Hole_26_18.pos' unit='mm' x='-0.8800000000000001' y='0.24' z='0.0'/>
       </physvol>
       <physvol name='Hole_26_22'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_26_22.pos' unit='mm' x='-0.8400000000000001' y='0.52' z='0.0'/>
+        <position name='Hole_26_22.pos' unit='mm' x='-0.8800000000000001' y='0.56' z='0.0'/>
       </physvol>
       <physvol name='Hole_26_24'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_26_24.pos' unit='mm' x='-0.8400000000000001' y='0.6799999999999999' z='0.0'/>
+        <position name='Hole_26_24.pos' unit='mm' x='-0.8800000000000001' y='0.72' z='0.0'/>
       </physvol>
       <physvol name='Hole_26_26'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_26_26.pos' unit='mm' x='-0.8400000000000001' y='0.8400000000000001' z='0.0'/>
+        <position name='Hole_26_26.pos' unit='mm' x='-0.8800000000000001' y='0.8800000000000001' z='0.0'/>
       </physvol>
       <physvol name='Hole_26_29'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_26_29.pos' unit='mm' x='-0.8400000000000001' y='1.0799999999999998' z='0.0'/>
+        <position name='Hole_26_29.pos' unit='mm' x='-0.8800000000000001' y='1.1199999999999999' z='0.0'/>
       </physvol>
       <physvol name='Hole_27_0'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_27_0.pos' unit='mm' x='-0.9200000000000002' y='-1.24' z='0.0'/>
+        <position name='Hole_27_0.pos' unit='mm' x='-0.9600000000000002' y='-1.2' z='0.0'/>
       </physvol>
       <physvol name='Hole_27_1'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_27_1.pos' unit='mm' x='-0.9200000000000002' y='-1.16' z='0.0'/>
+        <position name='Hole_27_1.pos' unit='mm' x='-0.9600000000000002' y='-1.1199999999999999' z='0.0'/>
       </physvol>
       <physvol name='Hole_27_5'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_27_5.pos' unit='mm' x='-0.9200000000000002' y='-0.84' z='0.0'/>
+        <position name='Hole_27_5.pos' unit='mm' x='-0.9600000000000002' y='-0.7999999999999999' z='0.0'/>
       </physvol>
       <physvol name='Hole_27_6'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_27_6.pos' unit='mm' x='-0.9200000000000002' y='-0.76' z='0.0'/>
+        <position name='Hole_27_6.pos' unit='mm' x='-0.9600000000000002' y='-0.72' z='0.0'/>
       </physvol>
       <physvol name='Hole_27_7'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_27_7.pos' unit='mm' x='-0.9200000000000002' y='-0.6799999999999999' z='0.0'/>
+        <position name='Hole_27_7.pos' unit='mm' x='-0.9600000000000002' y='-0.6399999999999999' z='0.0'/>
       </physvol>
       <physvol name='Hole_27_8'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_27_8.pos' unit='mm' x='-0.9200000000000002' y='-0.6' z='0.0'/>
+        <position name='Hole_27_8.pos' unit='mm' x='-0.9600000000000002' y='-0.5599999999999999' z='0.0'/>
       </physvol>
       <physvol name='Hole_27_10'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_27_10.pos' unit='mm' x='-0.9200000000000002' y='-0.43999999999999995' z='0.0'/>
+        <position name='Hole_27_10.pos' unit='mm' x='-0.9600000000000002' y='-0.3999999999999999' z='0.0'/>
       </physvol>
       <physvol name='Hole_27_12'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_27_12.pos' unit='mm' x='-0.9200000000000002' y='-0.28' z='0.0'/>
+        <position name='Hole_27_12.pos' unit='mm' x='-0.9600000000000002' y='-0.24' z='0.0'/>
       </physvol>
       <physvol name='Hole_27_14'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_27_14.pos' unit='mm' x='-0.9200000000000002' y='-0.11999999999999988' z='0.0'/>
+        <position name='Hole_27_14.pos' unit='mm' x='-0.9600000000000002' y='-0.07999999999999985' z='0.0'/>
       </physvol>
       <physvol name='Hole_27_19'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_27_19.pos' unit='mm' x='-0.9200000000000002' y='0.28' z='0.0'/>
+        <position name='Hole_27_19.pos' unit='mm' x='-0.9600000000000002' y='0.32000000000000006' z='0.0'/>
       </physvol>
       <physvol name='Hole_27_21'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_27_21.pos' unit='mm' x='-0.9200000000000002' y='0.43999999999999995' z='0.0'/>
+        <position name='Hole_27_21.pos' unit='mm' x='-0.9600000000000002' y='0.48' z='0.0'/>
       </physvol>
       <physvol name='Hole_27_24'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_27_24.pos' unit='mm' x='-0.9200000000000002' y='0.6799999999999999' z='0.0'/>
+        <position name='Hole_27_24.pos' unit='mm' x='-0.9600000000000002' y='0.72' z='0.0'/>
       </physvol>
       <physvol name='Hole_27_25'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_27_25.pos' unit='mm' x='-0.9200000000000002' y='0.76' z='0.0'/>
+        <position name='Hole_27_25.pos' unit='mm' x='-0.9600000000000002' y='0.8' z='0.0'/>
       </physvol>
       <physvol name='Hole_27_26'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_27_26.pos' unit='mm' x='-0.9200000000000002' y='0.8400000000000001' z='0.0'/>
+        <position name='Hole_27_26.pos' unit='mm' x='-0.9600000000000002' y='0.8800000000000001' z='0.0'/>
       </physvol>
       <physvol name='Hole_27_27'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_27_27.pos' unit='mm' x='-0.9200000000000002' y='0.9200000000000002' z='0.0'/>
+        <position name='Hole_27_27.pos' unit='mm' x='-0.9600000000000002' y='0.9600000000000002' z='0.0'/>
       </physvol>
       <physvol name='Hole_28_0'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_28_0.pos' unit='mm' x='-1.0000000000000002' y='-1.24' z='0.0'/>
+        <position name='Hole_28_0.pos' unit='mm' x='-1.0400000000000003' y='-1.2' z='0.0'/>
       </physvol>
       <physvol name='Hole_28_1'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_28_1.pos' unit='mm' x='-1.0000000000000002' y='-1.16' z='0.0'/>
+        <position name='Hole_28_1.pos' unit='mm' x='-1.0400000000000003' y='-1.1199999999999999' z='0.0'/>
       </physvol>
       <physvol name='Hole_28_2'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_28_2.pos' unit='mm' x='-1.0000000000000002' y='-1.08' z='0.0'/>
+        <position name='Hole_28_2.pos' unit='mm' x='-1.0400000000000003' y='-1.04' z='0.0'/>
       </physvol>
       <physvol name='Hole_28_3'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_28_3.pos' unit='mm' x='-1.0000000000000002' y='-1.0' z='0.0'/>
+        <position name='Hole_28_3.pos' unit='mm' x='-1.0400000000000003' y='-0.96' z='0.0'/>
       </physvol>
       <physvol name='Hole_28_5'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_28_5.pos' unit='mm' x='-1.0000000000000002' y='-0.84' z='0.0'/>
+        <position name='Hole_28_5.pos' unit='mm' x='-1.0400000000000003' y='-0.7999999999999999' z='0.0'/>
       </physvol>
       <physvol name='Hole_28_7'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_28_7.pos' unit='mm' x='-1.0000000000000002' y='-0.6799999999999999' z='0.0'/>
+        <position name='Hole_28_7.pos' unit='mm' x='-1.0400000000000003' y='-0.6399999999999999' z='0.0'/>
       </physvol>
       <physvol name='Hole_28_8'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_28_8.pos' unit='mm' x='-1.0000000000000002' y='-0.6' z='0.0'/>
+        <position name='Hole_28_8.pos' unit='mm' x='-1.0400000000000003' y='-0.5599999999999999' z='0.0'/>
       </physvol>
       <physvol name='Hole_28_12'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_28_12.pos' unit='mm' x='-1.0000000000000002' y='-0.28' z='0.0'/>
+        <position name='Hole_28_12.pos' unit='mm' x='-1.0400000000000003' y='-0.24' z='0.0'/>
       </physvol>
       <physvol name='Hole_28_13'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_28_13.pos' unit='mm' x='-1.0000000000000002' y='-0.19999999999999996' z='0.0'/>
+        <position name='Hole_28_13.pos' unit='mm' x='-1.0400000000000003' y='-0.15999999999999992' z='0.0'/>
       </physvol>
       <physvol name='Hole_28_14'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_28_14.pos' unit='mm' x='-1.0000000000000002' y='-0.11999999999999988' z='0.0'/>
+        <position name='Hole_28_14.pos' unit='mm' x='-1.0400000000000003' y='-0.07999999999999985' z='0.0'/>
       </physvol>
       <physvol name='Hole_28_16'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_28_16.pos' unit='mm' x='-1.0000000000000002' y='0.040000000000000036' z='0.0'/>
+        <position name='Hole_28_16.pos' unit='mm' x='-1.0400000000000003' y='0.08000000000000007' z='0.0'/>
       </physvol>
       <physvol name='Hole_28_17'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_28_17.pos' unit='mm' x='-1.0000000000000002' y='0.1200000000000001' z='0.0'/>
+        <position name='Hole_28_17.pos' unit='mm' x='-1.0400000000000003' y='0.16000000000000014' z='0.0'/>
       </physvol>
       <physvol name='Hole_28_18'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_28_18.pos' unit='mm' x='-1.0000000000000002' y='0.19999999999999996' z='0.0'/>
+        <position name='Hole_28_18.pos' unit='mm' x='-1.0400000000000003' y='0.24' z='0.0'/>
       </physvol>
       <physvol name='Hole_28_19'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_28_19.pos' unit='mm' x='-1.0000000000000002' y='0.28' z='0.0'/>
+        <position name='Hole_28_19.pos' unit='mm' x='-1.0400000000000003' y='0.32000000000000006' z='0.0'/>
       </physvol>
       <physvol name='Hole_28_21'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_28_21.pos' unit='mm' x='-1.0000000000000002' y='0.43999999999999995' z='0.0'/>
+        <position name='Hole_28_21.pos' unit='mm' x='-1.0400000000000003' y='0.48' z='0.0'/>
       </physvol>
       <physvol name='Hole_28_23'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_28_23.pos' unit='mm' x='-1.0000000000000002' y='0.6000000000000001' z='0.0'/>
+        <position name='Hole_28_23.pos' unit='mm' x='-1.0400000000000003' y='0.6400000000000001' z='0.0'/>
       </physvol>
       <physvol name='Hole_28_24'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_28_24.pos' unit='mm' x='-1.0000000000000002' y='0.6799999999999999' z='0.0'/>
+        <position name='Hole_28_24.pos' unit='mm' x='-1.0400000000000003' y='0.72' z='0.0'/>
       </physvol>
       <physvol name='Hole_28_27'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_28_27.pos' unit='mm' x='-1.0000000000000002' y='0.9200000000000002' z='0.0'/>
+        <position name='Hole_28_27.pos' unit='mm' x='-1.0400000000000003' y='0.9600000000000002' z='0.0'/>
       </physvol>
       <physvol name='Hole_28_30'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_28_30.pos' unit='mm' x='-1.0000000000000002' y='1.16' z='0.0'/>
+        <position name='Hole_28_30.pos' unit='mm' x='-1.0400000000000003' y='1.2' z='0.0'/>
       </physvol>
       <physvol name='Hole_29_1'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_29_1.pos' unit='mm' x='-1.0799999999999998' y='-1.16' z='0.0'/>
+        <position name='Hole_29_1.pos' unit='mm' x='-1.1199999999999999' y='-1.1199999999999999' z='0.0'/>
       </physvol>
       <physvol name='Hole_29_2'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_29_2.pos' unit='mm' x='-1.0799999999999998' y='-1.08' z='0.0'/>
+        <position name='Hole_29_2.pos' unit='mm' x='-1.1199999999999999' y='-1.04' z='0.0'/>
       </physvol>
       <physvol name='Hole_29_3'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_29_3.pos' unit='mm' x='-1.0799999999999998' y='-1.0' z='0.0'/>
+        <position name='Hole_29_3.pos' unit='mm' x='-1.1199999999999999' y='-0.96' z='0.0'/>
       </physvol>
       <physvol name='Hole_29_5'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_29_5.pos' unit='mm' x='-1.0799999999999998' y='-0.84' z='0.0'/>
+        <position name='Hole_29_5.pos' unit='mm' x='-1.1199999999999999' y='-0.7999999999999999' z='0.0'/>
       </physvol>
       <physvol name='Hole_29_6'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_29_6.pos' unit='mm' x='-1.0799999999999998' y='-0.76' z='0.0'/>
+        <position name='Hole_29_6.pos' unit='mm' x='-1.1199999999999999' y='-0.72' z='0.0'/>
       </physvol>
       <physvol name='Hole_29_7'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_29_7.pos' unit='mm' x='-1.0799999999999998' y='-0.6799999999999999' z='0.0'/>
+        <position name='Hole_29_7.pos' unit='mm' x='-1.1199999999999999' y='-0.6399999999999999' z='0.0'/>
       </physvol>
       <physvol name='Hole_29_8'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_29_8.pos' unit='mm' x='-1.0799999999999998' y='-0.6' z='0.0'/>
+        <position name='Hole_29_8.pos' unit='mm' x='-1.1199999999999999' y='-0.5599999999999999' z='0.0'/>
       </physvol>
       <physvol name='Hole_29_10'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_29_10.pos' unit='mm' x='-1.0799999999999998' y='-0.43999999999999995' z='0.0'/>
+        <position name='Hole_29_10.pos' unit='mm' x='-1.1199999999999999' y='-0.3999999999999999' z='0.0'/>
       </physvol>
       <physvol name='Hole_29_13'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_29_13.pos' unit='mm' x='-1.0799999999999998' y='-0.19999999999999996' z='0.0'/>
+        <position name='Hole_29_13.pos' unit='mm' x='-1.1199999999999999' y='-0.15999999999999992' z='0.0'/>
       </physvol>
       <physvol name='Hole_29_14'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_29_14.pos' unit='mm' x='-1.0799999999999998' y='-0.11999999999999988' z='0.0'/>
+        <position name='Hole_29_14.pos' unit='mm' x='-1.1199999999999999' y='-0.07999999999999985' z='0.0'/>
       </physvol>
       <physvol name='Hole_29_16'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_29_16.pos' unit='mm' x='-1.0799999999999998' y='0.040000000000000036' z='0.0'/>
+        <position name='Hole_29_16.pos' unit='mm' x='-1.1199999999999999' y='0.08000000000000007' z='0.0'/>
       </physvol>
       <physvol name='Hole_29_17'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_29_17.pos' unit='mm' x='-1.0799999999999998' y='0.1200000000000001' z='0.0'/>
+        <position name='Hole_29_17.pos' unit='mm' x='-1.1199999999999999' y='0.16000000000000014' z='0.0'/>
       </physvol>
       <physvol name='Hole_29_21'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_29_21.pos' unit='mm' x='-1.0799999999999998' y='0.43999999999999995' z='0.0'/>
+        <position name='Hole_29_21.pos' unit='mm' x='-1.1199999999999999' y='0.48' z='0.0'/>
       </physvol>
       <physvol name='Hole_29_24'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_29_24.pos' unit='mm' x='-1.0799999999999998' y='0.6799999999999999' z='0.0'/>
+        <position name='Hole_29_24.pos' unit='mm' x='-1.1199999999999999' y='0.72' z='0.0'/>
       </physvol>
       <physvol name='Hole_29_26'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_29_26.pos' unit='mm' x='-1.0799999999999998' y='0.8400000000000001' z='0.0'/>
+        <position name='Hole_29_26.pos' unit='mm' x='-1.1199999999999999' y='0.8800000000000001' z='0.0'/>
       </physvol>
       <physvol name='Hole_29_28'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_29_28.pos' unit='mm' x='-1.0799999999999998' y='1.0000000000000002' z='0.0'/>
+        <position name='Hole_29_28.pos' unit='mm' x='-1.1199999999999999' y='1.0400000000000003' z='0.0'/>
       </physvol>
       <physvol name='Hole_29_30'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_29_30.pos' unit='mm' x='-1.0799999999999998' y='1.16' z='0.0'/>
+        <position name='Hole_29_30.pos' unit='mm' x='-1.1199999999999999' y='1.2' z='0.0'/>
       </physvol>
       <physvol name='Hole_30_0'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_30_0.pos' unit='mm' x='-1.16' y='-1.24' z='0.0'/>
+        <position name='Hole_30_0.pos' unit='mm' x='-1.2' y='-1.2' z='0.0'/>
       </physvol>
       <physvol name='Hole_30_2'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_30_2.pos' unit='mm' x='-1.16' y='-1.08' z='0.0'/>
+        <position name='Hole_30_2.pos' unit='mm' x='-1.2' y='-1.04' z='0.0'/>
       </physvol>
       <physvol name='Hole_30_3'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_30_3.pos' unit='mm' x='-1.16' y='-1.0' z='0.0'/>
+        <position name='Hole_30_3.pos' unit='mm' x='-1.2' y='-0.96' z='0.0'/>
       </physvol>
       <physvol name='Hole_30_4'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_30_4.pos' unit='mm' x='-1.16' y='-0.9199999999999999' z='0.0'/>
+        <position name='Hole_30_4.pos' unit='mm' x='-1.2' y='-0.8799999999999999' z='0.0'/>
       </physvol>
       <physvol name='Hole_30_6'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_30_6.pos' unit='mm' x='-1.16' y='-0.76' z='0.0'/>
+        <position name='Hole_30_6.pos' unit='mm' x='-1.2' y='-0.72' z='0.0'/>
       </physvol>
       <physvol name='Hole_30_7'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_30_7.pos' unit='mm' x='-1.16' y='-0.6799999999999999' z='0.0'/>
+        <position name='Hole_30_7.pos' unit='mm' x='-1.2' y='-0.6399999999999999' z='0.0'/>
       </physvol>
       <physvol name='Hole_30_10'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_30_10.pos' unit='mm' x='-1.16' y='-0.43999999999999995' z='0.0'/>
+        <position name='Hole_30_10.pos' unit='mm' x='-1.2' y='-0.3999999999999999' z='0.0'/>
       </physvol>
       <physvol name='Hole_30_16'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_30_16.pos' unit='mm' x='-1.16' y='0.040000000000000036' z='0.0'/>
+        <position name='Hole_30_16.pos' unit='mm' x='-1.2' y='0.08000000000000007' z='0.0'/>
       </physvol>
       <physvol name='Hole_30_18'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_30_18.pos' unit='mm' x='-1.16' y='0.19999999999999996' z='0.0'/>
+        <position name='Hole_30_18.pos' unit='mm' x='-1.2' y='0.24' z='0.0'/>
       </physvol>
       <physvol name='Hole_30_19'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_30_19.pos' unit='mm' x='-1.16' y='0.28' z='0.0'/>
+        <position name='Hole_30_19.pos' unit='mm' x='-1.2' y='0.32000000000000006' z='0.0'/>
       </physvol>
       <physvol name='Hole_30_20'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_30_20.pos' unit='mm' x='-1.16' y='0.3600000000000001' z='0.0'/>
+        <position name='Hole_30_20.pos' unit='mm' x='-1.2' y='0.40000000000000013' z='0.0'/>
       </physvol>
       <physvol name='Hole_30_21'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_30_21.pos' unit='mm' x='-1.16' y='0.43999999999999995' z='0.0'/>
+        <position name='Hole_30_21.pos' unit='mm' x='-1.2' y='0.48' z='0.0'/>
       </physvol>
       <physvol name='Hole_30_26'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_30_26.pos' unit='mm' x='-1.16' y='0.8400000000000001' z='0.0'/>
+        <position name='Hole_30_26.pos' unit='mm' x='-1.2' y='0.8800000000000001' z='0.0'/>
       </physvol>
       <physvol name='Hole_30_27'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_30_27.pos' unit='mm' x='-1.16' y='0.9200000000000002' z='0.0'/>
+        <position name='Hole_30_27.pos' unit='mm' x='-1.2' y='0.9600000000000002' z='0.0'/>
       </physvol>
       <physvol name='Hole_30_28'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_30_28.pos' unit='mm' x='-1.16' y='1.0000000000000002' z='0.0'/>
+        <position name='Hole_30_28.pos' unit='mm' x='-1.2' y='1.0400000000000003' z='0.0'/>
       </physvol>
       <physvol name='Hole_30_30'>
         <volumeref ref='Hole.log'/>
-        <position name='Hole_30_30.pos' unit='mm' x='-1.16' y='1.16' z='0.0'/>
+        <position name='Hole_30_30.pos' unit='mm' x='-1.2' y='1.2' z='0.0'/>
       </physvol>
     </volume>
     <volume name='World.log'>
