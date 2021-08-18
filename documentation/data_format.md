@@ -61,104 +61,137 @@ common-mode noise corrections are applied).
 Energy value obtained from the PHA value after gain correction.
 (EPI stands for Energy pulse height invariant).
 
-#### [15] flag_data (unsigned 8-byte integer)
+#### [15] epi_error (4-byte floating point, keV)
+Error of EPI.
+
+#### [16] flag_data (unsigned 8-byte integer)
 Flag data assigned by the detector readout system.
 
-#### [16] flags (unsigned 8-byte integer)
+#### [17] flags (unsigned 8-byte integer)
 Flags used in Compton Soft.
 
-#### [17] real_time (8-byte floating point)
+#### [18] trackid (signed 4-byte integer)
+Track ID in Geant4 simulation.
+
+#### [19] particle (signed 4-byte integer)
+Particle ID (PDG particle code) in Geant4 simulation.
+
+#### [20] real_time (8-byte floating point)
 Raw simulation output of time.
 
-#### [18] time_trig (8-byte floating point)
+#### [21] time_trig (8-byte floating point)
 Time of the trigger.
 
-#### [19] time_group (signed 2-byte integer)
+#### [22] time_group (signed 2-byte integer)
 Time group ID. This ID distinguishs different readout groups at temporally
 separate readout (different trigger) but belong to the same event ID.
 This can happen if a radioactive primary makes decays distributed in a
 period longer than a detector readout timescale.
 
-#### [20] real_posx (4-byte floating point)
+#### [23] real_posx (4-byte floating point)
 Raw simulation output of position x.
 
-#### [21] real_posy (4-byte floating point)
+#### [24] real_posy (4-byte floating point)
 Raw simulation output of position y.
 
-#### [22] real_posz (4-byte floating point)
+#### [25] real_posz (4-byte floating point)
 Raw simulation output of position z.
 
-#### [23] edep (4-byte floating point)
+#### [26] edep (4-byte floating point)
 Raw simulation output of energy deposit.
 If a quenching factor is not unity, this factor is multiplied.
 
-#### [24] echarge (4-byte floating point)
+#### [27] echarge (4-byte floating point)
 Energy deposit multiplied by charge collection efficiency.
 
-#### [25] process (unsigned 4-byte integer)
+#### [28] process (unsigned 4-byte integer)
 Process flags.
 
-#### [26] energy (4-byte floating point)
+#### [29] energy (4-byte floating point)
 Reconstructed energy.
 
-#### [27] posx (4-byte floating point)
+#### [30] energy_error (4-byte floating point)
+Error of reconstructed energy.
+
+#### [31] posx (4-byte floating point)
 Reconstructed position x.
 
-#### [28] posy (4-byte floating point)
+#### [32] posy (4-byte floating point)
 Reconstructed position y.
 
-#### [29] posz (4-byte floating point)
+#### [33] posz (4-byte floating point)
 Reconstructed position z.
 
-#### [30] local_posx (4-byte floating point)
+#### [34] posx_error (4-byte floating point)
+Error of reconstructed position x.
+
+#### [35] posy_error (4-byte floating point)
+Error of reconstructed position y.
+
+#### [36] posz_error (4-byte floating point)
+Error of reconstructed position z.
+
+#### [37] local_posx (4-byte floating point)
 Reconstructed position x in detector-local coordicates.
 
-#### [31] local_posy (4-byte floating point)
+#### [38] local_posy (4-byte floating point)
 Reconstructed position y in detector-local coordicates.
 
-#### [32] local_posz (4-byte floating point)
+#### [39] local_posz (4-byte floating point)
 Reconstructed position z in detector-local coordicates.
 
-#### [33] time (8-byte floating point)
+#### [40] local_posx_error (4-byte floating point)
+Error of reconstructed position x in detector-local coordicates.
+
+#### [41] local_posy_error (4-byte floating point)
+Error of reconstructed position y in detector-local coordicates.
+
+#### [42] local_posz_error (4-byte floating point)
+Error of reconstructed position z in detector-local coordicates.
+
+#### [43] time (8-byte floating point)
 Reconstructed time.
 
-#### [34] grade (signed 4-byte integer)
+#### [44] time_error (8-byte floating point)
+Error of reconstructed time.
+
+#### [45] grade (signed 4-byte integer)
 Grade of this event.
 
-#### [35] ini_energy (4-byte floating point)
+#### [46] ini_energy (4-byte floating point)
 Energy of the primary particle of this event.
 
-#### [36] ini_dirx (4-byte floating point)
+#### [47] ini_dirx (4-byte floating point)
 Direction x of the primary particle of this event.
 
-#### [37] ini_diry (4-byte floating point)
+#### [48] ini_diry (4-byte floating point)
 Direction y of the primary particle of this event.
 
-#### [38] ini_dirz (4-byte floating point)
+#### [49] ini_dirz (4-byte floating point)
 Direction z of the primary particle of this event.
 
-#### [39] ini_time (8-byte floating point)
+#### [50] ini_time (8-byte floating point)
 Time of the primary particle of this event.
 
-#### [40] ini_posx (4-byte floating point)
+#### [51] ini_posx (4-byte floating point)
 Position x of the primary particle of this event.
 
-#### [41] ini_posy (4-byte floating point)
+#### [52] ini_posy (4-byte floating point)
 Position y of the primary particle of this event.
 
-#### [42] ini_posz (4-byte floating point)
+#### [53] ini_posz (4-byte floating point)
 Position z of the primary particle of this event.
 
-#### [43] ini_polarx (4-byte floating point)
+#### [54] ini_polarx (4-byte floating point)
 Polarization vector x of the primary particle of this event.
 
-#### [44] ini_polary (4-byte floating point)
+#### [55] ini_polary (4-byte floating point)
 Polarization vector y of the primary particle of this event.
 
-#### [45] ini_polarz (4-byte floating point)
+#### [56] ini_polarz (4-byte floating point)
 Polarization vector z of the primary particle of this event.
 
-#### [46] weight (4-byte floating point)
+#### [57] weight (4-byte floating point)
 Statistical weight of this event.
 
 ### Event Tree
