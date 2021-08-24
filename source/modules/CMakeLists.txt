@@ -52,7 +52,7 @@ set(CS_MODULES
   src/ConstructFrame.cc
   src/FillFrame.cc
   src/LoadFrame.cc
-  src/LoadReductedFrame.cc
+  src/LoadReducedFrame.cc
   src/XrayEventCollection.cc
   src/XrayEventSelection.cc
   src/AnalyzeFrame.cc

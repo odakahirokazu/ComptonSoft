@@ -17,7 +17,7 @@
  *                                                                       *
  *************************************************************************/
 
-#include "LoadReductedFrame.hh"
+#include "LoadReducedFrame.hh"
 #include <algorithm>
 #include "FrameData.hh"
 #include "ConstructDetector.hh"
@@ -31,18 +31,18 @@ using namespace anlnext;
 
 namespace comptonsoft {
 
-LoadReductedFrame::LoadReductedFrame()
+LoadReducedFrame::LoadReducedFrame()
 {
 }
 
-ANLStatus LoadReductedFrame::mod_define()
+ANLStatus LoadReducedFrame::mod_define()
 {
   define_parameter("files", &mod_class::files_);
   
   return AS_OK;
 }
 
-ANLStatus LoadReductedFrame::mod_initialize()
+ANLStatus LoadReducedFrame::mod_initialize()
 {
   ConstructDetector* detectorOwner;
   get_module_NC("ConstructDetector", &detectorOwner);
@@ -62,14 +62,14 @@ ANLStatus LoadReductedFrame::mod_initialize()
   return AS_OK;
 }
 
-ANLStatus LoadReductedFrame::mod_analyze()
+ANLStatus LoadReducedFrame::mod_analyze()
 {
   const std::size_t fileIndex = get_loop_index();
   if (fileIndex >= files_.size()) {
     return AS_QUIT;
   }
   const std::string filename = files_[fileIndex];
-  std::cout << "[LoadReductedFrame] filename: " << filename << std::endl;
+  std::cout << "[LoadReducedFrame] filename: " << filename << std::endl;
 
   frame_->setFrameID(fileIndex);
   frame_->resetRawFrame();
@@ -91,6 +91,23 @@ ANLStatus LoadReductedFrame::mod_analyze()
   }
 
   return AS_OK;
+}
+
+void LoadReducedFrame::addFile(const std::string& filename)
+{
+  files_.push_back(filename);
+  past_files_.insert(filename);
+}
+
+bool LoadReducedFrame::hasFile(const std::string& filename) const
+{
+  return past_files_.count(filename) != 0;
+}
+
+bool LoadReducedFrame::isDone() const
+{
+  const std::size_t fileIndex = get_loop_index();
+  return (fileIndex >= files_.size());
 }
 
 } /* namespace comptonsoft */

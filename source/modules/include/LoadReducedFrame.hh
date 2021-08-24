@@ -17,36 +17,43 @@
  *                                                                       *
  *************************************************************************/
 
-#ifndef COMPTONSOFT_LoadReductedFrame_H
-#define COMPTONSOFT_LoadReductedFrame_H 1
+#ifndef COMPTONSOFT_LoadReducedFrame_H
+#define COMPTONSOFT_LoadReducedFrame_H 1
 
 #include <anlnext/BasicModule.hh>
+#include <unordered_set>
+#include "VDataReader.hh"
 
 namespace comptonsoft {
 
 class FrameData;
 
-class LoadReductedFrame : public anlnext::BasicModule
+class LoadReducedFrame : public anlnext::BasicModule, public VDataReader
 {
-  DEFINE_ANL_MODULE(LoadReductedFrame, 1.0);
+  DEFINE_ANL_MODULE(LoadReducedFrame, 1.0);
 
 public:
-  LoadReductedFrame();
+  LoadReducedFrame();
   
 protected:
-  LoadReductedFrame(const LoadReductedFrame&);
+  LoadReducedFrame(const LoadReducedFrame&);
 
 public:
   anlnext::ANLStatus mod_define() override;
   anlnext::ANLStatus mod_initialize() override;
   anlnext::ANLStatus mod_analyze() override;
 
+  void addFile(const std::string& filename) override;
+  bool hasFile(const std::string& filename) const override;
+  bool isDone() const override;
+
 private:
   int detector_id_ = 0;
   std::vector<std::string> files_;
+  std::unordered_set<std::string> past_files_;
   FrameData* frame_ = nullptr;
 };
 
 } /* namespace comptonsoft */
 
-#endif /* COMPTONSOFT_LoadReductedFrame_H */
+#endif /* COMPTONSOFT_LoadReducedFrame_H */
