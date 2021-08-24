@@ -21,6 +21,7 @@
 #define COMPTONSOFT_LoadFrame_H 1
 
 #include <anlnext/BasicModule.hh>
+#include <unordered_set>
 #include "VDataReader.hh"
 
 namespace comptonsoft {
@@ -61,6 +62,7 @@ private:
   bool read_direction_x_ = false;
   int detector_id_ = 0;
   std::vector<std::string> files_;
+  std::unordered_set<std::string> past_files_;
   FrameData* frame_ = nullptr;
 };
 

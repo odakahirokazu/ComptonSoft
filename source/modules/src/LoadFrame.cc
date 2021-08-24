@@ -91,11 +91,12 @@ ANLStatus LoadFrame::mod_analyze()
 void LoadFrame::addFile(const std::string& filename)
 {
   files_.push_back(filename);
+  past_files_.insert(filename);
 }
 
 bool LoadFrame::hasFile(const std::string& filename) const
 {
-  return (std::find(files_.begin(), files_.end(), filename) != files_.end());
+  return past_files_.count(filename) != 0;
 }
 
 bool LoadFrame::isDone() const
