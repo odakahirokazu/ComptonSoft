@@ -89,6 +89,7 @@ ANLStatus LoadReducedFrame::mod_analyze()
     tree_->GetEntry(i);
     rawFrame[ix][iy] = ph;
   }
+  f->Close();
 
   return AS_OK;
 }
