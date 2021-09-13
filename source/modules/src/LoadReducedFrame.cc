@@ -73,6 +73,7 @@ ANLStatus LoadReducedFrame::mod_analyze()
 
   frame_->setFrameID(fileIndex);
   frame_->resetRawFrame();
+  frame_->clearEventCheckPixels();
   image_t& rawFrame = frame_->getRawFrame();
 
   TFile* f = new TFile(filename.c_str());
@@ -88,6 +89,7 @@ ANLStatus LoadReducedFrame::mod_analyze()
   for (int i=0; i<num_entries; i++) {
     tree_->GetEntry(i);
     rawFrame[ix][iy] = ph;
+    frame_->addEventCheckPixels(ix, iy);
   }
   f->Close();
 

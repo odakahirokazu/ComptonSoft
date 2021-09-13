@@ -127,6 +127,9 @@ public:
 
   double RawFrameMedian() const;
 
+  void clearEventCheckPixels() { eventCheckPixels_.clear(); }
+  void addEventCheckPixels(int ix, int iy) { eventCheckPixels_.emplace_back(ix, iy); }
+
   void setTrimSize(int v) { trimSize_ = v; }
   int TrimSize() { return trimSize_; }
 
@@ -163,6 +166,8 @@ private:
 
   double eventThreshold_ = 0.0;
   double splitThreshold_ = 0.0;
+
+  std::vector<std::pair<int, int>> eventCheckPixels_;
 
   std::vector<char> buf_;
 
