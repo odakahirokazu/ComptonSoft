@@ -85,9 +85,9 @@ ANLStatus AnalyzeFrame::mod_analyze()
         frame->correctGains();
       }
 
-      std::vector<comptonsoft::XrayEvent_sptr> es = frame->extractEvents();
+      events_ = frame->extractEvents();
       const int detectorID = detector->getID();
-      for (auto& event: es) {
+      for (auto& event: events_) {
         event->setFrameID(frameID);
         event->setDetectorID(detectorID);
         event->setEnergy(event->SumPH()*unit::keV);

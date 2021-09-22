@@ -17,56 +17,50 @@
  *                                                                       *
  *************************************************************************/
 
-/**
- * AnalyzeFrame
- *
- * @author Hirokazu Odaka
- * @date 2019-05-23
- * @date 2020-04-01 | v1.1
- */
 
-#ifndef COMPTONSOFT_AnalyzeFrame_H
-#define COMPTONSOFT_AnalyzeFrame_H 1
+#ifndef COMPTONSOFT_PushXrayEventToQuickLookDB_H
+#define COMPTONSOFT_PushXrayEventToQuickLookDB_H 1
 
 #include <anlnext/BasicModule.hh>
 #include "VCSModule.hh"
-#include "XrayEvent.hh"
-#include "XrayEventCollection.hh"
+#include "AnalyzeFrame.hh"
+
+namespace hsquicklook {
+class MongoDBClient;
+}
 
 namespace comptonsoft {
 
-class AnalyzeFrame : public VCSModule
+class PushXrayEventToQuickLookDB : public anlnext::BasicModule
 {
-  DEFINE_ANL_MODULE(AnalyzeFrame, 1.1);
+  DEFINE_ANL_MODULE(PushXrayEventToQuickLookDB, 1.0);
   // ENABLE_PARALLEL_RUN();
 public:
-  AnalyzeFrame();
+  PushXrayEventToQuickLookDB();
   
 protected:
-  AnalyzeFrame(const AnalyzeFrame&);
+  PushXrayEventToQuickLookDB(const PushXrayEventToQuickLookDB&);
 
 public:
   anlnext::ANLStatus mod_define() override;
   anlnext::ANLStatus mod_initialize() override;
-  anlnext::ANLStatus mod_begin_run() override;
   anlnext::ANLStatus mod_analyze() override;
   anlnext::ANLStatus mod_end_run() override;
 
-  std::vector<comptonsoft::XrayEvent_sptr> Events() { return events_; }
+protected:
+  void pushXrayEventToDB(XrayEvent_sptr event);
 
 private:
-  double pedestal_level_ = 0.0;
-  double event_threshold_ = 0.0;
-  double split_threshold_ = 0.0;
-  int event_size_ = 1;
-  int trim_size_ = 0;
-  bool gain_correction_ = false;
+  std::string collection_;
+  int period_ = 1;
+  int phase_ = 0;
+  std::string loop_id_ = "";
+  std::vector<comptonsoft::XrayEvent_sptr> es_;
 
-  std::vector<comptonsoft::XrayEvent_sptr> events_;
-  
-  XrayEventCollection* collection_ = nullptr;
+  AnalyzeFrame*  analyzeFrame_ = nullptr;
+  hsquicklook::MongoDBClient* mongodb_ = nullptr;
 };
 
 } /* namespace comptonsoft */
 
-#endif /* COMPTONSOFT_AnalyzeFrame_H */
+#endif /* COMPTONSOFT_PushXrayEventToQuickLookDB_H */

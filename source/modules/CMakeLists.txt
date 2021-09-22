@@ -138,6 +138,7 @@ endif()
 if(CS_USE_HSQUICKLOOK)
   set(CS_HSQUICKLOOK_MODULES
     src/PushToQuickLookDB.cc
+    src/PushXrayEventToQuickLookDB.cc
     )
 endif()
 

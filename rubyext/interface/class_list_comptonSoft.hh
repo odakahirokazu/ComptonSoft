@@ -89,6 +89,7 @@ class HistogramRawFrameImage;
 class ExtractXrayEventImage;
 class ProcessCodedAperture;
 class PushToQuickLookDB;
+class PushXrayEventToQuickLookDB;
 class GetInputFilesFromDirectory;
 class SelectEventsWithDetectorSpectrum;
 class AssignSXIGrade;

@@ -99,6 +99,7 @@
 #include "ProcessCodedAperture.hh"
 #ifdef USE_HSQUICKLOOK
 #include "PushToQuickLookDB.hh"
+#include "PushXrayEventToQuickLookDB.hh"
 #endif
 #include "GetInputFilesFromDirectory.hh"
 #include "SelectEventsWithDetectorSpectrum.hh"
@@ -892,6 +893,12 @@ class PushToQuickLookDB : public anlnext::BasicModule
 {
 public:
   PushToQuickLookDB();
+};
+
+class PushXrayEventToQuickLookDB : public anlnext::BasicModule
+{
+public:
+  PushXrayEventToQuickLookDB();
 };
 
 #endif
