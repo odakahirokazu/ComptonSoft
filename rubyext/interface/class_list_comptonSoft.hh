@@ -90,6 +90,7 @@ class ExtractXrayEventImage;
 class ProcessCodedAperture;
 class PushToQuickLookDB;
 class PushXrayEventToQuickLookDB;
+class ExtractXrayEventImageFromQuickLookDB;
 class GetInputFilesFromDirectory;
 class SelectEventsWithDetectorSpectrum;
 class AssignSXIGrade;

@@ -100,6 +100,7 @@
 #ifdef USE_HSQUICKLOOK
 #include "PushToQuickLookDB.hh"
 #include "PushXrayEventToQuickLookDB.hh"
+#include "ExtractXrayEventImageFromQuickLookDB.hh"
 #endif
 #include "GetInputFilesFromDirectory.hh"
 #include "SelectEventsWithDetectorSpectrum.hh"
@@ -899,6 +900,12 @@ class PushXrayEventToQuickLookDB : public anlnext::BasicModule
 {
 public:
   PushXrayEventToQuickLookDB();
+};
+
+class ExtractXrayEventImageFromQuickLookDB : public anlnext::BasicModule
+{
+public:
+  ExtractXrayEventImageFromQuickLookDB();
 };
 
 #endif

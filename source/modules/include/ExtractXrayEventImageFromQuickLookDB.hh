@@ -17,21 +17,19 @@
  *                                                                       *
  *************************************************************************/
 
-/**
- * ExtractXrayEventImage
- *
- * @author Tsubasa Tamba
- * @date 2019-11-01
- * @date 2019-11-21 | H. Odaka | modify image definition
- */
 
-#ifndef COMPTONSOFT_ExtractXrayEventImage_H
-#define COMPTONSOFT_ExtractXrayEventImage_H 1
+#ifndef COMPTONSOFT_ExtractXrayEventImageFromQuickLookDB_H
+#define COMPTONSOFT_ExtractXrayEventImageFromQuickLookDB_H 1
 
 #include "VCSModule.hh"
 #include <memory>
 #include <random>
-#include "XrayEvent.hh"
+#include "ExtractXrayEventImage.hh"
+#include <bsoncxx/builder/basic/document.hpp>
+#include <bsoncxx/builder/basic/kvp.hpp>
+#include <mongocxx/client.hpp>
+#include <mongocxx/instance.hpp>
+
 
 class TH2;
 
@@ -39,15 +37,15 @@ namespace comptonsoft {
 
 class XrayEventCollection;
 
-class ExtractXrayEventImage : public VCSModule
+class ExtractXrayEventImageFromQuickLookDB : public VCSModule
 {
-  DEFINE_ANL_MODULE(ExtractXrayEventImage, 1.0);
+  DEFINE_ANL_MODULE(ExtractXrayEventImageFromQuickLookDB, 1.0);
   // ENABLE_PARALLEL_RUN();
 public:
-  ExtractXrayEventImage();
+  ExtractXrayEventImageFromQuickLookDB();
   
 protected:
-  ExtractXrayEventImage(const ExtractXrayEventImage&);
+  ExtractXrayEventImageFromQuickLookDB(const ExtractXrayEventImageFromQuickLookDB&);
 
 public:
   anlnext::ANLStatus mod_define() override;
@@ -75,7 +73,9 @@ private:
   int rebinX_ = 1;
   int rebinY_ = 1;
   bool randomSampling_ = false;
-  std::string collectionModule_;
+  std::string collectionName_;
+  std::string dbName_;
+  std::string analysisId_;
   std::string outputName_;
 
   double axx_ = 1.0;
@@ -85,6 +85,8 @@ private:
   std::default_random_engine randomGenerator_;
   std::uniform_real_distribution<double> distribution_;
 
+  // mongocxx::database db_;
+
   XrayEventCollection* collection_ = nullptr;
   std::shared_ptr<image_t> image_;
   TH2* histogram_ = nullptr;
@@ -92,4 +94,4 @@ private:
 
 } /* namespace comptonsoft */
 
-#endif /* COMPTONSOFT_ExtractXrayEventImage_H */
+#endif /* COMPTONSOFT_ExtractXrayEventImageFromQuickLookDB_H */

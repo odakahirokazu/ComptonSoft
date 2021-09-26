@@ -38,6 +38,7 @@ namespace comptonsoft {
  * @date 2016-08-19 | Add isMCSimulation()
  * @date 2017-07-07 | merge mod_hit() to mod_initialize()
  * @date 2019-11-21 | drawCanvas()
+ * @date 2021-09-26 | Image() by Taihei Watanabe
  */
 class VCSModule : public anlnext::BasicModule
 {
@@ -49,6 +50,7 @@ public:
   virtual anlnext::ANLStatus mod_initialize() override;
 
   virtual void drawCanvas(TCanvas*, std::vector<std::string>* /* filenames */) {};
+  virtual std::shared_ptr<image_t> Image() { return nullptr; };
 
 protected:
   void mkdir(const std::string& name="");

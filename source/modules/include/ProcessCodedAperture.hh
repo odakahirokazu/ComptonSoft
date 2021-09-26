@@ -34,6 +34,7 @@
 #include "XrayEvent.hh"
 #include "VCodedAperture.hh"
 #include "ExtractXrayEventImage.hh"
+#include "ExtractXrayEventImageFromQuickLookDB.hh"
 
 class TH2;
 
@@ -104,7 +105,7 @@ private:
   std::string outputAngleUnit_;
 
   std::shared_ptr<image_t> decodedImage_;
-  ExtractXrayEventImage* imageOwner_ = nullptr;
+  VCSModule* imageOwner_ = nullptr;
   std::unique_ptr<VCodedAperture> codedAperture_;
   TH2* histogram_ = nullptr;
   bool finalHistogramReady_ = false;

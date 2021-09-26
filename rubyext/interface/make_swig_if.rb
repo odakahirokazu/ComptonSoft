@@ -97,6 +97,7 @@ clMod = [
   ANL::SWIGClass.new("ProcessCodedAperture"),
   ANL::SWIGClass.new("PushToQuickLookDB", false, "USE_HSQUICKLOOK"),
   ANL::SWIGClass.new("PushXrayEventToQuickLookDB", false, "USE_HSQUICKLOOK"),
+  ANL::SWIGClass.new("ExtractXrayEventImageFromQuickLookDB", false, "USE_HSQUICKLOOK")
   ANL::SWIGClass.new("GetInputFilesFromDirectory"),
   ANL::SWIGClass.new("SelectEventsWithDetectorSpectrum"),
   ANL::SWIGClass.new("AssignSXIGrade"),
