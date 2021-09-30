@@ -86,6 +86,7 @@ class HistogramXrayEventSpectrum;
 class HistogramXrayEventAzimuthAngle;
 class HistogramXrayEventProperties;
 class HistogramRawFrameImage;
+class HistogramDecodedImage;
 class ExtractXrayEventImage;
 class ProcessCodedAperture;
 class PushToQuickLookDB;

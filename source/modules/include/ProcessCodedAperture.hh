@@ -73,6 +73,8 @@ public:
   int NumDecodingIterations() const { return numDecodingIterations_; }
   int DecodingMode() const { return decodingMode_; }
 
+  TH2* Histogram() { return histogram_; }
+
   void drawCanvas(TCanvas* canvas, std::vector<std::string>* filenames) override;
 
 protected:

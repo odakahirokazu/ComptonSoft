@@ -70,6 +70,7 @@ set(CS_MODULES
   src/HistogramXrayEventSpectrum.cc
   src/HistogramXrayEventAzimuthAngle.cc
   src/HistogramXrayEventProperties.cc
+  src/HistogramDecodedImage.cc
   src/HistogramRawFrameImage.cc
   src/ExtractXrayEventImage.cc
   src/ProcessCodedAperture.cc
