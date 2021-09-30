@@ -140,6 +140,7 @@ if(CS_USE_HSQUICKLOOK)
   set(CS_HSQUICKLOOK_MODULES
     src/PushToQuickLookDB.cc
     src/PushXrayEventToQuickLookDB.cc
+    src/LoadMetaDataFile.cc
     src/ExtractXrayEventImageFromQuickLookDB.cc
     )
 endif()

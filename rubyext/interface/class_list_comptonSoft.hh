@@ -91,6 +91,7 @@ class ExtractXrayEventImage;
 class ProcessCodedAperture;
 class PushToQuickLookDB;
 class PushXrayEventToQuickLookDB;
+class LoadMetaDataFile;
 class ExtractXrayEventImageFromQuickLookDB;
 class GetInputFilesFromDirectory;
 class SelectEventsWithDetectorSpectrum;

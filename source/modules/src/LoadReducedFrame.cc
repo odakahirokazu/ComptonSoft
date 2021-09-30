@@ -68,15 +68,15 @@ ANLStatus LoadReducedFrame::mod_analyze()
   if (fileIndex >= files_.size()) {
     return AS_QUIT;
   }
-  const std::string filename = files_[fileIndex];
-  std::cout << "[LoadReducedFrame] filename: " << filename << std::endl;
+  filename_ = files_[fileIndex];
+  std::cout << "[LoadReducedFrame] filename: " << filename_ << std::endl;
 
   frame_->setFrameID(fileIndex);
   frame_->resetRawFrame();
   frame_->clearEventCheckPixels();
   image_t& rawFrame = frame_->getRawFrame();
 
-  TFile* f = new TFile(filename.c_str());
+  TFile* f = new TFile(filename_.c_str());
   TTree* tree_ = (TTree*)f->Get("rawtree");
   int ix = 0;
   int iy = 0;

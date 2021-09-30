@@ -19,6 +19,7 @@
 
 #include "PushXrayEventToQuickLookDB.hh"
 #include "AnalyzeFrame.hh"
+#include "LoadMetaDataFile.hh"
 
 #include <fstream>
 #include <boost/filesystem.hpp>
@@ -40,7 +41,7 @@ ANLStatus PushXrayEventToQuickLookDB::mod_define()
   define_parameter("collection", &mod_class::collection_);
   define_parameter("period", &mod_class::period_);
   define_parameter("phase", &mod_class::phase_);
-  define_parameter("loop_id", &mod_class::loop_id_);
+  define_parameter("analysis_id", &mod_class::analysis_id_);
   
   return AS_OK;
 }    
@@ -48,6 +49,7 @@ ANLStatus PushXrayEventToQuickLookDB::mod_define()
 ANLStatus PushXrayEventToQuickLookDB::mod_initialize()
 {
   get_module_NC("AnalyzeFrame", &analyzeFrame_);
+  get_module_NC("LoadMetaDataFile", &metaDataFile_);
 
   if (exist_module("MongoDBClient")) {
     get_module_NC("MongoDBClient", &mongodb_);
@@ -89,7 +91,7 @@ void PushXrayEventToQuickLookDB::pushXrayEventToDB(XrayEvent_sptr event)
 { 
   bsoncxx::builder::stream::document builder{};
 
-  builder << "loop_id" << loop_id_; 
+  builder << "analysis_id" << analysis_id_; 
   builder << "frameID" << event->FrameID();
   builder << "ix" << event->PixelX();
   builder << "iy" << event->PixelY();
@@ -98,6 +100,9 @@ void PushXrayEventToQuickLookDB::pushXrayEventToDB(XrayEvent_sptr event)
   builder << "angle" << event->Angle(); 
   builder << "weight" << event->Weight();
   builder << "rank" << event->Rank();
+  builder << "temperature" << metaDataFile_->Temperature();
+  builder << "capture_time" << metaDataFile_->CaptureTime();
+  builder << "filename" << metaDataFile_->Filename();
 
   bsoncxx::document::value doc
     = builder << bsoncxx::builder::stream::finalize;

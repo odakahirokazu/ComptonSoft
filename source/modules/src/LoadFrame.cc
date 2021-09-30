@@ -76,11 +76,11 @@ ANLStatus LoadFrame::mod_analyze()
   }
 
   const std::size_t fileIndex = get_loop_index();
-  const std::string filename = files_[fileIndex];
-  std::cout << "[LoadFrame] filename: " << filename << std::endl;
+  filename_ = files_[fileIndex];
+  std::cout << "[LoadFrame] filename: " << filename_ << std::endl;
 
   frame_->setFrameID(fileIndex);
-  bool status = frame_->load(filename);
+  bool status = frame_->load(filename_);
   if (!status) {
     return AS_ERROR;
   }

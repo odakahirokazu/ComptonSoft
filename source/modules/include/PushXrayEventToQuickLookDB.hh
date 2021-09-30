@@ -24,6 +24,7 @@
 #include <anlnext/BasicModule.hh>
 #include "VCSModule.hh"
 #include "AnalyzeFrame.hh"
+#include "LoadMetaDataFile.hh"
 
 namespace hsquicklook {
 class MongoDBClient;
@@ -54,10 +55,11 @@ private:
   std::string collection_;
   int period_ = 1;
   int phase_ = 0;
-  std::string loop_id_ = "";
+  std::string analysis_id_ = "";
   std::vector<comptonsoft::XrayEvent_sptr> es_;
 
   AnalyzeFrame*  analyzeFrame_ = nullptr;
+  LoadMetaDataFile* metaDataFile_ = nullptr;
   hsquicklook::MongoDBClient* mongodb_ = nullptr;
 };
 

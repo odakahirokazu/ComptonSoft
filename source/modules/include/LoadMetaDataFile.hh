@@ -17,47 +17,51 @@
  *                                                                       *
  *************************************************************************/
 
-#ifndef COMPTONSOFT_LoadReducedFrame_H
-#define COMPTONSOFT_LoadReducedFrame_H 1
+#ifndef COMPTONSOFT_LoadMetaDataFile_H
+#define COMPTONSOFT_LoadMetaDataFile_H 1
 
 #include <anlnext/BasicModule.hh>
-#include <unordered_set>
+#include "LoadReducedFrame.hh"
 #include "VDataReader.hh"
+
+
 
 namespace comptonsoft {
 
-class FrameData;
-
-class LoadReducedFrame : public anlnext::BasicModule, public VDataReader
+class LoadMetaDataFile : public anlnext::BasicModule
 {
-  DEFINE_ANL_MODULE(LoadReducedFrame, 1.0);
+  DEFINE_ANL_MODULE(LoadMetaDataFile, 1.0);
 
 public:
-  LoadReducedFrame();
+  LoadMetaDataFile();
   
 protected:
-  LoadReducedFrame(const LoadReducedFrame&);
+  LoadMetaDataFile(const LoadMetaDataFile&);
 
 public:
   anlnext::ANLStatus mod_define() override;
   anlnext::ANLStatus mod_initialize() override;
   anlnext::ANLStatus mod_analyze() override;
 
-  void addFile(const std::string& filename) override;
-  bool hasFile(const std::string& filename) const override;
-  bool isDone() const override;
+  std::string make_metafilename(std::string datafilename);
+  void load_json(std::string filename);
 
-  std::string Filename() override { return filename_; };
+  int Temperature() { return temperature_; };
+  std::string CaptureTime() { return capture_time_; };
+  std::string Filename() { return datafilename_; };
 
 private:
-  int detector_id_ = 0;
-  std::vector<std::string> files_;
-  std::unordered_set<std::string> past_files_;
-  FrameData* frame_ = nullptr;
+  std::string dataReaderModule_;
+  std::string dataFileExtension_;
+  std::string metaFileExtension_;
 
-  std::string filename_ = "";
+  VDataReader* data_reader_ = nullptr;
+
+  std::string datafilename_ = "";
+  int temperature_ = 0;
+  std::string capture_time_ = "";
 };
 
 } /* namespace comptonsoft */
 
-#endif /* COMPTONSOFT_LoadReducedFrame_H */
+#endif /* COMPTONSOFT_LoadMetaDataFile_H */

@@ -55,6 +55,8 @@ public:
   bool hasFile(const std::string& filename) const override;
   bool isDone() const override;
 
+  std::string Filename() override { return filename_; };
+
 private:
   bool byte_order_ = true;
   int odd_row_pixel_shift_ = 0;
@@ -64,6 +66,7 @@ private:
   std::vector<std::string> files_;
   std::unordered_set<std::string> past_files_;
   FrameData* frame_ = nullptr;
+  std::string filename_ = "";
 };
 
 } /* namespace comptonsoft */

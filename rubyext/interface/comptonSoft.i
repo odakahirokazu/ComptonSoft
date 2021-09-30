@@ -101,6 +101,7 @@
 #ifdef USE_HSQUICKLOOK
 #include "PushToQuickLookDB.hh"
 #include "PushXrayEventToQuickLookDB.hh"
+#include "LoadMetaDataFile.hh"
 #include "ExtractXrayEventImageFromQuickLookDB.hh"
 #endif
 #include "GetInputFilesFromDirectory.hh"
@@ -912,6 +913,12 @@ class ExtractXrayEventImageFromQuickLookDB : public anlnext::BasicModule
 {
 public:
   ExtractXrayEventImageFromQuickLookDB();
+};
+
+class LoadMetaDataFile : public anlnext::BasicModule
+{
+public:
+  LoadMetaDataFile();
 };
 
 #endif

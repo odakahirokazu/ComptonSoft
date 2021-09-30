@@ -34,6 +34,8 @@ public:
   virtual void addFile(const std::string& filename) = 0;
   virtual bool hasFile(const std::string& filename) const = 0;
   virtual bool isDone() const = 0;
+
+  virtual std::string Filename() = 0;
 };
 
 } /* namespace comptonsoft */
