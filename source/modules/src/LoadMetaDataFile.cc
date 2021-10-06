@@ -21,6 +21,10 @@
 #include <algorithm>
 #include <iostream>
 #include <fstream>
+#include <chrono>
+#include <sstream>
+#include <iomanip>
+#include <ctime>
 
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/json_parser.hpp>
@@ -85,7 +89,17 @@ void LoadMetaDataFile::load_json(std::string filename)
   boost::property_tree::read_json(filename, pt);
 
   temperature_ = pt.get_optional<int>("temperature").get();
-  capture_time_ = pt.get_optional<std::string>("time").get();
+  capture_time_ = convert_datetime(pt.get_optional<std::string>("time").get(), "%Y-%m-%dT%H:%M:%S");
+}
+
+std::chrono::system_clock::time_point LoadMetaDataFile::convert_datetime(std::string datetime, std::string format)
+{
+  std::tm tm = {};
+  std::stringstream ss(datetime);
+  ss >> std::get_time(&tm, format.c_str());
+  std::chrono::system_clock::time_point tp = std::chrono::system_clock::from_time_t(std::mktime(&tm));
+
+  return tp;
 }
 
 } /* namespace comptonsoft */

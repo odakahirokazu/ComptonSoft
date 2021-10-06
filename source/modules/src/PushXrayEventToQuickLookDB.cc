@@ -24,6 +24,7 @@
 #include <fstream>
 #include <boost/filesystem.hpp>
 #include <bsoncxx/builder/stream/document.hpp>
+#include <bsoncxx/types.hpp>
 #include "hsquicklook/MongoDBClient.hh"
 #include "hsquicklook/DocumentBuilder.hh"
 
@@ -101,7 +102,7 @@ void PushXrayEventToQuickLookDB::pushXrayEventToDB(XrayEvent_sptr event)
   builder << "weight" << event->Weight();
   builder << "rank" << event->Rank();
   builder << "temperature" << metaDataFile_->Temperature();
-  builder << "capture_time" << metaDataFile_->CaptureTime();
+  builder << "capture_time" << bsoncxx::types::b_date(metaDataFile_->CaptureTime());
   builder << "filename" << metaDataFile_->Filename();
 
   bsoncxx::document::value doc

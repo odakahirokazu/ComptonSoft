@@ -20,6 +20,7 @@
 #ifndef COMPTONSOFT_LoadMetaDataFile_H
 #define COMPTONSOFT_LoadMetaDataFile_H 1
 
+#include <chrono>
 #include <anlnext/BasicModule.hh>
 #include "LoadReducedFrame.hh"
 #include "VDataReader.hh"
@@ -45,9 +46,10 @@ public:
 
   std::string make_metafilename(std::string datafilename);
   void load_json(std::string filename);
+  std::chrono::system_clock::time_point convert_datetime(std::string datetime, std::string format);
 
   int Temperature() { return temperature_; };
-  std::string CaptureTime() { return capture_time_; };
+  std::chrono::system_clock::time_point CaptureTime() { return capture_time_; };
   std::string Filename() { return datafilename_; };
 
 private:
@@ -59,7 +61,7 @@ private:
 
   std::string datafilename_ = "";
   int temperature_ = 0;
-  std::string capture_time_ = "";
+  std::chrono::system_clock::time_point capture_time_;
 };
 
 } /* namespace comptonsoft */
