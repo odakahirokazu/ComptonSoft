@@ -46,7 +46,6 @@ public:
   anlnext::ANLStatus mod_define() override;
   anlnext::ANLStatus mod_initialize() override;
   anlnext::ANLStatus mod_analyze() override;
-  anlnext::ANLStatus mod_end_run() override;
 
 protected:
   void pushXrayEventToDB(XrayEvent_sptr event);

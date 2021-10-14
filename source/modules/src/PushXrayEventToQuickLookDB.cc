@@ -76,18 +76,6 @@ ANLStatus PushXrayEventToQuickLookDB::mod_analyze()
   return AS_OK;
 }
 
-ANLStatus PushXrayEventToQuickLookDB::mod_end_run()
-{
-  if (mongodb_) {
-    es_ = analyzeFrame_->Events();
-    for (auto& event : es_) {
-      pushXrayEventToDB(event);
-    }
-  }
-
-  return AS_OK;
-}
-
 void PushXrayEventToQuickLookDB::pushXrayEventToDB(XrayEvent_sptr event)
 { 
   bsoncxx::builder::stream::document builder{};
