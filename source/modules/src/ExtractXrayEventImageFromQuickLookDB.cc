@@ -123,7 +123,7 @@ ANLStatus ExtractXrayEventImageFromQuickLookDB::mod_analyze()
     using namespace bsoncxx::builder::basic;
 
     mongocxx::pipeline p{};
-    p.match(make_document(kvp("loop_id", analysisId_)));
+    p.match(make_document(kvp("analysis_id", analysisId_)));
     p.group(make_document(
       kvp("_id", make_document(kvp("ix", "$ix"), kvp("iy", "$iy"))),
       kvp("count", make_document(kvp("$sum", 1)))));
@@ -153,6 +153,7 @@ ANLStatus ExtractXrayEventImageFromQuickLookDB::mod_analyze()
       }
     }
   }
+
 
   return AS_OK;
 }
