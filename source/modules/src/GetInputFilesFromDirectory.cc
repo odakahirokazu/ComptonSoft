@@ -44,6 +44,7 @@ ANLStatus GetInputFilesFromDirectory::mod_define()
   define_parameter("extension", &mod_class::extension_);
   define_parameter("delay", &mod_class::delay_);
   define_parameter("wait", &mod_class::wait_);
+  define_parameter("directories", &mod_class::directories_);
   
   return AS_OK;
 }
@@ -52,6 +53,9 @@ ANLStatus GetInputFilesFromDirectory::mod_initialize()
 {
   get_module_IFNC(reader_module_, &data_reader_);
   entry_time_ = std::time(nullptr);
+  if (directories_.size()==0) {
+    directories_.push_back(directory_);
+  }
 
   return AS_OK;
 }
@@ -60,6 +64,10 @@ ANLStatus GetInputFilesFromDirectory::mod_analyze()
 {
   namespace fs = boost::filesystem;
 
+  if (directory_index_==static_cast<int>(directories_.size())) {
+    return AS_OK;
+  }
+
   if (redoing_) {
     redoing_ = false;
   }
@@ -67,7 +75,7 @@ ANLStatus GetInputFilesFromDirectory::mod_analyze()
     entry_time_ = std::time(nullptr);
   }
 
-  const fs::path dir(directory_);
+  const fs::path dir(directories_[directory_index_]);
   
   std::list<fs::path> files;
   for (const auto& f: boost::make_iterator_range(fs::directory_iterator(dir), {})) {
@@ -101,6 +109,8 @@ ANLStatus GetInputFilesFromDirectory::mod_analyze()
       return AS_REDO;
     }
   }
+
+  directory_index_++;
 
   return AS_OK;
 }

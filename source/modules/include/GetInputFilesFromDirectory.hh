@@ -57,6 +57,9 @@ private:
   VDataReader* data_reader_ = nullptr;
   bool redoing_ = false;
   std::time_t entry_time_ = 0;
+
+  std::vector<std::string> directories_;
+  int directory_index_ = 0;
 };
 
 } /* namespace comptonsoft */
