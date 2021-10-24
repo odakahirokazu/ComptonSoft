@@ -68,6 +68,11 @@ ANLStatus GetInputFilesFromDirectory::mod_analyze()
     return AS_OK;
   }
 
+  if (!fs::exists(directories_[directory_index_])) {
+    directory_index_++;
+    return AS_OK;
+  }
+
   if (redoing_) {
     redoing_ = false;
   }
