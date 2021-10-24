@@ -64,12 +64,13 @@ ANLStatus GetInputFilesFromDirectory::mod_analyze()
 {
   namespace fs = boost::filesystem;
 
-  if (directory_index_==static_cast<int>(directories_.size())) {
+  if (!redoing_ && directory_index_==static_cast<int>(directories_.size())) {
     return AS_OK;
   }
 
   if (!fs::exists(directories_[directory_index_])) {
     directory_index_++;
+    directory_index_ %= static_cast<int>(directories_.size());
     return AS_OK;
   }
 
@@ -92,6 +93,7 @@ ANLStatus GetInputFilesFromDirectory::mod_analyze()
     if (data_reader_->hasFile(file.string())) { continue; }
     
     files.push_back(file);
+    last_entry_index_ = directory_index_;
   }
 
   files.sort();
@@ -116,7 +118,8 @@ ANLStatus GetInputFilesFromDirectory::mod_analyze()
   }
 
   directory_index_++;
-
+  directory_index_ %= static_cast<int>(directories_.size());
+  
   return AS_OK;
 }
 
