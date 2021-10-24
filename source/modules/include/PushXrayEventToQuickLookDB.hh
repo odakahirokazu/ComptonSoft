@@ -48,7 +48,7 @@ public:
   anlnext::ANLStatus mod_analyze() override;
 
 protected:
-  void pushXrayEventToDB(XrayEvent_sptr event);
+  void pushXrayEventsToDB();
 
 private:
   std::string collection_;

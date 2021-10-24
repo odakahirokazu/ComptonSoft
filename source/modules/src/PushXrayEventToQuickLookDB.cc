@@ -22,6 +22,7 @@
 #include "LoadMetaDataFile.hh"
 
 #include <fstream>
+#include <vector>
 #include <boost/filesystem.hpp>
 #include <bsoncxx/builder/stream/document.hpp>
 #include <bsoncxx/types.hpp>
@@ -68,34 +69,35 @@ ANLStatus PushXrayEventToQuickLookDB::mod_analyze()
 
   if (mongodb_) {
     es_ = analyzeFrame_->Events();
-    for (auto& event : es_) {
-      pushXrayEventToDB(event);
-    }
+    pushXrayEventsToDB();
   }
 
   return AS_OK;
 }
 
-void PushXrayEventToQuickLookDB::pushXrayEventToDB(XrayEvent_sptr event)
-{ 
-  bsoncxx::builder::stream::document builder{};
+void PushXrayEventToQuickLookDB::pushXrayEventsToDB()
+{
+  std::vector<bsoncxx::document::value> documents;
 
-  builder << "analysis_id" << analysis_id_; 
-  builder << "frameID" << event->FrameID();
-  builder << "ix" << event->PixelX();
-  builder << "iy" << event->PixelY();
-  builder << "sumPH" << event->SumPH();
-  builder << "centerPH" << event->CenterPH();
-  builder << "angle" << event->Angle(); 
-  builder << "weight" << event->Weight();
-  builder << "rank" << event->Rank();
-  builder << "temperature" << metaDataFile_->Temperature();
-  builder << "capture_time" << bsoncxx::types::b_date(metaDataFile_->CaptureTime());
-  builder << "filename" << metaDataFile_->Filename();
-
-  bsoncxx::document::value doc
-    = builder << bsoncxx::builder::stream::finalize;
-  mongodb_->push(collection_, doc);
+  for (auto& event : es_) {
+    documents.push_back(
+      bsoncxx::builder::stream::document{}
+        << "analysis_id" << analysis_id_
+        << "frameID" << event->FrameID()
+        << "ix" << event->PixelX()
+        << "iy" << event->PixelY()
+        << "sumPH" << event->SumPH()
+        << "centerPH" << event->CenterPH()
+        << "angle" << event->Angle()
+        << "weight" << event->Weight()
+        << "rank" << event->Rank()
+        << "temperature" << metaDataFile_->Temperature()
+        << "capture_time" << bsoncxx::types::b_date(metaDataFile_->CaptureTime())
+        << "filename" << metaDataFile_->Filename()
+      << bsoncxx::builder::stream::finalize
+    );
+  }
+  mongodb_->push_many(collection_, documents);
 }
 
 } /* namespace comptonsoft */
