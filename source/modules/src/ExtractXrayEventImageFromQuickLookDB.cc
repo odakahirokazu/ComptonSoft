@@ -31,6 +31,9 @@
 using namespace anlnext;
 namespace unit = anlgeant4::unit;
 
+using namespace mongocxx;
+using namespace bsoncxx::builder::basic;
+
 namespace {
 
 void reset_image(std::shared_ptr<comptonsoft::image_t> image)
@@ -99,6 +102,9 @@ ANLStatus ExtractXrayEventImageFromQuickLookDB::mod_initialize()
   histogram_ = new TH2D(name.c_str(), title.c_str(),
                         nx, 0.0, static_cast<double>(numX_),
                         ny, 0.0, static_cast<double>(numY_));
+  if (analysisId_.empty()) {
+    setLatestAnalysisId();
+  }
 
   return AS_OK;
 }
@@ -119,9 +125,6 @@ ANLStatus ExtractXrayEventImageFromQuickLookDB::mod_analyze()
   reset_image(image_);
 
   {
-    using namespace mongocxx;
-    using namespace bsoncxx::builder::basic;
-
     mongocxx::pipeline p{};
     p.match(make_document(kvp("analysis_id", analysisId_)));
     p.group(make_document(
@@ -168,6 +171,20 @@ ANLStatus ExtractXrayEventImageFromQuickLookDB::mod_end_run()
 double ExtractXrayEventImageFromQuickLookDB::sampleRandomNumber()
 {
   return distribution_(randomGenerator_);
+}
+
+void ExtractXrayEventImageFromQuickLookDB::setLatestAnalysisId()
+{
+  const mongocxx::client conn{mongocxx::uri{}};
+  auto db_ = conn[dbName_];
+
+  mongocxx::pipeline p{};
+  p.sort(make_document(kvp("analysis_id", -1)));
+  p.limit(1);
+
+  auto cursor = db_[collectionName_].aggregate(p, mongocxx::options::aggregate{});
+
+  analysisId_ = (*cursor.begin())["analysis_id"].get_utf8().value.to_string();
 }
 
 void ExtractXrayEventImageFromQuickLookDB::fillHistogram()

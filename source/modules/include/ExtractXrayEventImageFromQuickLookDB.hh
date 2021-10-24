@@ -60,6 +60,7 @@ public:
 protected:
   double sampleRandomNumber();
   void fillHistogram();
+  void setLatestAnalysisId();
 
 private:
   int numX_ = 1;
