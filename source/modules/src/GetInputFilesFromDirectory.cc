@@ -108,7 +108,9 @@ ANLStatus GetInputFilesFromDirectory::mod_analyze()
   
   if (!added && data_reader_->isDone()) {
     if (entry_time_+wait_ < std::time(nullptr)) {
-      std::cout << "[GetInputFilesFromDirectory] timeout" << std::endl;;
+      std::cout << "[GetInputFilesFromDirectory] timeout" << std::endl;
+        directory_index_++;
+        directory_index_ %= static_cast<int>(directories_.size());
     }
     else {
       std::this_thread::sleep_for(std::chrono::seconds(1));
@@ -117,8 +119,6 @@ ANLStatus GetInputFilesFromDirectory::mod_analyze()
     }
   }
 
-  directory_index_++;
-  directory_index_ %= static_cast<int>(directories_.size());
   
   return AS_OK;
 }
