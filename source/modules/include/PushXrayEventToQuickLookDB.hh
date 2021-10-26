@@ -55,6 +55,7 @@ private:
   int period_ = 1;
   int phase_ = 0;
   std::string analysis_id_ = "";
+  int collection_max_size_ = 100*1024*1024;
   std::vector<comptonsoft::XrayEvent_sptr> es_;
 
   AnalyzeFrame*  analyzeFrame_ = nullptr;

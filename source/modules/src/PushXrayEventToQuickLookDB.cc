@@ -43,6 +43,7 @@ ANLStatus PushXrayEventToQuickLookDB::mod_define()
   define_parameter("collection", &mod_class::collection_);
   define_parameter("period", &mod_class::period_);
   define_parameter("phase", &mod_class::phase_);
+  define_parameter("collection_max_size", &mod_class::collection_max_size_);
   define_parameter("analysis_id", &mod_class::analysis_id_);
   
   return AS_OK;
@@ -55,7 +56,7 @@ ANLStatus PushXrayEventToQuickLookDB::mod_initialize()
 
   if (exist_module("MongoDBClient")) {
     get_module_NC("MongoDBClient", &mongodb_);
-    mongodb_->createCappedCollection(collection_, 100*1024*1024);
+    mongodb_->createCappedCollection(collection_, collection_max_size_);
   }
 
   return AS_OK;
