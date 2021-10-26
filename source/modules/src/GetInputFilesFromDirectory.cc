@@ -64,14 +64,13 @@ ANLStatus GetInputFilesFromDirectory::mod_analyze()
 {
   namespace fs = boost::filesystem;
 
-  if (!redoing_ && directory_index_==static_cast<int>(directories_.size())) {
+  if (directory_index_==static_cast<int>(directories_.size())) {
     return AS_OK;
   }
 
   if (!fs::exists(directories_[directory_index_])) {
     directory_index_++;
-    directory_index_ %= static_cast<int>(directories_.size());
-    return AS_OK;
+    return AS_REDO;
   }
 
   if (redoing_) {
@@ -93,7 +92,6 @@ ANLStatus GetInputFilesFromDirectory::mod_analyze()
     if (data_reader_->hasFile(file.string())) { continue; }
     
     files.push_back(file);
-    last_entry_index_ = directory_index_;
   }
 
   files.sort();
@@ -109,8 +107,9 @@ ANLStatus GetInputFilesFromDirectory::mod_analyze()
   if (!added && data_reader_->isDone()) {
     if (entry_time_+wait_ < std::time(nullptr)) {
       std::cout << "[GetInputFilesFromDirectory] timeout" << std::endl;
-        directory_index_++;
-        directory_index_ %= static_cast<int>(directories_.size());
+      directory_index_++;
+      redoing_ = false;
+      return AS_REDO;
     }
     else {
       std::this_thread::sleep_for(std::chrono::seconds(1));

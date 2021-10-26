@@ -60,7 +60,7 @@ private:
 
   std::vector<std::string> directories_;
   int directory_index_ = 0;
-  int last_entry_index_ = 0;
+  int last_entry_index_ = -1;
 };
 
 } /* namespace comptonsoft */
