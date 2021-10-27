@@ -56,7 +56,7 @@ ANLStatus PushXrayEventToQuickLookDB::mod_initialize()
 
   if (exist_module("MongoDBClient")) {
     get_module_NC("MongoDBClient", &mongodb_);
-    mongodb_->createCappedCollection(collection_, collection_max_size_);
+    mongodb_->createCollection(collection_);
   }
 
   return AS_OK;
