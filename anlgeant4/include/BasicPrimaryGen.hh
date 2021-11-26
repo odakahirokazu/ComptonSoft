@@ -173,6 +173,16 @@ protected:
 
   void setRealTime(double v) { realTime_ = v; }
 
+
+  std::string getEnergyDistributionName() const { return energyDistributionName_; }
+  SpectralShape getEnergyDistribution() const { return  energyDistribution_; }
+  double getEnergyMin() const { return energyMin_; }
+  double getEnergyMax() const { return energyMax_; }
+  double getPhotonIndex() const { return photonIndex_; }
+  double getEnergyMean() const { return energyMean_; }
+  double getEnergySigma() const { return energySigma_; }
+  double getEnergykT() const { return kT_; }
+
 private:
   BasicPrimaryGeneratorAction* primaryGenerator_ = nullptr;
   const anlgeant4::VANLGeometry* geometry_ = nullptr;
