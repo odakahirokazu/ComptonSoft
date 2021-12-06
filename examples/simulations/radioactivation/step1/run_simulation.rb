@@ -31,7 +31,7 @@ def run_simulation(num, random, output)
   sim.set_user_action :ActivationUserActionAssembly, {
     output_filename_base: output.sub(".root", ".act"),
     detection_by_generation: false,
-    processes_to_detect: ["RadioactiveDecay"],
+    processes_to_detect: ["RadioactiveDecayBase"],
   }
 
   sim.run(num)

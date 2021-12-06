@@ -1,8 +1,10 @@
 #! /usr/bin/env ruby
 
-require 'comptonsoft'
+require 'anlnext'
 
 def run_simulation(num, random, output)
+  require 'comptonsoft'
+
   energy = 150000.0 # keV
 
   sim = ComptonSoft::Simulation.new
