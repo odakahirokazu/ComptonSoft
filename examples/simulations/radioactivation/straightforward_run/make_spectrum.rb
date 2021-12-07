@@ -4,8 +4,7 @@ require "RubyROOT"
 
 file_list = ["simulation_selected.root"]
 file_output = "spectrum.root"
-scale = (10000000.0*100.0)/(1000*10000000)
-exposure = 100000.0/scale
+exposure = 100000.0
 
 tree = Root::TChain.new("hittree", "hittree")
 file_list.each do |file|
