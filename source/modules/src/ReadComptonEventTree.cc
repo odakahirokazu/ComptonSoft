@@ -38,8 +38,11 @@ ReadComptonEventTree::ReadComptonEventTree()
 
 ANLStatus ReadComptonEventTree::mod_define()
 {
+  EventReconstruction::mod_define();
+  hide_parameter("max_hits");
+  hide_parameter("reconstruction_method");
+  hide_parameter("parameter_file");
   register_parameter(&fileList_, "file_list");
-  
   return AS_OK;
 }
 
@@ -99,6 +102,7 @@ ANLStatus ReadComptonEventTree::mod_analyze()
 
   do {
     auto event = std::make_shared<BasicComptonEvent>();
+    assignSourceInformation(*event);
     treeIO_->retrieveEvent(*event);
     pushReconstructedEvent(event);
     retrieveHitPatterns();

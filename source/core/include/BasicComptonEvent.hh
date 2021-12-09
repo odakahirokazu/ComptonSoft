@@ -181,6 +181,7 @@ public:
   vector3_t SourcePosition() const { return sourcePosition_; }
 
   double DistanceBetweenTheHits() const;
+  double MaxDeltaTheta() const;
 
   void setEscapeFlag(bool f) { escapeFlag_ = f; }
   bool EscapeFlag() const { return escapeFlag_; }

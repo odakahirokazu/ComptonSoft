@@ -71,10 +71,11 @@ private:
  * @date 2017-02-06 | 4.0 | do not determine hit patterns in this module.
  * @date 2017-02-15 | 4.1 | can specify hit pattern in the condition phase
  * @date 2017-10-13 | 4.2 | fix hit pattern selection
+ * @date 2017-10-13 | 4.3 | add energy, first interaction distance, and max delta theta
  */
 class ComptonEventFilter : public VCSModule
 {
-  DEFINE_ANL_MODULE(ComptonEventFilter, 4.2);
+  DEFINE_ANL_MODULE(ComptonEventFilter, 4.3);
 public:
   ComptonEventFilter();
   ~ComptonEventFilter() = default;

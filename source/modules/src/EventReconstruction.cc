@@ -142,11 +142,16 @@ ANLStatus EventReconstruction::mod_end_run()
 
 void EventReconstruction::assignSourceInformation()
 {
+  assignSourceInformation(*m_BaseEvent);
+}
+
+void EventReconstruction::assignSourceInformation(BasicComptonEvent& event) const
+{
   if (m_SourceDistant) {
-    m_BaseEvent->setSourceDirection(m_SourceDirection);
+    event.setSourceDirection(m_SourceDirection);
   }
   else {
-    m_BaseEvent->setSourcePosition(m_SourcePosition);
+    event.setSourcePosition(m_SourcePosition);
   }
 }
 

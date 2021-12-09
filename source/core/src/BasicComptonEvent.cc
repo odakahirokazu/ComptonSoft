@@ -90,6 +90,15 @@ double BasicComptonEvent::DistanceBetweenTheHits() const
   return (Hit1Position()-Hit2Position()).mag();
 }
 
+double BasicComptonEvent::MaxDeltaTheta() const
+{
+  const double maxAngle = ThetaG() + ThetaE();
+  if (maxAngle > CLHEP::pi) {
+    return CLHEP::twopi - maxAngle;
+  }
+  return maxAngle;
+}
+
 void BasicComptonEvent::calc() const
 {
   using std::acos;

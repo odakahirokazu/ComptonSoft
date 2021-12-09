@@ -176,7 +176,17 @@ void ComptonEventFilter::add_condition(const std::string& type,
   std::function<bool (const BasicComptonEvent&)> condition;
 
   namespace arg = std::placeholders;
-  if (type == "E1") {
+  if (type == "event ID") {
+    condition = std::bind(filter_compton<int64_t>,
+                          &BasicComptonEvent::EventID,
+                          arg::_1, min_value, max_value);
+  }
+  else if (type == "number of hits") {
+    condition = std::bind(filter_compton<int>,
+                          &BasicComptonEvent::NumberOfHits,
+                          arg::_1, min_value, max_value);
+  }
+  else if (type == "E1") {
     condition = std::bind(filter_compton<double>,
                           &BasicComptonEvent::Hit1Energy,
                           arg::_1, min_value*unit::keV, max_value*unit::keV);
@@ -187,6 +197,11 @@ void ComptonEventFilter::add_condition(const std::string& type,
                           arg::_1, min_value*unit::keV, max_value*unit::keV);
   }
   else if (type == "E1+E2") {
+    condition = std::bind(filter_compton<double>,
+                          &BasicComptonEvent::IncidentEnergy,
+                          arg::_1, min_value*unit::keV, max_value*unit::keV);
+  }
+  else if (type == "energy") {
     condition = std::bind(filter_compton<double>,
                           &BasicComptonEvent::IncidentEnergy,
                           arg::_1, min_value*unit::keV, max_value*unit::keV);
@@ -240,6 +255,36 @@ void ComptonEventFilter::add_condition(const std::string& type,
     condition = std::bind(filter_compton<double>,
                           &BasicComptonEvent::Hit2PositionZ,
                           arg::_1, min_value*unit::cm, max_value*unit::cm);
+  }
+  else if (type == "first interaction distance") {
+    condition = std::bind(filter_compton<double>,
+                          &BasicComptonEvent::DistanceBetweenTheHits,
+                          arg::_1, min_value*unit::cm, max_value*unit::cm);
+  }
+  else if (type == "distance between the hits") {
+    condition = std::bind(filter_compton<double>,
+                          &BasicComptonEvent::DistanceBetweenTheHits,
+                          arg::_1, min_value*unit::cm, max_value*unit::cm);
+  }
+  else if (type == "max delta theta") {
+    condition = std::bind(filter_compton<double>,
+                          &BasicComptonEvent::MaxDeltaTheta,
+                          arg::_1, min_value, max_value);
+  }
+  else if (type == "grade") {
+    condition = std::bind(filter_compton<int32_t>,
+                          &BasicComptonEvent::Grade,
+                          arg::_1, min_value, max_value);
+  }
+  else if (type == "likelihood") {
+    condition = std::bind(filter_compton<double>,
+                          &BasicComptonEvent::Likelihood,
+                          arg::_1, min_value, max_value);
+  }
+  else if (type == "reconstruction fraction") {
+    condition = std::bind(filter_compton<double>,
+                          &BasicComptonEvent::ReconstructionFraction,
+                          arg::_1, min_value, max_value);
   }
   else {
     std::cout << "invalid condition type: " << type << std::endl;

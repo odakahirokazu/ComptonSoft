@@ -72,6 +72,7 @@ protected:
   std::string ReconstructionMethodName() const { return m_ReconstructionMethodName; }
   
   void assignSourceInformation();
+  void assignSourceInformation(BasicComptonEvent& event) const;
   void initializeHitPatternData();
 
   void initializeEvent();
