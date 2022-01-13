@@ -24,7 +24,7 @@ This package uses CMake to generate building scripts such as Makefiles.
 ### (3) [Boost C++ library](http://www.boost.org/)
 *We recommend version 1.61.0 or later*
 
-### (4) [ANL Next framework](http://www.astro.isas.jaxa.jp/~odaka/anlnext/)
+### (4) [ANL Next framework](https://github.com/odakahirokazu/ANLNext)
 *version 2.1.0 or later*
 
 Compton Soft uses the ANL Next framework. ANL Next is a framework for
