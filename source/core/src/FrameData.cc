@@ -52,6 +52,7 @@ FrameData::FrameData(const int nx, const int ny)
       deviation_[ix][iy] = 0.0;
       disabledPixels_[ix][iy] = 0;
       pixelValuesToExclude_[ix][iy] = std::make_unique<OutlierStore>();
+      addEventCheckPixels(ix, iy);
     }
   }
   buf_.resize(2*nx*ny);
@@ -221,9 +222,11 @@ std::vector<XrayEvent_sptr> FrameData::extractEvents()
   const int margin = size/2+TrimSize();
 
   std::list<std::pair<int, int>> hitPixels;
-  for (int ix=margin; ix<nx-margin; ix++) {
-    for (int iy=margin; iy<ny-margin; iy++) {
-      const double v = frame_[ix][iy];
+  for (std::size_t i=0; i<eventCheckPixels_.size(); i++){
+    const int ix = eventCheckPixels_[i].first;
+    const int iy = eventCheckPixels_[i].second;
+    const double v = frame_[ix][iy];
+    if (ix>=margin && ix<nx-margin && iy>=margin && iy<ny-margin) {
       if (isNotDisabledPixel(ix, iy) && v>=EventThreshold()) {
         if (isMaxPixel(ix, iy, size) && !(includeDisabledPixel(ix, iy, size))) {
           hitPixels.emplace_back(ix, iy);

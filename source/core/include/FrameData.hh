@@ -42,6 +42,7 @@ class VGainFunction;
  * @date 2020-05-28 | Kosuke Hatauchi & Hirokazu odaka | revise pedestal statistics
  * @date 2020-07-31 | Hirokazu odaka | byte order of raw data
  * @date 2020-08-01 | Hirokazu odaka | pixel shift at odd rows
+ * @date 2021-09-13 | Taihei Watanabe | extract events by checking eventCheckPixels
  */
 class FrameData
 {
@@ -127,6 +128,9 @@ public:
 
   double RawFrameMedian() const;
 
+  void clearEventCheckPixels() { eventCheckPixels_.clear(); }
+  void addEventCheckPixels(int ix, int iy) { eventCheckPixels_.emplace_back(ix, iy); }
+
   void setTrimSize(int v) { trimSize_ = v; }
   int TrimSize() { return trimSize_; }
 
@@ -163,6 +167,8 @@ private:
 
   double eventThreshold_ = 0.0;
   double splitThreshold_ = 0.0;
+
+  std::vector<std::pair<int, int>> eventCheckPixels_;
 
   std::vector<char> buf_;
 
