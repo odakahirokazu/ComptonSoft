@@ -21,6 +21,7 @@
 #define COMPTONSOFT_LoadFrame_H 1
 
 #include <anlnext/BasicModule.hh>
+#include <unordered_set>
 #include "VDataReader.hh"
 
 namespace comptonsoft {
@@ -34,10 +35,11 @@ class FrameData;
  * @author Hirokazu Odaka
  * @date 2019-05-23
  * @date 2020-04-01 | upgrade for new ConstructFrame
+ * @date 2021-09-30 | Taihei Watanabe | use a hash for checking file overlap
  */
 class LoadFrame : public anlnext::BasicModule, public VDataReader
 {
-  DEFINE_ANL_MODULE(LoadFrame, 1.1);
+  DEFINE_ANL_MODULE(LoadFrame, 1.2);
   // ENABLE_PARALLEL_RUN();
 public:
   LoadFrame();
@@ -54,6 +56,8 @@ public:
   bool hasFile(const std::string& filename) const override;
   bool isDone() const override;
 
+  std::string Filename() override { return filename_; };
+
 private:
   bool byte_order_ = true;
   int odd_row_pixel_shift_ = 0;
@@ -61,7 +65,9 @@ private:
   bool read_direction_x_ = false;
   int detector_id_ = 0;
   std::vector<std::string> files_;
+  std::unordered_set<std::string> file_hash_;
   FrameData* frame_ = nullptr;
+  std::string filename_;
 };
 
 } /* namespace comptonsoft */
