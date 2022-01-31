@@ -76,11 +76,11 @@ ANLStatus LoadFrame::mod_analyze()
   }
 
   const std::size_t fileIndex = get_loop_index();
-  const std::string filename = files_[fileIndex];
-  std::cout << "[LoadFrame] filename: " << filename << std::endl;
+  filename_ = files_[fileIndex];
+  std::cout << "[LoadFrame] filename: " << filename_ << std::endl;
 
   frame_->setFrameID(fileIndex);
-  bool status = frame_->load(filename);
+  bool status = frame_->load(filename_);
   if (!status) {
     return AS_ERROR;
   }
@@ -91,11 +91,12 @@ ANLStatus LoadFrame::mod_analyze()
 void LoadFrame::addFile(const std::string& filename)
 {
   files_.push_back(filename);
+  file_hash_.insert(filename);
 }
 
 bool LoadFrame::hasFile(const std::string& filename) const
 {
-  return (std::find(files_.begin(), files_.end(), filename) != files_.end());
+  return file_hash_.count(filename) != 0;
 }
 
 bool LoadFrame::isDone() const
