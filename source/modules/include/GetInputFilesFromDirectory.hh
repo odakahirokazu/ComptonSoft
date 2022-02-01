@@ -32,10 +32,12 @@ class VDataReader;
  *
  * @author Hirokazu Odaka
  * @date 2019-11-13
+ * @date 2021-10-24 | Tsubasa Tamba | 1.1 | search from directory sequence
+ * @date 2022-02-01 | Hirokazu Odaka | 1.2 | code review
  */
 class GetInputFilesFromDirectory : public anlnext::BasicModule
 {
-  DEFINE_ANL_MODULE(GetInputFilesFromDirectory, 1.0);
+  DEFINE_ANL_MODULE(GetInputFilesFromDirectory, 1.2);
   // ENABLE_PARALLEL_RUN();
 public:
   GetInputFilesFromDirectory();
@@ -55,8 +57,11 @@ private:
   int delay_ = 0;
   int wait_ = 0;
   VDataReader* data_reader_ = nullptr;
-  bool redoing_ = false;
+  bool is_new_entry_ = true;
   std::time_t entry_time_ = 0;
+
+  std::vector<std::string> directory_sequence_;
+  int directory_index_ = 0;
 };
 
 } /* namespace comptonsoft */
