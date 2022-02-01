@@ -17,62 +17,42 @@
  *                                                                       *
  *************************************************************************/
 
-#ifndef COMPTONSOFT_LoadFrame_H
-#define COMPTONSOFT_LoadFrame_H 1
+#include "LoadReducedFrame.hh"
+#include "TTree.h"
+#include "TFile.h"
+#include "FrameData.hh"
 
-#include <anlnext/BasicModule.hh>
-#include <unordered_set>
-#include "VDataReader.hh"
+using namespace anlnext;
 
 namespace comptonsoft {
 
-class FrameData;
-
-
-/**
- * LoadFrame
- *
- * @author Hirokazu Odaka
- * @date 2019-05-23
- * @date 2020-04-01 | upgrade for new ConstructFrame
- * @date 2021-09-30 | Taihei Watanabe | use a hash for checking file overlap
- */
-class LoadFrame : public anlnext::BasicModule, public VDataReader
+LoadReducedFrame::LoadReducedFrame()
 {
-  DEFINE_ANL_MODULE(LoadFrame, 1.2);
-  // ENABLE_PARALLEL_RUN();
-public:
-  LoadFrame();
-  
-protected:
-  LoadFrame(const LoadFrame&);
+}
 
-public:
-  anlnext::ANLStatus mod_define() override;
-  anlnext::ANLStatus mod_initialize() override;
-  anlnext::ANLStatus mod_analyze() override;
+bool LoadReducedFrame::load(FrameData* frame, const std::string& filename)
+{
+  frame->resetRawFrame();
+  frame->clearEventCheckPixels();
+  image_t& rawFrame = frame->getRawFrame();
 
-  void addFile(const std::string& filename) override;
-  bool hasFile(const std::string& filename) const override;
-  bool isDone() const override;
+  TFile f(filename.c_str());
+  TTree* tree = static_cast<TTree*>(f.Get("rawtree"));
+  int ix = 0;
+  int iy = 0;
+  double ph = 0;
+  tree->SetBranchAddress("ph", &ph);
+  tree->SetBranchAddress("x", &ix);
+  tree->SetBranchAddress("y", &iy);
+  const int num_entries = tree->GetEntries();
+  for (int i=0; i<num_entries; i++) {
+    tree->GetEntry(i);
+    rawFrame[ix][iy] = ph;
+    frame->addEventCheckPixels(ix, iy);
+  }
+  f.Close();
 
-  std::string CurrentFilename() override { return current_filename_; };
-
-protected:
-  virtual bool load(FrameData* frame, const std::string& filename);
-
-private:
-  bool byte_order_ = true;
-  int odd_row_pixel_shift_ = 0;
-  int start_position_ = 0;
-  bool read_direction_x_ = false;
-  int detector_id_ = 0;
-  std::vector<std::string> files_;
-  std::unordered_set<std::string> file_hash_;
-  FrameData* frame_ = nullptr;
-  std::string current_filename_;
-};
+  return true;
+}
 
 } /* namespace comptonsoft */
-
-#endif /* COMPTONSOFT_LoadFrame_H */

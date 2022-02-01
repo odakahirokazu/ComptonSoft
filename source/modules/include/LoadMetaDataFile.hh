@@ -17,62 +17,54 @@
  *                                                                       *
  *************************************************************************/
 
-#ifndef COMPTONSOFT_LoadFrame_H
-#define COMPTONSOFT_LoadFrame_H 1
+#ifndef COMPTONSOFT_LoadMetaDataFile_H
+#define COMPTONSOFT_LoadMetaDataFile_H 1
 
+#include <chrono>
 #include <anlnext/BasicModule.hh>
-#include <unordered_set>
+#include "LoadReducedFrame.hh"
 #include "VDataReader.hh"
 
 namespace comptonsoft {
 
-class FrameData;
-
-
 /**
- * LoadFrame
- *
- * @author Hirokazu Odaka
- * @date 2019-05-23
- * @date 2020-04-01 | upgrade for new ConstructFrame
- * @date 2021-09-30 | Taihei Watanabe | use a hash for checking file overlap
+ * LoadReducedFrame
+ * 
+ * @author Taihei Watanabe
+ * @date 2021-09-30
+ * @date 2022-02-01 | 1.2 | Hirokazu Odaka | code review
  */
-class LoadFrame : public anlnext::BasicModule, public VDataReader
+class LoadMetaDataFile : public anlnext::BasicModule
 {
-  DEFINE_ANL_MODULE(LoadFrame, 1.2);
-  // ENABLE_PARALLEL_RUN();
+  DEFINE_ANL_MODULE(LoadMetaDataFile, 1.2);
+
 public:
-  LoadFrame();
+  LoadMetaDataFile();
   
 protected:
-  LoadFrame(const LoadFrame&);
+  LoadMetaDataFile(const LoadMetaDataFile&);
 
 public:
   anlnext::ANLStatus mod_define() override;
   anlnext::ANLStatus mod_initialize() override;
   anlnext::ANLStatus mod_analyze() override;
 
-  void addFile(const std::string& filename) override;
-  bool hasFile(const std::string& filename) const override;
-  bool isDone() const override;
-
-  std::string CurrentFilename() override { return current_filename_; };
-
-protected:
-  virtual bool load(FrameData* frame, const std::string& filename);
+  int Temperature() { return temperature_; };
+  std::chrono::system_clock::time_point CaptureTime() { return capture_time_; };
+  std::string Filename() { return data_filename_; };
 
 private:
-  bool byte_order_ = true;
-  int odd_row_pixel_shift_ = 0;
-  int start_position_ = 0;
-  bool read_direction_x_ = false;
-  int detector_id_ = 0;
-  std::vector<std::string> files_;
-  std::unordered_set<std::string> file_hash_;
-  FrameData* frame_ = nullptr;
-  std::string current_filename_;
+  std::string data_reader_module_;
+  std::string data_file_extension_;
+  std::string meta_file_extension_;
+
+  VDataReader* data_reader_ = nullptr;
+
+  std::string data_filename_ = "";
+  int temperature_ = 0;
+  std::chrono::system_clock::time_point capture_time_;
 };
 
 } /* namespace comptonsoft */
 
-#endif /* COMPTONSOFT_LoadFrame_H */
+#endif /* COMPTONSOFT_LoadMetaDataFile_H */

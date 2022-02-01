@@ -52,6 +52,7 @@ set(CS_MODULES
   src/ConstructFrame.cc
   src/FillFrame.cc
   src/LoadFrame.cc
+  src/LoadReducedFrame.cc
   src/XrayEventCollection.cc
   src/XrayEventSelection.cc
   src/AnalyzeFrame.cc
@@ -69,6 +70,7 @@ set(CS_MODULES
   src/HistogramXrayEventSpectrum.cc
   src/HistogramXrayEventAzimuthAngle.cc
   src/HistogramXrayEventProperties.cc
+  # src/HistogramDecodedImage.cc
   src/HistogramRawFrameImage.cc
   src/ExtractXrayEventImage.cc
   src/ProcessCodedAperture.cc
@@ -137,6 +139,10 @@ endif()
 if(CS_USE_HSQUICKLOOK)
   set(CS_HSQUICKLOOK_MODULES
     src/PushToQuickLookDB.cc
+    # src/PushXrayEventToQuickLookDB.cc
+    # src/PushHistogramToQuickLookDB.cc
+    src/LoadMetaDataFile.cc
+    # src/ExtractXrayEventImageFromQuickLookDB.cc
     )
 endif()
 
