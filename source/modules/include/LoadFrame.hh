@@ -56,7 +56,7 @@ public:
   bool hasFile(const std::string& filename) const override;
   bool isDone() const override;
 
-  std::string Filename() override { return filename_; };
+  std::string CurrentFilename() override { return current_filename_; };
 
 private:
   bool byte_order_ = true;
@@ -67,7 +67,7 @@ private:
   std::vector<std::string> files_;
   std::unordered_set<std::string> file_hash_;
   FrameData* frame_ = nullptr;
-  std::string filename_;
+  std::string current_filename_;
 };
 
 } /* namespace comptonsoft */
