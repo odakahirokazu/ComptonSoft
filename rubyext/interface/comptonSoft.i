@@ -70,6 +70,7 @@
 #endif
 #include "FillFrame.hh"
 #include "LoadFrame.hh"
+#include "LoadReducedFrame.hh"
 #include "XrayEventCollection.hh"
 #include "XrayEventSelection.hh"
 #include "AnalyzeFrame.hh"
@@ -98,6 +99,9 @@
 #include "ProcessCodedAperture.hh"
 #ifdef USE_HSQUICKLOOK
 #include "PushToQuickLookDB.hh"
+#endif
+#ifdef USE_HSQUICKLOOK
+#include "LoadMetaDataFile.hh"
 #endif
 #include "GetInputFilesFromDirectory.hh"
 #include "SelectEventsWithDetectorSpectrum.hh"
@@ -718,6 +722,13 @@ public:
 };
 
 
+class LoadReducedFrame : public LoadFrame
+{
+public:
+  LoadReducedFrame();
+};
+
+
 class XrayEventCollection : public anlnext::BasicModule
 {
 public:
@@ -819,11 +830,13 @@ public:
   SetBadFrames();
 };
 
+
 class SetDynamicPedestals : public VCSModule
 {
 public:
   SetDynamicPedestals();
 };
+
 
 class SetPedestalsByMedian : public VCSModule
 {
@@ -886,6 +899,15 @@ class PushToQuickLookDB : public anlnext::BasicModule
 {
 public:
   PushToQuickLookDB();
+};
+
+#endif
+
+#ifdef USE_HSQUICKLOOK
+class LoadMetaDataFile : public anlnext::BasicModule
+{
+public:
+  LoadMetaDataFile();
 };
 
 #endif

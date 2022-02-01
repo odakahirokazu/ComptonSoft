@@ -17,62 +17,31 @@
  *                                                                       *
  *************************************************************************/
 
-#ifndef COMPTONSOFT_LoadFrame_H
-#define COMPTONSOFT_LoadFrame_H 1
+#ifndef COMPTONSOFT_LoadReducedFrame_H
+#define COMPTONSOFT_LoadReducedFrame_H 1
 
-#include <anlnext/BasicModule.hh>
-#include <unordered_set>
-#include "VDataReader.hh"
+#include "LoadFrame.hh"
 
 namespace comptonsoft {
 
-class FrameData;
-
-
 /**
- * LoadFrame
- *
- * @author Hirokazu Odaka
- * @date 2019-05-23
- * @date 2020-04-01 | upgrade for new ConstructFrame
- * @date 2021-09-30 | Taihei Watanabe | use a hash for checking file overlap
+ * LoadReducedFrame
+ * 
+ * @author Taihei Watanabe
+ * @date 2021-07-29
+ * @date 2022-02-01 | 1.2 | Hirokazu Odaka | derived from LoadFrame
  */
-class LoadFrame : public anlnext::BasicModule, public VDataReader
+class LoadReducedFrame : public LoadFrame
 {
-  DEFINE_ANL_MODULE(LoadFrame, 1.2);
-  // ENABLE_PARALLEL_RUN();
-public:
-  LoadFrame();
-  
-protected:
-  LoadFrame(const LoadFrame&);
+  DEFINE_ANL_MODULE(LoadReducedFrame, 1.2);
 
 public:
-  anlnext::ANLStatus mod_define() override;
-  anlnext::ANLStatus mod_initialize() override;
-  anlnext::ANLStatus mod_analyze() override;
-
-  void addFile(const std::string& filename) override;
-  bool hasFile(const std::string& filename) const override;
-  bool isDone() const override;
-
-  std::string CurrentFilename() override { return current_filename_; };
+  LoadReducedFrame();
 
 protected:
-  virtual bool load(FrameData* frame, const std::string& filename);
-
-private:
-  bool byte_order_ = true;
-  int odd_row_pixel_shift_ = 0;
-  int start_position_ = 0;
-  bool read_direction_x_ = false;
-  int detector_id_ = 0;
-  std::vector<std::string> files_;
-  std::unordered_set<std::string> file_hash_;
-  FrameData* frame_ = nullptr;
-  std::string current_filename_;
+  bool load(FrameData* frame, const std::string& filename) override;
 };
 
 } /* namespace comptonsoft */
 
-#endif /* COMPTONSOFT_LoadFrame_H */
+#endif /* COMPTONSOFT_LoadReducedFrame_H */

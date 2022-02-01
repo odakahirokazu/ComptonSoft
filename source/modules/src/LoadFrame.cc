@@ -80,12 +80,17 @@ ANLStatus LoadFrame::mod_analyze()
   std::cout << "[LoadFrame] filename: " << current_filename_ << std::endl;
 
   frame_->setFrameID(fileIndex);
-  bool status = frame_->load(current_filename_);
+  bool status = load(frame_, current_filename_);
   if (!status) {
     return AS_ERROR;
   }
 
   return AS_OK;
+}
+
+bool LoadFrame::load(FrameData* frame, const std::string& filename)
+{
+  return frame->load(filename);
 }
 
 void LoadFrame::addFile(const std::string& filename)
