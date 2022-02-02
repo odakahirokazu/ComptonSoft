@@ -74,9 +74,9 @@ ANLStatus ExtractXrayEventImage::mod_define()
 ANLStatus ExtractXrayEventImage::mod_initialize()
 {
   get_module_NC(collectionModule_, &collection_);
+
   image_.reset(new image_t(boost::extents[numX_][numY_]));
   reset_image(image_);
-
   recentImage_.reset(new image_t(boost::extents[numX_][numY_]));
   reset_image(recentImage_);
 
