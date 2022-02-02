@@ -41,7 +41,7 @@ class XrayEventCollection;
 
 class ExtractXrayEventImage : public VCSModule
 {
-  DEFINE_ANL_MODULE(ExtractXrayEventImage, 1.0);
+  DEFINE_ANL_MODULE(ExtractXrayEventImage, 1.1);
   // ENABLE_PARALLEL_RUN();
 public:
   ExtractXrayEventImage();
@@ -55,7 +55,8 @@ public:
   anlnext::ANLStatus mod_analyze() override;
   anlnext::ANLStatus mod_end_run() override;
 
-  std::shared_ptr<image_t> Image() { return image_; }
+  std::shared_ptr<image_t> Image() override { return image_; }
+  std::shared_ptr<image_t> RecentImage() override { return recentImage_; }
 
   void drawCanvas(TCanvas* canvas, std::vector<std::string>* filenames) override;
 
@@ -87,6 +88,7 @@ private:
 
   XrayEventCollection* collection_ = nullptr;
   std::shared_ptr<image_t> image_;
+  std::shared_ptr<image_t> recentImage_;
   TH2* histogram_ = nullptr;
 };
 

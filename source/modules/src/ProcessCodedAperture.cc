@@ -31,6 +31,39 @@
 using namespace anlnext;
 namespace unit = anlgeant4::unit;
 
+namespace {
+
+void reset_image(std::shared_ptr<comptonsoft::image_t> image)
+{
+  const int nx = (*image).shape()[0];
+  const int ny = (*image).shape()[1];
+  for (int ix=0; ix<nx; ix++) {
+    for (int iy=0; iy<ny; iy++) {
+      (*image)[ix][iy] = 0.0;
+    }
+  }
+}
+
+void add_image(std::shared_ptr<comptonsoft::image_t> image, std::shared_ptr<const comptonsoft::image_t> image1)
+{
+  const int nx = (*image).shape()[0];
+  const int ny = (*image).shape()[1];
+  for (int ix=0; ix<nx; ix++) {
+    for (int iy=0; iy<ny; iy++) {
+      (*image)[ix][iy] += (*image1)[ix][iy];
+    }
+  }
+}
+
+std::shared_ptr<comptonsoft::image_t> create_image(int nx, int ny)
+{
+  std::shared_ptr<comptonsoft::image_t> image(new comptonsoft::image_t(boost::extents[nx][ny]));
+  reset_image(image);
+  return image;
+}
+
+} /* anonymous namespace */
+
 namespace comptonsoft {
 
 ProcessCodedAperture::ProcessCodedAperture()
@@ -77,7 +110,7 @@ ANLStatus ProcessCodedAperture::mod_initialize()
   codedAperture_ = createCodedAperture();
   const int nx = ApertureNumX();
   const int ny = ApertureNumY();
-  std::shared_ptr<image_t> pattern(new image_t(boost::extents[nx][ny]));
+  std::shared_ptr<image_t> pattern = create_image(nx, ny);
   std::ifstream fin(patternFile_);
   if(!fin) {
     std::cerr << "cannnot open pattern file: " << patternFile_ << std::endl;
@@ -103,16 +136,20 @@ ANLStatus ProcessCodedAperture::mod_initialize()
   }
   fin.close();
   codedAperture_->setAperturePattern(pattern);
-  std::shared_ptr<image_t> encodedImage = imageOwner_->Image();
-  codedAperture_->setEncodedImage(encodedImage);
+
+  const int encoded_image_nx = imageOwner_->RecentImage()->shape()[0];
+  const int encoded_image_ny = imageOwner_->RecentImage()->shape()[1];
+  encodedImage_ = create_image(encoded_image_nx, encoded_image_ny);
+  codedAperture_->setEncodedImage(encodedImage_);
   bool sky_image_status = codedAperture_->buildSkyImage();
   if (!sky_image_status) {
     std::cerr << "Sky image was not set appropriately." << std::endl;
     return AS_QUIT_ERROR;
   }
-  const std::shared_ptr<image_t> decodedImageDummy = codedAperture_->DecodedImage();
-  const int Nsx = decodedImageDummy->shape()[0];
-  const int Nsy = decodedImageDummy->shape()[1];
+  const int Nsx = codedAperture_->DecodedImage()->shape()[0];
+  const int Nsy = codedAperture_->DecodedImage()->shape()[1];
+  decodedImage_ = create_image(Nsx, Nsy);
+  decodedImageSum_ = create_image(Nsx, Nsy);
 
   double output_angle_unit_value = 0.0;
   if (outputAngleUnit_=="degree") {
@@ -150,6 +187,15 @@ ANLStatus ProcessCodedAperture::mod_initialize()
                         Nsy, ymin, ymax);
   histogram_->GetXaxis()->SetTitle(outputAngleUnit_.c_str());
   histogram_->GetYaxis()->SetTitle(outputAngleUnit_.c_str());
+
+  return AS_OK;
+}
+
+ANLStatus ProcessCodedAperture::mod_analyze()
+{
+  std::shared_ptr<image_t> image = imageOwner_->RecentImage();
+  add_image(encodedImage_, image);
+  
   return AS_OK;
 }
 
@@ -183,16 +229,17 @@ std::unique_ptr<VCodedAperture> ProcessCodedAperture::createCodedAperture()
 
 void ProcessCodedAperture::decode()
 {
-  std::shared_ptr<image_t> image = imageOwner_->Image();
-  codedAperture_->setEncodedImage(image);
+  codedAperture_->setEncodedImage(encodedImage_);
   std::cout << "ProcessCodedAperture: decoding..." << std::endl;
   codedAperture_->decode();
   decodedImage_ = codedAperture_->DecodedImage();
+  add_image(decodedImageSum_, decodedImage_);
+  reset_image(encodedImage_);
 }
 
 void ProcessCodedAperture::fillHistogram()
 {
-  const image_t& image = *decodedImage_;
+  const image_t& image = *decodedImageSum_;
   TH2& h = *histogram_;
   h.Reset();
 

@@ -77,6 +77,9 @@ ANLStatus ExtractXrayEventImage::mod_initialize()
   image_.reset(new image_t(boost::extents[numX_][numY_]));
   reset_image(image_);
 
+  recentImage_.reset(new image_t(boost::extents[numX_][numY_]));
+  reset_image(recentImage_);
+
   const double cosTheta = std::cos(rotationAngle_);
   const double sinTheta = std::sin(rotationAngle_);
   axx_ =  scale_*cosTheta;
@@ -102,6 +105,8 @@ ANLStatus ExtractXrayEventImage::mod_initialize()
 
 ANLStatus ExtractXrayEventImage::mod_analyze()
 {
+  reset_image(recentImage_);
+  
   const int Nx = image_->shape()[0];
   const int Ny = image_->shape()[1];
   const double Cx = imageCenterX_;
@@ -128,6 +133,7 @@ ANLStatus ExtractXrayEventImage::mod_analyze()
     const int iy1 = static_cast<int>(std::floor(y1));
     if (0<=ix1 && ix1<Nx && 0<=iy1 && iy1<Ny) {
       (*image_)[ix1][iy1] += 1.0;
+      (*recentImage_)[ix1][iy1] += 1.0;
     }
   }
 
