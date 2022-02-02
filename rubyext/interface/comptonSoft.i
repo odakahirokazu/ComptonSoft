@@ -110,6 +110,9 @@
 #ifdef USE_HSQUICKLOOK
 #include "LoadMetaDataFile.hh"
 #endif
+#ifdef USE_HSQUICKLOOK
+#include "ExtractXrayEventImageFromQuickLookDB.hh"
+#endif
 #include "GetInputFilesFromDirectory.hh"
 #include "SelectEventsWithDetectorSpectrum.hh"
 #include "AssignSXIGrade.hh"
@@ -940,6 +943,15 @@ class LoadMetaDataFile : public anlnext::BasicModule
 {
 public:
   LoadMetaDataFile();
+};
+
+#endif
+
+#ifdef USE_HSQUICKLOOK
+class ExtractXrayEventImageFromQuickLookDB : public ExtractXrayEventImage
+{
+public:
+  ExtractXrayEventImageFromQuickLookDB();
 };
 
 #endif
