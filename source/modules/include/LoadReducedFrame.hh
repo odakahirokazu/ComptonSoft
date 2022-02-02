@@ -17,27 +17,31 @@
  *                                                                       *
  *************************************************************************/
 
-#ifndef COMPTONSOFT_VDataReader_H
-#define COMPTONSOFT_VDataReader_H 1
+#ifndef COMPTONSOFT_LoadReducedFrame_H
+#define COMPTONSOFT_LoadReducedFrame_H 1
+
+#include "LoadFrame.hh"
 
 namespace comptonsoft {
 
 /**
- * VDataReader
- *
- * @author Hirokazu Odaka
- * @date 2019-11-12
+ * LoadReducedFrame
+ * 
+ * @author Taihei Watanabe
+ * @date 2021-07-29
+ * @date 2022-02-01 | 1.2 | Hirokazu Odaka | derived from LoadFrame
  */
-class VDataReader
+class LoadReducedFrame : public LoadFrame
 {
-public:
-  virtual void addFile(const std::string& filename) = 0;
-  virtual bool hasFile(const std::string& filename) const = 0;
-  virtual bool isDone() const = 0;
+  DEFINE_ANL_MODULE(LoadReducedFrame, 1.2);
 
-  virtual std::string CurrentFilename() = 0;
+public:
+  LoadReducedFrame();
+
+protected:
+  bool load(FrameData* frame, const std::string& filename) override;
 };
 
 } /* namespace comptonsoft */
 
-#endif /* COMPTONSOFT_VDataReader_H */
+#endif /* COMPTONSOFT_LoadReducedFrame_H */

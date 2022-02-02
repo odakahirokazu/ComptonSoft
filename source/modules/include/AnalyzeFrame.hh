@@ -59,7 +59,7 @@ private:
   int event_size_ = 1;
   int trim_size_ = 0;
   bool gain_correction_ = false;
-  
+
   XrayEventCollection* collection_ = nullptr;
 };
 

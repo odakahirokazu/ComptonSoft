@@ -17,27 +17,45 @@
  *                                                                       *
  *************************************************************************/
 
-#ifndef COMPTONSOFT_VDataReader_H
-#define COMPTONSOFT_VDataReader_H 1
+
+#ifndef COMPTONSOFT_ExtractXrayEventImageFromQuickLookDB_H
+#define COMPTONSOFT_ExtractXrayEventImageFromQuickLookDB_H 1
+
+#include "ExtractXrayEventImage.hh"
 
 namespace comptonsoft {
 
-/**
- * VDataReader
- *
- * @author Hirokazu Odaka
- * @date 2019-11-12
- */
-class VDataReader
+class ExtractXrayEventImageFromQuickLookDB : public ExtractXrayEventImage
 {
+  DEFINE_ANL_MODULE(ExtractXrayEventImageFromQuickLookDB, 1.0);
+  // ENABLE_PARALLEL_RUN();
 public:
-  virtual void addFile(const std::string& filename) = 0;
-  virtual bool hasFile(const std::string& filename) const = 0;
-  virtual bool isDone() const = 0;
+  ExtractXrayEventImageFromQuickLookDB();
+  
+protected:
+  ExtractXrayEventImageFromQuickLookDB(const ExtractXrayEventImageFromQuickLookDB&);
 
-  virtual std::string CurrentFilename() = 0;
+public:
+  anlnext::ANLStatus mod_define() override;
+  anlnext::ANLStatus mod_initialize() override;
+  anlnext::ANLStatus mod_analyze() override;
+
+protected:
+  void setLatestAnalysisId();
+
+private:
+  std::string collectionName_;
+  int collectionType_ = 0;
+  int initial_frame_id_;
+  int max_frame_per_loop_;
+  std::string HostName_;
+  std::string dbName_;
+  std::string analysisId_;
+
+  int last_frame_id_;
+  XrayEventCollection* collection_ = nullptr;
 };
 
 } /* namespace comptonsoft */
 
-#endif /* COMPTONSOFT_VDataReader_H */
+#endif /* COMPTONSOFT_ExtractXrayEventImageFromQuickLookDB_H */

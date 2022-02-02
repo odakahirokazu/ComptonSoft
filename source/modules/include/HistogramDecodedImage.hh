@@ -17,27 +17,51 @@
  *                                                                       *
  *************************************************************************/
 
-#ifndef COMPTONSOFT_VDataReader_H
-#define COMPTONSOFT_VDataReader_H 1
+/**
+ * HistogramDecodedImage
+ *
+ * @author Taihei Watanabe
+ * @date 2021-09-28
+ */
+
+#ifndef COMPTONSOFT_HistogramDecodedImage_H
+#define COMPTONSOFT_HistogramDecodedImage_H 1
+
+#include "VCSModule.hh"
+#include "ProcessCodedAperture.hh"
+
+class TH2;
 
 namespace comptonsoft {
 
-/**
- * VDataReader
- *
- * @author Hirokazu Odaka
- * @date 2019-11-12
- */
-class VDataReader
+class HistogramDecodedImage : public VCSModule
 {
+  DEFINE_ANL_MODULE(HistogramDecodedImage, 1.0);
+  // ENABLE_PARALLEL_RUN();
 public:
-  virtual void addFile(const std::string& filename) = 0;
-  virtual bool hasFile(const std::string& filename) const = 0;
-  virtual bool isDone() const = 0;
+  HistogramDecodedImage();
+  
+protected:
+  HistogramDecodedImage(const HistogramDecodedImage&);
 
-  virtual std::string CurrentFilename() = 0;
+public:
+  anlnext::ANLStatus mod_define() override;
+  anlnext::ANLStatus mod_initialize() override;
+  anlnext::ANLStatus mod_end_run() override;
+
+  void drawCanvas(TCanvas* canvas, std::vector<std::string>* filenames) override;
+
+private:
+  void sumImages();
+
+private:
+  std::vector<std::string> decodingModuleNames_;
+  std::string outputName_;
+  
+  std::vector<ProcessCodedAperture*> modules_;
+  TH2* histogram_ = nullptr;
 };
 
 } /* namespace comptonsoft */
 
-#endif /* COMPTONSOFT_VDataReader_H */
+#endif /* COMPTONSOFT_HistogramDecodedImage_H */
