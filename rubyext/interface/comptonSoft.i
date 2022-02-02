@@ -102,6 +102,12 @@
 #include "PushToQuickLookDB.hh"
 #endif
 #ifdef USE_HSQUICKLOOK
+#include "PushXrayEventToQuickLookDB.hh"
+#endif
+#ifdef USE_HSQUICKLOOK
+#include "PushHistogramToQuickLookDB.hh"
+#endif
+#ifdef USE_HSQUICKLOOK
 #include "LoadMetaDataFile.hh"
 #endif
 #include "GetInputFilesFromDirectory.hh"
@@ -907,6 +913,24 @@ class PushToQuickLookDB : public anlnext::BasicModule
 {
 public:
   PushToQuickLookDB();
+};
+
+#endif
+
+#ifdef USE_HSQUICKLOOK
+class PushXrayEventToQuickLookDB : public anlnext::BasicModule
+{
+public:
+  PushXrayEventToQuickLookDB();
+};
+
+#endif
+
+#ifdef USE_HSQUICKLOOK
+class PushHistogramToQuickLookDB : public anlnext::BasicModule
+{
+public:
+  PushHistogramToQuickLookDB();
 };
 
 #endif

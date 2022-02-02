@@ -17,54 +17,51 @@
  *                                                                       *
  *************************************************************************/
 
-#ifndef COMPTONSOFT_LoadMetaDataFile_H
-#define COMPTONSOFT_LoadMetaDataFile_H 1
 
-#include <chrono>
+#ifndef COMPTONSOFT_PushXrayEventToQuickLookDB_H
+#define COMPTONSOFT_PushXrayEventToQuickLookDB_H 1
+
 #include <anlnext/BasicModule.hh>
-#include "LoadReducedFrame.hh"
-#include "VDataReader.hh"
+#include "VCSModule.hh"
+#include "XrayEventCollection.hh"
+#include "LoadMetaDataFile.hh"
+
+namespace hsquicklook {
+class MongoDBClient;
+}
 
 namespace comptonsoft {
 
-/**
- * LoadReducedFrame
- * 
- * @author Taihei Watanabe
- * @date 2021-09-30
- * @date 2022-02-01 | 1.2 | Hirokazu Odaka | code review
- */
-class LoadMetaDataFile : public anlnext::BasicModule
+class PushXrayEventToQuickLookDB : public anlnext::BasicModule
 {
-  DEFINE_ANL_MODULE(LoadMetaDataFile, 1.2);
-
+  DEFINE_ANL_MODULE(PushXrayEventToQuickLookDB, 1.0);
+  // ENABLE_PARALLEL_RUN();
 public:
-  LoadMetaDataFile();
+  PushXrayEventToQuickLookDB();
   
 protected:
-  LoadMetaDataFile(const LoadMetaDataFile&);
+  PushXrayEventToQuickLookDB(const PushXrayEventToQuickLookDB&);
 
 public:
   anlnext::ANLStatus mod_define() override;
   anlnext::ANLStatus mod_initialize() override;
   anlnext::ANLStatus mod_analyze() override;
 
-  int Temperature() const { return temperature_; };
-  std::chrono::system_clock::time_point CaptureTime() const { return capture_time_; };
-  std::string Filename() const { return data_filename_; };
+protected:
+  void pushXrayEventsToDB();
 
 private:
-  std::string data_reader_module_;
-  std::string data_file_extension_;
-  std::string meta_file_extension_;
+  std::string event_collection_module_name_;
+  std::string collection_;
+  int period_ = 1;
+  int phase_ = 0;
+  std::string analysis_id_ = "";
 
-  VDataReader* data_reader_ = nullptr;
-
-  std::string data_filename_ = "";
-  int temperature_ = 0;
-  std::chrono::system_clock::time_point capture_time_;
+  const XrayEventCollection* event_collection_module_ = nullptr;
+  const LoadMetaDataFile* metadata_file_module_ = nullptr;
+  hsquicklook::MongoDBClient* mongodb_ = nullptr;
 };
 
 } /* namespace comptonsoft */
 
-#endif /* COMPTONSOFT_LoadMetaDataFile_H */
+#endif /* COMPTONSOFT_PushXrayEventToQuickLookDB_H */
