@@ -55,8 +55,8 @@ public:
   anlnext::ANLStatus mod_analyze() override;
   anlnext::ANLStatus mod_end_run() override;
 
-  std::shared_ptr<image_t> Image() override { return image_; }
-  std::shared_ptr<image_t> RecentImage() override { return recentImage_; }
+  std::shared_ptr<image_t> Image() { return image_; }
+  std::shared_ptr<image_t> RecentImage() { return recentImage_; }
 
   void drawCanvas(TCanvas* canvas, std::vector<std::string>* filenames) override;
 
