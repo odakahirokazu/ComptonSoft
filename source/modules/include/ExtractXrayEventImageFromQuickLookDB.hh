@@ -17,83 +17,45 @@
  *                                                                       *
  *************************************************************************/
 
-/**
- * ExtractXrayEventImage
- *
- * @author Tsubasa Tamba
- * @date 2019-11-01
- * @date 2019-11-21 | H. Odaka | modify image definition
- */
 
-#ifndef COMPTONSOFT_ExtractXrayEventImage_H
-#define COMPTONSOFT_ExtractXrayEventImage_H 1
+#ifndef COMPTONSOFT_ExtractXrayEventImageFromQuickLookDB_H
+#define COMPTONSOFT_ExtractXrayEventImageFromQuickLookDB_H 1
 
-#include "VCSModule.hh"
-#include <memory>
-#include <random>
-#include "XrayEvent.hh"
-
-class TH2;
+#include "ExtractXrayEventImage.hh"
 
 namespace comptonsoft {
 
-class XrayEventCollection;
-
-class ExtractXrayEventImage : public VCSModule
+class ExtractXrayEventImageFromQuickLookDB : public ExtractXrayEventImage
 {
-  DEFINE_ANL_MODULE(ExtractXrayEventImage, 1.1);
+  DEFINE_ANL_MODULE(ExtractXrayEventImageFromQuickLookDB, 1.0);
   // ENABLE_PARALLEL_RUN();
 public:
-  ExtractXrayEventImage();
+  ExtractXrayEventImageFromQuickLookDB();
   
 protected:
-  ExtractXrayEventImage(const ExtractXrayEventImage&);
+  ExtractXrayEventImageFromQuickLookDB(const ExtractXrayEventImageFromQuickLookDB&);
 
 public:
   anlnext::ANLStatus mod_define() override;
   anlnext::ANLStatus mod_initialize() override;
   anlnext::ANLStatus mod_analyze() override;
-  anlnext::ANLStatus mod_end_run() override;
-
-  std::shared_ptr<image_t> Image() { return image_; }
-  std::shared_ptr<image_t> RecentImage() { return recentImage_; }
-
-  void drawCanvas(TCanvas* canvas, std::vector<std::string>* filenames) override;
 
 protected:
-  double sampleRandomNumber();
-  void fillHistogram();
-
-  XrayEventCollection* getEventCollection() { return collection_; }
+  void setLatestAnalysisId();
 
 private:
-  int numX_ = 1;
-  int numY_ = 1;
-  double imageCenterX_ = 0.0;
-  double imageCenterY_ = 0.0;
-  double rotationAngle_ = 0.0;
-  double scale_ = 1.0;
-  double newOriginX_ = 0.0;
-  double newOriginY_ = 0.0;
-  int rebinX_ = 1;
-  int rebinY_ = 1;
-  bool randomSampling_ = false;
-  std::string collectionModule_;
-  std::string outputName_;
+  std::string collectionName_;
+  int collectionType_ = 0;
+  int initial_frame_id_;
+  int max_frame_per_loop_;
+  std::string HostName_;
+  std::string dbName_;
+  std::string analysisId_;
 
-  double axx_ = 1.0;
-  double axy_ = 0.0;
-  double ayx_ = 0.0;
-  double ayy_ = 1.0;
-  std::default_random_engine randomGenerator_;
-  std::uniform_real_distribution<double> distribution_;
-
+  int last_frame_id_;
   XrayEventCollection* collection_ = nullptr;
-  std::shared_ptr<image_t> image_;
-  std::shared_ptr<image_t> recentImage_;
-  TH2* histogram_ = nullptr;
 };
 
 } /* namespace comptonsoft */
 
-#endif /* COMPTONSOFT_ExtractXrayEventImage_H */
+#endif /* COMPTONSOFT_ExtractXrayEventImageFromQuickLookDB_H */

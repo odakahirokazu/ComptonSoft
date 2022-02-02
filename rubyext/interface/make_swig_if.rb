@@ -100,7 +100,7 @@ clMod = [
   ANL::SWIGClass.new("PushXrayEventToQuickLookDB", false, "USE_HSQUICKLOOK"),
   ANL::SWIGClass.new("PushHistogramToQuickLookDB", false, "USE_HSQUICKLOOK"),
   ANL::SWIGClass.new("LoadMetaDataFile", false, "USE_HSQUICKLOOK"),
-  # ANL::SWIGClass.new("ExtractXrayEventImageFromQuickLookDB", false, "USE_HSQUICKLOOK")
+  ANL::SWIGClass.new("ExtractXrayEventImageFromQuickLookDB", false, "USE_HSQUICKLOOK"),
   ANL::SWIGClass.new("GetInputFilesFromDirectory"),
   ANL::SWIGClass.new("SelectEventsWithDetectorSpectrum"),
   ANL::SWIGClass.new("AssignSXIGrade"),

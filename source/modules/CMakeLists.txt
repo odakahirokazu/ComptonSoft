@@ -142,7 +142,7 @@ if(CS_USE_HSQUICKLOOK)
     src/PushXrayEventToQuickLookDB.cc
     src/PushHistogramToQuickLookDB.cc
     src/LoadMetaDataFile.cc
-    # src/ExtractXrayEventImageFromQuickLookDB.cc
+    src/ExtractXrayEventImageFromQuickLookDB.cc
     )
 endif()
 

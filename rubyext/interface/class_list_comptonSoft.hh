@@ -93,6 +93,7 @@ class PushToQuickLookDB;
 class PushXrayEventToQuickLookDB;
 class PushHistogramToQuickLookDB;
 class LoadMetaDataFile;
+class ExtractXrayEventImageFromQuickLookDB;
 class GetInputFilesFromDirectory;
 class SelectEventsWithDetectorSpectrum;
 class AssignSXIGrade;
