@@ -17,54 +17,74 @@
  *                                                                       *
  *************************************************************************/
 
-#ifndef COMPTONSOFT_LoadMetaDataFile_H
-#define COMPTONSOFT_LoadMetaDataFile_H 1
 
-#include <chrono>
+#ifndef COMPTONSOFT_PushHistogramToQuickLookDB_H
+#define COMPTONSOFT_PushHistogramToQuickLookDB_H 1
+
 #include <anlnext/BasicModule.hh>
-#include "LoadReducedFrame.hh"
-#include "VDataReader.hh"
+#include "VCSModule.hh"
+#include "XrayEventCollection.hh"
+#include "LoadMetaDataFile.hh"
+
+namespace hsquicklook {
+class MongoDBClient;
+}
 
 namespace comptonsoft {
 
-/**
- * LoadReducedFrame
- * 
- * @author Taihei Watanabe
- * @date 2021-09-30
- * @date 2022-02-01 | 1.2 | Hirokazu Odaka | code review
- */
-class LoadMetaDataFile : public anlnext::BasicModule
+class PushHistogramToQuickLookDB : public anlnext::BasicModule
 {
-  DEFINE_ANL_MODULE(LoadMetaDataFile, 1.2);
-
+  DEFINE_ANL_MODULE(PushHistogramToQuickLookDB, 1.0);
+  // ENABLE_PARALLEL_RUN();
 public:
-  LoadMetaDataFile();
+  PushHistogramToQuickLookDB();
   
 protected:
-  LoadMetaDataFile(const LoadMetaDataFile&);
+  PushHistogramToQuickLookDB(const PushHistogramToQuickLookDB&);
 
 public:
   anlnext::ANLStatus mod_define() override;
   anlnext::ANLStatus mod_initialize() override;
   anlnext::ANLStatus mod_analyze() override;
 
-  int Temperature() const { return temperature_; };
-  std::chrono::system_clock::time_point CaptureTime() const { return capture_time_; };
-  std::string Filename() const { return data_filename_; };
+protected:
+  void pushRecentHistograms();
+  void pushProfile();
+  void initializeHistograms();
+  void loadHistogramsFromMongoDB();
+  void updateHistograms();
+  void updateTrends();
+  void updateMFparameters();
 
 private:
-  std::string data_reader_module_;
-  std::string data_file_extension_;
-  std::string meta_file_extension_;
+  std::string event_collection_module_name_;
+  std::string recent_collection_name_;
+  std::string profile_collection_name_;
+  std::string directory_;
+  std::string analysis_id_ = "";
 
-  VDataReader* data_reader_ = nullptr;
+  std::vector<std::string> columns_name_;
+  std::vector<double> columns_min_;
+  std::vector<double> columns_max_;
+  std::vector<int> columns_bin_;
 
-  std::string data_filename_ = "";
-  int temperature_ = 0;
-  std::chrono::system_clock::time_point capture_time_;
+  std::vector<std::vector<int>> histograms_;
+
+  // vectors
+  std::vector<int> temperature_trend_;
+  std::vector<int> count_trend_;
+
+  // for modulation factor
+  int Nh_ = 0, Nv_ = 0;
+  std::string mf_output_ = "";
+
+  const double epi = 1e-4;
+
+  const XrayEventCollection* event_collection_module_ = nullptr;
+  const LoadMetaDataFile* metadata_file_module_ = nullptr;
+  hsquicklook::MongoDBClient* mongodb_ = nullptr;
 };
 
 } /* namespace comptonsoft */
 
-#endif /* COMPTONSOFT_LoadMetaDataFile_H */
+#endif /* COMPTONSOFT_PushHistogramToQuickLookDB_H */
