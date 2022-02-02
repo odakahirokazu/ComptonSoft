@@ -17,27 +17,42 @@
  *                                                                       *
  *************************************************************************/
 
-#ifndef COMPTONSOFT_VDataReader_H
-#define COMPTONSOFT_VDataReader_H 1
+#include "LoadReducedFrame.hh"
+#include "TTree.h"
+#include "TFile.h"
+#include "FrameData.hh"
+
+using namespace anlnext;
 
 namespace comptonsoft {
 
-/**
- * VDataReader
- *
- * @author Hirokazu Odaka
- * @date 2019-11-12
- */
-class VDataReader
+LoadReducedFrame::LoadReducedFrame()
 {
-public:
-  virtual void addFile(const std::string& filename) = 0;
-  virtual bool hasFile(const std::string& filename) const = 0;
-  virtual bool isDone() const = 0;
+}
 
-  virtual std::string CurrentFilename() = 0;
-};
+bool LoadReducedFrame::load(FrameData* frame, const std::string& filename)
+{
+  frame->resetRawFrame();
+  frame->clearEventCheckPixels();
+  image_t& rawFrame = frame->getRawFrame();
+
+  TFile f(filename.c_str());
+  TTree* tree = static_cast<TTree*>(f.Get("rawtree"));
+  int ix = 0;
+  int iy = 0;
+  double ph = 0;
+  tree->SetBranchAddress("ph", &ph);
+  tree->SetBranchAddress("x", &ix);
+  tree->SetBranchAddress("y", &iy);
+  const int num_entries = tree->GetEntries();
+  for (int i=0; i<num_entries; i++) {
+    tree->GetEntry(i);
+    rawFrame[ix][iy] = ph;
+    frame->addEventCheckPixels(ix, iy);
+  }
+  f.Close();
+
+  return true;
+}
 
 } /* namespace comptonsoft */
-
-#endif /* COMPTONSOFT_VDataReader_H */

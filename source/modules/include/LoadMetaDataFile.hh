@@ -17,27 +17,54 @@
  *                                                                       *
  *************************************************************************/
 
-#ifndef COMPTONSOFT_VDataReader_H
-#define COMPTONSOFT_VDataReader_H 1
+#ifndef COMPTONSOFT_LoadMetaDataFile_H
+#define COMPTONSOFT_LoadMetaDataFile_H 1
+
+#include <chrono>
+#include <anlnext/BasicModule.hh>
+#include "LoadReducedFrame.hh"
+#include "VDataReader.hh"
 
 namespace comptonsoft {
 
 /**
- * VDataReader
- *
- * @author Hirokazu Odaka
- * @date 2019-11-12
+ * LoadReducedFrame
+ * 
+ * @author Taihei Watanabe
+ * @date 2021-09-30
+ * @date 2022-02-01 | 1.2 | Hirokazu Odaka | code review
  */
-class VDataReader
+class LoadMetaDataFile : public anlnext::BasicModule
 {
-public:
-  virtual void addFile(const std::string& filename) = 0;
-  virtual bool hasFile(const std::string& filename) const = 0;
-  virtual bool isDone() const = 0;
+  DEFINE_ANL_MODULE(LoadMetaDataFile, 1.2);
 
-  virtual std::string CurrentFilename() = 0;
+public:
+  LoadMetaDataFile();
+  
+protected:
+  LoadMetaDataFile(const LoadMetaDataFile&);
+
+public:
+  anlnext::ANLStatus mod_define() override;
+  anlnext::ANLStatus mod_initialize() override;
+  anlnext::ANLStatus mod_analyze() override;
+
+  int Temperature() const { return temperature_; };
+  std::chrono::system_clock::time_point CaptureTime() const { return capture_time_; };
+  std::string Filename() const { return data_filename_; };
+
+private:
+  std::string data_reader_module_;
+  std::string data_file_extension_;
+  std::string meta_file_extension_;
+
+  VDataReader* data_reader_ = nullptr;
+
+  std::string data_filename_ = "";
+  int temperature_ = 0;
+  std::chrono::system_clock::time_point capture_time_;
 };
 
 } /* namespace comptonsoft */
 
-#endif /* COMPTONSOFT_VDataReader_H */
+#endif /* COMPTONSOFT_LoadMetaDataFile_H */

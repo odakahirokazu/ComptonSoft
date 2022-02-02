@@ -38,6 +38,7 @@ SaveData::~SaveData() = default;
 ANLStatus SaveData::mod_define()
 {
   register_parameter(&m_Filename, "output");
+  register_parameter(&m_Period, "period");
   return AS_OK;
 }
 
@@ -49,6 +50,18 @@ ANLStatus SaveData::mod_pre_initialize()
     return AS_QUIT;
   }
   
+  return AS_OK;
+}
+
+ANLStatus SaveData::mod_analyze()
+{
+  const int period = m_Period;
+  if (period==0) { return AS_OK; }
+
+  const int loop_count = get_loop_index()+1;
+  if (loop_count%period == 0) {
+    m_RootFile->Write();
+  }
   return AS_OK;
 }
 

@@ -17,53 +17,74 @@
  *                                                                       *
  *************************************************************************/
 
-#ifndef COMPTONSOFT_GetInputFilesFromDirectory_H
-#define COMPTONSOFT_GetInputFilesFromDirectory_H 1
+
+#ifndef COMPTONSOFT_PushHistogramToQuickLookDB_H
+#define COMPTONSOFT_PushHistogramToQuickLookDB_H 1
 
 #include <anlnext/BasicModule.hh>
-#include <ctime>
+#include "VCSModule.hh"
+#include "XrayEventCollection.hh"
+#include "LoadMetaDataFile.hh"
+
+namespace hsquicklook {
+class MongoDBClient;
+}
 
 namespace comptonsoft {
 
-class VDataReader;
-
-/**
- * GetInputFilesFromDirectory
- *
- * @author Hirokazu Odaka
- * @date 2019-11-13
- * @date 2021-10-24 | Tsubasa Tamba | 1.1 | search from directory sequence
- * @date 2022-02-01 | Hirokazu Odaka | 1.2 | code review
- */
-class GetInputFilesFromDirectory : public anlnext::BasicModule
+class PushHistogramToQuickLookDB : public anlnext::BasicModule
 {
-  DEFINE_ANL_MODULE(GetInputFilesFromDirectory, 1.2);
+  DEFINE_ANL_MODULE(PushHistogramToQuickLookDB, 1.0);
   // ENABLE_PARALLEL_RUN();
 public:
-  GetInputFilesFromDirectory();
+  PushHistogramToQuickLookDB();
   
 protected:
-  GetInputFilesFromDirectory(const GetInputFilesFromDirectory&);
+  PushHistogramToQuickLookDB(const PushHistogramToQuickLookDB&);
 
 public:
   anlnext::ANLStatus mod_define() override;
   anlnext::ANLStatus mod_initialize() override;
   anlnext::ANLStatus mod_analyze() override;
 
-private:
-  std::string reader_module_;
-  std::string directory_;
-  std::string extension_;
-  int delay_ = 0;
-  int wait_ = 0;
-  VDataReader* data_reader_ = nullptr;
-  bool is_new_entry_ = true;
-  std::time_t entry_time_ = 0;
+protected:
+  void pushRecentHistograms();
+  void pushProfile();
+  void initializeHistograms();
+  void loadHistogramsFromMongoDB();
+  void updateHistograms();
+  void updateTrends();
+  void updateMFparameters();
 
-  std::vector<std::string> directory_sequence_;
-  int directory_index_ = 0;
+private:
+  std::string event_collection_module_name_;
+  std::string recent_collection_name_;
+  std::string profile_collection_name_;
+  std::string directory_;
+  std::string analysis_id_ = "";
+
+  std::vector<std::string> columns_name_;
+  std::vector<double> columns_min_;
+  std::vector<double> columns_max_;
+  std::vector<int> columns_bin_;
+
+  std::vector<std::vector<int>> histograms_;
+
+  // vectors
+  std::vector<int> temperature_trend_;
+  std::vector<int> count_trend_;
+
+  // for modulation factor
+  int Nh_ = 0, Nv_ = 0;
+  std::string mf_output_ = "";
+
+  const double epi = 1e-4;
+
+  const XrayEventCollection* event_collection_module_ = nullptr;
+  const LoadMetaDataFile* metadata_file_module_ = nullptr;
+  hsquicklook::MongoDBClient* mongodb_ = nullptr;
 };
 
 } /* namespace comptonsoft */
 
-#endif /* COMPTONSOFT_GetInputFilesFromDirectory_H */
+#endif /* COMPTONSOFT_PushHistogramToQuickLookDB_H */

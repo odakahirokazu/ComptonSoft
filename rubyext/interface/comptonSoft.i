@@ -70,6 +70,7 @@
 #endif
 #include "FillFrame.hh"
 #include "LoadFrame.hh"
+#include "LoadReducedFrame.hh"
 #include "XrayEventCollection.hh"
 #include "XrayEventSelection.hh"
 #include "AnalyzeFrame.hh"
@@ -93,11 +94,24 @@
 #include "HistogramXrayEventSpectrum.hh"
 #include "HistogramXrayEventAzimuthAngle.hh"
 #include "HistogramXrayEventProperties.hh"
+#include "HistogramDecodedImage.hh"
 #include "HistogramRawFrameImage.hh"
 #include "ExtractXrayEventImage.hh"
 #include "ProcessCodedAperture.hh"
 #ifdef USE_HSQUICKLOOK
 #include "PushToQuickLookDB.hh"
+#endif
+#ifdef USE_HSQUICKLOOK
+#include "PushXrayEventToQuickLookDB.hh"
+#endif
+#ifdef USE_HSQUICKLOOK
+#include "PushHistogramToQuickLookDB.hh"
+#endif
+#ifdef USE_HSQUICKLOOK
+#include "LoadMetaDataFile.hh"
+#endif
+#ifdef USE_HSQUICKLOOK
+#include "ExtractXrayEventImageFromQuickLookDB.hh"
 #endif
 #include "GetInputFilesFromDirectory.hh"
 #include "SelectEventsWithDetectorSpectrum.hh"
@@ -718,6 +732,13 @@ public:
 };
 
 
+class LoadReducedFrame : public LoadFrame
+{
+public:
+  LoadReducedFrame();
+};
+
+
 class XrayEventCollection : public anlnext::BasicModule
 {
 public:
@@ -819,11 +840,13 @@ public:
   SetBadFrames();
 };
 
+
 class SetDynamicPedestals : public VCSModule
 {
 public:
   SetDynamicPedestals();
 };
+
 
 class SetPedestalsByMedian : public VCSModule
 {
@@ -860,6 +883,13 @@ public:
 };
 
 
+class HistogramDecodedImage : public VCSModule
+{
+public:
+  HistogramDecodedImage();
+};
+
+
 class HistogramRawFrameImage : public VCSModule
 {
 public:
@@ -886,6 +916,42 @@ class PushToQuickLookDB : public anlnext::BasicModule
 {
 public:
   PushToQuickLookDB();
+};
+
+#endif
+
+#ifdef USE_HSQUICKLOOK
+class PushXrayEventToQuickLookDB : public anlnext::BasicModule
+{
+public:
+  PushXrayEventToQuickLookDB();
+};
+
+#endif
+
+#ifdef USE_HSQUICKLOOK
+class PushHistogramToQuickLookDB : public anlnext::BasicModule
+{
+public:
+  PushHistogramToQuickLookDB();
+};
+
+#endif
+
+#ifdef USE_HSQUICKLOOK
+class LoadMetaDataFile : public anlnext::BasicModule
+{
+public:
+  LoadMetaDataFile();
+};
+
+#endif
+
+#ifdef USE_HSQUICKLOOK
+class ExtractXrayEventImageFromQuickLookDB : public ExtractXrayEventImage
+{
+public:
+  ExtractXrayEventImageFromQuickLookDB();
 };
 
 #endif

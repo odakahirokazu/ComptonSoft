@@ -35,13 +35,14 @@
 #include "VCodedAperture.hh"
 #include "ExtractXrayEventImage.hh"
 
+
 class TH2;
 
 namespace comptonsoft {
 
 class ProcessCodedAperture : public VCSModule
 {
-  DEFINE_ANL_MODULE(ProcessCodedAperture, 1.0);
+  DEFINE_ANL_MODULE(ProcessCodedAperture, 1.1);
   // ENABLE_PARALLEL_RUN();
 public:
   ProcessCodedAperture();
@@ -52,6 +53,7 @@ protected:
 public:
   anlnext::ANLStatus mod_define() override;
   anlnext::ANLStatus mod_initialize() override;
+  anlnext::ANLStatus mod_analyze() override;
   anlnext::ANLStatus mod_end_run() override;
 
   int ApertureNumX() const { return apertureNumX_; }
@@ -73,6 +75,8 @@ public:
   int DecodingMode() const { return decodingMode_; }
 
   void drawCanvas(TCanvas* canvas, std::vector<std::string>* filenames) override;
+
+  const TH2* getDecodedImageHistogram() const { return histogram_; }
 
 protected:
   virtual std::unique_ptr<VCodedAperture> createCodedAperture();
@@ -103,7 +107,9 @@ private:
   std::string outputName_;
   std::string outputAngleUnit_;
 
+  std::shared_ptr<image_t> encodedImage_;
   std::shared_ptr<image_t> decodedImage_;
+  std::shared_ptr<image_t> decodedImageSum_;
   ExtractXrayEventImage* imageOwner_ = nullptr;
   std::unique_ptr<VCodedAperture> codedAperture_;
   TH2* histogram_ = nullptr;

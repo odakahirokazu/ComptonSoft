@@ -42,6 +42,7 @@ public:
   
   anlnext::ANLStatus mod_define() override;
   anlnext::ANLStatus mod_pre_initialize() override;
+  anlnext::ANLStatus mod_analyze() override;
   anlnext::ANLStatus mod_finalize() override;
 
   TDirectory* GetDirectory();
@@ -52,6 +53,7 @@ public:
 private:
   std::string m_Filename;
   std::unique_ptr<TFile> m_RootFile;
+  int m_Period = 0;
 };
 
 } /* namespace comptonsoft */

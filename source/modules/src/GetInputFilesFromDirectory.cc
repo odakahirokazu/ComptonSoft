@@ -44,6 +44,7 @@ ANLStatus GetInputFilesFromDirectory::mod_define()
   define_parameter("extension", &mod_class::extension_);
   define_parameter("delay", &mod_class::delay_);
   define_parameter("wait", &mod_class::wait_);
+  define_parameter("directory_sequence", &mod_class::directory_sequence_);
   
   return AS_OK;
 }
@@ -51,7 +52,12 @@ ANLStatus GetInputFilesFromDirectory::mod_define()
 ANLStatus GetInputFilesFromDirectory::mod_initialize()
 {
   get_module_IFNC(reader_module_, &data_reader_);
+  is_new_entry_ = true;
   entry_time_ = std::time(nullptr);
+
+  if (directory_sequence_.size()==0) {
+    directory_sequence_.push_back(directory_);
+  }
 
   return AS_OK;
 }
@@ -60,15 +66,21 @@ ANLStatus GetInputFilesFromDirectory::mod_analyze()
 {
   namespace fs = boost::filesystem;
 
-  if (redoing_) {
-    redoing_ = false;
+  if (directory_index_==static_cast<int>(directory_sequence_.size())) {
+    return AS_OK;
   }
-  else {
+
+  const std::string current_directory = directory_sequence_[directory_index_];
+  if (!fs::exists(current_directory)) {
+    directory_index_++;
+    return AS_REDO;
+  }
+
+  if (is_new_entry_) {
     entry_time_ = std::time(nullptr);
   }
 
-  const fs::path dir(directory_);
-  
+  const fs::path dir(current_directory);
   std::list<fs::path> files;
   for (const auto& f: boost::make_iterator_range(fs::directory_iterator(dir), {})) {
     if (fs::is_directory(f)) { continue; }
@@ -90,18 +102,22 @@ ANLStatus GetInputFilesFromDirectory::mod_analyze()
       added = true;
     }
   }
-  
+
   if (!added && data_reader_->isDone()) {
     if (entry_time_+wait_ < std::time(nullptr)) {
-      std::cout << "[GetInputFilesFromDirectory] timeout" << std::endl;;
+      std::cout << "[GetInputFilesFromDirectory] timeout" << std::endl;
+      directory_index_++;
+      is_new_entry_ = true;
+      return AS_REDO;
     }
     else {
       std::this_thread::sleep_for(std::chrono::seconds(1));
-      redoing_ = true;
+      is_new_entry_ = false;
       return AS_REDO;
     }
   }
 
+  is_new_entry_ = true;
   return AS_OK;
 }
 
