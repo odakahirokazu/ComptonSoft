@@ -94,6 +94,7 @@
 #include "HistogramXrayEventSpectrum.hh"
 #include "HistogramXrayEventAzimuthAngle.hh"
 #include "HistogramXrayEventProperties.hh"
+#include "HistogramDecodedImage.hh"
 #include "HistogramRawFrameImage.hh"
 #include "ExtractXrayEventImage.hh"
 #include "ProcessCodedAperture.hh"
@@ -870,6 +871,13 @@ class HistogramXrayEventProperties : public VCSModule
 {
 public:
   HistogramXrayEventProperties();
+};
+
+
+class HistogramDecodedImage : public VCSModule
+{
+public:
+  HistogramDecodedImage();
 };
 
 

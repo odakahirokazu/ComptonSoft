@@ -76,6 +76,8 @@ public:
 
   void drawCanvas(TCanvas* canvas, std::vector<std::string>* filenames) override;
 
+  const TH2* getDecodedImageHistogram() const { return histogram_; }
+
 protected:
   virtual std::unique_ptr<VCodedAperture> createCodedAperture();
   virtual void decode();
