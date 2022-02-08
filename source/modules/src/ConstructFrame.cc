@@ -27,7 +27,7 @@ using namespace anlnext;
 namespace comptonsoft {
 
 ConstructFrame::ConstructFrame()
-  : ids_{0}
+  : ids_{1}
 {
   add_alias("ConstructFrame");
 }
