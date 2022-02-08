@@ -93,19 +93,19 @@ ANLStatus AEObservationPrimaryGen::mod_pre_initialize()
   cfitsio::fits_open_image(&fitsFile, arfFileName_.c_str(), READONLY, &fitsStatus);
   if (fitsStatus) {
     cfitsio::fits_report_error(stderr, fitsStatus);
-    return AS_ERROR;
+    return AS_QUIT_ERROR;
   }
  
   cfitsio::fits_read_pix(fitsFile, TDOUBLE, StartPixel, NumPixels, &nulval, &array[0], &anynul, &fitsStatus);
   if (fitsStatus) {
     cfitsio::fits_report_error(stderr, fitsStatus);
-    return AS_ERROR;
+    return AS_QUIT_ERROR;
   }
 
   cfitsio::ffmahd(fitsFile, 2, IMAGE_HDU, &fitsStatus);
   if(fitsStatus){
     cfitsio::fits_report_error(stderr, fitsStatus);
-    return AS_ERROR;
+    return AS_QUIT_ERROR;
   }
 
   for(int i=0; i<numColumns_; i++) {
@@ -113,7 +113,7 @@ ANLStatus AEObservationPrimaryGen::mod_pre_initialize()
                              &colid[i], &fitsStatus);
     if (fitsStatus) {
       cfitsio::fits_report_error(stderr, fitsStatus);
-      return AS_ERROR;
+      return AS_QUIT_ERROR;
     }
   }
   
@@ -132,14 +132,14 @@ ANLStatus AEObservationPrimaryGen::mod_pre_initialize()
                            &(effectiveArea_[i][0]), &anynul, &fitsStatus);
     if (fitsStatus) {
       cfitsio::fits_report_error(stderr, fitsStatus);
-      return AS_ERROR;
+      return AS_QUIT_ERROR;
     }
   }
   
   cfitsio::fits_close_file(fitsFile, &fitsStatus);
   if (fitsStatus) {
     cfitsio::fits_report_error(stderr, fitsStatus);
-    return AS_ERROR;
+    return AS_QUIT_ERROR;
   }
 
   for (int iy=0; iy<ny; iy++){
@@ -184,7 +184,7 @@ ANLStatus AEObservationPrimaryGen::mod_pre_initialize()
 
   if (arfEnergyMin>spectrumEnergy[0] || arfEnergyMax<spectrumEnergy.back()) {
   std::cout << "The energy range of arf does not match to the spectrum." << std::endl;
-  return AS_ERROR;
+  return AS_QUIT_ERROR;
   }
 #endif
 
