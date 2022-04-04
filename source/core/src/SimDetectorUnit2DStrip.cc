@@ -231,6 +231,27 @@ void SimDetectorUnit2DStrip::simulatePulseHeights()
       hit->setEnergyDeposit(0.0);
       insertSimulatedHit(hit);   
     }
+    else if (ChargeCollectionMode()>=4) {
+      const int strip_range = 7;
+
+      for (int delta_strip=-strip_range; delta_strip<=strip_range; delta_strip++) {
+        if (delta_strip!=0) {
+          PixelID nearStrip(sp.X()+delta_strip, PixelID::Undefined);
+          DetectorHit_sptr hit = generateHit(*rawhit, nearStrip);
+          hit->setEnergyDeposit(0.0);
+          insertSimulatedHit(hit);
+        }
+      }
+
+      for (int delta_strip=-strip_range; delta_strip<=strip_range; delta_strip++) {
+        if (delta_strip!=0) {
+          PixelID nearStrip(PixelID::Undefined, sp.Y()+delta_strip);
+          DetectorHit_sptr hit = generateHit(*rawhit, nearStrip);
+          hit->setEnergyDeposit(0.0);
+          insertSimulatedHit(hit);
+        }
+      }
+    }
   }
 }
 
@@ -344,6 +365,9 @@ void SimDetectorUnit2DStrip::buildWPMap()
   else if (ChargeCollectionMode() == 3) {
     buildWPMap(95, 95, 128, 5.0);
   }
+  else if (ChargeCollectionMode() == 4) {
+    buildWPMap(285, 285, 128, 15.0);
+  }
   else {
     std::cout << "Error : buildWPMap() " << std::endl;
     return;
@@ -372,11 +396,11 @@ void SimDetectorUnit2DStrip::buildWPMap(int nx, int ny, int nz, double pixel_fac
     }
   }
   
-  const std::string histnameX = (boost::format("wp_x_%04d")%getID()).str();
+  const std::string histnameX = (boost::format("wp_%04d_x")%getID()).str();
   WPMapXStrip_ =  new TH2D(histnameX.c_str(), histnameX.c_str(),
                            nx, -0.5*MapSizeX/unit::cm, +0.5*MapSizeX/unit::cm,
                            nz, -0.5*MapSizeZ/unit::cm, +0.5*MapSizeZ/unit::cm);
-  const std::string histnameY = (boost::format("wp_y_%04d")%getID()).str();
+  const std::string histnameY = (boost::format("wp_%04d_y")%getID()).str();
   WPMapYStrip_ =  new TH2D(histnameY.c_str(), histnameY.c_str(),
                            ny, -0.5*MapSizeY/unit::cm, +0.5*MapSizeY/unit::cm,
                            nz, -0.5*MapSizeZ/unit::cm, +0.5*MapSizeZ/unit::cm);
@@ -490,6 +514,9 @@ void SimDetectorUnit2DStrip::buildCCEMap()
   else if (ChargeCollectionMode() == 3) {
     buildCCEMap(95, 95, 127, 5.0);
   }
+  else if (ChargeCollectionMode() == 4) {
+    buildCCEMap(285, 285, 127, 15.0);
+  }
   else {
     std::cout << "Error : buildCCEMap() " << std::endl;
     return;
@@ -518,12 +545,12 @@ void SimDetectorUnit2DStrip::buildCCEMap(int nx, int ny, int nz, double pixel_fa
     }
   }
   
-  std::string histname = (boost::format("cce_x_%04d")%getID()).str();
-  CCEMapXStrip_ =  new TH2D(histname.c_str(), histname.c_str(),
+  const std::string histnameX = (boost::format("cce_%04d_x")%getID()).str();
+  CCEMapXStrip_ =  new TH2D(histnameX.c_str(), histnameX.c_str(),
                             nx, -0.5*MapSizeX/unit::cm, +0.5*MapSizeX/unit::cm,
                             nz, -0.5*MapSizeZ/unit::cm, +0.5*MapSizeZ/unit::cm);
-  histname = (boost::format("cce_y_%04d")%getID()).str();
-  CCEMapYStrip_ =  new TH2D(histname.c_str(), histname.c_str(),
+  const std::string histnameY = (boost::format("cce_%04d_y")%getID()).str();
+  CCEMapYStrip_ =  new TH2D(histnameY.c_str(), histnameY.c_str(),
                             nx, -0.5*MapSizeY/unit::cm, +0.5*MapSizeY/unit::cm,
                             nz, -0.5*MapSizeZ/unit::cm, +0.5*MapSizeZ/unit::cm);
   
