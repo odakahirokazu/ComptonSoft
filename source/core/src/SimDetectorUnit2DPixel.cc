@@ -131,7 +131,7 @@ void SimDetectorUnit2DPixel::simulatePulseHeights()
     }
 
     // adjacent pad
-    if (ChargeCollectionMode()==3) {
+    if (ChargeCollectionMode()>=3) {
       DetectorHit_sptr hit;
       PixelID adjacentPixel;
      

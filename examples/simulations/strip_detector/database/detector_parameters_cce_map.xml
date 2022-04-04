@@ -1,0 +1,47 @@
+<?xml version="1.0" ?>
+<?xml-stylesheet type="text/xsl" href="https://raw.githubusercontent.com/odakahirokazu/ComptonSoft/master/xmlstyle/detector_parameters_v3.xsl" ?>
+
+<detector_parameters>
+  <name>CdTe strip detector</name>
+  <comment>2016-08-26 | Hiro Odaka</comment>
+  <comment>2022-04-04 | Hiro Odaka | CCE map</comment>
+  <root_file name="cce_map.root" />
+  <auto_position flag="0" />
+  <sensitive_detector_not_found_warning flag="1" />
+  <data>
+    <sensitive_detector type="2DStrip" name="CdTeDetector.log">
+      <common>
+        <parameters>
+          <upside anode="1" xstrip="1" />
+          <quenching factor="0.6" />
+          <temperature value="255.0" />
+          <efield bias="500.0" mode="1" />
+          <charge_collection mode="3" cce_map_name="cce_0001" />
+          <diffusion mode="0" />
+          <timing_resolution trigger="3.0e-7" energy_measurement="1.0e-6" />
+          <pedestal_generation flag="1" />
+          <channel_properties side="anode">
+            <disable status="0" />
+            <trigger_discrimination center="5.0" sigma="1.0" />
+            <noise_level param0="0.5" param1="0.019" param2="0.0" />
+            <compensation factor="1.0" />
+            <threshold value="5.0" />
+          </channel_properties>
+          <channel_properties side="cathode">
+            <disable status="0" />
+            <trigger_discrimination center="5.0" sigma="1.0" />
+            <noise_level param0="0.3" param1="0.019" param2="0.0" />
+            <compensation factor="1.0" />
+            <threshold value="3.0" />
+          </channel_properties>
+          <reconstruction mode="0">
+            <energy_consistency_check lower_function_c0="-3.0" lower_function_c1="0.9" upper_function_c0="+3.0" upper_function_c1="1.1" />
+          </reconstruction>
+        </parameters>
+      </common>
+      <detector_list id_method="path" layer_offset="1">
+        <detector id="1" path="CdTeDetector" />
+      </detector_list>
+    </sensitive_detector>
+  </data>
+</detector_parameters>
