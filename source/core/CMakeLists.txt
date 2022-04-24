@@ -20,7 +20,7 @@ set(CS_CORE_CLASSES
   ### basic types and classes
   src/CSException.cc
   src/ChannelID.cc
-  src/PixelID.cc
+  src/VoxelID.cc
   src/DetectorGroup.cc
   src/HitPattern.cc
   src/PhaseSpaceVector.cc

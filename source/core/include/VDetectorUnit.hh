@@ -23,6 +23,7 @@
 #include <vector>
 #include <string>
 #include "CSTypes.hh"
+#include "VoxelID.hh"
 #include "PixelID.hh"
 #include "ChannelID.hh"
 #include "DetectorHit_sptr.hh"
@@ -160,6 +161,7 @@ public:
   virtual vector3_t LocalPositionWithDepth(int pixelX, int pixelY, double localz) const = 0;
   virtual vector3_t LocalPositionWithDepth(const PixelID& pixel, double localz) const = 0;
   
+  virtual VoxelID findVoxel(double localx, double localy, double localz) const = 0;
   virtual PixelID findPixel(double localx, double localy) const = 0;
 
   /**

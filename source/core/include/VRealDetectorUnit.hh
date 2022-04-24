@@ -205,6 +205,7 @@ public:
   vector3_t LocalPositionError() const;
   vector3_t PositionError(const vector3_t& localError) const;
   
+  VoxelID findVoxel(double localx, double localy, double localz) const override;
   PixelID findPixel(double localx, double localy) const override;
 
   PixelID ChannelToPixel(int section, int channel) const override;

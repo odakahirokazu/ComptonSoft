@@ -160,10 +160,37 @@ vector3_t VRealDetectorUnit::PositionError(const vector3_t& localError) const
   return v;
 }
 
+VoxelID
+VRealDetectorUnit::findVoxel(double localx, double localy, double localz) const
+{
+  if (voxelPitchX_ <= 0.0 || voxelPitchY_ <= 0.0 || voxelPitchZ_ <= 0.0) {
+    return VoxelID(VoxelID::Undefined, VoxelID::Undefined, VoxelID::Undefined);
+  }
+  
+  const double detOriginX = -0.5 * sizeX_ + offsetX_;
+  const double detOriginY = -0.5 * sizeY_ + offsetY_;
+  const double detOriginZ = -0.5 * sizeZ_ + offsetZ_;
+  const double xReal = localx - detOriginX;
+  const double yReal = localy - detOriginY;
+  const double zReal = localz - detOriginZ;
+  
+  int x = std::floor(xReal/voxelPitchX_);
+  int y = std::floor(yReal/voxelPitchY_);
+  int z = std::floor(zReal/voxelPitchZ_);
+  
+  if (x<0 || y<0 || z<0 || x>=numVoxelX_ || y>=numVoxelY_ || z>=numVoxelZ_) {
+    x = PixelID::OnMergin;
+    y = PixelID::OnMergin;
+    z = PixelID::OnMergin;
+  }
+  
+  return VoxelID(x, y, z);
+}
+
 PixelID
 VRealDetectorUnit::findPixel(double localx, double localy) const
 {
-  if (voxelPitchX_ <= 0.0 && voxelPitchY_ <= 0.0) {
+  if (voxelPitchX_ <= 0.0 || voxelPitchY_ <= 0.0) {
     return PixelID(PixelID::Undefined, PixelID::Undefined);
   }
   
