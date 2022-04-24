@@ -36,6 +36,7 @@ namespace comptonsoft {
  * @author Hirokazu Odaka
  * @date 2008-08-22
  * @date 2014-10-04 | all methods are pure virtual.
+ * @date 2022-04-24 | introduce 3D voxel detector
  */
 class VDetectorUnit
 {
@@ -73,18 +74,30 @@ public:
   virtual void setThickness(double r) = 0;
   virtual double getThickness() const = 0;
   
+  virtual void setOffset(double x, double y, double z) = 0;
   virtual void setOffset(double x, double y) = 0;
   virtual double getOffsetX() const = 0;
   virtual double getOffsetY() const = 0;
+  virtual double getOffsetZ() const = 0;
   
+  virtual void setVoxelPitch(double x, double y, double z) = 0;
+  virtual double getVoxelPitchX() const = 0;
+  virtual double getVoxelPitchY() const = 0;
+  virtual double getVoxelPitchZ() const = 0;
+
   virtual void setPixelPitch(double x, double y) = 0;
   virtual double getPixelPitchX() const = 0;
   virtual double getPixelPitchY() const = 0;
-  
+
+  virtual void setNumVoxel(int x, int y, int z) = 0;
+  virtual double getNumVoxelX() const = 0;
+  virtual double getNumVoxelY() const = 0;
+  virtual double getNumVoxelZ() const = 0;
+
   virtual void setNumPixel(int x, int y) = 0;
   virtual double getNumPixelX() const = 0;
   virtual double getNumPixelY() const = 0;
-  
+
   virtual void setCenterPosition(double x, double y, double z) = 0;
   virtual void setCenterPosition(const vector3_t& v) = 0;
   virtual vector3_t getCenterPosition() const = 0;
@@ -114,6 +127,15 @@ public:
   virtual double getZAxisDirectionZ() const = 0;
 
   /** 
+   * calculate global position of the voxel center.
+   * @param voxelX the pixel ID along the x axis of the detector
+   * @param voxelY the pixel ID along the y axis of the detector
+   * @param voxelZ the pixel ID along the z axis of the detector
+   * @return global position of the pixel ceneter
+   */
+  virtual vector3_t Position(int voxelX, int voxelY, int voxelZ) const = 0;
+
+  /** 
    * calculate global position of the pixel center.
    * @param pixelX the pixel ID along the x axis of the detector
    * @param pixelY the pixel ID along the y axis of the detector
@@ -123,38 +145,14 @@ public:
 
   /**
    * calculate global position of the pixel center.
-   * @param pixelX the pixel ID along the x axis of the detector
-   * @param pixelY the pixel ID along the y axis of the detector
-   * @param[out] x x-component of global position of the pixel ceneter
-   * @param[out] y y-component of global position of the pixel ceneter
-   * @param[out] z z-component of global position of the pixel ceneter
-   */
-  virtual void Position(int pixelX, int pixelY,
-                        double* x, double* y, double* z) const = 0;
-
-  /**
-   * calculate global position of the pixel center.
    * @param pixel the pixel ID in @link PixelID @endlink
    * @return global position of the pixel ceneter
    */
   virtual vector3_t Position(const PixelID& pixel) const = 0;
 
-  /**
-   * calculate global position of the pixel center.
-   * @param pixel the pixel ID in @link PixelID @endlink
-   * @param[out] x x-component of global position of the pixel ceneter
-   * @param[out] y y-component of global position of the pixel ceneter
-   * @param[out] z z-component of global position of the pixel ceneter
-   */
-  virtual void Position(const PixelID& pixel,
-                        double* x, double* y, double* z) const = 0;
-
+  virtual vector3_t LocalPosition(int voxelX, int voxelY, int voxelZ) const = 0;
   virtual vector3_t LocalPosition(int pixelX, int pixelY) const = 0;
-  virtual void LocalPosition(int pixelX, int pixelY,
-                             double* x, double* y, double* z) const = 0;
   virtual vector3_t LocalPosition(const PixelID& pixel) const = 0;
-  virtual void LocalPosition(const PixelID& pixel,
-                             double* x, double* y, double* z) const = 0;
 
   virtual vector3_t PositionWithDepth(int pixelX, int pixelY, double localz) const = 0;
   virtual vector3_t PositionWithDepth(const PixelID& pixel, double localz) const = 0;

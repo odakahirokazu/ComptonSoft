@@ -43,6 +43,7 @@ class FrameData;
  * @date 2009-07-09
  * @date 2014-10-02 | VDetectorUnit as a virtual base class.
  * @date 2015-10-11 | DetectorType as an enum class. AnalysisMode => ReconstructionMode
+ * @date 2022-04-24 | Introduce 3D voxel detector
  */
 class VRealDetectorUnit : virtual public VDetectorUnit
 {
@@ -80,19 +81,35 @@ public:
   void setThickness(double r) override { sizeZ_ = r; }
   double getThickness() const override { return sizeZ_; }
   
+  void setOffset(double x, double y, double z) override
+  { offsetX_ = x; offsetY_ = y; offsetZ_ = z; }
   void setOffset(double x, double y) override
-  { offsetX_ = x; offsetY_ = y; }
+  { offsetX_ = x; offsetY_ = y; offsetZ_ = 0.0; }
   double getOffsetX() const override { return offsetX_; }
   double getOffsetY() const override { return offsetY_; }
-  void setPixelPitch(double x, double y) override
-  { pixelPitchX_ = x; pixelPitchY_ = y; }
-  double getPixelPitchX() const override { return pixelPitchX_; }
-  double getPixelPitchY() const override { return pixelPitchY_; }
+  double getOffsetZ() const override { return offsetZ_; }
+
+  void setVoxelPitch(double x, double y, double z) override
+  { voxelPitchX_ = x; voxelPitchY_ = y; voxelPitchZ_ = z; }
+  double getVoxelPitchX() const override { return voxelPitchX_; }
+  double getVoxelPitchY() const override { return voxelPitchY_; }
+  double getVoxelPitchZ() const override { return voxelPitchZ_; }
   
+  void setPixelPitch(double x, double y) override
+  { voxelPitchX_ = x; voxelPitchY_ = y; voxelPitchZ_ = sizeZ_; }
+  double getPixelPitchX() const override { return voxelPitchX_; }
+  double getPixelPitchY() const override { return voxelPitchY_; }
+  
+  void setNumVoxel(int x, int y, int z) override
+  { numVoxelX_ = x; numVoxelY_ = y; numVoxelZ_ = z; }
+  double getNumVoxelX() const override { return numVoxelX_; }
+  double getNumVoxelY() const override { return numVoxelY_; }
+  double getNumVoxelZ() const override { return numVoxelZ_; }
+
   void setNumPixel(int x, int y) override
-  { numPixelX_ = x; numPixelY_ = y; }
-  double getNumPixelX() const override { return numPixelX_; }
-  double getNumPixelY() const override { return numPixelY_; }
+  { numVoxelX_ = x; numVoxelY_ = y; numVoxelZ_ = 1; }
+  double getNumPixelX() const override { return numVoxelX_; }
+  double getNumPixelY() const override { return numVoxelY_; }
   
   void setCenterPosition(double x, double y, double z) override
   { centerPosition_.set(x, y, z); }
@@ -171,19 +188,13 @@ public:
   std::shared_ptr<const VChannelMap> getChannelMap() const
   { return channelMap_; }
   
+  vector3_t Position(int voxelX, int voxelY, int voxelZ) const override;
   vector3_t Position(int pixelX, int pixelY) const override;
-  void Position(int pixelX, int pixelY,
-                double* x, double* y, double* z) const override;
   vector3_t Position(const PixelID& pixel) const override;
-  void Position(const PixelID& pixel,
-                double* x, double* y, double* z) const override;
 
+  vector3_t LocalPosition(int voxelX, int voxelY, int voxelZ) const override;
   vector3_t LocalPosition(int pixelX, int pixelY) const override;
-  void LocalPosition(int pixelX, int pixelY,
-                     double* x, double* y, double* z) const override;
   vector3_t LocalPosition(const PixelID& pixel) const override;
-  void LocalPosition(const PixelID& pixel,
-                     double* x, double* y, double* z) const override;
 
   vector3_t PositionWithDepth(int pixelX, int pixelY, double localz) const override;
   vector3_t PositionWithDepth(const PixelID& pixel, double localz) const override;
@@ -285,10 +296,13 @@ private:
   double sizeZ_;
   double offsetX_;
   double offsetY_;
-  double pixelPitchX_;
-  double pixelPitchY_;
-  int numPixelX_;
-  int numPixelY_;
+  double offsetZ_;
+  double voxelPitchX_;
+  double voxelPitchY_;
+  double voxelPitchZ_;
+  int numVoxelX_;
+  int numVoxelY_;
+  int numVoxelZ_;
   vector3_t centerPosition_;
   vector3_t directionX_;
   vector3_t directionY_;
@@ -313,26 +327,10 @@ private:
   VRealDetectorUnit& operator=(VRealDetectorUnit&&) = delete;
 };
 
-inline void VRealDetectorUnit::Position(int pixelX, int pixelY,
-                                        double* x, double* y, double* z) const
-{
-  vector3_t pos = Position(pixelX, pixelY);
-  *x = pos.x();
-  *y = pos.y();
-  *z = pos.z();
-}
-
 inline
 vector3_t VRealDetectorUnit::Position(const PixelID& pixel) const
 {
   return Position(pixel.X(), pixel.Y());
-}
-
-inline
-void VRealDetectorUnit::Position(const PixelID& pixel,
-                                 double* x, double* y, double* z) const
-{
-  Position(pixel.X(), pixel.Y(), x, y, z);
 }
 
 inline
@@ -342,26 +340,9 @@ vector3_t VRealDetectorUnit::PositionWithDepth(const PixelID& pixel, double loca
 }
 
 inline
-void VRealDetectorUnit::LocalPosition(int pixelX, int pixelY,
-                                      double* x, double* y, double* z) const
-{
-  vector3_t pos = LocalPosition(pixelX, pixelY);
-  *x = pos.x();
-  *y = pos.y();
-  *z = pos.z();
-}
-
-inline
 vector3_t VRealDetectorUnit::LocalPosition(const PixelID& pixel) const
 {
   return LocalPosition(pixel.X(), pixel.Y());
-}
-
-inline
-void VRealDetectorUnit::LocalPosition(const PixelID& pixel,
-                                      double* x, double* y, double* z) const
-{
-  LocalPosition(pixel.X(), pixel.Y(), x, y, z);
 }
 
 inline

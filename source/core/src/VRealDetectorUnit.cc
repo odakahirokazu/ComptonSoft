@@ -53,8 +53,9 @@ namespace comptonsoft {
 VRealDetectorUnit::VRealDetectorUnit()
   : name_(""), ID_(0), instrumentID_(0),
     sizeX_(0.0), sizeY_(0.0), sizeZ_(0.0),
-    offsetX_(0.0), offsetY_(0.0), pixelPitchX_(0.0), pixelPitchY_(0.0),
-    numPixelX_(1), numPixelY_(1),
+    offsetX_(0.0), offsetY_(0.0), offsetZ_(0.0),
+    voxelPitchX_(0.0), voxelPitchY_(0.0), voxelPitchZ_(0.0),
+    numVoxelX_(1), numVoxelY_(1), numVoxelZ_(1),
     centerPosition_(0.0, 0.0, 0.0),
     directionX_(1.0, 0.0, 0.0),
     directionY_(0.0, 1.0, 0.0),
@@ -82,11 +83,32 @@ void VRealDetectorUnit::registerMultiChannelData(std::unique_ptr<MultiChannelDat
   MCDVector_.push_back(std::move(mcd));
 }
 
+vector3_t VRealDetectorUnit::Position(int voxelX, int voxelY, int voxelZ) const
+{
+  const vector3_t pos = centerPosition_
+    + (-0.5*sizeX_ + (offsetX_+(0.5+voxelX)*voxelPitchX_)) * directionX_
+    + (-0.5*sizeY_ + (offsetY_+(0.5+voxelY)*voxelPitchY_)) * directionY_
+    + (-0.5*sizeZ_ + (offsetZ_+(0.5+voxelZ)*voxelPitchZ_)) * directionZ_;
+  return pos;
+}
+
 vector3_t VRealDetectorUnit::Position(int pixelX, int pixelY) const
 {
   const vector3_t pos = centerPosition_
-    + (-0.5*sizeX_ + (offsetX_+(0.5+pixelX)*pixelPitchX_)) * directionX_
-    + (-0.5*sizeY_ + (offsetY_+(0.5+pixelY)*pixelPitchY_)) * directionY_;
+    + (-0.5*sizeX_ + (offsetX_+(0.5+pixelX)*voxelPitchX_)) * directionX_
+    + (-0.5*sizeY_ + (offsetY_+(0.5+pixelY)*voxelPitchY_)) * directionY_;
+  return pos;
+}
+
+vector3_t VRealDetectorUnit::LocalPosition(int voxelX, int voxelY, int voxelZ) const
+{
+  const vector3_t dirx(1.0, 0.0, 0.0);
+  const vector3_t diry(0.0, 1.0, 0.0);
+  const vector3_t dirz(0.0, 0.0, 1.0);
+  const vector3_t pos =
+    (-0.5*sizeX_ + (offsetX_+(0.5+voxelX)*voxelPitchX_)) * dirx
+    + (-0.5*sizeY_ + (offsetY_+(0.5+voxelY)*voxelPitchY_)) * diry
+    + (-0.5*sizeZ_ + (offsetZ_+(0.5+voxelZ)*voxelPitchZ_)) * dirz;
   return pos;
 }
 
@@ -95,16 +117,16 @@ vector3_t VRealDetectorUnit::LocalPosition(int pixelX, int pixelY) const
   const vector3_t dirx(1.0, 0.0, 0.0);
   const vector3_t diry(0.0, 1.0, 0.0);
   const vector3_t pos =
-    (-0.5*sizeX_ + (offsetX_+(0.5+pixelX)*pixelPitchX_)) * dirx
-    + (-0.5*sizeY_ + (offsetY_+(0.5+pixelY)*pixelPitchY_)) * diry;
+    (-0.5*sizeX_ + (offsetX_+(0.5+pixelX)*voxelPitchX_)) * dirx
+    + (-0.5*sizeY_ + (offsetY_+(0.5+pixelY)*voxelPitchY_)) * diry;
   return pos;
 }
 
 vector3_t VRealDetectorUnit::PositionWithDepth(int pixelX, int pixelY, double localz) const
 {
   const vector3_t pos = centerPosition_
-    + (-0.5*sizeX_ + (offsetX_+(0.5+pixelX)*pixelPitchX_)) * directionX_
-    + (-0.5*sizeY_ + (offsetY_+(0.5+pixelY)*pixelPitchY_)) * directionY_
+    + (-0.5*sizeX_ + (offsetX_+(0.5+pixelX)*voxelPitchX_)) * directionX_
+    + (-0.5*sizeY_ + (offsetY_+(0.5+pixelY)*voxelPitchY_)) * directionY_
     + localz * directionZ_;
   return pos;
 }
@@ -115,8 +137,8 @@ vector3_t VRealDetectorUnit::LocalPositionWithDepth(int pixelX, int pixelY, doub
   const vector3_t diry(0.0, 1.0, 0.0);
   const vector3_t dirz(0.0, 0.0, 1.0);
   const vector3_t pos =
-    (-0.5*sizeX_ + (offsetX_+(0.5+pixelX)*pixelPitchX_)) * dirx
-    + (-0.5*sizeY_ + (offsetY_+(0.5+pixelY)*pixelPitchY_)) * diry
+    (-0.5*sizeX_ + (offsetX_+(0.5+pixelX)*voxelPitchX_)) * dirx
+    + (-0.5*sizeY_ + (offsetY_+(0.5+pixelY)*voxelPitchY_)) * diry
     + localz * dirz;
   return pos;
 }
@@ -141,7 +163,7 @@ vector3_t VRealDetectorUnit::PositionError(const vector3_t& localError) const
 PixelID
 VRealDetectorUnit::findPixel(double localx, double localy) const
 {
-  if (pixelPitchX_ <= 0.0 && pixelPitchY_ <= 0.0) {
+  if (voxelPitchX_ <= 0.0 && voxelPitchY_ <= 0.0) {
     return PixelID(PixelID::Undefined, PixelID::Undefined);
   }
   
@@ -150,10 +172,10 @@ VRealDetectorUnit::findPixel(double localx, double localy) const
   const double xReal = localx - detOriginX;
   const double yReal = localy - detOriginY;
   
-  int x = std::floor(xReal/pixelPitchX_);
-  int y = std::floor(yReal/pixelPitchY_);
+  int x = std::floor(xReal/voxelPitchX_);
+  int y = std::floor(yReal/voxelPitchY_);
   
-  if (x<0 || y<0 || x>=numPixelX_ || y>=numPixelY_) {
+  if (x<0 || y<0 || x>=numVoxelX_ || y>=numVoxelY_) {
     x = PixelID::OnMergin;
     y = PixelID::OnMergin;
   }

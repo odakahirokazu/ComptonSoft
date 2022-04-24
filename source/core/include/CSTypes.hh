@@ -34,7 +34,12 @@ typedef CLHEP::HepLorentzVector vector4_t;
 
 enum class ElectrodeSide { Undefined, Anode, Cathode };
 
-enum class DetectorType : int { PixelDetector=1, DoubleSidedStripDetector=2, Scintillator=3 };
+enum class DetectorType : int {
+  PixelDetector=1,
+  DoubleSidedStripDetector=2,
+  Scintillator=3,
+  VoxelDetector=4
+};
 
 using image_t = boost::multi_array<double, 2>;
 
