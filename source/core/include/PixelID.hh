@@ -20,6 +20,8 @@
 #ifndef COMPTONSOFT_PixelID_H
 #define COMPTONSOFT_PixelID_H 1
 
+#include "VoxelID.hh"
+
 namespace comptonsoft {
 
 /**
@@ -27,69 +29,10 @@ namespace comptonsoft {
  *
  * @author Hirokazu Odaka
  * @date 2014-11-11
+ * @date 2022-04-24 | become an alias of VoxelID
  */
-class PixelID
-{
-public:
-  constexpr static int Undefined = -1;
-  constexpr static int OnMergin = -2;
-  constexpr static int OnGuardRing = OnMergin;
-  
-public:
-  PixelID(int x=Undefined, int y=Undefined);
-  ~PixelID();
-  PixelID(const PixelID&) = default;
-  PixelID(PixelID&&) = default;
-  PixelID& operator=(const PixelID&) = default;
-  PixelID& operator=(PixelID&&) = default;
-  
-  int X() const { return x_; }
-  int Y() const { return y_; }
-  void set(int x, int y) { x_=x; y_=y; }
-  void setX(int v) { x_ = v; }
-  void setY(int v) { y_ = v; }
 
-  PixelID combine(const PixelID& pixel)
-  {
-    int newx = (x_>=0) ? x_ : pixel.X();
-    int newy = (y_>=0) ? y_ : pixel.Y();
-    return PixelID(newx, newy);
-  }
-  
-  bool operator==(const PixelID& r) const
-  {
-    return (x_==r.x_ && y_==r.y_);
-  }
-
-  bool operator!=(const PixelID& r) const
-  {
-    return !(x_==r.x_ && y_==r.y_);
-  }
-
-  bool isPixel() const
-  {
-    return x_>=0 && y_>=0;
-  }
-
-  bool isStrip() const
-  {
-    return isXStrip() || isYStrip();
-  }
-
-  bool isXStrip() const
-  {
-    return x_>=0 && y_==PixelID::Undefined;
-  }
-
-  bool isYStrip() const
-  {
-    return y_>=0 && x_==PixelID::Undefined;
-  }
-
-private:
-  int x_ = Undefined;
-  int y_ = Undefined;
-};
+using PixelID = VoxelID;
 
 } /* namespace comptonsoft */
 

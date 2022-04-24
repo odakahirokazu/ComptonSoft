@@ -17,16 +17,16 @@
  *                                                                       *
  *************************************************************************/
 
-#include "PixelID.hh"
+#include "VoxelID.hh"
 
 namespace comptonsoft
 {
 
-PixelID::PixelID(int x, int y)
-  : x_(x), y_(y)
+VoxelID::VoxelID(int x, int y, int z)
+  : x_(x), y_(y), z_(z)
 {
 }
 
-PixelID::~PixelID() = default;
+VoxelID::~VoxelID() = default;
 
 } /* nemespace comptonsoft */
