@@ -220,11 +220,9 @@ ChargeCollectionEfficiency(const PixelID& pixel,
                            double y,
                            double z) const
 {
-  double xPixel, yPixel, zPixel;
-  LocalPosition(pixel, &xPixel, &yPixel, &zPixel);
-  
-  const double xInPixel = x - xPixel;
-  const double yInPixel = y - yPixel;
+  const vector3_t pixelCenter = LocalPosition(pixel);
+  const double xInPixel = x - pixelCenter.x();
+  const double yInPixel = y - pixelCenter.y();
   
   const int ix = CCEMap_->GetXaxis()->FindBin(xInPixel/unit::cm);
   const int iy = CCEMap_->GetYaxis()->FindBin(yInPixel/unit::cm);
@@ -236,11 +234,9 @@ ChargeCollectionEfficiency(const PixelID& pixel,
 double SimDetectorUnit2DPixel::WeightingPotential(const PixelID& pixel,
                                                   double x, double y, double z)
 {
-  double xPixel, yPixel, zPixel;
-  Position(pixel, &xPixel, &yPixel, &zPixel);
-  
-  const double xInPixel = x - xPixel;
-  const double yInPixel = y - yPixel;
+  const vector3_t pixelCenter = LocalPosition(pixel);
+  const double xInPixel = x - pixelCenter.x();
+  const double yInPixel = y - pixelCenter.y();
   
   const int ix = WPMap_->GetXaxis()->FindBin(xInPixel/unit::cm);
   const int iy = WPMap_->GetYaxis()->FindBin(yInPixel/unit::cm);

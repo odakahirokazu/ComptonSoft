@@ -307,18 +307,17 @@ double SimDetectorUnit2DStrip::
 ChargeCollectionEfficiency(const PixelID& sp,
                            const double x, const double y, const double z) const
 {
-  double xPixel, yPixel, zPixel;
-  LocalPosition(sp, &xPixel, &yPixel, &zPixel);
+  const vector3_t pixelCenter = LocalPosition(sp);
   
   double cce = 1.0;
   if (sp.isXStrip()) {
-    const double xInPixel = x - xPixel;
+    const double xInPixel = x - pixelCenter.x();
     const int ix = CCEMapXStrip_->GetXaxis()->FindBin(xInPixel/unit::cm);
     const int iz = CCEMapXStrip_->GetYaxis()->FindBin(z/unit::cm);
     cce =  CCEMapXStrip_->GetBinContent(ix, iz);
   }
   else if (sp.isYStrip()) {
-    const double yInPixel = y - yPixel;
+    const double yInPixel = y - pixelCenter.y();
     const int iy = CCEMapYStrip_->GetXaxis()->FindBin(yInPixel/unit::cm);
     const int iz = CCEMapYStrip_->GetYaxis()->FindBin(z/unit::cm);
     cce =  CCEMapYStrip_->GetBinContent(iy, iz);
@@ -331,19 +330,17 @@ double SimDetectorUnit2DStrip::
 WeightingPotential(const PixelID& sp,
                    const double x, const double y, const double z)
 {
-  double xPixel, yPixel, zPixel;
-  Position(sp, &xPixel, &yPixel, &zPixel);
-  
-  const double xInPixel = x - xPixel;
-  const double yInPixel = y - yPixel;
+  const vector3_t pixelCenter = LocalPosition(sp);
 
   double wp = 0.0;
   if (sp.isXStrip()) {
+    const double xInPixel = x - pixelCenter.x();
     const int ix = WPMapXStrip_->GetXaxis()->FindBin(xInPixel/unit::cm);
     const int iz = WPMapXStrip_->GetYaxis()->FindBin(z/unit::cm);
     wp =  WPMapXStrip_->GetBinContent(ix, iz);
   }
   else if (sp.isYStrip()) {
+    const double yInPixel = y - pixelCenter.y();
     const int iy = WPMapYStrip_->GetXaxis()->FindBin(yInPixel/unit::cm);
     const int iz = WPMapYStrip_->GetYaxis()->FindBin(z/unit::cm);
     wp =  WPMapYStrip_->GetBinContent(iy, iz);
