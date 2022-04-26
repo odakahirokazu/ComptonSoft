@@ -36,26 +36,7 @@ public:
   virtual ~RealDetectorUnit3DVoxel();
 
   DetectorType Type() const override
-  { return DetectorType::PixelDetector; }
-
-  void setReadoutElectrode(ElectrodeSide v)
-  { readoutElectrode_ = v; }
-  ElectrodeSide ReadoutElectrode() const
-  { return readoutElectrode_; }
-  bool isAnodeReadout() const
-  { return ReadoutElectrode()==ElectrodeSide::Anode; }
-  bool isCathodeReadout() const
-  { return ReadoutElectrode()==ElectrodeSide::Cathode; }
-  bool isBottomSideReadout() const
-  {
-    return (ReadoutElectrode()!=ElectrodeSide::Undefined &&
-            ReadoutElectrode()==BottomSideElectrode());
-  }
-  bool isUpSideReadout() const
-  {
-    return (ReadoutElectrode()!=ElectrodeSide::Undefined &&
-            ReadoutElectrode()!=BottomSideElectrode());
-  }
+  { return DetectorType::VoxelDetector; }
 
 protected:
   bool setReconstructionDetails(int mode) override;
@@ -64,9 +45,6 @@ protected:
 
 private:
   void determinePosition(DetectorHitVector& hits) const;
-
-private:
-  ElectrodeSide readoutElectrode_;
 };
 
 } /* namespace comptonsoft */

@@ -33,7 +33,6 @@
 #include "AstroUnits.hh"
 #include "FlagDefinition.hh"
 #include "DetectorHit.hh"
-#include "WeightingPotentialPixel.hh"
 
 namespace unit = anlgeant4::unit;
 
@@ -63,13 +62,6 @@ void SimDetectorUnit3DVoxel::simulatePulseHeights()
 
     if (edep == 0.0) {
       rawhit->addFlags(flag::PrioritySide);
-      if (isAnodeReadout()) {
-        rawhit->addFlags(flag::AnodeSide);
-      }
-      else if (isCathodeReadout()) {
-        rawhit->addFlags(flag::CathodeSide);
-      }
-      
       fillVoxel(rawhit);
       insertSimulatedHit(rawhit);
       continue;
@@ -89,14 +81,7 @@ void SimDetectorUnit3DVoxel::simulatePulseHeights()
       const double edepDivision = edep/numDivision;
       const double energyChargeDivision = energyCharge/numDivision;
       
-      double diffusionSigma = 0.0;
-      if (isAnodeReadout()) {
-        diffusionSigma = DiffusionSigmaAnode(localposz);
-      }
-      else if (isCathodeReadout()) {
-        diffusionSigma = DiffusionSigmaCathode(localposz);
-      }
-
+      const double diffusionSigma = DiffusionSigmaAnode(localposz);
       std::vector<DetectorHit_sptr> diffusionHits;
       for (int l=0; l<numDivision; l++) {
         const double dx = gRandom->Gaus(0.0, diffusionSigma);
@@ -135,12 +120,6 @@ DetectorHit_sptr SimDetectorUnit3DVoxel::generateHit(const DetectorHit& rawhit,
 {
   DetectorHit_sptr hit(new DetectorHit(rawhit));
   hit->addFlags(flag::PrioritySide);
-  if (isAnodeReadout()) {
-    hit->addFlags(flag::AnodeSide);
-  }
-  else if (isCathodeReadout()) {
-    hit->addFlags(flag::CathodeSide);
-  }
     
   if (checkRange(voxel)) {
     hit->setVoxel(voxel);
@@ -169,8 +148,6 @@ DetectorHit_sptr SimDetectorUnit3DVoxel::generateHit(const DetectorHit& rawhit,
 void SimDetectorUnit3DVoxel::printSimulationParameters(std::ostream& os) const
 {
   os << "<SimDetectorUnit3DVoxel>" << '\n'
-     << "Upside anode   : " << isUpSideAnode() << '\n'
-     << "Upside readout : " << isUpSideReadout() << '\n'
      << std::endl;
   DeviceSimulation::printSimulationParameters(os);
 }

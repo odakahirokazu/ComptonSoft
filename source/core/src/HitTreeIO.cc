@@ -52,6 +52,7 @@ void HitTreeIO::defineBranches()
   hittree_->Branch("channel",          &channel_,          "channel/S");
   hittree_->Branch("pixelx",           &pixelx_,           "pixelx/S");
   hittree_->Branch("pixely",           &pixely_,           "pixely/S");
+  hittree_->Branch("pixelz",           &pixelz_,           "pixelz/S");
   hittree_->Branch("rawpha",           &rawpha_,           "rawpha/I");
   hittree_->Branch("pha",              &pha_,              "pha/F");
   hittree_->Branch("epi",              &epi_,              "epi/F");
@@ -108,6 +109,7 @@ void HitTreeIO::setBranchAddresses()
   hittree_->SetBranchAddress("channel",          &channel_);
   hittree_->SetBranchAddress("pixelx",           &pixelx_);
   hittree_->SetBranchAddress("pixely",           &pixely_);
+  hittree_->SetBranchAddress("pixelz",           &pixelz_);
   hittree_->SetBranchAddress("rawpha",           &rawpha_);
   hittree_->SetBranchAddress("pha",              &pha_);
   hittree_->SetBranchAddress("epi",              &epi_);
@@ -166,8 +168,9 @@ void HitTreeIO::fillHits(const int64_t eventID,
     readout_module_ = hit->ReadoutModuleID();
     section_ = hit->ReadoutSection();
     channel_ = hit->ReadoutChannel();
-    pixelx_ = hit->PixelX();
-    pixely_ = hit->PixelY();
+    pixelx_ = hit->VoxelX();
+    pixely_ = hit->VoxelY();
+    pixelz_ = hit->VoxelZ();
     rawpha_ = hit->RawPHA();
     pha_ = hit->PHA();
     epi_ = hit->EPI() / unit::keV;
@@ -215,7 +218,7 @@ DetectorHit_sptr HitTreeIO::retrieveHit() const
   hit->setInstrumentID(instrument_);
   hit->setDetectorChannelID(detector_, det_section_, channel_);
   hit->setReadoutChannelID(readout_module_, section_, channel_);
-  hit->setPixel(pixelx_, pixely_);
+  hit->setVoxel(pixelx_, pixely_, pixelz_);
   hit->setRawPHA(rawpha_);
   hit->setPHA(pha_);
   hit->setEPI(epi_ * unit::keV);

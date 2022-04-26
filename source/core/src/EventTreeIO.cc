@@ -49,6 +49,7 @@ void EventTreeIO::defineBranches()
   tree_->Branch("channel",        channel_.data(),        "channel[num_hits]/S");
   tree_->Branch("pixelx",         pixelx_.data(),         "pixelx[num_hits]/S");
   tree_->Branch("pixely",         pixely_.data(),         "pixely[num_hits]/S");
+  tree_->Branch("pixelz",         pixelz_.data(),         "pixelz[num_hits]/S");
   tree_->Branch("rawpha",         rawpha_.data(),         "rawpha[num_hits]/I");
   tree_->Branch("pha",            pha_.data(),            "pha[num_hits]/F");
   tree_->Branch("epi",            epi_.data(),            "epi[num_hits]/F");
@@ -95,6 +96,7 @@ void EventTreeIO::setBranchAddresses()
   tree_->SetBranchAddress("channel",        channel_.data());
   tree_->SetBranchAddress("pixelx",         pixelx_.data());
   tree_->SetBranchAddress("pixely",         pixely_.data());
+  tree_->SetBranchAddress("pixelz",         pixelz_.data());
   tree_->SetBranchAddress("rawpha",         rawpha_.data());
   tree_->SetBranchAddress("pha",            pha_.data());
   tree_->SetBranchAddress("epi",            epi_.data());
@@ -149,8 +151,9 @@ void EventTreeIO::fillHits(const int64_t eventID,
     readout_module_[i] = hit->ReadoutModuleID();
     section_[i] = hit->ReadoutSection();
     channel_[i] = hit->ReadoutChannel();
-    pixelx_[i] = hit->PixelX();
-    pixely_[i] = hit->PixelY();
+    pixelx_[i] = hit->VoxelX();
+    pixely_[i] = hit->VoxelY();
+    pixelz_[i] = hit->VoxelZ();
     rawpha_[i] = hit->RawPHA();
     pha_[i] = hit->PHA();
     epi_[i] = hit->EPI() / unit::keV;
@@ -199,7 +202,7 @@ DetectorHit_sptr EventTreeIO::retrieveHit(std::size_t i) const
   hit->setInstrumentID(instrument_);
   hit->setDetectorChannelID(detector_[i], det_section_[i], channel_[i]);
   hit->setReadoutChannelID(readout_module_[i], section_[i], channel_[i]);
-  hit->setPixel(pixelx_[i], pixely_[i]);
+  hit->setVoxel(pixelx_[i], pixely_[i], pixelz_[i]);
   hit->setRawPHA(rawpha_[i]);
   hit->setPHA(pha_[i]);
   hit->setEPI(epi_[i] * unit::keV);

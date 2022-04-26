@@ -103,7 +103,7 @@ clMod = [
   ANL::SWIGClass.new("ExtractXrayEventImageFromQuickLookDB", false, "USE_HSQUICKLOOK"),
   ANL::SWIGClass.new("GetInputFilesFromDirectory"),
   ANL::SWIGClass.new("SelectEventsWithDetectorSpectrum"),
-  ANL::SWIGClass.new("AssignSXIGrade"),
+  ANL::SWIGClass.new("AssignSXIGrade", false, "USE_FITSIO"),
   ANL::SWIGClass.new("AEAttitudeCorrection", false, "USE_FITSIO"),
   ANL::SWIGClass.new("SelectEventsWithCelestialSpectrum", false, 'USE_FITSIO'),
   ANL::SWIGClass.new("AEAssignWeightWithResponseMatrix", false, 'USE_FITSIO'),

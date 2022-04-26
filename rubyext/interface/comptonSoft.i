@@ -115,7 +115,9 @@
 #endif
 #include "GetInputFilesFromDirectory.hh"
 #include "SelectEventsWithDetectorSpectrum.hh"
+#ifdef USE_FITSIO
 #include "AssignSXIGrade.hh"
+#endif
 #ifdef USE_FITSIO
 #include "AEAttitudeCorrection.hh"
 #endif
@@ -971,6 +973,7 @@ public:
 };
 
 
+#ifdef USE_FITSIO
 class AssignSXIGrade : public VCSModule
 {
 public:
@@ -978,6 +981,7 @@ public:
   ~AssignSXIGrade();
 };
 
+#endif
 
 #ifdef USE_FITSIO
 class AEAttitudeCorrection : public anlnext::BasicModule

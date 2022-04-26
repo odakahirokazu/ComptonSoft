@@ -329,9 +329,12 @@ private:
 };
 
 inline
-vector3_t VRealDetectorUnit::Position(const PixelID& pixel) const
+vector3_t VRealDetectorUnit::Position(const VoxelID& voxel) const
 {
-  return Position(pixel.X(), pixel.Y());
+  if (voxel.isVoxel()) {
+    return Position(voxel.X(), voxel.Y(), voxel.Z());
+  }
+  return Position(voxel.X(), voxel.Y());
 }
 
 inline
@@ -341,9 +344,12 @@ vector3_t VRealDetectorUnit::PositionWithDepth(const PixelID& pixel, double loca
 }
 
 inline
-vector3_t VRealDetectorUnit::LocalPosition(const PixelID& pixel) const
+vector3_t VRealDetectorUnit::LocalPosition(const VoxelID& voxel) const
 {
-  return LocalPosition(pixel.X(), pixel.Y());
+  if (voxel.isVoxel()) {
+    return LocalPosition(voxel.X(), voxel.Y(), voxel.Z());
+  }
+  return LocalPosition(voxel.X(), voxel.Y());
 }
 
 inline

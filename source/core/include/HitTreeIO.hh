@@ -35,6 +35,7 @@ namespace comptonsoft {
  * @date 2020-09-02 | add error branches
  * @date 2020-11-24 | add the particle branch
  * @date 2020-12-25 | add the track ID branch
+ * @date 2022-04-27 | add the pixel-z
  */
 class HitTreeIO
 {
@@ -77,6 +78,7 @@ private:
   int16_t channel_ = -1;
   int16_t pixelx_ = -1;
   int16_t pixely_ = -1;
+  int16_t pixelz_ = -1;
   int32_t rawpha_ = 0;
   float pha_ = 0.0;
   float epi_ = 0.0;

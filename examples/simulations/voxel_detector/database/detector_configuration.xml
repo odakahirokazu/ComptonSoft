@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="https://raw.githubusercontent.com/odakahirokazu/ComptonSoft/master/xmlstyle/detector_configuration_v6.xsl" ?>
+
+<configuration>
+  <name>LArBox detector</name>
+  <comment>2022-04-27 | Hirokazu Odaka</comment>
+  <length_unit>cm</length_unit>
+  <detectors>
+    <detector id="1" type="3DVoxel" name="Sensor:1">
+      <geometry x="30.0" y="30.0" z="30.0" />
+      <offset x="0.0" y="0.0" z="0.0" />
+      <pixel number_x="100" number_y="100" number_z="300" size_x="0.3" size_y="0.3" size_z="0.1" />
+      <position x="0.0" y="0.0" z="0.0" />
+      <xaxis_direction x="+1.0" y="0.0"  z="0.0" />
+      <yaxis_direction x="0.0"  y="+1.0" z="0.0" />
+      <zaxis_direction x="0.0"  y="0.0" z="+1.0" />
+    </detector>
+  </detectors>
+  <readout />
+  <groups>
+    <group name="Any">
+      <detector id="1" />
+    </group>
+    <hit_pattern name="1hit" short_name="1hit" bit="0">
+      <group name="Any" />
+    </hit_pattern>
+    <hit_pattern name="2hit" short_name="2hit" bit="1">
+      <group name="Any" /><group name="Any" />
+    </hit_pattern>
+    <hit_pattern name="3hit" short_name="3hit" bit="2">
+      <group name="Any" /><group name="Any" /><group name="Any" />
+    </hit_pattern>
+    <hit_pattern name="4hit" short_name="4hit" bit="3">
+      <group name="Any" /><group name="Any" /><group name="Any" /><group name="Any" />
+    </hit_pattern>
+    <hit_pattern name="5hit" short_name="5hit" bit="4">
+      <group name="Any" /><group name="Any" /><group name="Any" /><group name="Any" /><group name="Any" />
+    </hit_pattern>
+    <hit_pattern name="6hit" short_name="6hit" bit="5">
+      <group name="Any" /><group name="Any" /><group name="Any" /><group name="Any" /><group name="Any" /><group name="Any" />
+    </hit_pattern>
+    <hit_pattern name="7hit" short_name="7hit" bit="6">
+      <group name="Any" /><group name="Any" /><group name="Any" /><group name="Any" /><group name="Any" /><group name="Any" /><group name="Any" />
+    </hit_pattern>
+    <hit_pattern name="8hit" short_name="8hit" bit="7">
+      <group name="Any" /><group name="Any" /><group name="Any" /><group name="Any" /><group name="Any" /><group name="Any" /><group name="Any" /><group name="Any" />
+    </hit_pattern>
+  </groups>
+</configuration>

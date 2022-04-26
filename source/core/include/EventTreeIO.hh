@@ -80,6 +80,7 @@ private:
   std::array<int16_t, MaxHits> channel_;
   std::array<int16_t, MaxHits> pixelx_;
   std::array<int16_t, MaxHits> pixely_;
+  std::array<int16_t, MaxHits> pixelz_;
   std::array<int32_t, MaxHits> rawpha_;
   std::array<float, MaxHits> pha_;
   std::array<float, MaxHits> epi_;
