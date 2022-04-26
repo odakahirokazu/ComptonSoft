@@ -200,6 +200,7 @@ public:
 
   bool checkTriggerDiscrimination(double energyCharge, const PixelID& pixel) const;
 
+  void fillVoxel(DetectorHit_sptr hit) const;
   void fillPixel(DetectorHit_sptr hit) const;
 
   virtual void printSimulationParameters(std::ostream& os) const = 0;
@@ -207,7 +208,7 @@ public:
   void insertRawHit(DetectorHit_sptr hit) { RawHits_.push_back(hit); }
 
   void assignLocalDepth(DetectorHit_sptr hit) const;
-  virtual void assignLocalPositionError(DetectorHit_sptr hit) const;
+  void assignLocalPositionError(DetectorHit_sptr hit) const;
 
 protected:
   virtual bool checkRange(const PixelID& pixel) const = 0;

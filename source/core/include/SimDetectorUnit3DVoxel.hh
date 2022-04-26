@@ -17,33 +17,67 @@
  *                                                                       *
  *************************************************************************/
 
-#include "RealDetectorUnitFactory.hh"
-#include "RealDetectorUnit2DPixel.hh"
-#include "RealDetectorUnit2DStrip.hh"
-#include "RealDetectorUnitScintillator.hh"
+#ifndef COMPTONSOFT_SimDetectorUnit3DVoxel_H
+#define COMPTONSOFT_SimDetectorUnit3DVoxel_H 1
+
 #include "RealDetectorUnit3DVoxel.hh"
-#include "MultiChannelData.hh"
+#include "DeviceSimulation.hh"
+
+class TH3D;
 
 namespace comptonsoft {
 
-VRealDetectorUnit* RealDetectorUnitFactory::createDetectorUnit2DPixel()
+/**
+ * A class of a 3D-voxel detector unit including device simulations.
+ * @author Hirokazu Odaka
+ * @date 2022-04-27
+ */
+class SimDetectorUnit3DVoxel
+  : public RealDetectorUnit3DVoxel, public DeviceSimulation
 {
-  return new RealDetectorUnit2DPixel;
+public:
+  SimDetectorUnit3DVoxel();
+  virtual ~SimDetectorUnit3DVoxel();
+
+  void initializeEvent() override;
+
+  void printSimulationParameters(std::ostream& os) const override;
+
+protected:
+  virtual DetectorHit_sptr generateHit(const DetectorHit& rawhit,
+                                       const VoxelID& voxel);
+
+  bool checkRange(const VoxelID& voxel) const override;
+  int IndexOfTable(const VoxelID& voxel) const override;
+  int SizeOfTable() const override;
+  VoxelID TableIndexToPixelID(int index) const override;
+
+private:
+  void simulatePulseHeights() override;
+};
+
+inline bool SimDetectorUnit3DVoxel::checkRange(const VoxelID& voxel) const
+{
+  return ( 0<=voxel.X() && voxel.X()<getNumVoxelX()
+           && 0<=voxel.Y() && voxel.Y()<getNumVoxelY()
+           && 0<=voxel.Z() && voxel.Z()<getNumVoxelZ() );
 }
 
-VRealDetectorUnit* RealDetectorUnitFactory::createDetectorUnit2DStrip()
+inline int SimDetectorUnit3DVoxel::IndexOfTable(const VoxelID&) const
 {
-  return new RealDetectorUnit2DStrip;
+  return 0;
 }
 
-VRealDetectorUnit* RealDetectorUnitFactory::createDetectorUnitScintillator()
+inline int SimDetectorUnit3DVoxel::SizeOfTable() const
 {
-  return new RealDetectorUnitScintillator;
+  return 1;
 }
 
-VRealDetectorUnit* RealDetectorUnitFactory::createDetectorUnit3DVoxel()
+inline VoxelID SimDetectorUnit3DVoxel::TableIndexToPixelID(int) const
 {
-  return new RealDetectorUnit3DVoxel;
+  return VoxelID();
 }
 
 } /* namespace comptonsoft */
+
+#endif /* COMPTONSOFT_SimDetectorUnit3DVoxel_H */

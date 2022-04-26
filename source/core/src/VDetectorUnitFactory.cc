@@ -35,6 +35,9 @@ VRealDetectorUnit* VDetectorUnitFactory::createDetectorUnit(const std::string& t
   else if (type=="Scintillator") {
     detector = createDetectorUnitScintillator();
   }
+  else if (type=="3DVoxel") {
+    detector = createDetectorUnit3DVoxel();
+  }
 
   return detector;
 }
