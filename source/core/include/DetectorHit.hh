@@ -33,6 +33,7 @@
 
 #include "CSTypes.hh"
 #include "ChannelID.hh"
+#include "VoxelID.hh"
 #include "PixelID.hh"
 #include "FlagDefinition.hh"
 
@@ -50,6 +51,7 @@ namespace comptonsoft {
  * @date 2020-09-02 | add errors of energy/position/time
  * @date 2020-11-24 | add particle type
  * @date 2020-12-25 | add track ID
+ * @date 2022-04-25 | introduce a voxel
  */
 class DetectorHit
 {
@@ -103,12 +105,19 @@ public:
   int ReadoutModuleID() const { return readoutChannelID_.ReadoutModule(); }
   int ReadoutSection() const { return readoutChannelID_.Section(); }
   int ReadoutChannel() const { return readoutChannelID_.Channel(); }
- 
-  void setPixel(int x, int y) { pixel_.set(x, y); }
-  void setPixel(const PixelID& v) { pixel_ = v; }
-  int PixelX() const { return pixel_.X(); }
-  int PixelY() const { return pixel_.Y(); }
-  PixelID Pixel() const { return pixel_; }
+
+  void setVoxel(const VoxelID& v) { voxel_ = v; }
+  void setVoxel(int x, int y, int z) { voxel_.set(x, y, z); }
+  int VoxelX() const { return voxel_.X(); }
+  int VoxelY() const { return voxel_.Y(); }
+  int VoxelZ() const { return voxel_.Z(); }
+  VoxelID Voxel() const { return voxel_; }
+
+  void setPixel(int x, int y) { voxel_.set(x, y); }
+  void setPixel(const PixelID& v) { voxel_ = v; }
+  int PixelX() const { return voxel_.X(); }
+  int PixelY() const { return voxel_.Y(); }
+  PixelID Pixel() const { return voxel_; }
 
   void setRawPHA(int32_t v) { rawPHA_ = v; }
   int32_t RawPHA() const { return rawPHA_; }
@@ -220,9 +229,10 @@ public:
   bool isInSameDetector(const DetectorHit& r) const;
 
   /**
-   * check if the given hit occurred in the same pixel or strip.
+   * check if the given hit occurred in the same voxel, pixel or strip.
    */
-  bool isInSamePixel(const DetectorHit& r) const;
+  bool isInSameVoxel(const DetectorHit& r) const;
+  bool isInSamePixel(const DetectorHit& r) const { return isInSameVoxel(r); }
 
   /**
    * check if the given hit occurred in adjacent pixels (or strips).
@@ -243,11 +253,13 @@ public:
   { return (Position()-v).mag2(); }
 
   bool isXStrip() const
-  { return Pixel().isXStrip(); }
+  { return Voxel().isXStrip(); }
   bool isYStrip() const
-  { return Pixel().isYStrip(); }
+  { return Voxel().isYStrip(); }
   bool isPixel() const
-  { return Pixel().isPixel(); }
+  { return Voxel().isPixel(); }
+  bool isVoxel() const
+  { return Voxel().isVoxel(); }
 
   /**
    * merge the given hit to this object. This method is used for merging
@@ -278,7 +290,7 @@ private:
   int instrumentID_ = 0;
   DetectorBasedChannelID detectorChannelID_;
   ReadoutBasedChannelID readoutChannelID_;
-  PixelID pixel_;
+  VoxelID voxel_;
   int32_t rawPHA_ = 0;
   double PHA_ = 0.0;
   double EPI_ = 0.0;
@@ -316,9 +328,9 @@ inline bool DetectorHit::isInSameDetector(const DetectorHit& r) const
            && DetectorID() == r.DetectorID() );
 }
 
-inline bool DetectorHit::isInSamePixel(const DetectorHit& r) const
+inline bool DetectorHit::isInSameVoxel(const DetectorHit& r) const
 {
-  return ( isInSameDetector(r) && Pixel() == r.Pixel() );
+  return ( isInSameDetector(r) && Voxel() == r.Voxel() );
 }
 
 // override new/delete operators
