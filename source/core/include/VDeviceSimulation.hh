@@ -207,7 +207,7 @@ public:
   void insertRawHit(DetectorHit_sptr hit) { RawHits_.push_back(hit); }
 
   void assignLocalDepth(DetectorHit_sptr hit) const;
-  void assignLocalPositionError(DetectorHit_sptr hit) const;
+  virtual void assignLocalPositionError(DetectorHit_sptr hit) const;
 
 protected:
   virtual bool checkRange(const PixelID& pixel) const = 0;

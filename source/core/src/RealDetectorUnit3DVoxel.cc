@@ -17,7 +17,7 @@
  *                                                                       *
  *************************************************************************/
 
-#include "RealDetectorUnit2DPixel.hh"
+#include "RealDetectorUnit3DVoxel.hh"
 #include <list>
 #include <algorithm>
 #include <iterator>
@@ -26,14 +26,14 @@
 
 namespace comptonsoft {
 
-RealDetectorUnit2DPixel::RealDetectorUnit2DPixel()
+RealDetectorUnit3DVoxel::RealDetectorUnit3DVoxel()
   : readoutElectrode_(ElectrodeSide::Undefined)
 {
 }
 
-RealDetectorUnit2DPixel::~RealDetectorUnit2DPixel() = default;
+RealDetectorUnit3DVoxel::~RealDetectorUnit3DVoxel() = default;
 
-bool RealDetectorUnit2DPixel::setReconstructionDetails(int mode)
+bool RealDetectorUnit3DVoxel::setReconstructionDetails(int mode)
 {
   if (mode == 1) {
     // basic reconstruction with clustering
@@ -50,7 +50,7 @@ bool RealDetectorUnit2DPixel::setReconstructionDetails(int mode)
   return true;
 }
 
-void RealDetectorUnit2DPixel::reconstruct(const DetectorHitVector& hitSignals,
+void RealDetectorUnit3DVoxel::reconstruct(const DetectorHitVector& hitSignals,
                                           DetectorHitVector& hitsReconstructed)
 {
   std::transform(hitSignals.begin(), hitSignals.end(),
@@ -67,18 +67,12 @@ void RealDetectorUnit2DPixel::reconstruct(const DetectorHitVector& hitSignals,
   }
 }
 
-void RealDetectorUnit2DPixel::determinePosition(DetectorHitVector& hits) const
+void RealDetectorUnit3DVoxel::determinePosition(DetectorHitVector& hits) const
 {
   for (auto& hit: hits) {
-    const PixelID pixel = hit->Pixel();
-    if (hit->DepthSensingMode()==1) {
-      hit->setPosition(PositionWithDepth(pixel, hit->LocalPositionZ()));
-      hit->setLocalPosition(LocalPositionWithDepth(pixel, hit->LocalPositionZ()));
-    }
-    else {
-      hit->setPosition(Position(pixel));
-      hit->setLocalPosition(LocalPosition(pixel));
-    }
+    const VoxelID voxel = hit->Voxel();
+    hit->setPosition(Position(voxel));
+    hit->setLocalPosition(LocalPosition(voxel));
     hit->setPositionError(PositionError(hit->LocalPositionError()));
   }
 }

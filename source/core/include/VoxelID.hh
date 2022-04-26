@@ -71,6 +71,11 @@ public:
     return !(x_==r.x_ && y_==r.y_ && z_==r.z_);
   }
 
+  bool isVoxel() const
+  {
+    return x_>=0 && y_>=0 && z_>=0;
+  }
+
   bool isPixel() const
   {
     return x_>=0 && y_>=0 && z_==VoxelID::Undefined;

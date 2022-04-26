@@ -113,7 +113,22 @@ DetectorHit& DetectorHit::merge(const DetectorHit& r)
 bool DetectorHit::isAdjacent(const DetectorHit& r, bool contact) const
 {
   if (isInSameDetector(r)) {
-    if (isPixel() && r.isPixel()) {
+    if (isVoxel() && r.isVoxel()) {
+      const int dx = Voxel().X() - r.Voxel().X();
+      const int dy = Voxel().Y() - r.Voxel().Y();
+      const int dz = Voxel().Z() - r.Voxel().Z();
+      if (contact) {
+        return (dx==0 && dy==0 && (dz==-1 || dz==1))
+          || (dy==0 && dz==0 && (dx==-1 || dx==1))
+          || (dz==0 && dx==0 && (dy==-1 || dy==1));
+      }
+      else {
+        if (dx!=0 || dy!=0 || dz!=0) {
+          return (-1<=dx && dx<=1) && (-1<=dy && dy<=1) && (-1<=dz && dz<=1);
+        }
+      }
+    }
+    else if (isPixel() && r.isPixel()) {
       const int dx = Pixel().X() - r.Pixel().X();
       const int dy = Pixel().Y() - r.Pixel().Y();
       if (contact) {
@@ -152,7 +167,7 @@ DetectorHit& DetectorHit::mergeAdjacentSignal(const DetectorHit& r,
       setLocalPosition( 0.5*(LocalPosition()+r.LocalPosition()) );
       setRealPosition( 0.5*(RealPosition()+r.RealPosition()) );
       if (epi0 < epi1) {
-        setPixel(r.Pixel());
+        setVoxel(r.Voxel());
         setPositionError(r.PositionError());
         setLocalPositionError(r.LocalPositionError());
       }
@@ -163,7 +178,7 @@ DetectorHit& DetectorHit::mergeAdjacentSignal(const DetectorHit& r,
       setLocalPosition( (LocalPosition()*epi0 + r.LocalPosition()*epi1)/sumE );
       setRealPosition( (RealPosition()*epi0 + r.RealPosition()*epi1)/sumE );
       if (epi0 < epi1) {
-        setPixel(r.Pixel());
+        setVoxel(r.Voxel());
         setPositionError(r.PositionError());
         setLocalPositionError(r.LocalPositionError());
       }
@@ -172,7 +187,7 @@ DetectorHit& DetectorHit::mergeAdjacentSignal(const DetectorHit& r,
       setPosition(r.Position());
       setLocalPosition(r.LocalPosition());
       setRealPosition(r.RealPosition());
-      setPixel(r.Pixel());
+      setVoxel(r.Voxel());
       setPositionError(r.PositionError());
       setLocalPositionError(r.LocalPositionError());
     }
