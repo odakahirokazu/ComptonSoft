@@ -235,6 +235,15 @@ checkTriggerDiscrimination(double energyCharge, const PixelID& pixel) const
   return (energyForTrigger >= threshold);
 }
 
+void VDeviceSimulation::fillVoxel(DetectorHit_sptr hit) const
+{
+  const double localposx = hit->LocalPositionX();
+  const double localposy = hit->LocalPositionY();
+  const double localposz = hit->LocalPositionZ();
+  const VoxelID voxel = findVoxel(localposx, localposy, localposz);
+  hit->setVoxel(voxel);
+}
+
 void VDeviceSimulation::fillPixel(DetectorHit_sptr hit) const
 {
   const double localposx = hit->LocalPositionX();
@@ -383,9 +392,9 @@ void VDeviceSimulation::assignLocalDepth(DetectorHit_sptr hit) const
 void VDeviceSimulation::assignLocalPositionError(DetectorHit_sptr hit) const
 {
   const double conversionToSigma = 1.0/std::sqrt(12.0);
-  const double dx = getPixelPitchX()*conversionToSigma;
-  const double dy = getPixelPitchY()*conversionToSigma;
-  const double dz = (DepthSensingMode()==1) ? DepthResolution() : (getThickness()*conversionToSigma);
+  const double dx = getVoxelPitchX()*conversionToSigma;
+  const double dy = getVoxelPitchY()*conversionToSigma;
+  const double dz = (DepthSensingMode()==1) ? DepthResolution() : (getVoxelPitchZ()*conversionToSigma);
   hit->setLocalPositionError(dx, dy, dz);
 }
 
