@@ -411,10 +411,14 @@ loadDCDetectorNode(const boost::property_tree::ptree& DetectorNode,
   {
     const optional<double> offset_x = DetectorNode.get_optional<double>("offset.<xmlattr>.x");
     const optional<double> offset_y = DetectorNode.get_optional<double>("offset.<xmlattr>.y");
-    if (offset_x && offset_y) {
+    const optional<double> offset_z = DetectorNode.get_optional<double>("offset.<xmlattr>.z");
+    if (offset_x && offset_y && offset_z) {
+      detector->setOffset((*offset_x)*LengthUnit, (*offset_y)*LengthUnit, (*offset_z)*LengthUnit);
+    }
+    else if (offset_x && offset_y) {
       detector->setOffset((*offset_x)*LengthUnit, (*offset_y)*LengthUnit);
     }
-    else if (offset_x==boost::none && offset_y==boost::none) {
+    else if (offset_x==boost::none && offset_y==boost::none && offset_z==boost::none) {
       std::cout << format("Warning: default pixel offsets are used for Detector ID: %d") % detector->getID() << std::endl;
     }
     else {
@@ -428,13 +432,19 @@ loadDCDetectorNode(const boost::property_tree::ptree& DetectorNode,
   {
     const optional<int> number_x = DetectorNode.get_optional<int>("pixel.<xmlattr>.number_x");
     const optional<int> number_y = DetectorNode.get_optional<int>("pixel.<xmlattr>.number_y");
+    const optional<int> number_z = DetectorNode.get_optional<int>("pixel.<xmlattr>.number_z");
     const optional<double> size_x = DetectorNode.get_optional<double>("pixel.<xmlattr>.size_x");
     const optional<double> size_y = DetectorNode.get_optional<double>("pixel.<xmlattr>.size_y");
-    if (number_x && number_y && size_x && size_y) {
+    const optional<double> size_z = DetectorNode.get_optional<double>("pixel.<xmlattr>.size_z");
+    if (number_x && number_y && number_z && size_x && size_y && size_z) {
+      detector->setNumVoxel(*number_x, *number_y, *number_z);
+      detector->setVoxelPitch((*size_x)*LengthUnit, (*size_y)*LengthUnit, (*size_z)*LengthUnit);
+    }
+    else if (number_x && number_y && size_x && size_y) {
       detector->setNumPixel(*number_x, *number_y);
       detector->setPixelPitch((*size_x)*LengthUnit, (*size_y)*LengthUnit);
     }
-    else if (number_x==boost::none && number_y==boost::none && size_x==boost::none && size_y==boost::none) {
+    else if (number_x==boost::none && number_y==boost::none && number_z==boost::none && size_x==boost::none && size_y==boost::none && size_z==boost::none) {
       std::cout << format("Warning: default pixel settings are used for Detector ID: %d") % detector->getID() << std::endl;
     }
     else {

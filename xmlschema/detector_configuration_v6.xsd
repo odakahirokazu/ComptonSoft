@@ -1,0 +1,152 @@
+<?xml version="1.0"?>
+
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:element name="configuration">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="name" type="xs:string" />
+        <xs:element name="comment" type="xs:string" minOccurs="0" maxOccurs="unbounded" />
+        <xs:element name="length_unit" type="xs:string" />
+        <xs:element name="detectors" type="detectors_type" />
+        <xs:element name="readout" type="readout_type" />
+        <xs:element name="groups" type="groups_type" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:complexType name="detectors_type">
+    <xs:sequence>
+      <xs:element name="detector" type="detector_type" minOccurs="0" maxOccurs="unbounded" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="detector_type">
+    <xs:group ref="detector_type_contents" />
+    <xs:attribute name="id" type="xs:integer" use="required" />
+    <xs:attribute name="type" type="xs:string" use="required" />
+    <xs:attribute name="name" type="xs:string" use="required" />
+  </xs:complexType>
+  <xs:group name="detector_type_contents">
+    <xs:sequence>
+      <xs:element name="geometry" minOccurs="0" maxOccurs="1">
+        <xs:complexType>
+          <xs:attribute name="x" type="xs:decimal" use="required" />
+          <xs:attribute name="y" type="xs:decimal" use="required" />
+          <xs:attribute name="z" type="xs:decimal" use="required" />
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="offset" minOccurs="0" maxOccurs="1">
+        <xs:complexType>
+          <xs:attribute name="x" type="xs:decimal" use="required" />
+          <xs:attribute name="y" type="xs:decimal" use="required" />
+          <xs:attribute name="z" type="xs:decimal" use="optional" />
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="pixel" minOccurs="0" maxOccurs="1">
+        <xs:complexType>
+          <xs:attribute name="number_x" type="xs:integer" use="required" />
+          <xs:attribute name="number_y" type="xs:integer" use="required" />
+          <xs:attribute name="number_z" type="xs:integer" use="optional" />
+          <xs:attribute name="size_x" type="xs:decimal" use="required" />
+          <xs:attribute name="size_y" type="xs:decimal" use="required" />
+          <xs:attribute name="size_z" type="xs:decimal" use="optional" />
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="position" minOccurs="0" maxOccurs="1">
+        <xs:complexType>
+          <xs:attribute name="x" type="xs:decimal" use="required" />
+          <xs:attribute name="y" type="xs:decimal" use="required" />
+          <xs:attribute name="z" type="xs:decimal" use="required" />
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="xaxis_direction" minOccurs="0" maxOccurs="1">
+        <xs:complexType>
+          <xs:attribute name="x" type="xs:decimal" use="required" />
+          <xs:attribute name="y" type="xs:decimal" use="required" />
+          <xs:attribute name="z" type="xs:decimal" use="required" />
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="yaxis_direction" minOccurs="0" maxOccurs="1">
+        <xs:complexType>
+          <xs:attribute name="x" type="xs:decimal" use="required" />
+          <xs:attribute name="y" type="xs:decimal" use="required" />
+          <xs:attribute name="z" type="xs:decimal" use="required" />
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="zaxis_direction" minOccurs="0" maxOccurs="1">
+        <xs:complexType>
+          <xs:attribute name="x" type="xs:decimal" use="required" />
+          <xs:attribute name="y" type="xs:decimal" use="required" />
+          <xs:attribute name="z" type="xs:decimal" use="required" />
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="energy_priority" minOccurs="0" maxOccurs="1">
+        <xs:complexType>
+          <xs:attribute name="electrode_side" type="xs:string" use="required" />
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="sections" minOccurs="0" maxOccurs="1">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="section" minOccurs="0" maxOccurs="unbounded">
+              <xs:complexType>
+                <xs:attribute name="num_channels" type="xs:integer" use="required" />
+                <xs:attribute name="electrode_side" type="xs:string" use="required" />
+              </xs:complexType>
+            </xs:element>
+            <xs:element name="frame" minOccurs="0" maxOccurs="1">
+              <xs:complexType>
+                <xs:attribute name="electrode_side" type="xs:string" use="optional" />
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:group>
+  <xs:complexType name="readout_type">
+    <xs:sequence>
+      <xs:element name="module" minOccurs="0" maxOccurs="unbounded">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="section" minOccurs="0" maxOccurs="unbounded">
+              <xs:complexType>
+                <xs:attribute name="detector_id" type="xs:integer" use="required" />
+                <xs:attribute name="section" type="xs:integer" use="required" />
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+          <xs:attribute name="id" type="xs:integer" use="required" />
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="groups_type">
+    <xs:sequence>
+      <xs:element name="group" minOccurs="0" maxOccurs="unbounded">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="detector" minOccurs="1" maxOccurs="unbounded">
+              <xs:complexType>
+                <xs:attribute name="id" type="xs:integer" use="required" />
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+          <xs:attribute name="name" type="xs:string" use="required" />
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="hit_pattern" minOccurs="0" maxOccurs="unbounded">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="group" minOccurs="1" maxOccurs="unbounded">
+              <xs:complexType>
+                <xs:attribute name="name" type="xs:string" use="required" />
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+          <xs:attribute name="name" type="xs:string" use="required" />
+          <xs:attribute name="short_name" type="xs:string" use="required" />
+          <xs:attribute name="bit" type="xs:integer" use="required" />
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+</xs:schema>
