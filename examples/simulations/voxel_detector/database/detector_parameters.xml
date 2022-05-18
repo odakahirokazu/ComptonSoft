@@ -10,11 +10,12 @@
     <sensitive_detector type="3DVoxel" name="LArBox.log">
       <common>
         <parameters>
+          <upside anode="1" readout="1" />
           <quenching factor="0.6" />
           <temperature value="87.0" />
           <charge_collection mode="0" />
-          <diffusion mode="0">
-            <spread_factor anode="1.0" />
+          <diffusion mode="2">
+            <constant anode="0.01" />
           </diffusion>
           <channel_properties>
             <disable status="0" />
@@ -22,7 +23,7 @@
             <compensation factor="1.0" />
             <threshold value="25.0" />
           </channel_properties>
-          <reconstruction mode="1" />
+          <reconstruction mode="2" />
         </parameters>
       </common>
       <detector_list id_method="path" layer_offset="1">

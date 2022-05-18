@@ -38,8 +38,10 @@
 #include "SimDetectorUnitFactory.hh"
 #include "RealDetectorUnit2DPixel.hh"
 #include "RealDetectorUnit2DStrip.hh"
+#include "RealDetectorUnit3DVoxel.hh"
 #include "SimDetectorUnit2DPixel.hh"
 #include "SimDetectorUnit2DStrip.hh"
+#include "SimDetectorUnit3DVoxel.hh"
 #include "MultiChannelData.hh"
 #include "FrameData.hh"
 #include "GainFunctionCubic.hh"
@@ -955,14 +957,21 @@ void DetectorSystem::setupDetectorParameters(const DetectorSystem::ParametersNod
   }
 
   if (ds->checkType(DetectorType::PixelDetector)) {
-    if (auto upside_pixel = parameters.upside_pixel) {
+    boost::optional<int> upside_readout;
+    if (parameters.upside_readout) {
+      upside_readout = parameters.upside_readout;
+    }
+    if (parameters.upside_pixel) {
+      upside_readout = parameters.upside_pixel;
+    }
+    if (upside_readout) {
       SimDetectorUnit2DPixel* ds1
         = dynamic_cast<SimDetectorUnit2DPixel*>(ds);
       if (ds1) {
-        if (*upside_pixel == 1) {
+        if (*upside_readout == 1) {
           ds1->setReadoutElectrode(ds1->UpSideElectrode());
         }
-        else if (*upside_pixel == 0) {
+        else if (*upside_readout == 0) {
           ds1->setReadoutElectrode(ds1->BottomSideElectrode());
         }
       }
@@ -979,6 +988,21 @@ void DetectorSystem::setupDetectorParameters(const DetectorSystem::ParametersNod
         }
         else if (*upside_xstrip == 0) {
           ds1->setXStripSideElectrode(ds1->BottomSideElectrode());
+        }
+      }
+    }
+  }
+
+  if (ds->checkType(DetectorType::VoxelDetector)) {
+    if (auto upside_readout = parameters.upside_readout) {
+      SimDetectorUnit3DVoxel* ds1
+        = dynamic_cast<SimDetectorUnit3DVoxel*>(ds);
+      if (ds1) {
+        if (*upside_readout == 1) {
+          ds1->setReadoutElectrode(ds1->UpSideElectrode());
+        }
+        else if (*upside_readout == 0) {
+          ds1->setReadoutElectrode(ds1->BottomSideElectrode());
         }
       }
     }
@@ -1280,6 +1304,9 @@ load(const boost::property_tree::ptree& node)
   
   if (auto o=node.get_optional<int>("upside.<xmlattr>.anode")) {
     upside_anode = o;
+  }
+  if (auto o=node.get_optional<int>("upside.<xmlattr>.readout")) {
+    upside_readout = o;
   }
   if (auto o=node.get_optional<int>("upside.<xmlattr>.pixel")) {
     upside_pixel = o;
