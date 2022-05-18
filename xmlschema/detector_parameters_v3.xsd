@@ -80,6 +80,7 @@
       <xs:element name="upside" minOccurs="0" maxOccurs="1">
         <xs:complexType>
           <xs:attribute name="anode" type="xs:integer" />
+          <xs:attribute name="readout" type="xs:integer" />
           <xs:attribute name="pixel" type="xs:integer" />
           <xs:attribute name="xstrip" type="xs:integer" />
         </xs:complexType>

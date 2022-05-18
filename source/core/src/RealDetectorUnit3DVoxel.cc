@@ -27,7 +27,7 @@
 namespace comptonsoft {
 
 RealDetectorUnit3DVoxel::RealDetectorUnit3DVoxel()
-{
+  : readoutElectrode_(ElectrodeSide::Undefined){
 }
 
 RealDetectorUnit3DVoxel::~RealDetectorUnit3DVoxel() = default;

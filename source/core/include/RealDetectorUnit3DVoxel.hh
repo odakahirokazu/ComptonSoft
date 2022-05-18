@@ -38,6 +38,25 @@ public:
   DetectorType Type() const override
   { return DetectorType::VoxelDetector; }
 
+  void setReadoutElectrode(ElectrodeSide v)
+  { readoutElectrode_ = v; }
+  ElectrodeSide ReadoutElectrode() const
+  { return readoutElectrode_; }
+  bool isAnodeReadout() const
+  { return ReadoutElectrode()==ElectrodeSide::Anode; }
+  bool isCathodeReadout() const
+  { return ReadoutElectrode()==ElectrodeSide::Cathode; }
+  bool isBottomSideReadout() const
+  {
+    return (ReadoutElectrode()!=ElectrodeSide::Undefined &&
+            ReadoutElectrode()==BottomSideElectrode());
+  }
+  bool isUpSideReadout() const
+  {
+    return (ReadoutElectrode()!=ElectrodeSide::Undefined &&
+            ReadoutElectrode()!=BottomSideElectrode());
+  }
+
 protected:
   bool setReconstructionDetails(int mode) override;
   void reconstruct(const DetectorHitVector& hitSignals,
@@ -45,6 +64,9 @@ protected:
 
 private:
   void determinePosition(DetectorHitVector& hits) const;
+
+private:
+  ElectrodeSide readoutElectrode_;
 };
 
 } /* namespace comptonsoft */

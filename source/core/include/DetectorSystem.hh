@@ -82,6 +82,7 @@ public:
   struct ParametersNodeContents
   {
     boost::optional<int> upside_anode = boost::none;
+    boost::optional<int> upside_readout = boost::none;
     boost::optional<int> upside_pixel = boost::none;
     boost::optional<int> upside_xstrip = boost::none;
     boost::optional<int> depth_sensing_mode = boost::none;
