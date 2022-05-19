@@ -34,7 +34,6 @@
 
 // gamma
 #include "G4PhotoElectricEffect.hh"
-#include "G4LivermorePolarizedPhotoElectricModel.hh"
 
 #include "G4ComptonScattering.hh"
 #include "G4LivermorePolarizedComptonModel.hh"
@@ -82,7 +81,6 @@
 
 #include "G4hIonisation.hh"
 #include "G4ionIonisation.hh"
-#include "G4alphaIonisation.hh"
 #include "G4IonParametrisedLossModel.hh"
 #include "G4NuclearStopping.hh"
 
