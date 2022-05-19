@@ -35,7 +35,7 @@ void BasicComptonEvent::setHit1(int hitID, const DetectorHit_sptr& hit)
   hit1Process_ = hit->Process();
   hit1DetectorChannelID_ = hit->DetectorChannelID();
   hit1ReadoutChannelID_ = hit->ReadoutChannelID();
-  hit1Pixel_ = hit->Pixel();
+  hit1Voxel_ = hit->Voxel();
   hit1Time_ = hit->Time();
   hit1Position_ = hit->Position();
   hit1Energy_ = hit->Energy();
@@ -51,7 +51,7 @@ void BasicComptonEvent::setHit2(int hitID, const DetectorHit_sptr& hit)
   hit2Process_ = hit->Process();
   hit2DetectorChannelID_ = hit->DetectorChannelID();
   hit2ReadoutChannelID_ = hit->ReadoutChannelID();
-  hit2Pixel_ = hit->Pixel();
+  hit2Voxel_ = hit->Voxel();
   hit2Time_ = hit->Time();
   hit2Position_ = hit->Position();
   hit2Energy_ = hit->Energy();
@@ -76,7 +76,7 @@ void BasicComptonEvent::swap()
   std::swap(hit1Process_, hit2Process_);
   std::swap(hit1DetectorChannelID_, hit2DetectorChannelID_);
   std::swap(hit1ReadoutChannelID_, hit2ReadoutChannelID_);
-  std::swap(hit1Pixel_, hit2Pixel_);
+  std::swap(hit1Voxel_, hit2Voxel_);
   std::swap(hit1Time_, hit2Time_);
   std::swap(hit1Position_, hit2Position_);
   std::swap(hit1Energy_, hit2Energy_);

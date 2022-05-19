@@ -24,7 +24,7 @@
 #include <memory>
 #include "CSTypes.hh"
 #include "ChannelID.hh"
-#include "PixelID.hh"
+#include "VoxelID.hh"
 #include "DetectorHit_sptr.hh"
 
 namespace comptonsoft {
@@ -37,6 +37,7 @@ namespace comptonsoft {
  * @date 2020-07-02 | add properties: total energy deposit, escape flag, reconstructed order, reconstruction fraction
  * @date 2020-07-08 | rename TotalEnergy() -> IncidentEnergy()
  * @date 2020-09-02 | add errors of energy/position
+ * @date 2022-05-19 | pixel -> voxel
  */
 class BasicComptonEvent
 {
@@ -59,7 +60,7 @@ public:
   DetectorBasedChannelID Hit1DetectorChannelID() const { return hit1DetectorChannelID_; }
   int32_t Hit1DetectorID() const { return hit1DetectorChannelID_.Detector(); }
   ReadoutBasedChannelID Hit1ReadoutChannelID() const { return hit1ReadoutChannelID_; }
-  PixelID Hit1Pixel() const { return hit1Pixel_; }
+  VoxelID Hit1Voxel() const { return hit1Voxel_; }
   double Hit1Time() const { return hit1Time_; }
   vector3_t Hit1Position() const { return hit1Position_; }
   double Hit1PositionX() const { return hit1Position_.x(); }
@@ -78,7 +79,7 @@ public:
   DetectorBasedChannelID Hit2DetectorChannelID() const { return hit2DetectorChannelID_; }
   int32_t Hit2DetectorID() const { return hit2DetectorChannelID_.Detector(); }
   ReadoutBasedChannelID Hit2ReadoutChannelID() const { return hit2ReadoutChannelID_; }
-  PixelID Hit2Pixel() const { return hit2Pixel_; }
+  VoxelID Hit2Voxel() const { return hit2Voxel_; }
   double Hit2Time() const { return hit2Time_; }
   vector3_t Hit2Position() const { return hit2Position_; }
   double Hit2PositionX() const { return hit2Position_.x(); }
@@ -99,8 +100,8 @@ public:
   { hit1DetectorChannelID_ = v; bCalc_ = false; }
   void setHit1ReadoutChannelID(const ReadoutBasedChannelID& v)
   { hit1ReadoutChannelID_ = v; bCalc_ = false; }
-  void setHit1Pixel(const PixelID& v) { hit1Pixel_ = v; bCalc_ = false; }
-  void setHit1Pixel(int x, int y) { hit1Pixel_.set(x, y); bCalc_ = false; }
+  void setHit1Voxel(const VoxelID& v) { hit1Voxel_ = v; bCalc_ = false; }
+  void setHit1Voxel(int x, int y, int z) { hit1Voxel_.set(x, y, z); bCalc_ = false; }
   void setHit1Time(double v) { hit1Time_ = v; bCalc_ = false; }
   void setHit1Position(const vector3_t& v) { hit1Position_ = v; bCalc_ = false; }
   void setHit1Position(double x, double y, double z)
@@ -119,8 +120,8 @@ public:
   { hit2DetectorChannelID_ = v; bCalc_ = false; }
   void setHit2ReadoutChannelID(const ReadoutBasedChannelID& v)
   { hit2ReadoutChannelID_ = v; bCalc_ = false; }
-  void setHit2Pixel(const PixelID& v) { hit2Pixel_ = v; bCalc_ = false; }
-  void setHit2Pixel(int x, int y) { hit2Pixel_.set(x, y); bCalc_ = false; }
+  void setHit2Voxel(const VoxelID& v) { hit2Voxel_ = v; bCalc_ = false; }
+  void setHit2Voxel(int x, int y, int z) { hit2Voxel_.set(x, y, z); bCalc_ = false; }
   void setHit2Time(double v) { hit2Time_ = v; bCalc_ = false; }
   void setHit2Position(const vector3_t& v) { hit2Position_ = v; bCalc_ = false; }
   void setHit2Position(double x, double y, double z)
@@ -207,7 +208,7 @@ private:
   uint32_t hit1Process_ = 0;
   DetectorBasedChannelID hit1DetectorChannelID_;
   ReadoutBasedChannelID hit1ReadoutChannelID_;
-  PixelID hit1Pixel_{0, 0};
+  VoxelID hit1Voxel_{0, 0, 0};
   double hit1Time_ = 0.0;
   vector3_t hit1Position_{0.0, 0.0, 0.0};
   double hit1Energy_ = 0.0;
@@ -219,7 +220,7 @@ private:
   uint32_t hit2Process_ = 0;
   DetectorBasedChannelID hit2DetectorChannelID_;
   ReadoutBasedChannelID hit2ReadoutChannelID_;
-  PixelID hit2Pixel_{0, 0};
+  VoxelID hit2Voxel_{0, 0, 0};
   double hit2Time_ = 0.0;
   vector3_t hit2Position_{0.0, 0.0, 0.0};
   double hit2Energy_ = 0.0;
