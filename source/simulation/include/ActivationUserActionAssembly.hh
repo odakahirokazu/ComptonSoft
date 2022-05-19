@@ -23,7 +23,6 @@
 #include "StandardUserActionAssembly.hh"
 
 #include <cstdint>
-#include <memory>
 #include <vector>
 #include <map>
 
@@ -48,6 +47,7 @@ namespace comptonsoft {
  * @date 2017-04-25 | Hiro Odaka | support both detection methods
  * @date 2017-07-29 | Hiro Odaka | new design of VUserActionAssembly
  * @date 2017-07-29 | Hiro Odaka | use floating level of isotope.
+ * @date 2022-05-20 | Hiro Odaka | Geant4-v11: The analysis manager is not owned by this class.
  */
 class ActivationUserActionAssembly : public anlgeant4::StandardUserActionAssembly
 {
@@ -80,7 +80,7 @@ protected:
   std::string VolumeName(int index);
   
 private:
-  std::unique_ptr<G4VAnalysisManager> m_AnalysisManager;
+  G4VAnalysisManager* m_AnalysisManager = nullptr;
   std::string m_FilenameBase;
   bool m_DetectionByGeneration;
   std::vector<std::string> m_ProcessesToDetect;

@@ -37,6 +37,6 @@ G4VPhysicalVolume* GDMLDetectorConstruction::Construct()
   G4GDMLParser parser;
   parser.Read(m_GeometryFileName, m_Validate);
   G4VPhysicalVolume* world = parser.GetWorldVolume();
-  world->GetLogicalVolume()->SetVisAttributes(G4VisAttributes::Invisible);
+  world->GetLogicalVolume()->SetVisAttributes(G4VisAttributes::GetInvisible());
   return world;
 }
