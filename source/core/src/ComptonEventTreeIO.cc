@@ -48,6 +48,7 @@ void ComptonEventTreeIO::defineBranches()
   cetree_->Branch("hit1_channel", &hit1_channel_, "hit1_channel/S");
   cetree_->Branch("hit1_pixelx", &hit1_pixelx_, "hit1_pixelx/S");
   cetree_->Branch("hit1_pixely", &hit1_pixely_, "hit1_pixely/S");
+  cetree_->Branch("hit1_pixelz", &hit1_pixelz_, "hit1_pixelz/S");
 
   cetree_->Branch("hit1_time", &hit1_time_, "hit1_time/F");
   cetree_->Branch("hit1_posx", &hit1_posx_, "hit1_posx/F");
@@ -68,6 +69,7 @@ void ComptonEventTreeIO::defineBranches()
   cetree_->Branch("hit2_channel", &hit2_channel_, "hit2_channel/S");
   cetree_->Branch("hit2_pixelx", &hit2_pixelx_, "hit2_pixelx/S");
   cetree_->Branch("hit2_pixely", &hit2_pixely_, "hit2_pixely/S");
+  cetree_->Branch("hit2_pixelz", &hit2_pixelz_, "hit2_pixelz/S");
 
   cetree_->Branch("hit2_time", &hit2_time_, "hit2_time/F");
   cetree_->Branch("hit2_posx", &hit2_posx_, "hit2_posx/F");
@@ -111,6 +113,7 @@ void ComptonEventTreeIO::setBranchAddresses()
   cetree_->SetBranchAddress("hit1_channel", &hit1_channel_);
   cetree_->SetBranchAddress("hit1_pixelx", &hit1_pixelx_);
   cetree_->SetBranchAddress("hit1_pixely", &hit1_pixely_);
+  cetree_->SetBranchAddress("hit1_pixelz", &hit1_pixelz_);
 
   cetree_->SetBranchAddress("hit1_time", &hit1_time_);
   cetree_->SetBranchAddress("hit1_posx", &hit1_posx_);
@@ -131,6 +134,7 @@ void ComptonEventTreeIO::setBranchAddresses()
   cetree_->SetBranchAddress("hit2_channel", &hit2_channel_);
   cetree_->SetBranchAddress("hit2_pixelx", &hit2_pixelx_);
   cetree_->SetBranchAddress("hit2_pixely", &hit2_pixely_);
+  cetree_->SetBranchAddress("hit2_pixelz", &hit2_pixelz_);
 
   cetree_->SetBranchAddress("hit2_time", &hit2_time_);
   cetree_->SetBranchAddress("hit2_posx", &hit2_posx_);
@@ -175,9 +179,10 @@ void ComptonEventTreeIO::fillEvent(const int64_t eventID,
   hit1_readout_module_ = hit1ReadoutChannelID.ReadoutModule();
   hit1_section_ = hit1ReadoutChannelID.Section();
   hit1_channel_ = hit1ReadoutChannelID.Channel();
-  const PixelID hit1Pixel = event.Hit1Pixel();
-  hit1_pixelx_ = hit1Pixel.X();
-  hit1_pixely_ = hit1Pixel.Y();
+  const VoxelID hit1Voxel = event.Hit1Voxel();
+  hit1_pixelx_ = hit1Voxel.X();
+  hit1_pixely_ = hit1Voxel.Y();
+  hit1_pixelz_ = hit1Voxel.Z();
 
   hit1_time_ = event.Hit1Time() / unit::second;
   const vector3_t hit1Position = event.Hit1Position();
@@ -200,9 +205,10 @@ void ComptonEventTreeIO::fillEvent(const int64_t eventID,
   hit2_readout_module_ = hit2ReadoutChannelID.ReadoutModule();
   hit2_section_ = hit2ReadoutChannelID.Section();
   hit2_channel_ = hit2ReadoutChannelID.Channel();
-  const PixelID hit2Pixel = event.Hit2Pixel();
-  hit2_pixelx_ = hit2Pixel.X();
-  hit2_pixely_ = hit2Pixel.Y();
+  const VoxelID hit2Voxel = event.Hit2Voxel();
+  hit2_pixelx_ = hit2Voxel.X();
+  hit2_pixely_ = hit2Voxel.Y();
+  hit2_pixelz_ = hit2Voxel.Z();
 
   hit2_time_ = event.Hit2Time() / unit::second;
   const vector3_t hit2Position = event.Hit2Position();
@@ -263,7 +269,7 @@ void ComptonEventTreeIO::retrieveEvent(BasicComptonEvent& event) const
   event.setHit1ReadoutChannelID(ReadoutBasedChannelID(hit1_readout_module_,
                                                       hit1_section_,
                                                       hit1_channel_));
-  event.setHit1Pixel(hit1_pixelx_, hit1_pixely_);
+  event.setHit1Voxel(hit1_pixelx_, hit1_pixely_, hit1_pixelz_);
   event.setHit1Time(hit1_time_ * unit::second);
   event.setHit1Position(hit1_posx_ * unit::cm, hit1_posy_ * unit::cm, hit1_posz_ * unit::cm);
   event.setHit1Energy(hit1_energy_ * unit::keV);
@@ -277,7 +283,7 @@ void ComptonEventTreeIO::retrieveEvent(BasicComptonEvent& event) const
   event.setHit2ReadoutChannelID(ReadoutBasedChannelID(hit2_readout_module_,
                                                       hit2_section_,
                                                       hit2_channel_));
-  event.setHit2Pixel(hit2_pixelx_, hit2_pixely_);
+  event.setHit2Voxel(hit2_pixelx_, hit2_pixely_, hit2_pixelz_);
   event.setHit2Time(hit2_time_ * unit::second);
   event.setHit2Position(hit2_posx_ * unit::cm, hit2_posy_ * unit::cm, hit2_posz_ * unit::cm);
   event.setHit2Energy(hit2_energy_ * unit::keV);

@@ -37,6 +37,7 @@ namespace comptonsoft {
  * @date 2020-07-09 | new properties
  * @date 2020-09-02 | add error branches
  * @date 2020-11-20 | change the types of reconstruction_fraction and likelihood
+ * @date 2022-05-19 | add hit1-/hit2-pixelz
  */
 class ComptonEventTreeIO
 {
@@ -80,6 +81,7 @@ private:
   int16_t hit1_channel_ = 0;
   int16_t hit1_pixelx_ = 0;
   int16_t hit1_pixely_ = 0;
+  int16_t hit1_pixelz_ = 0;
   float hit1_time_ = 0.0;
   float hit1_posx_ = 0.0;
   float hit1_posy_ = 0.0;
@@ -99,6 +101,7 @@ private:
   int16_t hit2_channel_ = 0;
   int16_t hit2_pixelx_ = 0;
   int16_t hit2_pixely_ = 0;
+  int16_t hit2_pixelz_ = 0;
   float hit2_time_ = 0.0;
   float hit2_posx_ = 0.0;
   float hit2_posy_ = 0.0;
