@@ -4,6 +4,7 @@
 - Updated: 2020-05-29 小高裕和
 - Updated: 2020-07-01 小高裕和
 - Updated: 2021-04-07 小高裕和
+- Updated: 2022-05-24 小高裕和
 
 本文章はMacにComptonSoftをインストールする標準的な方法を解説する。
 MacOS標準のシェルであるzshを使っていると仮定する。（その他のシェルを使う場合は、適宜同等の操作に読みかえること）
@@ -26,8 +27,8 @@ https://github.com/odakahirokazu/ComptonSoft/blob/master/documentation/installat
 
 ### 開発環境の整備
 
-1. MacOSを最新版にする。(11.2.3 on 2021-04-07)
-2. Xcode (Mac標準の開発環境) をApp Storeからインストールする。(12.4 on 2021-04-07)
+1. MacOSを最新版にする。(12.4 on 2022-05-24)
+2. Xcode (Mac標準の開発環境) をApp Storeからインストールする。(13.4 on 2022-05-27)
 3. Xcodeのインストールが完了したら、アプリケーションを実行し、自動的に出てくる追加インストールを行う。完了したらXcodeは終了する。
 4. Command Line Toolsをインストールする。(ターミナルから次を実行)
 ```    
@@ -88,7 +89,7 @@ Macには標準でRubyがインストールされているが、システムを�
 公式ページからソースコードを取得し、ビルドする。
 
 1. http://geant4.web.cern.ch/support/download_archive
-のSource filesからダウンロード(ファイル名: `geant4.10.07.p01.tar.gz`)
+のSource filesからダウンロード(ファイル名: `geant4-v11.0.1.tar.gz`)
 2. Geant4をインストールするディレクトリを作る。例: Software/geant4
 ```
     $ mkdir -p Software/geant4
@@ -96,22 +97,21 @@ Macには標準でRubyがインストールされているが、システムを�
 ```
 3. ここにソースファイルを持ってきて展開する。`<...>`は適切に置き換えること。
 ```
-    $ mv <somewhere>/geant4.10.07.p01.tar.gz .
-    $ tar xfvz geant4.10.07.p01.tar.gz
+    $ mv <somewhere>/geant4-v11.0.1.tar.gz .
+    $ tar xfvz geant4-v11.0.1.tar.gz
 ```
-これでディレクトリ`geant4.10.07.p01`ができる。
+これでディレクトリ`geant4-v11.0.1`ができる。
 4. 以下のようにコマンドで、ビルド・インストールを行う。cmakeのお勧めオプションを付けてある。`make`は`make -jN`としても良い (補足参照)。
 ```
-    $ mkdir geant4.10.07.p01-build
-    $ cd geant4.10.07.p01-build
-    $ cmake ../geant4.10.07.p01 \
-            -DCMAKE_INSTALL_PREFIX=../geant4.10.07.p01-install \
+    $ mkdir geant4-v11.0.1-build
+    $ cd geant4-v11.0.1-build
+    $ cmake ../geant4-v11.0.1 \
+            -DCMAKE_INSTALL_PREFIX=../geant4-v11.0.1-install \
             -DCMAKE_PREFIX_PATH=/usr/local/opt/qt5 \
             -DGEANT4_USE_GDML=ON \
             -DGEANT4_USE_QT=ON \
             -DGEANT4_USE_OPENGL_X11=ON \
-            -DGEANT4_USE_RAYTRACER_X11=ON \
-            -DGEANT4_USE_NETWORKDAWN=ON
+            -DGEANT4_USE_RAYTRACER_X11=ON
     $ make
     $ make install
 ```
@@ -126,12 +126,12 @@ Macには標準でRubyがインストールされているが、システムを�
 6. データディレクトリへのシンボリックリンクの作成。
 ```
     $ cd Software/geant4
-    $ cd geant4.10.07.p01-install/share/Geant4-10.7.1
+    $ cd geant4-v11.0.1-install/share/Geant4-11.0.1
     $ ln -s ../../../data .
 ```
 7. 環境変数の設定。.zshrcに以下を記述。インストール先が異なる場合は適宜読みかえること。
 ```
-    export G4INSTALL=<somewhere>/Software/geant4/geant4.10.05.p01-install
+    export G4INSTALL=<somewhere>/Software/geant4/geant4-v11.0.1-install
     cd $G4INSTALL/bin
     . ./geant4.sh; export DYLD_LIBRARY_PATH=''
     cd -
@@ -152,10 +152,10 @@ $ pwd
 <somewhere>/Software/geant4
 $ ls -1
 data/
-geant4.10.07.p01/
-geant4.10.07.p01-build/
-geant4.10.07.p01-install/
-geant4.10.07.p01.tar.gz
+geant4-v11.0.1/
+geant4-v11.0.1-build/
+geant4-v11.0.1-install/
+geant4-v11.0.1.tar.gz
 ```
 
 

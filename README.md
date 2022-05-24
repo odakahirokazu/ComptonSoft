@@ -1,7 +1,7 @@
 Compton Soft
 ================================================================
 
-- Version: 5.12.0
+- Version: 5.13.0
 - Author: Hirokazu Odaka
 
 ----
@@ -20,6 +20,10 @@ This software provides
 This software package can be used for wide-range applications of radiation
 measurements: X-/gamma-ray astrophysics, nuclear medicine, and imaging
 search for radioactive sources.
+
+### Version 5.12
+
+Simulation output format (hittree/eventtree) has changed since version 5.11. It has new branches: pixelz denoting index of a voxel along z-axis.
 
 ### Version 5.9
 
