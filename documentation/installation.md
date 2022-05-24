@@ -17,15 +17,15 @@ Installation | Compton Soft
 ### (1) C++ compliler
 
 ### (2) [CMake](http://www.cmake.org/) (Cross platform make)
-*We recommend version 3.6.1 or later.*
+*We recommend version 3.20.0 or later.*
 
 This package uses CMake to generate building scripts such as Makefiles.
 
 ### (3) [Boost C++ library](http://www.boost.org/)
-*We recommend version 1.61.0 or later*
+*We recommend version 1.70.0 or later*
 
 ### (4) [ANL Next framework](https://github.com/odakahirokazu/ANLNext)
-*version 2.1.0 or later*
+*version 2.1.2 or later*
 
 Compton Soft uses the ANL Next framework. ANL Next is a framework for
 constructing software that performs event-by-event analysis, which usually
@@ -42,7 +42,7 @@ You can find
 of ANL Next.
 
 ### (5) [Geant4](http://geant4.cern.ch/)
-*version 10.5*
+*version 11.0*
 
 A toolkit library for Monte Carlo simulations.
 Following building options are required:
@@ -64,7 +64,7 @@ Example of running cmake:
       ../geant4.10.04.p02
 
 ### (6) [ROOT](http://root.cern.ch/)
-*We recommend version 6.06 or later.*
+*We recommend version 6.26 or later.*
 
 A data analysis framework.
 
