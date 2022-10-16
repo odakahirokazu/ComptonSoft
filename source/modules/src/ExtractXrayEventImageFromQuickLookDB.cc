@@ -143,7 +143,7 @@ void ExtractXrayEventImageFromQuickLookDB::setLatestAnalysisId()
 
   auto cursor = db_[collectionName_].aggregate(p, mongocxx::options::aggregate{});
 
-  analysisId_ = (*cursor.begin())["analysis_id"].get_utf8().value.to_string();
+  analysisId_ = (*cursor.begin())["analysis_id"].get_string().value.to_string();
 }
 
 } /* namespace comptonsoft */

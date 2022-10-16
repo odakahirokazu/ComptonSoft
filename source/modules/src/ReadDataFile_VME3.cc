@@ -136,6 +136,7 @@ ANLStatus ReadDataFile_VME3::mod_analyze()
   unixtime += static_cast<int>(*(p++))<<24;
   setTime(unixtime);
 
+#if 0
   ULong64_t eventid = 0;
   eventid += static_cast<ULong64_t>(*(p++))<<0;
   eventid += static_cast<ULong64_t>(*(p++))<<8;
@@ -145,6 +146,7 @@ ANLStatus ReadDataFile_VME3::mod_analyze()
   eventid += static_cast<ULong64_t>(*(p++))<<40;
   eventid += static_cast<ULong64_t>(*(p++))<<48;
   eventid += static_cast<ULong64_t>(*(p++))<<56;
+#endif
 
   DetectorSystem* detectorManager = getDetectorManager();
   for (auto& readoutModule: detectorManager->getReadoutModules()) {
