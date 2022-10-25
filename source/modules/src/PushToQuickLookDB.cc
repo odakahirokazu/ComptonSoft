@@ -128,7 +128,7 @@ void PushToQuickLookDB::pushImagesToDB()
   }
   
   auto block = block_open << bsoncxx::builder::stream::finalize;
-  builder.addBlock(block_name, block);
+  builder.addSection(block_name, block);
 
   auto doc = builder.generate();
   mongodb_->push(collection_, doc);
