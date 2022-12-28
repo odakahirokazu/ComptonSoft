@@ -17,8 +17,8 @@
  *                                                                       *
  *************************************************************************/
 
-#ifndef COMPTONSOFT_HY2020EventReconstructionAlgorithm_H
-#define COMPTONSOFT_HY2020EventReconstructionAlgorithm_H 1
+#ifndef COMPTONSOFT_TangoAlgorithm_H
+#define COMPTONSOFT_TangoAlgorithm_H 1
 
 #include "VEventReconstructionAlgorithm.hh"
 #include "TString.h"
@@ -32,17 +32,17 @@ namespace comptonsoft {
  * @author Hiroki Yoneda
  * @date 2020-11-18 | Hiroki Yoneda
  * @date 2021-01-04 | Hirokazu Odaka | code cleanup
- * @date 2022-12-28 | Hiroki Yoneda | code cleanup
+ * @date 2022-12-28 | Hiroki Yoneda | review
  */
-class HY2020EventReconstructionAlgorithm : public VEventReconstructionAlgorithm
+class TangoAlgorithm : public VEventReconstructionAlgorithm
 {
 public:
-  HY2020EventReconstructionAlgorithm();
-  virtual ~HY2020EventReconstructionAlgorithm();
-  HY2020EventReconstructionAlgorithm(const HY2020EventReconstructionAlgorithm&) = default;
-  HY2020EventReconstructionAlgorithm(HY2020EventReconstructionAlgorithm&&) = default;
-  HY2020EventReconstructionAlgorithm& operator=(const HY2020EventReconstructionAlgorithm&) = default;
-  HY2020EventReconstructionAlgorithm& operator=(HY2020EventReconstructionAlgorithm&&) = default;
+  TangoAlgorithm();
+  virtual ~TangoAlgorithm();
+  TangoAlgorithm(const TangoAlgorithm&) = default;
+  TangoAlgorithm(TangoAlgorithm&&) = default;
+  TangoAlgorithm& operator=(const TangoAlgorithm&) = default;
+  TangoAlgorithm& operator=(TangoAlgorithm&&) = default;
 
   void initializeEvent() override;
 
@@ -73,7 +73,7 @@ protected:
                               double incident_energy,
                               bool is_escape_event = false);
 
-  double calLikelihood(const std::vector<DetectorHit_sptr>& ordered_hits,
+  double calFOM(const std::vector<DetectorHit_sptr>& ordered_hits,
                        double incident_energy,
                        bool is_escape_event);
 
@@ -89,15 +89,23 @@ private:
   double probCompton(double gammaray_energy_before_hit, double path_length);
   double probComptonFirst(double gammaray_energy_before_hit);
   double probAbsorption(double gammaray_energy_before_hit, double path_length);
-  double probEscape(double gammaray_energy_before_lasthit, double energy_deposit_lasthit);
+  double probEscapeSimple(double gammaray_energy_before_lasthit, double energy_deposit_lasthit);
+  double probEscapeOriginal(double gammaray_energy_before_lasthit, double energy_deposit_lasthit, const vector3_t position_last, const vector3_t position_second_from_last);
+  double compScatteringAngle(const std::vector<DetectorHit_sptr>& ordered_hits, int i_hit, double incident_energy, bool is_escape_event);
+  double compScatteringAngleWithInitialDirection(const std::vector<DetectorHit_sptr>& ordered_hits, double incident_energy, bool is_escape_event);
 
 private:
   double sigma_level_energy_margin_for_checkScatteringAngle_;
   int process_mode;
-  int edepcalc_mode;
+  int FOM_function_type;
   bool assume_initial_gammaray_energy;
   double known_initial_gammaray_energy;
+  bool assume_initial_direction;
+  vector3_t known_initial_direction;
   bool use_averaged_escaped_energy;
+  bool ignore_out_of_costheta_candidate;
+  bool use_original_escape_length_calc = false; // this is just for the paper.
+  bool use_costheta;
 
   double total_energy_deposits_;
   double num_hits_;
@@ -125,9 +133,11 @@ private:
   TGraph* tg_cross_section_tot_;
 
   bool selecting_maximum_likelihood_order_ = true;
-  bool kinematics_check_ = true;
+
+  bool ignore_length_inverse_square = true;
+  bool Kroger_mode = false; // to compare Kroger et al. 2002 
 };
 
 } /* namespace comptonsoft */
 
-#endif /* COMPTONSOFT_HY2020EventReconstructionAlgorithm_H */
+#endif /* COMPTONSOFT_TangoAlgorithm_H */

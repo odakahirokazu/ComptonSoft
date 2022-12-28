@@ -120,10 +120,10 @@ bool estimateEscapedEnergy(const std::vector<DetectorHit_sptr>& ordered_hits,
   const vector3_t scattering_direction_at_lastsecondpoint = ordered_hits[num_hits - 1]->Position() - ordered_hits[num_hits - 2]->Position();
 
   const double cos_theta_geom = cosThetaGeometry(incident_direction_at_lastsecondpoint, scattering_direction_at_lastsecondpoint);
-  const double scattered_energy_at_lasesecondpoint = scatteredGammarayEnergyFromEdep(ordered_hits[num_hits-2]->Energy(), cos_theta_geom);
+  const double scattered_energy_at_lastsecondpoint = scatteredGammarayEnergyFromEdep(ordered_hits[num_hits-2]->Energy(), cos_theta_geom);
 
-  if (scattered_energy_at_lasesecondpoint > 0 && scattered_energy_at_lasesecondpoint > ordered_hits[num_hits - 1]->Energy()) {
-    escaped_energy = scattered_energy_at_lasesecondpoint - ordered_hits[num_hits - 1]->Energy();
+  if (scattered_energy_at_lastsecondpoint > 0 && scattered_energy_at_lastsecondpoint > ordered_hits[num_hits - 1]->Energy()) {
+    escaped_energy = scattered_energy_at_lastsecondpoint - ordered_hits[num_hits - 1]->Energy();
     return true;
   }
 
@@ -144,9 +144,9 @@ bool estimateAveragedEscapedEnergy(const std::vector<DetectorHit_sptr>& ordered_
     const vector3_t scattering_direction_at_lastsecondpoint = ordered_hits[i_hit]->Position() - ordered_hits[i_hit - 1]->Position();
 
     const double cos_theta_geom = cosThetaGeometry(incident_direction_at_lastsecondpoint, scattering_direction_at_lastsecondpoint);
-    const double scattered_energy_at_lasesecondpoint = scatteredGammarayEnergyFromEdep(ordered_hits[i_hit - 1]->Energy(), cos_theta_geom);
+    const double scattered_energy_at_lastsecondpoint = scatteredGammarayEnergyFromEdep(ordered_hits[i_hit - 1]->Energy(), cos_theta_geom);
     
-    double escaped_energy = scattered_energy_at_lasesecondpoint;
+    double escaped_energy = scattered_energy_at_lastsecondpoint;
     for(int j_hit = i_hit; j_hit < num_hits; ++j_hit){
         escaped_energy -= ordered_hits[j_hit]->Energy();
     }

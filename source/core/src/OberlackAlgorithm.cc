@@ -17,7 +17,7 @@
  *                                                                       *
  *************************************************************************/
 
-#include "HY2020EventReconstructionAlgorithm.hh"
+#include "OberlackAlgorithm.hh"
 #include <algorithm>
 #include <cmath>
 #include "AstroUnits.hh"
@@ -31,18 +31,16 @@ namespace comptonsoft {
 
 using namespace compton_constraints;
 
-HY2020EventReconstructionAlgorithm::HY2020EventReconstructionAlgorithm()
+OberlackAlgorithm::OberlackAlgorithm()
   : sigma_level_energy_margin_for_checkScatteringAngle_(5.0),
-    process_mode(0), // 0: assume full deposit & escapoe simul, 1: first assume full dep, if no order is OK, then assume escape, 2: only full deposit, 3: only escape
-    edepcalc_mode(1), // 0: use the detected energy, 1: use the detected position
+    process_mode(2), // 0: assume full deposit & escapoe simul, 1: first assume full dep, if no order is OK, then assume escape, 2: only full deposit, 3: only escape
     assume_initial_gammaray_energy(false),
     known_initial_gammaray_energy(1000.0 * unit::keV),
+    assume_initial_direction(false),
     use_averaged_escaped_energy(true),
     par0_energy_resolution_(5.0),
     par1_energy_resolution_(0.5),
     par2_energy_resolution_(0.0),
-    detector_length_scale(15.0), // cm
-    escape_length_scale(15.0), // cm
     consider_position_resolution(true),
     position_resolution_x_(0.2 * unit::cm),
     position_resolution_y_(0.2 * unit::cm),
@@ -50,38 +48,39 @@ HY2020EventReconstructionAlgorithm::HY2020EventReconstructionAlgorithm()
     escape_weight_(1.0),
     cross_section_filename_("crosssection.root")
 {
-  setParameterFile("parfile_HY2020.json");
+  setParameterFile("parfile_Oberlack.json");
 }
 
-HY2020EventReconstructionAlgorithm::~HY2020EventReconstructionAlgorithm() = default;
+OberlackAlgorithm::~OberlackAlgorithm() = default;
 
-bool HY2020EventReconstructionAlgorithm::loadParameters(boost::property_tree::ptree& pt)
+bool OberlackAlgorithm::loadParameters(boost::property_tree::ptree& pt)
 {
-  sigma_level_energy_margin_for_checkScatteringAngle_ = pt.get<double>("HY2020.sigma_level_energy_margin_for_checkScatteringAngle");
-  process_mode = pt.get<int>("HY2020.process_mode");
-
+  sigma_level_energy_margin_for_checkScatteringAngle_ = pt.get<double>("Oberlack.sigma_level_energy_margin_for_checkScatteringAngle");
+  process_mode = pt.get<int>("Oberlack.process_mode");
+  assume_initial_gammaray_energy = pt.get<bool>("Oberlack.assume_initial_gammaray_energy");
+  known_initial_gammaray_energy = pt.get<double>("Oberlack.known_initial_gammaray_energy") * unit::keV;
+  use_averaged_escaped_energy = pt.get<bool>("Oberlack.use_averaged_escaped_energy");
+  par0_energy_resolution_ = pt.get<double>("Oberlack.energy_resolution.par0");
+  par1_energy_resolution_ = pt.get<double>("Oberlack.energy_resolution.par1");
+  par2_energy_resolution_ = pt.get<double>("Oberlack.energy_resolution.par2");
+  consider_position_resolution = pt.get<bool>("Oberlack.consider_position_resolution");
+  position_resolution_x_ = pt.get<double>("Oberlack.position_resolution.x") * unit::cm;
+  position_resolution_y_ = pt.get<double>("Oberlack.position_resolution.y") * unit::cm;
+  position_resolution_z_ = pt.get<double>("Oberlack.position_resolution.z") * unit::cm;
+    
   try{
-    if(pt.get<int>("HY2020.edepcalc_mode") == 0 || pt.get<int>("HY2020.edepcalc_mode") == 1){
-      edepcalc_mode = pt.get<int>("HY2020.edepcalc_mode");
+    assume_initial_direction = pt.get<bool>("Oberlack.assume_initial_direction");
+    if(assume_initial_direction){
+      known_initial_direction.set( pt.get<double>("Oberlack.known_initial_direction.x"),
+                                   pt.get<double>("Oberlack.known_initial_direction.y"),
+                                   pt.get<double>("Oberlack.known_initial_direction.z") );
     }
-  }catch(...){
+  }catch (...){
 
   }
 
-  assume_initial_gammaray_energy = pt.get<bool>("HY2020.assume_initial_gammaray_energy");
-  known_initial_gammaray_energy = pt.get<double>("HY2020.known_initial_gammaray_energy") * unit::keV;
-  use_averaged_escaped_energy = pt.get<bool>("HY2020.use_averaged_escaped_energy");
-  detector_length_scale = pt.get<double>("HY2020.detector_length_scale");
-  escape_length_scale = pt.get<double>("HY2020.escape_length_scale");
-  par0_energy_resolution_ = pt.get<double>("HY2020.energy_resolution.par0");
-  par1_energy_resolution_ = pt.get<double>("HY2020.energy_resolution.par1");
-  par2_energy_resolution_ = pt.get<double>("HY2020.energy_resolution.par2");
-  consider_position_resolution = pt.get<bool>("HY2020.consider_position_resolution");
-  position_resolution_x_ = pt.get<double>("HY2020.position_resolution.x") * unit::cm;
-  position_resolution_y_ = pt.get<double>("HY2020.position_resolution.y") * unit::cm;
-  position_resolution_z_ = pt.get<double>("HY2020.position_resolution.z") * unit::cm;
-  escape_weight_ = pt.get<double>("HY2020.escape_weight");
-  cross_section_filename_ = pt.get<std::string>("HY2020.cross_section_filename");
+  escape_weight_ = pt.get<double>("Oberlack.escape_weight");
+  cross_section_filename_ = pt.get<std::string>("Oberlack.cross_section_filename");
   
   cross_section_file_ = new TFile(cross_section_filename_.c_str(), "r");
   tg_cross_section_compton_ = (TGraph*)cross_section_file_->Get("compton");
@@ -90,17 +89,14 @@ bool HY2020EventReconstructionAlgorithm::loadParameters(boost::property_tree::pt
   tg_cross_section_tot_ = (TGraph*)cross_section_file_->Get("tot_wo_coherent");
 
   std::cout << std::endl;
-  std::cout << "--- HY2020 ---" << std::endl;
+  std::cout << "--- Oberlack ---" << std::endl;
   std::cout << "sigma_level_energy_margin_for_checkScatteringAngle_ : " << sigma_level_energy_margin_for_checkScatteringAngle_ << std::endl;
   std::cout << "process_mode : " << process_mode << std::endl;
-  std::cout << "edepcalc_mode: " << edepcalc_mode << std::endl;
   std::cout << "assume_initial_gammaray_energy : " << assume_initial_gammaray_energy << std::endl;
   if (assume_initial_gammaray_energy) {
     std::cout << "known_initial_gammaray_energy (keV) : " << known_initial_gammaray_energy / unit::keV << std::endl;
   }
   std::cout << "use_averaged_escaped_energy : " << use_averaged_escaped_energy << std::endl;
-  std::cout << "detector_length_scale (cm) : " << detector_length_scale << std::endl;
-  std::cout << "escape_length_scale (cm) : " << escape_length_scale << std::endl;
   std::cout << "par0_energy_resolution_ : " << par0_energy_resolution_ << std::endl;
   std::cout << "par1_energy_resolution_ : " << par1_energy_resolution_ << std::endl;
   std::cout << "par2_energy_resolution_ : " << par2_energy_resolution_ << std::endl;
@@ -111,16 +107,26 @@ bool HY2020EventReconstructionAlgorithm::loadParameters(boost::property_tree::pt
     std::cout << "position_resolution_y_ (cm) : " << position_resolution_y_ / unit::cm << std::endl;
     std::cout << "position_resolution_z_ (cm) : " << position_resolution_z_ / unit::cm << std::endl;
   }
+  if (assume_initial_direction) {
+    std::cout << "assume_initial_direction : " << assume_initial_direction << std::endl;
+    std::cout << "known_initial_direction (x) : " << known_initial_direction.x() << std::endl;
+    std::cout << "known_initial_direction (y) : " << known_initial_direction.y() << std::endl;
+    std::cout << "known_initial_direction (z) : " << known_initial_direction.z() << std::endl;
+  }
   std::cout << "escape_weight: " << escape_weight_ << std::endl;
+
+  if(Kroger_mode){
+    std::cout << "!!!WARNING!!! Kroger_mode is set to TRUE !!!" << std::endl;
+  }
 
   return true;
 }
 
-void HY2020EventReconstructionAlgorithm::initializeEvent()
+void OberlackAlgorithm::initializeEvent()
 {
 }
 
-bool HY2020EventReconstructionAlgorithm::
+bool OberlackAlgorithm::
 reconstruct(const std::vector<DetectorHit_sptr>& hits,
             const BasicComptonEvent& baseEvent,
             std::vector<BasicComptonEvent_sptr>& eventsReconstructed)
@@ -150,7 +156,7 @@ reconstruct(const std::vector<DetectorHit_sptr>& hits,
   return false;
 }
 
-bool HY2020EventReconstructionAlgorithm::
+bool OberlackAlgorithm::
 reconstructFullDepositEvent(const std::vector<DetectorHit_sptr>& hits,
                             const BasicComptonEvent& baseEvent,
                             std::vector<BasicComptonEvent_sptr>& eventsReconstructed)
@@ -175,6 +181,17 @@ reconstructFullDepositEvent(const std::vector<DetectorHit_sptr>& hits,
     if (assume_initial_gammaray_energy){
       this_result = reconstructOrderedHits(ordered_hits, *eventReconstructed, known_initial_gammaray_energy);
     }
+    if (Kroger_mode){
+      double escaped_energy = 0.0;
+      if (use_averaged_escaped_energy) {
+        this_result = estimateAveragedEscapedEnergy(ordered_hits, escaped_energy);
+      } else {
+        this_result = estimateEscapedEnergy(ordered_hits, escaped_energy);
+      }
+      if (!this_result) { continue; }
+      const double corrected_total_energy = total_energy_deposits_ + escaped_energy;
+      this_result = reconstructOrderedHits(ordered_hits, *eventReconstructed, corrected_total_energy);
+    }
     else{
       this_result = reconstructOrderedHits(ordered_hits, *eventReconstructed, total_energy_deposits_);
     }
@@ -191,7 +208,7 @@ reconstructFullDepositEvent(const std::vector<DetectorHit_sptr>& hits,
   return result;
 }
 
-bool HY2020EventReconstructionAlgorithm::
+bool OberlackAlgorithm::
 reconstructEscapeEvent(const std::vector<DetectorHit_sptr>& hits,
                        const BasicComptonEvent& baseEvent,
                        std::vector<BasicComptonEvent_sptr>& eventsReconstructed)
@@ -223,10 +240,7 @@ reconstructEscapeEvent(const std::vector<DetectorHit_sptr>& hits,
       } else {
         this_result = estimateEscapedEnergy(ordered_hits, escaped_energy);
       }
-      if (!this_result) { 
-        ++reconstructedOrder;
-        continue; 
-      }
+      if (!this_result) { continue; }
       const double corrected_total_energy = total_energy_deposits_ + escaped_energy;
       this_result = reconstructOrderedHits(ordered_hits, *eventReconstructed, corrected_total_energy, true);
     }
@@ -243,7 +257,7 @@ reconstructEscapeEvent(const std::vector<DetectorHit_sptr>& hits,
   return result;
 }
 
-bool HY2020EventReconstructionAlgorithm::
+bool OberlackAlgorithm::
 reconstructOrderedHits(const std::vector<DetectorHit_sptr>& ordered_hits,
                        BasicComptonEvent& eventReconstructed,
                        double incident_energy,
@@ -263,8 +277,8 @@ reconstructOrderedHits(const std::vector<DetectorHit_sptr>& ordered_hits,
     if (!is_this_scattering_acceptable) { return false; }
   }
 
-  double likelihood_ = calLikelihood(ordered_hits, incident_energy, is_escape_event);
-  if (likelihood_ == 0.0) { return false; }
+  double FOM_ = calFOM(ordered_hits, incident_energy, is_escape_event);
+  if (FOM_ == 0.0) { return false; }
 
   eventReconstructed.setHit1(0, ordered_hits[0]);
   eventReconstructed.setHit2(1, ordered_hits[1]);
@@ -272,91 +286,59 @@ reconstructOrderedHits(const std::vector<DetectorHit_sptr>& ordered_hits,
   eventReconstructed.setNumberOfHits(num_hits_);
   eventReconstructed.setEscapeFlag(is_escape_event);
   eventReconstructed.setTotalEnergyDeposit(total_energy_deposits_);
-  eventReconstructed.setLikelihood(likelihood_);
+  eventReconstructed.setLikelihood(FOM_);
 
-  const double this_reconstruction_fraction = likelihood_;
+  const double this_reconstruction_fraction = FOM_;
   eventReconstructed.setReconstructionFraction(this_reconstruction_fraction);
 
   return true;
 }
 
-double HY2020EventReconstructionAlgorithm::
-calLikelihood(const std::vector<DetectorHit_sptr>& ordered_hits,
-              double incident_energy,
-              bool is_escape_event) 
+double OberlackAlgorithm::
+calFOM(const std::vector<DetectorHit_sptr>& ordered_hits,
+       double incident_energy,
+       bool is_escape_event) 
 {
-  double likelihood_ = 1.0;
+  double FOM_ = 1.0;
 
   double gammaray_energy_before_ihit = incident_energy;
   for (int i_hit = 0; i_hit < num_hits_; ++i_hit) {
     if (i_hit == 0) {
       double cos_theta_first_scattering = cosThetaKinematics( incident_energy, 
                                                               ordered_hits[0]->Energy() ); 
-      if(kinematics_check_){
-        if (cos_theta_first_scattering < -1.0 || 1.0 < cos_theta_first_scattering) {
-          likelihood_ = 0.0;
-          break;
-        }
+      if (cos_theta_first_scattering < -1.0 || 1.0 < cos_theta_first_scattering) {
+        FOM_ = 0.0;
+        break;
       }
       
-      double sigma_energy = getEnergyResolution(ordered_hits[0]->Energy());
-      likelihood_ *= probComptonFirst(gammaray_energy_before_ihit);
-      likelihood_ *= normalized_differentialCrossSection( incident_energy, cos_theta_first_scattering );
-      likelihood_ *= probEnergyDetection( ordered_hits[0]->Energy(), ordered_hits[0]->Energy(), sigma_energy);
+      if(assume_initial_direction){
+        FOM_ *= compScatteringAngleWithInitialDirection(ordered_hits, incident_energy, is_escape_event); 
+      }
 
       gammaray_energy_before_ihit -= ordered_hits[0]->Energy();
     }
     else if (i_hit == num_hits_ - 1) {
-      double path_length = (ordered_hits[i_hit]->Position() - ordered_hits[i_hit - 1]->Position()).mag() / unit::cm;
-      if ( is_escape_event ) {
-        likelihood_ *= probCompton(gammaray_energy_before_ihit, path_length);
-        likelihood_ *= probEscape(gammaray_energy_before_ihit, ordered_hits[i_hit]->Energy());
-      }
-      else {
-        double sigma_energy = getEnergyResolution(gammaray_energy_before_ihit);
-        likelihood_ *= probAbsorption(gammaray_energy_before_ihit, path_length);
-        likelihood_ *= probEnergyDetection( gammaray_energy_before_ihit, ordered_hits[i_hit]->Energy(), sigma_energy); 
-      }
+
     }
     else {
-      double path_length = (ordered_hits[i_hit]->Position() - ordered_hits[i_hit - 1]->Position()).mag() / unit::cm;
-      double cos_theta_geom = cosThetaGeometry(ordered_hits[i_hit]->Position() - ordered_hits[i_hit - 1]->Position(),
-                                               ordered_hits[i_hit + 1]->Position() - ordered_hits[i_hit]->Position());
-      double energy_deposit = energyDeposit(gammaray_energy_before_ihit, cos_theta_geom);
+      FOM_ *= compScatteringAngle(ordered_hits, i_hit, incident_energy, is_escape_event); 
 
-      double sigma_energy = getEnergyResolution(energy_deposit);
-      if (consider_position_resolution) {
-        double sigma_energy_by_position_error = std::pow(gammaray_energy_before_ihit - energy_deposit, 2) / CLHEP::electron_mass_c2
-                                              * getErrorCosThetaGeom(ordered_hits[i_hit]->Position() - ordered_hits[i_hit - 1]->Position(),
-                                                                     ordered_hits[i_hit + 1]->Position() - ordered_hits[i_hit]->Position());
-        sigma_energy = std::sqrt(std::pow(sigma_energy, 2) + std::pow(sigma_energy_by_position_error, 2));
-      }
-
-      likelihood_ *= probCompton(gammaray_energy_before_ihit, path_length);
-      likelihood_ *= normalized_differentialCrossSection(gammaray_energy_before_ihit, cos_theta_geom);
-      likelihood_ *= probEnergyDetection(energy_deposit, ordered_hits[i_hit]->Energy(), sigma_energy); 
-      
-      if(edepcalc_mode == 0){
-        gammaray_energy_before_ihit -= ordered_hits[i_hit]->Energy();
-      }
-      else if(edepcalc_mode == 1){
-        gammaray_energy_before_ihit -= energy_deposit;
-      }
+      gammaray_energy_before_ihit -= ordered_hits[i_hit]->Energy();
     }
   }
   
-  if (is_escape_event) { likelihood_ *= escape_weight_; }
+  if (is_escape_event) { FOM_ *= escape_weight_; }
 
-  return likelihood_;
+  return FOM_;
 }
 
-void HY2020EventReconstructionAlgorithm::setTotalEnergyDepositsAndNumHits(const std::vector<DetectorHit_sptr>& hits)
+void OberlackAlgorithm::setTotalEnergyDepositsAndNumHits(const std::vector<DetectorHit_sptr>& hits)
 {
   total_energy_deposits_ = total_energy_deposits(hits);
   num_hits_ = hits.size();
 }
 
-void HY2020EventReconstructionAlgorithm::normalizeReconstructionFraction(std::vector<BasicComptonEvent_sptr>& eventsReconstructed)
+void OberlackAlgorithm::normalizeReconstructionFraction(std::vector<BasicComptonEvent_sptr>& eventsReconstructed)
 {
   double sum_reconstruction_fraction = 0.0;
   for (std::size_t i = 0; i < eventsReconstructed.size(); ++i) {
@@ -367,7 +349,7 @@ void HY2020EventReconstructionAlgorithm::normalizeReconstructionFraction(std::ve
   }
 }
 
-void HY2020EventReconstructionAlgorithm::selectMaximumLikelihoodOrder(std::vector<BasicComptonEvent_sptr>& eventsReconstructed)
+void OberlackAlgorithm::selectMaximumLikelihoodOrder(std::vector<BasicComptonEvent_sptr>& eventsReconstructed)
 {
   using event_t = BasicComptonEvent_sptr;
   const event_t event_yielding_maximum_likelihood =
@@ -378,16 +360,21 @@ void HY2020EventReconstructionAlgorithm::selectMaximumLikelihoodOrder(std::vecto
                       });
   eventsReconstructed.clear();
   eventsReconstructed.push_back(event_yielding_maximum_likelihood);
+  if( std::isnan(event_yielding_maximum_likelihood->ReconstructionFraction()) ){
+    std::cout << "------ WARNING!!! ------" << std::endl;
+    std::cout << "ReconstructionFraction is NaN." << std::endl;
+    std::cout << "------------------------" << std::endl;
+  }
 }
 
-double HY2020EventReconstructionAlgorithm::getEnergyResolution(double energy)
+double OberlackAlgorithm::getEnergyResolution(double energy)
 {
   return std::sqrt( std::pow(par0_energy_resolution_, 2)
                     + std::pow(par1_energy_resolution_, 2) * energy / unit::keV
                     + std::pow(par2_energy_resolution_, 2) * std::pow(energy / unit::keV, 2) ) * unit::keV; //MeV
 }
 
-double HY2020EventReconstructionAlgorithm::getErrorCosThetaGeom(const vector3_t& incident_direction, const vector3_t& scattering_direction)
+double OberlackAlgorithm::getErrorCosThetaGeom(const vector3_t& incident_direction, const vector3_t& scattering_direction)
 {
   const double cos_theta_ = cosThetaGeometry(incident_direction, scattering_direction);
   
@@ -416,57 +403,73 @@ double HY2020EventReconstructionAlgorithm::getErrorCosThetaGeom(const vector3_t&
   return std::sqrt(error2);
 }
 
-double HY2020EventReconstructionAlgorithm::
-probEnergyDetection(double energy_real, double energy_detected, double sigma_energy)
+double OberlackAlgorithm::
+compScatteringAngle(const std::vector<DetectorHit_sptr>& ordered_hits, int i_hit, double incident_energy, bool is_escape_event)
 {
-  const double sigma_energy_2 = std::pow(sigma_energy, 2);
-  const double prob = 1.0 / std::sqrt( 2 * CLHEP::pi * sigma_energy_2)
-    * std::exp( - std::pow(energy_real - energy_detected, 2) / 2.0 / sigma_energy_2 );
-  return prob;
-}
-
-double HY2020EventReconstructionAlgorithm::
-probCompton(double gammaray_energy_before_hit, double path_length)
-{
-  const double cs_tot_ = tg_cross_section_tot_->Eval(gammaray_energy_before_hit);
-  const double cs_compton_ = tg_cross_section_compton_->Eval(gammaray_energy_before_hit);
-  const double prob = std::exp( -1 * cs_tot_ * path_length ) * cs_compton_ / std::pow( path_length, 2 );
-  return prob;
-}
-
-double HY2020EventReconstructionAlgorithm::
-probComptonFirst(double gammaray_energy_before_hit) {
-  const double cs_tot_ = tg_cross_section_tot_->Eval(gammaray_energy_before_hit);
-  const double cs_compton_ = tg_cross_section_compton_->Eval(gammaray_energy_before_hit);
-  double prob = std::exp( -1 * cs_tot_ * detector_length_scale) * cs_compton_;
-
-  return prob;
-}
-
-double HY2020EventReconstructionAlgorithm::
-probAbsorption(double gammaray_energy_before_hit, double path_length)
-{
-  const double cs_tot_ = tg_cross_section_tot_->Eval(gammaray_energy_before_hit);
-  const double cs_phot_abs_ = tg_cross_section_phot_abs_->Eval(gammaray_energy_before_hit);
-  const double prob = std::exp( -1 * cs_tot_ * path_length ) * cs_phot_abs_ / std::pow( path_length, 2 );
-  return prob;
-}
-
-double HY2020EventReconstructionAlgorithm::
-probEscape(double gammaray_energy_before_lasthit, double energy_deposit_lasthit)
-{
-  const double cs_tot_escape = tg_cross_section_tot_->Eval( gammaray_energy_before_lasthit - energy_deposit_lasthit );
-  const double cos_theta_last_scattering = cosThetaKinematics( gammaray_energy_before_lasthit, energy_deposit_lasthit);
-  if(kinematics_check_){
-    if (cos_theta_last_scattering < -1.0 || 1.0 < cos_theta_last_scattering) {
-      return 0.0;
+    double gammaray_energy_before_ihit = incident_energy;
+    for(int j_hit = 0; j_hit < i_hit; ++j_hit){
+      gammaray_energy_before_ihit -= ordered_hits[j_hit]->Energy(); 
     }
-  }
-  
-  double prob = 2 * CLHEP::pi * normalized_differentialCrossSection( gammaray_energy_before_lasthit, cos_theta_last_scattering );
-  prob *= std::exp( -1 * cs_tot_escape * escape_length_scale );
-  prob *= CLHEP::electron_mass_c2 / pow(gammaray_energy_before_lasthit - energy_deposit_lasthit, 2);
-  return prob;
+    double gammaray_energy_after_ihit = gammaray_energy_before_ihit - ordered_hits[i_hit]->Energy(); 
+
+    const double cos_theta_geom = cosThetaGeometry(ordered_hits[i_hit]->Position() - ordered_hits[i_hit - 1]->Position(),
+                                                   ordered_hits[i_hit + 1]->Position() - ordered_hits[i_hit]->Position());
+    const double cos_theta_kin = cosThetaKinematics( gammaray_energy_before_ihit,
+                                                     ordered_hits[i_hit]->Energy() ); 
+    
+    const double delta_e_dep = getEnergyResolution(ordered_hits[i_hit]->Energy());
+    double delta_E_scatteredgamma = 0;
+    for(int j_hit = i_hit + 1; j_hit < (int)ordered_hits.size(); ++j_hit){
+        delta_E_scatteredgamma += std::pow(getEnergyResolution(ordered_hits[j_hit]->Energy()), 2);
+    }
+    delta_E_scatteredgamma = std::sqrt(delta_E_scatteredgamma);
+
+    const double delta_cos_theta_kin = CLHEP::electron_mass_c2 
+                                 * std::sqrt( std::pow(delta_e_dep, 2) / std::pow(gammaray_energy_before_ihit, 4)
+                                            + std::pow(delta_E_scatteredgamma, 2) * std::pow( 1.0 / std::pow(gammaray_energy_after_ihit, 2) - 1.0 / std::pow(gammaray_energy_before_ihit, 2), 2) );
+    
+    double sigma;
+    if(consider_position_resolution){
+      const double delta_cos_theta_geom = getErrorCosThetaGeom(ordered_hits[i_hit]->Position() - ordered_hits[i_hit - 1]->Position(),
+                                                              ordered_hits[i_hit + 1]->Position() - ordered_hits[i_hit]->Position());
+      sigma = std::sqrt( std::pow(delta_cos_theta_kin, 2) + std::pow(delta_cos_theta_geom, 2) );       
+    }else{
+      sigma = delta_cos_theta_kin;
+    }
+
+    double prob = 0.0;
+    prob = std::exp( - std::pow( (cos_theta_kin - cos_theta_geom) / sigma, 2) );
+    
+    return prob;
+}
+
+double OberlackAlgorithm::
+compScatteringAngleWithInitialDirection(const std::vector<DetectorHit_sptr>& ordered_hits, double incident_energy, bool is_escape_event)
+{
+    double gammaray_energy_before_ihit = incident_energy;
+    double gammaray_energy_after_ihit = gammaray_energy_before_ihit - ordered_hits[0]->Energy(); 
+
+    double cos_theta_geom = cosThetaGeometry( known_initial_direction,
+                                                    ordered_hits[1]->Position() - ordered_hits[0]->Position() );
+    double cos_theta_kin = cosThetaKinematics( gammaray_energy_before_ihit,
+                                                     ordered_hits[0]->Energy() ); 
+
+    const double delta_e_dep = getEnergyResolution(ordered_hits[0]->Energy());
+    double delta_E_scatteredgamma = 0;
+    for(int j_hit = 1; j_hit < (int)ordered_hits.size(); ++j_hit){
+        delta_E_scatteredgamma += std::pow(getEnergyResolution(ordered_hits[j_hit]->Energy()), 2);
+    }
+    delta_E_scatteredgamma = std::sqrt(delta_E_scatteredgamma);
+
+    const double delta_cos_theta_kin = CLHEP::electron_mass_c2 
+                                 * std::sqrt( std::pow(delta_e_dep, 2) / std::pow(gammaray_energy_before_ihit, 4)
+                                            + std::pow(delta_E_scatteredgamma, 2) * std::pow( 1.0 / std::pow(gammaray_energy_after_ihit, 2) - 1.0 / std::pow(gammaray_energy_before_ihit, 2), 2) );
+    
+    double sigma = delta_cos_theta_kin;
+
+    double prob = std::exp( - std::pow( (cos_theta_kin - cos_theta_geom) / sigma, 2) );
+
+    return prob;
 }
 
 } /* namespace comptonsoft */

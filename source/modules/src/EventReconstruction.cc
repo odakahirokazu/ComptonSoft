@@ -31,6 +31,8 @@
 #include "SGDEventReconstructionAlgorithm.hh"
 #include "HY2017EventReconstructionAlgorithm.hh"
 #include "HY2020EventReconstructionAlgorithm.hh"
+#include "TangoAlgorithm.hh"
+#include "OberlackAlgorithm.hh"
 #include "CSHitCollection.hh"
 
 using namespace anlnext;
@@ -94,6 +96,12 @@ ANLStatus EventReconstruction::mod_initialize()
   }
   else if (ReconstructionMethodName()=="HY2020") {
     m_Reconstruction.reset(new HY2020EventReconstructionAlgorithm);
+  }
+  else if (ReconstructionMethodName()=="TANGO") {
+    m_Reconstruction.reset(new TangoAlgorithm);
+  }
+  else if (ReconstructionMethodName()=="Oberlack") {
+    m_Reconstruction.reset(new OberlackAlgorithm);
   }
   else {
     std::cout << "Unknown reconstruction method is given: " << ReconstructionMethodName()
