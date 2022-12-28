@@ -67,6 +67,8 @@ set(CS_CORE_CLASSES
   src/ComptonConstraints.cc
   src/HY2017EventReconstructionAlgorithm.cc
   src/HY2020EventReconstructionAlgorithm.cc
+  src/OberlackAlgorithm.cc
+  src/TangoAlgorithm.cc
   ### sensitive detector
   src/VCSSensitiveDetector.cc
   ### manager
