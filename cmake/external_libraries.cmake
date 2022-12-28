@@ -67,6 +67,16 @@ if(CS_USE_FITSIO)
     PATHS /usr/local/lib $ENV{HEADAS}/lib)
 endif(CS_USE_FITSIO)
 
+### HEALPIX ###
+if(CS_USE_HEALPIX)
+  find_path(HEALPIX_INC_DIR
+    NAMES healpix_map.h
+    PATHS /usr/local/include/healpix_cxx /opt/homebrew/include/healpix_cxx)
+  find_library(HEALPIX_LIB
+    NAMES healpix_cxx
+    PATHS /usr/local/lib /opt/homebrew/lib)
+endif(CS_USE_HEALPIX)
+
 ### SIMX ###
 if(CS_USE_SIMX)
   set(SIMX_TOP $ENV{SIMX})
