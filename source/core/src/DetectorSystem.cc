@@ -696,7 +696,7 @@ loadDetectorParametersRootNode(const boost::property_tree::ptree& RootNode,
 
   if (optional<std::string> rootFile = mainNode.get_optional<std::string>("root_file.<xmlattr>.name")) {
     boost::filesystem::path paramFilePath(filename);
-    boost::filesystem::path dir = paramFilePath.branch_path();
+    boost::filesystem::path dir = paramFilePath.parent_path();
     boost::filesystem::path relativePath(*rootFile);
     boost::filesystem::path fullPath = dir / relativePath;
     std::cout << "ROOT file: " << fullPath << std::endl;
