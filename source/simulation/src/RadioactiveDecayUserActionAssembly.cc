@@ -45,7 +45,7 @@ void RadioactiveDecayUserActionAssembly::SteppingAction(const G4Step* aStep)
 {
   G4Track* aTrack = aStep->GetTrack();
   const double globalTime = aTrack->GetGlobalTime();
-  const G4String radioactiveDecayProcessName = "RadioactiveDecayBase";
+  const G4String radioactiveDecayProcessName = "RadioactiveDecay";
   
   if (aTrack->GetTrackID()==1 && aTrack->GetCurrentStepNumber()==1) {
     const G4String processName

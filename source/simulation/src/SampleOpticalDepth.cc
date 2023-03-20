@@ -116,7 +116,8 @@ void SampleOpticalDepth::SteppingAction(const G4Step* aStep)
   const G4Track* aTrack = aStep->GetTrack();
   const G4MaterialCutsCouple* mcc = aTrack->GetMaterialCutsCouple();
   const double stepLength = aStep->GetStepLength();
-  const double deltaTau = stepLength * process_->GetLambda(energy_, mcc);
+  const double macroscopicCrossSection = process_->GetCrossSection(energy_, mcc);
+  const double deltaTau = stepLength * macroscopicCrossSection;
 
   length_ += stepLength/unit::cm;
   tau_ += deltaTau;
