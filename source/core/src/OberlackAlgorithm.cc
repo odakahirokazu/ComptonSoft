@@ -301,7 +301,6 @@ calFOM(const std::vector<DetectorHit_sptr>& ordered_hits,
 {
   double FOM_ = 1.0;
 
-  double gammaray_energy_before_ihit = incident_energy;
   for (int i_hit = 0; i_hit < num_hits_; ++i_hit) {
     if (i_hit == 0) {
       double cos_theta_first_scattering = cosThetaKinematics( incident_energy, 
@@ -314,16 +313,12 @@ calFOM(const std::vector<DetectorHit_sptr>& ordered_hits,
       if(assume_initial_direction){
         FOM_ *= compScatteringAngleWithInitialDirection(ordered_hits, incident_energy, is_escape_event); 
       }
-
-      gammaray_energy_before_ihit -= ordered_hits[0]->Energy();
     }
     else if (i_hit == num_hits_ - 1) {
 
     }
     else {
       FOM_ *= compScatteringAngle(ordered_hits, i_hit, incident_energy, is_escape_event); 
-
-      gammaray_energy_before_ihit -= ordered_hits[i_hit]->Energy();
     }
   }
   
@@ -404,7 +399,7 @@ double OberlackAlgorithm::getErrorCosThetaGeom(const vector3_t& incident_directi
 }
 
 double OberlackAlgorithm::
-compScatteringAngle(const std::vector<DetectorHit_sptr>& ordered_hits, int i_hit, double incident_energy, bool is_escape_event)
+compScatteringAngle(const std::vector<DetectorHit_sptr>& ordered_hits, int i_hit, double incident_energy, bool /* is_escape_event */)
 {
     double gammaray_energy_before_ihit = incident_energy;
     for(int j_hit = 0; j_hit < i_hit; ++j_hit){
@@ -444,7 +439,7 @@ compScatteringAngle(const std::vector<DetectorHit_sptr>& ordered_hits, int i_hit
 }
 
 double OberlackAlgorithm::
-compScatteringAngleWithInitialDirection(const std::vector<DetectorHit_sptr>& ordered_hits, double incident_energy, bool is_escape_event)
+compScatteringAngleWithInitialDirection(const std::vector<DetectorHit_sptr>& ordered_hits, double incident_energy, bool /* is_escape_event */)
 {
     double gammaray_energy_before_ihit = incident_energy;
     double gammaray_energy_after_ihit = gammaray_energy_before_ihit - ordered_hits[0]->Energy(); 

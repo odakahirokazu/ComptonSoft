@@ -557,7 +557,7 @@ probEscapeOriginal(double gammaray_energy_before_lasthit, double energy_deposit_
 }
 
 double TangoAlgorithm::
-compScatteringAngle(const std::vector<DetectorHit_sptr>& ordered_hits, int i_hit, double incident_energy, bool is_escape_event)
+compScatteringAngle(const std::vector<DetectorHit_sptr>& ordered_hits, int i_hit, double incident_energy, bool /* is_escape_event */)
 {
     double gammaray_energy_before_ihit = incident_energy;
     for(int j_hit = 0; j_hit < i_hit; ++j_hit){
@@ -652,7 +652,7 @@ compScatteringAngle(const std::vector<DetectorHit_sptr>& ordered_hits, int i_hit
 }
 
 double TangoAlgorithm::
-compScatteringAngleWithInitialDirection(const std::vector<DetectorHit_sptr>& ordered_hits, double incident_energy, bool is_escape_event)
+compScatteringAngleWithInitialDirection(const std::vector<DetectorHit_sptr>& ordered_hits, double incident_energy, bool /* is_escape_event */)
 {
     double gammaray_energy_before_ihit = incident_energy;
     double gammaray_energy_after_ihit = gammaray_energy_before_ihit - ordered_hits[0]->Energy(); 
