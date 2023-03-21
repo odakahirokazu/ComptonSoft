@@ -367,11 +367,11 @@ calFOM(const std::vector<DetectorHit_sptr>& ordered_hits,
       if ( is_escape_event ) {
         FOM_ *= probCompton(gammaray_energy_before_ihit, path_length);
         if(use_original_escape_length_calc){
-            FOM_ *= probEscapeOriginal(gammaray_energy_before_ihit, ordered_hits[i_hit]->Energy(),
-                                       ordered_hits[num_hits_ - 1]->Position(), 
-                                       ordered_hits[num_hits_ - 2]->Position());
+          FOM_ *= probEscapeOriginal(gammaray_energy_before_ihit, ordered_hits[i_hit]->Energy(),
+                                     ordered_hits[num_hits_ - 1]->Position(), 
+                                     ordered_hits[num_hits_ - 2]->Position());
         }else{
-            FOM_ *= probEscapeSimple(gammaray_energy_before_ihit, ordered_hits[i_hit]->Energy());
+          FOM_ *= probEscapeSimple(gammaray_energy_before_ihit, ordered_hits[i_hit]->Energy());
         }
       }
       else {
@@ -443,26 +443,26 @@ double TangoAlgorithm::getErrorCosThetaGeom(const vector3_t& incident_direction,
   const double cos_theta_ = cosThetaGeometry(incident_direction, scattering_direction);
   
   const double dcos_dx_A = scattering_direction.x() / scattering_direction.mag() / incident_direction.mag()
-                         - incident_direction.x() / incident_direction.mag2() * cos_theta_;
+    - incident_direction.x() / incident_direction.mag2() * cos_theta_;
   const double dcos_dx_B = incident_direction.x() / scattering_direction.mag() / incident_direction.mag()
-                         - scattering_direction.x() / scattering_direction.mag2() * cos_theta_;
+    - scattering_direction.x() / scattering_direction.mag2() * cos_theta_;
   const double dcos_dx_sq = 2 * ( std::pow(dcos_dx_A, 2) + std::pow(dcos_dx_B, 2) - dcos_dx_A * dcos_dx_B );
   
   const double dcos_dy_A = scattering_direction.y() / scattering_direction.mag() / incident_direction.mag()
-                         - incident_direction.y() / incident_direction.mag2() * cos_theta_;
+    - incident_direction.y() / incident_direction.mag2() * cos_theta_;
   const double dcos_dy_B = incident_direction.y() / scattering_direction.mag() / incident_direction.mag()
-                         - scattering_direction.y() / scattering_direction.mag2() * cos_theta_;
+    - scattering_direction.y() / scattering_direction.mag2() * cos_theta_;
   const double dcos_dy_sq = 2 * ( std::pow(dcos_dy_A, 2) + std::pow(dcos_dy_B, 2) - dcos_dy_A * dcos_dy_B );
 
   const double dcos_dz_A = scattering_direction.z() / scattering_direction.mag() / incident_direction.mag()
-                         - incident_direction.z() / incident_direction.mag2() * cos_theta_;
+    - incident_direction.z() / incident_direction.mag2() * cos_theta_;
   const double dcos_dz_B = incident_direction.z() / scattering_direction.mag() / incident_direction.mag()
-                         - scattering_direction.z() / scattering_direction.mag2() * cos_theta_;
+    - scattering_direction.z() / scattering_direction.mag2() * cos_theta_;
   const double dcos_dz_sq = 2 * ( std::pow(dcos_dz_A, 2) + std::pow(dcos_dz_B, 2) - dcos_dz_A * dcos_dz_B );
 
   const double error2 = dcos_dx_sq * std::pow(position_resolution_x_, 2) 
-                      + dcos_dy_sq * std::pow(position_resolution_y_, 2) 
-                      + dcos_dz_sq * std::pow(position_resolution_z_, 2);
+    + dcos_dy_sq * std::pow(position_resolution_y_, 2) 
+    + dcos_dz_sq * std::pow(position_resolution_z_, 2);
 
   return std::sqrt(error2);
 }
@@ -517,7 +517,7 @@ probEscapeSimple(double gammaray_energy_before_lasthit, double energy_deposit_la
   const double cs_tot_escape = tg_cross_section_tot_->Eval( gammaray_energy_before_lasthit - energy_deposit_lasthit );
 /*
   if (cos_theta_last_scattering < -1.0 || 1.0 < cos_theta_last_scattering) {
-    return 0.0;
+  return 0.0;
   }
 */
   
@@ -559,177 +559,177 @@ probEscapeOriginal(double gammaray_energy_before_lasthit, double energy_deposit_
 double TangoAlgorithm::
 compScatteringAngle(const std::vector<DetectorHit_sptr>& ordered_hits, int i_hit, double incident_energy, bool /* is_escape_event */)
 {
-    double gammaray_energy_before_ihit = incident_energy;
-    for(int j_hit = 0; j_hit < i_hit; ++j_hit){
-      gammaray_energy_before_ihit -= ordered_hits[j_hit]->Energy(); 
-    }
-    double gammaray_energy_after_ihit = gammaray_energy_before_ihit - ordered_hits[i_hit]->Energy(); 
+  double gammaray_energy_before_ihit = incident_energy;
+  for(int j_hit = 0; j_hit < i_hit; ++j_hit){
+    gammaray_energy_before_ihit -= ordered_hits[j_hit]->Energy(); 
+  }
+  double gammaray_energy_after_ihit = gammaray_energy_before_ihit - ordered_hits[i_hit]->Energy(); 
 
-    const double cos_theta_geom = cosThetaGeometry(ordered_hits[i_hit]->Position() - ordered_hits[i_hit - 1]->Position(),
-                                                   ordered_hits[i_hit + 1]->Position() - ordered_hits[i_hit]->Position());
-    const double cos_theta_kin = cosThetaKinematics( gammaray_energy_before_ihit,
-                                                     ordered_hits[i_hit]->Energy() ); 
-    const double almost_zero = 1e-10;
+  const double cos_theta_geom = cosThetaGeometry(ordered_hits[i_hit]->Position() - ordered_hits[i_hit - 1]->Position(),
+                                                 ordered_hits[i_hit + 1]->Position() - ordered_hits[i_hit]->Position());
+  const double cos_theta_kin = cosThetaKinematics( gammaray_energy_before_ihit,
+                                                   ordered_hits[i_hit]->Energy() ); 
+  const double almost_zero = 1e-10;
     
-    if( cos_theta_geom < -1 || 1 < cos_theta_geom ){
-        if(ignore_out_of_costheta_candidate){
-            return 0;
-        }
+  if( cos_theta_geom < -1 || 1 < cos_theta_geom ){
+    if(ignore_out_of_costheta_candidate){
+      return 0;
     }
+  }
 
-    if( cos_theta_kin < -1 || 1 < cos_theta_kin ){
-        if(ignore_out_of_costheta_candidate){
-            return 0;
-        }
+  if( cos_theta_kin < -1 || 1 < cos_theta_kin ){
+    if(ignore_out_of_costheta_candidate){
+      return 0;
     }
+  }
 
-    double theta_geom = std::acos(cos_theta_geom);
-    double theta_kin = std::acos(cos_theta_kin);
+  double theta_geom = std::acos(cos_theta_geom);
+  double theta_kin = std::acos(cos_theta_kin);
 
-    if( cos_theta_geom < -1 || 1 < cos_theta_geom ){
-        if(cos_theta_geom > 1){
-            theta_geom = std::acos(1 - almost_zero);
-        }else{
-            theta_geom = std::acos(-1 + almost_zero);
-        }
-    }
-
-    if( cos_theta_kin < -1 || 1 < cos_theta_kin ){
-        if(cos_theta_kin > 1){
-            theta_kin = std::acos(1 - almost_zero);
-        }else{
-            theta_kin = std::acos(-1 + almost_zero);
-        }
-    }
-
-    const double delta_e_dep = getEnergyResolution(ordered_hits[i_hit]->Energy());
-    double delta_E_scatteredgamma = 0;
-    for(int j_hit = i_hit + 1; j_hit < (int)ordered_hits.size(); ++j_hit){
-        delta_E_scatteredgamma += std::pow(getEnergyResolution(ordered_hits[j_hit]->Energy()), 2);
-    }
-    delta_E_scatteredgamma = std::sqrt(delta_E_scatteredgamma);
-
-    const double delta_cos_theta_kin = CLHEP::electron_mass_c2 
-                                 * std::sqrt( std::pow(delta_e_dep, 2) / std::pow(gammaray_energy_before_ihit, 4)
-                                            + std::pow(delta_E_scatteredgamma, 2) * std::pow( 1.0 / std::pow(gammaray_energy_after_ihit, 2) - 1.0 / std::pow(gammaray_energy_before_ihit, 2), 2) );
-    const double delta_theta_kin = delta_cos_theta_kin / std::sin(theta_kin);
-
-    double sigma;
-    if(consider_position_resolution){
-      const double delta_cos_theta_geom = getErrorCosThetaGeom(ordered_hits[i_hit]->Position() - ordered_hits[i_hit - 1]->Position(),
-                                                              ordered_hits[i_hit + 1]->Position() - ordered_hits[i_hit]->Position());
-      const double delta_theta_geom = delta_cos_theta_geom / std::sin(theta_geom);
-      if(use_costheta){
-        sigma = std::sqrt( std::pow(delta_cos_theta_kin, 2) + std::pow(delta_cos_theta_geom, 2) );       
-      }else{
-        sigma = std::sqrt( std::pow(delta_theta_kin, 2) + std::pow(delta_theta_geom, 2) );       
-      }
+  if( cos_theta_geom < -1 || 1 < cos_theta_geom ){
+    if(cos_theta_geom > 1){
+      theta_geom = std::acos(1 - almost_zero);
     }else{
-      if(use_costheta){
-        sigma = delta_cos_theta_kin;
-      }else{
-        sigma = delta_theta_kin;
-      }
+      theta_geom = std::acos(-1 + almost_zero);
     }
+  }
 
-    double prob = 0.0;
-    double diff = 0.0;
+  if( cos_theta_kin < -1 || 1 < cos_theta_kin ){
+    if(cos_theta_kin > 1){
+      theta_kin = std::acos(1 - almost_zero);
+    }else{
+      theta_kin = std::acos(-1 + almost_zero);
+    }
+  }
+
+  const double delta_e_dep = getEnergyResolution(ordered_hits[i_hit]->Energy());
+  double delta_E_scatteredgamma = 0;
+  for(int j_hit = i_hit + 1; j_hit < (int)ordered_hits.size(); ++j_hit){
+    delta_E_scatteredgamma += std::pow(getEnergyResolution(ordered_hits[j_hit]->Energy()), 2);
+  }
+  delta_E_scatteredgamma = std::sqrt(delta_E_scatteredgamma);
+
+  const double delta_cos_theta_kin = CLHEP::electron_mass_c2 
+    * std::sqrt( std::pow(delta_e_dep, 2) / std::pow(gammaray_energy_before_ihit, 4)
+                 + std::pow(delta_E_scatteredgamma, 2) * std::pow( 1.0 / std::pow(gammaray_energy_after_ihit, 2) - 1.0 / std::pow(gammaray_energy_before_ihit, 2), 2) );
+  const double delta_theta_kin = delta_cos_theta_kin / std::sin(theta_kin);
+
+  double sigma;
+  if(consider_position_resolution){
+    const double delta_cos_theta_geom = getErrorCosThetaGeom(ordered_hits[i_hit]->Position() - ordered_hits[i_hit - 1]->Position(),
+                                                             ordered_hits[i_hit + 1]->Position() - ordered_hits[i_hit]->Position());
+    const double delta_theta_geom = delta_cos_theta_geom / std::sin(theta_geom);
     if(use_costheta){
-        diff = cos_theta_kin - cos_theta_geom;
+      sigma = std::sqrt( std::pow(delta_cos_theta_kin, 2) + std::pow(delta_cos_theta_geom, 2) );       
     }else{
-        diff = theta_kin - theta_geom;
+      sigma = std::sqrt( std::pow(delta_theta_kin, 2) + std::pow(delta_theta_geom, 2) );       
     }
-
-    if(FOM_function_type == 0){
-      prob = std::exp( - std::fabs(diff) / sigma );
-    }else if(FOM_function_type == 1){
-      prob = std::exp( - std::pow( diff / sigma, 2) );
-    }else if(FOM_function_type == 2){
-      prob = 1.0 / sigma * std::exp( - 0.5 * std::pow( diff / sigma, 2) );
-    }
-    
-    return prob;
-}
-
-double TangoAlgorithm::
-compScatteringAngleWithInitialDirection(const std::vector<DetectorHit_sptr>& ordered_hits, double incident_energy, bool /* is_escape_event */)
-{
-    double gammaray_energy_before_ihit = incident_energy;
-    double gammaray_energy_after_ihit = gammaray_energy_before_ihit - ordered_hits[0]->Energy(); 
-
-    const double cos_theta_geom = cosThetaGeometry( known_initial_direction,
-                                                    ordered_hits[1]->Position() - ordered_hits[0]->Position() );
-    const double cos_theta_kin = cosThetaKinematics( gammaray_energy_before_ihit,
-                                                     ordered_hits[0]->Energy() ); 
-    const double almost_zero = 1e-10;
-    
-    if( cos_theta_geom < -1 || 1 < cos_theta_geom ){
-        if(ignore_out_of_costheta_candidate){
-            return 0;
-        }
-    }
-
-    if( cos_theta_kin < -1 || 1 < cos_theta_kin ){
-        if(ignore_out_of_costheta_candidate){
-            return 0;
-        }
-    }
-
-    double theta_geom = std::acos(cos_theta_geom);
-    double theta_kin = std::acos(cos_theta_kin);
-
-    if( cos_theta_geom < -1 || 1 < cos_theta_geom ){
-        if(cos_theta_geom > 1){
-            theta_geom = std::acos(1 - almost_zero);
-        }else{
-            theta_geom = std::acos(-1 + almost_zero);
-        }
-    }
-
-    if( cos_theta_kin < -1 || 1 < cos_theta_kin ){
-        if(cos_theta_kin > 1){
-            theta_kin = std::acos(1 - almost_zero);
-        }else{
-            theta_kin = std::acos(-1 + almost_zero);
-        }
-    }
-
-    const double delta_e_dep = getEnergyResolution(ordered_hits[0]->Energy());
-    double delta_E_scatteredgamma = 0;
-    for(int j_hit = 1; j_hit < (int)ordered_hits.size(); ++j_hit){
-        delta_E_scatteredgamma += std::pow(getEnergyResolution(ordered_hits[j_hit]->Energy()), 2);
-    }
-    delta_E_scatteredgamma = std::sqrt(delta_E_scatteredgamma);
-
-    const double delta_cos_theta_kin = CLHEP::electron_mass_c2 
-                                 * std::sqrt( std::pow(delta_e_dep, 2) / std::pow(gammaray_energy_before_ihit, 4)
-                                            + std::pow(delta_E_scatteredgamma, 2) * std::pow( 1.0 / std::pow(gammaray_energy_after_ihit, 2) - 1.0 / std::pow(gammaray_energy_before_ihit, 2), 2) );
-    const double delta_theta_kin = delta_cos_theta_kin / std::sin(theta_kin);
-    
-    double sigma;
+  }else{
     if(use_costheta){
       sigma = delta_cos_theta_kin;
     }else{
       sigma = delta_theta_kin;
     }
+  }
 
-    double prob = 0.0;
-    double diff = 0.0;
-    if(use_costheta){
-        diff = cos_theta_kin - cos_theta_geom;
-    }else{
-        diff = theta_kin - theta_geom;
-    }
+  double prob = 0.0;
+  double diff = 0.0;
+  if(use_costheta){
+    diff = cos_theta_kin - cos_theta_geom;
+  }else{
+    diff = theta_kin - theta_geom;
+  }
 
-    if(FOM_function_type == 0){
-      prob = std::exp( - std::fabs(diff) / sigma );
-    }else if(FOM_function_type == 1){
-      prob = std::exp( - std::pow( diff / sigma, 2) );
-    }else if(FOM_function_type == 2){
-      prob = 1.0 / sigma * std::exp( - 0.5 * std::pow( diff / sigma, 2) );
-    }
+  if(FOM_function_type == 0){
+    prob = std::exp( - std::fabs(diff) / sigma );
+  }else if(FOM_function_type == 1){
+    prob = std::exp( - std::pow( diff / sigma, 2) );
+  }else if(FOM_function_type == 2){
+    prob = 1.0 / sigma * std::exp( - 0.5 * std::pow( diff / sigma, 2) );
+  }
     
-    return prob;
+  return prob;
+}
+
+double TangoAlgorithm::
+compScatteringAngleWithInitialDirection(const std::vector<DetectorHit_sptr>& ordered_hits, double incident_energy, bool /* is_escape_event */)
+{
+  double gammaray_energy_before_ihit = incident_energy;
+  double gammaray_energy_after_ihit = gammaray_energy_before_ihit - ordered_hits[0]->Energy(); 
+
+  const double cos_theta_geom = cosThetaGeometry( known_initial_direction,
+                                                  ordered_hits[1]->Position() - ordered_hits[0]->Position() );
+  const double cos_theta_kin = cosThetaKinematics( gammaray_energy_before_ihit,
+                                                   ordered_hits[0]->Energy() ); 
+  const double almost_zero = 1e-10;
+    
+  if( cos_theta_geom < -1 || 1 < cos_theta_geom ){
+    if(ignore_out_of_costheta_candidate){
+      return 0;
+    }
+  }
+
+  if( cos_theta_kin < -1 || 1 < cos_theta_kin ){
+    if(ignore_out_of_costheta_candidate){
+      return 0;
+    }
+  }
+
+  double theta_geom = std::acos(cos_theta_geom);
+  double theta_kin = std::acos(cos_theta_kin);
+
+  if( cos_theta_geom < -1 || 1 < cos_theta_geom ){
+    if(cos_theta_geom > 1){
+      theta_geom = std::acos(1 - almost_zero);
+    }else{
+      theta_geom = std::acos(-1 + almost_zero);
+    }
+  }
+
+  if( cos_theta_kin < -1 || 1 < cos_theta_kin ){
+    if(cos_theta_kin > 1){
+      theta_kin = std::acos(1 - almost_zero);
+    }else{
+      theta_kin = std::acos(-1 + almost_zero);
+    }
+  }
+
+  const double delta_e_dep = getEnergyResolution(ordered_hits[0]->Energy());
+  double delta_E_scatteredgamma = 0;
+  for(int j_hit = 1; j_hit < (int)ordered_hits.size(); ++j_hit){
+    delta_E_scatteredgamma += std::pow(getEnergyResolution(ordered_hits[j_hit]->Energy()), 2);
+  }
+  delta_E_scatteredgamma = std::sqrt(delta_E_scatteredgamma);
+
+  const double delta_cos_theta_kin = CLHEP::electron_mass_c2 
+    * std::sqrt( std::pow(delta_e_dep, 2) / std::pow(gammaray_energy_before_ihit, 4)
+                 + std::pow(delta_E_scatteredgamma, 2) * std::pow( 1.0 / std::pow(gammaray_energy_after_ihit, 2) - 1.0 / std::pow(gammaray_energy_before_ihit, 2), 2) );
+  const double delta_theta_kin = delta_cos_theta_kin / std::sin(theta_kin);
+    
+  double sigma;
+  if(use_costheta){
+    sigma = delta_cos_theta_kin;
+  }else{
+    sigma = delta_theta_kin;
+  }
+
+  double prob = 0.0;
+  double diff = 0.0;
+  if(use_costheta){
+    diff = cos_theta_kin - cos_theta_geom;
+  }else{
+    diff = theta_kin - theta_geom;
+  }
+
+  if(FOM_function_type == 0){
+    prob = std::exp( - std::fabs(diff) / sigma );
+  }else if(FOM_function_type == 1){
+    prob = std::exp( - std::pow( diff / sigma, 2) );
+  }else if(FOM_function_type == 2){
+    prob = 1.0 / sigma * std::exp( - 0.5 * std::pow( diff / sigma, 2) );
+  }
+    
+  return prob;
 }
 
 } /* namespace comptonsoft */
