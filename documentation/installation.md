@@ -22,10 +22,10 @@ Installation | Compton Soft
 This package uses CMake to generate building scripts such as Makefiles.
 
 ### (3) [Boost C++ library](http://www.boost.org/)
-*We recommend version 1.70.0 or later*
+*We recommend version 1.80.0 or later*
 
 ### (4) [ANL Next framework](https://github.com/odakahirokazu/ANLNext)
-*version 2.1.2 or later*
+*version 2.1.3 or later*
 
 Compton Soft uses the ANL Next framework. ANL Next is a framework for
 constructing software that performs event-by-event analysis, which usually
@@ -42,7 +42,7 @@ You can find
 of ANL Next.
 
 ### (5) [Geant4](http://geant4.cern.ch/)
-*version 11.0*
+*version 11.1 or later*
 
 A toolkit library for Monte Carlo simulations.
 Following building options are required:
@@ -55,13 +55,13 @@ Following building options are required:
 Example of running cmake:
 
     unix> cmake \
-      -DCMAKE_INSTALL_PREFIX=../geant4.10.04.p02-install \
+      -DCMAKE_INSTALL_PREFIX=../geant4-v11.1.1-install \
+      -DCMAKE_PREFIX_PATH=/usr/local/opt/qt5 \
       -DGEANT4_USE_GDML=ON \
       -DGEANT4_USE_QT=ON \
       -DGEANT4_USE_OPENGL_X11=ON \
       -DGEANT4_USE_RAYTRACER_X11=ON \
-      -DGEANT4_USE_NETWORKDAWN=ON \
-      ../geant4.10.04.p02
+      ../geant4-v11.1.1
 
 ### (6) [ROOT](http://root.cern.ch/)
 *We recommend version 6.26 or later.*
