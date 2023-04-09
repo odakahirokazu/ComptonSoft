@@ -63,7 +63,7 @@ homebrewを使う。
     $ brew install qt@5
 ```
 
-#### 補足
+#### 注意: Apple Silicon CPU搭載Macの場合
 - Intel Macではhomebrewのインストール先は`/usr/local`だが、新しいAppleのCPUを搭載したMacでは`/opt/homebrew`となるので注意。
 
 
