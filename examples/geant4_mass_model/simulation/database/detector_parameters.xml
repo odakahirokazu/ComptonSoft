@@ -1,0 +1,38 @@
+<?xml version="1.0" ?>
+<?xml-stylesheet type="text/xsl" href="https://raw.githubusercontent.com/odakahirokazu/ComptonSoft/master/xmlstyle/detector_parameters_v3.xsl" ?>
+
+<detector_parameters>
+  <name>Si pixel detector</name>
+  <comment>2023-09-05 | Hiro Odaka</comment>
+  <auto_position flag="0" />
+  <sensitive_detector_not_found_warning flag="1" />
+  <data>
+    <sensitive_detector type="2DPixel" name="Detector_Logical">
+      <common>
+        <parameters>
+          <upside anode="1" pixel="1" />
+          <quenching factor="0.6" />
+          <temperature value="255.0" />
+          <efield bias="400.0" mode="1" />
+          <charge_collection mode="0" />
+          <diffusion mode="1">
+            <spread_factor cathode="1.0" anode="1.0" />
+          </diffusion>
+          <timing_resolution trigger="3.0e-7" energy_measurement="1.0e-6" />
+          <pedestal_generation flag="0" />
+          <channel_properties>
+            <disable status="0" />
+            <trigger_discrimination center="0.5" sigma="0.1" />
+            <noise_level param0="0.1" param1="0.019" param2="0.0" />
+            <compensation factor="1.0" />
+            <threshold value="2.0" />
+          </channel_properties>
+          <reconstruction mode="1" />
+        </parameters>
+      </common>
+      <detector_list id_method="path" layer_offset="1">
+        <detector id="1" path="Detector" />
+      </detector_list>
+    </sensitive_detector>
+  </data>
+</detector_parameters>
