@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<gdml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://service-spi.web.cern.ch/service-spi/app/releases/GDML/schema/gdml.xsd">
+  <define />
+  <materials>
+    <material Z="1" name="Vacuum" state="gas">
+        <D unit="g/cm3" value="1e-12" />
+        <atom unit="g/mole" value="1"/>
+    </material>
+    <material Z="14" name="Si" state="solid">
+      <D unit="g/cm3" value="2.33" />
+      <atom unit="g/mole" value="28"/>
+    </material>
+    <material Z="13" name="Al" state="solid">
+        <D unit="g/cm3" value="2.7" />
+        <atom unit="g/mole" value="26.98"/>
+    </material>
+    <element Z="7" formula="N" name="Nitrogen" >
+      <atom value="14.01" />
+    </element>
+    <element Z="8" formula="O" name="Oxygen" >
+      <atom value="16" />
+    </element>
+    <material formula=" " name="Air" >
+      <D unit="g/cm3" value="0.001293" />
+      <fraction n="0.8" ref="Nitrogen" />
+      <fraction n="0.2" ref="Oxygen" />
+    </material>
+    <material formula="SiO2" name="SiO2" >
+      <D unit="g/cm3" value="2.196" />
+      <composite n="1" ref="Si" />
+      <composite n="2" ref="Oxygen" />
+    </material>
+  </materials>
+  <solids>
+    <box lunit="mm" name="World.box" x="1000.0" y="1000.0" z="1000.0" />
+    <box lunit="mm" name="Depletion.box" x="15.36" y="30.72" z="0.200" />
+    <box lunit="mm" name="SiO2.box" x="15.36" y="30.72" z="0.00002" />
+    <box lunit="mm" name="Si.box" x="15.36" y="30.72" z="0.00002" />
+    <box lunit="mm" name="Al.box" x="15.36" y="30.72" z="0.0002" />
+  </solids>
+  <structure>
+    <volume name="Depletion.log">
+      <materialref ref="Si" />
+      <solidref ref="Depletion.box" />
+    </volume>
+    <volume name="DeadLayer1.log">
+      <materialref ref="SiO2" />
+      <solidref ref="SiO2.box" />
+    </volume>
+    <volume name="DeadLayer2.log">
+      <materialref ref="Si" />
+      <solidref ref="Si.box" />
+    </volume>
+    <volume name="Al.log">
+        <materialref ref="Al" />
+        <solidref ref="Al.box" />
+    </volume>
+    <volume name="World.log">
+    <materialref ref="Vacuum" />
+      <solidref ref="World.box" />
+      <physvol name="Depletion">
+        <volumeref ref="Depletion.log" />
+        <position name="Depletion.pos" unit="mm" x="0.0" y="0.0" z="-0.100" />
+      </physvol>
+      <physvol name="DeadLayer1">
+        <volumeref ref="DeadLayer1.log" />
+        <position name="DeadLayer1.pos" unit="mm" x="0.0" y="0.0" z="0.00001" />
+      </physvol>
+      <physvol name="DeadLayer2">
+        <volumeref ref="DeadLayer2.log" />
+        <position name="DeadLayer2.pos" unit="mm" x="0.0" y="0.0" z="0.00003" />
+      </physvol>
+<!--  <physvol name="Al">
+          <volumeref ref="Al.log" />
+          <position name="Al.pos" unit="mm" x="0.0" y="0.0" z="0.03" />
+      </physvol> -->
+    </volume>
+  </structure>
+  <setup name="Default" version="1.0">
+    <world ref="World.log" />
+  </setup>
+ <!--
+ -->
+</gdml>
+

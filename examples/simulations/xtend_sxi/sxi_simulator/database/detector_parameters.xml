@@ -1,0 +1,36 @@
+<?xml version="1.0" ?>
+<?xml-stylesheet type="text/xsl" href="https://raw.githubusercontent.com/odakahirokazu/ComptonSoft/master/xmlstyle/detector_parameters_v1.xsl" ?>
+<detector_parameters>
+  <name>Si pixel detector</name>
+  <comment>2018-11 | Tsubasa Tamba</comment>
+  <comment>2018-12 | Hiro Odaka | modification</comment>
+  <auto_position flag="0" />
+  <sensitive_detector_not_found_warning flag="1" />
+  <data>
+    <sensitive_detector type="2DPixel" name="Depletion.log">
+      <common>
+        <parameters>
+          <upside anode="1" pixel="0" />
+          <quenching factor="0.6" />
+          <temperature value="163.0" />
+          <efield bias="55.0" mode="2" param0="15.0"/>
+          <charge_collection mode="0" />
+          <diffusion mode="1">
+            <spread_factor cathode="1.0" anode="1.0" />
+          </diffusion>
+          <pedestal_generation flag="0" />
+          <channel_properties>
+            <disable status="0" />
+            <noise_level param0="0.000" param1="0.0209" param2="0.0" />
+            <compensation factor="1.0" />
+            <threshold value="0.0" />
+          </channel_properties>
+          <reconstruction mode="0" />
+        </parameters>
+      </common>
+      <detector_list id_method="path" layer_offset="1">
+        <detector id="1" path="Depletion" />
+      </detector_list>
+    </sensitive_detector>
+  </data>
+</detector_parameters>
