@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="https://raw.githubusercontent.com/odakahirokazu/ComptonSoft/master/xmlstyle/detector_configuration_v4.xsl" ?>
+<configuration>
+  <name>Si pixel detector</name>
+  <comment>2018-11 | Tsubasa Tamba</comment>
+  <comment>2018-12 | Hiro Odaka | modification</comment>
+  <length_unit>cm</length_unit>
+  <detectors>
+    <detector id="1" type="2DPixel" name="Sensor:1">
+      <geometry x="1.536" y="3.072" z="0.0200" />
+      <offset x="0" y="0" />
+      <pixel number_x="320" number_y="640" size_x="0.0048" size_y="0.0048" />
+      <position x="0.0" y="0.0" z="-0.0100" />
+      <xaxis_direction x="+1.0" y="0.0"  z="0.0" />
+      <yaxis_direction x="0.0"  y="+1.0" z="0.0" />
+      <energy_priority electrode_side="anode" />
+      <sections>
+        <section num_channels="204800" electrode_side="anode" />
+      </sections>
+    </detector>
+  </detectors>
+  <readout>
+    <module id="0">
+      <section detector_id="1" section="0" />
+    </module>
+  </readout>
+  <groups>
+    <group name="Any">
+      <detector id="1" />
+    </group>
+    <hit_pattern name="1hit" short_name="1hit" bit="0">
+      <group name="Any" />
+    </hit_pattern>
+    <hit_pattern name="2hit" short_name="2hit" bit="1">
+      <group name="Any" /><group name="Any" />
+    </hit_pattern>
+  </groups>
+</configuration>
