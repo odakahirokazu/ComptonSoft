@@ -65,4 +65,14 @@ void VCSModule::mkdir(const std::string& name)
   }
 }
 
+void VCSModule::chdir(const std::string& name)
+{
+  if (name=="") {
+    saveDir_->cd(module_id().c_str());
+  }
+  else {
+    saveDir_->cd(name.c_str());
+  }
+}
+
 } /* namespace comptonsoft */

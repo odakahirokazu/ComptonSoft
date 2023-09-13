@@ -19,6 +19,8 @@
 
 #include "HistogramRawFrameImage.hh"
 
+#include <boost/format.hpp>
+
 #include "FrameData.hh"
 #include "TH2.h"
 #include "TStyle.h"
@@ -39,6 +41,7 @@ ANLStatus HistogramRawFrameImage::mod_define()
   define_parameter("output_name", &mod_class::outputName_);
   define_parameter("rebin_x", &mod_class::rebinX_);
   define_parameter("rebin_y", &mod_class::rebinY_);
+  define_parameter("update_each_frame", &mod_class::update_each_frame_);
   
   return AS_OK;
 }
@@ -72,6 +75,23 @@ ANLStatus HistogramRawFrameImage::mod_initialize()
                         numx, 0.0, static_cast<double>(nx),
                         numy, 0.0, static_cast<double>(ny));
 
+  return AS_OK;
+}
+
+
+ANLStatus HistogramRawFrameImage::mod_analyze()
+{
+  if (update_each_frame_) {
+    fillHistogram();
+
+    chdir();
+    const std::string name = (boost::format("rawimage_%06d") % get_loop_index()).str();
+    TH2* hist = static_cast<TH2*>(histogram_->Clone(name.c_str()));
+    hist->SetTitle(name.c_str());
+    hist->Write();
+    hist->Delete();
+  }
+  
   return AS_OK;
 }
 
