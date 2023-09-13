@@ -36,12 +36,13 @@ namespace comptonsoft {
  * @date 2008-08-30
  * @date 2014-11-22
  * @date 2016-08-19 | Add isMCSimulation()
- * @date 2017-07-07 | merge mod_hit() to mod_initialize()
- * @date 2019-11-21 | drawCanvas()
+ * @date 2017-07-07 | merge mod_hist() to mod_initialize()
+ * @date 2019-11-21 | 1.4 | drawCanvas()
+ * @date 2023-09-13 | 1.5 | chdir()
  */
 class VCSModule : public anlnext::BasicModule
 {
-  DEFINE_ANL_MODULE(VCSModule, 1.4);
+  DEFINE_ANL_MODULE(VCSModule, 1.5);
 public:
   VCSModule();
   ~VCSModule();
@@ -52,6 +53,7 @@ public:
 
 protected:
   void mkdir(const std::string& name="");
+  void chdir(const std::string& name="");
   DetectorSystem* getDetectorManager() { return detectorSystem_; }
   const DetectorSystem* getDetectorManager() const { return detectorSystem_; }
   bool isMCSimulation() const { return detectorSystem_->isMCSimulation(); }
