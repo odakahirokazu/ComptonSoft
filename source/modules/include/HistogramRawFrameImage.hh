@@ -22,6 +22,7 @@
  *
  * @author Tsubasa Tamba
  * @date 2020-11-02
+ * @date 2023-09-13 | H.Odaka | draw-each-frame mode
  */
 
 #ifndef COMPTONSOFT_HistogramRawFrameImage_H
@@ -46,6 +47,7 @@ public:
 public:
   anlnext::ANLStatus mod_define() override;
   anlnext::ANLStatus mod_initialize() override;
+  anlnext::ANLStatus mod_analyze() override;
   anlnext::ANLStatus mod_end_run() override;
 
   void drawCanvas(TCanvas* canvas, std::vector<std::string>* filenames) override;
@@ -58,6 +60,7 @@ private:
   std::string outputName_;
   int rebinX_ = 1;
   int rebinY_ = 1;
+  bool update_each_frame_ = false;
 
   FrameData* frame_ = nullptr;
   TH2* histogram_ = nullptr;
