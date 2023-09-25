@@ -7,6 +7,9 @@ message("-- BOOST_INC_DIR: ${BOOST_INC_DIR}")
 message("-- BOOST_LIB_DIR: ${BOOST_LIB_DIR}")
 message("-- BOOST_LIB: ${BOOST_LIB}")
 
+### Workaround for Clang-15 not to use std::unary_function
+add_compile_definitions(_HAS_AUTO_PTR_ETC=FALSE)
+
 ### ANL ###
 if(NOT DEFINED ANLNEXT_INSTALL)
   if(DEFINED ENV{ANLNEXT_INSTALL})
