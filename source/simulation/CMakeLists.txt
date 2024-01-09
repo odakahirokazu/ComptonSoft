@@ -12,6 +12,7 @@ include_directories(
   ${ADD_INC_DIR}
   ${SIMX_INC_DIR}
   ${CFITSIO_INC_DIR}
+  ${HEALPIX_INC_DIR}
   ${BOOST_INC_DIR}
   )
 
@@ -58,6 +59,12 @@ if(CS_USE_FITSIO)
     )
 endif()
 
+if(CS_USE_HEALPIX)
+  set(CS_SIMULATION_CLASSES_HEALPIX
+    src/AllSkyPrimaryGen.cc
+    )
+endif()
+
 if(CS_USE_SIMX)
   set(CS_SIMULATION_CLASSES_SIMX
     # basic interface
@@ -75,12 +82,13 @@ endif(CS_USE_SIMX)
 add_library(CSSimulation SHARED
   ${CS_SIMULATION_CLASSES_BASIC}
   ${CS_SIMULATION_CLASSES_FITSIO}
+  ${CS_SIMULATION_CLASSES_HEALPIX}
   ${CS_SIMULATION_CLASSES_SIMX}
   )
 
 target_link_libraries(CSSimulation
   CSCore CSModules ${ANLG4_LIB} ${ANLNEXT_LIB}
-  ${ROOT_LIB} ${G4_LIB} ${CLHEP_LIB} ${ADD_LIB} ${SIMX_LIB} ${CFITSIO_LIB})
+  ${ROOT_LIB} ${G4_LIB} ${CLHEP_LIB} ${ADD_LIB} ${SIMX_LIB} ${CFITSIO_LIB} ${HEALPIX_LIB})
 
 install(TARGETS CSSimulation LIBRARY DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
 
