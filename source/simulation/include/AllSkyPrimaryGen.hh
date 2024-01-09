@@ -20,14 +20,12 @@
 #ifndef COMPTONSOFT_AllSkyPrimaryGen_H
 #define COMPTONSOFT_AllSkyPrimaryGen_H 1
 
+#include "IsotropicPrimaryGen.hh"
+
 #include <utility>
 #include <memory>
-#include <boost/multi_array.hpp>
-#include "BasicPrimaryGen.hh"
-#include "IsotropicPrimaryGen.hh"
 #include "G4ThreeVector.hh"
 #include "G4RotationMatrix.hh"
-
 #include <healpix_cxx/healpix_base.h>
 #include <healpix_cxx/healpix_map.h>
 #include <healpix_cxx/healpix_map_fitsio.h>
@@ -42,10 +40,10 @@ namespace comptonsoft {
  * @author Naomi Tsuji, Hiroki Yoneda, Hirokazu Odaka
  * @date 2021-10-22
  * @date 2022-08-11
+ * @date 2023-01-09 | H.Odaka | review
  *
  */
 
-//using image_t = boost::multi_array<double, 2>;
 
 class AllSkyPrimaryGen : public anlgeant4::IsotropicPrimaryGen
 {
@@ -61,14 +59,13 @@ public:
   void makePrimarySetting() override;
 
 protected:
-  void loadMultiBandImages(fitshandle* fits, int num_maps_, anlnext::ANLStatus& status);
+  void loadMultiBandImages(fitshandle* fits, int num_maps, anlnext::ANLStatus& status);
   void constructMaps(anlnext::ANLStatus& status);
   void constructMapsMultiBand(anlnext::ANLStatus& status);
   void calculateMapIntegrals(anlnext::ANLStatus& status);
   void setCoordinate(anlnext::ANLStatus& status);
   int sampleBandIndex();
-  int samplePixel(int band_index_);
-  G4ThreeVector convertCoordinate(const G4RotationMatrix r, G4ThreeVector vector);
+  int samplePixel(int band_index);
 
 private:
   /* module parameters */
@@ -100,23 +97,23 @@ private:
   std::vector<Healpix_Map<double>> maps_;
   std::vector<double> energies_;
 
-  std::vector<double> image_theta;
-  std::vector<double> image_phi;
+  std::vector<double> image_theta_;
+  std::vector<double> image_phi_;
 
   /* internal class members */
   
-  struct band_intensity {
+  struct band_intensity
+  {
     double emin;
     double emax;
     double photon_index;
-    //double intensity;
     double integrated_intensity;
   };
   std::vector<Healpix_Map<band_intensity>> band_maps_;
   std::vector<double> band_integrals_;
   std::vector< std::vector<double> > pixel_integrals_;
 
-  double threshold_zero_angle = 1e-5;
+  const double threshold_zero_angle_ = 1.0e-5;
 };
 
 } /* namespace comptonsoft */
