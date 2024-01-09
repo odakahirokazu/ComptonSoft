@@ -142,6 +142,9 @@
 #ifdef USE_FITSIO
 #include "CelestialSourcePrimaryGen.hh"
 #endif
+#ifdef USE_HEALPIX
+#include "AllSkyPrimaryGen.hh"
+#endif
 #include "RadioactiveDecayUserActionAssembly.hh"
 #include "ActivationUserActionAssembly.hh"
 #ifdef USE_SIMX
@@ -1070,6 +1073,16 @@ class CelestialSourcePrimaryGen : public anlgeant4::IsotropicPrimaryGen
 public:
   CelestialSourcePrimaryGen();
   ~CelestialSourcePrimaryGen();
+};
+
+#endif
+
+#ifdef USE_HEALPIX
+class AllSkyPrimaryGen : public anlgeant4::IsotropicPrimaryGen
+{
+public:
+  AllSkyPrimaryGen();
+  ~AllSkyPrimaryGen();
 };
 
 #endif
