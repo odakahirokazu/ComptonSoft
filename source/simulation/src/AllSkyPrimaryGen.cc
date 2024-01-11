@@ -151,7 +151,7 @@ ANLStatus AllSkyPrimaryGen::mod_end_run()
   double totalPhotonFlux = 0.0;
   for (int i=0; i< num_bands_; i++) {
     for (int ipix = 0; ipix < num_pixel_; ipix++) {
-      totalPhotonFlux += band_maps_[i][ipix].integrated_intensity * (1.0/unit::cm2/unit::s);
+      totalPhotonFlux += band_maps_[i][ipix].integrated_intensity;
     }
   }
   const double radius = Radius();
@@ -192,6 +192,10 @@ void AllSkyPrimaryGen::loadMultiBandImages(fitshandle* fits, int num_maps, ANLSt
               << "  Nside = " << maps_[i].Nside() << "\n"
               << "  Npix  = " << maps_[i].Npix() << "\n"
               << std::endl;
+
+    for (int ipix = 0; ipix < maps_[i].Npix(); ipix++) {
+      maps_[i][ipix] *= 1.0/unit::cm2/unit::keV/unit::s/unit::sr;
+    }
   }
 
   fits->goto_hdu(hdu_index_energy_);
@@ -232,7 +236,7 @@ void AllSkyPrimaryGen::loadMultiBandImages(fitshandle* fits, int num_maps, ANLSt
   num_bands_ = maps_.size() - 1;
   num_pixel_ = maps_[0].Npix();
   num_side_ = maps_[0].Nside();
-  pixel_area_ = 4 * M_PI / num_pixel_;
+  pixel_area_ = 4 * M_PI / num_pixel_ * unit::sr;
 
   std::cout << "The information about the filtered maps\n"
             << "  the number of the energy bands = " << num_bands_ << "\n"
@@ -284,7 +288,7 @@ void AllSkyPrimaryGen::constructMapsMultiBand(ANLStatus& status)
       const double photon_index = -1 * log(nmax/nmin) / log(emax/emin);
       const double intg_1 = nmin * emin / (-photon_index+1.0);
       const double intg_2 = nmin * pow ( 1.0/emin, (-1.0)*photon_index) * pow(emax, -photon_index+1.0)/(-photon_index+1.0);
-      const double integrated_intensity = (intg_2 - intg_1) * pixel_area_ * (unit::MeV / unit::keV);
+      const double integrated_intensity = (intg_2 - intg_1) * pixel_area_;
       band_maps_[i][ipix] = {emin, emax, photon_index, integrated_intensity};
     }
   }
