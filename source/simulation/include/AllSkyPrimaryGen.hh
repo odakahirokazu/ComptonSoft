@@ -107,7 +107,7 @@ private:
     double emin;
     double emax;
     double photon_index;
-    double integrated_intensity;
+    double integrated_flux;
   };
   std::vector<Healpix_Map<band_intensity>> band_maps_;
   std::vector<double> band_integrals_;
