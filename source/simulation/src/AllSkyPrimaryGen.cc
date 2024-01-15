@@ -151,7 +151,7 @@ ANLStatus AllSkyPrimaryGen::mod_end_run()
   double totalPhotonFlux = 0.0;
   for (int i=0; i< num_bands_; i++) {
     for (int ipix = 0; ipix < num_pixel_; ipix++) {
-      totalPhotonFlux += band_maps_[i][ipix].integrated_intensity;
+      totalPhotonFlux += band_maps_[i][ipix].integrated_flux;
     }
   }
   const double radius = Radius();
@@ -288,8 +288,8 @@ void AllSkyPrimaryGen::constructMapsMultiBand(ANLStatus& status)
       const double photon_index = -1 * log(nmax/nmin) / log(emax/emin);
       const double intg_1 = nmin * emin / (-photon_index+1.0);
       const double intg_2 = nmin * pow ( 1.0/emin, (-1.0)*photon_index) * pow(emax, -photon_index+1.0)/(-photon_index+1.0);
-      const double integrated_intensity = (intg_2 - intg_1) * pixel_area_;
-      band_maps_[i][ipix] = {emin, emax, photon_index, integrated_intensity};
+      const double integrated_flux = (intg_2 - intg_1) * pixel_area_;
+      band_maps_[i][ipix] = {emin, emax, photon_index, integrated_flux};
     }
   }
 
@@ -307,7 +307,7 @@ void AllSkyPrimaryGen::calculateMapIntegrals(ANLStatus& status)
     pixel_integrals_[i_band][0] = 0.0;
 
     for (int ipix=0; ipix<num_pixel_; ++ipix) {
-      pixel_integrals_[i_band][ipix+1] += pixel_integrals_[i_band][ipix] + band_maps_[i_band][ipix].integrated_intensity;
+      pixel_integrals_[i_band][ipix+1] += pixel_integrals_[i_band][ipix] + band_maps_[i_band][ipix].integrated_flux;
     }
 
     const double pixel_integrals_norm = pixel_integrals_[i_band].back();
