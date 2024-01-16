@@ -29,6 +29,7 @@ namespace unit {
 
 using CLHEP::pi;
 using CLHEP::twopi;
+using CLHEP::halfpi;
 
 using CLHEP::nm;
 using CLHEP::um;
@@ -121,6 +122,7 @@ namespace constant
 {
 using CLHEP::pi;
 using CLHEP::twopi;
+using CLHEP::halfpi;
 
 using CLHEP::Avogadro;
 

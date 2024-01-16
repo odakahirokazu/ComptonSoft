@@ -26,6 +26,7 @@
 using namespace anlnext;
 namespace unit = anlgeant4::unit;
 
+
 namespace comptonsoft
 {
 
@@ -114,6 +115,7 @@ void AllSkyPrimaryGen::makePrimarySetting()
   using std::cos;
   using std::sin;
   using std::sqrt;
+  using anlgeant4::constant::twopi;
 
   const int band_index = sampleBandIndex();
   const int ipix = samplePixel(band_index);
@@ -126,7 +128,7 @@ void AllSkyPrimaryGen::makePrimarySetting()
 
   G4ThreeVector v2 = v.orthogonal();
   v2.setMag( Radius() * sqrt(G4UniformRand()) );
-  const G4double chi = CLHEP::twopi * G4UniformRand();
+  const G4double chi = twopi * G4UniformRand();
   v2.rotate(chi, v);
 
   const G4ThreeVector position = CenterPosition() + v + v2;
@@ -148,6 +150,8 @@ void AllSkyPrimaryGen::makePrimarySetting()
 
 ANLStatus AllSkyPrimaryGen::mod_end_run()
 {
+  using anlgeant4::constant::pi;
+
   double totalPhotonFlux = 0.0;
   for (int i=0; i< num_bands_; i++) {
     for (int ipix = 0; ipix < num_pixel_; ipix++) {
@@ -155,7 +159,7 @@ ANLStatus AllSkyPrimaryGen::mod_end_run()
     }
   }
   const double radius = Radius();
-  const double area = CLHEP::pi*radius*radius;
+  const double area = pi*radius*radius;
   const double realTime = Number()/(totalPhotonFlux*area);
 
   setRealTime(realTime);
@@ -177,6 +181,8 @@ ANLStatus AllSkyPrimaryGen::mod_end_run()
 
 void AllSkyPrimaryGen::loadMultiBandImages(fitshandle* fits, int num_maps, ANLStatus& status)
 {
+  using anlgeant4::constant::pi;
+  
   maps_.resize(num_maps);
   energies_.resize(num_maps);
 
@@ -236,7 +242,7 @@ void AllSkyPrimaryGen::loadMultiBandImages(fitshandle* fits, int num_maps, ANLSt
   num_bands_ = maps_.size() - 1;
   num_pixel_ = maps_[0].Npix();
   num_side_ = maps_[0].Nside();
-  pixel_area_ = 4 * M_PI / num_pixel_ * unit::sr;
+  pixel_area_ = (4*pi*unit::sr)/num_pixel_;
 
   std::cout << "The information about the filtered maps\n"
             << "  the number of the energy bands = " << num_bands_ << "\n"
@@ -358,7 +364,7 @@ void AllSkyPrimaryGen::setCoordinate(ANLStatus& status)
   using std::cos;
   using std::acos;
   using std::abs;
-  using CLHEP::halfpi;
+  using anlgeant4::constant::halfpi;
 
   G4ThreeVector newX(sin(halfpi-origin_latitude_)*cos(origin_longitude_),
                      sin(halfpi-origin_latitude_)*sin(origin_longitude_),
