@@ -30,13 +30,16 @@ namespace comptonsoft
 {
 
 RadioactiveDecayUserActionAssembly::RadioactiveDecayUserActionAssembly()
-  : m_TerminationTime(1.0*unit::ms), m_FirstDecayTime(0.0)
+  : terminationTime_(1.0*unit::ms),
+    firstDecayTime_(0.0),
+    radioactiveDecayProcessName_("Radioactivation")
 {
 }
 
 ANLStatus RadioactiveDecayUserActionAssembly::mod_define()
 {
-  register_parameter(&m_TerminationTime, "termination_time", unit::s, "s");
+  define_parameter("termination_time", &mod_class::terminationTime_, unit::s, "s");
+  define_parameter("radioative_decay_process_name", &mod_class::radioactiveDecayProcessName_);
 
   return AS_OK;
 }
@@ -45,22 +48,21 @@ void RadioactiveDecayUserActionAssembly::SteppingAction(const G4Step* aStep)
 {
   G4Track* aTrack = aStep->GetTrack();
   const double globalTime = aTrack->GetGlobalTime();
-  const G4String radioactiveDecayProcessName = "RadioactiveDecay";
   
   if (aTrack->GetTrackID()==1 && aTrack->GetCurrentStepNumber()==1) {
     const G4String processName
       = aStep->GetPostStepPoint()->GetProcessDefinedStep()->GetProcessName();
-    if (processName == radioactiveDecayProcessName) {
-      m_FirstDecayTime = globalTime;
-      setInitialTime(m_FirstDecayTime);
+    if (processName == radioactiveDecayProcessName_) {
+      firstDecayTime_ = globalTime;
+      setInitialTime(firstDecayTime_);
     }
     else {
       throw ANLException("RadioactiveDecayUserActionAssembly:Error---First step is not radioactive decay.");
     }
   }
 
-  const double timeFromFirstDecay = globalTime - m_FirstDecayTime;
-  if (timeFromFirstDecay > m_TerminationTime) {
+  const double timeFromFirstDecay = globalTime - firstDecayTime_;
+  if (timeFromFirstDecay > terminationTime_) {
     aTrack->SetTrackStatus(fKillTrackAndSecondaries);
     return;
   }
