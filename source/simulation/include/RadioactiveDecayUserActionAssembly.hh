@@ -33,10 +33,11 @@ namespace comptonsoft {
  * @date 2011-04-08
  * @date 2016-06-29 | rename the module name.
  * @date 2017-06-29 | new design of UserActionAssembly
+ * @date 2024-02-24 | process name as a member
  */
 class RadioactiveDecayUserActionAssembly : public anlgeant4::StandardUserActionAssembly
 {
-  DEFINE_ANL_MODULE(RadioactiveDecayUserActionAssembly, 3.0);
+  DEFINE_ANL_MODULE(RadioactiveDecayUserActionAssembly, 3.1);
 public:
   RadioactiveDecayUserActionAssembly();
   
@@ -44,14 +45,15 @@ public:
 
   void SteppingAction(const G4Step* aStep) override;
 
-  void SetTerminationTime(double v) { m_TerminationTime = v; }
-  double TerminationTime() const { return m_TerminationTime; }
+  void SetTerminationTime(double v) { terminationTime_ = v; }
+  double TerminationTime() const { return terminationTime_; }
 
-  double FirstDecayTime() const { return m_FirstDecayTime; }
+  double FirstDecayTime() const { return firstDecayTime_; }
 
 private:
-  double m_TerminationTime;
-  double m_FirstDecayTime;
+  double terminationTime_;
+  double firstDecayTime_;
+  std::string radioactiveDecayProcessName_;
 };
 
 } /* namespace comptonsoft */
