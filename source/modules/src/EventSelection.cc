@@ -35,6 +35,7 @@ EventSelection::EventSelection()
     m_DiscardTimeGroupNonZero(false),
     m_OffEnabled(true),
     m_VetoEnabled(true),
+    m_TriggerEnabled(false),
     m_HitCollection(nullptr)
 {
 }
@@ -45,6 +46,7 @@ ANLStatus EventSelection::mod_define()
   register_parameter(&m_DiscardTimeGroupNonZero, "discard_time_group_nonzero");
   register_parameter(&m_OffEnabled, "enable_off");
   register_parameter(&m_VetoEnabled, "enable_veto");
+  register_parameter(&m_TriggerEnabled, "enable_trigger");
 
   return AS_OK;
 }
@@ -54,6 +56,7 @@ ANLStatus EventSelection::mod_initialize()
   VCSModule::mod_initialize();
   get_module_NC("CSHitCollection", &m_HitCollection);
   define_evs("EventSelection:Veto");
+  define_evs("EventSelection:Trigger");
   return AS_OK;
 }
 
@@ -64,6 +67,8 @@ ANLStatus EventSelection::mod_analyze()
     = detectorManager->getDetectorGroup("Anti");
   const DetectorGroup& OffDetectorGroup
     = detectorManager->getDetectorGroup("Off");
+  const DetectorGroup& TriggerDetectorGroup
+    = detectorManager->getDetectorGroup("Trigger");
   const DetectorGroup& LowZDetectorGroup
     = detectorManager->getDetectorGroup("LowZ");
   const DetectorGroup& HighZDetectorGroup
@@ -100,9 +105,11 @@ ANLStatus EventSelection::mod_analyze()
     }
     
     bool veto = false;
+    bool trigger = false;
     for (DetectorHit_sptr& hit: hits) {
-      hit->clearFlags(flag::AntiCoincidence|flag::LowZHit|flag::HighZHit);
+      hit->clearFlags(flag::AntiCoincidence|flag::Trigger|flag::LowZHit|flag::HighZHit);
       const int detectorID = hit->DetectorID();
+
       if (AntiDetectorGroup.isMember(detectorID)) {
         veto = true;
         hit->addFlags(flag::AntiCoincidence);
@@ -110,10 +117,20 @@ ANLStatus EventSelection::mod_analyze()
           set_evs("EventSelection:Veto");
         }
       }
-      else if (LowZDetectorGroup.isMember(detectorID)) {
+
+      if (TriggerDetectorGroup.isMember(detectorID)) {
+        trigger = true;
+        hit->addFlags(flag::Trigger);
+        if (timeGroup==0) {
+          set_evs("EventSelection:Trigger");
+        }
+      }
+
+      if (LowZDetectorGroup.isMember(detectorID)) {
         hit->addFlags(flag::LowZHit);
       }
-      else if (HighZDetectorGroup.isMember(detectorID)) {
+
+      if (HighZDetectorGroup.isMember(detectorID)) {
         hit->addFlags(flag::HighZHit);
       }
 
@@ -134,6 +151,10 @@ ANLStatus EventSelection::mod_analyze()
     }
 
     if (m_VetoEnabled && veto) {
+      hits.clear();
+    }
+
+    if (m_TriggerEnabled && !trigger) {
       hits.clear();
     }
   }
