@@ -113,11 +113,6 @@ ANLStatus BasicPrimaryGen::mod_pre_initialize()
     expose_parameter("nucleus_mass_number");
     expose_parameter("nucleus_excitation_energy");
     expose_parameter("nucleus_floating_level");
-
-    setNucleusDefinition(nucleus_atomic_number_,
-                         nucleus_mass_number_,
-                         nucleus_excitation_energy_,
-                         nucleus_floating_level_);
   }
 
   disableDefaultEnergyInput();
@@ -185,6 +180,13 @@ ANLStatus BasicPrimaryGen::mod_begin_run()
 {
   number_ = 0;
   totalEnergy_ = 0.0;
+
+  if (particleName_ == "nucleus") {
+    setNucleusDefinition(nucleus_atomic_number_,
+                         nucleus_mass_number_,
+                         nucleus_excitation_energy_,
+                         nucleus_floating_level_);
+  }
 
   return AS_OK;
 }
@@ -430,6 +432,10 @@ G4VUserPrimaryGeneratorAction* BasicPrimaryGen::create()
 {
   if (definition_) {
     primaryGenerator_ = new BasicPrimaryGeneratorAction(definition_);
+  }
+  else if (particleName_ == "nucleus") {
+    /* particle definition will be set in mod_begin_run() */
+    primaryGenerator_ = new BasicPrimaryGeneratorAction;
   }
   else if (particleName_ != "") {
     primaryGenerator_ = new BasicPrimaryGeneratorAction(particleName_);
