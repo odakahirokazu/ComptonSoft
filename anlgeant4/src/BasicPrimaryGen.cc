@@ -23,6 +23,9 @@
 #include <iterator>
 #include <boost/format.hpp>
 #include "Randomize.hh"
+#include "G4Ions.hh"
+#include "G4IonTable.hh"
+#include "G4VIsotopeTable.hh"
 #include "AstroUnits.hh"
 #include "BasicPrimaryGeneratorAction.hh"
 #include "VANLGeometry.hh"
@@ -35,6 +38,10 @@ namespace anlgeant4
 BasicPrimaryGen::BasicPrimaryGen()
   : InitialInformation(true),
     particleName_("gamma"),
+    nucleus_atomic_number_(0),
+    nucleus_mass_number_(0),
+    nucleus_excitation_energy_(0.0),
+    nucleus_floating_level_(0),
     time_(0.0),
     position_(0.0, 0.0, 0.0),
     energy_(0.0), direction_(0.0, 0.0, -1.0),
@@ -58,26 +65,36 @@ ANLStatus BasicPrimaryGen::mod_define()
 {
   VANLPrimaryGen::mod_define();
 
-  register_parameter(&particleName_, "particle");
-  set_parameter_description("Particle name (gamma, e-, e+, proton, neutron, geantino...)");
+  define_parameter("particle", &mod_class::particleName_);
+  set_parameter_description("Particle name (gamma, e-, e+, proton, neutron, geantino...) Set this to \"nucleus\" for nucleus/isotope such as C-12, Cs-137.");
 
-  register_parameter(&energyDistributionName_, "spectral_distribution");
+  define_parameter("nucleus_atomic_number", &mod_class::nucleus_atomic_number_);
+  define_parameter("nucleus_mass_number", &mod_class::nucleus_mass_number_);
+  define_parameter("nucleus_excitation_energy", &mod_class::nucleus_excitation_energy_, unit::keV, "keV");
+  define_parameter("nucleus_floating_level", &mod_class::nucleus_floating_level_);
 
-  register_parameter(&energyMin_, "energy_min", unit::keV, "keV");
+  hide_parameter("nucleus_atomic_number");
+  hide_parameter("nucleus_mass_number");
+  hide_parameter("nucleus_excitation_energy");
+  hide_parameter("nucleus_floating_level");
+
+  define_parameter("spectral_distribution", &mod_class::energyDistributionName_);
+
+  define_parameter("energy_min", &mod_class::energyMin_, unit::keV, "keV");
   set_parameter_description("Minimum value of the energy distribution");
-  register_parameter(&energyMax_, "energy_max", unit::keV, "keV");
+  define_parameter("energy_max", &mod_class::energyMax_, unit::keV, "keV");
   set_parameter_description("Maximum value of the energy distribution");
-  register_parameter(&photonIndex_, "photon_index");
+  define_parameter("photon_index", &mod_class::photonIndex_);
   set_parameter_description("Power law index of the photon spectrum");
-  register_parameter(&energyMean_, "energy_mean", unit::keV, "keV");
+  define_parameter("energy_mean", &mod_class::energyMean_, unit::keV, "keV");
   set_parameter_description("Mean energy of the Gaussian distribution");
-  register_parameter(&energySigma_, "energy_sigma", unit::keV, "keV");
+  define_parameter("energy_sigma", &mod_class::energySigma_, unit::keV, "keV");
   set_parameter_description("Standard deviation of the Gaussian distribution");
-  register_parameter(&kT_, "radiation_temperature", unit::keV, "keV");
+  define_parameter("radiation_temperature", &mod_class::kT_, unit::keV, "keV");
   set_parameter_description("Radiation temperature in units of keV");
-  register_parameter(&spectrumEnergy_, "energy_array", unit::keV, "keV");
+  define_parameter("energy_array", &mod_class::spectrumEnergy_, unit::keV, "keV");
   set_parameter_description("Energy array of spectral histogram");
-  register_parameter(&spectrumPhotons_, "photons_array");
+  define_parameter("photons_array", &mod_class::spectrumPhotons_);
   set_parameter_description("Photons array of spectral histogram");
 
   define_result("real_time", &mod_class::realTime_, unit::s, "s");
@@ -90,6 +107,18 @@ ANLStatus BasicPrimaryGen::mod_define()
 ANLStatus BasicPrimaryGen::mod_pre_initialize()
 {
   get_module("VANLGeometry", &geometry_);
+
+  if (particleName_=="nucleus") {
+    expose_parameter("nucleus_atomic_number");
+    expose_parameter("nucleus_mass_number");
+    expose_parameter("nucleus_excitation_energy");
+    expose_parameter("nucleus_floating_level");
+
+    setNucleusDefinition(nucleus_atomic_number_,
+                         nucleus_mass_number_,
+                         nucleus_excitation_energy_,
+                         nucleus_floating_level_);
+  }
 
   disableDefaultEnergyInput();
   
@@ -183,6 +212,24 @@ void BasicPrimaryGen::setDefinition(G4ParticleDefinition* def)
   if (primaryGenerator_) {
     primaryGenerator_->SetDefinition(def);
   }
+}
+
+void BasicPrimaryGen::setNucleusDefinition(int atomic_number,
+                                           int mass_number,
+                                           double excitation_energy,
+                                           int floating_level)
+{
+  G4IonTable* ionTable = static_cast<G4IonTable*>(G4ParticleTable::GetParticleTable()->GetIonTable());
+  G4ParticleDefinition* particle_base =
+    ionTable->GetIon(atomic_number,
+                     mass_number,
+                     excitation_energy,
+                     G4Ions::FloatLevelBase(floating_level));
+  G4Ions* particle = dynamic_cast<G4Ions*>(particle_base);
+  if (particle == nullptr) {
+    std::cout << "Error: the particle can not be converted into G4Ions." << std::endl;
+  }
+  setDefinition(particle);
 }
 
 void BasicPrimaryGen::enablePowerLawInput()
