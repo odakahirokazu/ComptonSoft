@@ -43,6 +43,7 @@ class VANLGeometry;
  * @date 2017-07-27 | Hirokazu Odaka | this can transfer its setting function to the generator action, introducing makePrimarySetting().
  * @date 2017-07-03 | 4.2 | Hirokazu Odaka | length unit is fixed to cm
  * @date 2020-04-13 | 5.0 | Hirokazu Odaka | remove polarization mode
+ * @date 2024-03-08 | 6.0 | Hirokazu Odaka | nucleus
  */
 class BasicPrimaryGen : public VANLPrimaryGen, public InitialInformation
 {
@@ -122,6 +123,7 @@ protected:
 
   void setDefinition(G4ParticleDefinition* def);
   void setParticleName(const std::string& name) { particleName_ = name; }
+  void setNucleusDefinition(int atomic_number, int mass_number, double excitation_energy, int floating_level);
 
   void setEnergyDistribution(SpectralShape v, const std::string& name)
   {
@@ -188,6 +190,12 @@ private:
   const anlgeant4::VANLGeometry* geometry_ = nullptr;
 
   std::string particleName_;
+
+  /* properties of a nucleus */
+  int nucleus_atomic_number_;
+  int nucleus_mass_number_;
+  double nucleus_excitation_energy_;
+  int nucleus_floating_level_;
 
   double time_;
   G4ThreeVector position_;
