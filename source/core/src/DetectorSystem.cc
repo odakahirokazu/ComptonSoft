@@ -59,7 +59,7 @@ DetectorSystem::DetectorSystem()
     detectorConstructed_(false),
     ROOTFile_(nullptr)
 {
-  std::vector<std::string> defaultGroups = {"Anti", "Off", "LowZ", "HighZ"};
+  std::vector<std::string> defaultGroups = {"Anti", "Trigger", "Off", "LowZ", "HighZ"};
   for (auto& groupName: defaultGroups) {
     detectorGroupMap_[groupName]
       = std::unique_ptr<DetectorGroup>(new DetectorGroup(groupName));
