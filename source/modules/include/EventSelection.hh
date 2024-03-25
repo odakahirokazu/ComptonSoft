@@ -37,10 +37,11 @@ class CSHitCollection;
  * @date 2014-11-25
  * @date 2015-10-10
  * @date 2016-09-20 | detectors off
+ * @date 2024-03-22 | trigger
  */
 class EventSelection : public VCSModule
 {
-  DEFINE_ANL_MODULE(EventSelection, 2.2)
+  DEFINE_ANL_MODULE(EventSelection, 3.0)
 public:
   EventSelection();
   ~EventSelection() = default;
@@ -54,6 +55,7 @@ private:
   bool m_DiscardTimeGroupNonZero;
   bool m_OffEnabled;
   bool m_VetoEnabled;
+  bool m_TriggerEnabled;
   std::vector<std::pair<double, double>> m_FluoresenceRanges;
   CSHitCollection* m_HitCollection;
 };

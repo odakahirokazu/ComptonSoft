@@ -47,6 +47,7 @@ constexpr uint64_t ElectronEscape    = 0x0080u;
 constexpr uint64_t LowZHit           = 0x0100u;
 constexpr uint64_t HighZHit          = 0x0200u;
 constexpr uint64_t AntiCoincidence   = 0x0400u;
+constexpr uint64_t Trigger           = 0x0800u;
 
 constexpr uint64_t EnergyDepositQuenched = 0x1000u;
 
