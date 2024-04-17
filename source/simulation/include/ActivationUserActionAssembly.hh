@@ -28,7 +28,7 @@
 
 #include "IsotopeInfo.hh"
 
-class G4VTouchable;
+class G4TouchableHistory;
 class G4VPhysicalVolume;
 class G4Ions;
 class G4VAnalysisManager;
@@ -48,6 +48,7 @@ namespace comptonsoft {
  * @date 2017-07-29 | Hiro Odaka | new design of VUserActionAssembly
  * @date 2017-07-29 | Hiro Odaka | use floating level of isotope.
  * @date 2022-05-20 | Hiro Odaka | Geant4-v11: The analysis manager is not owned by this class.
+ * @date 2024-04-17 | Hiro Odaka | Geant4-v11.2: G4VTouchable -> G4TouchableHistory
  */
 class ActivationUserActionAssembly : public anlgeant4::StandardUserActionAssembly
 {
@@ -71,7 +72,7 @@ public:
 protected:
   void SetInitialEnergy(double var) { m_InitialEnergy = var; }
   void Fill(const G4Ions* nucleus,
-            const G4VTouchable* touchable,
+            const G4TouchableHistory* touchable,
             double posx, double posy, double posz);
   void OutputVolumeInfo(const std::string& filename="");
   void OutputSummary(const std::string& filename, int numberOfRun);

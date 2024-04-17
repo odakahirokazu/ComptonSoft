@@ -116,7 +116,7 @@ void ActivationUserActionAssembly::SteppingAction(const G4Step* step)
   if (std::find(std::begin(m_ProcessesToDetect),
                 std::end(m_ProcessesToDetect),
                 processName) != std::end(m_ProcessesToDetect)) {
-    const G4VTouchable* hist = step->GetPreStepPoint()->GetTouchable();
+    const G4TouchableHistory* hist = step->GetPreStepPoint()->GetTouchable();
     const G4ThreeVector position = step->GetPreStepPoint()->GetPosition();
 
     if (m_DetectionByGeneration) {
@@ -160,7 +160,7 @@ std::string ActivationUserActionAssembly::VolumeName(int index)
 }
 
 void ActivationUserActionAssembly::Fill(const G4Ions* nucleus,
-                                        const G4VTouchable* touchable,
+                                        const G4TouchableHistory* touchable,
                                         double posx, double posy, double posz)
 {
   const int Z = nucleus->GetAtomicNumber();

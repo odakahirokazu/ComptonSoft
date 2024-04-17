@@ -3,6 +3,7 @@
  * @brief source file of class RIDecayChains
  * @author Hirokazu Odaka
  * @date 2016-05-04
+ * @date 2024-04-17 |geant4 v11.2 changed interface
  */
 
 #include "RIDecayChains.hh"
@@ -208,7 +209,7 @@ RIDecayChains::collectDecayProducts(const G4Ions* parent)
   }
   
   // decay_process_->SetVerboseLevel(2);
-  std::unique_ptr<const G4DecayTable> decayTable(decay_process_->LoadDecayTable(*parent));
+  std::unique_ptr<const G4DecayTable> decayTable(decay_process_->LoadDecayTable(parent));
 
   if (decayTable.get()==nullptr) {
     return std::list<RIDecayProperties>();
