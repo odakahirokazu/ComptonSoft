@@ -110,14 +110,14 @@ DetectorHit& DetectorHit::merge(const DetectorHit& r)
   return *this;
 }
 
-bool DetectorHit::isAdjacent(const DetectorHit& r, bool contact) const
+bool DetectorHit::isAdjacent(const DetectorHit& r, bool contact_condition) const
 {
   if (isInSameDetector(r)) {
     if (isVoxel() && r.isVoxel()) {
       const int dx = Voxel().X() - r.Voxel().X();
       const int dy = Voxel().Y() - r.Voxel().Y();
       const int dz = Voxel().Z() - r.Voxel().Z();
-      if (contact) {
+      if (contact_condition) {
         return (dx==0 && dy==0 && (dz==-1 || dz==1))
           || (dy==0 && dz==0 && (dx==-1 || dx==1))
           || (dz==0 && dx==0 && (dy==-1 || dy==1));
@@ -131,7 +131,7 @@ bool DetectorHit::isAdjacent(const DetectorHit& r, bool contact) const
     else if (isPixel() && r.isPixel()) {
       const int dx = Pixel().X() - r.Pixel().X();
       const int dy = Pixel().Y() - r.Pixel().Y();
-      if (contact) {
+      if (contact_condition) {
         return (dx==0 && (dy==1 || dy==-1)) || (dy==0 && (dx==1 || dx==-1));
       }
       else {

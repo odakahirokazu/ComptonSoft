@@ -44,6 +44,7 @@ class FrameData;
  * @date 2014-10-02 | VDetectorUnit as a virtual base class.
  * @date 2015-10-11 | DetectorType as an enum class. AnalysisMode => ReconstructionMode
  * @date 2022-04-24 | Introduce 3D voxel detector
+ * @date 2024-05-17 | Introduce the contact condition in clustering
  */
 class VRealDetectorUnit : virtual public VDetectorUnit
 {
@@ -251,8 +252,12 @@ public:
     return setReconstructionDetails(mode);
   }
   int ReconstructionMode() const { return reconstructionMode_; }
-  void setClusteringOn(bool v=true) { clusteringOn_ = v; }
+  void setClusteringOn(bool on=true, bool contact_condition=true) {
+    clusteringOn_ = on;
+    clusteringContactCondition_ = contact_condition;
+  }
   bool isClusteringOn() const { return clusteringOn_; }
+  bool ClusteringContactCondition() const { return clusteringContactCondition_; }
 
   void initializeEvent() override;
   virtual void selectHits();
@@ -313,6 +318,7 @@ private:
 
   int reconstructionMode_;
   bool clusteringOn_;
+  bool clusteringContactCondition_;
 
   std::vector<std::unique_ptr<MultiChannelData>> MCDVector_;
   std::shared_ptr<const VChannelMap> channelMap_;
