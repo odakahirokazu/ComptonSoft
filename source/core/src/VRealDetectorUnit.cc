@@ -440,7 +440,8 @@ printDetectorParameters(std::ostream& os) const
   os << "Frame data: " << hasFrameData() << '\n';
   os << "Reconstruction\n"
      << "  Mode : " << ReconstructionMode() << '\n'
-     << "  Clustering : " << isClusteringOn() << '\n';
+     << "  Clustering : " << isClusteringOn() << '\n'
+     << "  Contact condition : " << ClusteringContactCondition() << '\n';
 }
 
 void VRealDetectorUnit::registerFrameData(std::unique_ptr<FrameData>&& frame)
