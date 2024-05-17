@@ -35,10 +35,10 @@ namespace {
 
 typedef std::list<comptonsoft::DetectorHit_sptr> HitList;
 
-bool is_group_adjacent(const HitList& group0, const HitList& group1) {
+bool is_group_adjacent(const HitList& group0, const HitList& group1, bool contact_condition) {
   for (const auto& hit0: group0) {
     for (const auto& hit1: group1) {
-      if (hit0->isAdjacent(*hit1, true)) {
+      if (hit0->isAdjacent(*hit1, contact_condition)) {
         return true;
       }
     }
@@ -61,7 +61,7 @@ VRealDetectorUnit::VRealDetectorUnit()
     directionY_(0.0, 1.0, 0.0),
     directionZ_(0.0, 0.0, 1.0),
     bottomSideElectrode_(ElectrodeSide::Undefined),
-    reconstructionMode_(1), clusteringOn_(true),
+    reconstructionMode_(1), clusteringOn_(true), clusteringContactCondition_(true),
     channelMap_(nullptr)
 {
 }
@@ -369,6 +369,8 @@ void VRealDetectorUnit::cluster(DetectorHitVector& hits) const
     return hit1->EPI() > hit2->EPI();
   };
 
+  const bool contact_condition = ClusteringContactCondition();
+
   bool merged = true;
   while (merged) {
     merged = false;
@@ -376,7 +378,7 @@ void VRealDetectorUnit::cluster(DetectorHitVector& hits) const
     while (groupIter != std::end(groups)) {
       auto groupIter1 = groupIter + 1;
       while (groupIter1 != std::end(groups)) {
-        if (is_group_adjacent(*groupIter, *groupIter1)) {
+        if (is_group_adjacent(*groupIter, *groupIter1, contact_condition)) {
           groupIter->merge(*groupIter1, compair);
           groupIter1 = groups.erase(groupIter1);
           merged = true;

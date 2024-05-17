@@ -42,6 +42,10 @@ bool RealDetectorUnit3DVoxel::setReconstructionDetails(int mode)
     // basic reconstruction without clustering
     setClusteringOn(false);
   }
+  else if (mode == 3) {
+    // basic reconstruction with clustering (contact: false)
+    setClusteringOn(true, false);
+  }
   else {
     std::cout << "Unknown reconstruction mode is given." << std::endl;
     return false;
