@@ -3,9 +3,8 @@
 require 'comptonsoft'
 
 def run_simulation(num, random, output)
-  # energy = 1332.5 # keV
-  energy = 3000.5 # keV
-
+  energy = 1332.5 # keV
+  
   sim = ComptonSoft::Simulation.new
   sim.output = output
   sim.random_seed = random
