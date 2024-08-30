@@ -23,6 +23,7 @@ list(APPEND CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
 ### options
 ## interface options
 option(CS_USE_RUBY "enable Ruby binding" ON)
+option(CS_USE_PYTHON "enable Python binding (anlgeant4)" ON)
 option(CS_USE_EXE "enable standalone executables" OFF)
 ## library options
 option(CS_USE_GDML "enable GDML" ON)
@@ -67,6 +68,7 @@ if(CS_HARD_ALL)
 endif(CS_HARD_ALL)
 
 set(USE_RUBY ${CS_USE_RUBY})
+set(USE_PYTHON ${CS_USE_PYTHON})
 set(USE_EXE ${CS_USE_EXE})
 set(INSTALL_HEADERS ${CS_INSTALL_HEADERS})
 set(INSTALL_CMAKE_FILES ${CS_INSTALL_CMAKE_FILES})
