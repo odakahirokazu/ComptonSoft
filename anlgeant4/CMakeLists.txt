@@ -91,3 +91,7 @@ endif(INSTALL_HEADERS)
 if(USE_RUBY)
   add_subdirectory(rubyext)
 endif(USE_RUBY)
+
+if(USE_PYTHON)
+  add_subdirectory(pyext)
+endif(USE_PYTHON)
