@@ -32,7 +32,7 @@
 %}
 
 
-%import(module="anlnext/ANL") "anlnext/python/anlpy.i"
+%import(module="anlnext.anlnextpy") "anlnext/python/anlnextpy.i"
 
 namespace anlgeant4 {
 
