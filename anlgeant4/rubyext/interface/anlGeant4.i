@@ -13,6 +13,7 @@
 #include "VANLPrimaryGen.hh"
 #include "BasicPrimaryGen.hh"
 #include "PointSourcePrimaryGen.hh"
+#include "SphericalSourcePrimaryGen.hh"
 #include "PlaneWavePrimaryGen.hh"
 #include "PlaneWaveRectanglePrimaryGen.hh"
 #include "GaussianBeamPrimaryGen.hh"
@@ -106,6 +107,14 @@ class PointSourcePrimaryGen : public BasicPrimaryGen
 public:
   PointSourcePrimaryGen();
   ~PointSourcePrimaryGen();
+};
+
+
+class SphericalSourcePrimaryGen : public PointSourcePrimaryGen
+{
+public:
+  SphericalSourcePrimaryGen();
+  ~SphericalSourcePrimaryGen();
 };
 
 

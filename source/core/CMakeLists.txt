@@ -1,5 +1,3 @@
-cmake_minimum_required(VERSION 3.0)
-
 include_directories(include
   ${ANLG4_INC_DIR}
   ${ROOT_INC_DIR}
