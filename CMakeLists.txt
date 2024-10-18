@@ -1,5 +1,5 @@
 ####### CMakeLists.txt for Compton Soft
-cmake_minimum_required(VERSION 3.0)
+cmake_minimum_required(VERSION 3.30)
 
 ### Initial definition of cmake variables
 set(CMAKE_INSTALL_PREFIX $ENV{HOME} CACHE PATH "install prefix")

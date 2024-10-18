@@ -8,6 +8,7 @@ class WriteGDML;
 class VANLPrimaryGen;
 class BasicPrimaryGen;
 class PointSourcePrimaryGen;
+class SphericalSourcePrimaryGen;
 class PlaneWavePrimaryGen;
 class PlaneWaveRectanglePrimaryGen;
 class GaussianBeamPrimaryGen;

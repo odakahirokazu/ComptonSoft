@@ -13,6 +13,7 @@ classList = [
   ANL::SWIGClass.new('VANLPrimaryGen', true),
   ANL::SWIGClass.new('BasicPrimaryGen', true),
   ANL::SWIGClass.new('PointSourcePrimaryGen'),
+  ANL::SWIGClass.new('SphericalSourcePrimaryGen'),
   ANL::SWIGClass.new('PlaneWavePrimaryGen'),
   ANL::SWIGClass.new('PlaneWaveRectanglePrimaryGen'),
   ANL::SWIGClass.new('GaussianBeamPrimaryGen'),
