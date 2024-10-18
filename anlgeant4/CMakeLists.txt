@@ -54,6 +54,7 @@ add_library(${TARGET_LIBRARY} SHARED
   src/BasicPrimaryGeneratorAction.cc
   src/BasicPrimaryGen.cc
   src/PointSourcePrimaryGen.cc
+  src/SphericalSourcePrimaryGen.cc
   src/PlaneWavePrimaryGen.cc
   src/PlaneWaveRectanglePrimaryGen.cc
   src/GaussianBeamPrimaryGen.cc
