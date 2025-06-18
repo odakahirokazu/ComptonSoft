@@ -5,6 +5,7 @@ include_directories(include
   ${CLHEP_INC_DIR}
   ${ADD_INC_DIR}
   ${BOOST_INC_DIR}
+  ${ORT_INC_DIR}
   )
 
 link_directories(
@@ -12,6 +13,7 @@ link_directories(
   ${G4_LIB_DIR}
   ${CLHEP_LIB_DIR}
   ${BOOST_LIB_DIR}
+  ${ORT_LIB_DIR}
   )
 
 set(CS_CORE_CLASSES
@@ -67,6 +69,8 @@ set(CS_CORE_CLASSES
   src/HY2020EventReconstructionAlgorithm.cc
   src/OberlackAlgorithm.cc
   src/TangoAlgorithm.cc
+  src/NNEstimator.cc
+  src/MTNNEventReconstructionAlgorithm.cc
   ### sensitive detector
   src/VCSSensitiveDetector.cc
   ### manager
@@ -110,7 +114,7 @@ add_library(CSCore SHARED
   )
 
 target_link_libraries(CSCore
-  ${ROOT_LIB} ${G4_LIB} ${CLHEP_LIB} ${ADD_LIB} ${BOOST_LIB})
+  ${ROOT_LIB} ${G4_LIB} ${CLHEP_LIB} ${ADD_LIB} ${BOOST_LIB} ${ORT_LIB})
 
 install(TARGETS CSCore LIBRARY DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
 

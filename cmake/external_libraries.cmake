@@ -93,6 +93,15 @@ if(CS_USE_SIMX)
   set(SIMX_LIB simx simput cfitsio ape wcs fftw3 readline termcap)
 endif(CS_USE_SIMX)
 
+
+#ONNX
+if(CS_USE_ORT)
+  set(ORT_INC_DIR $ENV{ORT_PATH}/include)
+  set(ORT_LIB_DIR $ENV{ORT_PATH}/lib)
+  set(ORT_LIB     $ENV{ORT_PATH}/lib/libonnxruntime.dylib)
+  message(STATUS ${ORT_INC_DIR})
+endif(CS_USE_ORT)
+
 ### HSQuickLook ###
 if(CS_USE_HSQUICKLOOK)
   find_path(HSQUICKLOOK_INC_DIR
