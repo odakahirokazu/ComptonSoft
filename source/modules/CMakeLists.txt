@@ -14,6 +14,7 @@ include_directories(
   ${ADD_INC_DIR}
   ${QT_INC_DIR}
   ${BOOST_INC_DIR}
+  ${ORT_INC_DIR}
   )
 
 link_directories(
@@ -23,6 +24,7 @@ link_directories(
   ${G4_LIB_DIR}
   ${CLHEP_LIB_DIR}
   ${SIMX_LIB_DIR}
+  ${ORT_LIB_DIR}
   )
 
 set(CS_MODULES
@@ -162,6 +164,7 @@ target_link_libraries(CSModules
   ${HSQUICKLOOK_LIB}
   ${SIMX_LIB}
   ${ADD_LIB}
+  ${ORT_LIB}
   )
 
 install(TARGETS CSModules LIBRARY DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
