@@ -53,8 +53,6 @@ int argmax(float *arg, int len);
 
 int calculate_product(const std::vector<std::int64_t>& v);
 
-std::string print_shape(const std::vector<std::int64_t>& v);
-
 template <typename T>
 Ort::Value vec_to_tensor(std::vector<T>& data, const std::vector<std::int64_t>& shape);
 

@@ -69,8 +69,6 @@ set(CS_CORE_CLASSES
   src/HY2020EventReconstructionAlgorithm.cc
   src/OberlackAlgorithm.cc
   src/TangoAlgorithm.cc
-  src/NNEstimator.cc
-  src/MTNNEventReconstructionAlgorithm.cc
   ### sensitive detector
   src/VCSSensitiveDetector.cc
   ### manager
@@ -109,8 +107,16 @@ set(CS_CORE_CLASSES
   src/RIDecayCalculation.cc
 )
 
+if(CS_USE_ORT)
+  set(CS_CORE_CLASSES_ORT
+    src/NNEstimator.cc
+    src/MTNNEventReconstructionAlgorithm.cc
+  )
+endif(CS_USE_ORT)
+
 add_library(CSCore SHARED
   ${CS_CORE_CLASSES}
+  ${CS_CORE_CLASSES_ORT}
   )
 
 target_link_libraries(CSCore

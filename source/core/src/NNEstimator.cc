@@ -165,8 +165,6 @@ bool NNAnalyzer::Run(const std::vector<DetectorHit_sptr>& hits,
     pred_order_prob_ = output_tensor_hit_order_values_[pred_order_];
     num_array_       = dict_label2array_[pred_order_];
 
-    //OK up to here
-
     DetectorHit_sptr hit1_sptr = ordered_hits[num_array_[0]];
     DetectorHit_sptr hit2_sptr = ordered_hits[num_array_[1]];
 
@@ -262,17 +260,6 @@ int argmax(float *arg, int len){
         }
     } while(len > 0);
     return index_max;
-}
-
-
-// pretty prints a shape dimension std::vector
-std::string print_shape(const std::vector<std::int64_t>& v) {
-    std::stringstream ss("");
-    for (std::size_t i = 0; i < v.size() - 1; i++){
-        ss << v[i] << "x";
-    }
-    ss << v[v.size() - 1];
-    return ss.str();
 }
 
 

@@ -100,7 +100,8 @@ if(CS_USE_ORT)
   set(ORT_INC_DIR $ENV{ORT_PATH}/include)
   set(ORT_LIB_DIR $ENV{ORT_PATH}/lib)
   set(ORT_LIB     $ENV{ORT_PATH}/lib/libonnxruntime.dylib)
-  message(STATUS ${ORT_INC_DIR})
+  add_definitions(-DCS_USE_ORT)
+  message("-- ONNX Runtime libraries: ${ORT_LIB}")
 endif(CS_USE_ORT)
 
 ### HSQuickLook ###
