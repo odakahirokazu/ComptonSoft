@@ -34,6 +34,7 @@ class DetectorSystem;
  * @author Hirokazu Odaka
  * @date 2011-04-04
  * @date 2014-11-14
+ * @date 2025-06-24
  */
 class VCSSensitiveDetector : public G4VSensitiveDetector
 {
