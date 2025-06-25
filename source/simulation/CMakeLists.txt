@@ -1,5 +1,3 @@
-add_definitions(-DANLNEXT_USE_TVECTOR -DANLNEXT_USE_HEPVECTOR)
-
 include_directories(
   include
   ../core/include
@@ -85,6 +83,13 @@ add_library(CSSimulation SHARED
   ${CS_SIMULATION_CLASSES_HEALPIX}
   ${CS_SIMULATION_CLASSES_SIMX}
   )
+
+target_compile_definitions(
+  CSSimulation
+  PRIVATE
+  ANLNEXT_USE_TVECTOR=TRUE
+  ANLNEXT_USE_HEPVECTOR=TRUE
+)
 
 target_link_libraries(CSSimulation
   CSCore CSModules ${ANLG4_LIB} ${ANLNEXT_LIB}
