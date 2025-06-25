@@ -101,7 +101,7 @@ if(CS_USE_ORT)
   set(ORT_PATH "" CACHE PATH "Path to ORT")
   find_path(ORT_INC_DIR
     NAMES onnxruntime_cxx_api.h
-    PATHS "${ORT_PATH}/include"
+    PATHS "${ORT_PATH}/include" "${ORT_PATH}/include/onnxruntime"
     REQUIRED
   )
   find_library(ORT_LIB
