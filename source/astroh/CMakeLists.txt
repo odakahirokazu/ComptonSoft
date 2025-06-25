@@ -1,5 +1,3 @@
-add_definitions(-DANLNEXT_USE_TVECTOR -DANLNEXT_USE_HEPVECTOR)
-
 include_directories(
   include
   ../core/include
@@ -57,6 +55,13 @@ add_library(CSAstroH SHARED
   ${CS_ASTROH_CLASSES}
   ${CS_ASTROH_FITSIO_CLASSES}
   )
+
+target_compile_definitions(
+  CSAstroH
+  PRIVATE
+  ANLNEXT_USE_TVECTOR=TRUE
+  ANLNEXT_USE_HEPVECTOR=TRUE
+)
 
 target_link_libraries(CSAstroH
   CSCore CSModules ${ANLG4_LIB} ${ANLNEXT_LIB}

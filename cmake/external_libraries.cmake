@@ -10,7 +10,7 @@ message("-- BOOST_LIB: ${BOOST_LIB}")
 ### Workaround for Clang-15 not to use std::unary_function
 add_compile_definitions(_HAS_AUTO_PTR_ETC=FALSE)
 
-### ANL ###
+### ANLNext ###
 if(NOT DEFINED ANLNEXT_INSTALL)
   if(DEFINED ENV{ANLNEXT_INSTALL})
     set(ANLNEXT_INSTALL $ENV{ANLNEXT_INSTALL})
@@ -36,8 +36,8 @@ message("-- ROOTSYS = ${ROOTSYS}")
 message("-- ROOT_INC_DIR = ${ROOT_INC_DIR}")
 message("-- ROOT_LIB_DIR = ${ROOT_LIB_DIR}")
 message("-- ROOT libraries = ${ROOT_LIB}")
-add_definitions(-DUSE_ROOT)
-add_definitions(-DCS_BASIC2)
+add_compile_definitions(USE_ROOT=TRUE)
+add_compile_definitions(CS_BASIC2=TRUE)
 
 ### Geant4 ###
 find_package(Geant4 REQUIRED)
@@ -53,7 +53,6 @@ message("-- Geant4 libraries: ${G4_LIB}")
 
 ### CLHEP ###
 if(CS_USE_SYSTEM_CLHEP)
-  add_definitions(-DANLNEXT_USE_HEPVECTOR)
   set(CLHEP_BASE_DIR $ENV{CLHEP_BASE_DIR})
   set(CLHEP_INC_DIR ${CLHEP_BASE_DIR}/include)
   set(CLHEP_LIB_DIR ${CLHEP_BASE_DIR}/lib)
@@ -93,15 +92,6 @@ if(CS_USE_SIMX)
   set(SIMX_LIB simx simput cfitsio ape wcs fftw3 readline termcap)
 endif(CS_USE_SIMX)
 
-
-#ONNX
-if(CS_USE_ORT)
-  set(ORT_INC_DIR $ENV{ORT_PATH}/include)
-  set(ORT_LIB_DIR $ENV{ORT_PATH}/lib)
-  set(ORT_LIB     $ENV{ORT_PATH}/lib/libonnxruntime.dylib)
-  message(STATUS ${ORT_INC_DIR})
-endif(CS_USE_ORT)
-
 ### HSQuickLook ###
 if(CS_USE_HSQUICKLOOK)
   find_path(HSQUICKLOOK_INC_DIR
@@ -123,3 +113,10 @@ if(CS_USE_GDML)
   message("-- XercesC_INCLUDE_DIRS: ${XercesC_INCLUDE_DIRS}")
   message("-- XercesC_LIBRARIES: ${XercesC_LIBRARIES}")
 endif(CS_USE_GDML)
+
+### ONNX ###
+if(CS_USE_ORT)
+  add_compile_definitions(CS_USE_ORT=1)
+  find_package(ONNXRuntime REQUIRED)
+  set(ORT_LIB onnxruntime::onnxruntime)
+endif(CS_USE_ORT)

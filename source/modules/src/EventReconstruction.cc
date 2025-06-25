@@ -31,10 +31,13 @@
 #include "SGDEventReconstructionAlgorithm.hh"
 #include "HY2017EventReconstructionAlgorithm.hh"
 #include "HY2020EventReconstructionAlgorithm.hh"
-#include "MTNNEventReconstructionAlgorithm.hh"
 #include "TangoAlgorithm.hh"
 #include "OberlackAlgorithm.hh"
 #include "CSHitCollection.hh"
+
+#if CS_USE_ORT
+#include "MTNNEventReconstructionAlgorithm.hh"
+#endif
 
 using namespace anlnext;
 
@@ -104,9 +107,11 @@ ANLStatus EventReconstruction::mod_initialize()
   else if (ReconstructionMethodName()=="Oberlack") {
     m_Reconstruction.reset(new OberlackAlgorithm);
   }
+#if CS_USE_ORT
   else if (ReconstructionMethodName()=="MTNN") {
     m_Reconstruction.reset(new MTNNEventReconstructionAlgorithm);
   }
+#endif /* CS_USE_ORT */
   else {
     std::cout << "Unknown reconstruction method is given: " << ReconstructionMethodName()
               << std::endl;
