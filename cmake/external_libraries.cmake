@@ -94,15 +94,23 @@ if(CS_USE_SIMX)
   set(SIMX_LIB simx simput cfitsio ape wcs fftw3 readline termcap)
 endif(CS_USE_SIMX)
 
-
-#ONNX
+### ORT ###
 if(CS_USE_ORT)
-  set(ORT_INC_DIR $ENV{ORT_PATH}/include)
-  set(ORT_LIB_DIR $ENV{ORT_PATH}/lib)
-  set(ORT_LIB     $ENV{ORT_PATH}/lib/libonnxruntime.dylib)
   add_definitions(-DCS_USE_ORT)
   message("-- ONNX Runtime libraries: ${ORT_LIB}")
+  set(ORT_PATH "" CACHE PATH "Path to ORT")
+  find_path(ORT_INC_DIR
+    NAMES onnxruntime_cxx_api.h
+    PATHS "${ORT_PATH}/include"
+    REQUIRED
+  )
+  find_library(ORT_LIB
+    NAMES onnxruntime
+    PATHS "${ORT_PATH}/lib"
+    REQUIRED
+  )
 endif(CS_USE_ORT)
+
 
 ### HSQuickLook ###
 if(CS_USE_HSQUICKLOOK)

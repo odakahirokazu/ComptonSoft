@@ -24,7 +24,6 @@ link_directories(
   ${G4_LIB_DIR}
   ${CLHEP_LIB_DIR}
   ${SIMX_LIB_DIR}
-  ${ORT_LIB_DIR}
   )
 
 set(CS_MODULES
