@@ -1,5 +1,3 @@
-add_definitions(-DANLNEXT_USE_TVECTOR -DANLNEXT_USE_HEPVECTOR)
-
 include_directories(
   include
   ../core/include
@@ -14,7 +12,6 @@ include_directories(
   ${ADD_INC_DIR}
   ${QT_INC_DIR}
   ${BOOST_INC_DIR}
-  ${ORT_INC_DIR}
   )
 
 link_directories(
@@ -24,7 +21,6 @@ link_directories(
   ${G4_LIB_DIR}
   ${CLHEP_LIB_DIR}
   ${SIMX_LIB_DIR}
-  ${ORT_LIB_DIR}
   )
 
 set(CS_MODULES
@@ -150,7 +146,14 @@ add_library(CSModules SHARED
   ${CS_MODULES}
   ${CS_FITSIO_MODULES}
   ${CS_HSQUICKLOOK_MODULES}
-  )
+)
+
+target_compile_definitions(
+  CSModules
+  PRIVATE
+  ANLNEXT_USE_TVECTOR=TRUE
+  ANLNEXT_USE_HEPVECTOR=TRUE
+)
 
 target_link_libraries(CSModules
   CSCore
