@@ -9,6 +9,7 @@ include_directories(
   ${CFITSIO_INC_DIR}
   ${HSQUICKLOOK_INC_DIR}
   ${SIMX_INC_DIR}
+  ${ORT_INC_DIR}
   ${ADD_INC_DIR}
   ${QT_INC_DIR}
   ${BOOST_INC_DIR}
@@ -166,8 +167,8 @@ target_link_libraries(CSModules
   ${MONGOCXX_LIB}
   ${HSQUICKLOOK_LIB}
   ${SIMX_LIB}
-  ${ADD_LIB}
   ${ORT_LIB}
+  ${ADD_LIB}
   )
 
 install(TARGETS CSModules LIBRARY DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
