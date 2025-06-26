@@ -3,9 +3,10 @@ include_directories(include
   ${ROOT_INC_DIR}
   ${G4_INC_DIR}
   ${CLHEP_INC_DIR}
+  ${ORT_INC_DIR}
   ${ADD_INC_DIR}
   ${BOOST_INC_DIR}
-  )
+)
 
 link_directories(
   ${ROOT_LIB_DIR}
@@ -118,7 +119,7 @@ add_library(CSCore SHARED
   )
 
 target_link_libraries(CSCore
-  ${ROOT_LIB} ${G4_LIB} ${CLHEP_LIB} ${ADD_LIB} ${BOOST_LIB} ${ORT_LIB})
+  ${ROOT_LIB} ${G4_LIB} ${CLHEP_LIB} ${ORT_LIB} ${ADD_LIB} ${BOOST_LIB})
 
 install(TARGETS CSCore LIBRARY DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
 
