@@ -16,7 +16,7 @@ module ComptonSoft
       @pedestal_level = 0.0
       @event_threshold = 100.0
       @split_threshold = 10.0
-      @frame_store_capacity = 1
+      @frame_store_size = 1
       @pedestal_file = nil
       @channel_properties_list = [] # "channel_properties.xml"
       @num_pixels_x = 1
@@ -27,7 +27,7 @@ module ComptonSoft
     attr_accessor :byte_order, :odd_row_pixel_shift, :start_position, :read_direction_x
     attr_accessor :pedestal_level, :event_threshold
     attr_accessor :split_threshold
-    attr_accessor :pedestal_file, :frame_store_capacity
+    attr_accessor :pedestal_file, :frame_store_size
     attr_accessor :num_pixels_x, :num_pixels_y
 
     def define_pixels(nx, ny)
@@ -278,7 +278,7 @@ module ComptonSoft
         with_parameters(filename: @pedestal_file)
       else
         chain :SetDynamicPedestals
-        with_parameters(frame_store_capacity: @frame_store_capacity)
+        with_parameters(frame_store_size: @frame_store_size)
       end
 
       chain :WriteXrayEventTree
