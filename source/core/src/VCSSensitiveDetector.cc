@@ -57,6 +57,7 @@ VCSSensitiveDetector::ProcessHits(G4Step* aStep, G4TouchableHistory* )
 
   uint32_t processFlag = 0;
   const G4VProcess* process = aStep->GetPostStepPoint()->GetProcessDefinedStep();
+  bool isContinuous = false;
   if (process) {
     G4String processName = process->GetProcessName();
     if(processName.find("phot") != std::string::npos) {
@@ -70,6 +71,9 @@ VCSSensitiveDetector::ProcessHits(G4Step* aStep, G4TouchableHistory* )
     }
     else if(processName.find("conv") != std::string::npos) {
       processFlag = process::GammaConversion;
+    }
+    if (process->isAlongStepDoItIsEnabled()) {
+      isContinuous = true;
     }
   }
 
@@ -86,6 +90,7 @@ VCSSensitiveDetector::ProcessHits(G4Step* aStep, G4TouchableHistory* )
   hit->setEnergyDeposit(edep);
   hit->setProcess(processFlag);
   hit->setParticle(particleDefinition->GetPDGEncoding());
+  hit->setContinuousProcess(isContinuous);
 
   G4ThreeVector position;
   switch (aStep->GetPostStepPoint()->GetStepStatus()) 

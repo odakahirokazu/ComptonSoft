@@ -183,6 +183,8 @@ public:
   void addProcess(uint32_t f) { process_ |= f; }
   void clearProcess(uint32_t f) { process_ &= ~f; }
   bool isProcess(uint32_t f) const { return (process_&f)==f; }
+  bool isContinuousProcess() const  { return isContinuousProcess_; }
+  void setContinuousProcess(bool v) { isContinuousProcess_ = v; }
 
   void setSelfTriggered(bool v);
   bool SelfTriggered() const { return isFlags(flag::SelfTriggered); }
@@ -324,6 +326,7 @@ private:
   double energyDeposit_ = 0.0;
   double energyCharge_ = 0.0;
   uint32_t process_ = 0u;
+  bool isContinuousProcess_ = false;
   // trigger information
   double selfTriggeredTime_ = 0.0;
   double triggeredTime_ = 0.0;
