@@ -17,39 +17,19 @@
  *                                                                       *
  *************************************************************************/
 
-#include "SimDetectorUnitFactory.hh"
-#include "SimDetectorUnit2DPixel.hh"
-#include "SimDetectorUnit2DStrip.hh"
-#include "SimDetectorUnitScintillator.hh"
-#include "SimDetectorUnit3DVoxel.hh"
-#include "SimDetectorUnitLArTPC.hh"
-#include "MultiChannelData.hh"
-
+#include "BirksModel.hh"
 namespace comptonsoft {
-
-VRealDetectorUnit* SimDetectorUnitFactory::createDetectorUnit2DPixel()
-{
-  return new SimDetectorUnit2DPixel;
+BirksModel::BirksModel() : VLArRecombinationModel("Birks Model") {
 }
-
-VRealDetectorUnit* SimDetectorUnitFactory::createDetectorUnit2DStrip()
-{
-  return new SimDetectorUnit2DStrip;
+double BirksModel::electronLet(double let, double electricField) const {
+  const double kOverRhoE = kOverRho_ / electricField;
+  return Ab_ * (let / (1 + kOverRhoE * let));
 }
-
-VRealDetectorUnit* SimDetectorUnitFactory::createDetectorUnitScintillator()
-{
-  return new SimDetectorUnitScintillator;
-}
-
-VRealDetectorUnit* SimDetectorUnitFactory::createDetectorUnit3DVoxel()
-{
-  return new SimDetectorUnit3DVoxel;
-}
-
-VRealDetectorUnit* SimDetectorUnitFactory::createDetectorUnitLArTPC()
-{
-  return new SimDetectorUnitLArTPC;
+void BirksModel::printInfo(std::ostream &os) const {
+  VLArRecombinationModel::printInfo(os);
+  os << "  Birks Constant (Ab): " << Ab_ << '\n'
+     << "  k: " << k << " (V/mm)(g/cm2)/MeV\n"
+     << "  k/Rho: " << kOverRho_ << " (V/mm)/MeV\n";
 }
 
 } /* namespace comptonsoft */

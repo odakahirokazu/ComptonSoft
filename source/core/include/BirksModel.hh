@@ -17,39 +17,22 @@
  *                                                                       *
  *************************************************************************/
 
-#include "SimDetectorUnitFactory.hh"
-#include "SimDetectorUnit2DPixel.hh"
-#include "SimDetectorUnit2DStrip.hh"
-#include "SimDetectorUnitScintillator.hh"
-#include "SimDetectorUnit3DVoxel.hh"
-#include "SimDetectorUnitLArTPC.hh"
-#include "MultiChannelData.hh"
+#include "AstroUnits.hh"
+#include "VLArRecombinationModel.hh"
 
 namespace comptonsoft {
+class BirksModel: public VLArRecombinationModel {
+public:
+  BirksModel();
+  virtual ~BirksModel() = default;
+  virtual double electronLet(double let, double electricField) const override;
+  void printInfo(std::ostream &os) const override;
 
-VRealDetectorUnit* SimDetectorUnitFactory::createDetectorUnit2DPixel()
-{
-  return new SimDetectorUnit2DPixel;
-}
-
-VRealDetectorUnit* SimDetectorUnitFactory::createDetectorUnit2DStrip()
-{
-  return new SimDetectorUnit2DStrip;
-}
-
-VRealDetectorUnit* SimDetectorUnitFactory::createDetectorUnitScintillator()
-{
-  return new SimDetectorUnitScintillator;
-}
-
-VRealDetectorUnit* SimDetectorUnitFactory::createDetectorUnit3DVoxel()
-{
-  return new SimDetectorUnit3DVoxel;
-}
-
-VRealDetectorUnit* SimDetectorUnitFactory::createDetectorUnitLArTPC()
-{
-  return new SimDetectorUnitLArTPC;
-}
-
-} /* namespace comptonsoft */
+private:
+  // Constants for the Birks model
+  // Reference: B. Birks, "The Theory and Practice of Scintillation Counting", 1964, Pergamon Press
+  static constexpr double Ab_ = 0.800; // Dimensionless
+  static constexpr double k = 0.0486 * (CLHEP::kilovolt / CLHEP::cm3 * CLHEP::g / CLHEP::MeV) / (CLHEP::volt / CLHEP::cm2 / CLHEP::mm * CLHEP::g / CLHEP::MeV); // in (V/mm)(g/cm2)/MeV
+  const double kOverRho_ = k / Rho(); // in (V/mm)/MeV
+};
+} // namespace comptonsoft

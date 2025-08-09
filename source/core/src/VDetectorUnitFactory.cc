@@ -38,6 +38,9 @@ VRealDetectorUnit* VDetectorUnitFactory::createDetectorUnit(const std::string& t
   else if (type=="3DVoxel") {
     detector = createDetectorUnit3DVoxel();
   }
+  else if (type=="LArTPC") {
+    detector = createDetectorUnitLArTPC();
+  }
 
   return detector;
 }

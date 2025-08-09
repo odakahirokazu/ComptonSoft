@@ -17,39 +17,58 @@
  *                                                                       *
  *************************************************************************/
 
-#include "SimDetectorUnitFactory.hh"
-#include "SimDetectorUnit2DPixel.hh"
-#include "SimDetectorUnit2DStrip.hh"
-#include "SimDetectorUnitScintillator.hh"
-#include "SimDetectorUnit3DVoxel.hh"
-#include "SimDetectorUnitLArTPC.hh"
-#include "MultiChannelData.hh"
+#ifndef COMPTONSOFT_RealDetectorUnitLArTPC_H
+#define COMPTONSOFT_RealDetectorUnitLArTPC_H 1
+
+#include "VRealDetectorUnit.hh"
 
 namespace comptonsoft {
 
-VRealDetectorUnit* SimDetectorUnitFactory::createDetectorUnit2DPixel()
+/**
+ * A class of a LArTPC detector unit.
+ * @author Shota Arai
+ * @date 2025-06-27
+ */
+class RealDetectorUnitLArTPC : public VRealDetectorUnit
 {
-  return new SimDetectorUnit2DPixel;
-}
+public:
+  RealDetectorUnitLArTPC();
+  virtual ~RealDetectorUnitLArTPC();
 
-VRealDetectorUnit* SimDetectorUnitFactory::createDetectorUnit2DStrip()
-{
-  return new SimDetectorUnit2DStrip;
-}
+  DetectorType Type() const override
+  { return DetectorType::VoxelDetector; }
 
-VRealDetectorUnit* SimDetectorUnitFactory::createDetectorUnitScintillator()
-{
-  return new SimDetectorUnitScintillator;
-}
+  void setReadoutElectrode(ElectrodeSide v)
+  { readoutElectrode_ = v; }
+  ElectrodeSide ReadoutElectrode() const
+  { return readoutElectrode_; }
+  bool isAnodeReadout() const
+  { return ReadoutElectrode()==ElectrodeSide::Anode; }
+  bool isCathodeReadout() const
+  { return ReadoutElectrode()==ElectrodeSide::Cathode; }
+  bool isBottomSideReadout() const
+  {
+    return (ReadoutElectrode()!=ElectrodeSide::Undefined &&
+            ReadoutElectrode()==BottomSideElectrode());
+  }
+  bool isUpSideReadout() const
+  {
+    return (ReadoutElectrode()!=ElectrodeSide::Undefined &&
+            ReadoutElectrode()!=BottomSideElectrode());
+  }
 
-VRealDetectorUnit* SimDetectorUnitFactory::createDetectorUnit3DVoxel()
-{
-  return new SimDetectorUnit3DVoxel;
-}
+protected:
+  bool setReconstructionDetails(int mode) override;
+  void reconstruct(const DetectorHitVector& hitSignals,
+                   DetectorHitVector& hitsReconstructed) override;
 
-VRealDetectorUnit* SimDetectorUnitFactory::createDetectorUnitLArTPC()
-{
-  return new SimDetectorUnitLArTPC;
-}
+private:
+  void determinePosition(DetectorHitVector& hits) const;
+
+private:
+  ElectrodeSide readoutElectrode_;
+};
 
 } /* namespace comptonsoft */
+
+#endif /* COMPTONSOFT_RealDetectorUnitLArTPC_H */

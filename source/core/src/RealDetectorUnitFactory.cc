@@ -22,6 +22,7 @@
 #include "RealDetectorUnit2DStrip.hh"
 #include "RealDetectorUnitScintillator.hh"
 #include "RealDetectorUnit3DVoxel.hh"
+#include "RealDetectorUnitLArTPC.hh"
 #include "MultiChannelData.hh"
 
 namespace comptonsoft {
@@ -44,6 +45,11 @@ VRealDetectorUnit* RealDetectorUnitFactory::createDetectorUnitScintillator()
 VRealDetectorUnit* RealDetectorUnitFactory::createDetectorUnit3DVoxel()
 {
   return new RealDetectorUnit3DVoxel;
+}
+
+VRealDetectorUnit* RealDetectorUnitFactory::createDetectorUnitLArTPC()
+{
+  return new RealDetectorUnitLArTPC;
 }
 
 } /* namespace comptonsoft */

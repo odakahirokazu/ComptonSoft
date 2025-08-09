@@ -17,39 +17,18 @@
  *                                                                       *
  *************************************************************************/
 
-#include "SimDetectorUnitFactory.hh"
-#include "SimDetectorUnit2DPixel.hh"
-#include "SimDetectorUnit2DStrip.hh"
-#include "SimDetectorUnitScintillator.hh"
-#include "SimDetectorUnit3DVoxel.hh"
-#include "SimDetectorUnitLArTPC.hh"
-#include "MultiChannelData.hh"
-
+#include "ModifiedBoxModel.hh"
 namespace comptonsoft {
-
-VRealDetectorUnit* SimDetectorUnitFactory::createDetectorUnit2DPixel()
-{
-  return new SimDetectorUnit2DPixel;
+ModifiedBoxModel::ModifiedBoxModel() : VLArRecombinationModel("Modified Box Model") {
 }
-
-VRealDetectorUnit* SimDetectorUnitFactory::createDetectorUnit2DStrip()
-{
-  return new SimDetectorUnit2DStrip;
+double ModifiedBoxModel::electronLet(double let, double electricField) const {
+  const double betaOverRhoE = betaOverRho_ / electricField;
+  return log(betaOverRhoE * let + alpha) / betaOverRhoE;
 }
-
-VRealDetectorUnit* SimDetectorUnitFactory::createDetectorUnitScintillator()
-{
-  return new SimDetectorUnitScintillator;
+void ModifiedBoxModel::printInfo(std::ostream &os) const {
+  VLArRecombinationModel::printInfo(os);
+  os << "  Alpha: " << alpha << "\n"
+     << "  Beta: " << beta << " (V/mm)(g/cm2)/MeV\n"
+     << "  Beta/Rho: " << betaOverRho_ << " V/MeV\n";
 }
-
-VRealDetectorUnit* SimDetectorUnitFactory::createDetectorUnit3DVoxel()
-{
-  return new SimDetectorUnit3DVoxel;
-}
-
-VRealDetectorUnit* SimDetectorUnitFactory::createDetectorUnitLArTPC()
-{
-  return new SimDetectorUnitLArTPC;
-}
-
 } /* namespace comptonsoft */
