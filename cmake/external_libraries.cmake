@@ -1,6 +1,5 @@
 ### BOOST ###
-find_package(Boost 1.80.0 CONFIG COMPONENTS system filesystem)
-# find_package(Boost 1.56.0 REQUIRED COMPONENTS system filesystem)
+find_package(Boost 1.80.0 CONFIG COMPONENTS filesystem)
 set(BOOST_INC_DIR ${Boost_INCLUDE_DIRS})
 set(BOOST_LIB_DIR ${Boost_LIBRARY_DIRS})
 set(BOOST_LIB ${Boost_LIBRARIES})
