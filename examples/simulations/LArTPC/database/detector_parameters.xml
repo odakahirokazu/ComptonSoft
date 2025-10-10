@@ -23,6 +23,8 @@
             <compensation factor="1.0" />
             <threshold value="0.0" />
           </channel_properties>
+          <efield bias="30000.0" />
+          <recombination filename="database/recombination.xml" />
           <reconstruction mode="0" />
         </parameters>
       </common>

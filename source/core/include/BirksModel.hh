@@ -21,9 +21,16 @@
 #include "VLArRecombinationModel.hh"
 
 namespace comptonsoft {
+/**
+ * A Birks model for recombination in LArTPC.
+ * @author Shota Arai
+ * @date 2025-08-09
+ * @date 2025-10-10 | added parameterized constructor
+ */
 class BirksModel: public VLArRecombinationModel {
 public:
   BirksModel();
+  BirksModel(const std::map<std::string, double> &params);
   virtual ~BirksModel() = default;
   virtual double electronLet(double let, double electricField) const override;
   void printInfo(std::ostream &os) const override;
@@ -31,8 +38,8 @@ public:
 private:
   // Constants for the Birks model
   // Reference: B. Birks, "The Theory and Practice of Scintillation Counting", 1964, Pergamon Press
-  static constexpr double Ab_ = 0.800; // Dimensionless
-  static constexpr double k = 0.0486 * (CLHEP::kilovolt / CLHEP::cm3 * CLHEP::g / CLHEP::MeV) / (CLHEP::volt / CLHEP::cm2 / CLHEP::mm * CLHEP::g / CLHEP::MeV); // in (V/mm)(g/cm2)/MeV
-  const double kOverRho_ = k / Rho(); // in (V/mm)/MeV
+  double Ab_ = 0.800; // Dimensionless
+  double k_ = 0.0486 * (CLHEP::kilovolt / CLHEP::cm3 * CLHEP::g / CLHEP::MeV); // in (kV g/cm3)/MeV
+  double kOverRho_ = k_ / Rho(); // in (Vg/cm3)/MeV
 };
 } // namespace comptonsoft

@@ -21,7 +21,7 @@
 #define COMPTONSOFT_SimDetectorUnitLArTPC_H 1
 
 #include "RealDetectorUnitLArTPC.hh"
-#include "DeviceSimulation.hh"
+#include "LArTPCDeviceSimulation.hh"
 #include "VLArRecombinationModel.hh"
 
 class TH3D;
@@ -32,17 +32,16 @@ namespace comptonsoft {
  * A class of a LArTPC detector unit including device simulations.
  * @author Shota Arai
  * @date 2025-07-12
+ * @date 2025-10-10 | inherited LArTPCDeviceSimulation & removed recombination caliculation feature
  */
 class SimDetectorUnitLArTPC
-  : public RealDetectorUnitLArTPC, public DeviceSimulation
+  : public RealDetectorUnitLArTPC, public LArTPCDeviceSimulation
 {
 public:
   SimDetectorUnitLArTPC();
   virtual ~SimDetectorUnitLArTPC();
 
   void initializeEvent() override;
-
-  void printSimulationParameters(std::ostream& os) const override;
 
 protected:
   virtual DetectorHit_sptr generateHit(const DetectorHit& rawhit,
@@ -55,8 +54,6 @@ protected:
   
 private:
   void simulatePulseHeights() override;
-  void applyRecombinationModel(DetectorHit_sptr hit); // This should be defined in the DeviceSimulation class. But we define it here to avoid affecting the other classes.
-  VLArRecombinationModel* recombinationModel_; ///< Recombination model for LArTPC.
 };
 
 inline bool SimDetectorUnitLArTPC::checkRange(const VoxelID& voxel) const

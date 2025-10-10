@@ -88,6 +88,7 @@ public:
     boost::optional<int> depth_sensing_mode = boost::none;
     boost::optional<double> depth_sensing_resolution = boost::none;
     boost::optional<double> quenching_factor = boost::none;
+    boost::optional<std::string> recombination_configuration_file = boost::none;
     boost::optional<double> temperature_value = boost::none;
     boost::optional<double> efield_bias = boost::none;
     boost::optional<int> efield_mode = boost::none;

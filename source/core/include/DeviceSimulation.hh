@@ -181,6 +181,9 @@ public:
 
   void printSimulationParameters(std::ostream& os) const override;
 
+  virtual void instantiateRecombinationModel(const std::string &/*config_filename*/){}
+  virtual double applyRecombination(DetectorHit_sptr hit) const;
+
 protected:
   void setWeightingPotential(bool upside_electrode, boost::shared_array<double> wp, int num_point)
   {

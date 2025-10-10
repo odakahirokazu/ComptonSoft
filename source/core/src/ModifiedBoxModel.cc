@@ -21,6 +21,17 @@
 namespace comptonsoft {
 ModifiedBoxModel::ModifiedBoxModel() : VLArRecombinationModel("Modified Box Model") {
 }
+ModifiedBoxModel::ModifiedBoxModel(const std::map<std::string, double> &params) : VLArRecombinationModel("Modified Box Model", params) {
+  auto it = params.find("Alpha");
+  if (it != params.end()) {
+    alpha = it->second;
+  }
+  it = params.find("Beta");
+  if (it != params.end()) {
+    beta = it->second * (CLHEP::kilovolt / CLHEP::cm3 * CLHEP::g / CLHEP::MeV);
+  }
+  betaOverRho_ = beta / Rho();
+}
 double ModifiedBoxModel::electronLet(double let, double electricField) const {
   const double betaOverRhoE = betaOverRho_ / electricField;
   return log(betaOverRhoE * let + alpha) / betaOverRhoE;
@@ -28,7 +39,7 @@ double ModifiedBoxModel::electronLet(double let, double electricField) const {
 void ModifiedBoxModel::printInfo(std::ostream &os) const {
   VLArRecombinationModel::printInfo(os);
   os << "  Alpha: " << alpha << "\n"
-     << "  Beta: " << beta << " (V/mm)(g/cm2)/MeV\n"
-     << "  Beta/Rho: " << betaOverRho_ << " V/MeV\n";
+     << "  Beta: " << beta / (CLHEP::kilovolt / CLHEP::cm3 * CLHEP::g / CLHEP::MeV) << " (kVg/cm3)/MeV\n"
+     << "  Beta/Rho: " << betaOverRho_ / (CLHEP::kilovolt / CLHEP::MeV) << " kV/MeV\n";
 }
 } /* namespace comptonsoft */

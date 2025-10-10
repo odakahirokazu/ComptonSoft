@@ -28,6 +28,7 @@ namespace comptonsoft {
  * A class of a LArTPC detector unit.
  * @author Shota Arai
  * @date 2025-06-27
+ * @date 2025-10-10 | defined DetectorType as LArTPC
  */
 class RealDetectorUnitLArTPC : public VRealDetectorUnit
 {
@@ -36,7 +37,7 @@ public:
   virtual ~RealDetectorUnitLArTPC();
 
   DetectorType Type() const override
-  { return DetectorType::VoxelDetector; }
+  { return DetectorType::LArTPC; }
 
   void setReadoutElectrode(ElectrodeSide v)
   { readoutElectrode_ = v; }

@@ -38,7 +38,8 @@ enum class DetectorType : int {
   PixelDetector=1,
   DoubleSidedStripDetector=2,
   Scintillator=3,
-  VoxelDetector=4
+  VoxelDetector=4,
+  LArTPC=5
 };
 
 using image_t = boost::multi_array<double, 2>;

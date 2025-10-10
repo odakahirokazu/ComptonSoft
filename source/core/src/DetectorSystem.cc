@@ -1009,6 +1009,22 @@ void DetectorSystem::setupDetectorParameters(const DetectorSystem::ParametersNod
       }
     }
   }
+  if (ds->checkType(DetectorType::LArTPC)){
+    if (auto upside_readout = parameters.upside_readout) {
+      SimDetectorUnitLArTPC *ds1 = dynamic_cast<SimDetectorUnitLArTPC *>(ds);
+      if (ds1) {
+        if (*upside_readout == 1) {
+          ds1->setReadoutElectrode(ds1->UpSideElectrode());
+        }
+        else if (*upside_readout == 0) {
+          ds1->setReadoutElectrode(ds1->BottomSideElectrode());
+        }
+      }
+    }
+    if (auto o = parameters.recombination_configuration_file) {
+      ds->instantiateRecombinationModel(*o);
+    }
+  }
 
   if (auto o = parameters.depth_sensing_mode) {
     ds->setDepthSensingMode(*o);
@@ -1406,6 +1422,9 @@ load(const boost::property_tree::ptree& node)
   }
   if (auto o=node.get_optional<int>("reconstruction.energy_consistency_check.<xmlattr>.upper_function_c1")) {
     reconstruction_energy_consistency_check_upper_function_c1 = o;
+  }
+  if (auto o=node.get_optional<std::string>("recombination.<xmlattr>.filename")) {
+    recombination_configuration_file = o;
   }
 
   for (const ptree::value_type& v: node.get_child("")) {

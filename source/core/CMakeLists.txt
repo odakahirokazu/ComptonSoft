@@ -46,6 +46,7 @@ set(CS_CORE_CLASSES
   src/EFieldModel.cc
   src/VDeviceSimulation.cc
   src/DeviceSimulation.cc
+  src/LArTPCDeviceSimulation.cc
   src/SimDetectorUnit2DPixel.cc
   src/SimDetectorUnit2DStrip.cc
   src/SimDetectorUnitScintillator.cc
@@ -106,6 +107,8 @@ set(CS_CORE_CLASSES
   src/RIDecayChains.cc
   src/RIDecayCalculation.cc
   ### recombination models
+  src/VLArRecombinationModel.cc
+  src/VLArRecombinationModelFactory.cc
   src/ModifiedBoxModel.cc
   src/BirksModel.cc
   )

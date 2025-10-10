@@ -20,6 +20,18 @@
 #include "BirksModel.hh"
 namespace comptonsoft {
 BirksModel::BirksModel() : VLArRecombinationModel("Birks Model") {
+  kOverRho_ = k_ / Rho();
+}
+BirksModel::BirksModel(const std::map<std::string, double> &params) : VLArRecombinationModel("Birks Model", params) {
+  auto it = params.find("Ab");
+  if (it != params.end()) {
+    Ab_ = it->second;
+  }
+  it = params.find("k");
+  if (it != params.end()) {
+    k_ = it->second * (CLHEP::kilovolt / CLHEP::cm3 * CLHEP::g / CLHEP::MeV);
+  }
+  kOverRho_ = k_ / Rho();
 }
 double BirksModel::electronLet(double let, double electricField) const {
   const double kOverRhoE = kOverRho_ / electricField;
@@ -28,8 +40,7 @@ double BirksModel::electronLet(double let, double electricField) const {
 void BirksModel::printInfo(std::ostream &os) const {
   VLArRecombinationModel::printInfo(os);
   os << "  Birks Constant (Ab): " << Ab_ << '\n'
-     << "  k: " << k << " (V/mm)(g/cm2)/MeV\n"
-     << "  k/Rho: " << kOverRho_ << " (V/mm)/MeV\n";
+     << "  k: " << k_ / (CLHEP::volt * CLHEP::g / CLHEP::cm3 / CLHEP::MeV) << " (Vg/cm3)/MeV\n"
+     << "  k/Rho: " << kOverRho_ / (CLHEP::volt / CLHEP::MeV) << " (V/MeV)\n";
 }
-
 } /* namespace comptonsoft */

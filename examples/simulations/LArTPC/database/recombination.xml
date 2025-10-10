@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<RecombinationModel model="ModifiedBox">
+  <parameters>
+    <model type="Birks">
+      <parameter name="Ab" value="0.8" /> <!-- Dimensionless -->
+      <parameter name="k" value="0.0486" /> <!-- k in (kV/cm) (g/cm2) / MeV-->
+      <parameter name="Wexc" value="19.5" /> <!-- Wexc in eV -->
+      <parameter name="Wion" value="23.6" /> <!-- Wion in eV -->
+      <parameter name="rho" value="1.396" /> <!-- rho in g/cm3 -->
+    </model>
+    <model type="ModifiedBox">
+      <parameter name="A" value="0.8" /> <!-- Dimensionless -->
+      <parameter name="kB" value="0.0486" /> <!-- kB in (kV/cm) (g/cm2) / MeV-->
+      <parameter name="Wexc" value="19.5" /> <!-- Wexc in eV -->
+      <parameter name="Wion" value="23.6" /> <!-- Wion in eV -->
+      <parameter name="rho" value="1.396" /> <!-- rho in g/cm3 -->
+    </model>
+  </parameters>
+</RecombinationModel>

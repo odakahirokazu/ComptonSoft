@@ -41,15 +41,9 @@ namespace unit = anlgeant4::unit;
 
 namespace comptonsoft {
 
-SimDetectorUnitLArTPC::SimDetectorUnitLArTPC() {
-  //recombinationModel_ = new ModifiedBoxModel();
-  recombinationModel_ = new BirksModel();
-}
+SimDetectorUnitLArTPC::SimDetectorUnitLArTPC() = default;
 
-SimDetectorUnitLArTPC::~SimDetectorUnitLArTPC() {
-  if (recombinationModel_ != nullptr) delete recombinationModel_;
-}
-
+SimDetectorUnitLArTPC::~SimDetectorUnitLArTPC() = default;
 void SimDetectorUnitLArTPC::initializeEvent() {
   RealDetectorUnitLArTPC::initializeEvent();
   DeviceSimulation::initializeEvent();
@@ -153,9 +147,8 @@ DetectorHit_sptr SimDetectorUnitLArTPC::generateHit(const DetectorHit &rawhit,
   }
 
   applyQuenching(hit);
-  applyRecombinationModel(hit);
 
-  const double edep = hit->EnergyCharge(); // TODO: Use EnergyCharge instead of EnergyDeposit
+  const double edep = applyRecombination(hit);
   const double localposx = hit->LocalPositionX();
   const double localposy = hit->LocalPositionY();
   const double localposz = hit->LocalPositionZ();
@@ -167,26 +160,5 @@ DetectorHit_sptr SimDetectorUnitLArTPC::generateHit(const DetectorHit &rawhit,
   hit->setEnergyCharge(energyCharge);
 
   return hit;
-}
-
-void SimDetectorUnitLArTPC::printSimulationParameters(std::ostream &os) const {
-  os << "<SimDetectorUnitLArTPC>" << '\n'
-     << std::endl;
-  DeviceSimulation::printSimulationParameters(os);
-  recombinationModel_->printInfo(os);
-}
-
-void SimDetectorUnitLArTPC::applyRecombinationModel(DetectorHit_sptr hit) {
-  const double edep = hit->EnergyDeposit();
-  const auto process = hit->Process();
-  if (edep <= 0.0) return;
-  if (!hit->isContinuousProcess()) return;
-  const double length = (hit->PostStepPointPosition() - hit->PreStepPointPosition()).mag();
-  //std::cout << "Applying recombination model: edep = " << edep
-  //<< ", length = " << length << std::endl;
-  const double let = edep / length;
-  const double let_new = recombinationModel_->electronLet(let, 200);
-  //std::cout << "Recombination model applied: new let = " << let_new << " edep_new = " << let_new * length << std::endl;
-  hit->setEnergyCharge(std::max(let_new * length, 0.0));
 }
 } /* namespace comptonsoft */
