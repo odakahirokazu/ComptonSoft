@@ -106,11 +106,14 @@ public:
     boost::optional<double> charge_collection_mobility_hole = boost::none;
     boost::optional<double> charge_collection_lifetime_electron = boost::none;
     boost::optional<double> charge_collection_lifetime_hole = boost::none;
+    boost::optional<double> drift_velocity = boost::none;
     boost::optional<int> diffusion_mode = boost::none;
     boost::optional<double> diffusion_spread_factor_cathode = boost::none;
     boost::optional<double> diffusion_spread_factor_anode = boost::none;
     boost::optional<double> diffusion_constant_cathode = boost::none;
     boost::optional<double> diffusion_constant_anode = boost::none;
+    boost::optional<double> diffusion_coefficient_longitudinal = boost::none;
+    boost::optional<double> diffusion_coefficient_transverse = boost::none;
     boost::optional<double> timing_resolution_trigger = boost::none;
     boost::optional<double> timing_resolution_energy_measurement = boost::none;
     boost::optional<int> pedestal_generation_flag = boost::none;

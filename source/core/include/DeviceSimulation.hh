@@ -68,6 +68,7 @@ public:
     EField_->setUpSideAnode(isUpSideAnode());
     return EField_->setEField(bias, mode, p0, p1, p2, p3);
   }
+  void setEFieldModel(std::unique_ptr<EFieldModel> ef) { EField_ = std::move(ef); }
   double BiasVoltage() const { return EField_->BiasVoltage(); }
   EFieldModel::FieldShape EFieldMode() const { return EField_->EFieldMode(); }
   double EFieldParam(int i) const { return EField_->EFieldParam(i); }

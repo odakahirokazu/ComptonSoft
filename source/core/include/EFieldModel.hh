@@ -87,7 +87,7 @@ public:
   double PositionZ(double index) const;
   double PositionIndex(double z) const;
 
-  double CCE(double z) const;
+  virtual double CCE(double z) const;
   double CCEOfElectron(double z) const { return CCE_impl(true, z); }
   double CCEOfHole(double z) const { return CCE_impl(false, z); }
   double DriftTimeMobility(double z, double zInitial) const;

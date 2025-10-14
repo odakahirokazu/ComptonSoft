@@ -1113,8 +1113,31 @@ void DetectorSystem::setupDetectorParameters(const DetectorSystem::ParametersNod
       const double value = (*o)*unit::cm;
       ds->setDiffusionSigmaConstantAnode(value);
     }
+    if (ds->checkType(DetectorType::LArTPC)) {
+      SimDetectorUnitLArTPC *ds1 = dynamic_cast<SimDetectorUnitLArTPC *>(ds);
+      if (ds1){
+        if (auto o = parameters.diffusion_coefficient_longitudinal) {
+          const double value = (*o)*unit::cm*unit::cm/unit::second;
+          ds1->setDiffusionCoefficientLongitudinal(value);
+        }
+        if (auto o = parameters.diffusion_coefficient_transverse) {
+          const double value = (*o)*unit::cm*unit::cm/unit::second;
+          ds1->setDiffusionCoefficientTransverse(value);
+        }
+        auto o = parameters.drift_velocity;
+        if (!o) {
+          throw std::runtime_error("Error: In LArTPC, drift_velocity must be specified when diffusion_mode is set.");
+        }
+      }
+    }
   }
-  
+  if (auto o = parameters.drift_velocity) {
+    SimDetectorUnitLArTPC* ds1 = dynamic_cast<SimDetectorUnitLArTPC*>(ds);
+    if (ds1){
+      const double value = (*o)*unit::cm/unit::second;
+      ds1->setDriftVelocity(value);
+    }
+  }
   if (auto o = parameters.timing_resolution_trigger) {
     const double value = (*o)*unit::second;
     ds->setTimingResolutionForTrigger(value);
@@ -1384,6 +1407,9 @@ load(const boost::property_tree::ptree& node)
   if (auto o=node.get_optional<double>("charge_collection.mutau.<xmlattr>.hole")) {
     charge_collection_mutau_hole = o;
   }
+  if (auto o=node.get_optional<double>("drift_velocity.<xmlattr>.value")) {
+    drift_velocity = o;
+  }
   if (auto o=node.get_optional<int>("diffusion.<xmlattr>.mode")) {
     diffusion_mode = o;
   }
@@ -1398,6 +1424,12 @@ load(const boost::property_tree::ptree& node)
   }
   if (auto o=node.get_optional<double>("diffusion.constant.<xmlattr>.anode")) {
     diffusion_constant_anode = o;
+  }
+  if (auto o=node.get_optional<double>("diffusion.coefficient.<xmlattr>.longitudinal")) {
+    diffusion_coefficient_longitudinal = o;
+  }
+  if (auto o=node.get_optional<double>("diffusion.coefficient.<xmlattr>.transverse")) {
+    diffusion_coefficient_transverse = o;
   }
   if (auto o=node.get_optional<double>("timing_resolution.<xmlattr>.trigger")) {
     timing_resolution_trigger = o;
