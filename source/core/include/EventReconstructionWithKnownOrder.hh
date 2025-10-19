@@ -1,5 +1,6 @@
 #ifndef COMPTONSOFT_EventReconstructionWithKnownOrder_hh
 #define COMPTONSOFT_EventReconstructionWithKnownOrder_hh 1
+#include "AstroUnits.hh"
 #include "DetectorHit.hh"
 #include "DetectorHit_sptr.hh"
 #include "VEventReconstructionAlgorithm.hh"
@@ -37,10 +38,11 @@ protected:
 
 private:
   static constexpr double fixedLikelihood_ = 1.;
-  static constexpr double tolerance_ = 1e-3;
+  static constexpr double tolerance_ = 1e-3 * anlgeant4::unit::keV;
   int processMode_ = 0; // 0: full + escape, 1: full only, 2: escape only
   double initialEnergy_ = 0.0;
   int verbose_ = 0;
+  bool excludeGammaFromNonZeroTrackID_ = false;
 };
 } /* namespace comptonsoft */
 #endif //COMPTONSOFT_EventReconstructionWithKnownOrder_hh
