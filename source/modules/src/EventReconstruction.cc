@@ -31,6 +31,7 @@
 #include "SGDEventReconstructionAlgorithm.hh"
 #include "HY2017EventReconstructionAlgorithm.hh"
 #include "HY2020EventReconstructionAlgorithm.hh"
+#include "EventReconstructionWithKnownOrder.hh"
 #include "TangoAlgorithm.hh"
 #include "OberlackAlgorithm.hh"
 #include "CSHitCollection.hh"
@@ -102,6 +103,9 @@ ANLStatus EventReconstruction::mod_initialize()
   }
   else if (ReconstructionMethodName()=="Oberlack") {
     m_Reconstruction.reset(new OberlackAlgorithm);
+  }
+  else if (ReconstructionMethodName()=="known_order") {
+    m_Reconstruction.reset(new EventReconstructionWithKnownOrder);
   }
   else {
     std::cout << "Unknown reconstruction method is given: " << ReconstructionMethodName()
