@@ -55,7 +55,9 @@ bool EventReconstructionWithKnownOrder::reconstruct(const std::vector<DetectorHi
                 << ordered_hits[i]->PositionY() / unit::mm << ", "
                 << ordered_hits[i]->PositionZ() / unit::mm << ") mm"
                 << ", RealTime=" << ordered_hits[i]->RealTime() / unit::ns << " ns"
-                << ", Process=" << ordered_hits[i]->Process() << std::endl;
+                << ", Process=" << ordered_hits[i]->Process()
+                << ", TrackID=" << ordered_hits[i]->TrackID()
+                << std::endl;
     }
   }
 
@@ -70,7 +72,7 @@ bool EventReconstructionWithKnownOrder::reconstruct(const std::vector<DetectorHi
               << ((detect_flag & flags::IS_ESCAPED) ? "IS_ESCAPED " : "")
               << std::endl;
   }
-  if ((processMode_ != 1) && !(detect_flag & flags::HAS_PHOTOABSORPTION)) {
+  if ((processMode_ != 1) && (detect_flag & flags::IS_ESCAPED)) {
     const auto result = reconstructEscapeEvent(ordered_hits, eventReconstructed);
     if (!result) {
       std::cerr << "Error: Failed to reconstruct escape event." << std::endl;
@@ -87,7 +89,7 @@ bool EventReconstructionWithKnownOrder::reconstruct(const std::vector<DetectorHi
     }
     eventsReconstructed.push_back(eventReconstructed);
   }
-  else if ((processMode_ != 2) && (flags::HAS_PHOTOABSORPTION & detect_flag)) {
+  else if ((processMode_ != 2) && !(flags::IS_ESCAPED & detect_flag)) {
     const auto result = reconstructFullDepositEvent(ordered_hits, eventReconstructed);
     if (!result) {
       std::cerr << "Error: Failed to reconstruct full deposit event." << std::endl;

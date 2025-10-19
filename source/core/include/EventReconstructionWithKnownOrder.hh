@@ -8,8 +8,8 @@
 #include <cstdint>
 namespace comptonsoft {
 namespace flags {
-uint8_t HAS_PHOTOABSORPTION = 0x1U;
-uint8_t IS_ESCAPED = 0x2U;
+constexpr uint8_t HAS_PHOTOABSORPTION = 0x1U;
+constexpr uint8_t IS_ESCAPED = 0x2U;
 } // namespace flags
 class EventReconstructionWithKnownOrder: public VEventReconstructionAlgorithm {
 public:
