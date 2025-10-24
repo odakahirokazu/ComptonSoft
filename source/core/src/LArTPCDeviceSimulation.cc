@@ -6,6 +6,7 @@ LArTPCDeviceSimulation::LArTPCDeviceSimulation()
     : DeviceSimulation(),
       recombinationModel_(nullptr) {
   setEFieldModel(std::make_unique<LArEFieldModel>());
+  //setDiffusionDivisionNumber(1000);
 }
 void LArTPCDeviceSimulation::printSimulationParameters(std::ostream &os) const {
   DeviceSimulation::printSimulationParameters(os);
@@ -46,7 +47,7 @@ double LArTPCDeviceSimulation::DiffusionSigmaAnode3D(double z, double &longitudi
     return DeviceSimulation::DiffusionSigmaAnode(z);
   }
 }
-double LArTPCDeviceSimulation::DiffusionSigmaCathode(double z) {
+double LArTPCDeviceSimulation::DiffusionSigmaCathode(double) {
   return 0.0; // hole diffusion is not considered
 }
 

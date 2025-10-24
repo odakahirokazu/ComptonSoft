@@ -67,6 +67,7 @@ protected:
   int IndexOfTable(const VoxelID &voxel) const override;
   int SizeOfTable() const override;
   VoxelID TableIndexToPixelID(int index) const override;
+  void checkBranchingGamma();
 
 private:
   void simulatePulseHeights() override;

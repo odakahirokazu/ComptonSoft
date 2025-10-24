@@ -263,7 +263,34 @@ void SimDetectorUnitLArTPC::buildCCEMap(int nx, int ny, int nz, double pixel_fac
   std::cout << "Charge collection efficiency map is built." << std::endl;
 }
 
+void SimDetectorUnitLArTPC::checkBranchingGamma() {
+  const int N = NumberOfRawHits();
+  uint64_t flag = 0;
+  for (int i = 0; i < N; i++) {
+    DetectorHit_sptr rawhit = getRawHit(i);
+    if (rawhit->isProcess(process::Bremsstrahlung)) {
+      flag |= flag::BranchingGammaIncluded;
+    }
+    if ((rawhit->isProcess(process::PhotoelectricAbsorption) || rawhit->isProcess(process::ComptonScattering)) && rawhit->TrackID() != 1) {
+      rawhit->addFlags(flag::BranchingGammaDeposited);
+    }
+    if (rawhit->isProcess(process::PhotoelectricAbsorption) && rawhit->TrackID() == 1) {
+      rawhit->addFlags(flag::LastHitPhotoAbsorption);
+    }
+    if (rawhit->isProcess(process::RayleighScattering)) {
+      flag |= flag::HasRayleighScattering;
+    }
+  }
+  if (flag) {
+    for (int i = 0; i < N; i++) {
+      DetectorHit_sptr rawhit = getRawHit(i);
+      rawhit->addFlags(flag);
+    }
+  }
+}
+
 void SimDetectorUnitLArTPC::simulatePulseHeights() {
+  checkBranchingGamma();
   const int N = NumberOfRawHits();
   for (int i = 0; i < N; i++) {
     DetectorHit_sptr rawhit = getRawHit(i);

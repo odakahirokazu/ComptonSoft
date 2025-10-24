@@ -27,6 +27,7 @@ constexpr uint32_t PhotoelectricAbsorption = 0x00000001u;
 constexpr uint32_t ComptonScattering       = 0x00000002u;
 constexpr uint32_t RayleighScattering      = 0x00000004u;
 constexpr uint32_t GammaConversion         = 0x00000008u;
+constexpr uint32_t Bremsstrahlung          = 0x00000010u;
 
 constexpr uint32_t NucleusHit = 0x00010000u;
 }
@@ -49,10 +50,14 @@ constexpr uint64_t HighZHit          = 0x0200u;
 constexpr uint64_t AntiCoincidence   = 0x0400u;
 constexpr uint64_t Trigger           = 0x0800u;
 
-constexpr uint64_t EnergyDepositQuenched = 0x1000u;
+constexpr uint64_t EnergyDepositQuenched         = 0x1000u;
+constexpr uint64_t LastHitPhotoAbsorption        = 0x2000u;
+constexpr uint64_t BranchingGammaDeposited       = 0x4000u;
+constexpr uint64_t BranchingGammaIncluded        = 0x8000u;
 
 constexpr uint64_t SelfTriggered = 0x10000u;
 constexpr uint64_t Triggered     = 0x20000u;
+constexpr uint64_t HasRayleighScattering = 0x40000u;
 }
 
 namespace channel_status {

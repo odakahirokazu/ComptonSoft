@@ -72,6 +72,9 @@ VCSSensitiveDetector::ProcessHits(G4Step* aStep, G4TouchableHistory* )
     else if(processName.find("conv") != std::string::npos) {
       processFlag = process::GammaConversion;
     }
+    else if(processName.find("brem") != std::string::npos) {
+      processFlag = process::Bremsstrahlung;
+    }
     if (process->isAlongStepDoItIsEnabled()) {
       isContinuous = true;
     }

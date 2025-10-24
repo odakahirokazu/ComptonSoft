@@ -401,7 +401,7 @@ void VRealDetectorUnit::cluster(DetectorHitVector& hits) const
     auto hitIter=std::begin(group);
     ++hitIter;
     for (; hitIter!=std::end(group); ++hitIter) {
-      clusteredHits.back()->mergeAdjacentSignal(**hitIter, DetectorHit::MergedPosition::KeepLeft);
+      clusteredHits.back()->mergeAdjacentSignal(**hitIter, DetectorHit::MergedPosition::EnergyWeighted);
     }
   }
   hits = std::move(clusteredHits);
