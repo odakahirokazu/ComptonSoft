@@ -31,6 +31,7 @@ bool EventReconstructionWithKnownOrder::loadParameters(boost::property_tree::ptr
     std::cerr << "Error: Unknown escape detection method mode: " << escape_method_mode << std::endl;
     return false;
   }
+  numLastHits_ = pt.get<int>("known_order.num_last_hits", 0);
   verbose_ = pt.get<int>("known_order.verbose", 0);
   std::cout << "--- EventReconstructionWithKnownOrder v2---" << std::endl;
   std::cout << "  process_mode: " << processMode_ << std::endl;
@@ -43,6 +44,7 @@ bool EventReconstructionWithKnownOrder::loadParameters(boost::property_tree::ptr
     std::cout << "    exclude_branching_gamma_deposit: " << excludeBranchingGammaDeposit_ << std::endl;
   }
   std::cout << "  exclude_rayleigh_scattering: " << excludeRayleighScattering_ << std::endl;
+  std::cout << "  num_last_hits: " << numLastHits_ << std::endl;
   std::cout << "  verbose: " << verbose_ << std::endl;
   std::cout << "------------------------------------------" << std::endl;
   return true;
@@ -53,10 +55,15 @@ bool EventReconstructionWithKnownOrder::reconstruct(const std::vector<DetectorHi
     std::cerr << "Error: Not enough hits to reconstruct event. Number of hits: " << num_hits << ", Event ID: " << hits[0]->EventID() << std::endl;
     return false;
   }
-  std::vector<DetectorHit_sptr> ordered_hits = hits;
+  size_t hits_used = num_hits;
+  if (numLastHits_ > 0 && numLastHits_ < num_hits) {
+    hits_used = numLastHits_;
+  }
+
+  std::vector<DetectorHit_sptr> ordered_hits(hits.begin(), hits.begin() + hits_used);
   sortByRealTime(ordered_hits);
   if (verbose_ > 0) {
-    std::cout << "Reconstructing event ID: " << ordered_hits[0]->EventID() << " with " << num_hits << " hits." << std::endl;
+    std::cout << "Reconstructing event ID: " << ordered_hits[0]->EventID() << " with " << num_hits << " (" << hits_used << ") hits." << std::endl;
     for (size_t i = 0; i < ordered_hits.size(); ++i) {
       std::cout << "  Hit " << i << ":"
                 << ", Edep=" << ordered_hits[i]->EnergyDeposit() / unit::keV << " keV"
@@ -90,7 +97,10 @@ bool EventReconstructionWithKnownOrder::reconstruct(const std::vector<DetectorHi
     }
     return false;
   }
-  const bool is_escaped = isEscapeEvent(detect_flag);
+  bool is_escaped = isEscapeEvent(detect_flag);
+  if (num_hits != hits_used && numLastHits_ > 0) {
+    is_escaped = true; // Escape event if not all hits are used
+  }
   if ((processMode_ != 1) && is_escaped) {
     const auto result = reconstructEscapeEvent(ordered_hits, eventReconstructed);
     if (!result) {

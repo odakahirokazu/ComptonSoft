@@ -53,6 +53,7 @@ private:
   bool excludeEscapeBranchingGamma_ = false; // only for escape detection by flag check
   bool excludeBranchingGammaDeposit_ = false; // only for escape detection by flag check
   bool excludeRayleighScattering_ = false;
+  size_t numLastHits_ = 0;
   EscapeDetectionMethod escapeDetectionMethod_ = EscapeDetectionMethod::TOTAL_ENERGY_DEPOSITION;
 };
 } /* namespace comptonsoft */

@@ -76,10 +76,10 @@ double SimDetectorUnitLArTPC::WeightingPotential(const VoxelID &voxel, double x,
 
 void SimDetectorUnitLArTPC::buildWPMap() {
   if (ChargeCollectionMode() == 2) {
-    buildWPMap(31, 31, 1000, 1.0);
+    buildWPMap(31, 31, 64, 1.0);
   }
   else if (ChargeCollectionMode() == 3) {
-    buildWPMap(93, 93, 1000, 3.0);
+    buildWPMap(93, 93, 64, 3.0);
   }
   else {
     std::cout << "Error : buildWPMap() " << std::endl;
@@ -350,18 +350,11 @@ void SimDetectorUnitLArTPC::simulatePulseHeights() {
                                [&](const DetectorHit_sptr &hit) {
                                  return (hit->Voxel() == voxelDiff);
                                });
-          double diffusion_dz; // if dz is negative, the CCE does not change.
-          if (isUpSideReadout()) {
-            diffusion_dz = std::max(dz, 0.0);
-          }
-          else {
-            diffusion_dz = std::min(dz, 0.0);
-          }
           const double energyChargeDivision = calculateEnergyCharge(voxelDiff,
                                                                     edepDivision,
                                                                     localposx + dx,
                                                                     localposy + dy,
-                                                                    localposz + diffusion_dz);
+                                                                    localposz); // even if diffusion exists, dz is not included in CCE calculation
           if (itHit != diffusionHits.end()) {
             DetectorHit_sptr &hit = *itHit;
             hit->setEnergyDeposit(hit->EnergyDeposit() + edepDivision);
@@ -389,18 +382,11 @@ void SimDetectorUnitLArTPC::simulatePulseHeights() {
                                [&](const DetectorHit_sptr &hit) {
                                  return (hit->Voxel() == voxelDiff);
                                });
-          double diffusion_dz; // if dz is negative, the CCE does not change.
-          if (isUpSideReadout()) {
-            diffusion_dz = std::max(dz, 0.0);
-          }
-          else {
-            diffusion_dz = std::min(dz, 0.0);
-          }
           const double energyChargeDivision = calculateEnergyCharge(voxelDiff,
                                                                     edepDivision,
                                                                     localposx + dx,
                                                                     localposy + dy,
-                                                                    localposz + diffusion_dz);
+                                                                    localposz); // even if diffusion exists, dz is not included in CCE calculation
           if (itHit != diffusionHits.end()) {
             DetectorHit_sptr &hit = *itHit;
             hit->setEnergyDeposit(hit->EnergyDeposit() + edepDivision);

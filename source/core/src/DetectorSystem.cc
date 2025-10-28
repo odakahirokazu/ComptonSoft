@@ -1079,6 +1079,13 @@ void DetectorSystem::setupDetectorParameters(const DetectorSystem::ParametersNod
           ds1->setCCEMapYStrip(cce_mapy);
         }
       }
+      else if (ds->checkType(DetectorType::LArTPC)) {
+        SimDetectorUnitLArTPC* ds1 = dynamic_cast<SimDetectorUnitLArTPC*>(ds);
+        if (ds1) {
+          TH3D* cce_map = (TH3D*)(ROOTFile_->Get((*mapName).c_str()));
+          ds1->setCCEMap(cce_map);
+        }
+      }
     }
 
     if (auto o = parameters.charge_collection_mutau_electron) {
