@@ -32,6 +32,7 @@ bool EventReconstructionWithKnownOrder::loadParameters(boost::property_tree::ptr
     return false;
   }
   numLastHits_ = pt.get<int>("known_order.num_last_hits", 0);
+  thresholdOfPixelz_ = pt.get<int>("known_order.threshold_of_pixelz", -1);
   verbose_ = pt.get<int>("known_order.verbose", 0);
   std::cout << "--- EventReconstructionWithKnownOrder v2---" << std::endl;
   std::cout << "  process_mode: " << processMode_ << std::endl;
@@ -45,6 +46,7 @@ bool EventReconstructionWithKnownOrder::loadParameters(boost::property_tree::ptr
   }
   std::cout << "  exclude_rayleigh_scattering: " << excludeRayleighScattering_ << std::endl;
   std::cout << "  num_last_hits: " << numLastHits_ << std::endl;
+  std::cout << "  threshold_of_pixelz: " << thresholdOfPixelz_ << std::endl;
   std::cout << "  verbose: " << verbose_ << std::endl;
   std::cout << "------------------------------------------" << std::endl;
   return true;
@@ -179,6 +181,13 @@ uint8_t EventReconstructionWithKnownOrder::checkEvent(const std::vector<Detector
       flag |= flags::TO_BE_EXCLUDED;
       if (verbose_ > 1) {
         std::cout << "  Hit marked as RayleighScattering. Mark event to be excluded." << std::endl;
+      }
+      break;
+    }
+    if (thresholdOfPixelz_ >= 0 && ((anodeUpside_ && hit->VoxelZ() >= thresholdOfPixelz_) || (!anodeUpside_ && hit->VoxelZ() <= thresholdOfPixelz_))) {
+      flag |= flags::TO_BE_EXCLUDED;
+      if (verbose_ > 1) {
+        std::cout << "  Hit pixel Z (" << hit->VoxelZ() << ") >= threshold_of_pixelz (" << thresholdOfPixelz_ << "). Mark event to be excluded." << std::endl;
       }
       break;
     }
