@@ -258,7 +258,13 @@ public:
   }
   bool isClusteringOn() const { return clusteringOn_; }
   bool ClusteringContactCondition() const { return clusteringContactCondition_; }
-
+  void setClusteringEnergyThreshold(double v) { clusteringEnergyThreshold_ = v; }
+  void setClusteringSplitThreshold(double v) { clusteringSplitThreshold_ = v; }
+  double ClusteringEnergyThreshold() const { return clusteringEnergyThreshold_; }
+  double ClusteringSplitThreshold() const { return clusteringSplitThreshold_; }
+  int ClusteringRange() const { return clusteringRange_; }
+  void setClusteringRange(int value) { clusteringRange_ = value; }
+  
   void initializeEvent() override;
   virtual void selectHits();
   void discriminateHits();
@@ -292,6 +298,7 @@ protected:
   virtual void reconstruct(const DetectorHitVector& hitSignals,
                            DetectorHitVector& hitsReconstructed) = 0;
   virtual void cluster(DetectorHitVector& hits) const;
+  virtual void clusterByThreshold(DetectorHitVector& hits) const;
 
 private:
   std::string name_;
@@ -319,6 +326,9 @@ private:
   int reconstructionMode_;
   bool clusteringOn_;
   bool clusteringContactCondition_;
+  double clusteringEnergyThreshold_;
+  double clusteringSplitThreshold_;
+  int clusteringRange_; // in unit of pixel pitch
 
   std::vector<std::unique_ptr<MultiChannelData>> MCDVector_;
   std::shared_ptr<const VChannelMap> channelMap_;

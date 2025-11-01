@@ -36,6 +36,22 @@ public:
                    const BasicComptonEvent &baseEvent,
                    std::vector<BasicComptonEvent_sptr> &eventsReconstructed) override;
   void initializeEvent() override {}
+  void setNoiseLevelParameters(double p0, double p1, double p2) {
+    noiseLevelParam0_ = p0;
+    noiseLevelParam1_ = p1;
+    noiseLevelParam2_ = p2;
+    if (noiseLevelParam0_ <= 0.0 && noiseLevelParam1_ <= 0.0 && noiseLevelParam2_ <= 0.0) {
+      applyNoise_ = false;
+    }
+    else {
+      applyNoise_ = true;
+    }
+  }
+  double getNoiseParam0() const { return noiseLevelParam0_; }
+  double getNoiseParam1() const { return noiseLevelParam1_; }
+  double getNoiseParam2() const { return noiseLevelParam2_; }
+  void setApplyNoise(bool v) { applyNoise_ = v; }
+  bool ApplyNoise() const { return applyNoise_; }
 
 protected:
   bool sortByRealTime(std::vector<DetectorHit_sptr> &hits);
@@ -57,6 +73,10 @@ private:
   bool anodeUpside_ = true;
   size_t numLastHits_ = 0;
   EscapeDetectionMethod escapeDetectionMethod_ = EscapeDetectionMethod::TOTAL_ENERGY_DEPOSITION;
+  double noiseLevelParam0_ = 0.0;
+  double noiseLevelParam1_ = 0.0;
+  double noiseLevelParam2_ = 0.0;
+  bool applyNoise_ = false;
 };
 } /* namespace comptonsoft */
 #endif //COMPTONSOFT_EventReconstructionWithKnownOrder_hh

@@ -27,14 +27,14 @@
 namespace comptonsoft {
 
 RealDetectorUnitLArTPC::RealDetectorUnitLArTPC()
-  : readoutElectrode_(ElectrodeSide::Undefined){
+    : readoutElectrode_(ElectrodeSide::Undefined){
 }
 
 RealDetectorUnitLArTPC::~RealDetectorUnitLArTPC() = default;
 
 bool RealDetectorUnitLArTPC::setReconstructionDetails(int mode)
 {
-  if (mode == 1) {
+  if (mode == 1 || mode == 4) {
     // basic reconstruction with clustering
     setClusteringOn(true);
   }
@@ -66,7 +66,12 @@ void RealDetectorUnitLArTPC::reconstruct(const DetectorHitVector& hitSignals,
                  });
   determinePosition(hitsReconstructed);
   if (isClusteringOn()) {
-    cluster(hitsReconstructed);
+    if (ReconstructionMode() == 4) {
+      clusterByThreshold(hitsReconstructed);
+    }
+    else {
+      cluster(hitsReconstructed);
+    }
   }
 }
 

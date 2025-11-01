@@ -125,6 +125,9 @@ public:
     boost::optional<double> reconstruction_energy_consistency_check_lower_function_c1 = boost::none;
     boost::optional<double> reconstruction_energy_consistency_check_upper_function_c0 = boost::none;
     boost::optional<double> reconstruction_energy_consistency_check_upper_function_c1 = boost::none;
+    boost::optional<double> clustering_energy_threshold = boost::none;
+    boost::optional<double> clustering_split_threshold = boost::none;
+    boost::optional<int> clustering_range = boost::none;
 
     void load(const boost::property_tree::ptree& node);
   };

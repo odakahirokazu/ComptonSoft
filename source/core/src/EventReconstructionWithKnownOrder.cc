@@ -1,6 +1,7 @@
 #include "EventReconstructionWithKnownOrder.hh"
 #include "AstroUnits.hh"
 #include "BasicComptonEvent.hh"
+#include "CLHEP/Random/RandGauss.h"
 #include "ComptonConstraints.hh"
 #include "FlagDefinition.hh"
 #include <algorithm>
@@ -33,6 +34,15 @@ bool EventReconstructionWithKnownOrder::loadParameters(boost::property_tree::ptr
   }
   numLastHits_ = pt.get<int>("known_order.num_last_hits", 0);
   thresholdOfPixelz_ = pt.get<int>("known_order.threshold_of_pixelz", -1);
+  noiseLevelParam0_ = pt.get<double>("known_order.noise_level_param0", 0.0);
+  noiseLevelParam1_ = pt.get<double>("known_order.noise_level_param1", 0.0);
+  noiseLevelParam2_ = pt.get<double>("known_order.noise_level_param2", 0.0);
+  if (noiseLevelParam0_ <= 0.0 && noiseLevelParam1_ <= 0.0 && noiseLevelParam2_ <= 0.0) {
+    applyNoise_ = false;
+  }
+  else {
+    applyNoise_ = true;
+  }
   verbose_ = pt.get<int>("known_order.verbose", 0);
   std::cout << "--- EventReconstructionWithKnownOrder v2---" << std::endl;
   std::cout << "  process_mode: " << processMode_ << std::endl;
@@ -47,6 +57,9 @@ bool EventReconstructionWithKnownOrder::loadParameters(boost::property_tree::ptr
   std::cout << "  exclude_rayleigh_scattering: " << excludeRayleighScattering_ << std::endl;
   std::cout << "  num_last_hits: " << numLastHits_ << std::endl;
   std::cout << "  threshold_of_pixelz: " << thresholdOfPixelz_ << std::endl;
+  std::cout << "  noise_level_param0: " << noiseLevelParam0_ << std::endl;
+  std::cout << "  noise_level_param1: " << noiseLevelParam1_ << std::endl;
+  std::cout << "  noise_level_param2: " << noiseLevelParam2_ << std::endl;
   std::cout << "  verbose: " << verbose_ << std::endl;
   std::cout << "------------------------------------------" << std::endl;
   return true;
@@ -64,6 +77,30 @@ bool EventReconstructionWithKnownOrder::reconstruct(const std::vector<DetectorHi
 
   std::vector<DetectorHit_sptr> ordered_hits(hits.begin(), hits.begin() + hits_used);
   sortByRealTime(ordered_hits);
+  std::transform(ordered_hits.begin(), ordered_hits.end(), ordered_hits.begin(),
+                 [this](DetectorHit_sptr &hit) {
+                   if (ApplyNoise()) {
+                     // y^2 = param0^2 + (param1*x^(1/2))^2 + (param2*x)^2
+                     // x: energy in keV
+                     // y: noise value in keV
+
+                     const double x = hit->Energy() / unit::keV; // in keV
+                     const double param0 = getNoiseParam0();
+                     const double param1 = getNoiseParam1();
+                     const double param2 = getNoiseParam2();
+                     const double y2 = param0 * param0 + param1 * param1 * x + param2 * param2 * x * x; // in keV2
+                     const double sigma = std::sqrt(y2) * unit::keV;
+                     if (verbose_ > 2) {
+                       std::cout << "  Applying noise to hit (TrackID=" << hit->TrackID() << ", E=" << hit->Energy() / unit::keV << " keV): sigma = " << sigma / unit::keV << " keV" << std::endl;
+                     }
+                     const double ePI = CLHEP::RandGauss::shoot(hit->Energy(), sigma);
+                     if (verbose_ > 2) {
+                       std::cout << "    Energy before noise: " << hit->Energy() / unit::keV << " keV, after noise: " << ePI / unit::keV << " keV" << std::endl;
+                     }
+                     hit->setEnergy(ePI);
+                   }
+                   return hit;
+                 });
   if (verbose_ > 0) {
     std::cout << "Reconstructing event ID: " << ordered_hits[0]->EventID() << " with " << num_hits << " (" << hits_used << ") hits." << std::endl;
     for (size_t i = 0; i < ordered_hits.size(); ++i) {

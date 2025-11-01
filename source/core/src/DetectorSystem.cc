@@ -1285,6 +1285,17 @@ void DetectorSystem::setupReconstructionParameters(const DetectorSystem::Paramet
         }
       }
     }
+    if (auto o1 = parameters.clustering_energy_threshold) {
+      const double value = (*o1) * unit::keV;
+      detector->setClusteringEnergyThreshold(value);
+    }
+    if (auto o2 = parameters.clustering_split_threshold) {
+      const double value = (*o2) * unit::keV;
+      detector->setClusteringSplitThreshold(value);
+    }
+    if (auto o3 = parameters.clustering_range) {
+      detector->setClusteringRange(*o3);
+    }
   }
 }
 
@@ -1461,6 +1472,15 @@ load(const boost::property_tree::ptree& node)
   }
   if (auto o=node.get_optional<int>("reconstruction.energy_consistency_check.<xmlattr>.upper_function_c1")) {
     reconstruction_energy_consistency_check_upper_function_c1 = o;
+  }
+  if (auto o=node.get_optional<double>("reconstruction.<xmlattr>.clustering_energy_threshold")) {
+    clustering_energy_threshold = o;
+  }
+  if (auto o=node.get_optional<double>("reconstrunction.<xmlattr>.clustering_split_threshold")) {
+    clustering_split_threshold = o;
+  }
+  if (auto o=node.get_optional<int>("reconstruction.<xmlattr>.clustering_range")) {
+    clustering_range = o;
   }
   if (auto o=node.get_optional<std::string>("recombination.<xmlattr>.filename")) {
     recombination_configuration_file = o;

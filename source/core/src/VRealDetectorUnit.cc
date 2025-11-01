@@ -46,6 +46,15 @@ bool is_group_adjacent(const HitList& group0, const HitList& group1, bool contac
   return false;
 }
 
+bool is_within_distance(const comptonsoft::DetectorHit_sptr &hit0,
+                        const comptonsoft::DetectorHit_sptr &hit1,
+                        int distanceThreshold) {
+  const int dx = std::abs(hit0->VoxelX() - hit1->VoxelX());
+  const int dy = std::abs(hit0->VoxelY() - hit1->VoxelY());
+  const int dz = (hit0->isVoxel() && hit1->isVoxel()) ? std::abs(hit0->VoxelZ() - hit1->VoxelZ()) : 0;
+  return ((dx <= distanceThreshold) && (dy <= distanceThreshold) && (dz <= distanceThreshold));
+}
+
 } /* anonymous namespace */
 
 namespace comptonsoft {
@@ -61,7 +70,7 @@ VRealDetectorUnit::VRealDetectorUnit()
     directionY_(0.0, 1.0, 0.0),
     directionZ_(0.0, 0.0, 1.0),
     bottomSideElectrode_(ElectrodeSide::Undefined),
-    reconstructionMode_(1), clusteringOn_(true), clusteringContactCondition_(true),
+    reconstructionMode_(1), clusteringOn_(true), clusteringContactCondition_(true), clusteringEnergyThreshold_(0.0), clusteringSplitThreshold_(0.0), clusteringRange_(2),
     channelMap_(nullptr)
 {
 }
@@ -402,6 +411,64 @@ void VRealDetectorUnit::cluster(DetectorHitVector& hits) const
     ++hitIter;
     for (; hitIter!=std::end(group); ++hitIter) {
       clusteredHits.back()->mergeAdjacentSignal(**hitIter, DetectorHit::MergedPosition::EnergyWeighted);
+    }
+  }
+  hits = std::move(clusteredHits);
+}
+
+void VRealDetectorUnit::clusterByThreshold(DetectorHitVector &hits) const {
+  const auto energyThreshold = ClusteringEnergyThreshold();
+  const auto splitThreshold = ClusteringSplitThreshold();
+  const auto distanceThreshold = ClusteringRange();
+  if (energyThreshold <= 0.0 && splitThreshold <= 0.0) {
+    return;
+  }
+
+  auto compair = [](const DetectorHit_sptr &hit1, const DetectorHit_sptr &hit2) -> bool {
+    return hit1->EPI() > hit2->EPI();
+  };
+  std::list<std::list<DetectorHit_sptr>> groups;
+  auto iter_vector = std::reverse_iterator(hits.begin());
+  for (; iter_vector < std::reverse_iterator(hits.end()); iter_vector++) {
+    if ((*iter_vector)->Energy() >= energyThreshold) {
+      groups.emplace_back(*iter_vector);
+      hits.erase(iter_vector.base());
+    }
+  }
+  auto iter1 = std::begin(groups);
+  while (iter1 != groups.end()) {
+    auto iter2 = iter1;
+    iter2++;
+    while (iter2 != groups.end()) {
+      if (is_within_distance(iter1->back(), iter2->back(), distanceThreshold)) { // Each element is sorted by EPI. So iter1->back() means the hit with largest EPI.
+        iter1->merge(*iter2, compair);
+        iter2 = groups.erase(iter2);
+      }
+      else {
+        ++iter2;
+      }
+    }
+    ++iter1;
+  }
+
+  for (auto &group: groups) {
+    auto iter_vector = std::reverse_iterator(hits.begin());
+    for (; iter_vector < std::reverse_iterator(hits.begin()); iter_vector++) {
+      if (is_within_distance(group.back(), *iter_vector, distanceThreshold)) {
+        group.merge({*iter_vector}, compair);
+        hits.erase(iter_vector.base());
+      }
+    }
+  }
+
+  DetectorHitVector clusteredHits;
+  for (const auto &group: groups) {
+    auto iter = group.begin();
+    clusteredHits.push_back(*iter);
+    iter++;
+    while (iter != group.end()) {
+      clusteredHits.back()->merge(**iter);
+      iter++;
     }
   }
   hits = std::move(clusteredHits);

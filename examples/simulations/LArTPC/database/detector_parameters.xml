@@ -1,5 +1,5 @@
-<?xml version="1.0" ?>
-<?xml-stylesheet type="text/xsl" href="https://raw.githubusercontent.com/odakahirokazu/ComptonSoft/master/xmlstyle/detector_parameters_v3.xsl" ?>
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="https://raw.githubusercontent.com/odakahirokazu/ComptonSoft/master/xmlstyle/detector_parameters_v3.xsl"?>
 
 <detector_parameters>
   <name>LArBox detector</name>
@@ -13,19 +13,22 @@
           <upside anode="1" readout="1" />
           <quenching factor="1.0" />
           <temperature value="87.0" />
-          <charge_collection mode="0" />
-          <diffusion mode="0">
-            <constant anode="0.01" />
+          <charge_collection mode="0">
+            <mutau electron="1e20" hole="1e20" />
+          </charge_collection>
+          <diffusion mode="1">
+            <coefficient transverse="" longitudinal="6.50851478" />
           </diffusion>
+          <drift_velocity value="1.22966088e5" />
           <channel_properties>
             <disable status="0" />
-            <noise_level param0="5.0" param1="0.5" param2="0.0" />
+            <noise_level param0="0.0" param1="0.0" param2="0.0" />
             <compensation factor="1.0" />
             <threshold value="0.0" />
           </channel_properties>
-          <efield bias="30000.0" />
+          <efield bias="9000.0" /> <!-- 300 V/cm -->
           <recombination filename="database/recombination.xml" />
-          <reconstruction mode="0" />
+          <reconstruction mode="4" clustering_energy_threshold="25" clustering_split_threshold="10" />
         </parameters>
       </common>
       <detector_list id_method="path" layer_offset="1">
