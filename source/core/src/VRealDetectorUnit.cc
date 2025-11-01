@@ -60,17 +60,17 @@ bool is_within_distance(const comptonsoft::DetectorHit_sptr &hit0,
 namespace comptonsoft {
 
 VRealDetectorUnit::VRealDetectorUnit()
-  : name_(""), ID_(0), instrumentID_(0),
-    sizeX_(0.0), sizeY_(0.0), sizeZ_(0.0),
-    offsetX_(0.0), offsetY_(0.0), offsetZ_(0.0),
-    voxelPitchX_(0.0), voxelPitchY_(0.0), voxelPitchZ_(0.0),
-    numVoxelX_(1), numVoxelY_(1), numVoxelZ_(1),
-    centerPosition_(0.0, 0.0, 0.0),
-    directionX_(1.0, 0.0, 0.0),
-    directionY_(0.0, 1.0, 0.0),
-    directionZ_(0.0, 0.0, 1.0),
-    bottomSideElectrode_(ElectrodeSide::Undefined),
-    reconstructionMode_(1), clusteringOn_(true), clusteringContactCondition_(true), clusteringEnergyThreshold_(0.0), clusteringSplitThreshold_(0.0), clusteringRange_(2),
+    : name_(""), ID_(0), instrumentID_(0),
+      sizeX_(0.0), sizeY_(0.0), sizeZ_(0.0),
+      offsetX_(0.0), offsetY_(0.0), offsetZ_(0.0),
+      voxelPitchX_(0.0), voxelPitchY_(0.0), voxelPitchZ_(0.0),
+      numVoxelX_(1), numVoxelY_(1), numVoxelZ_(1),
+      centerPosition_(0.0, 0.0, 0.0),
+      directionX_(1.0, 0.0, 0.0),
+      directionY_(0.0, 1.0, 0.0),
+      directionZ_(0.0, 0.0, 1.0),
+      bottomSideElectrode_(ElectrodeSide::Undefined),
+      reconstructionMode_(1), clusteringOn_(true), clusteringContactCondition_(true), clusteringEnergyThreshold_(0.0), clusteringSplitThreshold_(0.0), clusteringRange_(2),
     channelMap_(nullptr)
 {
 }
@@ -175,24 +175,24 @@ VRealDetectorUnit::findVoxel(double localx, double localy, double localz) const
   if (voxelPitchX_ <= 0.0 || voxelPitchY_ <= 0.0 || voxelPitchZ_ <= 0.0) {
     return VoxelID(VoxelID::Undefined, VoxelID::Undefined, VoxelID::Undefined);
   }
-  
+
   const double detOriginX = -0.5 * sizeX_ + offsetX_;
   const double detOriginY = -0.5 * sizeY_ + offsetY_;
   const double detOriginZ = -0.5 * sizeZ_ + offsetZ_;
   const double xReal = localx - detOriginX;
   const double yReal = localy - detOriginY;
   const double zReal = localz - detOriginZ;
-  
+
   int x = std::floor(xReal/voxelPitchX_);
   int y = std::floor(yReal/voxelPitchY_);
   int z = std::floor(zReal/voxelPitchZ_);
-  
+
   if (x<0 || y<0 || z<0 || x>=numVoxelX_ || y>=numVoxelY_ || z>=numVoxelZ_) {
     x = PixelID::OnMergin;
     y = PixelID::OnMergin;
     z = PixelID::OnMergin;
   }
-  
+
   return VoxelID(x, y, z);
 }
 
@@ -202,20 +202,20 @@ VRealDetectorUnit::findPixel(double localx, double localy) const
   if (voxelPitchX_ <= 0.0 || voxelPitchY_ <= 0.0) {
     return PixelID(PixelID::Undefined, PixelID::Undefined);
   }
-  
+
   const double detOriginX = -0.5 * sizeX_ + offsetX_;
   const double detOriginY = -0.5 * sizeY_ + offsetY_;
   const double xReal = localx - detOriginX;
   const double yReal = localy - detOriginY;
-  
+
   int x = std::floor(xReal/voxelPitchX_);
   int y = std::floor(yReal/voxelPitchY_);
-  
+
   if (x<0 || y<0 || x>=numVoxelX_ || y>=numVoxelY_) {
     x = PixelID::OnMergin;
     y = PixelID::OnMergin;
   }
-  
+
   return PixelID(x, y);
 }
 
@@ -227,13 +227,13 @@ PixelID VRealDetectorUnit::ChannelToStripPair(const int hit1Section,
   if (hit1Section<0 || hit1Channel<0) {
     return PixelID(PixelID::Undefined, PixelID::Undefined);
   }
-  
+
   PixelID pixel = channelMap_->getPixel(hit1Section, hit1Channel);
-  
+
   if (hit2Section<0 || hit2Channel<0) {
     return pixel;
   }
-  
+
   PixelID pixel2 = channelMap_->getPixel(hit2Section, hit2Channel);
   return pixel.combine(pixel2);
 }
@@ -257,7 +257,7 @@ void VRealDetectorUnit::initializeEvent()
     mcd->resetEventData();
     mcd->resetDataValidVector(0);
   }
-  
+
   detectorHits_.clear();
   reconstructedHits_.clear();
 }
@@ -428,19 +428,20 @@ void VRealDetectorUnit::clusterByThreshold(DetectorHitVector &hits) const {
     return hit1->EPI() > hit2->EPI();
   };
   std::list<std::list<DetectorHit_sptr>> groups;
-  auto iter_vector = std::reverse_iterator(hits.begin());
-  for (; iter_vector < std::reverse_iterator(hits.end()); iter_vector++) {
-    if ((*iter_vector)->Energy() >= energyThreshold) {
-      groups.emplace_back(*iter_vector);
-      hits.erase(iter_vector.base());
+  auto iter_vector = hits.end();
+  for (; iter_vector != hits.begin();) {
+    --iter_vector;
+    if ((*iter_vector)->EPI() >= splitThreshold) {
+      groups.emplace_back(1, *iter_vector);
+      hits.erase(iter_vector);
     }
   }
-  auto iter1 = std::begin(groups);
+  auto iter1 = groups.begin();
   while (iter1 != groups.end()) {
     auto iter2 = iter1;
     iter2++;
     while (iter2 != groups.end()) {
-      if (is_within_distance(iter1->back(), iter2->back(), distanceThreshold)) { // Each element is sorted by EPI. So iter1->back() means the hit with largest EPI.
+      if (is_within_distance(iter1->front(), iter2->front(), distanceThreshold)) { // Each element is sorted by EPI. So iter1->front() means the hit with largest EPI.
         iter1->merge(*iter2, compair);
         iter2 = groups.erase(iter2);
       }
@@ -452,11 +453,12 @@ void VRealDetectorUnit::clusterByThreshold(DetectorHitVector &hits) const {
   }
 
   for (auto &group: groups) {
-    auto iter_vector = std::reverse_iterator(hits.begin());
-    for (; iter_vector < std::reverse_iterator(hits.begin()); iter_vector++) {
-      if (is_within_distance(group.back(), *iter_vector, distanceThreshold)) {
+    auto iter_vector = std::end(hits);
+    for (; iter_vector != hits.begin();) {
+      --iter_vector;
+      if (is_within_distance(group.front(), *iter_vector, distanceThreshold) && (*iter_vector)->EPI() >= splitThreshold) {
         group.merge({*iter_vector}, compair);
-        hits.erase(iter_vector.base());
+        hits.erase(iter_vector);
       }
     }
   }
@@ -508,11 +510,13 @@ printDetectorParameters(std::ostream& os) const
   os << "Reconstruction\n"
      << "  Mode : " << ReconstructionMode() << '\n'
      << "  Clustering : " << isClusteringOn() << '\n'
-     << "  Contact condition : " << ClusteringContactCondition() << '\n';
+     << "  Contact condition : " << ClusteringContactCondition() << '\n'
+     << "  Event Threshold : " << ClusteringEnergyThreshold() / unit::keV << " keV\n"
+     << "  Split Threshold : " << ClusteringSplitThreshold() / unit::keV << " keV\n"
+     << "  Clustering Range : " << ClusteringRange() << '\n';
 }
 
-void VRealDetectorUnit::registerFrameData(std::unique_ptr<FrameData>&& frame)
-{
+void VRealDetectorUnit::registerFrameData(std::unique_ptr<FrameData> &&frame) {
   frame_ = std::move(frame);
 }
 
