@@ -17,6 +17,14 @@ VLArRecombinationModel::VLArRecombinationModel(const std::string &name, const st
   if (it != params.end()) {
     rho_ = it->second * (CLHEP::g / CLHEP::cm3);
   }
+  it = params.find("FanoFactor");
+  if (it != params.end()) {
+    fanoFactor_ = it->second;
+  }
+  it = params.find("RandomizeMode");
+  if (it != params.end()) {
+    randomizeMode_ = static_cast<int>(it->second);
+  }
 }
 
 void VLArRecombinationModel::printInfo(std::ostream &os) const {
@@ -24,6 +32,8 @@ void VLArRecombinationModel::printInfo(std::ostream &os) const {
      << "  Name: " << name() << '\n'
      << "  Wion: " << Wion_ / (CLHEP::eV) << " eV\n"
      << "  Wexc: " << Wexc_ / (CLHEP::eV) << " eV\n"
-     << "  Density: " << rho_ / (CLHEP::g / CLHEP::cm3) << " g/cm3\n";
+     << "  Density: " << rho_ / (CLHEP::g / CLHEP::cm3) << " g/cm3\n"
+     << "  Fano Factor: " << fanoFactor_ << "\n"
+     << "  Randomize Mode: " << randomizeMode_ << "\n";
 }
 } /* namespace comptonsoft */

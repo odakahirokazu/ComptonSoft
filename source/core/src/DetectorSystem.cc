@@ -700,7 +700,7 @@ loadDetectorParametersRootNode(const boost::property_tree::ptree& RootNode,
     boost::filesystem::path paramFilePath(filename);
     boost::filesystem::path dir = paramFilePath.parent_path();
     boost::filesystem::path relativePath(*rootFile);
-    boost::filesystem::path fullPath = dir / relativePath;
+    boost::filesystem::path fullPath = relativePath.is_absolute() ? relativePath : dir / relativePath;
     std::cout << "ROOT file: " << fullPath << std::endl;
     ROOTFile_.reset(new TFile(fullPath.c_str()));
   }
@@ -1476,7 +1476,7 @@ load(const boost::property_tree::ptree& node)
   if (auto o=node.get_optional<double>("reconstruction.<xmlattr>.clustering_energy_threshold")) {
     clustering_energy_threshold = o;
   }
-  if (auto o=node.get_optional<double>("reconstrunction.<xmlattr>.clustering_split_threshold")) {
+  if (auto o=node.get_optional<double>("reconstruction.<xmlattr>.clustering_split_threshold")) {
     clustering_split_threshold = o;
   }
   if (auto o=node.get_optional<int>("reconstruction.<xmlattr>.clustering_range")) {

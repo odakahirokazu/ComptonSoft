@@ -23,6 +23,7 @@
 #include "AstroUnits.hh"
 #include <iostream>
 #include <map>
+#include <random>
 #include <string>
 
 namespace comptonsoft {
@@ -41,16 +42,18 @@ public:
 
   // Pure virtual function to calculate recombination energy
   virtual double electronLet(double let, double electricField) const = 0;
-  virtual double lightYieldPerLength(double let, double /*electricField*/) const {
-    return (let - electronYieldPerLength(let, 0.0)) + let / Wexc();
+  virtual double lightYieldPerLength(double let, double electricField) const {
+    return (let - electronLet(let, electricField)) / Wexc();
   };
   double electronYieldPerLength(double let, double electricField) const {
     return electronLet(let, electricField) / Wion();
   }
   std::string name() const { return name_; }
   virtual void printInfo(std::ostream &os) const;
-  void setRandomize(bool flag) { randomize_ = flag; }
-  bool getRandomize() const { return randomize_; }
+  int RandomizeMode() const { return randomizeMode_; }
+  void setRandomizeMode(int mode) { randomizeMode_ = mode; }
+  double FanoFactor() const { return fanoFactor_; }
+  void setFanoFactor(double fano) { fanoFactor_ = fano; }
 
 protected:
   double Wion() const { return Wion_; } /// Ionization energy of LAr
@@ -61,7 +64,8 @@ private:
   double Wion_ = 23.6 * CLHEP::eV; // in eV
   double Wexc_ = 19.6 * CLHEP::eV; // in eV
   double rho_ = 1.39 * (CLHEP::g / CLHEP::cm3); // in g/cm^3
-  bool randomize_ = false; // whether to randomize the output or not
+  int randomizeMode_ = 0; // 0: no randomization, 1: Binomial
+  double fanoFactor_ = 0.107; // Fano factor for LAr // Reference: Bonivento, W. M. and Terranova, F., "The science and technology of liquid argon detectors", 2024,
 };
 } // namespace comptonsoft
 #endif //COMPTONSOFT_VLArRecombinationModel_H
