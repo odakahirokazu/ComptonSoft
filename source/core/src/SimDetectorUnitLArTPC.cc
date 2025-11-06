@@ -318,7 +318,7 @@ void SimDetectorUnitLArTPC::simulatePulseHeights() {
     if (DiffusionMode() == 0) {
       DetectorHit_sptr hit = generateHit(*rawhit, voxel);
       const double energyCharge = calculateEnergyCharge(voxel,
-                                                        edep,
+                                                        hit->EnergyCharge(),
                                                         localposx,
                                                         localposy,
                                                         localposz);
@@ -330,6 +330,7 @@ void SimDetectorUnitLArTPC::simulatePulseHeights() {
 
       const int numDivision = DiffusionDivisionNumber();
       const double edepDivision = edep / numDivision;
+      const double echargeDivision = hit->EnergyCharge() / numDivision;
 
       std::vector<DetectorHit_sptr> diffusionHits;
       if (DiffusionMode() != 3) {
@@ -351,7 +352,7 @@ void SimDetectorUnitLArTPC::simulatePulseHeights() {
                                  return (hit->Voxel() == voxelDiff);
                                });
           const double energyChargeDivision = calculateEnergyCharge(voxelDiff,
-                                                                    edepDivision,
+                                                                    echargeDivision,
                                                                     localposx + dx,
                                                                     localposy + dy,
                                                                     localposz); // even if diffusion exists, dz is not included in CCE calculation
@@ -383,7 +384,7 @@ void SimDetectorUnitLArTPC::simulatePulseHeights() {
                                  return (hit->Voxel() == voxelDiff);
                                });
           const double energyChargeDivision = calculateEnergyCharge(voxelDiff,
-                                                                    edepDivision,
+                                                                    echargeDivision,
                                                                     localposx + dx,
                                                                     localposy + dy,
                                                                     localposz); // even if diffusion exists, dz is not included in CCE calculation
@@ -431,7 +432,7 @@ DetectorHit_sptr SimDetectorUnitLArTPC::generateHit(const DetectorHit &rawhit,
 
   applyQuenching(hit);
 
-  applyRecombination(hit);
+  hit->setEnergyCharge(applyRecombination(hit));
   return hit;
 }
 } /* namespace comptonsoft */
