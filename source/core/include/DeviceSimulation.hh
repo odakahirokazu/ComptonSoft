@@ -150,7 +150,7 @@ public:
   void resetEPICompensationFactorVector(double v)
   { resetTable(&DeviceSimulation::EPICompensationFactorVector_, v); }
 
-  std::tuple<double, double> compensateEPI(const PixelID& sp, std::tuple<double, double> ePI) const;
+  virtual std::tuple<double, double> compensateEPI(const PixelID& sp, std::tuple<double, double> ePI) const;
   std::tuple<double, double> compensateEPI(int chip, int channel, std::tuple<double, double> ePI) const;
 
   virtual double ChargeCollectionEfficiency(const PixelID& /* sp */,

@@ -18,6 +18,8 @@ bool EventReconstructionWithKnownOrder::loadParameters(boost::property_tree::ptr
   excludeEscapeBranchingGamma_ = pt.get<bool>("known_order.exclude_escape_branching_gamma", false);
   excludeBranchingGammaDeposit_ = pt.get<bool>("known_order.exclude_branching_gamma_deposit", false);
   excludeRayleighScattering_ = pt.get<bool>("known_order.exclude_rayleigh_scattering", false);
+  excludeGammaConversion_ = pt.get<bool>("known_order.exclude_gamma_conversion", false);
+
   const int escape_method_mode = pt.get<int>("known_order.escape_detection_method", 2);
   if (escape_method_mode == 0) {
     escapeDetectionMethod_ = EscapeDetectionMethod::TOTAL_ENERGY_DEPOSITION;
@@ -43,6 +45,10 @@ bool EventReconstructionWithKnownOrder::loadParameters(boost::property_tree::ptr
   else {
     applyNoise_ = true;
   }
+  energyCompensation_ = pt.get<bool>("known_order.energy_compensation", false);
+  energyCompensationParam0_ = pt.get<double>("known_order.energy_compensation_param0", 0.0);
+  energyCompensationParam1_ = pt.get<double>("known_order.energy_compensation_param1", 0.0);
+  energyCompensationParam2_ = pt.get<double>("known_order.energy_compensation_param2", 0.0);
   verbose_ = pt.get<int>("known_order.verbose", 0);
   std::cout << "--- EventReconstructionWithKnownOrder v2---" << std::endl;
   std::cout << "  process_mode: " << processMode_ << std::endl;
@@ -55,11 +61,16 @@ bool EventReconstructionWithKnownOrder::loadParameters(boost::property_tree::ptr
     std::cout << "    exclude_branching_gamma_deposit: " << excludeBranchingGammaDeposit_ << std::endl;
   }
   std::cout << "  exclude_rayleigh_scattering: " << excludeRayleighScattering_ << std::endl;
+  std::cout << "  exclude_gamma_conversion: " << excludeGammaConversion_ << std::endl;
   std::cout << "  num_last_hits: " << numLastHits_ << std::endl;
   std::cout << "  threshold_of_pixelz: " << thresholdOfPixelz_ << std::endl;
   std::cout << "  noise_level_param0: " << noiseLevelParam0_ << std::endl;
   std::cout << "  noise_level_param1: " << noiseLevelParam1_ << std::endl;
   std::cout << "  noise_level_param2: " << noiseLevelParam2_ << std::endl;
+  std::cout << "  energy_compensation: " << energyCompensation_ << std::endl;
+  std::cout << "    energy_compensation_param0: " << energyCompensationParam0_ << std::endl;
+  std::cout << "    energy_compensation_param1: " << energyCompensationParam1_ << std::endl;
+  std::cout << "    energy_compensation_param2: " << energyCompensationParam2_ << std::endl;
   std::cout << "  verbose: " << verbose_ << std::endl;
   std::cout << "------------------------------------------" << std::endl;
   return true;
@@ -73,6 +84,12 @@ bool EventReconstructionWithKnownOrder::reconstruct(const std::vector<DetectorHi
   size_t hits_used = num_hits;
   if (numLastHits_ > 0 && numLastHits_ < num_hits) {
     hits_used = numLastHits_;
+  }
+  for (const auto &hit: hits) {
+    if (excludeGammaConversion_ && hit->isProcess(process::GammaConversion)) {
+      std::cerr << "Excluding event (TrackID=" << hit->TrackID() << ") due to gamma conversion." << std::endl;
+      return false;
+    }
   }
 
   std::vector<DetectorHit_sptr> ordered_hits(hits.begin(), hits.begin() + hits_used);

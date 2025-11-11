@@ -54,6 +54,8 @@ ANLStatus ApplyEPICompensation::mod_analyze()
       std::tie(EPI_value, EPI_error) = ds->compensateEPI(hit->Pixel(), std::make_tuple(hit->EPI(), hit->EPIError()));
       hit->setEPI(EPI_value);
       hit->setEPIError(EPI_error);
+      hit->setEnergy(EPI_value);  // for compatibility
+      hit->setEnergyError(EPI_error);  // for compatibility
     }
   }
 

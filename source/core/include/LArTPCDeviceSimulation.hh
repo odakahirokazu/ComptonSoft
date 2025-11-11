@@ -4,6 +4,8 @@
 #include "DetectorHit_sptr.hh"
 #include "DeviceSimulation.hh"
 #include "EFieldModel.hh"
+#include "TFile.h"
+#include "TSpline.h"
 #include "VLArRecombinationModel.hh"
 #include "VLArRecombinationModelFactory.hh"
 #include <memory>
@@ -32,12 +34,22 @@ public:
   double DiffusionCoefficientTransverse() const { return transverseDiffusionCoefficient_; }
   double DriftVelocity() const { return driftVelocity_; }
   void setDriftVelocity(double val) { driftVelocity_ = val; }
+  std::tuple<double, double> compensateEPI(const PixelID &sp, std::tuple<double, double> ePI) const override;
+  void setRecombinationFunctionForEPI(TSpline *spline) { recombinationFunctionForEPI_ = spline; }
+  TSpline *getRecombinationFunctionForEPI() const { return recombinationFunctionForEPI_; }
+  void setResponseFileForEPI(const std::string &filename, const std::string &graph_name = "g_Etrue_mean_pix");
+  const std::vector<TGraph *> &getResponseGraphListForEPI() const { return responseGraphListForEPI_; }
 
 private:
   std::unique_ptr<VLArRecombinationModel> recombinationModel_;
+  TSpline *recombinationFunctionForEPI_ = nullptr;
   double longitudinalDiffusionCoefficient_ = 0.0;
   double transverseDiffusionCoefficient_ = 0.0;
   double driftVelocity_ = -1.0;
+  TFile *responseFileForEPI_ = nullptr;
+  std::vector<TGraph *> responseGraphListForEPI_;
+  std::vector<int> zIndicesForEPI_;
+  std::tuple<double, double> compensateEPIRecombinationIteration(std::tuple<double, double> ePI) const;
 };
 } // namespace comptonsoft
 #endif //COMPTONSOFT_LArTPCDeviceSimlation_H

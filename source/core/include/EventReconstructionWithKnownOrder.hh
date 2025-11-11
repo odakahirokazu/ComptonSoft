@@ -69,6 +69,7 @@ private:
   bool excludeEscapeBranchingGamma_ = false; // only for escape detection by flag check
   bool excludeBranchingGammaDeposit_ = false; // only for escape detection by flag check
   bool excludeRayleighScattering_ = false;
+  bool excludeGammaConversion_ = false;
   int thresholdOfPixelz_ = -1;
   bool anodeUpside_ = true;
   size_t numLastHits_ = 0;
@@ -77,6 +78,10 @@ private:
   double noiseLevelParam1_ = 0.0;
   double noiseLevelParam2_ = 0.0;
   bool applyNoise_ = false;
+  bool energyCompensation_ = false;
+  double energyCompensationParam0_ = 0.0;
+  double energyCompensationParam1_ = 0.0;
+  double energyCompensationParam2_ = 0.0;
 };
 } /* namespace comptonsoft */
 #endif //COMPTONSOFT_EventReconstructionWithKnownOrder_hh
