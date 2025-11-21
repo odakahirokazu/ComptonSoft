@@ -109,7 +109,7 @@ set(CS_CORE_CLASSES
 if(CS_USE_ORT)
   set(CS_ORT_CLASSES
     src/NNAnalyzer.cc
-    src/MTNNEventReconstructionAlgorithm.cc
+    src/NeuralNetST2022EventReconstructionAlgorithm.cc
     )
 endif()
 

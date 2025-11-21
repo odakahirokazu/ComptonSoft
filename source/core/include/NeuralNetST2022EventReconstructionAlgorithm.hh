@@ -17,8 +17,8 @@
  *                                                                       *
  *************************************************************************/
 
-#ifndef COMPTONSOFT_MTNNEventReconstructionAlgorithm_H
-#define COMPTONSOFT_MTNNEventReconstructionAlgorithm_H 1
+#ifndef COMPTONSOFT_NeuralNetST2022EventReconstructionAlgorithm_H
+#define COMPTONSOFT_NeuralNetST2022EventReconstructionAlgorithm_H 1
 
 #include "VEventReconstructionAlgorithm.hh"
 #include <string>
@@ -30,15 +30,15 @@
 
 namespace comptonsoft {
 
-class MTNNEventReconstructionAlgorithm : public VEventReconstructionAlgorithm
+class NeuralNetST2022EventReconstructionAlgorithm : public VEventReconstructionAlgorithm
 {
 public:
-  MTNNEventReconstructionAlgorithm();
-  virtual ~MTNNEventReconstructionAlgorithm();
-  MTNNEventReconstructionAlgorithm(const MTNNEventReconstructionAlgorithm&) = default;
-  MTNNEventReconstructionAlgorithm(MTNNEventReconstructionAlgorithm&&) = default;
-  MTNNEventReconstructionAlgorithm& operator=(const MTNNEventReconstructionAlgorithm&) = default;
-  MTNNEventReconstructionAlgorithm& operator=(MTNNEventReconstructionAlgorithm&&) = default;
+  NeuralNetST2022EventReconstructionAlgorithm();
+  virtual ~NeuralNetST2022EventReconstructionAlgorithm();
+  NeuralNetST2022EventReconstructionAlgorithm(const NeuralNetST2022EventReconstructionAlgorithm&) = default;
+  NeuralNetST2022EventReconstructionAlgorithm(NeuralNetST2022EventReconstructionAlgorithm&&) = default;
+  NeuralNetST2022EventReconstructionAlgorithm& operator=(const NeuralNetST2022EventReconstructionAlgorithm&) = default;
+  NeuralNetST2022EventReconstructionAlgorithm& operator=(NeuralNetST2022EventReconstructionAlgorithm&&) = default;
 
   bool loadParameters(boost::property_tree::ptree& pt);
   void set_source_direction(float x, float y, float z);
@@ -66,4 +66,4 @@ private:
 
 } /* namespace comptonsoft */
 
-#endif /* COMPTONSOFT_MTNNEventReconstructionAlgorithm_H */
+#endif /* COMPTONSOFT_NeuralNetST2022EventReconstructionAlgorithm_H */
