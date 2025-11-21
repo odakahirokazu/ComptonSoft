@@ -17,14 +17,14 @@
  *                                                                       *
  *************************************************************************/
 
-#include "MTNNEventReconstructionAlgorithm.hh"
+#include "NeuralNetST2022EventReconstructionAlgorithm.hh"
 #include "AstroUnits.hh"
 
 namespace unit = anlgeant4::unit;
 
 namespace comptonsoft {
 
-MTNNEventReconstructionAlgorithm::MTNNEventReconstructionAlgorithm()
+NeuralNetST2022EventReconstructionAlgorithm::NeuralNetST2022EventReconstructionAlgorithm()
   : distinguish_escape_(true),
     min_hits_(3),
     max_hits_(3)
@@ -33,14 +33,14 @@ MTNNEventReconstructionAlgorithm::MTNNEventReconstructionAlgorithm()
 }
 
 
-MTNNEventReconstructionAlgorithm::~MTNNEventReconstructionAlgorithm()
+NeuralNetST2022EventReconstructionAlgorithm::~NeuralNetST2022EventReconstructionAlgorithm()
 {
   for (int i=0; i<num_models_; i++){
     delete analyzerNN_[i];
   }
 }
 
-bool MTNNEventReconstructionAlgorithm::loadParameters(boost::property_tree::ptree& pt)
+bool NeuralNetST2022EventReconstructionAlgorithm::loadParameters(boost::property_tree::ptree& pt)
 {
   min_hits_ = pt.get<int>("min_hits");
   max_hits_ = MaxHits();
@@ -88,7 +88,7 @@ bool MTNNEventReconstructionAlgorithm::loadParameters(boost::property_tree::ptre
   return true;
 }
 
-void MTNNEventReconstructionAlgorithm::set_source_direction(float x, float y, float z)
+void NeuralNetST2022EventReconstructionAlgorithm::set_source_direction(float x, float y, float z)
 {
   source_direction_.setX(x);
   source_direction_.setY(y);
@@ -96,11 +96,11 @@ void MTNNEventReconstructionAlgorithm::set_source_direction(float x, float y, fl
   source_direction_ = source_direction_.unit();
 }
 
-void MTNNEventReconstructionAlgorithm::initializeEvent()
+void NeuralNetST2022EventReconstructionAlgorithm::initializeEvent()
 {
 }
 
-void MTNNEventReconstructionAlgorithm::setupModel(std::vector<std::string> model_paths)
+void NeuralNetST2022EventReconstructionAlgorithm::setupModel(std::vector<std::string> model_paths)
 {
   analyzerNN_.resize(num_models_, nullptr);
 
@@ -112,13 +112,13 @@ void MTNNEventReconstructionAlgorithm::setupModel(std::vector<std::string> model
   }
 }
 
-void MTNNEventReconstructionAlgorithm::setTotalEnergyDepositsAndNumHits(const std::vector<DetectorHit_sptr>& hits)
+void NeuralNetST2022EventReconstructionAlgorithm::setTotalEnergyDepositsAndNumHits(const std::vector<DetectorHit_sptr>& hits)
 {
   total_energy_deposits_ = total_energy_deposits(hits);
   num_hits_ = hits.size();
 }
 
-bool MTNNEventReconstructionAlgorithm::
+bool NeuralNetST2022EventReconstructionAlgorithm::
 reconstruct(const std::vector<DetectorHit_sptr>& hits,
             const BasicComptonEvent& baseEvent,
             std::vector<BasicComptonEvent_sptr>& eventsReconstructed)

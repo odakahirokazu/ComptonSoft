@@ -36,7 +36,7 @@
 #include "CSHitCollection.hh"
 
 #if CS_USE_ORT
-#include "MTNNEventReconstructionAlgorithm.hh"
+#include "NeuralNetST2022EventReconstructionAlgorithm.hh"
 #endif
 
 using namespace anlnext;
@@ -108,8 +108,8 @@ ANLStatus EventReconstruction::mod_initialize()
     m_Reconstruction.reset(new OberlackAlgorithm);
   }
 #if CS_USE_ORT
-  else if (ReconstructionMethodName()=="MTNN") {
-    m_Reconstruction.reset(new MTNNEventReconstructionAlgorithm);
+  else if (ReconstructionMethodName()=="NeutralNetST2022") {
+    m_Reconstruction.reset(new NeuralNetST2022EventReconstructionAlgorithm);
   }
 #endif /* CS_USE_ORT */
   else {
