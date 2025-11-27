@@ -47,7 +47,7 @@ public:
   OnnxInference(OnnxInference&&) = default;
   OnnxInference& operator=(OnnxInference&&) = default;
 
-  std::vector<float> infer(const std::vector<float>& input);
+  std::vector<std::vector<float>> infer(const std::vector<float>& input);
 
 private:
   Ort::Env env_;

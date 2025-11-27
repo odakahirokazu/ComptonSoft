@@ -47,7 +47,8 @@ namespace comptonsoft
 {
 
 EventReconstruction::EventReconstruction()
-  : m_MaxHits(2),
+  : m_MinHits(1),
+    m_MaxHits(2),
     m_ReconstructionMethodName("standard"),
     m_SourceDistant(true),
     m_SourceDirection(0.0, 0.0, 1.0),
@@ -62,6 +63,7 @@ EventReconstruction::EventReconstruction()
 
 ANLStatus EventReconstruction::mod_define()
 {
+  define_parameter("min_hits", &mod_class::m_MinHits);
   define_parameter("max_hits", &mod_class::m_MaxHits);
   define_parameter("reconstruction_method", &mod_class::m_ReconstructionMethodName);
   define_parameter("source_distant", &mod_class::m_SourceDistant);
@@ -108,7 +110,7 @@ ANLStatus EventReconstruction::mod_initialize()
     m_Reconstruction.reset(new OberlackAlgorithm);
   }
 #if CS_USE_ORT
-  else if (ReconstructionMethodName()=="NeutralNetST2022") {
+  else if (ReconstructionMethodName()=="NeuralNetST2022") {
     m_Reconstruction.reset(new NeuralNetST2022EventReconstructionAlgorithm);
   }
 #endif /* CS_USE_ORT */
@@ -118,6 +120,7 @@ ANLStatus EventReconstruction::mod_initialize()
     return AS_QUIT_ERROR;
   }
 
+  m_Reconstruction->setMinHits(m_MinHits);
   m_Reconstruction->setMaxHits(m_MaxHits);
 
   if (m_ParameterFile != "") {

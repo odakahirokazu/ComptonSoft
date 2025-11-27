@@ -54,16 +54,13 @@ OnnxInference::OnnxInference(const std::string& model_path)
   }
 }
 
-std::vector<float> OnnxInference::infer(const std::vector<float>& input)
+std::vector<std::vector<float>> OnnxInference::infer(const std::vector<float>& input)
 {
   // Prepare CPU memory info
-  Ort::MemoryInfo mem_info = Ort::MemoryInfo::CreateCpu(
-    OrtDeviceAllocator, OrtMemTypeCPU);
+  Ort::MemoryInfo mem_info = Ort::MemoryInfo::CreateCpu(OrtDeviceAllocator, OrtMemTypeCPU);
 
   // Here we assume a 1D tensor [N]
-  std::vector<int64_t> input_shape = {
-    static_cast<int64_t>(input.size())
-  };
+  std::vector<int64_t> input_shape = {1, static_cast<int64_t>(input.size())};
 
   // Create input tensor
   Ort::Value input_tensor = Ort::Value::CreateTensor<float>(
@@ -98,14 +95,15 @@ std::vector<float> OnnxInference::infer(const std::vector<float>& input)
     output_names_cstr.size()
     );
 
-  // Here we assume the first output is a 1D float tensor
-  Ort::Value& out = output_tensors.front();
+  std::vector<std::vector<float>> output;
+  for (auto& out : output_tensors) {
+    const auto info = out.GetTensorTypeAndShapeInfo();
+    const size_t n = info.GetElementCount();
+    const float* data = out.GetTensorMutableData<float>();
+    output.emplace_back(data, data + n);
+  }
 
-  float* output_data = out.GetTensorMutableData<float>();
-  const size_t output_size =
-    out.GetTensorTypeAndShapeInfo().GetElementCount();
-
-  return std::vector<float>(output_data, output_data + output_size);
+  return output;
 }
 
 } // namespace comptonsoft

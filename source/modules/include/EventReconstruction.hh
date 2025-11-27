@@ -40,10 +40,11 @@ class CSHitCollection;
  * @date 2014-11-25
  * @date 2015-10-10 | derived from VCSModule
  * @date 2020-07-02 | 3.0 | multiple reconstruction event cases
+ * @date 2025-11-28 | 3.1 | add min_hits
  */
 class EventReconstruction : public VCSModule
 {
-  DEFINE_ANL_MODULE(EventReconstruction, 3.0)
+  DEFINE_ANL_MODULE(EventReconstruction, 3.1)
 public:
   EventReconstruction();
   ~EventReconstruction() = default;
@@ -85,6 +86,7 @@ protected:
   void pushReconstructedEvent(const BasicComptonEvent_sptr& event);
   
 private:
+  int m_MinHits;
   int m_MaxHits;
   std::string m_ReconstructionMethodName;
   bool m_SourceDistant;

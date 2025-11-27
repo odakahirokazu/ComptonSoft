@@ -24,7 +24,7 @@
 namespace comptonsoft {
 
 VEventReconstructionAlgorithm::VEventReconstructionAlgorithm()
-  : maxHits_(2)
+  : minHits_(2), maxHits_(2)
 {
 }
 

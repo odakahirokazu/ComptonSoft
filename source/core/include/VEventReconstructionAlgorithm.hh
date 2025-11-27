@@ -36,6 +36,7 @@ namespace comptonsoft {
  * @date 2014-11-17
  * @date 2020-07-02 | multiple reconstructed events
  * @date 2021-01-04 | add parameter file
+ * @date 2025-11-27 | add minHits
  */
 class VEventReconstructionAlgorithm
 {
@@ -46,6 +47,9 @@ public:
   VEventReconstructionAlgorithm(VEventReconstructionAlgorithm&&) = default;
   VEventReconstructionAlgorithm& operator=(const VEventReconstructionAlgorithm&) = default;
   VEventReconstructionAlgorithm& operator=(VEventReconstructionAlgorithm&&) = default;
+
+  void setMinHits(int v) { minHits_ = v; }
+  int MinHits() const { return minHits_; }
 
   void setMaxHits(int v) { maxHits_ = v; }
   int MaxHits() const { return maxHits_; }
@@ -73,6 +77,7 @@ protected:
   { return true; }
 
 private:
+  int minHits_;
   int maxHits_;
   std::string parameterFile_;
 };
