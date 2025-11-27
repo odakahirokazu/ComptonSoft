@@ -23,10 +23,8 @@
 #include "VEventReconstructionAlgorithm.hh"
 #include <string>
 #include <vector>
-#include <CLHEP/Vector/ThreeVector.h>
-#include "DetectorHit_sptr.hh"
-#include "NNAnalyzer.hh"
-#include <boost/property_tree/json_parser.hpp>
+#include <memory>
+#include "OnnxInference.hh"
 
 namespace comptonsoft {
 
@@ -34,35 +32,19 @@ class NeuralNetST2022EventReconstructionAlgorithm : public VEventReconstructionA
 {
 public:
   NeuralNetST2022EventReconstructionAlgorithm();
-  virtual ~NeuralNetST2022EventReconstructionAlgorithm();
-  NeuralNetST2022EventReconstructionAlgorithm(const NeuralNetST2022EventReconstructionAlgorithm&) = default;
-  NeuralNetST2022EventReconstructionAlgorithm(NeuralNetST2022EventReconstructionAlgorithm&&) = default;
-  NeuralNetST2022EventReconstructionAlgorithm& operator=(const NeuralNetST2022EventReconstructionAlgorithm&) = default;
-  NeuralNetST2022EventReconstructionAlgorithm& operator=(NeuralNetST2022EventReconstructionAlgorithm&&) = default;
 
-  bool loadParameters(boost::property_tree::ptree& pt);
-  void set_source_direction(float x, float y, float z);
-  void initializeEvent();
-  void setupModel(std::vector<std::string> model_paths);
-  void setTotalEnergyDepositsAndNumHits(const std::vector<DetectorHit_sptr>& hits);
+  void initializeEvent() override;
   bool reconstruct(const std::vector<DetectorHit_sptr>& hits,
                    const BasicComptonEvent& baseEvent,
-                   std::vector<BasicComptonEvent_sptr>& eventsReconstructed);
+                   std::vector<BasicComptonEvent_sptr>& eventsReconstructed) override;
+
+protected:
+  bool loadParameters(boost::property_tree::ptree& pt) override;
 
 private:
   bool distinguish_escape_;
-  int min_hits_, max_hits_;
-  int num_models_;
-  std::vector<std::string> model_paths_;
-
-  vector3_t source_direction_;
-
-  double total_energy_deposits_;
-  int num_hits_;
-
-  std::vector<NNAnalyzer*> analyzerNN_;
+  std::vector<std::unique_ptr<OnnxInference>> models_;
 };
-
 
 } /* namespace comptonsoft */
 

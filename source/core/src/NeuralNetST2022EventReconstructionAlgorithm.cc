@@ -18,6 +18,8 @@
  *************************************************************************/
 
 #include "NeuralNetST2022EventReconstructionAlgorithm.hh"
+
+#include "DetectorHit.hh"
 #include "AstroUnits.hh"
 
 namespace unit = anlgeant4::unit;
@@ -25,97 +27,51 @@ namespace unit = anlgeant4::unit;
 namespace comptonsoft {
 
 NeuralNetST2022EventReconstructionAlgorithm::NeuralNetST2022EventReconstructionAlgorithm()
-  : distinguish_escape_(true),
-    min_hits_(3),
-    max_hits_(3)
+  : distinguish_escape_(true)
 {
   setParameterFile("parfile_MTNN.json");
 }
 
 
-NeuralNetST2022EventReconstructionAlgorithm::~NeuralNetST2022EventReconstructionAlgorithm()
-{
-  for (int i=0; i<num_models_; i++){
-    delete analyzerNN_[i];
-  }
-}
-
 bool NeuralNetST2022EventReconstructionAlgorithm::loadParameters(boost::property_tree::ptree& pt)
 {
-  min_hits_ = pt.get<int>("min_hits");
-  max_hits_ = MaxHits();
   distinguish_escape_ = pt.get<bool>("distinguish_escape");
-
   std::cout << distinguish_escape_ << std::endl;
-  std::vector<double> source_dir;
-  for (const auto& r: pt.get_child("source_dir")) {
-    source_dir.push_back(r.second.get_value<double>());
-  }
-  set_source_direction(source_dir[0], source_dir[1], source_dir[2]);
 
-  //Setup NN models
-  std::string model_dir = pt.get<std::string>("model_dir");
-
-  std::vector<std::string> model_filenames;
+  const std::string model_dir = pt.get<std::string>("model_dir");
+  std::vector<std::string> model_paths;
   for (const auto& r: pt.get_child("model_filenames")) {
-    model_filenames.push_back(r.second.get_value<std::string>());
-    std::cout << r.second.get_value<std::string>() << std::endl;
+    const std::string filename = r.second.get_value<std::string>();
+    const std::string path = model_dir + std::string("/") + filename;
+    model_paths.push_back(path);
   }
 
-  num_models_ = max_hits_ - min_hits_ + 1;
-  if (num_models_ != (int)model_filenames.size()) {
+  const size_t num_models = MaxHits() - (MinHits()-1);
+  if (num_models != model_paths.size()) {
     std::cout << "The number of models does not match the designated num_hits range" << std::endl;
     return false;
   }
 
-  model_paths_.resize(num_models_);
-  for (int ihit=min_hits_;ihit<=max_hits_;ihit++) {
-    model_paths_[ihit - min_hits_] = model_dir + std::string("/") + model_filenames[ihit - min_hits_];
+  models_.reserve(num_models);
+  for (const std::string& path: model_paths) {
+    models_.emplace_back(std::make_unique<OnnxInference>(path));
   }
 
-  setupModel(model_paths_);
-
   std::cout << std::endl;
-  std::cout << "--- MTNN (Multi-task neural network model) ---" << std::endl;
-  std::cout << "source position: [" << source_dir[0] << ", "<< source_dir[1] << ", " << source_dir[2] << "]" << std::endl;
+  std::cout << "--- Multi-task neural network model ST2022 ---" << std::endl;
   std::cout << "distinguish_escape: " << distinguish_escape_ << std::endl;
 
-  for (int ihit=min_hits_;ihit<=max_hits_;ihit++) {
-    std::cout << "Model_path (" << ihit << "): ";
-    std::cout << model_paths_[ihit-min_hits_] << std::endl;
+  for (size_t i=0; i<num_models; ++i) {
+    const int nhit = MinHits() + i;
+    std::cout << "Model_path (" << nhit << "): ";
+    std::cout << model_paths[i] << std::endl;
   }
 
   return true;
 }
 
-void NeuralNetST2022EventReconstructionAlgorithm::set_source_direction(float x, float y, float z)
-{
-  source_direction_.setX(x);
-  source_direction_.setY(y);
-  source_direction_.setZ(z);
-  source_direction_ = source_direction_.unit();
-}
-
 void NeuralNetST2022EventReconstructionAlgorithm::initializeEvent()
 {
-}
-
-void NeuralNetST2022EventReconstructionAlgorithm::setupModel(std::vector<std::string> model_paths)
-{
-  analyzerNN_.resize(num_models_, nullptr);
-
-  for (int i=0;i<num_models_;i++) {
-    int ihit = min_hits_ + i;
-    const char* model_path_char = model_paths[i].c_str();
-    analyzerNN_[i] = new NNAnalyzer(model_path_char, ihit);
-    analyzerNN_[i]->SetupModel(distinguish_escape_);
-  }
-}
-
-void NeuralNetST2022EventReconstructionAlgorithm::setTotalEnergyDepositsAndNumHits(const std::vector<DetectorHit_sptr>& hits)
-{
-  total_energy_deposits_ = total_energy_deposits(hits);
-  num_hits_ = hits.size();
 }
 
 bool NeuralNetST2022EventReconstructionAlgorithm::
@@ -124,19 +80,44 @@ reconstruct(const std::vector<DetectorHit_sptr>& hits,
             std::vector<BasicComptonEvent_sptr>& eventsReconstructed)
 {
   auto eventReconstructed = std::make_shared<BasicComptonEvent>(baseEvent);
-  setTotalEnergyDepositsAndNumHits(hits);
-
-  if (num_hits_ > max_hits_ || num_hits_< min_hits_) {
+  const int num_hits = hits.size();
+  if (num_hits < MinHits() || num_hits > MaxHits()) {
     return false;
   }
 
-  bool result = analyzerNN_[num_hits_ - min_hits_]->Run(hits, eventReconstructed);
+  std::vector<DetectorHit_sptr> energy_sorted_hits = hits;
+  std::sort(energy_sorted_hits.begin(), energy_sorted_hits.end(),
+            [](const DetectorHit_sptr& a, const DetectorHit_sptr& b) {
+              return a->Energy() < b->Energy();
+            });
 
-  if (result) {
-    eventsReconstructed.push_back(eventReconstructed);
+  const size_t model_index = num_hits - MinHits();
+  OnnxInference* model = models_[model_index].get();
+
+  const size_t num_params_per_hit = 4;
+  const size_t input_dim = num_params_per_hit * num_hits;
+  std::vector<float> input (input_dim, 0.0);
+  for (int i=0; i<num_hits; ++i) {
+    input[i*num_params_per_hit + 0] = energy_sorted_hits[i]->Energy() / unit::keV;
+    input[i*num_params_per_hit + 1] = energy_sorted_hits[i]->PositionX() / unit::cm;
+    input[i*num_params_per_hit + 2] = energy_sorted_hits[i]->PositionY() / unit::cm;
+    input[i*num_params_per_hit + 3] = energy_sorted_hits[i]->PositionZ() / unit::cm;
   }
 
-  return result;
+  const std::vector<std::vector<float>> output = model->infer(input);
+  const std::vector<float>& output_escape = output[0];
+  const std::vector<float>& output_order  = output[1];
+  
+  const bool escape_flag = (output_escape[0] < output_escape[1]) ? true: false;
+
+  /**
+     extract the best order from output_order.
+     
+   */
+  
+  eventsReconstructed.push_back(eventReconstructed);
+
+  return true;
 }
 
 } /* namespace comptonsoft */
