@@ -28,6 +28,14 @@
 
 namespace comptonsoft {
 
+/**
+ * class for Compton event reconstrcution
+ * based on multi-task neural network
+ * Reference: S. Takashima et al., NIMA, 1038, 166897, 2022
+ *
+ * @author Satoshi Takashima, Hirokazu Odaka
+ * @date 2025-11-29
+ */
 class NeuralNetST2022EventReconstructionAlgorithm : public VEventReconstructionAlgorithm
 {
 public:
@@ -38,12 +46,17 @@ public:
                    const BasicComptonEvent& baseEvent,
                    std::vector<BasicComptonEvent_sptr>& eventsReconstructed) override;
 
+  std::tuple<bool, std::vector<DetectorHit_sptr>, double>
+  infer_hit_order(const std::vector<DetectorHit_sptr>& hits);
+
 protected:
   bool loadParameters(boost::property_tree::ptree& pt) override;
 
 private:
+  const int first_n_hits_;
   bool distinguish_escape_;
   std::vector<std::unique_ptr<OnnxInference>> models_;
+  std::vector<std::vector<std::vector<int>>> permutations_;
 };
 
 } /* namespace comptonsoft */
