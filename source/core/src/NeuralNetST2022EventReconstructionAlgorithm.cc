@@ -145,16 +145,12 @@ reconstruct(const std::vector<DetectorHit_sptr>& hits,
   eventReconstructed->setLikelihood(order_probability);
   eventReconstructed->setReconstructionFraction(1.0);
 
-  const double total_energy_deposits
-    = std::accumulate(hits.begin(), hits.end(), 0.0,
-                      [](double sum, const DetectorHit_sptr& hit) {
-                        return sum + hit->Energy();
-                      });
-  eventReconstructed->setTotalEnergyDeposit(total_energy_deposits);
+  const double sum_energies = total_energy_deposits(hits);
+  eventReconstructed->setTotalEnergyDeposit(sum_energies);
 
   if (distinguish_escape_ && !escape_flag) {
     const double energy_recoil_electron = ordered_hits[0]->Energy();
-    const double energy_scattered_photon = total_energy_deposits - energy_recoil_electron;
+    const double energy_scattered_photon = sum_energies - energy_recoil_electron;
     eventReconstructed->setHit2Energy(energy_scattered_photon);
   }
   else {
