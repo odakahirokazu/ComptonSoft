@@ -191,7 +191,7 @@ NeuralNetST2022EventReconstructionAlgorithm::infer_hit_order(const std::vector<D
   const size_t num_hits = hits.size();
   const size_t model_index = num_hits - MinHits();
   OnnxInference* model = models_[model_index].get();
-  const std::vector<std::vector<int>>& permulations = permutations_[model_index];
+  const std::vector<std::vector<int>>& permutations = permutations_[model_index];
 
   const size_t num_params_per_hit = 4;
   const size_t input_dim = num_params_per_hit * num_hits;
@@ -212,7 +212,7 @@ NeuralNetST2022EventReconstructionAlgorithm::infer_hit_order(const std::vector<D
   const auto order_iter = std::max_element(output_order.begin(), output_order.end());
   const std::size_t order_index = std::distance(output_order.begin(), order_iter);
   const double order_probability = *order_iter;
-  const std::vector<int>& order = permulations[order_index];
+  const std::vector<int>& order = permutations[order_index];
 
   std::vector<DetectorHit_sptr> ordered_hits;
   for (int i=0; i<first_n_hits_; ++i) {
