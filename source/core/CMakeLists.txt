@@ -109,7 +109,6 @@ set(CS_CORE_CLASSES
 if(CS_USE_ORT)
   set(CS_ORT_CLASSES
     src/OnnxInference.cc
-    src/NNAnalyzer.cc
     src/NeuralNetST2022EventReconstructionAlgorithm.cc
     )
 endif()
