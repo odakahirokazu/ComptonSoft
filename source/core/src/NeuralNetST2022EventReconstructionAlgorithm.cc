@@ -135,7 +135,7 @@ reconstruct(const std::vector<DetectorHit_sptr>& hits,
   }
 
   // infer the escape flag and hit order via multi-task neural network
-  const auto [escape_flag, ordered_hits, order_index, order_probability] = infer_hit_order(hits);
+  const auto [escape_flag, order_index, order_probability, ordered_hits] = infer_hit_order(hits);
 
   auto eventReconstructed = std::make_shared<BasicComptonEvent>(baseEvent);
   eventReconstructed->setHit1(0, ordered_hits[0]);
@@ -176,7 +176,7 @@ reconstruct(const std::vector<DetectorHit_sptr>& hits,
   return true;
 }
 
-std::tuple<bool, std::vector<DetectorHit_sptr>, int, double>
+std::tuple<bool, int, double, std::vector<DetectorHit_sptr>>
 NeuralNetST2022EventReconstructionAlgorithm::infer_hit_order(const std::vector<DetectorHit_sptr>& hits)
 {
   std::vector<DetectorHit_sptr> energy_sorted_hits = hits;
@@ -216,7 +216,7 @@ NeuralNetST2022EventReconstructionAlgorithm::infer_hit_order(const std::vector<D
     ordered_hits.push_back(energy_sorted_hits[order[i]]);
   }
  
-  return std::make_tuple(escape_flag, ordered_hits, order_index, order_probability);
+  return std::make_tuple(escape_flag, order_index, order_probability, ordered_hits);
 }
 
 } /* namespace comptonsoft */
