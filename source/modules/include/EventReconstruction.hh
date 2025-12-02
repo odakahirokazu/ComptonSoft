@@ -28,6 +28,11 @@
 #include "BasicComptonEvent.hh"
 #include "VCSModule.hh"
 
+
+namespace anlgeant4 {
+class InitialInformation;
+}
+
 namespace comptonsoft {
 
 class VEventReconstructionAlgorithm;
@@ -41,6 +46,7 @@ class CSHitCollection;
  * @date 2015-10-10 | derived from VCSModule
  * @date 2020-07-02 | 3.0 | multiple reconstruction event cases
  * @date 2025-11-28 | 3.1 | add min_hits
+ * @date 2025-12-02 | 4.0 | use initial information for calculating ARM (optional)
  */
 class EventReconstruction : public VCSModule
 {
@@ -89,11 +95,13 @@ private:
   int m_MinHits;
   int m_MaxHits;
   std::string m_ReconstructionMethodName;
+  bool m_UseInitialInfo;
   bool m_SourceDistant;
   vector3_t m_SourceDirection;
   vector3_t m_SourcePosition;
   std::string m_ParameterFile;
 
+  const anlgeant4::InitialInformation* m_InitialInfo;
   CSHitCollection* m_HitCollection;
 
   std::unique_ptr<BasicComptonEvent> m_BaseEvent;

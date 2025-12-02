@@ -34,6 +34,7 @@
 #include "TangoAlgorithm.hh"
 #include "OberlackAlgorithm.hh"
 #include "CSHitCollection.hh"
+#include "InitialInformation.hh"
 
 #if CS_USE_ORT
 #include "NeuralNetST2022EventReconstructionAlgorithm.hh"
@@ -50,10 +51,12 @@ EventReconstruction::EventReconstruction()
   : m_MinHits(1),
     m_MaxHits(2),
     m_ReconstructionMethodName("standard"),
+    m_UseInitialInfo(false),
     m_SourceDistant(true),
     m_SourceDirection(0.0, 0.0, 1.0),
     m_SourcePosition(0.0, 0.0, 0.0),
     m_ParameterFile(""),
+    m_InitialInfo(nullptr),
     m_HitCollection(nullptr),
     m_BaseEvent(new BasicComptonEvent),
     m_Reconstruction(new StandardEventReconstructionAlgorithm)
@@ -66,6 +69,7 @@ ANLStatus EventReconstruction::mod_define()
   define_parameter("min_hits", &mod_class::m_MinHits);
   define_parameter("max_hits", &mod_class::m_MaxHits);
   define_parameter("reconstruction_method", &mod_class::m_ReconstructionMethodName);
+  define_parameter("use_initial_info", &mod_class::m_UseInitialInfo);
   define_parameter("source_distant", &mod_class::m_SourceDistant);
   define_parameter("source_direction", &mod_class::m_SourceDirection);
   define_parameter("source_position", &mod_class::m_SourcePosition, unit::cm, "cm");
@@ -80,6 +84,14 @@ ANLStatus EventReconstruction::mod_initialize()
   
   define_evs("EventReconstruction:OK");
   define_evs("EventReconstruction:NG");
+
+  if (m_UseInitialInfo) {
+    get_module_IF("InitialInformation", &m_InitialInfo);
+    if (m_InitialInfo == nullptr) {
+      std::cout << "Error: InitialInformation module is not found." << std::endl;
+      return AS_QUIT_ERROR;
+    }
+  }
   
   assignSourceInformation();
   get_module_NC("CSHitCollection", &m_HitCollection);
@@ -137,6 +149,7 @@ ANLStatus EventReconstruction::mod_initialize()
 ANLStatus EventReconstruction::mod_analyze()
 {
   initializeEvent();
+  assignSourceInformation();
 
   const std::vector<DetectorHit_sptr> hits = m_HitCollection->getHits();
   determineHitPatterns(hits);
@@ -167,11 +180,17 @@ void EventReconstruction::assignSourceInformation()
 
 void EventReconstruction::assignSourceInformation(BasicComptonEvent& event) const
 {
-  if (m_SourceDistant) {
-    event.setSourceDirection(m_SourceDirection);
+  if (m_UseInitialInfo) {
+    const vector3_t source_direction = -(m_InitialInfo->InitialDirection());
+    event.setSourceDirection(source_direction);
   }
   else {
-    event.setSourcePosition(m_SourcePosition);
+    if (m_SourceDistant) {
+      event.setSourceDirection(m_SourceDirection);
+    }
+    else {
+      event.setSourcePosition(m_SourcePosition);
+    }
   }
 }
 
