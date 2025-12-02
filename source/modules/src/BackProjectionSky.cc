@@ -33,7 +33,8 @@ namespace comptonsoft
 {
 
 BackProjectionSky::BackProjectionSky()
-  : m_Rotation(0.0)
+  : m_Rotation(0.0), m_Image_Center_Theta(0.0*unit::degree), m_Image_Center_Phi(0.0*unit::degree), 
+                     m_Image_YAxis_Theta(90.0*unit::degree), m_Image_YAxis_Phi(90.0*unit::degree)
 {
   setUnit(unit::degree, "degree");
 }
@@ -48,15 +49,43 @@ ANLStatus BackProjectionSky::mod_define()
   unregister_parameter("plane_point");
   register_parameter(&m_Rotation, "rotation_angle", unit::degree, "degree");
 
+  define_parameter("image_center_theta", &mod_class::m_Image_Center_Theta, unit::degree, "degree");
+  define_parameter("image_center_phi",   &mod_class::m_Image_Center_Phi,   unit::degree, "degree");
+  define_parameter("image_yaxis_theta",  &mod_class::m_Image_YAxis_Theta,  unit::degree, "degree");
+  define_parameter("image_yaxis_phi",    &mod_class::m_Image_YAxis_Phi,    unit::degree, "degree");
+
   return AS_OK;
 }
 
 ANLStatus BackProjectionSky::mod_initialize()
 {
   BackProjection::mod_initialize();
-  m_XAxis.set(std::cos(m_Rotation), std::sin(m_Rotation), 0.0);
-  m_YAxis.set(-m_XAxis.y(), m_XAxis.x(), 0.0);
-  m_ZAxis.set(0.0, 0.0, 1.0);
+
+  vector3_t zDirection_unit(std::sin(m_Image_Center_Theta)*std::cos(m_Image_Center_Phi), 
+                            std::sin(m_Image_Center_Theta)*std::sin(m_Image_Center_Phi), 
+                            std::cos(m_Image_Center_Theta));
+
+  vector3_t yDirectionRaw_unit(std::sin(m_Image_YAxis_Theta)*std::cos(m_Image_YAxis_Phi), 
+                               std::sin(m_Image_YAxis_Theta)*std::sin(m_Image_YAxis_Phi), 
+                               std::cos(m_Image_YAxis_Theta));
+
+  //obtain component vertical to image center direction
+  vector3_t yDirection      = yDirectionRaw_unit - (zDirection_unit * yDirectionRaw_unit) * zDirection_unit;
+  vector3_t yDirection_unit = yDirection.unit();
+  vector3_t xDirection      = yDirection_unit.cross(zDirection_unit);
+  vector3_t xDirection_unit = xDirection.unit();
+
+  //rotation
+  xDirection_unit = (xDirection_unit.rotate(m_Rotation, zDirection_unit)).unit();
+  yDirection_unit = (yDirection_unit.rotate(m_Rotation, zDirection_unit)).unit();
+
+  m_XAxis.set(xDirection_unit.x(), xDirection_unit.y(), xDirection_unit.z());
+  m_YAxis.set(yDirection_unit.x(), yDirection_unit.y(), yDirection_unit.z());
+  m_ZAxis.set(zDirection_unit.x(), zDirection_unit.y(), zDirection_unit.z());
+
+  std::cout << "X Axis: (" << m_XAxis.x() << ", " << m_XAxis.y() << ", " << m_XAxis.z() << ")" << std::endl;
+  std::cout << "Y Axis: (" << m_YAxis.x() << ", " << m_YAxis.y() << ", " << m_YAxis.z() << ")" << std::endl;
+  std::cout << "Z Axis: (" << m_ZAxis.x() << ", " << m_ZAxis.y() << ", " << m_ZAxis.z() << ")" << std::endl;
 
   return AS_OK;
 }

@@ -32,7 +32,7 @@ namespace comptonsoft {
  */
 class BackProjectionSky : public BackProjection
 {
-  DEFINE_ANL_MODULE(BackProjectionSky, 2.2);
+  DEFINE_ANL_MODULE(BackProjectionSky, 3.1);
 public:
   BackProjectionSky();
   ~BackProjectionSky();
@@ -46,6 +46,12 @@ private:
   vector3_t m_XAxis;
   vector3_t m_YAxis;
   vector3_t m_ZAxis;
+
+  double m_Image_Center_Theta;
+  double m_Image_Center_Phi;
+  double m_Image_YAxis_Theta;
+  double m_Image_YAxis_Phi;
+
 };
 
 } /* namespace comptonsoft */
