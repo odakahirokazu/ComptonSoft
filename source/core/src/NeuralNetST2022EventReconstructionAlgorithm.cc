@@ -135,7 +135,7 @@ reconstruct(const std::vector<DetectorHit_sptr>& hits,
   }
 
   // infer the escape flag and hit order via multi-task neural network
-  const auto [escape_flag, ordered_hits, order_probability] = infer_hit_order(hits);
+  const auto [escape_flag, ordered_hits, order_index, order_probability] = infer_hit_order(hits);
 
   auto eventReconstructed = std::make_shared<BasicComptonEvent>(baseEvent);
   eventReconstructed->setHit1(0, ordered_hits[0]);
@@ -143,6 +143,7 @@ reconstruct(const std::vector<DetectorHit_sptr>& hits,
   eventReconstructed->setNumberOfHits(num_hits);
   eventReconstructed->setEscapeFlag(escape_flag);
   eventReconstructed->setLikelihood(order_probability);
+  eventReconstructed->setReconstructedOrder(order_index);
   eventReconstructed->setReconstructionFraction(1.0);
 
   const double sum_energies = total_energy_deposits(hits);
@@ -175,13 +176,13 @@ reconstruct(const std::vector<DetectorHit_sptr>& hits,
   return true;
 }
 
-std::tuple<bool, std::vector<DetectorHit_sptr>, double>
+std::tuple<bool, std::vector<DetectorHit_sptr>, int, double>
 NeuralNetST2022EventReconstructionAlgorithm::infer_hit_order(const std::vector<DetectorHit_sptr>& hits)
 {
   std::vector<DetectorHit_sptr> energy_sorted_hits = hits;
   std::sort(energy_sorted_hits.begin(), energy_sorted_hits.end(),
             [](const DetectorHit_sptr& a, const DetectorHit_sptr& b) {
-              return a->Energy() < b->Energy();
+              return a->Energy() > b->Energy();
             });
 
   const size_t num_hits = hits.size();
@@ -206,7 +207,7 @@ NeuralNetST2022EventReconstructionAlgorithm::infer_hit_order(const std::vector<D
   const bool escape_flag = (output_escape[0] < output_escape[1]) ? true: false;
 
   const auto order_iter = std::max_element(output_order.begin(), output_order.end());
-  const std::size_t order_index = std::distance(output_order.begin(), order_iter);
+  const int order_index = std::distance(output_order.begin(), order_iter);
   const double order_probability = *order_iter;
   const std::vector<int>& order = permutations[order_index];
 
@@ -215,7 +216,7 @@ NeuralNetST2022EventReconstructionAlgorithm::infer_hit_order(const std::vector<D
     ordered_hits.push_back(energy_sorted_hits[order[i]]);
   }
  
-  return std::make_tuple(escape_flag, ordered_hits, order_probability);
+  return std::make_tuple(escape_flag, ordered_hits, order_index, order_probability);
 }
 
 } /* namespace comptonsoft */

@@ -46,7 +46,7 @@ public:
                    const BasicComptonEvent& baseEvent,
                    std::vector<BasicComptonEvent_sptr>& eventsReconstructed) override;
 
-  std::tuple<bool, std::vector<DetectorHit_sptr>, double>
+  std::tuple<bool, std::vector<DetectorHit_sptr>, int, double>
   infer_hit_order(const std::vector<DetectorHit_sptr>& hits);
 
 protected:
