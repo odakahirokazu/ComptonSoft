@@ -42,16 +42,14 @@ public:
   anlnext::ANLStatus mod_analyze() override;
 
 private:
-  double m_Rotation;
-  vector3_t m_XAxis;
-  vector3_t m_YAxis;
-  vector3_t m_ZAxis;
+  vector3_t xaxis_;
+  vector3_t yaxis_;
+  vector3_t zaxis_;
 
-  double m_Image_Center_Theta;
-  double m_Image_Center_Phi;
-  double m_Image_YAxis_Theta;
-  double m_Image_YAxis_Phi;
-
+  double image_center_theta_;
+  double image_center_phi_;
+  double image_yaxis_theta_;
+  double image_yaxis_phi_;
 };
 
 } /* namespace comptonsoft */
