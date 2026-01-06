@@ -23,6 +23,8 @@
 #include "VANLPrimaryGen.hh"
 #include "InitialInformation.hh"
 #include "G4ThreeVector.hh"
+#include "G4Threading.hh"
+#include "G4AutoLock.hh"
 
 class G4ParticleDefinition;
 
@@ -69,6 +71,9 @@ public:
   virtual void makePrimarySetting() = 0;
   virtual void confirmPrimarySetting();
   void storeInitialCondition();
+  
+  G4Mutex& getMutex() { return mutex_; }
+  void setPrimaryGeneratorAction(BasicPrimaryGeneratorAction* action) { primaryGenerator_ = action; }
 
 protected:
   void setPrimary(double time0,
@@ -186,6 +191,7 @@ protected:
   double getEnergykT() const { return kT_; }
 
 private:
+  G4Mutex mutex_;
   BasicPrimaryGeneratorAction* primaryGenerator_ = nullptr;
   const anlgeant4::VANLGeometry* geometry_ = nullptr;
 

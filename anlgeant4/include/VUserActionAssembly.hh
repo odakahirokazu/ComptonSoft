@@ -29,9 +29,11 @@ class G4Run;
 
 class G4RunManager;
 class G4UserStackingAction;
+class G4VUserActionInitialization;
 
 namespace anlgeant4
 {
+class ANLG4ActionInitialization;
 
 /**
  * Virtual UserActionAssembly module
@@ -60,6 +62,9 @@ public:
   bool isSteppingActionEnabled() const { return steppingActionEnabled_; }
 
   virtual void registerUserActions(G4RunManager* run_manager);
+  virtual void registerUserActions(ANLG4ActionInitialization* action_init, bool for_master = false);
+
+  virtual void buildUserActions() {}
 
 protected:
   void enableSteppingAction() { steppingActionEnabled_ = true; }

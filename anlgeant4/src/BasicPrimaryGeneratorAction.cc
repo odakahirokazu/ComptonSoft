@@ -21,6 +21,7 @@
 
 #include "G4ParticleGun.hh"
 #include "G4ParticleTable.hh"
+#include "G4AutoLock.hh"
 #include "AstroUnits.hh"
 #include "BasicPrimaryGen.hh"
 
@@ -57,6 +58,8 @@ BasicPrimaryGeneratorAction::~BasicPrimaryGeneratorAction() = default;
 void BasicPrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
 {
   if (m_GeneratorSetting) {
+    G4AutoLock lock(m_GeneratorSetting->getMutex());
+    m_GeneratorSetting->setPrimaryGeneratorAction(this);
     m_GeneratorSetting->makePrimarySetting();
     m_GeneratorSetting->confirmPrimarySetting();
   }

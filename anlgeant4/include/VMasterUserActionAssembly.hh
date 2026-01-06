@@ -43,6 +43,7 @@ public:
   virtual ~VMasterUserActionAssembly();
 
   void registerUserActions(G4RunManager* run_manager) override;
+  void registerUserActions(ANLG4ActionInitialization* action_init, bool for_master = false) override;
 
   bool hasStackingAction() const { return (stackingAction_!=nullptr); }
   void appendUserActions(VAppendableUserActionAssembly* user_action_assembly);

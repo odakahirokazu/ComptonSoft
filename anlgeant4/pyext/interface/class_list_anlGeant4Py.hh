@@ -1,5 +1,6 @@
 namespace anlgeant4 {
 class Geant4Body;
+class Geant4MTBody;
 class Geant4Simple;
 class VANLPhysicsList;
 class VANLGeometry;

@@ -26,6 +26,7 @@
 #include "UserActionAssemblyTrackingAction.hh"
 #include "UserActionAssemblySteppingAction.hh"
 #include "VAppendableUserActionAssembly.hh"
+#include "ANLG4ActionInitialization.hh"
 
 using namespace anlnext;
 
@@ -69,6 +70,39 @@ void VMasterUserActionAssembly::registerUserActions(G4RunManager* run_manager)
   
   if (stackingAction_) {
     run_manager->SetUserAction(stackingAction_);
+  }
+
+  printSummary();
+}
+
+void VMasterUserActionAssembly::registerUserActions(ANLG4ActionInitialization* action_init, bool for_master)
+{
+  createUserActions();
+
+  std::list<VUserActionAssembly*> userActions;
+  userActions.push_back(this);
+  for (VUserActionAssembly* pud: userActionsAppended_) {
+    userActions.push_back(pud);
+  }
+  
+  UserActionAssemblyRunAction* runAction = new UserActionAssemblyRunAction(userActions);
+  action_init->RegisterUserAction(runAction);
+
+  if (!for_master) {
+    UserActionAssemblyEventAction* eventAction = new UserActionAssemblyEventAction(userActions);
+    UserActionAssemblyTrackingAction* trackingAction = new UserActionAssemblyTrackingAction(userActions);
+
+    action_init->RegisterUserAction(eventAction);
+    action_init->RegisterUserAction(trackingAction);
+
+    if (isSteppingActionEnabled()) {
+      UserActionAssemblySteppingAction* steppingAction = new UserActionAssemblySteppingAction(userActions);
+      action_init->RegisterUserAction(steppingAction);
+    }
+  
+    if (stackingAction_) {
+      action_init->RegisterUserAction(stackingAction_);
+    }
   }
 
   printSummary();

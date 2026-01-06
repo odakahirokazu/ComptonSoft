@@ -1,6 +1,7 @@
 %module anlGeant4Py
 %{
 #include "Geant4Body.hh"
+#include "Geant4MTBody.hh"
 #include "Geant4Simple.hh"
 #include "VANLPhysicsList.hh"
 #include "VANLGeometry.hh"
@@ -41,6 +42,14 @@ class Geant4Body : public anlnext::BasicModule
 public:
   Geant4Body();
   ~Geant4Body();
+};
+
+
+class Geant4MTBody : public anlnext::BasicModule
+{
+public:
+  Geant4MTBody();
+  ~Geant4MTBody();
 };
 
 

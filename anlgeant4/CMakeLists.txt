@@ -49,7 +49,10 @@ link_directories(
 add_library(${TARGET_LIBRARY} SHARED
   src/InitialInformation.cc
   src/ANLG4RunManager.cc
+  src/ANLG4MTRunManager.cc
+  src/ANLG4ActionInitialization.cc
   src/Geant4Body.cc
+  src/Geant4MTBody.cc
   src/Geant4Simple.cc
   src/BasicPrimaryGeneratorAction.cc
   src/BasicPrimaryGen.cc
