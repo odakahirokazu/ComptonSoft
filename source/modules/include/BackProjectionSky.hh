@@ -50,6 +50,10 @@ private:
   double image_center_phi_;
   double image_yaxis_theta_;
   double image_yaxis_phi_;
+
+  double arm_;
+  int num_points_;
+
 };
 
 } /* namespace comptonsoft */

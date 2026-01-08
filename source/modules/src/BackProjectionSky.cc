@@ -37,7 +37,9 @@ BackProjectionSky::BackProjectionSky()
   : image_center_theta_(0.0*unit::degree),
     image_center_phi_(0.0*unit::degree),
     image_yaxis_theta_(90.0*unit::degree),
-    image_yaxis_phi_(90.0*unit::degree)
+    image_yaxis_phi_(90.0*unit::degree),
+    arm_(0.0*unit::degree),
+    num_points_(1000)
 {
   setUnit(unit::degree, "degree");
 }
@@ -55,6 +57,9 @@ ANLStatus BackProjectionSky::mod_define()
   define_parameter("image_center_phi",   &mod_class::image_center_phi_,   unit::degree, "degree");
   define_parameter("image_yaxis_theta",  &mod_class::image_yaxis_theta_,  unit::degree, "degree");
   define_parameter("image_yaxis_phi",    &mod_class::image_yaxis_phi_,    unit::degree, "degree");
+  define_parameter("arm",                &mod_class::arm_,                unit::degree, "degree");
+
+  define_parameter("num_points",         &mod_class::num_points_);
 
   return AS_OK;
 }
@@ -72,7 +77,7 @@ ANLStatus BackProjectionSky::mod_initialize()
                                  sin(image_yaxis_theta_)*sin(image_yaxis_phi_),
                                  cos(image_yaxis_theta_));
   
-  const vector3_t yaxis = (yaxis_proposed - (yaxis_proposed.dot(yaxis_proposed))*zaxis).unit();
+  const vector3_t yaxis = (yaxis_proposed - (yaxis_proposed.dot(zaxis))*zaxis).unit();
   const vector3_t xaxis = yaxis.cross(zaxis);
 
   xaxis_ = xaxis;
@@ -91,23 +96,25 @@ ANLStatus BackProjectionSky::mod_analyze()
 {
   static std::mt19937 randgen;
   std::uniform_real_distribution<double> uniform_dist(0.0, 1.0);
+  std::normal_distribution<double> normal_dist(0.0, arm_);
 
   const std::vector<BasicComptonEvent_sptr> events = getEventReconstructionModule()->getReconstructedEvents();
   for (const auto& event: events) {
     const double fraction = event->ReconstructionFraction();
-    const int num_points = 1000;
-    const double weight = fraction/num_points;
-  
+    const double weight = fraction/num_points_;
+
     const vector3_t cone_vertex = event->ConeVertex();
     const vector3_t cone_axis = event->ConeAxis();
     const vector3_t cone_axis_ortho = cone_axis.orthogonal();
     const double costhetaE = event->CosThetaE();
 
-    vector3_t cone1(cone_axis);
-    const double thetaE = TMath::ACos(costhetaE);
-    cone1.rotate(thetaE, cone_axis_ortho);
+    const double thetaE0 = TMath::ACos(costhetaE);
 
-    for (int t=0; t<num_points; t++) {
+    for (int t=0; t<num_points_; t++) {
+      vector3_t cone1(cone_axis);
+      const double delta_thetaE = normal_dist(randgen);
+      const double thetaE = thetaE0 + delta_thetaE;
+      cone1.rotate(thetaE, cone_axis_ortho);
       vector3_t cone_sample = cone1;
       const double phi = constant::twopi * uniform_dist(randgen);
       cone_sample.rotate(phi, cone_axis);
