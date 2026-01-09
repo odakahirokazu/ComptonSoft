@@ -70,6 +70,7 @@ set(CS_CORE_CLASSES
   src/HY2020EventReconstructionAlgorithm.cc
   src/OberlackAlgorithm.cc
   src/TangoAlgorithm.cc
+  src/EventReconstructionWithKnownOrder.cc
   ### sensitive detector
   src/VCSSensitiveDetector.cc
   ### manager
