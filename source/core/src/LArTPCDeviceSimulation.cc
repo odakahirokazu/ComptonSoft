@@ -28,6 +28,7 @@ void LArTPCDeviceSimulation::printSimulationParameters(std::ostream &os) const {
   os << "  EPI compensation function for recombination: "
      << (recombinationFunctionForEPI_ ? recombinationFunctionForEPI_->GetName() : "not set") << "\n";
   os << "  Response graph list for EPI compensation: " << responseGraphListForEPI_.size() << " graphs loaded. Name header is " << (responseGraphListForEPI_.empty() ? "none" : responseGraphListForEPI_[0]->GetName()) << "\n";
+  os << "  dEdx spline: " << (dedxSpline_ ? dedxSpline_->GetName() : "not set") << "\n";
 }
 double LArTPCDeviceSimulation::DiffusionSigmaAnode3D(double z, double &longitudinal, double &transverse) {
   if (DiffusionMode() == 3) { // Calcurate from temperature and electric field
@@ -148,7 +149,7 @@ std::tuple<double, double> LArTPCDeviceSimulation::compensateEPIRecombinationIte
     }
     new_recombination_factor = next_recombination_factor;
   }
-  std::cout << "Final compensated ePI: " << new_ePI_value << " +/- " << new_ePI_error << std::endl;
+  //std::cout << "Final compensated ePI: " << new_ePI_value << " +/- " << new_ePI_error << std::endl;
   return std::make_tuple(new_ePI_value, new_ePI_error);
 }
 
@@ -162,12 +163,39 @@ double LArTPCDeviceSimulation::applyRecombination(DetectorHit_sptr hit) const {
   }
   if (edep <= 0.0) return edep;
   if (!hit->isContinuousProcess()) return edep;
-  const double length = (hit->PostStepPointPosition() - hit->PreStepPointPosition()).mag();
-  //std::cout << "Applying recombination model: edep = " << edep
-  //<< ", length = " << length << std::endl;
-  const double let = edep / length;
-  const double let_new = recombinationModel_->electronLet(let, BiasVoltage() / getThickness());
-  //std::cout << "Recombination model applied: new let = " << let_new << " edep_new = " << let_new * length << std::endl;
-  return std::max(let_new * length, 0.0);
+  const double ken = hit->KineticEnergy();
+  //std::cout << "Applying recombination model: edep = " << edep / keV
+  //          << " keV, kinetic energy = " << ken / keV << " keV" << std::endl;
+  const double dedx = getdEdxFromKineticEnergy(ken);
+  //std::cout << "  dEdx = " << dedx/ (keV/cm) << " keV/cm" << std::endl;
+  if (dedx <= 0.0) {
+    return edep;
+  }
+  const double recombination_factor = recombinationModel_->electronLet(dedx, BiasVoltage() / getThickness()) / dedx;
+  //std::cout << "Recombination model applied: recombination_factor = " << recombination_factor << " edep_new = " << recombination_factor * edep << std::endl;
+  return std::max(edep * recombination_factor, 0.0);
+}
+double LArTPCDeviceSimulation::getdEdxFromKineticEnergy(double kineticEnergy) const {
+  if (kineticEnergy <= 0.0) {
+    return 0.0;
+  }
+  if (!dedxSpline_) {
+    throw std::runtime_error("LArTPCDeviceSimulation::getdEdxFromKineticEnergy: dEdx spline is not set.");
+  }
+  return dedxSpline_->Eval(kineticEnergy / keV) * keV / cm;
+}
+void LArTPCDeviceSimulation::setdEdxFile(const std::string &filename, const std::string &spline_name) {
+  if (filename.empty()) {
+    return;
+  }
+  TFile *file = TFile::Open(filename.c_str(), "READ");
+  if (!file || file->IsZombie()) {
+    throw std::runtime_error("LArTPCDeviceSimulation::setdEdxFile: Cannot open file: " + filename);
+  }
+  dedxFile_ = file;
+  dedxSpline_ = (TSpline *)(file->Get(spline_name.c_str()));
+  if (!dedxSpline_) {
+    throw std::runtime_error("LArTPCDeviceSimulation::setdEdxFile: Cannot find spline: " + spline_name);
+  }
 }
 } // namespace comptonsoft

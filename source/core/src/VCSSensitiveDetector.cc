@@ -84,7 +84,8 @@ VCSSensitiveDetector::ProcessHits(G4Step* aStep, G4TouchableHistory* )
   if (particleDefinition->GetParticleType() == "nucleus") {
     processFlag |= process::NucleusHit;
   }
-    
+  const auto kineticEnergy = aTrack->GetKineticEnergy();
+
   if (edep==0.0 && processFlag==0) { return true; }
   
   comptonsoft::DetectorHit_sptr hit(new comptonsoft::DetectorHit);
@@ -114,6 +115,7 @@ VCSSensitiveDetector::ProcessHits(G4Step* aStep, G4TouchableHistory* )
 
   hit->setPreStepPointPosition(aStep->GetPreStepPoint()->GetPosition());
   hit->setPostStepPointPosition(aStep->GetPostStepPoint()->GetPosition());
+  hit->setKineticEnergy(kineticEnergy);
 
   for (G4int i = touchable->GetHistoryDepth()-1; i >= 0; i--) {
    G4VPhysicalVolume* physicalVolume = touchable->GetVolume(i);

@@ -202,6 +202,9 @@ public:
   double Energy() const { return energy_; }
   void setEnergyError(double v) { energyError_ = v; }
   double EnergyError() const { return energyError_; }
+  
+  void setKineticEnergy(double v) { kineticEnergy_ = v; }
+  double KineticEnergy() const { return kineticEnergy_; }
 
   void setPosition(double x, double y, double z) { position_.set(x, y, z); }
   void setPosition(const vector3_t& v) { position_ = v; }
@@ -325,6 +328,7 @@ private:
   vector3_t postStepPointPosition_{0.0, 0.0, 0.0};
   double energyDeposit_ = 0.0;
   double energyCharge_ = 0.0;
+  double kineticEnergy_ = 0.0;
   uint32_t process_ = 0u;
   bool isContinuousProcess_ = false;
   // trigger information

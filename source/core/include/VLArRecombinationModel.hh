@@ -36,8 +36,8 @@ namespace comptonsoft {
 class VLArRecombinationModel {
 public:
   VLArRecombinationModel();
-  VLArRecombinationModel(const std::string &name, const std::map<std::string, double> &params);
-  VLArRecombinationModel(const std::string &name);
+  VLArRecombinationModel(const std::string &name, const std::map<std::string, double> &params, unsigned int seed = std::random_device{}());
+  VLArRecombinationModel(const std::string &name, unsigned int seed= std::random_device{}());
   virtual ~VLArRecombinationModel();
 
   // Pure virtual function to calculate recombination energy
@@ -66,6 +66,12 @@ private:
   double rho_ = 1.39 * (CLHEP::g / CLHEP::cm3); // in g/cm^3
   int randomizeMode_ = 0; // 0: no randomization, 1: Binomial
   double fanoFactor_ = 0.107; // Fano factor for LAr // Reference: Bonivento, W. M. and Terranova, F., "The science and technology of liquid argon detectors", 2024,
+  mutable std::mt19937 rng_;
+  double lightCollectionEfficiency_ = 0.0; // default: lightCollectionEfficiency_ = 0.0;
+  unsigned int seed_ = 0;
+
+protected:
+  double Binomial(int n, double p) const;
 };
 } // namespace comptonsoft
 #endif //COMPTONSOFT_VLArRecombinationModel_H

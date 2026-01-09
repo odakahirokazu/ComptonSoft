@@ -66,7 +66,10 @@ ANLStatus BackProjectionSky::mod_analyze()
   const std::vector<BasicComptonEvent_sptr> events = getEventReconstructionModule()->getReconstructedEvents();
   for (const auto& event: events) {
     const double fraction = event->ReconstructionFraction();
-
+    if (std::isnan(fraction)) {
+      std::cerr << "Warning: NaN fraction for event with ID " << event->EventID() << std::endl;
+      continue;
+    }
     static TRandom3 randgen;
     const int Times = 1000;
     const double FillWeight = fraction/Times;

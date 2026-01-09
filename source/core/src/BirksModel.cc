@@ -18,6 +18,8 @@
  *************************************************************************/
 
 #include "BirksModel.hh"
+#include "TMath.h"
+#include "TRandom3.h"
 namespace comptonsoft {
 BirksModel::BirksModel() : VLArRecombinationModel("Birks Model") {
   kOverRho_ = k_ / Rho();
@@ -35,7 +37,53 @@ BirksModel::BirksModel(const std::map<std::string, double> &params) : VLArRecomb
 }
 double BirksModel::electronLet(double let, double electricField) const {
   const double kOverRhoE = kOverRho_ / electricField;
-  return Ab_ * (let / (1 + kOverRhoE * let));
+  const double yield = Ab_ * (let / (1 + kOverRhoE * let));
+  if (RandomizeMode() == 0) {
+    return yield;
+  }
+  else if (RandomizeMode() == 1) {
+    // Binomial randomization
+    const double nQuanta = let / Wion(); // number of quanta
+    int nQuantaWithFluctuations = TMath::Nint(gRandom->Gaus(nQuanta, TMath::Sqrt(TMath::Max(0.0, nQuanta * FanoFactor()))));
+    if (nQuantaWithFluctuations < 0) {
+      nQuantaWithFluctuations = 0;
+    }
+    double p = yield / let;
+    if (p < 0.0) {
+      return 0.0;
+    }
+    else if (p > 1.0) {
+      return nQuantaWithFluctuations * Wion();
+    }
+    const double var = nQuantaWithFluctuations * p * (1.0 - p);
+    const double ex = nQuantaWithFluctuations * p;
+    //std::cout << "var: " << var << ", ex: " << ex << std::endl;
+    double nElectron;
+    if (var > 10.0 && ex > 10.0) {
+      nElectron = gRandom->Gaus(nQuantaWithFluctuations * p, TMath::Sqrt(nQuantaWithFluctuations * p * (1.0 - p)));
+      //std::cout << "Gaus: " << nElectron << std::endl;
+    }
+    else {
+      nElectron = gRandom->Binomial(static_cast<int>(nQuantaWithFluctuations), p);
+      //std::cout << "Binomial: " << nElectron << std::endl;
+    }
+    int nElectronInt;
+    if (nElectron < 0.0) {
+      nElectronInt = 0;
+    }
+    else if (nElectron > nQuantaWithFluctuations) {
+      nElectronInt = nQuantaWithFluctuations;
+    }
+    else {
+      nElectronInt = TMath::Nint(nElectron);
+    }
+    //std::cout << "nElectron: " << nElectronInt << std::endl;
+    return nElectronInt * Wion();
+  }
+  else {
+    std::cerr << "BirksModel::electronLet: Unknown randomization mode: " << RandomizeMode() << std::endl;
+    return yield;
+  }
 }
 void BirksModel::printInfo(std::ostream &os) const {
   VLArRecombinationModel::printInfo(os);

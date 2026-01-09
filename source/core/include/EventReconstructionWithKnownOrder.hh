@@ -82,6 +82,7 @@ private:
   double energyCompensationParam0_ = 0.0;
   double energyCompensationParam1_ = 0.0;
   double energyCompensationParam2_ = 0.0;
+  double threshold_ = 0.0;
 };
 } /* namespace comptonsoft */
 #endif //COMPTONSOFT_EventReconstructionWithKnownOrder_hh

@@ -49,6 +49,7 @@ bool EventReconstructionWithKnownOrder::loadParameters(boost::property_tree::ptr
   energyCompensationParam0_ = pt.get<double>("known_order.energy_compensation_param0", 0.0);
   energyCompensationParam1_ = pt.get<double>("known_order.energy_compensation_param1", 0.0);
   energyCompensationParam2_ = pt.get<double>("known_order.energy_compensation_param2", 0.0);
+  threshold_ = pt.get<double>("known_order.energy_threshold", 0.0) * unit::keV;
   verbose_ = pt.get<int>("known_order.verbose", 0);
   std::cout << "--- EventReconstructionWithKnownOrder v2---" << std::endl;
   std::cout << "  process_mode: " << processMode_ << std::endl;
@@ -71,6 +72,7 @@ bool EventReconstructionWithKnownOrder::loadParameters(boost::property_tree::ptr
   std::cout << "    energy_compensation_param0: " << energyCompensationParam0_ << std::endl;
   std::cout << "    energy_compensation_param1: " << energyCompensationParam1_ << std::endl;
   std::cout << "    energy_compensation_param2: " << energyCompensationParam2_ << std::endl;
+  std::cout << "  energy_threshold: " << threshold_ / unit::keV << " keV" << std::endl;
   std::cout << "  verbose: " << verbose_ << std::endl;
   std::cout << "------------------------------------------" << std::endl;
   return true;
@@ -81,10 +83,7 @@ bool EventReconstructionWithKnownOrder::reconstruct(const std::vector<DetectorHi
     std::cerr << "Error: Not enough hits to reconstruct event. Number of hits: " << num_hits << ", Event ID: " << hits[0]->EventID() << std::endl;
     return false;
   }
-  size_t hits_used = num_hits;
-  if (numLastHits_ > 0 && numLastHits_ < num_hits) {
-    hits_used = numLastHits_;
-  }
+
   for (const auto &hit: hits) {
     if (excludeGammaConversion_ && hit->isProcess(process::GammaConversion)) {
       std::cerr << "Excluding event (TrackID=" << hit->TrackID() << ") due to gamma conversion." << std::endl;
@@ -92,7 +91,7 @@ bool EventReconstructionWithKnownOrder::reconstruct(const std::vector<DetectorHi
     }
   }
 
-  std::vector<DetectorHit_sptr> ordered_hits(hits.begin(), hits.begin() + hits_used);
+  std::vector<DetectorHit_sptr> ordered_hits(hits.begin(), hits.end());
   sortByRealTime(ordered_hits);
   std::transform(ordered_hits.begin(), ordered_hits.end(), ordered_hits.begin(),
                  [this](DetectorHit_sptr &hit) {
@@ -118,6 +117,14 @@ bool EventReconstructionWithKnownOrder::reconstruct(const std::vector<DetectorHi
                    }
                    return hit;
                  });
+  ordered_hits.erase(
+      std::remove_if(ordered_hits.begin(), ordered_hits.end(),
+                     [this](DetectorHit_sptr hit) { return hit->Energy() <= threshold_; }),
+      ordered_hits.end());
+  size_t hits_used = ordered_hits.size();
+  if (numLastHits_ > 0 && numLastHits_ < hits_used) {
+    hits_used = numLastHits_;
+  }
   if (verbose_ > 0) {
     std::cout << "Reconstructing event ID: " << ordered_hits[0]->EventID() << " with " << num_hits << " (" << hits_used << ") hits." << std::endl;
     for (size_t i = 0; i < ordered_hits.size(); ++i) {
@@ -133,7 +140,12 @@ bool EventReconstructionWithKnownOrder::reconstruct(const std::vector<DetectorHi
                 << std::endl;
     }
   }
-
+  if (ordered_hits.size() < 2) {
+    if (verbose_ > 0) {
+      std::cout << "  Not enough hits after energy threshold selection. Skip..." << std::endl;
+    }
+    return false;
+  }
   BasicComptonEvent_sptr eventReconstructed(new BasicComptonEvent(baseEvent));
   eventReconstructed->setHit1(0, ordered_hits[0]);
   eventReconstructed->setHit2(1, ordered_hits[1]);
@@ -154,7 +166,7 @@ bool EventReconstructionWithKnownOrder::reconstruct(const std::vector<DetectorHi
     return false;
   }
   bool is_escaped = isEscapeEvent(detect_flag);
-  if (num_hits != hits_used && numLastHits_ > 0) {
+  if (ordered_hits.size() > hits_used && numLastHits_ > 0) {
     is_escaped = true; // Escape event if not all hits are used
   }
   if ((processMode_ != 1) && is_escaped) {

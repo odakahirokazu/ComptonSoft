@@ -28,7 +28,7 @@
           </channel_properties>
           <efield bias="9000.0" /> <!-- 300 V/cm -->
           <recombination filename="database/recombination.xml" />
-          <reconstruction mode="4" clustering_energy_threshold="25" clustering_split_threshold="10" />
+          <reconstruction mode="4" clustering_energy_threshold="2.0" clustering_split_threshold="1.0" clustering_range="3" />
         </parameters>
       </common>
       <detector_list id_method="path" layer_offset="1">

@@ -20,18 +20,18 @@
 #ifndef COMPTONSOFT_DetectorSystem_H
 #define COMPTONSOFT_DetectorSystem_H 1
 
-#include <vector>
-#include <map>
-#include <memory>
-#include <boost/utility.hpp>
-#include <boost/property_tree/xml_parser.hpp>
-#include <boost/optional.hpp>
 #include "CSException.hh"
 #include "ChannelID.hh"
-#include "VRealDetectorUnit.hh"
-#include "ReadoutModule.hh"
 #include "DetectorGroup.hh"
 #include "HitPattern.hh"
+#include "ReadoutModule.hh"
+#include "VRealDetectorUnit.hh"
+#include <boost/optional.hpp>
+#include <boost/property_tree/xml_parser.hpp>
+#include <boost/utility.hpp>
+#include <map>
+#include <memory>
+#include <vector>
 
 class TFile;
 
@@ -52,12 +52,9 @@ class VCSSensitiveDetector;
  * @date 2018-03-09 | new XML schema (detector config v5, detector parameters v2)
  * @date 2020-03-30 | new XML schema (channel properties v2, detector parameters v3)
  */
-class DetectorSystem : private boost::noncopyable
-{
+class DetectorSystem: private boost::noncopyable {
 public:
-
-  struct ChannelNodeContents
-  {
+  struct ChannelNodeContents {
     boost::optional<int> id = boost::none;
     boost::optional<int> x = boost::none;
     boost::optional<int> y = boost::none;
@@ -76,11 +73,10 @@ public:
     boost::optional<double> gain_correction_c3 = boost::none;
     boost::optional<double> threshold_value = boost::none;
 
-    void load(const boost::property_tree::ptree& node);
+    void load(const boost::property_tree::ptree &node);
   };
 
-  struct ParametersNodeContents
-  {
+  struct ParametersNodeContents {
     boost::optional<int> upside_anode = boost::none;
     boost::optional<int> upside_readout = boost::none;
     boost::optional<int> upside_pixel = boost::none;
@@ -120,6 +116,8 @@ public:
     boost::optional<std::string> recombination_function_for_epi = boost::none;
     boost::optional<std::string> graph_file_for_epi = boost::none;
     boost::optional<std::string> graph_list_name_for_epi = boost::none;
+    boost::optional<std::string> recombination_dedx_file = boost::none;
+    boost::optional<std::string> recombination_dedx_spline_name = boost::none;
     ChannelNodeContents channel_properties;
     ChannelNodeContents channel_properties_cathode;
     ChannelNodeContents channel_properties_anode;
@@ -143,55 +141,45 @@ public:
   bool isMCSimulation() { return MCSimulation_; }
 
   int NumberOfDetectors() const { return detectors_.size(); }
-  VRealDetectorUnit* getDetectorByID(int id);
-  const VRealDetectorUnit* getDetectorByID(int id) const;
-  VRealDetectorUnit* getDetectorByIndex(int index)
-  { return detectors_[index].get(); }
-  const VRealDetectorUnit* getDetectorByIndex(int index) const
-  { return detectors_[index].get(); }
-  bool existDetector(int id) const
-  { return detectorIDMap_.count(id); }
+  VRealDetectorUnit *getDetectorByID(int id);
+  const VRealDetectorUnit *getDetectorByID(int id) const;
+  VRealDetectorUnit *getDetectorByIndex(int index) { return detectors_[index].get(); }
+  const VRealDetectorUnit *getDetectorByIndex(int index) const { return detectors_[index].get(); }
+  bool existDetector(int id) const { return detectorIDMap_.count(id); }
 
-  std::vector<std::unique_ptr<VRealDetectorUnit>>& getDetectors()
-  { return detectors_; }
+  std::vector<std::unique_ptr<VRealDetectorUnit>> &getDetectors() { return detectors_; }
 
   template <typename Func>
-  void doForEachDetector(const Func& func)
-  {
-    for (std::unique_ptr<VRealDetectorUnit>& detector: detectors_) {
+  void doForEachDetector(const Func &func) {
+    for (std::unique_ptr<VRealDetectorUnit> &detector: detectors_) {
       func(*detector);
     }
   }
 
   int NumberOfReadoutModules() const { return readoutModules_.size(); }
-  ReadoutModule* getReadoutModuleByID(int id);
-  const ReadoutModule* getReadoutModuleByID(int id) const;
-  ReadoutModule* getReadoutModuleByIndex(int index)
-  { return readoutModules_[index].get(); }
-  const ReadoutModule* getReadoutModuleByIndex(int index) const
-  { return readoutModules_[index].get(); }
+  ReadoutModule *getReadoutModuleByID(int id);
+  const ReadoutModule *getReadoutModuleByID(int id) const;
+  ReadoutModule *getReadoutModuleByIndex(int index) { return readoutModules_[index].get(); }
+  const ReadoutModule *getReadoutModuleByIndex(int index) const { return readoutModules_[index].get(); }
 
-  std::vector<std::unique_ptr<ReadoutModule>>& getReadoutModules()
-  { return readoutModules_; }
+  std::vector<std::unique_ptr<ReadoutModule>> &getReadoutModules() { return readoutModules_; }
 
   template <typename Func>
-  void doForEachReadoutModule(const Func& func)
-  {
-    for (std::unique_ptr<ReadoutModule>& readoutModule: readoutModules_) {
+  void doForEachReadoutModule(const Func &func) {
+    for (std::unique_ptr<ReadoutModule> &readoutModule: readoutModules_) {
       func(*readoutModule);
     }
   }
 
-  MultiChannelData* getMultiChannelData(const DetectorBasedChannelID& channelID);
-  MultiChannelData* getMultiChannelData(const ReadoutBasedChannelID& channelID);
+  MultiChannelData *getMultiChannelData(const DetectorBasedChannelID &channelID);
+  MultiChannelData *getMultiChannelData(const ReadoutBasedChannelID &channelID);
 
   template <typename Func>
-  void doForEachMultiChannelDataInDetectorOrder(const Func& func)
-  {
-    for (std::unique_ptr<VRealDetectorUnit>& detector: detectors_) {
+  void doForEachMultiChannelDataInDetectorOrder(const Func &func) {
+    for (std::unique_ptr<VRealDetectorUnit> &detector: detectors_) {
       const int NumMCD = detector->NumberOfMultiChannelData();
-      for (int i=0; i<NumMCD; i++) {
-        MultiChannelData* mcd = detector->getMultiChannelData(i);
+      for (int i = 0; i < NumMCD; i++) {
+        MultiChannelData *mcd = detector->getMultiChannelData(i);
         DetectorBasedChannelID channel(detector->getID(), i);
         func(mcd, channel);
       }
@@ -199,53 +187,47 @@ public:
   }
 
   template <typename Func>
-  void doForEachMultiChannelDataInReadoutOrder(const Func& func)
-  {
-    for (std::unique_ptr<ReadoutModule>& readoutModule: readoutModules_) {
+  void doForEachMultiChannelDataInReadoutOrder(const Func &func) {
+    for (std::unique_ptr<ReadoutModule> &readoutModule: readoutModules_) {
       const int NumMCD = readoutModule->NumberOfSections();
-      for (int i=0; i<NumMCD; i++) {
+      for (int i = 0; i < NumMCD; i++) {
         const int readoutModuleID = readoutModule->ID();
         const ReadoutBasedChannelID readoutChannel(readoutModuleID, i);
-        MultiChannelData* mcd = this->getMultiChannelData(readoutChannel);
+        MultiChannelData *mcd = this->getMultiChannelData(readoutChannel);
         func(mcd, readoutChannel);
       }
     }
   }
 
-  DetectorBasedChannelID convertToDetectorBasedChannelID(const ReadoutBasedChannelID& channelID);
-  ReadoutBasedChannelID convertToReadoutBasedChannelID(const DetectorBasedChannelID& channelID);
+  DetectorBasedChannelID convertToDetectorBasedChannelID(const ReadoutBasedChannelID &channelID);
+  ReadoutBasedChannelID convertToReadoutBasedChannelID(const DetectorBasedChannelID &channelID);
 
   // Detector groups and hit patterns
-  const DetectorGroup& getDetectorGroup(const std::string& name) const
-  { return *(detectorGroupMap_.at(name)); }
+  const DetectorGroup &getDetectorGroup(const std::string &name) const { return *(detectorGroupMap_.at(name)); }
 
-  const std::vector<HitPattern>& getHitPatterns() const
-  { return hitPatterns_; }
+  const std::vector<HitPattern> &getHitPatterns() const { return hitPatterns_; }
 
   void printDetectorGroups() const;
 
   // Device simulations
-  DeviceSimulation* getDeviceSimulationByID(int id);
-  const DeviceSimulation* getDeviceSimulationByID(int id) const;
-  DeviceSimulation* getDeviceSimulationByIndex(int index)
-  { return deviceSimulationVector_[index]; }
-  const DeviceSimulation* getDeviceSimulationByIndex(int index) const
-  { return deviceSimulationVector_[index]; }
-  std::vector<DeviceSimulation*>& getDeviceSimulationVector()
-  { return deviceSimulationVector_; }
+  DeviceSimulation *getDeviceSimulationByID(int id);
+  const DeviceSimulation *getDeviceSimulationByID(int id) const;
+  DeviceSimulation *getDeviceSimulationByIndex(int index) { return deviceSimulationVector_[index]; }
+  const DeviceSimulation *getDeviceSimulationByIndex(int index) const { return deviceSimulationVector_[index]; }
+  std::vector<DeviceSimulation *> &getDeviceSimulationVector() { return deviceSimulationVector_; }
 
   // Setup detector system manually
-  void addDetector(std::unique_ptr<VRealDetectorUnit>&& detector);
-  void addReadoutModule(std::unique_ptr<ReadoutModule>&& detector);
-  void addDetectorGroup(std::unique_ptr<DetectorGroup>&& group);
-  void addHitPattern(const HitPattern& hitpat);
+  void addDetector(std::unique_ptr<VRealDetectorUnit> &&detector);
+  void addReadoutModule(std::unique_ptr<ReadoutModule> &&detector);
+  void addDetectorGroup(std::unique_ptr<DetectorGroup> &&group);
+  void addHitPattern(const HitPattern &hitpat);
   void setConstructed();
-  void addSenstiveDetector(VCSSensitiveDetector* sd);
+  void addSenstiveDetector(VCSSensitiveDetector *sd);
 
   // Setup detector system by database files
-  void readDetectorConfiguration(const std::string& filename);
+  void readDetectorConfiguration(const std::string &filename);
   bool isConstructed() const { return detectorConstructed_; }
-  void readDetectorParameters(const std::string& filename);
+  void readDetectorParameters(const std::string &filename);
   void registerGeant4SensitiveDetectors();
 
   // for an event loop
@@ -253,31 +235,31 @@ public:
 
 private:
   // detector configuration
-  void loadDetectorConfigurationRootNode(const boost::property_tree::ptree& RootNode);
-  void loadDCDetectorsNode(const boost::property_tree::ptree& DetectorsNode,
+  void loadDetectorConfigurationRootNode(const boost::property_tree::ptree &RootNode);
+  void loadDCDetectorsNode(const boost::property_tree::ptree &DetectorsNode,
                            double LengthUnit);
-  void loadDCDetectorNode(const boost::property_tree::ptree& DetectorsNode,
+  void loadDCDetectorNode(const boost::property_tree::ptree &DetectorsNode,
                           double LengthUnit,
-                          VRealDetectorUnit* detector);
-  void loadDCDetectorSectionsNode(const boost::property_tree::ptree& SectionsNode,
+                          VRealDetectorUnit *detector);
+  void loadDCDetectorSectionsNode(const boost::property_tree::ptree &SectionsNode,
                                   ElectrodeSide priority_side,
-                                  VRealDetectorUnit* detector);
-  void loadDCReadoutNode(const boost::property_tree::ptree& ReadoutNode);
-  void loadDCGroupsNode(const boost::property_tree::ptree& GroupsNode);
+                                  VRealDetectorUnit *detector);
+  void loadDCReadoutNode(const boost::property_tree::ptree &ReadoutNode);
+  void loadDCGroupsNode(const boost::property_tree::ptree &GroupsNode);
 
   // detector parameters
-  void loadDetectorParametersRootNode(const boost::property_tree::ptree& RootNode,
-                                      const std::string& filename);
-  void loadDetectorParametersDataNode(const boost::property_tree::ptree& DataNode);
-  void loadDPDetectorSetNode(const boost::property_tree::ptree& SetNode,
+  void loadDetectorParametersRootNode(const boost::property_tree::ptree &RootNode,
+                                      const std::string &filename);
+  void loadDetectorParametersDataNode(const boost::property_tree::ptree &DataNode);
+  void loadDPDetectorSetNode(const boost::property_tree::ptree &SetNode,
                              bool isSensitiveDetector);
   void setupDetectorParameters(const DetectorSystem::ParametersNodeContents parameters,
-                               VRealDetectorUnit* detector);
+                               VRealDetectorUnit *detector);
   void setupDetectorParameters(const DetectorSystem::ParametersNodeContents parameters,
-                               DeviceSimulation* ds);
+                               DeviceSimulation *ds);
   void setupReconstructionParameters(const DetectorSystem::ParametersNodeContents parameters,
-                                     VRealDetectorUnit* detector);
-  
+                                     VRealDetectorUnit *detector);
+
 private:
   bool MCSimulation_;
   bool simAutoPosition_;
@@ -289,59 +271,53 @@ private:
   std::map<int, int> detectorIDMap_;
   std::map<int, int> readoutModuleIDMap_;
 
-  std::vector<DeviceSimulation*> deviceSimulationVector_;
-  std::vector<VCSSensitiveDetector*> sensitiveDetectorVector_;
+  std::vector<DeviceSimulation *> deviceSimulationVector_;
+  std::vector<VCSSensitiveDetector *> sensitiveDetectorVector_;
   std::unique_ptr<TFile> ROOTFile_;
 
   std::map<std::string, std::unique_ptr<DetectorGroup>> detectorGroupMap_;
   std::vector<HitPattern> hitPatterns_;
-  
+
 private:
-  DetectorSystem(const DetectorSystem&) = delete;
-  DetectorSystem(DetectorSystem&&) = delete;
-  DetectorSystem& operator=(const DetectorSystem&) = delete;
-  DetectorSystem& operator=(DetectorSystem&&) = delete;
+  DetectorSystem(const DetectorSystem &) = delete;
+  DetectorSystem(DetectorSystem &&) = delete;
+  DetectorSystem &operator=(const DetectorSystem &) = delete;
+  DetectorSystem &operator=(DetectorSystem &&) = delete;
 };
 
-inline VRealDetectorUnit* DetectorSystem::getDetectorByID(int id)
-{
+inline VRealDetectorUnit *DetectorSystem::getDetectorByID(int id) {
   auto it = detectorIDMap_.find(id);
-  if (it==detectorIDMap_.end()) { return nullptr; }
+  if (it == detectorIDMap_.end()) { return nullptr; }
   return getDetectorByIndex((*it).second);
 }
 
-inline const VRealDetectorUnit* DetectorSystem::getDetectorByID(int id) const
-{
+inline const VRealDetectorUnit *DetectorSystem::getDetectorByID(int id) const {
   auto it = detectorIDMap_.find(id);
-  if (it==detectorIDMap_.end()) { return nullptr; }
+  if (it == detectorIDMap_.end()) { return nullptr; }
   return getDetectorByIndex((*it).second);
 }
 
-inline ReadoutModule* DetectorSystem::getReadoutModuleByID(int id)
-{
+inline ReadoutModule *DetectorSystem::getReadoutModuleByID(int id) {
   auto it = readoutModuleIDMap_.find(id);
-  if (it==readoutModuleIDMap_.end()) { return nullptr; }
+  if (it == readoutModuleIDMap_.end()) { return nullptr; }
   return getReadoutModuleByIndex((*it).second);
 }
 
-inline const ReadoutModule* DetectorSystem::getReadoutModuleByID(int id) const
-{
+inline const ReadoutModule *DetectorSystem::getReadoutModuleByID(int id) const {
   auto it = readoutModuleIDMap_.find(id);
-  if (it==readoutModuleIDMap_.end()) { return nullptr; }
+  if (it == readoutModuleIDMap_.end()) { return nullptr; }
   return getReadoutModuleByIndex((*it).second);
 }
 
-inline DeviceSimulation* DetectorSystem::getDeviceSimulationByID(int id)
-{
+inline DeviceSimulation *DetectorSystem::getDeviceSimulationByID(int id) {
   auto it = detectorIDMap_.find(id);
-  if (it==detectorIDMap_.end()) { return nullptr; }
+  if (it == detectorIDMap_.end()) { return nullptr; }
   return getDeviceSimulationByIndex((*it).second);
 }
 
-inline const DeviceSimulation* DetectorSystem::getDeviceSimulationByID(int id) const
-{
+inline const DeviceSimulation *DetectorSystem::getDeviceSimulationByID(int id) const {
   auto it = detectorIDMap_.find(id);
-  if (it==detectorIDMap_.end()) { return nullptr; }
+  if (it == detectorIDMap_.end()) { return nullptr; }
   return getDeviceSimulationByIndex((*it).second);
 }
 

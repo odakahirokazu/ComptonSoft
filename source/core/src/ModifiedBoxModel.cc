@@ -43,7 +43,7 @@ double ModifiedBoxModel::electronLet(double let, double electricField) const {
   }
   else if (RandomizeMode() == 1) {
     // Binomial randomization
-    const double nQuanta = let / Wion(); // number of quanta
+    const double nQuanta = let / Wexc(); // number of quanta
     //std::cout << "nQuanta: " << nQuanta << std::endl;
     int nQuantaWithFluctuations = TMath::Nint(gRandom->Gaus(nQuanta, TMath::Sqrt(TMath::Max(0.0, nQuanta * FanoFactor()))));
     if (nQuantaWithFluctuations < 0) {
@@ -57,28 +57,17 @@ double ModifiedBoxModel::electronLet(double let, double electricField) const {
     else if (p > 1.0) {
       return nQuantaWithFluctuations * Wion();
     }
-    //std::cout << "p: " << p << std::endl;
-    const double var = nQuantaWithFluctuations * p * (1.0 - p);
-    const double ex = nQuantaWithFluctuations * p;
-    double nElectron;
-    if (var > 10.0 && ex > 10.0) {
-      nElectron = gRandom->Gaus(nQuantaWithFluctuations * p, TMath::Sqrt(nQuantaWithFluctuations * p * (1.0 - p)));
-    }
-    else {
-      nElectron = gRandom->Binomial(static_cast<int>(nQuantaWithFluctuations), p);
-    }
-    int nElectronInt;
+    int nElectron = Binomial(nQuantaWithFluctuations, p);
     if (nElectron < 0.0) {
-      nElectronInt = 0;
+      nElectron = 0;
     }
     else if (nElectron > nQuantaWithFluctuations) {
-      nElectronInt = nQuantaWithFluctuations;
+      nElectron = nQuantaWithFluctuations;
     }
     else {
-      nElectronInt = TMath::Nint(nElectron);
+      nElectron = TMath::Nint(nElectron);
     }
-    //std::cout << "nElectron: " << nElectron << std::endl;
-    return nElectronInt * Wion();
+    return nElectron * Wion();
   }
   else {
     // No randomization

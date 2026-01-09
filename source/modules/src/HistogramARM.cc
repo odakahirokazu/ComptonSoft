@@ -87,6 +87,14 @@ ANLStatus HistogramARM::mod_analyze()
     }
 
     const double ARMValue = event->DeltaTheta()/unit::degree;
+    if (std::isnan(fraction)){
+      std::cerr << "Warning: NaN fraction for event with ID " << event->EventID() << std::endl;
+      continue;
+    }
+    if (std::isnan(ARMValue)) {
+      std::cerr << "Warning: NaN ARM value for event with ID " << event->EventID() << std::endl;
+      continue;
+    }
     hist_all_->Fill(ARMValue, fraction);
     for (std::size_t i=0; i<hist_vec_.size(); i++) {
       if (eventReconstruction_->HitPatternFlag(i)) {

@@ -1158,6 +1158,14 @@ void DetectorSystem::setupDetectorParameters(const DetectorSystem::ParametersNod
         if (!o) {
           throw std::runtime_error("Error: In LArTPC, drift_velocity must be specified when diffusion_mode is set.");
         }
+        if (auto o = parameters.recombination_dedx_file) {
+          if (auto o2 = parameters.recombination_dedx_spline_name ){
+            ds1->setdEdxFile(*o, *o2);
+          }
+          else{
+            ds1->setdEdxFile(*o);
+          }
+        }
       }
     }
   }
@@ -1516,6 +1524,12 @@ load(const boost::property_tree::ptree& node)
   }
   if (auto o=node.get_optional<std::string>("recombination.<xmlattr>.filename")) {
     recombination_configuration_file = o;
+  }
+  if (auto o = node.get_optional<std::string>("recombination.<xmlattr>.dedx_file")) {
+    recombination_dedx_file = o;
+  }
+  if (auto o = node.get_optional<std::string>("recombination.<xmlattr>.dedx_spline_name")) {
+    recombination_dedx_spline_name = o;
   }
 
   for (const ptree::value_type& v: node.get_child("")) {
