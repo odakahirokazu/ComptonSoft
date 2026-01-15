@@ -58,7 +58,6 @@ ANLStatus BackProjectionSky::mod_define()
   define_parameter("image_yaxis_theta",  &mod_class::image_yaxis_theta_,  unit::degree, "degree");
   define_parameter("image_yaxis_phi",    &mod_class::image_yaxis_phi_,    unit::degree, "degree");
   define_parameter("arm",                &mod_class::arm_,                unit::degree, "degree");
-
   define_parameter("num_points",         &mod_class::num_points_);
 
   return AS_OK;
@@ -101,16 +100,16 @@ ANLStatus BackProjectionSky::mod_analyze()
   const std::vector<BasicComptonEvent_sptr> events = getEventReconstructionModule()->getReconstructedEvents();
   for (const auto& event: events) {
     const double fraction = event->ReconstructionFraction();
-    const double weight = fraction/num_points_;
+    const size_t num_points = num_points_;
+    const double weight = fraction/num_points;
 
     const vector3_t cone_vertex = event->ConeVertex();
     const vector3_t cone_axis = event->ConeAxis();
     const vector3_t cone_axis_ortho = cone_axis.orthogonal();
     const double costhetaE = event->CosThetaE();
+    const double thetaE0 = std::acos(costhetaE);
 
-    const double thetaE0 = TMath::ACos(costhetaE);
-
-    for (int t=0; t<num_points_; t++) {
+    for (size_t i=0; i<num_points_; i++) {
       vector3_t cone1(cone_axis);
       const double delta_thetaE = normal_dist(randgen);
       const double thetaE = thetaE0 + delta_thetaE;
@@ -122,7 +121,7 @@ ANLStatus BackProjectionSky::mod_analyze()
       const double uy = cone_sample.dot(yaxis_);
       const double uz = cone_sample.dot(zaxis_);
       const double x = std::atan2(ux, uz);
-      const double y = 0.5*CLHEP::pi - std::acos(uy);
+      const double y = 0.5*constant::pi - std::acos(uy);
       fillImage(x/PixelUnit(), y/PixelUnit(), weight);
     }
   }
