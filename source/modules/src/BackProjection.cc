@@ -111,18 +111,19 @@ ANLStatus BackProjection::mod_analyze()
     const double thetaE0 = std::acos(costhetaE);
 
     for (size_t i=0; i<num_points; i++) {
-      vector3_t cone1(cone_axis);
+      vector3_t cone0(cone_axis);
       const double delta_thetaE = normal_dist(randgen);
       const double thetaE = thetaE0 + delta_thetaE;
-      cone1.rotate(thetaE, cone_axis_ortho);
-      vector3_t cone_sample = cone1;
-      const double phi = constant::twopi * uniform_dist(randgen);
-      cone_sample.rotate(phi, cone_axis);
+      cone0.rotate(thetaE, cone_axis_ortho);
 
-      vector3_t cone_projected;
-      const bool positive = sectionConeAndPlane(cone_vertex, cone_sample, cone_projected);
+      vector3_t cone1 = cone0;
+      const double phi = constant::twopi * uniform_dist(randgen);
+      cone1.rotate(phi, cone_axis);
+
+      vector3_t cone_section;
+      const bool positive = sectionConeAndPlane(cone_vertex, cone1, cone_section);
       if (positive) {
-        fillImage(cone_projected.x()/PixelUnit(), cone_projected.y()/PixelUnit(), weight);
+        fillImage(cone_section.x()/PixelUnit(), cone_section.y()/PixelUnit(), weight);
       }
     }
   }
@@ -140,10 +141,11 @@ void BackProjection::fillImage(double x, double y, double weight)
   }
 }
 
-bool BackProjection::sectionConeAndPlane(const vector3_t& vertex, const vector3_t& cone, vector3_t& cone_projected)
+bool BackProjection::sectionConeAndPlane(const vector3_t& vertex, const vector3_t& cone, vector3_t& cone_section)
 {
-  const double t = (plane_normal_*(plane_point_-vertex)) / (plane_normal_*cone);
-  cone_projected = vertex + t*cone;
+  const double t = plane_normal_.dot(plane_point_-vertex)/plane_normal_.dot(cone);
+  cone_section = vertex + t*cone;
+
   if (t < 0.0) { return false; }
   return true;
 }
