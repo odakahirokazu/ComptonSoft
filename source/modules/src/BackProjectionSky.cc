@@ -109,7 +109,7 @@ ANLStatus BackProjectionSky::mod_analyze()
     const double costhetaE = event->CosThetaE();
     const double thetaE0 = std::acos(costhetaE);
 
-    for (size_t i=0; i<num_points_; i++) {
+    for (size_t i=0; i<num_points; i++) {
       vector3_t cone1(cone_axis);
       const double delta_thetaE = normal_dist(randgen);
       const double thetaE = thetaE0 + delta_thetaE;

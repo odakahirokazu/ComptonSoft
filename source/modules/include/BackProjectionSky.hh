@@ -53,7 +53,6 @@ private:
 
   double arm_;
   int num_points_;
-
 };
 
 } /* namespace comptonsoft */

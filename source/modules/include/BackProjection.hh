@@ -34,10 +34,11 @@ namespace comptonsoft {
  * @date 2007-xx-xx
  * @date 2012-03-14
  * @date 2019-07-03 | remove CdTeFluor flag
+ * @date 2026-01-15 | ARM spread
  */
 class BackProjection : public VCSModule
 {
-  DEFINE_ANL_MODULE(BackProjection, 2.3);
+  DEFINE_ANL_MODULE(BackProjection, 4.0);
 public:
   BackProjection();
   ~BackProjection();
@@ -49,36 +50,36 @@ public:
 protected:
   void setUnit(double unit, std::string name)
   {
-    m_PixelUnit = unit;
-    m_PixelUnitName = name;
+    pixel_unit_ = unit;
+    pixel_unit_name_ = name;
   }
 
-  double PixelUnit() { return m_PixelUnit; }
+  double PixelUnit() { return pixel_unit_; }
 
   void fillImage(double x, double y, double weight);
-  bool sectionConeAndPlane(const vector3_t& vertex, const vector3_t& cone, vector3_t& coneProjected);
+  bool sectionConeAndPlane(const vector3_t& vertex, const vector3_t& cone, vector3_t& cone_projected);
 
   EventReconstruction* getEventReconstructionModule()
-  { return m_EventReconstruction; }
+  { return event_reconstruction_module_; }
   
 private:
-  EventReconstruction* m_EventReconstruction;
+  EventReconstruction* event_reconstruction_module_;
 
-  vector3_t m_PlaneNormal;
-  vector3_t m_PlanePoint;
+  vector3_t plane_normal_;
+  vector3_t plane_point_;
 
-  TH2D* m_hist_bp_All;
-  std::vector<TH2D*> m_hist_vec;
+  TH2D* hist_bp_all_;
+  std::vector<TH2D*> hist_vec_;
 
-  int m_NumPixelX;
-  int m_NumPixelY;
-  double m_RangeX1;
-  double m_RangeX2;
-  double m_RangeY1;
-  double m_RangeY2;
+  int num_pixel_x_;
+  int num_pixel_y_;
+  double range_x1_;
+  double range_x2_;
+  double range_y1_;
+  double range_y2_;
 
-  double m_PixelUnit;
-  std::string m_PixelUnitName;
+  double pixel_unit_;
+  std::string pixel_unit_name_;
 };
 
 } /* namespace comptonsoft */
