@@ -19,6 +19,8 @@
 
 #include "BackProjection.hh"
 
+#include <cmath>
+
 #include "AstroUnits.hh"
 #include "TDirectory.h"
 #include "TRandom3.h"
@@ -33,13 +35,13 @@ namespace comptonsoft
 {
 
 BackProjection::BackProjection()
-  : m_EventReconstruction(0),
-    m_PlaneNormal(0.0, 0.0, 1.0),
-    m_PlanePoint(0.0*unit::cm, 0.0*unit::cm, 10.0*unit::cm),
-    m_NumPixelX(256), m_NumPixelY(256),
-    m_RangeX1(-4.0*unit::cm), m_RangeX2(+4.0*unit::cm),
-    m_RangeY1(-4.0*unit::cm), m_RangeY2(+4.0*unit::cm),
-    m_PixelUnit(unit::cm), m_PixelUnitName("cm")
+  : event_reconstruction_module_(nullptr),
+    plane_normal_(0.0, 0.0, 1.0),
+    plane_point_(0.0*unit::cm, 0.0*unit::cm, 10.0*unit::cm),
+    num_pixel_x_(256), num_pixel_y_(256),
+    range_x1_(-4.0*unit::cm), range_x2_(+4.0*unit::cm),
+    range_y1_(-4.0*unit::cm), range_y2_(+4.0*unit::cm),
+    pixel_unit_(unit::cm), pixel_unit_name_("cm")
 {
 }
 
@@ -47,14 +49,14 @@ BackProjection::~BackProjection() = default;
 
 ANLStatus BackProjection::mod_define()
 {
-  register_parameter(&m_PlaneNormal, "plane_normal");
-  register_parameter(&m_PlanePoint, "plane_point", 1, m_PixelUnitName);
-  register_parameter(&m_NumPixelX, "num_pixel_x");
-  register_parameter(&m_NumPixelY, "num_pixel_y");
-  register_parameter(&m_RangeX1, "x_min", 1, m_PixelUnitName);
-  register_parameter(&m_RangeX2, "x_max", 1, m_PixelUnitName);
-  register_parameter(&m_RangeY1, "y_min", 1, m_PixelUnitName);
-  register_parameter(&m_RangeY2, "y_max", 1, m_PixelUnitName);
+  define_parameter("plane_normal", &mod_class::plane_normal_);
+  define_parameter("plane_point", &mod_class::plane_point_, 1, pixel_unit_name_);
+  define_parameter("num_pixel_x", &mod_class::num_pixel_x_);
+  define_parameter("num_pixel_y", &mod_class::num_pixel_y_);
+  define_parameter("x_min", &mod_class::range_x1_, 1, pixel_unit_name_);
+  define_parameter("x_max", &mod_class::range_x2_, 1, pixel_unit_name_);
+  define_parameter("y_min", &mod_class::range_y1_, 1, pixel_unit_name_);
+  define_parameter("y_max", &mod_class::range_y2_, 1, pixel_unit_name_);
 
   return AS_OK;
 }
@@ -63,21 +65,25 @@ ANLStatus BackProjection::mod_initialize()
 {
   VCSModule::mod_initialize();
 
-  get_module_NC("EventReconstruction", &m_EventReconstruction);
+  get_module_NC("EventReconstruction", &event_reconstruction_module_);
   
   mkdir();
   
-  m_hist_bp_All  = new TH2D("h_bp_All","Back Projection (All)", m_NumPixelX, m_RangeX1, m_RangeX2, m_NumPixelY, m_RangeY1, m_RangeY2);
+  hist_bp_all_ = new TH2D("h_bp_all","Back Projection (All)",
+                          num_pixel_x_, range_x1_, range_x2_,
+                          num_pixel_y_, range_y1_, range_y2_);
 
   const std::vector<HitPattern>& hitpat_vec = getDetectorManager()->getHitPatterns();
-  m_hist_vec.resize(hitpat_vec.size());
-  for (unsigned int i=0; i<hitpat_vec.size(); i++) {
+  hist_vec_.resize(hitpat_vec.size());
+  for (size_t i=0; i<hitpat_vec.size(); i++) {
     std::string hist_name = "h_bp_";
     std::string hist_title = "BackProjection (";
     hist_name += hitpat_vec[i].ShortName();
     hist_title += hitpat_vec[i].Name();
     hist_title += ")";
-    m_hist_vec[i] = new TH2D(hist_name.c_str(), hist_title.c_str(), m_NumPixelX, m_RangeX1, m_RangeX2, m_NumPixelY, m_RangeY1, m_RangeY2);
+    hist_vec_[i] = new TH2D(hist_name.c_str(), hist_title.c_str(),
+                          num_pixel_x_, range_x1_, range_x2_,
+                          num_pixel_y_, range_y1_, range_y2_);
   }
 
   return AS_OK;
@@ -106,7 +112,7 @@ ANLStatus BackProjection::mod_analyze()
     double phi;
     vector3_t coneProjected;
 
-    for (int t=0; t<Times; t++) {
+    for (int i=0; i<Times; i++) {
       coneSample = cone1;
       phi = randgen.Uniform(0.0, TMath::TwoPi());
       coneSample.rotate(phi, coneAxis);
@@ -116,7 +122,7 @@ ANLStatus BackProjection::mod_analyze()
         continue;
       }
 
-      fillImage(coneProjected.x()/m_PixelUnit, coneProjected.y()/m_PixelUnit, FillWeight);
+      fillImage(coneProjected.x()/pixel_unit_, coneProjected.y()/pixel_unit_, FillWeight);
     }
   }
   
@@ -125,21 +131,19 @@ ANLStatus BackProjection::mod_analyze()
 
 void BackProjection::fillImage(double x, double y, double weight)
 {
-  // Filling histograms 
-  // All
-  m_hist_bp_All->Fill(x, y, weight);
-  for(unsigned int i=0; i<m_hist_vec.size(); i++) {
-    if(m_EventReconstruction->HitPatternFlag(i)) {
-      m_hist_vec[i]->Fill(x, y, weight);
+  hist_bp_all_->Fill(x, y, weight);
+  for(size_t i=0; i<hist_vec_.size(); i++) {
+    if(event_reconstruction_module_->HitPatternFlag(i)) {
+      hist_vec_[i]->Fill(x, y, weight);
     }
   }
 }
 
-bool BackProjection::sectionConeAndPlane(const vector3_t& vertex, const vector3_t& cone, vector3_t& coneProjected)
+bool BackProjection::sectionConeAndPlane(const vector3_t& vertex, const vector3_t& cone, vector3_t& cone_projected)
 {
-  const double t = (m_PlaneNormal*(m_PlanePoint-vertex)) / (m_PlaneNormal*cone);
-  coneProjected = vertex + t*cone;
-  if (t < 0.) { return false; }
+  const double t = (plane_normal_*(plane_point_-vertex)) / (plane_normal_*cone);
+  cone_projected = vertex + t*cone;
+  if (t < 0.0) { return false; }
   return true;
 }
 
