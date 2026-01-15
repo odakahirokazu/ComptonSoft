@@ -53,8 +53,10 @@ protected:
     pixel_unit_ = unit;
     pixel_unit_name_ = name;
   }
-
   double PixelUnit() { return pixel_unit_; }
+
+  std::size_t NumPoints() const { return static_cast<std::size_t>(num_points_); }
+  double ARMSpread() const { return arm_spread_; }
 
   void fillImage(double x, double y, double weight);
   bool sectionConeAndPlane(const vector3_t& vertex, const vector3_t& cone, vector3_t& cone_projected);
@@ -80,6 +82,9 @@ private:
 
   double pixel_unit_;
   std::string pixel_unit_name_;
+
+  int num_points_;
+  double arm_spread_;
 };
 
 } /* namespace comptonsoft */

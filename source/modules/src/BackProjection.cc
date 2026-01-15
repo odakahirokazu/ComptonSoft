@@ -20,16 +20,15 @@
 #include "BackProjection.hh"
 
 #include <cmath>
-
+#include <random>
 #include "AstroUnits.hh"
 #include "TDirectory.h"
-#include "TRandom3.h"
-#include "TMath.h"
 #include "BasicComptonEvent.hh"
 
 using namespace anlnext;
 
 namespace unit = anlgeant4::unit;
+namespace constant = anlgeant4::constant;
 
 namespace comptonsoft
 {
@@ -41,7 +40,9 @@ BackProjection::BackProjection()
     num_pixel_x_(256), num_pixel_y_(256),
     range_x1_(-4.0*unit::cm), range_x2_(+4.0*unit::cm),
     range_y1_(-4.0*unit::cm), range_y2_(+4.0*unit::cm),
-    pixel_unit_(unit::cm), pixel_unit_name_("cm")
+    pixel_unit_(unit::cm), pixel_unit_name_("cm"),
+    num_points_(1000),
+    arm_spread_(0.0*unit::degree)
 {
 }
 
@@ -57,7 +58,9 @@ ANLStatus BackProjection::mod_define()
   define_parameter("x_max", &mod_class::range_x2_, 1, pixel_unit_name_);
   define_parameter("y_min", &mod_class::range_y1_, 1, pixel_unit_name_);
   define_parameter("y_max", &mod_class::range_y2_, 1, pixel_unit_name_);
-
+  define_parameter("num_points", &mod_class::num_points_);
+  define_parameter("arm", &mod_class::arm_spread_, unit::degree, "degree");
+  
   return AS_OK;
 }
 
@@ -91,38 +94,36 @@ ANLStatus BackProjection::mod_initialize()
 
 ANLStatus BackProjection::mod_analyze()
 {
+  static std::mt19937 randgen;
+  std::uniform_real_distribution<double> uniform_dist(0.0, 1.0);
+  std::normal_distribution<double> normal_dist(0.0, ARMSpread());
+
   const std::vector<BasicComptonEvent_sptr> events = getEventReconstructionModule()->getReconstructedEvents();
   for (const auto& event: events) {
     const double fraction = event->ReconstructionFraction();
+    const size_t num_points = NumPoints();
+    const double weight = fraction/num_points;
 
-    static TRandom3 randgen;
-    const int Times = 1000;
-    const double FillWeight = fraction/double(Times);
-  
-    const vector3_t coneVertex = event->ConeVertex();
-    const vector3_t coneAxis = event->ConeAxis();
-    const vector3_t coneAxisOrtho = coneAxis.orthogonal();
-    const double cosThetaE = event->CosThetaE();
+    const vector3_t cone_vertex = event->ConeVertex();
+    const vector3_t cone_axis = event->ConeAxis();
+    const vector3_t cone_axis_ortho = cone_axis.orthogonal();
+    const double costhetaE = event->CosThetaE();
+    const double thetaE0 = std::acos(costhetaE);
 
-    vector3_t cone1(coneAxis);
-    double thetaE = TMath::ACos(cosThetaE);
-    cone1.rotate(thetaE, coneAxisOrtho);
+    for (size_t i=0; i<num_points; i++) {
+      vector3_t cone1(cone_axis);
+      const double delta_thetaE = normal_dist(randgen);
+      const double thetaE = thetaE0 + delta_thetaE;
+      cone1.rotate(thetaE, cone_axis_ortho);
+      vector3_t cone_sample = cone1;
+      const double phi = constant::twopi * uniform_dist(randgen);
+      cone_sample.rotate(phi, cone_axis);
 
-    vector3_t coneSample;
-    double phi;
-    vector3_t coneProjected;
-
-    for (int i=0; i<Times; i++) {
-      coneSample = cone1;
-      phi = randgen.Uniform(0.0, TMath::TwoPi());
-      coneSample.rotate(phi, coneAxis);
-      bool bPositive = sectionConeAndPlane(coneVertex, coneSample, coneProjected);
-  
-      if (bPositive == false) {
-        continue;
+      vector3_t cone_projected;
+      const bool positive = sectionConeAndPlane(cone_vertex, cone_sample, cone_projected);
+      if (positive) {
+        fillImage(cone_projected.x()/PixelUnit(), cone_projected.y()/PixelUnit(), weight);
       }
-
-      fillImage(coneProjected.x()/pixel_unit_, coneProjected.y()/pixel_unit_, FillWeight);
     }
   }
   

@@ -32,7 +32,7 @@ namespace comptonsoft {
  */
 class BackProjectionSky : public BackProjection
 {
-  DEFINE_ANL_MODULE(BackProjectionSky, 3.1);
+  DEFINE_ANL_MODULE(BackProjectionSky, 4.0);
 public:
   BackProjectionSky();
   ~BackProjectionSky();
@@ -50,9 +50,6 @@ private:
   double image_center_phi_;
   double image_yaxis_theta_;
   double image_yaxis_phi_;
-
-  double arm_;
-  int num_points_;
 };
 
 } /* namespace comptonsoft */
