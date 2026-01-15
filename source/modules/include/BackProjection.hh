@@ -59,7 +59,7 @@ protected:
   double ARMSpread() const { return arm_spread_; }
 
   void fillImage(double x, double y, double weight);
-  bool sectionConeAndPlane(const vector3_t& vertex, const vector3_t& cone, vector3_t& cone_projected);
+  bool sectionConeAndPlane(const vector3_t& vertex, const vector3_t& cone, vector3_t& cone_section);
 
   EventReconstruction* getEventReconstructionModule()
   { return event_reconstruction_module_; }

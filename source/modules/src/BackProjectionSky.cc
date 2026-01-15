@@ -106,16 +106,18 @@ ANLStatus BackProjectionSky::mod_analyze()
     const double thetaE0 = std::acos(costhetaE);
 
     for (size_t i=0; i<num_points; i++) {
-      vector3_t cone1(cone_axis);
+      vector3_t cone0(cone_axis);
       const double delta_thetaE = normal_dist(randgen);
       const double thetaE = thetaE0 + delta_thetaE;
-      cone1.rotate(thetaE, cone_axis_ortho);
-      vector3_t cone_sample = cone1;
+      cone0.rotate(thetaE, cone_axis_ortho);
+
+      vector3_t cone1 = cone0;
       const double phi = constant::twopi * uniform_dist(randgen);
-      cone_sample.rotate(phi, cone_axis);
-      const double ux = cone_sample.dot(xaxis_);
-      const double uy = cone_sample.dot(yaxis_);
-      const double uz = cone_sample.dot(zaxis_);
+      cone1.rotate(phi, cone_axis);
+
+      const double ux = cone1.dot(xaxis_);
+      const double uy = cone1.dot(yaxis_);
+      const double uz = cone1.dot(zaxis_);
       const double x = std::atan2(ux, uz);
       const double y = 0.5*constant::pi - std::acos(uy);
       fillImage(x/PixelUnit(), y/PixelUnit(), weight);
