@@ -37,9 +37,7 @@ BackProjectionSky::BackProjectionSky()
   : image_center_theta_(0.0*unit::degree),
     image_center_phi_(0.0*unit::degree),
     image_yaxis_theta_(90.0*unit::degree),
-    image_yaxis_phi_(90.0*unit::degree),
-    arm_(0.0*unit::degree),
-    num_points_(1000)
+    image_yaxis_phi_(90.0*unit::degree)
 {
   setUnit(unit::degree, "degree");
 }
@@ -57,8 +55,6 @@ ANLStatus BackProjectionSky::mod_define()
   define_parameter("image_center_phi",   &mod_class::image_center_phi_,   unit::degree, "degree");
   define_parameter("image_yaxis_theta",  &mod_class::image_yaxis_theta_,  unit::degree, "degree");
   define_parameter("image_yaxis_phi",    &mod_class::image_yaxis_phi_,    unit::degree, "degree");
-  define_parameter("arm",                &mod_class::arm_,                unit::degree, "degree");
-  define_parameter("num_points",         &mod_class::num_points_);
 
   return AS_OK;
 }
@@ -95,12 +91,12 @@ ANLStatus BackProjectionSky::mod_analyze()
 {
   static std::mt19937 randgen;
   std::uniform_real_distribution<double> uniform_dist(0.0, 1.0);
-  std::normal_distribution<double> normal_dist(0.0, arm_);
+  std::normal_distribution<double> normal_dist(0.0, ARMSpread());
 
   const std::vector<BasicComptonEvent_sptr> events = getEventReconstructionModule()->getReconstructedEvents();
   for (const auto& event: events) {
     const double fraction = event->ReconstructionFraction();
-    const size_t num_points = num_points_;
+    const size_t num_points = NumPoints();
     const double weight = fraction/num_points;
 
     const vector3_t cone_vertex = event->ConeVertex();
