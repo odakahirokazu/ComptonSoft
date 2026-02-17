@@ -217,8 +217,10 @@ void VDeviceSimulation::makeEPI(DetectorHit_sptr hit)
 {
   double ePI(0.0), ePIError(0.0);
   std::tie(ePI, ePIError) = calculateEPI(hit->EnergyCharge(), hit->Pixel());
+  const double photon_count = calculatePhotonCount(hit->PhotonCount());
   hit->setEPI(ePI);
   hit->setEPIError(ePIError);
+  hit->setPhotonCount(photon_count);
 }
 
 bool VDeviceSimulation::

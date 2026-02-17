@@ -203,6 +203,7 @@ public:
                                        double x, double y, double z) const = 0;
   virtual std::tuple<double, double> calculateEPI(double energyCharge, const PixelID& pixel) const = 0;
   void makeEPI(DetectorHit_sptr hit);
+  virtual double calculatePhotonCount(double photonCount) const { return photonCount; }
 
   bool checkTriggerDiscrimination(double energyCharge, const PixelID& pixel) const;
 

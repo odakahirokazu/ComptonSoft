@@ -1,6 +1,7 @@
 #include "LArTPCDeviceSimulation.hh"
 #include "AstroUnits.hh"
 #include "CLHEP/Units/SystemOfUnits.h"
+#include "CLHEP/Random/RandGauss.h"
 #include "LArEFieldModel.hh"
 #include "TFile.h"
 #include "TSpline.h"
@@ -22,6 +23,7 @@ void LArTPCDeviceSimulation::printSimulationParameters(std::ostream &os) const {
   if (recombinationModel_) {
     recombinationModel_->printInfo(os);
     os << "  Photon efficiency: " << PhotonEfficiency(0, 0, 0) << "\n";
+    os << "  Photon noise parameters: param0 = " << PhotonNoiseParam0() << ", param1 = " << PhotonNoiseParam1() << ", param2 = " << PhotonNoiseParam2() << "\n";
   }
   else {
     os << "  No recombination model is set.\n";
@@ -32,7 +34,7 @@ void LArTPCDeviceSimulation::printSimulationParameters(std::ostream &os) const {
   os << "  dEdx spline: " << (dedxSpline_ ? dedxSpline_->GetName() : "not set") << "\n";
 }
 double LArTPCDeviceSimulation::DiffusionSigmaAnode3D(double z, double &longitudinal, double &transverse) {
-  if (DiffusionMode() == 3) { // Calcurate from temperature and electric field
+  if (DiffusionMode() == 3) { // Calculate from drift time and diffusion coefficients
     double zAnode;
     if (isUpSideAnode()) {
       zAnode = 0.5 * getThickness();
@@ -188,12 +190,12 @@ void LArTPCDeviceSimulation::applyRecombination(DetectorHit_sptr &hit) {
   const double recombination_factor = recombinationModel_->getRecombinationFactor(dedx, BiasVoltage() / getThickness());
   //std::cout << "Recombination model applied: recombination_factor = " << recombination_factor << " edep_new = " << recombination_factor * edep / keV << " keV" << std::endl;
   const auto new_edep = std::max(edep * recombination_factor, 0.0);
-  const auto new_light_count = recombinationModel_->lightYield(edep, recombination_factor);
-  //const auto new_light_count = recombinationModel_->lightYield(edep, recombination_factor) * PhotonEfficiency(hit->LocalPositionX(), hit->LocalPositionY(), hit->LocalPositionZ());
+  const auto new_light_count = recombinationModel_->lightYield(edep, recombination_factor) * PhotonEfficiency(hit->LocalPositionX(), hit->LocalPositionY(), hit->LocalPositionZ());
   //std::cout << "  Light count: " << new_light_count << std::endl;
-  hit->setPhotonCount(new_light_count);
+  hit->setPhotonCount(new_light_count * PhotonEfficiency(hit->LocalPositionX(), hit->LocalPositionY(), hit->LocalPositionZ()));
   hit->setEnergyCharge(new_edep);
 }
+
 double LArTPCDeviceSimulation::getdEdxFromKineticEnergy(double kineticEnergy) const {
   if (kineticEnergy <= 0.0) {
     return 0.0;
@@ -216,5 +218,20 @@ void LArTPCDeviceSimulation::setdEdxFile(const std::string &filename, const std:
   if (!dedxSpline_) {
     throw std::runtime_error("LArTPCDeviceSimulation::setdEdxFile: Cannot find spline: " + spline_name);
   }
+}
+
+double LArTPCDeviceSimulation::calculatePhotonCount(double photonCount) const {
+  if (photonCount <= 0.0) {
+    return 0.0;
+  }
+  const double param0 = PhotonNoiseParam0();
+  const double param1 = PhotonNoiseParam1();
+  const double param2 = PhotonNoiseParam2();
+  const double noise = param0 + param1 * photonCount + param2 * photonCount * photonCount;
+  //std::cout << "Calculating photon count with noise: photonCount = " << photonCount << ", noise^2 = " << noise << std::endl;
+  if (noise < 0.0) {
+    return photonCount;
+  }
+  return CLHEP::RandGauss::shoot(photonCount, std::sqrt(noise));
 }
 } // namespace comptonsoft

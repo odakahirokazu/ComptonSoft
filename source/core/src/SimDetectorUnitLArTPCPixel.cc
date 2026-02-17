@@ -317,43 +317,36 @@ void SimDetectorUnitLArTPCPixel::simulatePulseHeights() {
 
     if (DiffusionMode() == 0) {
       DetectorHit_sptr hit = generateHit(*rawhit, pixel);
-      const double energyCharge = calculateEnergyCharge(pixel,
-                                                        hit->EnergyCharge(),
-                                                        localposx,
-                                                        localposy,
-                                                        localposz);
-      hit->setEnergyCharge(energyCharge);
       insertSimulatedHit(hit);
     }
     else {
       DetectorHit_sptr hit = generateHit(*rawhit, pixel);
+      const double energyCharge = hit->EnergyCharge();
 
       const int numDivision = DiffusionDivisionNumber();
-      const double localposx_hit = hit->LocalPositionX();
-      const double localposy_hit = hit->LocalPositionY();
-      const double localposz_hit = hit->LocalPositionZ();
       const double edep_hit = hit->EnergyDeposit();
       const double edepDivision = edep_hit / numDivision;
-      const double echargeDivision = hit->EnergyCharge() / numDivision;
+      const double energyChargeDivision = energyCharge / numDivision;
 
       std::vector<DetectorHit_sptr> diffusionHits;
       double diffusionSigma = 0.0;
-      if (isAnodeReadout()) {
-        diffusionSigma = DiffusionSigmaAnode(localposz_hit);
+      if (DiffusionMode() != 3) {
+        if (isAnodeReadout()) {
+          diffusionSigma = DiffusionSigmaAnode(localposz);
+        }
+        else if (isCathodeReadout()) {
+          diffusionSigma = DiffusionSigmaCathode(localposz);
+        }
       }
-      else if (isCathodeReadout()) {
-        diffusionSigma = DiffusionSigmaCathode(localposz_hit);
+      else {
+        double longitudinal, transverse;
+        diffusionSigma = DiffusionSigmaAnode3D(localposz, longitudinal, transverse);// only use transverse diffusion.
       }
       for (int l = 0; l < numDivision; l++) {
         const double dx = gRandom->Gaus(0.0, diffusionSigma);
         const double dy = gRandom->Gaus(0.0, diffusionSigma);
-        const PixelID pixelDiff = findPixel(localposx_hit + dx, localposy_hit + dy);
+        const PixelID pixelDiff = findPixel(localposx + dx, localposy + dy);
 
-        const double energyChargeDivision = calculateEnergyCharge(pixelDiff,
-                                                                  echargeDivision,
-                                                                  localposx_hit,
-                                                                  localposy_hit,
-                                                                  localposz_hit); // even if diffusion exists, dz is not included in CCE calculation
         auto itHit = find_if(diffusionHits.begin(), diffusionHits.end(),
                              [&](const DetectorHit_sptr &hit) {
                                return (hit->Pixel() == pixelDiff);
@@ -376,6 +369,52 @@ void SimDetectorUnitLArTPCPixel::simulatePulseHeights() {
         DetectorHit_sptr &hit = *itHit;
         insertSimulatedHit(hit);
       }
+    }
+    
+     // adjacent pad
+    if (ChargeCollectionMode()>=3) {
+      DetectorHit_sptr hit;
+      PixelID adjacentPixel;
+     
+      adjacentPixel.set(pixel.X()+1, pixel.Y()+1);
+      hit = generateHit(*rawhit, adjacentPixel);
+      hit->setEnergyDeposit(0.0);
+      insertSimulatedHit(hit);
+      
+      adjacentPixel.set(pixel.X()+1, pixel.Y());
+      hit = generateHit(*rawhit, adjacentPixel);
+      hit->setEnergyDeposit(0.0);
+      insertSimulatedHit(hit);
+      
+      adjacentPixel.set(pixel.X()+1, pixel.Y()-1);
+      hit = generateHit(*rawhit, adjacentPixel);
+      hit->setEnergyDeposit(0.0);
+      insertSimulatedHit(hit);
+      
+      adjacentPixel.set(pixel.X()  , pixel.Y()+1);
+      hit = generateHit(*rawhit, adjacentPixel);
+      hit->setEnergyDeposit(0.0);
+      insertSimulatedHit(hit);
+      
+      adjacentPixel.set(pixel.X()  , pixel.Y()-1);
+      hit = generateHit(*rawhit, adjacentPixel);
+      hit->setEnergyDeposit(0.0);
+      insertSimulatedHit(hit);
+      
+      adjacentPixel.set(pixel.X()-1, pixel.Y()+1);
+      hit = generateHit(*rawhit, adjacentPixel);
+      hit->setEnergyDeposit(0.0);
+      insertSimulatedHit(hit);
+      
+      adjacentPixel.set(pixel.X()-1, pixel.Y()  );
+      hit = generateHit(*rawhit, adjacentPixel);
+      hit->setEnergyDeposit(0.0);
+      insertSimulatedHit(hit);
+      
+      adjacentPixel.set(pixel.X()-1, pixel.Y()-1);
+      hit = generateHit(*rawhit, adjacentPixel);
+      hit->setEnergyDeposit(0.0);
+      insertSimulatedHit(hit);
     }
   }
 }
@@ -400,7 +439,17 @@ DetectorHit_sptr SimDetectorUnitLArTPCPixel::generateHit(const DetectorHit &rawh
   }
 
   applyQuenching(hit);
-  applyRecombination(hit);
+  applyRecombination(hit); // echarge is updated in this function.
+  
+  const double localposx = hit->LocalPositionX();
+  const double localposy = hit->LocalPositionY();
+  const double localposz = hit->LocalPositionZ();
+  const double energyCharge = calculateEnergyCharge(pixel,
+                                                  hit->EnergyCharge(),
+                                                  localposx,
+                                                  localposy,
+                                                  localposz);
+  hit->setEnergyCharge(energyCharge);
 
   return hit;
 }

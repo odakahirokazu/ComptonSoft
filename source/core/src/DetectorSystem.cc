@@ -1060,9 +1060,25 @@ void DetectorSystem::setupDetectorParameters(const DetectorSystem::ParametersNod
         }
       }
     }
+    
     if (auto o = parameters.photon_efficiency) {
       if (ds1) {        
         ds1->setPhotonEfficiency(*o);
+      }
+    }
+    if (auto o = parameters.photon_noise_param0) {
+      if (ds1) {
+        ds1->setPhotonNoiseParam0(*o);
+      }
+    }
+    if (auto o = parameters.photon_noise_param1) {
+      if (ds1) {
+        ds1->setPhotonNoiseParam1(*o);
+      }
+    }
+    if (auto o = parameters.photon_noise_param2) {
+      if (ds1) {
+        ds1->setPhotonNoiseParam2(*o);
       }
     }
   }
@@ -1121,6 +1137,22 @@ void DetectorSystem::setupDetectorParameters(const DetectorSystem::ParametersNod
     if (auto o = parameters.photon_efficiency) {
       if (ds1) {        
         ds1->setPhotonEfficiency(*o);
+      }
+    }
+    
+    if (auto o = parameters.photon_noise_param0) {
+      if (ds1) {
+        ds1->setPhotonNoiseParam0(*o);
+      }
+    }
+    if (auto o = parameters.photon_noise_param1) {
+      if (ds1) {
+        ds1->setPhotonNoiseParam1(*o);
+      }
+    }
+    if (auto o = parameters.photon_noise_param2) {
+      if (ds1) {
+        ds1->setPhotonNoiseParam2(*o);
       }
     }
   }
@@ -1262,13 +1294,20 @@ void DetectorSystem::setupDetectorParameters(const DetectorSystem::ParametersNod
       }
     }
   }
+  
   if (auto o = parameters.drift_velocity) {
     SimDetectorUnitLArTPC* ds1 = dynamic_cast<SimDetectorUnitLArTPC*>(ds);
     if (ds1){
       const double value = (*o)*unit::cm/unit::second;
       ds1->setDriftVelocity(value);
     }
+    SimDetectorUnitLArTPCPixel* ds2 = dynamic_cast<SimDetectorUnitLArTPCPixel*>(ds);
+    if (ds2){
+      const double value = (*o)*unit::cm/unit::second;
+      ds2->setDriftVelocity(value);
+    }
   }
+  
   if (auto o = parameters.timing_resolution_trigger) {
     const double value = (*o)*unit::second;
     ds->setTimingResolutionForTrigger(value);
@@ -1624,8 +1663,17 @@ load(const boost::property_tree::ptree& node)
   if (auto o = node.get_optional<std::string>("recombination.<xmlattr>.dedx_spline_name")) {
     recombination_dedx_spline_name = o;
   }
-if (auto o = node.get_optional<double>("recombination.<xmlattr>.photon_efficiency")) {
+  if (auto o = node.get_optional<double>("recombination.<xmlattr>.photon_efficiency")) {
     photon_efficiency = o;
+  }
+  if (auto o = node.get_optional<double>("photon_noise.<xmlattr>.param0")) {
+    photon_noise_param0 = o;
+  }
+  if (auto o = node.get_optional<double>("photon_noise.<xmlattr>.param1")) {
+    photon_noise_param1 = o;
+  }
+  if (auto o = node.get_optional<double>("photon_noise.<xmlattr>.param2")) {
+    photon_noise_param2 = o;
   }
   for (const ptree::value_type& v: node.get_child("")) {
     if (v.first == "channel_properties") {

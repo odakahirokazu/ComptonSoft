@@ -45,7 +45,27 @@ public:
   
   void setPhotonEfficiency(double photonEfficiency) { photonEfficiency_ = photonEfficiency; }
   virtual double PhotonEfficiency(double /*x*/, double /*y*/, double /*z*/) const { return photonEfficiency_; }
-  
+
+  double calculatePhotonCount(double photonCount) const override;
+  void setPhotonNoiseParam0(double param0) {
+    photonNoiseParam0_ = param0;
+  }
+  double PhotonNoiseParam0() const {
+    return photonNoiseParam0_;
+  }
+  void setPhotonNoiseParam1(double param1) {
+    photonNoiseParam1_ = param1;
+  }
+  double PhotonNoiseParam1() const {
+    return photonNoiseParam1_;
+  }
+  void setPhotonNoiseParam2(double param2) {
+    photonNoiseParam2_ = param2;
+  }
+  double PhotonNoiseParam2() const {
+    return photonNoiseParam2_;
+  }
+
   const VLArRecombinationModel* recombinationModel() const override { return recombinationModel_.get(); }
 
 private:
@@ -60,6 +80,9 @@ private:
   TFile *dedxFile_ = nullptr;
   TSpline *dedxSpline_ = nullptr;
   std::vector<int> zIndicesForEPI_;
+  double photonNoiseParam0_ = 0.0;
+  double photonNoiseParam1_ = 0.0;
+  double photonNoiseParam2_ = 0.0;
   std::tuple<double, double> compensateEPIRecombinationIteration(std::tuple<double, double> ePI) const;
 };
 } // namespace comptonsoft

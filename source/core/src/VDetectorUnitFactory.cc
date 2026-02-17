@@ -41,6 +41,9 @@ VRealDetectorUnit* VDetectorUnitFactory::createDetectorUnit(const std::string& t
   else if (type=="LArTPC") {
     detector = createDetectorUnitLArTPC();
   }
+  else if (type=="LArTPCPixel") {
+    detector = createDetectorUnitLArTPCPixel();
+  }
 
   return detector;
 }
