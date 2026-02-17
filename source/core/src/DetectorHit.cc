@@ -73,6 +73,7 @@ DetectorHit& DetectorHit::merge(const DetectorHit& r)
   setEnergyCharge(EnergyCharge()+r.EnergyCharge());
   setEnergy(Energy()+r.Energy());
   setEPI(EPI()+r.EPI());
+  setPhotonCount(PhotonCount() + r.PhotonCount());
 
   if (RealTime() > r.RealTime()) {
     setRealTime(r.RealTime());
@@ -198,6 +199,7 @@ DetectorHit& DetectorHit::mergeAdjacentSignal(const DetectorHit& r,
   setEnergy(Energy()+r.Energy());
   setPHA(PHA()+r.PHA());
   setEPI(EPI()+r.EPI());
+  setPhotonCount(PhotonCount() + r.PhotonCount());
 
   if (RealTime() > r.RealTime()) {
     setRealTime(r.RealTime());

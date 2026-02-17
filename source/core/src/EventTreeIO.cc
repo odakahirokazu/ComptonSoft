@@ -53,6 +53,7 @@ void EventTreeIO::defineBranches()
   tree_->Branch("rawpha",         rawpha_.data(),         "rawpha[num_hits]/I");
   tree_->Branch("pha",            pha_.data(),            "pha[num_hits]/F");
   tree_->Branch("epi",            epi_.data(),            "epi[num_hits]/F");
+  tree_->Branch("photon_count",   photon_count_.data(),   "photon_count[num_hits]/F");
   tree_->Branch("flag_data",      &flag_data_,            "flag_data/l");
   tree_->Branch("flags",          &flags_,                "flags/l");
   
@@ -100,6 +101,7 @@ void EventTreeIO::setBranchAddresses()
   tree_->SetBranchAddress("rawpha",         rawpha_.data());
   tree_->SetBranchAddress("pha",            pha_.data());
   tree_->SetBranchAddress("epi",            epi_.data());
+  tree_->SetBranchAddress("photon_count",   photon_count_.data());
   tree_->SetBranchAddress("flag_data",      &flag_data_);
   tree_->SetBranchAddress("flags",          &flags_);
 
@@ -157,6 +159,7 @@ void EventTreeIO::fillHits(const int64_t eventID,
     rawpha_[i] = hit->RawPHA();
     pha_[i] = hit->PHA();
     epi_[i] = hit->EPI() / unit::keV;
+    photon_count_[i] = hit->PhotonCount();
     trackid_[i] = hit->TrackID();
     particle_[i] = hit->Particle();
     real_time_[i] = hit->RealTime() / unit::second;
@@ -206,6 +209,7 @@ DetectorHit_sptr EventTreeIO::retrieveHit(std::size_t i) const
   hit->setRawPHA(rawpha_[i]);
   hit->setPHA(pha_[i]);
   hit->setEPI(epi_[i] * unit::keV);
+  hit->setPhotonCount(photon_count_[i]);
   hit->setFlagData(flag_data_);
   hit->setFlags(flags_);
   hit->setTrackID(trackid_[i]);

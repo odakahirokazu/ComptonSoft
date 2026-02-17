@@ -35,7 +35,6 @@ void VLArRecombinationModel::printInfo(std::ostream &os) const {
      << "  Density: " << rho_ / (CLHEP::g / CLHEP::cm3) << " g/cm3\n"
      << "  Fano Factor: " << fanoFactor_ << "\n"
      << "  Randomize Mode: " << randomizeMode_ << "\n"
-     << "  Light Collection Efficiency (not implemented yet): " << lightCollectionEfficiency_ << "\n"
      << "  Random Number Generator Seed: " << seed_ << "\n";
 }
 

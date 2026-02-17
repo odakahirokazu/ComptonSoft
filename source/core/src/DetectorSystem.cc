@@ -40,10 +40,12 @@
 #include "RealDetectorUnit2DStrip.hh"
 #include "RealDetectorUnit3DVoxel.hh"
 #include "RealDetectorUnitLArTPC.hh"
+#include "RealDetectorUnitLArTPCPixel.hh"
 #include "SimDetectorUnit2DPixel.hh"
 #include "SimDetectorUnit2DStrip.hh"
 #include "SimDetectorUnit3DVoxel.hh"
 #include "SimDetectorUnitLArTPC.hh"
+#include "SimDetectorUnitLArTPCPixel.hh"
 #include "MultiChannelData.hh"
 #include "FrameData.hh"
 #include "GainFunctionCubic.hh"
@@ -1010,8 +1012,8 @@ void DetectorSystem::setupDetectorParameters(const DetectorSystem::ParametersNod
     }
   }
   if (ds->checkType(DetectorType::LArTPC)){
+    SimDetectorUnitLArTPC *ds1 = dynamic_cast<SimDetectorUnitLArTPC *>(ds);
     if (auto upside_readout = parameters.upside_readout) {
-      SimDetectorUnitLArTPC *ds1 = dynamic_cast<SimDetectorUnitLArTPC *>(ds);
       if (ds1) {
         if (*upside_readout == 1) {
           ds1->setReadoutElectrode(ds1->UpSideElectrode());
@@ -1024,8 +1026,20 @@ void DetectorSystem::setupDetectorParameters(const DetectorSystem::ParametersNod
     if (auto o = parameters.recombination_configuration_file) {
       ds->instantiateRecombinationModel(*o);
     }
+    if (auto o = parameters.recombination_dedx_file) {
+      if (ds1) {
+        if (auto o2 = parameters.recombination_dedx_spline_name ){
+          ds1->setdEdxFile(*o, *o2);
+        }
+        else{
+          ds1->setdEdxFile(*o);
+        }
+      }
+    }
+    else if (ds->recombinationModel()) {// Recombination model is instantiated but dE/dx file is not specified
+      BOOST_THROW_EXCEPTION(CSException("Error: Recombination model is instantiated but dE/dx file is not specified for LArTPCPixel detector."));
+    }
     if (auto o = parameters.recombination_function_for_epi) {
-      auto ds1 = dynamic_cast<SimDetectorUnitLArTPC *>(ds);
       if (ds1) {
         TSpline* spline = (TSpline*)(ROOTFile_->Get((*o).c_str()));
         if (spline == nullptr) {
@@ -1037,7 +1051,6 @@ void DetectorSystem::setupDetectorParameters(const DetectorSystem::ParametersNod
       }
     }
     if (auto o = parameters.graph_file_for_epi) {
-      auto ds1 = dynamic_cast<SimDetectorUnitLArTPC *>(ds);
       if (ds1) {
         if (auto o2 = parameters.graph_list_name_for_epi){
           ds1->setResponseFileForEPI(*o, *o2);
@@ -1045,6 +1058,69 @@ void DetectorSystem::setupDetectorParameters(const DetectorSystem::ParametersNod
         else{
           ds1->setResponseFileForEPI(*o);
         }
+      }
+    }
+    if (auto o = parameters.photon_efficiency) {
+      if (ds1) {        
+        ds1->setPhotonEfficiency(*o);
+      }
+    }
+  }
+  
+  if (ds->checkType(DetectorType::LArTPCPixel)) {
+    SimDetectorUnitLArTPCPixel *ds1 = dynamic_cast<SimDetectorUnitLArTPCPixel *>(ds);
+    if (auto upside_readout = parameters.upside_readout) {
+      if (ds1) {
+        if (*upside_readout == 1) {
+          ds1->setReadoutElectrode(ds1->UpSideElectrode());
+        }
+        else if (*upside_readout == 0) {
+          ds1->setReadoutElectrode(ds1->BottomSideElectrode());
+        }
+      }
+    }
+    if (auto o = parameters.recombination_configuration_file) {
+      ds->instantiateRecombinationModel(*o);
+    }
+    if (auto o = parameters.recombination_dedx_file) {
+      if (ds1) {
+        if (auto o2 = parameters.recombination_dedx_spline_name ){
+          ds1->setdEdxFile(*o, *o2);
+        }
+        else{
+          ds1->setdEdxFile(*o);
+        }
+      }
+    }
+    else if (ds->recombinationModel()) {// Recombination model is instantiated but dE/dx file is not specified
+      BOOST_THROW_EXCEPTION(CSException("Error: Recombination model is instantiated but dE/dx file is not specified for LArTPCPixel detector."));
+    }
+    
+    if (auto o = parameters.recombination_function_for_epi) {
+      if (ds1) {
+        TSpline *spline = (TSpline *)(ROOTFile_->Get((*o).c_str()));
+        if (spline == nullptr) {
+          std::cout << "Error: Recombination function spline " << *o << " not found in ROOT file.\n";
+        }
+        else {
+          ds1->setRecombinationFunctionForEPI(spline);
+        }
+      }
+    }
+    if (auto o = parameters.graph_file_for_epi) {
+      if (ds1) {
+        if (auto o2 = parameters.graph_list_name_for_epi) {
+          ds1->setResponseFileForEPI(*o, *o2);
+        }
+        else {
+          ds1->setResponseFileForEPI(*o);
+        }
+      }
+    }
+ 
+    if (auto o = parameters.photon_efficiency) {
+      if (ds1) {        
+        ds1->setPhotonEfficiency(*o);
       }
     }
   }
@@ -1109,6 +1185,13 @@ void DetectorSystem::setupDetectorParameters(const DetectorSystem::ParametersNod
           ds1->setCCEMap(cce_map);
         }
       }
+      else if (ds->checkType(DetectorType::LArTPCPixel)) {
+        SimDetectorUnitLArTPCPixel* ds1 = dynamic_cast<SimDetectorUnitLArTPCPixel*>(ds);
+        if (ds1) {
+          TH3D* cce_map = (TH3D*)(ROOTFile_->Get((*mapName).c_str()));
+          ds1->setCCEMap(cce_map);
+        }
+      }
     }
 
     if (auto o = parameters.charge_collection_mutau_electron) {
@@ -1156,15 +1239,25 @@ void DetectorSystem::setupDetectorParameters(const DetectorSystem::ParametersNod
         }
         auto o = parameters.drift_velocity;
         if (!o) {
-          throw std::runtime_error("Error: In LArTPC, drift_velocity must be specified when diffusion_mode is set.");
+          BOOST_THROW_EXCEPTION(CSException("Error: In LArTPC, drift_velocity must be specified when diffusion_mode is set."));
         }
-        if (auto o = parameters.recombination_dedx_file) {
-          if (auto o2 = parameters.recombination_dedx_spline_name ){
-            ds1->setdEdxFile(*o, *o2);
-          }
-          else{
-            ds1->setdEdxFile(*o);
-          }
+        
+      }
+    }
+    if (ds->checkType(DetectorType::LArTPCPixel)) {
+      SimDetectorUnitLArTPCPixel *ds1 = dynamic_cast<SimDetectorUnitLArTPCPixel *>(ds);
+      if (ds1) {
+        if (auto o = parameters.diffusion_coefficient_longitudinal) {
+          const double value = (*o) * unit::cm * unit::cm / unit::second;
+          ds1->setDiffusionCoefficientLongitudinal(value);
+        }
+        if (auto o = parameters.diffusion_coefficient_transverse) {
+          const double value = (*o) * unit::cm * unit::cm / unit::second;
+          ds1->setDiffusionCoefficientTransverse(value);
+        }
+        auto o = parameters.drift_velocity;
+        if (!o) {
+          BOOST_THROW_EXCEPTION(CSException("Error: In LArTPC, drift_velocity must be specified when diffusion_mode is set."));
         }
       }
     }
@@ -1531,7 +1624,9 @@ load(const boost::property_tree::ptree& node)
   if (auto o = node.get_optional<std::string>("recombination.<xmlattr>.dedx_spline_name")) {
     recombination_dedx_spline_name = o;
   }
-
+if (auto o = node.get_optional<double>("recombination.<xmlattr>.photon_efficiency")) {
+    photon_efficiency = o;
+  }
   for (const ptree::value_type& v: node.get_child("")) {
     if (v.first == "channel_properties") {
       const ptree& channelsNode = v.second;

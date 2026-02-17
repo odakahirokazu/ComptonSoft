@@ -34,23 +34,23 @@ ModifiedBoxModel::ModifiedBoxModel(const std::map<std::string, double> &params) 
   }
   betaOverRho_ = beta / Rho();
 }
-double ModifiedBoxModel::electronLet(double let, double electricField) const {
+double ModifiedBoxModel::electronDeDx(double dedx, double electricField) const {
   const double betaOverRhoE = betaOverRho_ / electricField;
-  const double yield = TMath::Log(betaOverRhoE * let + alpha) / betaOverRhoE;
-  //std::cout << "ModifiedBoxModel::electronLet: let=" << let / (CLHEP::MeV / CLHEP::cm) << "MeV/cm, electricField=" << electricField / (CLHEP::kilovolt / CLHEP::cm) << " kV/cm, yield=" << yield / (CLHEP::MeV / CLHEP::cm) << "MeV/cm" << std::endl;
+  const double new_dedx = TMath::Log(betaOverRhoE * dedx + alpha) / betaOverRhoE;
+  //std::cout << "ModifiedBoxModel::electronDeDx: dedx=" << dedx / (CLHEP::MeV / CLHEP::cm) << "MeV/cm, electricField=" << electricField / (CLHEP::kilovolt / CLHEP::cm) << " kV/cm, new_dedx=" << new_dedx / (CLHEP::MeV / CLHEP::cm) << "MeV/cm" << std::endl;
   if (RandomizeMode() == 0) {
-    return yield;
+    return (new_dedx > 0.0 && dedx > new_dedx) ? new_dedx : 0.0;
   }
   else if (RandomizeMode() == 1) {
     // Binomial randomization
-    const double nQuanta = let / Wexc(); // number of quanta
+    const double nQuanta = dedx / Wexc(); // number of quanta
     //std::cout << "nQuanta: " << nQuanta << std::endl;
     int nQuantaWithFluctuations = TMath::Nint(gRandom->Gaus(nQuanta, TMath::Sqrt(TMath::Max(0.0, nQuanta * FanoFactor()))));
     if (nQuantaWithFluctuations < 0) {
       nQuantaWithFluctuations = 0;
     }
     //std::cout << "nQuantaWithFluctuations: " << nQuantaWithFluctuations << std::endl;
-    double p = yield / let;
+    double p = new_dedx / dedx;
     if (p < 0.0) {
       return 0.0;
     }
@@ -71,7 +71,7 @@ double ModifiedBoxModel::electronLet(double let, double electricField) const {
   }
   else {
     // No randomization
-    return yield;
+    return (new_dedx > 0.0 && dedx > new_dedx) ? new_dedx : 0.0;
   }
 }
 void ModifiedBoxModel::printInfo(std::ostream &os) const {

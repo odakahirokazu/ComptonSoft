@@ -128,6 +128,9 @@ public:
   double EPI() const { return EPI_; }
   void setEPIError(double v) { EPIError_ = v; }
   double EPIError() const { return EPIError_; }
+  
+  double PhotonCount() const { return photonCount_; }
+  void setPhotonCount(double v) { photonCount_ = v; }
 
   void setFlagData(uint64_t v) { flagData_ = v; }
   uint64_t FlagData() const { return flagData_; }
@@ -317,6 +320,7 @@ private:
   double PHA_ = 0.0;
   double EPI_ = 0.0;
   double EPIError_ = 0.0;
+  double photonCount_ = 0.0;
   uint64_t flagData_ = 0ul;
   uint64_t flags_ = 0ul;
   // simulation

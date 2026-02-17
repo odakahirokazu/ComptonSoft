@@ -397,5 +397,4 @@ void VDeviceSimulation::assignLocalPositionError(DetectorHit_sptr hit) const
   const double dz = (DepthSensingMode()==1) ? DepthResolution() : (getVoxelPitchZ()*conversionToSigma);
   hit->setLocalPositionError(dx, dy, dz);
 }
-
 } /* namespace comptonsoft */

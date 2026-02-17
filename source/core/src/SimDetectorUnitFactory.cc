@@ -23,6 +23,7 @@
 #include "SimDetectorUnitScintillator.hh"
 #include "SimDetectorUnit3DVoxel.hh"
 #include "SimDetectorUnitLArTPC.hh"
+#include "SimDetectorUnitLArTPCPixel.hh"
 #include "MultiChannelData.hh"
 
 namespace comptonsoft {
@@ -51,5 +52,8 @@ VRealDetectorUnit* SimDetectorUnitFactory::createDetectorUnitLArTPC()
 {
   return new SimDetectorUnitLArTPC;
 }
-
+VRealDetectorUnit* SimDetectorUnitFactory::createDetectorUnitLArTPCPixel()
+{
+  return new SimDetectorUnitLArTPCPixel;
+}
 } /* namespace comptonsoft */

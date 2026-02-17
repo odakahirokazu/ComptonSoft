@@ -420,9 +420,6 @@ void VRealDetectorUnit::clusterByThreshold(DetectorHitVector &hits) const {
   const auto energyThreshold = ClusteringEnergyThreshold();
   const auto splitThreshold = ClusteringSplitThreshold();
   const auto distanceThreshold = ClusteringRange();
-  if (energyThreshold <= 0.0 && splitThreshold <= 0.0) {
-    return;
-  }
 
   auto compair = [](const DetectorHit_sptr &hit1, const DetectorHit_sptr &hit2) -> bool {
     return hit1->EPI() > hit2->EPI();
@@ -431,7 +428,7 @@ void VRealDetectorUnit::clusterByThreshold(DetectorHitVector &hits) const {
   auto iter_vector = hits.end();
   for (; iter_vector != hits.begin();) {
     --iter_vector;
-    if ((*iter_vector)->EPI() >= splitThreshold) {
+    if ((*iter_vector)->EPI() >= energyThreshold) {
       groups.emplace_back(1, *iter_vector);
       hits.erase(iter_vector);
     }
@@ -469,7 +466,7 @@ void VRealDetectorUnit::clusterByThreshold(DetectorHitVector &hits) const {
     clusteredHits.push_back(*iter);
     iter++;
     while (iter != group.end()) {
-      clusteredHits.back()->merge(**iter);
+      clusteredHits.back()->mergeAdjacentSignal(**iter, DetectorHit::MergedPosition::EnergyWeighted);
       iter++;
     }
   }

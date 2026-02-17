@@ -35,20 +35,20 @@ BirksModel::BirksModel(const std::map<std::string, double> &params) : VLArRecomb
   }
   kOverRho_ = k_ / Rho();
 }
-double BirksModel::electronLet(double let, double electricField) const {
+double BirksModel::electronDeDx(double dedx, double electricField) const {
   const double kOverRhoE = kOverRho_ / electricField;
-  const double yield = Ab_ * (let / (1 + kOverRhoE * let));
+  const double new_dedx = Ab_ * (dedx / (1 + kOverRhoE * dedx));
   if (RandomizeMode() == 0) {
-    return yield;
+    return (new_dedx > 0.0 && dedx > new_dedx) ? new_dedx : 0.0;
   }
   else if (RandomizeMode() == 1) {
     // Binomial randomization
-    const double nQuanta = let / Wion(); // number of quanta
+    const double nQuanta = dedx / Wion(); // number of quanta
     int nQuantaWithFluctuations = TMath::Nint(gRandom->Gaus(nQuanta, TMath::Sqrt(TMath::Max(0.0, nQuanta * FanoFactor()))));
     if (nQuantaWithFluctuations < 0) {
       nQuantaWithFluctuations = 0;
     }
-    double p = yield / let;
+    double p = new_dedx / dedx;
     if (p < 0.0) {
       return 0.0;
     }
@@ -81,8 +81,8 @@ double BirksModel::electronLet(double let, double electricField) const {
     return nElectronInt * Wion();
   }
   else {
-    std::cerr << "BirksModel::electronLet: Unknown randomization mode: " << RandomizeMode() << std::endl;
-    return yield;
+    std::cerr << "BirksModel::electronDeDx: Unknown randomization mode: " << RandomizeMode() << std::endl;
+    return (new_dedx > 0.0 && dedx > new_dedx) ? new_dedx : 0.0;
   }
 }
 void BirksModel::printInfo(std::ostream &os) const {

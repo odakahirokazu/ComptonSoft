@@ -27,6 +27,7 @@
 #include "DetectorHit_sptr.hh"
 #include "VDetectorUnit.hh"
 #include "PixelID.hh"
+#include "VLArRecombinationModel.hh"
 
 namespace comptonsoft {
 
@@ -192,6 +193,11 @@ public:
   void makeDetectorHitsAtTime(double time_triggered, int time_group);
 
   virtual void applyQuenching(DetectorHit_sptr hit) const;
+  
+  virtual void instantiateRecombinationModel(const std::string &/*config_filename*/){}
+  virtual const VLArRecombinationModel* recombinationModel() const { return nullptr; }
+  virtual void applyRecombination(DetectorHit_sptr &/*hit*/) {}
+  
   virtual double calculateEnergyCharge(const PixelID& pixel,
                                        double energyDeposit,
                                        double x, double y, double z) const = 0;
@@ -236,7 +242,7 @@ private:
   void removeHitsOutOfPixelRange(std::list<DetectorHit_sptr>& hits);
   void removeHitsAtChannelsDisabled(std::list<DetectorHit_sptr>& hits);
   void removeHitsBelowThresholds(std::list<DetectorHit_sptr>& hits);
-  void mergeHits(std::list<DetectorHit_sptr>& hits);
+  virtual void mergeHits(std::list<DetectorHit_sptr>& hits);
   void mergeHitsIfCoincident(double time_width,
                              std::list<DetectorHit_sptr>& hits);
 

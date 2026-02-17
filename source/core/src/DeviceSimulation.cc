@@ -183,8 +183,4 @@ void DeviceSimulation::printSimulationParameters(std::ostream& os) const
      << "  for energy measurement : " << TimingResolutionForEnergyMeasurement()/unit::ns << " ns\n";
   os << "Pedestal generation : " << isPedestalEnabled() << '\n';
 }
-double DeviceSimulation::applyRecombination(DetectorHit_sptr hit) const
-{
-  return hit->EnergyDeposit();
-}
 } /* nemespace comptonsoft */

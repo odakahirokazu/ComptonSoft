@@ -17,7 +17,7 @@
  *                                                                       *
  *************************************************************************/
 
-#include "SimDetectorUnitLArTPC.hh"
+#include "SimDetectorUnitLArTPCPixel.hh"
 
 #include <algorithm>
 #include <boost/format.hpp>
@@ -40,17 +40,17 @@ namespace unit = anlgeant4::unit;
 
 namespace comptonsoft {
 
-SimDetectorUnitLArTPC::SimDetectorUnitLArTPC() {
+SimDetectorUnitLArTPCPixel::SimDetectorUnitLArTPCPixel() {
   setNumPixelsInWPCalculation(20.0);
 };
 
-SimDetectorUnitLArTPC::~SimDetectorUnitLArTPC() = default;
-void SimDetectorUnitLArTPC::initializeEvent() {
-  RealDetectorUnitLArTPC::initializeEvent();
+SimDetectorUnitLArTPCPixel::~SimDetectorUnitLArTPCPixel() = default;
+void SimDetectorUnitLArTPCPixel::initializeEvent() {
+  RealDetectorUnitLArTPCPixel::initializeEvent();
   DeviceSimulation::initializeEvent();
 }
 
-double SimDetectorUnitLArTPC::ChargeCollectionEfficiency(const VoxelID &voxel, double x, double y, double z) const {
+double SimDetectorUnitLArTPCPixel::ChargeCollectionEfficiency(const VoxelID &voxel, double x, double y, double z) const {
   const vector3_t pixelCenter = LocalPosition(voxel);
   const double xInPixel = x - pixelCenter.x();
   const double yInPixel = y - pixelCenter.y();
@@ -62,7 +62,7 @@ double SimDetectorUnitLArTPC::ChargeCollectionEfficiency(const VoxelID &voxel, d
   return CCEMap_->GetBinContent(ix, iy, iz);
 }
 
-double SimDetectorUnitLArTPC::WeightingPotential(const VoxelID &voxel, double x, double y, double z) {
+double SimDetectorUnitLArTPCPixel::WeightingPotential(const VoxelID &voxel, double x, double y, double z) {
   const vector3_t pixelCenter = LocalPosition(voxel);
   const double xInPixel = x - pixelCenter.x();
   const double yInPixel = y - pixelCenter.y();
@@ -74,7 +74,7 @@ double SimDetectorUnitLArTPC::WeightingPotential(const VoxelID &voxel, double x,
   return WPMap_->GetBinContent(ix, iy, iz);
 }
 
-void SimDetectorUnitLArTPC::buildWPMap() {
+void SimDetectorUnitLArTPCPixel::buildWPMap() {
   if (ChargeCollectionMode() == 2) {
     buildWPMap(31, 31, 100, 1.0);
   }
@@ -87,7 +87,7 @@ void SimDetectorUnitLArTPC::buildWPMap() {
   }
 }
 
-void SimDetectorUnitLArTPC::buildWPMap(int nx, int ny, int nz, double pixel_factor) {
+void SimDetectorUnitLArTPCPixel::buildWPMap(int nx, int ny, int nz, double pixel_factor) {
   if (nx < 1 || ny < 1 || nz <= 1) {
     std::cout << "Error : buildWPMap " << std::endl;
     return;
@@ -169,7 +169,7 @@ void SimDetectorUnitLArTPC::buildWPMap(int nx, int ny, int nz, double pixel_fact
   std::cout << std::endl;
 }
 
-void SimDetectorUnitLArTPC::buildCCEMap() {
+void SimDetectorUnitLArTPCPixel::buildCCEMap() {
   if (ChargeCollectionMode() == 2) {
     buildCCEMap(31, 31, 100, 1.0);
   }
@@ -182,7 +182,7 @@ void SimDetectorUnitLArTPC::buildCCEMap() {
   }
 }
 
-void SimDetectorUnitLArTPC::buildCCEMap(int nx, int ny, int nz, double pixel_factor) {
+void SimDetectorUnitLArTPCPixel::buildCCEMap(int nx, int ny, int nz, double pixel_factor) {
   if (nx < 1 || ny < 1 || nz < 1) {
     std::cout << "Error : buildCCEMap " << std::endl;
     return;
@@ -263,7 +263,7 @@ void SimDetectorUnitLArTPC::buildCCEMap(int nx, int ny, int nz, double pixel_fac
   std::cout << "Charge collection efficiency map is built." << std::endl;
 }
 
-void SimDetectorUnitLArTPC::checkBranchingGamma() {
+void SimDetectorUnitLArTPCPixel::checkBranchingGamma() {
   const int N = NumberOfRawHits();
   uint64_t flag = 0;
   for (int i = 0; i < N; i++) {
@@ -289,7 +289,7 @@ void SimDetectorUnitLArTPC::checkBranchingGamma() {
   }
 }
 
-void SimDetectorUnitLArTPC::simulatePulseHeights() {
+void SimDetectorUnitLArTPCPixel::simulatePulseHeights() {
   checkBranchingGamma();
   const int N = NumberOfRawHits();
   for (int i = 0; i < N; i++) {
@@ -308,16 +308,16 @@ void SimDetectorUnitLArTPC::simulatePulseHeights() {
         rawhit->addFlags(flag::CathodeSide);
       }
 
-      fillVoxel(rawhit);
+      fillPixel(rawhit);
       insertSimulatedHit(rawhit);
       continue;
     }
 
-    const VoxelID voxel = findVoxel(localposx, localposy, localposz);
+    const PixelID pixel = findPixel(localposx, localposy);
 
     if (DiffusionMode() == 0) {
-      DetectorHit_sptr hit = generateHit(*rawhit, voxel);
-      const double energyCharge = calculateEnergyCharge(voxel,
+      DetectorHit_sptr hit = generateHit(*rawhit, pixel);
+      const double energyCharge = calculateEnergyCharge(pixel,
                                                         hit->EnergyCharge(),
                                                         localposx,
                                                         localposy,
@@ -326,7 +326,7 @@ void SimDetectorUnitLArTPC::simulatePulseHeights() {
       insertSimulatedHit(hit);
     }
     else {
-      DetectorHit_sptr hit = generateHit(*rawhit, voxel);
+      DetectorHit_sptr hit = generateHit(*rawhit, pixel);
 
       const int numDivision = DiffusionDivisionNumber();
       const double localposx_hit = hit->LocalPositionX();
@@ -337,73 +337,38 @@ void SimDetectorUnitLArTPC::simulatePulseHeights() {
       const double echargeDivision = hit->EnergyCharge() / numDivision;
 
       std::vector<DetectorHit_sptr> diffusionHits;
-      if (DiffusionMode() != 3) {
-        double diffusionSigma = 0.0;
-        if (isAnodeReadout()) {
-          diffusionSigma = DiffusionSigmaAnode(localposz_hit);
-        }
-        else if (isCathodeReadout()) {
-          diffusionSigma = DiffusionSigmaCathode(localposz_hit);
-        }
-        for (int l = 0; l < numDivision; l++) {
-          const double dx = gRandom->Gaus(0.0, diffusionSigma);
-          const double dy = gRandom->Gaus(0.0, diffusionSigma);
-          const double dz = gRandom->Gaus(0.0, diffusionSigma);
-          const VoxelID voxelDiff = findVoxel(localposx_hit + dx, localposy_hit + dy, localposz_hit + dz);
-
-          auto itHit = find_if(diffusionHits.begin(), diffusionHits.end(),
-                               [&](const DetectorHit_sptr &hit) {
-                                 return (hit->Voxel() == voxelDiff);
-                               });
-          const double energyChargeDivision = calculateEnergyCharge(voxelDiff,
-                                                                    echargeDivision,
-                                                                    localposx_hit,
-                                                                    localposy_hit,
-                                                                    localposz_hit); // even if diffusion exists, dz is not included in CCE calculation
-          if (itHit != diffusionHits.end()) {
-            DetectorHit_sptr &hit = *itHit;
-            hit->setEnergyDeposit(hit->EnergyDeposit() + edepDivision);
-            hit->setEnergyCharge(hit->EnergyCharge() + energyChargeDivision);
-          }
-          else {
-            DetectorHit_sptr hitDivision(new DetectorHit(*hit));
-            hitDivision->setEnergyDeposit(edepDivision);
-            hitDivision->setEnergyCharge(energyChargeDivision);
-            hitDivision->setVoxel(voxelDiff);
-            diffusionHits.push_back(hitDivision);
-          }
-        }
+      double diffusionSigma = 0.0;
+      if (isAnodeReadout()) {
+        diffusionSigma = DiffusionSigmaAnode(localposz_hit);
       }
-      else { // if diffusion mode == 3
-        double diffusionSigma_t, diffusionSigma_l;
-        DiffusionSigmaAnode3D(localposz, diffusionSigma_l, diffusionSigma_t);
-        for (int l = 0; l < numDivision; l++) {
-          const double dx = gRandom->Gaus(0.0, diffusionSigma_t);
-          const double dy = gRandom->Gaus(0.0, diffusionSigma_t);
-          const double dz = gRandom->Gaus(0.0, diffusionSigma_l);
-          const VoxelID voxelDiff = findVoxel(localposx + dx, localposy + dy, localposz + dz);
+      else if (isCathodeReadout()) {
+        diffusionSigma = DiffusionSigmaCathode(localposz_hit);
+      }
+      for (int l = 0; l < numDivision; l++) {
+        const double dx = gRandom->Gaus(0.0, diffusionSigma);
+        const double dy = gRandom->Gaus(0.0, diffusionSigma);
+        const PixelID pixelDiff = findPixel(localposx_hit + dx, localposy_hit + dy);
 
-          auto itHit = find_if(diffusionHits.begin(), diffusionHits.end(),
-                               [&](const DetectorHit_sptr &hit) {
-                                 return (hit->Voxel() == voxelDiff);
-                               });
-          const double energyChargeDivision = calculateEnergyCharge(voxelDiff,
-                                                                    echargeDivision,
-                                                                    localposx_hit,
-                                                                    localposy_hit,
-                                                                    localposz_hit); // even if diffusion exists, dz is not included in CCE calculation
-          if (itHit != diffusionHits.end()) {
-            DetectorHit_sptr &hit = *itHit;
-            hit->setEnergyDeposit(hit->EnergyDeposit() + edepDivision);
-            hit->setEnergyCharge(hit->EnergyCharge() + energyChargeDivision);
-          }
-          else {
-            DetectorHit_sptr hitDivision(new DetectorHit(*hit));
-            hitDivision->setEnergyDeposit(edepDivision);
-            hitDivision->setEnergyCharge(energyChargeDivision);
-            hitDivision->setVoxel(voxelDiff);
-            diffusionHits.push_back(hitDivision);
-          }
+        const double energyChargeDivision = calculateEnergyCharge(pixelDiff,
+                                                                  echargeDivision,
+                                                                  localposx_hit,
+                                                                  localposy_hit,
+                                                                  localposz_hit); // even if diffusion exists, dz is not included in CCE calculation
+        auto itHit = find_if(diffusionHits.begin(), diffusionHits.end(),
+                             [&](const DetectorHit_sptr &hit) {
+                               return (hit->Pixel() == pixelDiff);
+                             });
+        if (itHit != diffusionHits.end()) {
+          DetectorHit_sptr &hit = *itHit;
+          hit->setEnergyDeposit(hit->EnergyDeposit() + edepDivision);
+          hit->setEnergyCharge(hit->EnergyCharge() + energyChargeDivision);
+        }
+        else {
+          DetectorHit_sptr hitDivision(new DetectorHit(*hit));
+          hitDivision->setEnergyDeposit(edepDivision);
+          hitDivision->setEnergyCharge(energyChargeDivision);
+          hitDivision->setPixel(pixelDiff);
+          diffusionHits.push_back(hitDivision);
         }
       }
 
@@ -415,8 +380,8 @@ void SimDetectorUnitLArTPC::simulatePulseHeights() {
   }
 }
 
-DetectorHit_sptr SimDetectorUnitLArTPC::generateHit(const DetectorHit &rawhit,
-                                                    const VoxelID &voxel) {
+DetectorHit_sptr SimDetectorUnitLArTPCPixel::generateHit(const DetectorHit &rawhit,
+                                                         const PixelID &pixel) {
   DetectorHit_sptr hit(new DetectorHit(rawhit));
   hit->addFlags(flag::PrioritySide);
   if (isAnodeReadout()) {
@@ -426,17 +391,35 @@ DetectorHit_sptr SimDetectorUnitLArTPC::generateHit(const DetectorHit &rawhit,
     hit->addFlags(flag::CathodeSide);
   }
 
-  if (checkRange(voxel)) {
-    hit->setVoxel(voxel);
+  if (checkRange(pixel)) {
+    hit->setPixel(pixel);
   }
   else {
-    hit->setVoxel(VoxelID::OnMergin, VoxelID::OnMergin, VoxelID::OnMergin);
+    hit->setPixel(PixelID::OnMergin, PixelID::OnMergin);
     return hit;
   }
 
   applyQuenching(hit);
-
   applyRecombination(hit);
+
   return hit;
+}
+void SimDetectorUnitLArTPCPixel::mergeHits(std::list<DetectorHit_sptr> &hits) {
+  for (auto it1 = hits.begin(); it1 != hits.end(); ++it1) {
+    auto it2 = it1;
+    ++it2;
+    while (it2 != hits.end()) {
+      if ((*it1)->isInSamePixel(**it2)) {
+        (*it1)->merge(**it2);
+        if (abs((*it1)->LocalPositionZ() - (*it2)->LocalPositionZ()) > DistanceThreshold()) {
+          (*it1)->addFlags(flag::DistantClustered);
+        }
+        it2 = hits.erase(it2);
+      }
+      else {
+        ++it2;
+      }
+    }
+  }
 }
 } /* namespace comptonsoft */

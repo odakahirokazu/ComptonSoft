@@ -21,6 +21,7 @@ void LArTPCDeviceSimulation::printSimulationParameters(std::ostream &os) const {
   os << "  Transverse diffusion coefficient: " << transverseDiffusionCoefficient_ / (CLHEP::cm2 / CLHEP::s) << " cm^2/s\n";
   if (recombinationModel_) {
     recombinationModel_->printInfo(os);
+    os << "  Photon efficiency: " << PhotonEfficiency(0, 0, 0) << "\n";
   }
   else {
     os << "  No recombination model is set.\n";
@@ -156,24 +157,42 @@ std::tuple<double, double> LArTPCDeviceSimulation::compensateEPIRecombinationIte
 void LArTPCDeviceSimulation::instantiateRecombinationModel(const std::string &config_filename) {
   recombinationModel_ = VLArRecombinationModelFactory::load(config_filename);
 }
-double LArTPCDeviceSimulation::applyRecombination(DetectorHit_sptr hit) const {
+
+void LArTPCDeviceSimulation::applyRecombination(DetectorHit_sptr &hit) {
   const double edep = hit->EnergyDeposit();
   if (!recombinationModel_) {
-    return edep;
+    hit->setPhotonCount(0.0);
+    hit->setEnergyCharge(edep);
+    return;
   }
-  if (edep <= 0.0) return edep;
-  if (!hit->isContinuousProcess()) return edep;
+  if (edep <= 0.0) {
+    hit->setPhotonCount(0.0);
+    hit->setEnergyCharge(0.0);
+    return;
+  }
+  if (!hit->isContinuousProcess()) {
+    hit->setPhotonCount(recombinationModel_->lightYield(edep, 1.0));
+    hit->setEnergyCharge(edep);
+    return;
+  }
   const double ken = hit->KineticEnergy();
   //std::cout << "Applying recombination model: edep = " << edep / keV
   //          << " keV, kinetic energy = " << ken / keV << " keV" << std::endl;
   const double dedx = getdEdxFromKineticEnergy(ken);
   //std::cout << "  dEdx = " << dedx/ (keV/cm) << " keV/cm" << std::endl;
   if (dedx <= 0.0) {
-    return edep;
+    hit->setPhotonCount(recombinationModel_->lightYield(edep, 1.0));
+    hit->setEnergyCharge(edep);
+    return;
   }
-  const double recombination_factor = recombinationModel_->electronLet(dedx, BiasVoltage() / getThickness()) / dedx;
-  //std::cout << "Recombination model applied: recombination_factor = " << recombination_factor << " edep_new = " << recombination_factor * edep << std::endl;
-  return std::max(edep * recombination_factor, 0.0);
+  const double recombination_factor = recombinationModel_->getRecombinationFactor(dedx, BiasVoltage() / getThickness());
+  //std::cout << "Recombination model applied: recombination_factor = " << recombination_factor << " edep_new = " << recombination_factor * edep / keV << " keV" << std::endl;
+  const auto new_edep = std::max(edep * recombination_factor, 0.0);
+  const auto new_light_count = recombinationModel_->lightYield(edep, recombination_factor);
+  //const auto new_light_count = recombinationModel_->lightYield(edep, recombination_factor) * PhotonEfficiency(hit->LocalPositionX(), hit->LocalPositionY(), hit->LocalPositionZ());
+  //std::cout << "  Light count: " << new_light_count << std::endl;
+  hit->setPhotonCount(new_light_count);
+  hit->setEnergyCharge(new_edep);
 }
 double LArTPCDeviceSimulation::getdEdxFromKineticEnergy(double kineticEnergy) const {
   if (kineticEnergy <= 0.0) {

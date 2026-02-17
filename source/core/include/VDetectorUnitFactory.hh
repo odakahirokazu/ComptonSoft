@@ -43,6 +43,7 @@ public:
   virtual VRealDetectorUnit* createDetectorUnitScintillator() = 0;
   virtual VRealDetectorUnit* createDetectorUnit3DVoxel() = 0;
   virtual VRealDetectorUnit* createDetectorUnitLArTPC() = 0;
+  virtual VRealDetectorUnit* createDetectorUnitLArTPCPixel() = 0;
 
 private:
   VDetectorUnitFactory(const VDetectorUnitFactory&) = delete;

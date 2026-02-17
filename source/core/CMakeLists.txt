@@ -42,6 +42,7 @@ set(CS_CORE_CLASSES
   src/RealDetectorUnitScintillator.cc
   src/RealDetectorUnit3DVoxel.cc
   src/RealDetectorUnitLArTPC.cc
+  src/RealDetectorUnitLArTPCPixel.cc
   ### device simulation
   src/EFieldModel.cc
   src/VDeviceSimulation.cc
@@ -52,6 +53,7 @@ set(CS_CORE_CLASSES
   src/SimDetectorUnitScintillator.cc
   src/SimDetectorUnit3DVoxel.cc
   src/SimDetectorUnitLArTPC.cc
+  src/SimDetectorUnitLArTPCPixel.cc
   src/WeightingPotentialPixel.cc
   src/WeightingPotentialStrip.cc
   ### detector unit factory

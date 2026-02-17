@@ -41,13 +41,29 @@ public:
   virtual ~VLArRecombinationModel();
 
   // Pure virtual function to calculate recombination energy
-  virtual double electronLet(double let, double electricField) const = 0;
-  virtual double lightYieldPerLength(double let, double electricField) const {
-    return (let - electronLet(let, electricField)) / Wexc();
-  };
-  double electronYieldPerLength(double let, double electricField) const {
-    return electronLet(let, electricField) / Wion();
+  virtual double electronDeDx(double dedx, double electricField) const = 0;
+  double lightYieldPerLength(double dedx, double electricField) const {
+    return dedx/Wexc() - electronYieldPerLength(dedx, electricField);
   }
+  double electronYieldPerLength(double dedx, double electricField) const {
+    return electronDeDx(dedx, electricField) / Wion();
+  }
+  double getRecombinationFactor(double dedx, double electricField) const {
+    const double recombination_dedx = electronDeDx(dedx, electricField);
+    if (dedx <= 0.0) {
+      return 1.0;
+    }
+    return recombination_dedx / dedx;
+  }
+  double lightYield(double edep, double recombination_factor) const {
+    if (edep <= 0.0) {
+      return 0.0;
+    }
+    const double total_quanta = edep / Wexc();
+    const double light = total_quanta - recombination_factor * edep / Wion();
+    return std::max(light, 0.0);
+  }
+  
   std::string name() const { return name_; }
   virtual void printInfo(std::ostream &os) const;
   int RandomizeMode() const { return randomizeMode_; }
@@ -55,10 +71,10 @@ public:
   double FanoFactor() const { return fanoFactor_; }
   void setFanoFactor(double fano) { fanoFactor_ = fano; }
 
-protected:
   double Wion() const { return Wion_; } /// Ionization energy of LAr
   double Wexc() const { return Wexc_; } /// Excitation energy of LAr
   double Rho() const { return rho_; } /// Density of LAr
+
 private:
   std::string name_ = "VLArRecombinationModel";
   double Wion_ = 23.6 * CLHEP::eV; // in eV
@@ -67,7 +83,6 @@ private:
   int randomizeMode_ = 0; // 0: no randomization, 1: Binomial
   double fanoFactor_ = 0.107; // Fano factor for LAr // Reference: Bonivento, W. M. and Terranova, F., "The science and technology of liquid argon detectors", 2024,
   mutable std::mt19937 rng_;
-  double lightCollectionEfficiency_ = 0.0; // default: lightCollectionEfficiency_ = 0.0;
   unsigned int seed_ = 0;
 
 protected:

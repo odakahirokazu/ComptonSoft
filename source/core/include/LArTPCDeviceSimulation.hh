@@ -24,7 +24,7 @@ public:
   virtual ~LArTPCDeviceSimulation() = default;
 
   void instantiateRecombinationModel(const std::string &config_filename) override;
-  double applyRecombination(DetectorHit_sptr hit) const override;
+  void applyRecombination(DetectorHit_sptr &hit) override;
   void printSimulationParameters(std::ostream &os) const override;
   double DiffusionSigmaAnode3D(double z, double &longitudinal, double &transverse);
   double DiffusionSigmaCathode(double z) override;
@@ -42,6 +42,11 @@ public:
   double getdEdxFromKineticEnergy(double kineticEnergy) const;
   void setdEdxFile(const std::string &filename, const std::string &spline_name="dedx_spline");
   TSpline *getdEdxSpline() const { return dedxSpline_; }
+  
+  void setPhotonEfficiency(double photonEfficiency) { photonEfficiency_ = photonEfficiency; }
+  virtual double PhotonEfficiency(double /*x*/, double /*y*/, double /*z*/) const { return photonEfficiency_; }
+  
+  const VLArRecombinationModel* recombinationModel() const override { return recombinationModel_.get(); }
 
 private:
   std::unique_ptr<VLArRecombinationModel> recombinationModel_;
@@ -49,6 +54,7 @@ private:
   double longitudinalDiffusionCoefficient_ = 0.0;
   double transverseDiffusionCoefficient_ = 0.0;
   double driftVelocity_ = -1.0;
+  double photonEfficiency_ = 1.0;
   TFile *responseFileForEPI_ = nullptr;
   std::vector<TGraph *> responseGraphListForEPI_;
   TFile *dedxFile_ = nullptr;

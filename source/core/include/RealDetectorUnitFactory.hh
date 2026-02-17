@@ -37,6 +37,7 @@ public:
   VRealDetectorUnit* createDetectorUnitScintillator() override;
   VRealDetectorUnit* createDetectorUnit3DVoxel() override;
   VRealDetectorUnit* createDetectorUnitLArTPC() override;
+  VRealDetectorUnit* createDetectorUnitLArTPCPixel() override;
 };
 
 } /* namespace comptonsoft */

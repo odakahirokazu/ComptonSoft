@@ -129,6 +129,7 @@ public:
     boost::optional<double> clustering_energy_threshold = boost::none;
     boost::optional<double> clustering_split_threshold = boost::none;
     boost::optional<int> clustering_range = boost::none;
+    boost::optional<double> photon_efficiency = boost::none;
 
     void load(const boost::property_tree::ptree& node);
   };
