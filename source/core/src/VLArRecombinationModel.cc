@@ -1,10 +1,11 @@
 #include "VLArRecombinationModel.hh"
+#include "TRandom3.h"
 namespace comptonsoft {
 VLArRecombinationModel::VLArRecombinationModel() = default;
-VLArRecombinationModel::VLArRecombinationModel(const std::string &name, unsigned int seed) : name_(name), rng_(std::mt19937(seed)), seed_(seed) {}
+VLArRecombinationModel::VLArRecombinationModel(const std::string &name) : name_(name){}
 VLArRecombinationModel::~VLArRecombinationModel() = default;
 
-VLArRecombinationModel::VLArRecombinationModel(const std::string &name, const std::map<std::string, double> &params, unsigned int seed) : name_(name), rng_(std::mt19937(seed)), seed_(seed) {
+VLArRecombinationModel::VLArRecombinationModel(const std::string &name, const std::map<std::string, double> &params) : name_(name) {
   auto it = params.find("Wion");
   if (it != params.end()) {
     Wion_ = it->second * CLHEP::eV;
@@ -34,8 +35,7 @@ void VLArRecombinationModel::printInfo(std::ostream &os) const {
      << "  Wexc: " << Wexc_ / (CLHEP::eV) << " eV\n"
      << "  Density: " << rho_ / (CLHEP::g / CLHEP::cm3) << " g/cm3\n"
      << "  Fano Factor: " << fanoFactor_ << "\n"
-     << "  Randomize Mode: " << randomizeMode_ << "\n"
-     << "  Random Number Generator Seed: " << seed_ << "\n";
+     << "  Randomize Mode: " << randomizeMode_ << "\n";
 }
 
 double VLArRecombinationModel::Binomial(const int n, double p) const {
@@ -58,19 +58,18 @@ double VLArRecombinationModel::Binomial(const int n, double p) const {
   }
 
   if (lambda <= 5.0 && p <= 0.05) {
-    std::poisson_distribution<int> pois(lambda);
-    const int nElectron = pois(rng_);
+    const int nElectron = gRandom->Poisson(lambda);
     return inverted ? n - nElectron : nElectron;
   }
   else if (lambda >= T && nq >= T) {
     std::normal_distribution<double> norm(lambda, std::sqrt(lambda * (1.0 - p)));
-    const int nElectron = static_cast<int>(std::lround(norm(rng_)));
+    const double sigma = gRandom->Gaus(lambda, std::sqrt(lambda * (1.0 - p)));
+    const int nElectron = static_cast<int>(std::lround(sigma));
     return inverted ? (n - std::clamp(nElectron, 0, n)) : std::clamp(nElectron, 0, n);
   }
   else {
     // Use binomial distribution directly
-    std::binomial_distribution<int> binom(n, p);
-    const int nElectron = binom(rng_);
+    const int nElectron = gRandom->Binomial(n, p);
     return inverted ? n - nElectron : nElectron;
   }
   return 0;
