@@ -58,6 +58,7 @@ void HitTreeIO::defineBranches()
   hittree_->Branch("epi",              &epi_,              "epi/F");
   hittree_->Branch("epi_error",        &epi_error_,        "epi_error/F");
   hittree_->Branch("photon_count",     &photon_count_,    "photon_count/F");
+  hittree_->Branch("photon_count_error", &photon_count_error_, "photon_count_error/F");
   hittree_->Branch("flag_data",        &flag_data_,        "flag_data/l");
   hittree_->Branch("flags",            &flags_,            "flags/l");
   
@@ -116,6 +117,7 @@ void HitTreeIO::setBranchAddresses()
   hittree_->SetBranchAddress("epi",              &epi_);
   hittree_->SetBranchAddress("epi_error",        &epi_error_);
   hittree_->SetBranchAddress("photon_count",     &photon_count_);
+  hittree_->SetBranchAddress("photon_count_error", &photon_count_error_);
   hittree_->SetBranchAddress("flag_data",        &flag_data_);
   hittree_->SetBranchAddress("flags",            &flags_);
 
@@ -178,6 +180,7 @@ void HitTreeIO::fillHits(const int64_t eventID,
     epi_ = hit->EPI() / unit::keV;
     epi_error_ = hit->EPIError() / unit::keV;
     photon_count_ = hit->PhotonCount();
+    photon_count_error_ = hit->PhotonCountError();
     flag_data_ = hit->FlagData();
     flags_ = hit->Flags();
     trackid_ = hit->TrackID();
@@ -227,6 +230,7 @@ DetectorHit_sptr HitTreeIO::retrieveHit() const
   hit->setEPI(epi_ * unit::keV);
   hit->setEPIError(epi_error_ * unit::keV);
   hit->setPhotonCount(photon_count_);
+  hit->setPhotonCountError(photon_count_error_);
   hit->setFlagData(flag_data_);
   hit->setFlags(flags_);
   hit->setTrackID(trackid_);

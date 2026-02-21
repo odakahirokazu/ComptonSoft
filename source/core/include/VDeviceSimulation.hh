@@ -203,7 +203,31 @@ public:
                                        double x, double y, double z) const = 0;
   virtual std::tuple<double, double> calculateEPI(double energyCharge, const PixelID& pixel) const = 0;
   void makeEPI(DetectorHit_sptr hit);
-  virtual double calculatePhotonCount(double photonCount) const { return photonCount; }
+
+  void makePhotonCount();
+  std::tuple<double, double> applyNoiseToPhotonCount(double photonCount);
+
+  void setPhotonNoiseParam0(double param0) {
+    photonNoiseParam0_ = param0;
+  }
+  double PhotonNoiseParam0() const {
+    return photonNoiseParam0_;
+  }
+  void setPhotonNoiseParam1(double param1) {
+    photonNoiseParam1_ = param1;
+  }
+  double PhotonNoiseParam1() const {
+    return photonNoiseParam1_;
+  }
+  void setPhotonNoiseParam2(double param2) {
+    photonNoiseParam2_ = param2;
+  }
+  double PhotonNoiseParam2() const {
+    return photonNoiseParam2_;
+  }
+  void setPhotonEfficiency(double photonEfficiency) { photonEfficiency_ = photonEfficiency; }
+  virtual double PhotonEfficiency(double /*x*/, double /*y*/, double /*z*/) const { return photonEfficiency_; }
+
 
   bool checkTriggerDiscrimination(double energyCharge, const PixelID& pixel) const;
 
@@ -306,6 +330,11 @@ private:
   double TimeResolutionSlow_;
 
   bool pedestalEnabled_;
+  
+  double photonEfficiency_ = 1.0;
+  double photonNoiseParam0_ = 0.0;
+  double photonNoiseParam1_ = 0.0;
+  double photonNoiseParam2_ = 0.0;
 
   std::vector<DetectorHit_sptr> RawHits_;
   std::list<DetectorHit_sptr> SimulatedHits_;

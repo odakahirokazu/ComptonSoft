@@ -85,6 +85,7 @@ private:
   std::array<float, MaxHits> pha_;
   std::array<float, MaxHits> epi_;
   std::array<float, MaxHits> photon_count_;
+  std::array<float, MaxHits> photon_count_error_;
   uint64_t flag_data_ = 0ul;
   uint64_t flags_ = 0ul;
   // simulation

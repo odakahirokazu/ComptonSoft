@@ -327,6 +327,7 @@ void SimDetectorUnitLArTPCPixel::simulatePulseHeights() {
       const double edep_hit = hit->EnergyDeposit();
       const double edepDivision = edep_hit / numDivision;
       const double energyChargeDivision = energyCharge / numDivision;
+      const double photonCountDivision = hit->PhotonCount() / numDivision;
 
       std::vector<DetectorHit_sptr> diffusionHits;
       double diffusionSigma = 0.0;
@@ -355,11 +356,13 @@ void SimDetectorUnitLArTPCPixel::simulatePulseHeights() {
           DetectorHit_sptr &hit = *itHit;
           hit->setEnergyDeposit(hit->EnergyDeposit() + edepDivision);
           hit->setEnergyCharge(hit->EnergyCharge() + energyChargeDivision);
+          hit->setPhotonCount(hit->PhotonCount() + photonCountDivision);
         }
         else {
           DetectorHit_sptr hitDivision(new DetectorHit(*hit));
           hitDivision->setEnergyDeposit(edepDivision);
           hitDivision->setEnergyCharge(energyChargeDivision);
+          hitDivision->setPhotonCount(photonCountDivision);
           hitDivision->setPixel(pixelDiff);
           diffusionHits.push_back(hitDivision);
         }
@@ -371,49 +374,57 @@ void SimDetectorUnitLArTPCPixel::simulatePulseHeights() {
       }
     }
     
-     // adjacent pad
+    // adjacent pad
     if (ChargeCollectionMode()>=3) {
       DetectorHit_sptr hit;
       PixelID adjacentPixel;
-     
+      
       adjacentPixel.set(pixel.X()+1, pixel.Y()+1);
       hit = generateHit(*rawhit, adjacentPixel);
       hit->setEnergyDeposit(0.0);
+      hit->setPhotonCount(0.0);
       insertSimulatedHit(hit);
       
       adjacentPixel.set(pixel.X()+1, pixel.Y());
       hit = generateHit(*rawhit, adjacentPixel);
       hit->setEnergyDeposit(0.0);
+      hit->setPhotonCount(0.0);
       insertSimulatedHit(hit);
       
       adjacentPixel.set(pixel.X()+1, pixel.Y()-1);
       hit = generateHit(*rawhit, adjacentPixel);
       hit->setEnergyDeposit(0.0);
+      hit->setPhotonCount(0.0);
       insertSimulatedHit(hit);
       
       adjacentPixel.set(pixel.X()  , pixel.Y()+1);
       hit = generateHit(*rawhit, adjacentPixel);
       hit->setEnergyDeposit(0.0);
+      hit->setPhotonCount(0.0);
       insertSimulatedHit(hit);
       
       adjacentPixel.set(pixel.X()  , pixel.Y()-1);
       hit = generateHit(*rawhit, adjacentPixel);
       hit->setEnergyDeposit(0.0);
+      hit->setPhotonCount(0.0);
       insertSimulatedHit(hit);
       
       adjacentPixel.set(pixel.X()-1, pixel.Y()+1);
       hit = generateHit(*rawhit, adjacentPixel);
       hit->setEnergyDeposit(0.0);
+      hit->setPhotonCount(0.0);
       insertSimulatedHit(hit);
       
       adjacentPixel.set(pixel.X()-1, pixel.Y()  );
       hit = generateHit(*rawhit, adjacentPixel);
       hit->setEnergyDeposit(0.0);
+      hit->setPhotonCount(0.0);
       insertSimulatedHit(hit);
       
       adjacentPixel.set(pixel.X()-1, pixel.Y()-1);
       hit = generateHit(*rawhit, adjacentPixel);
       hit->setEnergyDeposit(0.0);
+      hit->setPhotonCount(0.0);
       insertSimulatedHit(hit);
     }
   }
@@ -453,6 +464,7 @@ DetectorHit_sptr SimDetectorUnitLArTPCPixel::generateHit(const DetectorHit &rawh
 
   return hit;
 }
+
 void SimDetectorUnitLArTPCPixel::mergeHits(std::list<DetectorHit_sptr> &hits) {
   for (auto it1 = hits.begin(); it1 != hits.end(); ++it1) {
     auto it2 = it1;

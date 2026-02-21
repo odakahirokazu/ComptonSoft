@@ -70,6 +70,7 @@ void VDeviceSimulation::initializeTables()
 void VDeviceSimulation::makeDetectorHits()
 {
   simulatePulseHeights();
+  makePhotonCount();
   removeHitsOutOfPixelRange(SimulatedHits_);
   mergeHits(SimulatedHits_);
 
@@ -217,10 +218,35 @@ void VDeviceSimulation::makeEPI(DetectorHit_sptr hit)
 {
   double ePI(0.0), ePIError(0.0);
   std::tie(ePI, ePIError) = calculateEPI(hit->EnergyCharge(), hit->Pixel());
-  const double photon_count = calculatePhotonCount(hit->PhotonCount());
   hit->setEPI(ePI);
   hit->setEPIError(ePIError);
-  hit->setPhotonCount(photon_count);
+}
+
+void VDeviceSimulation::makePhotonCount() {
+  double photonCount = 0.0;
+  for (auto& hit: SimulatedHits_) {
+    photonCount += hit->PhotonCount() * photonEfficiency_;
+  }
+  double photonCountWithNoise(0.0), photonCountError(0.0);
+  std::tie(photonCountWithNoise, photonCountError) = applyNoiseToPhotonCount(photonCount);
+  for (auto& hit: SimulatedHits_) {
+    hit->setPhotonCount(photonCountWithNoise);
+    hit->setPhotonCountError(photonCountError);
+  }
+}
+
+std::tuple<double, double> VDeviceSimulation::applyNoiseToPhotonCount(double photonCount) {
+  if (photonCount <= 0.0) {
+    return std::make_tuple(0.0, 0.0);
+  }
+  const double param0 = PhotonNoiseParam0();
+  const double param1 = PhotonNoiseParam1();
+  const double param2 = PhotonNoiseParam2();
+  const double noise = param0 + param1 * photonCount + param2 * photonCount * photonCount;
+  if (noise < 0.0) {
+    return std::make_tuple(photonCount, 0.0);
+  }
+  return std::make_tuple(CLHEP::RandGauss::shoot(photonCount, std::sqrt(noise)), std::sqrt(noise));
 }
 
 bool VDeviceSimulation::

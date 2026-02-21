@@ -1060,27 +1060,7 @@ void DetectorSystem::setupDetectorParameters(const DetectorSystem::ParametersNod
         }
       }
     }
-    
-    if (auto o = parameters.photon_efficiency) {
-      if (ds1) {        
-        ds1->setPhotonEfficiency(*o);
-      }
-    }
-    if (auto o = parameters.photon_noise_param0) {
-      if (ds1) {
-        ds1->setPhotonNoiseParam0(*o);
-      }
-    }
-    if (auto o = parameters.photon_noise_param1) {
-      if (ds1) {
-        ds1->setPhotonNoiseParam1(*o);
-      }
-    }
-    if (auto o = parameters.photon_noise_param2) {
-      if (ds1) {
-        ds1->setPhotonNoiseParam2(*o);
-      }
-    }
+
   }
   
   if (ds->checkType(DetectorType::LArTPCPixel)) {
@@ -1131,28 +1111,6 @@ void DetectorSystem::setupDetectorParameters(const DetectorSystem::ParametersNod
         else {
           ds1->setResponseFileForEPI(*o);
         }
-      }
-    }
- 
-    if (auto o = parameters.photon_efficiency) {
-      if (ds1) {        
-        ds1->setPhotonEfficiency(*o);
-      }
-    }
-    
-    if (auto o = parameters.photon_noise_param0) {
-      if (ds1) {
-        ds1->setPhotonNoiseParam0(*o);
-      }
-    }
-    if (auto o = parameters.photon_noise_param1) {
-      if (ds1) {
-        ds1->setPhotonNoiseParam1(*o);
-      }
-    }
-    if (auto o = parameters.photon_noise_param2) {
-      if (ds1) {
-        ds1->setPhotonNoiseParam2(*o);
       }
     }
   }
@@ -1417,6 +1375,19 @@ void DetectorSystem::setupDetectorParameters(const DetectorSystem::ParametersNod
       const double value = (*o)*unit::keV;
       ds->resetThresholdVector(value);
     }
+  }
+  
+  if (auto o = parameters.photon_efficiency) {
+      ds->setPhotonEfficiency(*o);
+  }
+  if (auto o = parameters.photon_noise_param0) {
+      ds->setPhotonNoiseParam0(*o);
+  }
+  if (auto o = parameters.photon_noise_param1) {
+      ds->setPhotonNoiseParam1(*o);
+  }
+  if (auto o = parameters.photon_noise_param2) {
+      ds->setPhotonNoiseParam2(*o);
   }
 
   VRealDetectorUnit* detector = dynamic_cast<VRealDetectorUnit*>(ds);

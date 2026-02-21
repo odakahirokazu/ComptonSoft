@@ -84,6 +84,7 @@ private:
   float epi_ = 0.0;
   float epi_error_ = 0.0;
   float photon_count_ = 0.0;
+  float photon_count_error_ = 0.0;
   uint64_t flag_data_ = 0ul;
   uint64_t flags_ = 0ul;
   // simulation

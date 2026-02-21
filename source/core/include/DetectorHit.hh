@@ -131,6 +131,8 @@ public:
   
   double PhotonCount() const { return photonCount_; }
   void setPhotonCount(double v) { photonCount_ = v; }
+  void setPhotonCountError(double v) { photonCountError_ = v; }
+  double PhotonCountError() const { return photonCountError_; }
 
   void setFlagData(uint64_t v) { flagData_ = v; }
   uint64_t FlagData() const { return flagData_; }
@@ -321,6 +323,7 @@ private:
   double EPI_ = 0.0;
   double EPIError_ = 0.0;
   double photonCount_ = 0.0;
+  double photonCountError_ = 0.0;
   uint64_t flagData_ = 0ul;
   uint64_t flags_ = 0ul;
   // simulation

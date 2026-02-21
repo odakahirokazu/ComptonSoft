@@ -192,7 +192,7 @@ void LArTPCDeviceSimulation::applyRecombination(DetectorHit_sptr &hit) {
   const auto new_edep = std::max(edep * recombination_factor, 0.0);
   const auto new_light_count = recombinationModel_->lightYield(edep, recombination_factor) * PhotonEfficiency(hit->LocalPositionX(), hit->LocalPositionY(), hit->LocalPositionZ());
   //std::cout << "  Light count: " << new_light_count << std::endl;
-  hit->setPhotonCount(new_light_count * PhotonEfficiency(hit->LocalPositionX(), hit->LocalPositionY(), hit->LocalPositionZ()));
+  hit->setPhotonCount(new_light_count);
   hit->setEnergyCharge(new_edep);
 }
 
@@ -218,20 +218,5 @@ void LArTPCDeviceSimulation::setdEdxFile(const std::string &filename, const std:
   if (!dedxSpline_) {
     throw std::runtime_error("LArTPCDeviceSimulation::setdEdxFile: Cannot find spline: " + spline_name);
   }
-}
-
-double LArTPCDeviceSimulation::calculatePhotonCount(double photonCount) const {
-  if (photonCount <= 0.0) {
-    return 0.0;
-  }
-  const double param0 = PhotonNoiseParam0();
-  const double param1 = PhotonNoiseParam1();
-  const double param2 = PhotonNoiseParam2();
-  const double noise = param0 + param1 * photonCount + param2 * photonCount * photonCount;
-  //std::cout << "Calculating photon count with noise: photonCount = " << photonCount << ", noise^2 = " << noise << std::endl;
-  if (noise < 0.0) {
-    return photonCount;
-  }
-  return CLHEP::RandGauss::shoot(photonCount, std::sqrt(noise));
 }
 } // namespace comptonsoft
