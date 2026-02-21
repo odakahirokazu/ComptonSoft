@@ -32,8 +32,14 @@ RealDetectorUnitLArTPC::RealDetectorUnitLArTPC()
 
 RealDetectorUnitLArTPC::~RealDetectorUnitLArTPC() = default;
 
-bool RealDetectorUnitLArTPC::setReconstructionDetails(int mode)
-{
+void RealDetectorUnitLArTPC::printDetectorParameters(std::ostream &os) const {
+  VRealDetectorUnit::printDetectorParameters(os);
+  os << "  Recombination correction: " << isRecombinationCorrectionEnabled()<< "\n";
+  os << "  Wion: " << Wion_/CLHEP::eV << " eV" << "\n";
+  os << "  Wexc: " << Wexc_/CLHEP::eV << " eV" << "\n";
+}
+
+bool RealDetectorUnitLArTPC::setReconstructionDetails(int mode) {
   if (mode == 1 || mode == 4) {
     // basic reconstruction with clustering
     setClusteringOn(true);
@@ -73,6 +79,9 @@ void RealDetectorUnitLArTPC::reconstruct(const DetectorHitVector& hitSignals,
       cluster(hitsReconstructed);
     }
   }
+  if (isRecombinationCorrectionEnabled()) {
+    applyRecombinationCorrection(hitsReconstructed);
+  }
 }
 
 void RealDetectorUnitLArTPC::determinePosition(DetectorHitVector& hits) const
@@ -82,6 +91,21 @@ void RealDetectorUnitLArTPC::determinePosition(DetectorHitVector& hits) const
     hit->setPosition(Position(voxel));
     hit->setLocalPosition(LocalPosition(voxel));
     hit->setPositionError(PositionError(hit->LocalPositionError()));
+  }
+}
+
+void RealDetectorUnitLArTPC::applyRecombinationCorrection(DetectorHitVector &hits) {
+  const auto wexc = Wexc();
+  const auto wion = Wion();
+  for (auto &hit: hits) {
+    const auto epi = hit->EPI();
+    const auto epi_error = hit->EPIError();
+    const auto photon_count = hit->PhotonCount();
+    const auto photon_count_error = hit->PhotonCountError();
+    const double corrected_epi = (epi / wion + photon_count) * wexc;
+    const double corrected_epi_error = wexc * std::sqrt(std::pow(epi_error / wion, 2) + std::pow(photon_count_error, 2)); // propagation of uncertainty
+    hit->setEPI(corrected_epi);
+    hit->setEPIError(corrected_epi_error);
   }
 }
 

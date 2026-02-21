@@ -21,6 +21,7 @@
 #define COMPTONSOFT_RealDetectorUnitLArTPC_H 1
 
 #include "VRealDetectorUnit.hh"
+#include "CLHEP/Units/SystemOfUnits.h"
 
 namespace comptonsoft {
 
@@ -29,6 +30,7 @@ namespace comptonsoft {
  * @author Shota Arai
  * @date 2025-06-27
  * @date 2025-10-10 | defined DetectorType as LArTPC
+ * @date 2026-02-21 | added recombination correction
  */
 class RealDetectorUnitLArTPC : public VRealDetectorUnit
 {
@@ -57,7 +59,16 @@ public:
     return (ReadoutElectrode()!=ElectrodeSide::Undefined &&
             ReadoutElectrode()!=BottomSideElectrode());
   }
-
+  bool isRecombinationCorrectionEnabled() const { return isRecombinationCorrectionEnabled_; }
+  bool setRecombinationCorrectionEnabled(bool v) { return isRecombinationCorrectionEnabled_ = v; }
+  
+  void setWion(double v) { Wion_ = v; }
+  double Wion() const { return Wion_; }
+  void setWexc(double v) { Wexc_ = v; }
+  double Wexc() const { return Wexc_; }
+  
+  void printDetectorParameters(std::ostream& os) const override;
+  
 protected:
   bool setReconstructionDetails(int mode) override;
   void reconstruct(const DetectorHitVector& hitSignals,
@@ -65,9 +76,13 @@ protected:
 
 private:
   void determinePosition(DetectorHitVector& hits) const;
+  void applyRecombinationCorrection(DetectorHitVector &hits);
 
 private:
   ElectrodeSide readoutElectrode_;
+  bool isRecombinationCorrectionEnabled_ = true;
+  double Wion_ = 23.6 * CLHEP::eV; // Ionization energy in liquid argon
+  double Wexc_ = 19.5 * CLHEP::eV; // Excitation energy in liquid argon
 };
 
 } /* namespace comptonsoft */

@@ -1431,6 +1431,22 @@ void DetectorSystem::setupReconstructionParameters(const DetectorSystem::Paramet
       detector->setClusteringRange(*o3);
     }
   }
+  if (detector->checkType(DetectorType::LArTPC)) {
+    RealDetectorUnitLArTPC* ds1 = dynamic_cast<RealDetectorUnitLArTPC*>(detector);
+    if (ds1) {
+      if (auto o = parameters.recombination_correction) {
+        ds1->setRecombinationCorrectionEnabled(*o);
+      }
+    }
+  }
+  if (detector->checkType(DetectorType::LArTPCPixel)) {
+    RealDetectorUnitLArTPCPixel* ds1 = dynamic_cast<RealDetectorUnitLArTPCPixel*>(detector);
+    if (ds1) {
+      if (auto o = parameters.recombination_correction) {
+        ds1->setRecombinationCorrectionEnabled(*o);
+      }
+    }
+  }
 }
 
 void DetectorSystem::ChannelNodeContents::
@@ -1624,6 +1640,15 @@ load(const boost::property_tree::ptree& node)
   }
   if (auto o=node.get_optional<int>("reconstruction.<xmlattr>.clustering_range")) {
     clustering_range = o;
+  }
+  if (auto o=node.get_optional<int>("reconstruction.<xmlattr>.recombination_correction")) {
+    recombination_correction = o;
+  }
+  if (auto o=node.get_optional<double>("reconstruction.<xmlattr>.w_ion")) {
+    w_ion = o.value() * unit::eV;
+  }
+  if (auto o=node.get_optional<double>("reconstruction.<xmlattr>.w_exc")) {
+    w_exc = o.value() * unit::eV;
   }
   if (auto o=node.get_optional<std::string>("recombination.<xmlattr>.filename")) {
     recombination_configuration_file = o;

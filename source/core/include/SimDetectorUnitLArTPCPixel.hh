@@ -31,8 +31,7 @@ namespace comptonsoft {
 /**
  * A class of a LArTPC detector unit including device simulations.
  * @author Shota Arai
- * @date 2025-07-12
- * @date 2025-10-10 | inherited LArTPCDeviceSimulation & removed recombination caliculation feature
+ * @date 2026-02-17
  */
 class SimDetectorUnitLArTPCPixel
     : public RealDetectorUnitLArTPCPixel,

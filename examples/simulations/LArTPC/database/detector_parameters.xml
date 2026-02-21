@@ -7,7 +7,7 @@
   <auto_position flag="0" />
   <sensitive_detector_not_found_warning flag="1" />
   <data>
-    <sensitive_detector type="LArTPC" name="LArBox.log">
+    <sensitive_detector type="LArTPCPixel" name="LArBox.log">
       <common>
         <parameters>
           <upside anode="1" readout="1" />
@@ -17,9 +17,9 @@
             <mutau electron="1e20" hole="1e20" />
           </charge_collection>
           <diffusion mode="1">
-            <coefficient transverse="" longitudinal="6.50851478" />
+            <coefficient transverse="2.472" longitudinal="6.822" /> <!-- in cm2/s-->
           </diffusion>
-          <drift_velocity value="1.22966088e5" />
+          <drift_velocity value="164831." /> <!-- in cm/s-->
           <channel_properties>
             <disable status="0" />
             <noise_level param0="0.0" param1="0.0" param2="0.0" />
@@ -27,8 +27,8 @@
             <threshold value="0.0" />
           </channel_properties>
           <efield bias="9000.0" /> <!-- 300 V/cm -->
-          <recombination filename="database/recombination.xml" />
-          <reconstruction mode="4" clustering_energy_threshold="2.0" clustering_split_threshold="1.0" clustering_range="3" />
+          <recombination filename="database/recombination.xml" photon_efficiency="1.0" />
+          <reconstruction mode="4" clustering_energy_threshold="2.0" clustering_split_threshold="1.0" clustering_range="3" recombination_correction="1" w_ion="23.6" w_exc="19.5" /> <!-- clustering_energy_threshold and clustering_split_threshold are in keV, clustering_range is in number of pixels W values are in eV-->
         </parameters>
       </common>
       <detector_list id_method="path" layer_offset="1">
