@@ -419,7 +419,7 @@ void VRealDetectorUnit::cluster(DetectorHitVector& hits) const
 void VRealDetectorUnit::clusterByThreshold(DetectorHitVector &hits) const {
   const auto energyThreshold = ClusteringEnergyThreshold();
   const auto splitThreshold = ClusteringSplitThreshold();
-  std::cout << "Clustering with energy threshold " << energyThreshold/CLHEP::keV << " keV and split threshold " << splitThreshold/CLHEP::keV << " keV." << std::endl;
+  //std::cout << "Clustering with energy threshold " << energyThreshold/CLHEP::keV << " keV and split threshold " << splitThreshold/CLHEP::keV << " keV." << std::endl;
   const auto clusteringRange = ClusteringRange();
   const int clusteringRange_z = (getNumVoxelZ() > 1 ? clusteringRange : 0);
   
@@ -429,41 +429,44 @@ void VRealDetectorUnit::clusterByThreshold(DetectorHitVector &hits) const {
   };
   std::vector<int> splitIdx; // index of hits with EPI above split threshold (expressed in hits)
   std::vector<int> mainIdx; // index of hits with EPI above energy threshold (expressed in splitIdx)
-
+  std::vector<uint8_t> merged;
   const int num_hits = hits.size();
-  std::cout << "Number of hits before clustering: " << num_hits << std::endl;
+  merged.reserve(hits.size());
+  DetectorHitVector clusteredHits;
+
+  //std::cout << "Number of hits before clustering: " << num_hits << std::endl;
   for (int i = 0; i < num_hits; ++i) {
-    std::cout << "Hit " << i << ": EPI = " << hits[i]->EPI()/CLHEP::keV << " keV." << std::endl;
+    merged.clear();
+    clusteredHits.clear();
+    //std::cout << "Hit " << i << ": EPI = " << hits[i]->EPI()/CLHEP::keV << " keV." << std::endl;
     if (hits[i]->EPI() < splitThreshold) {
-      std::cout << "Hit " << i << " with EPI " << hits[i]->EPI()/CLHEP::keV << " keV is below split threshold, skipping." << std::endl;
+      //std::cout << "Hit " << i << " with EPI " << hits[i]->EPI()/CLHEP::keV << " keV is below split threshold, skipping." << std::endl;
       continue;
     }
     const int x = hits[i]->VoxelX();
     const int y = hits[i]->VoxelY();
-    int z = hits[i]->isVoxel() ? hits[i]->VoxelZ(): 0;
+    const int z = hits[i]->isVoxel() ? hits[i]->VoxelZ(): 0;
     const int idx = voxelToPix(x, y, z);
     if (pixelMapping[idx] == -1) {
       pixelMapping[idx] = splitIdx.size();
       splitIdx.push_back(i);
-      std::cout << "Hit " << i << " with EPI " << hits[i]->EPI()/CLHEP::keV << " keV is above split threshold, added to splitIdx." << std::endl;
+      //std::cout << "Hit " << i << " with EPI " << hits[i]->EPI()/CLHEP::keV << " keV is above split threshold, added to splitIdx." << std::endl;
     }
   }
-  std::cout << "Number of hits above split threshold: " << splitIdx.size() << std::endl;
+  //std::cout << "Number of hits above split threshold: " << splitIdx.size() << std::endl;
   
   for (int ii = 0; ii < splitIdx.size(); ++ii) {
     const auto &h = hits[splitIdx[ii]];
     if (h->EPI() >= energyThreshold) {
-      std::cout << "Hit " << splitIdx[ii] << " with EPI " << h->EPI()/CLHEP::keV << " keV is above energy threshold, added to mainIdx." << std::endl;
+      //std::cout << "Hit " << splitIdx[ii] << " with EPI " << h->EPI()/CLHEP::keV << " keV is above energy threshold, added to mainIdx." << std::endl;
       mainIdx.push_back(splitIdx[ii]);
     }
   }
   
   std::sort(mainIdx.begin(), mainIdx.end(), [&](int a, int b){
-    return hits[mainIdx[a]]->EPI() > hits[mainIdx[b]]->EPI();
+    return hits[splitIdx[a]]->EPI() > hits[splitIdx[b]]->EPI();
   });
   
-  std::vector<uint8_t> merged(splitIdx.size(), 0);
-  DetectorHitVector clusteredHits;
   clusteredHits.reserve(mainIdx.size());
   
   std::queue<int> to_merge;
@@ -495,25 +498,30 @@ void VRealDetectorUnit::clusterByThreshold(DetectorHitVector &hits) const {
               continue;
             }
             const int neighbor_idx = voxelToPix(nx, ny, nz);
-            if (neighbor_idx == -1) {
+            const int neighbor_split_idx = pixelMapping[neighbor_idx];
+            if (neighbor_split_idx -1) {
               continue;
             }
-            if (merged[neighbor_idx]) {
+            if (merged[neighbor_split_idx]) {
               continue;
             }
             
-            merged[neighbor_idx] = 1;
-            to_merge.push(neighbor_idx);
-            merged_hit->mergeAdjacentSignal(*hits[splitIdx[neighbor_idx]], DetectorHit::MergedPosition::EnergyWeighted);
+            merged[neighbor_split_idx] = 1;
+            to_merge.push(neighbor_split_idx);
+            //std::cout << "splitIdx.size(): " << splitIdx.size() << " hits.size(): " << hits.size() << " merged: " << merged.size() << std::endl;
+            //std::cout << " neighbor idx: " << neighbor_idx << std::endl;
+            //std::cout << ", merged: " << static_cast<int>(merged[neighbor_split_idx]) << std::endl;
+            //std::cout << ", splitIdx: " << splitIdx[neighbor_split_idx] << " hits[" << splitIdx[neighbor_split_idx] << "]: " << hits[splitIdx[neighbor_split_idx]] << std::endl;
+            merged_hit->mergeAdjacentSignal(*hits[splitIdx[neighbor_split_idx]], DetectorHit::MergedPosition::EnergyWeighted);
           
           }
         }
       }
     }
-    std::cout << "Merged hit with EPI " << merged_hit->EPI()/CLHEP::keV << " keV." << std::endl;
+    //std::cout << "Merged hit with EPI " << merged_hit->EPI()/CLHEP::keV << " keV." << std::endl;
     clusteredHits.push_back(merged_hit);
   }
-  std::cout << "Number of hits after clustering: " << clusteredHits.size() << std::endl;
+  //std::cout << "Number of hits after clustering: " << clusteredHits.size() << std::endl;
   hits = std::move(clusteredHits);
 }
 
