@@ -39,6 +39,7 @@ ANLStatus ConstructFrame::mod_define()
   define_parameter("num_pixels_x", &mod_class::num_pixels_x_);
   define_parameter("num_pixels_y", &mod_class::num_pixels_y_);
   define_parameter("detector_list", &mod_class::ids_);
+  define_parameter("polarization", &mod_class::polarization_);
 
   hide_parameter("detector_configuration");
   
@@ -52,9 +53,7 @@ ANLStatus ConstructFrame::mod_initialize()
   for (int i: ids_) {
     auto detector = std::make_unique<RealDetectorUnit2DPixel>();
     detector->setID(i);
-    auto frame = createFrameData();
-    frame->setPedestals(0.0);
-    detector->registerFrameData(std::move(frame));
+    detector->registerFrameData(createFrameData());
     detectorManager->addDetector(std::move(detector));
     detectorManager->setConstructed();
   }
@@ -64,7 +63,12 @@ ANLStatus ConstructFrame::mod_initialize()
 
 std::unique_ptr<FrameData> ConstructFrame::createFrameData()
 {
-  return std::make_unique<FrameData>(NumPixelsX(), NumPixelsY());
+  auto frame = std::make_unique<FrameData>(NumPixelsX(), NumPixelsY());
+  frame->setPedestals(0.0);
+  if (polarization_) {
+    frame->setEventAngleMethod(XrayEvent::EventAngleMethod_t::Max2ndMoment);
+  }
+  return frame;
 }
 
 } /* namespace comptonsoft */

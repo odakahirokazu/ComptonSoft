@@ -84,6 +84,7 @@ set(CS_CORE_CLASSES
   src/FrameData.cc
   src/OutlierStore.cc
   src/XrayEvent.cc
+  src/PolarizedXrayEvent.cc
   src/XrayEventTreeIO.cc
   ### coded aperture
   src/VCodedAperture.cc

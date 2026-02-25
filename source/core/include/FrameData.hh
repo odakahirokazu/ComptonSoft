@@ -83,6 +83,9 @@ public:
   double EventThreshold() const { return eventThreshold_; }
   double SplitThreshold() const { return splitThreshold_; }
 
+  void setEventAngleMethod(XrayEvent::EventAngleMethod_t v) { eventAngleMethod_ = v; }
+  XrayEvent::EventAngleMethod_t EventAngleMethod() const { return eventAngleMethod_; }
+
   void setStatisticsExclusionNumbers(int num_low, int num_high);
   
   void resetRawFrame();
@@ -167,6 +170,8 @@ private:
 
   double eventThreshold_ = 0.0;
   double splitThreshold_ = 0.0;
+
+  XrayEvent::EventAngleMethod_t eventAngleMethod_ = XrayEvent::EventAngleMethod_t::Average;
 
   std::vector<std::pair<int, int>> eventCheckPixels_;
 

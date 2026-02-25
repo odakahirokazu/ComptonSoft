@@ -17,96 +17,69 @@
  *                                                                       *
  *************************************************************************/
 
-#include "XrayEvent.hh"
+#include "PolarizedXrayEvent.hh"
 
 #include <iostream>
 #include <cmath>
 
+#include "AstroUnits.hh"
+
 namespace comptonsoft
 {
 
-XrayEvent::XrayEvent(int size)
-  : size_(size),
-    data_(boost::extents[size][size])
+PolarizedXrayEvent::PolarizedXrayEvent(int size)
+  : XrayEvent(size)
 {
 }
 
-XrayEvent::~XrayEvent() = default;
+PolarizedXrayEvent::~PolarizedXrayEvent() = default;
 
-void XrayEvent::copyFrom(const image_t& image, int ix, int iy)
+/**
+   Event angle is determined by the maximum of 2nd momentum
+ */
+double PolarizedXrayEvent::calculateEventAngle() const
 {
-  const int size = EventSize();
-  const int center_index = size/2;
-  const int ix0 = ix - center_index;
-  const int iy0 = iy - center_index;
+  using std::atan;
+  using std::cos;
+  using std::sin;
+  using anlgeant4::constant::halfpi;
 
-  ix_ = ix;
-  iy_ = iy;
-
-  for (int i=0; i<size; i++) {
-    for (int j=0; j<size; j++) {
-      data_[i][j] = image[ix0+i][iy0+j];
-    }
-  }
-  centerPH_ = data_[center_index][center_index];
-}
-
-void XrayEvent::reduce()
-{
-  const int size = EventSize();
-  const int halfSize = size/2;
-
-  for (int i=0; i<size; i++) {
-    for (int j=0; j<size; j++) {
-      const double v = data_[i][j];
-      if (v < SplitThreshold()) {
-        data_[i][j] = 0.0;
-      }
-    }
-  }
-
-  int rank = 0;
-  int weight = 0;
-  double sumPH = 0.0;
-  for (int i=0; i<size; i++) {
-    for (int j=0; j<size; j++) {
-      const double v = data_[i][j];
-      if (v > 0.0) {
-        weight++;
-        sumPH += v;
-        const int dx = std::abs(i-halfSize);
-        const int dy = std::abs(j-halfSize);
-        const int thisRank = std::max(dx, dy);
-        if (rank < thisRank) {
-          rank = thisRank;
-        }
-      }
-    }
-  }
-
-  rank_ = rank;
-  weight_ = weight;
-  sumPH_ = sumPH;
-  angle_ = calculateEventAngle();
-}
-
-double XrayEvent::calculateEventAngle() const
-{
   const int size = EventSize();
   const int center = size/2;
-  double x(0.0), y(0.0);
+
+  double xsum(0.0), ysum(0.0), esum(0.0);
   for (int i=0; i<size; i++) {
     for (int j=0; j<size; j++) {
-      if (!(i==center && j==center)) {
-        const double epi = data_[i][j];
-        const double x1 = static_cast<double>(i-center);
-        const double y1 = static_cast<double>(j-center);
-        x += x1*epi;
-        y += y1*epi;
-      }
+      const double epi = Data()[i][j];
+      const double x1 = static_cast<double>(i-center);
+      const double y1 = static_cast<double>(j-center);
+      xsum += x1*epi;
+      ysum += y1*epi;
+      esum += epi;
     }
   }
-  return std::atan2(y, x);
+
+  const double xcm = xsum/esum;
+  const double ycm = ysum/esum;
+
+  double u11(0.0), u20(0.0), u02(0.0);
+  for (int i=0; i<size; i++) {
+    for (int j=0; j<size; j++) {
+      const double epi = Data()[i][j];
+      u11 += (i - xcm) * (j - ycm) * epi;
+      u20 += (i - xcm) * (i - xcm) * epi;
+      u02 += (j - ycm) * (j - ycm) * epi;
+    }
+  }
+
+  const double tan2phi = 2 * u11/(u20 - u02);
+  const double two_phi1 = atan(tan2phi);
+  const double phi1 = 0.5*two_phi1;
+  const double phi2 = 0.5*two_phi1 + halfpi;
+
+  const double A = (u20-u02)*cos(2.0*phi1) + u11*sin(2.0*phi1);
+  const double phi = (A>=0.0) ? phi1 : phi2;
+  return phi;
 }
 
 } /* namespace comptonsoft */

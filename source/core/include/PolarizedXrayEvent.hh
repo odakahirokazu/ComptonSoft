@@ -1,6 +1,6 @@
 /*************************************************************************
  *                                                                       *
- * Copyright (c) 2011 Hirokazu Odaka                                     *
+ * Copyright (c) 2019 Hirokazu Odaka                                     *
  *                                                                       *
  * This program is free software: you can redistribute it and/or modify  *
  * it under the terms of the GNU General Public License as published by  *
@@ -17,51 +17,33 @@
  *                                                                       *
  *************************************************************************/
 
-#ifndef COMPTONSOFT_ConstructFrame_H
-#define COMPTONSOFT_ConstructFrame_H 1
+#ifndef COMPTONSOFT_PolarizedXrayEvent_H
+#define COMPTONSOFT_PolarizedXrayEvent_H 1
 
-#include "ConstructDetector.hh"
-#include "DetectorSystem.hh"
+#include "XrayEvent.hh"
 
-namespace comptonsoft {
-
-class FrameData;
-
+namespace comptonsoft
+{
 
 /**
- * ConstructFrame
+ * A class of an X-ray event measured with a pixel detector.
  *
  * @author Hirokazu Odaka
- * @date 2019-06-05
- * @date 2020-04-01 | v2.0 | based on ConstructDetector
+ * @date 2026-02-25 | polarization
  */
-class ConstructFrame : public ConstructDetector
+class PolarizedXrayEvent : public XrayEvent
 {
-  DEFINE_ANL_MODULE(ConstructFrame, 2.0);
-  // ENABLE_PARALLEL_RUN();
 public:
-  ConstructFrame();
-  
-protected:
-  ConstructFrame(const ConstructFrame&);
+  explicit PolarizedXrayEvent(int size);
+  virtual ~PolarizedXrayEvent();
 
-public:
-  anlnext::ANLStatus mod_define() override;
-  anlnext::ANLStatus mod_initialize() override;
+  PolarizedXrayEvent(const PolarizedXrayEvent& r) = default;
+  PolarizedXrayEvent(PolarizedXrayEvent&& r) = default;
 
 protected:
-  int NumPixelsX() const { return num_pixels_x_; }
-  int NumPixelsY() const { return num_pixels_y_; }
-
-  virtual std::unique_ptr<FrameData> createFrameData();
-
-private:
-  int num_pixels_x_ = 1;
-  int num_pixels_y_ = 1;
-  std::vector<int> ids_;
-  bool polarization_ = false;
+  double calculateEventAngle() const override;
 };
 
 } /* namespace comptonsoft */
 
-#endif /* COMPTONSOFT_ConstructFrame_H */
+#endif /* COMPTONSOFT_XrayEvent_H */
