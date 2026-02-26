@@ -1039,24 +1039,13 @@ void DetectorSystem::setupDetectorParameters(const DetectorSystem::ParametersNod
     else if (ds->recombinationModel()) {// Recombination model is instantiated but dE/dx file is not specified
       BOOST_THROW_EXCEPTION(CSException("Error: Recombination model is instantiated but dE/dx file is not specified for LArTPCPixel detector."));
     }
-    if (auto o = parameters.recombination_function_for_epi) {
+    if (auto o = parameters.graph_file_for_epi_compensation) {
       if (ds1) {
-        TSpline* spline = (TSpline*)(ROOTFile_->Get((*o).c_str()));
-        if (spline == nullptr) {
-          std::cout << "Error: Recombination function spline " << *o << " not found in ROOT file.\n";
-        }
-        else {
-          ds1->setRecombinationFunctionForEPI(spline);
-        }
-      }
-    }
-    if (auto o = parameters.graph_file_for_epi) {
-      if (ds1) {
-        if (auto o2 = parameters.graph_list_name_for_epi){
-          ds1->setResponseFileForEPI(*o, *o2);
+        if (auto o2 = parameters.graph_list_name_for_epi_compensation){
+          ds1->setResponseFileForEPICompensation(*o, *o2);
         }
         else{
-          ds1->setResponseFileForEPI(*o);
+          ds1->setResponseFileForEPICompensation(*o);
         }
       }
     }
@@ -1092,24 +1081,13 @@ void DetectorSystem::setupDetectorParameters(const DetectorSystem::ParametersNod
       BOOST_THROW_EXCEPTION(CSException("Error: Recombination model is instantiated but dE/dx file is not specified for LArTPCPixel detector."));
     }
     
-    if (auto o = parameters.recombination_function_for_epi) {
+    if (auto o = parameters.graph_file_for_epi_compensation) {
       if (ds1) {
-        TSpline *spline = (TSpline *)(ROOTFile_->Get((*o).c_str()));
-        if (spline == nullptr) {
-          std::cout << "Error: Recombination function spline " << *o << " not found in ROOT file.\n";
+        if (auto o2 = parameters.graph_list_name_for_epi_compensation) {
+          ds1->setResponseFileForEPICompensation(*o, *o2);
         }
         else {
-          ds1->setRecombinationFunctionForEPI(spline);
-        }
-      }
-    }
-    if (auto o = parameters.graph_file_for_epi) {
-      if (ds1) {
-        if (auto o2 = parameters.graph_list_name_for_epi) {
-          ds1->setResponseFileForEPI(*o, *o2);
-        }
-        else {
-          ds1->setResponseFileForEPI(*o);
+          ds1->setResponseFileForEPICompensation(*o);
         }
       }
     }
@@ -1608,14 +1586,11 @@ load(const boost::property_tree::ptree& node)
   if (auto o=node.get_optional<int>("pedestal_generation.<xmlattr>.flag")) {
     pedestal_generation_flag = o;
   }
-  if (auto o = node.get_optional<std::string>("compensation.<xmlattr>.recombination_function_for_epi")) {
-    recombination_function_for_epi = o;
+  if (auto o = node.get_optional<std::string>("compensation.<xmlattr>.graph_file_for_epi_compensation")) {
+    graph_file_for_epi_compensation = o;
   }
-  if (auto o = node.get_optional<std::string>("compensation.<xmlattr>.graph_file_for_epi")) {
-    graph_file_for_epi = o;
-  }
-  if (auto o = node.get_optional<std::string>("compensation.<xmlattr>.graph_list_name_for_epi")) {
-    graph_list_name_for_epi = o;
+  if (auto o = node.get_optional<std::string>("compensation.<xmlattr>.graph_list_name_for_epi_compensation")) {
+    graph_list_name_for_epi_compensation = o;
   }
   if (auto o=node.get_optional<int>("reconstruction.<xmlattr>.mode")) {
     reconstruction_mode = o;

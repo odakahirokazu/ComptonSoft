@@ -35,10 +35,8 @@ public:
   double DriftVelocity() const { return driftVelocity_; }
   void setDriftVelocity(double val) { driftVelocity_ = val; }
   std::tuple<double, double> compensateEPI(const PixelID &sp, std::tuple<double, double> ePI) const override;
-  void setRecombinationFunctionForEPI(TSpline *spline) { recombinationFunctionForEPI_ = spline; }
-  TSpline *getRecombinationFunctionForEPI() const { return recombinationFunctionForEPI_; }
-  void setResponseFileForEPI(const std::string &filename, const std::string &graph_name = "g_Etrue_mean_pix");
-  const std::vector<TGraph *> &getResponseGraphListForEPI() const { return responseGraphListForEPI_; }
+  void setResponseFileForEPICompensation(const std::string &filename, const std::string &graph_name = "g_Etrue_mean_pix");
+  const std::vector<TGraph *> &getResponseGraphListForEPICompensation() const { return responseGraphListForEPI_; }
   double getdEdxFromKineticEnergy(double kineticEnergy) const;
   void setdEdxFile(const std::string &filename, const std::string &spline_name="dedx_spline");
   TSpline *getdEdxSpline() const { return dedxSpline_; }
@@ -50,7 +48,6 @@ public:
 
 private:
   std::unique_ptr<VLArRecombinationModel> recombinationModel_;
-  TSpline *recombinationFunctionForEPI_ = nullptr;
   double longitudinalDiffusionCoefficient_ = 0.0;
   double transverseDiffusionCoefficient_ = 0.0;
   double driftVelocity_ = -1.0;
@@ -60,7 +57,6 @@ private:
   TFile *dedxFile_ = nullptr;
   TSpline *dedxSpline_ = nullptr;
   std::vector<int> zIndicesForEPI_;
-  std::tuple<double, double> compensateEPIRecombinationIteration(std::tuple<double, double> ePI) const;
 };
 } // namespace comptonsoft
 #endif //COMPTONSOFT_LArTPCDeviceSimlation_H

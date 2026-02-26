@@ -83,9 +83,6 @@ comptonsoft::DetectorHit_sptr merge_hits(const HitList& group) {
   merged_hit->setPosition(pos / sumE);
   merged_hit->setRealPosition(realPos / sumE);
   merged_hit->setEPI(sumE);
-  if (group.size() > 1) {
-    std::cout << "  Max EPI among merged hits: " << maxEpi / unit::keV << " keV." << std::endl;
-  }
   return merged_hit;
 }
 } /* anonymous namespace */

@@ -113,9 +113,8 @@ public:
     boost::optional<double> timing_resolution_trigger = boost::none;
     boost::optional<double> timing_resolution_energy_measurement = boost::none;
     boost::optional<int> pedestal_generation_flag = boost::none;
-    boost::optional<std::string> recombination_function_for_epi = boost::none;
-    boost::optional<std::string> graph_file_for_epi = boost::none;
-    boost::optional<std::string> graph_list_name_for_epi = boost::none;
+    boost::optional<std::string> graph_file_for_epi_compensation = boost::none;
+    boost::optional<std::string> graph_list_name_for_epi_compensation = boost::none;
     boost::optional<std::string> recombination_dedx_file = boost::none;
     boost::optional<std::string> recombination_dedx_spline_name = boost::none;
     ChannelNodeContents channel_properties;

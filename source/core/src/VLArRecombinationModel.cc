@@ -62,7 +62,6 @@ double VLArRecombinationModel::Binomial(const int n, double p) const {
     return inverted ? n - nElectron : nElectron;
   }
   else if (lambda >= T && nq >= T) {
-    std::normal_distribution<double> norm(lambda, std::sqrt(lambda * (1.0 - p)));
     const double sigma = gRandom->Gaus(lambda, std::sqrt(lambda * (1.0 - p)));
     const int nElectron = static_cast<int>(std::lround(sigma));
     return inverted ? (n - std::clamp(nElectron, 0, n)) : std::clamp(nElectron, 0, n);
