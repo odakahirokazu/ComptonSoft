@@ -225,7 +225,7 @@ void VDeviceSimulation::makeEPI(DetectorHit_sptr hit)
 void VDeviceSimulation::makePhotonCount() {
   double photonCount = 0.0;
   for (auto& hit: SimulatedHits_) {
-    photonCount += hit->PhotonCount() * photonEfficiency_;
+    photonCount += hit->PhotonCount();
   }
   double photonCountWithNoise(0.0), photonCountError(0.0);
   std::tie(photonCountWithNoise, photonCountError) = applyNoiseToPhotonCount(photonCount);

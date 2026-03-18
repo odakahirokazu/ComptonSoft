@@ -1412,6 +1412,14 @@ void DetectorSystem::setupReconstructionParameters(const DetectorSystem::Paramet
       if (auto o = parameters.photon_efficiency) {
         ds1->setPhotonDetectionEfficiency(*o);
       }
+      if (auto o4 = parameters.w_exc) {
+        const double value = (*o4) * unit::eV;
+        ds1->setWexc(value);
+      }
+      if (auto o5 = parameters.w_ion) {
+        const double value = (*o5) * unit::eV;
+        ds1->setWion(value);
+      }
     }
   }
   if (detector->checkType(DetectorType::LArTPCPixel)) {
@@ -1422,6 +1430,14 @@ void DetectorSystem::setupReconstructionParameters(const DetectorSystem::Paramet
       }
       if (auto o = parameters.photon_efficiency) {
         ds1->setPhotonDetectionEfficiency(*o);
+      }
+      if (auto o4 = parameters.w_exc) {
+        const double value = (*o4) * unit::eV;
+        ds1->setWexc(value);
+      }
+      if (auto o5 = parameters.w_ion) {
+        const double value = (*o5) * unit::eV;
+        ds1->setWion(value);
       }
     }
   }
@@ -1620,10 +1636,10 @@ load(const boost::property_tree::ptree& node)
     recombination_correction = o;
   }
   if (auto o=node.get_optional<double>("reconstruction.<xmlattr>.w_ion")) {
-    w_ion = o.value() * unit::eV;
+    w_ion = o;
   }
   if (auto o=node.get_optional<double>("reconstruction.<xmlattr>.w_exc")) {
-    w_exc = o.value() * unit::eV;
+    w_exc = o;
   }
   if (auto o=node.get_optional<std::string>("recombination.<xmlattr>.filename")) {
     recombination_configuration_file = o;

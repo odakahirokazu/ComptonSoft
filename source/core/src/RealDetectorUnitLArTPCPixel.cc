@@ -80,6 +80,7 @@ void RealDetectorUnitLArTPCPixel::reconstruct(const DetectorHitVector &hitSignal
       cluster(hitsReconstructed);
     }
   }
+  correctPhotonDetectionEfficiency(hitsReconstructed);
   if (isRecombinationCorrectionEnabled()) {
     applyRecombinationCorrection(hitsReconstructed);
   }
@@ -106,6 +107,9 @@ void RealDetectorUnitLArTPCPixel::applyRecombinationCorrection(DetectorHitVector
     const auto photon_count_error = hit->PhotonCountError();
     const double corrected_epi = (epi / wion + photon_count) * wexc;
     const double corrected_epi_error = wexc * std::sqrt(std::pow(epi_error / wion, 2) + std::pow(photon_count_error, 2)); // propagation of uncertainty
+    std::cout << "eventid: " << hit->EventID() << ", detectorid: " << hit->DetectorID() << ", pixel: (" << hit->PixelX() << "," << hit->PixelY() << ") - ";
+    std::cout << "EPI before correction: " << epi / CLHEP::keV << " ± " << epi_error / CLHEP::keV << ", Photon count: " << photon_count << " ± " << photon_count_error << std::endl;
+    std::cout << "EPI after correction: " << corrected_epi / CLHEP::keV << " ± " << corrected_epi_error / CLHEP::keV << " while true energy is " << hit->EnergyDeposit() / CLHEP::keV << std::endl;
     hit->setEPI(corrected_epi);
     hit->setEPIError(corrected_epi_error);
   }
@@ -114,10 +118,13 @@ void RealDetectorUnitLArTPCPixel::applyRecombinationCorrection(DetectorHitVector
 void RealDetectorUnitLArTPCPixel::correctPhotonDetectionEfficiency(DetectorHitVector &hits) const {
   for (auto &hit: hits) {
     const auto photon_count = hit->PhotonCount();
+    std::cout << "eventid: " << hit->EventID() << ", detectorid: " << hit->DetectorID() << ", pixel: (" << hit->PixelX() << "," << hit->PixelY() << ") - ";
+    std::cout << "Photon count before correction: " << photon_count << " ± " << hit->PhotonCountError() << std::endl;
     const auto photon_count_error = hit->PhotonCountError();
     const double corrected_photon_count = photon_count * photonDetectionEfficiencyInv_;
     const double corrected_photon_count_error = photon_count_error * photonDetectionEfficiencyInv_; // propagation of uncertainty
     hit->setPhotonCount(corrected_photon_count);
+    std::cout << "Photon count after correction: " << corrected_photon_count << " ± " << corrected_photon_count_error << std::endl;
     hit->setPhotonCountError(corrected_photon_count_error);
   }
 }

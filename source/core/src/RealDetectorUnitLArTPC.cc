@@ -79,6 +79,7 @@ void RealDetectorUnitLArTPC::reconstruct(const DetectorHitVector& hitSignals,
       cluster(hitsReconstructed);
     }
   }
+  correctPhotonDetectionEfficiency(hitsReconstructed);
   if (isRecombinationCorrectionEnabled()) {
     applyRecombinationCorrection(hitsReconstructed);
   }
