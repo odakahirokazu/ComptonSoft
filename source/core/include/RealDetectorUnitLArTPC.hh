@@ -66,6 +66,9 @@ public:
   double Wion() const { return Wion_; }
   void setWexc(double v) { Wexc_ = v; }
   double Wexc() const { return Wexc_; }
+  void setPhotonDetectionEfficiency(double v) { photonDetectionEfficiencyInv_ = 1.0 / v; }
+  double PhotonDetectionEfficiency() const { return 1.0 / photonDetectionEfficiencyInv_; }
+  void correctPhotonDetectionEfficiency(DetectorHitVector &hits) const;
   
   void printDetectorParameters(std::ostream& os) const override;
   
@@ -83,6 +86,7 @@ private:
   bool isRecombinationCorrectionEnabled_ = true;
   double Wion_ = 23.6 * CLHEP::eV; // Ionization energy in liquid argon
   double Wexc_ = 19.5 * CLHEP::eV; // Excitation energy in liquid argon
+  double photonDetectionEfficiencyInv_ = 1.0; // Inverse of photon detection efficiency
 };
 
 } /* namespace comptonsoft */

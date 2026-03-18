@@ -1036,9 +1036,6 @@ void DetectorSystem::setupDetectorParameters(const DetectorSystem::ParametersNod
         }
       }
     }
-    else if (ds->recombinationModel()) {// Recombination model is instantiated but dE/dx file is not specified
-      BOOST_THROW_EXCEPTION(CSException("Error: Recombination model is instantiated but dE/dx file is not specified for LArTPCPixel detector."));
-    }
     if (auto o = parameters.graph_file_for_epi_compensation) {
       if (ds1) {
         if (auto o2 = parameters.graph_list_name_for_epi_compensation){
@@ -1076,9 +1073,6 @@ void DetectorSystem::setupDetectorParameters(const DetectorSystem::ParametersNod
           ds1->setdEdxFile(*o);
         }
       }
-    }
-    else if (ds->recombinationModel()) {// Recombination model is instantiated but dE/dx file is not specified
-      BOOST_THROW_EXCEPTION(CSException("Error: Recombination model is instantiated but dE/dx file is not specified for LArTPCPixel detector."));
     }
     
     if (auto o = parameters.graph_file_for_epi_compensation) {
@@ -1415,6 +1409,9 @@ void DetectorSystem::setupReconstructionParameters(const DetectorSystem::Paramet
       if (auto o = parameters.recombination_correction) {
         ds1->setRecombinationCorrectionEnabled(*o);
       }
+      if (auto o = parameters.photon_efficiency) {
+        ds1->setPhotonDetectionEfficiency(*o);
+      }
     }
   }
   if (detector->checkType(DetectorType::LArTPCPixel)) {
@@ -1422,6 +1419,9 @@ void DetectorSystem::setupReconstructionParameters(const DetectorSystem::Paramet
     if (ds1) {
       if (auto o = parameters.recombination_correction) {
         ds1->setRecombinationCorrectionEnabled(*o);
+      }
+      if (auto o = parameters.photon_efficiency) {
+        ds1->setPhotonDetectionEfficiency(*o);
       }
     }
   }

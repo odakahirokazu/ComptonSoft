@@ -46,16 +46,7 @@ bool is_group_adjacent(const HitList& group0, const HitList& group1, bool contac
   return false;
 }
 
-bool is_within_distance(const comptonsoft::DetectorHit_sptr &hit0,
-                        const comptonsoft::DetectorHit_sptr &hit1,
-                        int distanceThreshold) {
-  const int dx = std::abs(hit0->VoxelX() - hit1->VoxelX());
-  const int dy = std::abs(hit0->VoxelY() - hit1->VoxelY());
-  const int dz = (hit0->isVoxel() && hit1->isVoxel()) ? std::abs(hit0->VoxelZ() - hit1->VoxelZ()) : 0;
-  return ((dx <= distanceThreshold) && (dy <= distanceThreshold) && (dz <= distanceThreshold));
-}
-
-comptonsoft::DetectorHit_sptr merge_hits(const HitList& group) {
+comptonsoft::DetectorHit_sptr merge_hits(const std::vector<comptonsoft::DetectorHit_sptr>& group) {
   comptonsoft::DetectorHit_sptr merged_hit = group.front()->clone();
   double sumE = merged_hit->EPI();
   double maxEpi = merged_hit->EPI();
@@ -448,109 +439,122 @@ void VRealDetectorUnit::cluster(DetectorHitVector& hits) const
 
 void VRealDetectorUnit::clusterByThreshold(DetectorHitVector &hits) const {
   const auto energyThreshold = ClusteringEnergyThreshold();
-  const auto splitThreshold = ClusteringSplitThreshold();
+  const auto splitThreshold  = ClusteringSplitThreshold();
   const auto clusteringRange = ClusteringRange();
-  const int clusteringRange_z = (getNumVoxelZ() > 1 ? clusteringRange : 0);
-  
-  std::vector<int> pixelMapping(getNumVoxelX()*getNumVoxelY()*getNumVoxelZ(), -1); // index of hits in splitIdx for each voxel, -1 if no hit with EPI above split threshold
+
+  // Cash the number of voxels in each dimension locally to avoid repeated function calls inside the loop
+  const int NX = getNumVoxelX();
+  const int NY = getNumVoxelY();
+  const int NZ = getNumVoxelZ();
+  const int clusteringRange_z = (NZ > 1 ? clusteringRange : 0);
+
   auto voxelToPix = [&](int x, int y, int z) {
-    return x + y * getNumVoxelX() + z * getNumVoxelX() * getNumVoxelY();
+    return x + y * NX + z * NX * NY;
   };
-  std::vector<int> splitIdx; // index of hits with EPI above split threshold (expressed in hits)
-  std::vector<int> mainIdx; // index of hits with EPI above energy threshold (expressed in splitIdx)
-  std::vector<uint8_t> visited;
-  DetectorHitVector clusteredHits;
-  const int num_hits = hits.size();
-  visited.reserve(hits.size());
-  std::vector<std::list<DetectorHit_sptr>> groups;
-  std::deque<int> to_merge;
-  
-  
+
+  // thread_local variable for pixel mapping to avoid repeated memory allocation and deallocation across events
+  const int totalVoxels = NX * NY * NZ;
+  static thread_local std::vector<int> pixelMapping;
+  if ((int)pixelMapping.size() < totalVoxels) {
+    pixelMapping.assign(totalVoxels, -1);
+  }
+
+  std::vector<int> usedPixels;
+  std::vector<int> splitIdx;
+  std::vector<int> mainIdx;
+  const int num_hits = (int)hits.size();
+
+  splitIdx.reserve(num_hits);
+  mainIdx.reserve(num_hits);
+  usedPixels.reserve(num_hits);
+
   for (int i = 0; i < num_hits; ++i) {
-    if (hits[i]->EPI() < splitThreshold) {
-      continue;
-    }
+    if (hits[i]->EPI() < splitThreshold) continue;
     const int x = hits[i]->VoxelX();
     const int y = hits[i]->VoxelY();
-    const int z = hits[i]->isVoxel() ? hits[i]->VoxelZ(): 0;
+    const int z = hits[i]->isVoxel() ? hits[i]->VoxelZ() : 0;
     const int idx = voxelToPix(x, y, z);
     if (pixelMapping[idx] == -1) {
-      pixelMapping[idx] = splitIdx.size();
+      pixelMapping[idx] = (int)splitIdx.size();
       splitIdx.push_back(i);
+      usedPixels.push_back(idx);
     }
   }
 
   const int M = (int)splitIdx.size();
   if (M == 0) {
+    // Reset only the entries corresponding to used pixels
+    for (int idx : usedPixels) pixelMapping[idx] = -1;
     hits.clear();
     return;
   }
 
   for (int ii = 0; ii < M; ++ii) {
-    const auto &h = hits[splitIdx[ii]];
-    if (h->EPI() >= energyThreshold) {
+    if (hits[splitIdx[ii]]->EPI() >= energyThreshold) {
       mainIdx.push_back(ii);
     }
   }
 
-  std::sort(mainIdx.begin(), mainIdx.end(), [&](int a, int b){
+  std::sort(mainIdx.begin(), mainIdx.end(), [&](int a, int b) {
     return hits[splitIdx[a]]->EPI() > hits[splitIdx[b]]->EPI();
   });
+
+  std::vector<uint8_t> visited(M, 0);
+  DetectorHitVector clusteredHits;
+  clusteredHits.reserve(mainIdx.size());
+
   
-  visited.resize(M, 0);
-  groups.resize(mainIdx.size());
-  
-  for (int main_index: mainIdx) {
-    if (visited[main_index]) {
-      continue;
-    }
+  std::vector<int> to_merge;
+  to_merge.reserve(M);
+
+  std::vector<DetectorHit_sptr> group;
+  group.reserve(64);
+
+  for (int main_index : mainIdx) {
+    if (visited[main_index]) continue;
+
     visited[main_index] = 1;
     to_merge.clear();
     to_merge.push_back(main_index);
-
-    HitList group;
+    group.clear();
     group.push_back(hits[splitIdx[main_index]]);
 
-    while (!to_merge.empty()) {
-      const int current_index = to_merge.front();
-      to_merge.pop_front();
+    int head = 0;
+    while (head < (int)to_merge.size()) {
+      const int current_index = to_merge[head++];
       const auto &current_hit = hits[splitIdx[current_index]];
       const int x = current_hit->VoxelX();
       const int y = current_hit->VoxelY();
       const int z = current_hit->VoxelZ();
-      
+
       for (int dx = -clusteringRange; dx <= clusteringRange; ++dx) {
+        const int nx = x + dx;
+        if (nx < 0 || nx >= NX) continue;
         for (int dy = -clusteringRange; dy <= clusteringRange; ++dy) {
+          const int ny = y + dy;
+          if (ny < 0 || ny >= NY) continue;
           for (int dz = -clusteringRange_z; dz <= clusteringRange_z; ++dz) {
-            const int nx = x + dx;
-            const int ny = y + dy;
             const int nz = z + dz;
-            if (nx < 0 || nx >= getNumVoxelX() || ny < 0 || ny >= getNumVoxelY() || nz < 0 || nz >= getNumVoxelZ()) {
-              continue;
-            }
-            const int neighbor_idx = voxelToPix(nx, ny, nz);
-            const int neighbor_split_idx = pixelMapping[neighbor_idx];
-            if (neighbor_split_idx == -1) {
-              continue;
-            }
-            if (visited[neighbor_split_idx]) {
-              continue;
-            }
-            
+            if (nz < 0 || nz >= NZ) continue;
+
+            const int neighbor_split_idx = pixelMapping[voxelToPix(nx, ny, nz)];
+            if (neighbor_split_idx == -1 || visited[neighbor_split_idx]) continue;
+
             visited[neighbor_split_idx] = 1;
             to_merge.push_back(neighbor_split_idx);
-            
             group.push_back(hits[splitIdx[neighbor_split_idx]]);
-          
           }
         }
       }
     }
-    group.sort([](const DetectorHit_sptr& a, const DetectorHit_sptr& b){
+    std::sort(group.begin(), group.end(), [](const DetectorHit_sptr &a, const DetectorHit_sptr &b) {
       return a->EPI() > b->EPI();
     });
     clusteredHits.push_back(merge_hits(group));
   }
+
+  for (int idx : usedPixels) pixelMapping[idx] = -1;
+
   hits = std::move(clusteredHits);
 }
 

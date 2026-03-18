@@ -28,7 +28,7 @@ void LArTPCDeviceSimulation::printSimulationParameters(std::ostream &os) const {
   else {
     os << "  No recombination model is set.\n";
   }
-  os << "  Response graph list for EPI compensation: " << responseGraphListForEPI_.size() << " graphs loaded. Name header is " << (responseGraphListForEPI_.empty() ? "none" : responseGraphListForEPI_[0]->GetName()) << "\n";
+  os << "  Response graph list for EPI compensation: " << responseGraphListForEPICompensation_.size() << " graphs loaded. Name header is " << (responseGraphListForEPICompensation_.empty() ? "none" : responseGraphListForEPICompensation_[0]->GetName()) << "\n";
   os << "  dEdx spline: " << (dedxSpline_ ? dedxSpline_->GetName() : "not set") << "\n";
 }
 double LArTPCDeviceSimulation::DiffusionSigmaAnode3D(double z, double &longitudinal, double &transverse) {
@@ -104,14 +104,14 @@ void LArTPCDeviceSimulation::setResponseFileForEPICompensation(const std::string
     }
     zIndicesForEPI_ = *pixelz_map;
   }
-  responseFileForEPI_ = file;
+  responseFileForEPICompensation_ = file;
   const auto num_div = zIndicesForEPI_.back() + 1;
   for (int iz = 0; iz < num_div; ++iz) {
     auto graph = dynamic_cast<TGraph *>(file->Get(Form("%s%d", graph_name.c_str(), iz)));
     if (!graph) {
       throw std::runtime_error(Form("LArTPCDeviceSimulation::setResponseFileForEPICompensation: Cannot find spline: %s%d", graph_name.c_str(), iz));
     }
-    responseGraphListForEPI_.push_back(graph);
+    responseGraphListForEPICompensation_.push_back(graph);
   }
   if (getNumVoxelZ() > nz) {
     std::cerr << "LArTPCDeviceSimulation::setResponseFileForEPICompensation: Warning! Number of Z voxels (" << getNumVoxelZ()
@@ -140,21 +140,30 @@ void LArTPCDeviceSimulation::applyRecombination(DetectorHit_sptr &hit) {
     hit->setEnergyCharge(edep);
     return;
   }
-  const double ken = hit->KineticEnergy();
-  //std::cout << "Applying recombination model: edep = " << edep / keV
-  //          << " keV, kinetic energy = " << ken / keV << " keV" << std::endl;
-  const double dedx = getdEdxFromKineticEnergy(ken);
-  //std::cout << "  dEdx = " << dedx/ (keV/cm) << " keV/cm" << std::endl;
-  if (dedx <= 0.0) {
-    hit->setPhotonCount(recombinationModel_->lightYield(edep, 1.0));
-    hit->setEnergyCharge(edep);
-    return;
+  
+  double dedx = 0.0;
+  if (!getdEdxSpline()) {
+    const double step_length = (hit->PostStepPointPosition() - hit->PreStepPointPosition()).mag();
+    if (step_length <= 0.0) {
+      hit->setPhotonCount(recombinationModel_->lightYield(edep, 1.0));
+      hit->setEnergyCharge(edep);
+      return;
+    }
+    dedx = edep / step_length;
+  }
+  else {
+    const double ken = hit->KineticEnergy();
+    dedx = getdEdxFromKineticEnergy(ken);
+    if (dedx <= 0.0) {
+      hit->setPhotonCount(recombinationModel_->lightYield(edep, 1.0));
+      hit->setEnergyCharge(edep);
+      return;
+    }
+    
   }
   const double recombination_factor = recombinationModel_->getRecombinationFactor(dedx, BiasVoltage() / getThickness());
-  //std::cout << "Recombination model applied: recombination_factor = " << recombination_factor << " edep_new = " << recombination_factor * edep / keV << " keV" << std::endl;
   const auto new_edep = std::max(edep * recombination_factor, 0.0);
   const auto new_light_count = recombinationModel_->lightYield(edep, recombination_factor) * PhotonEfficiency(hit->LocalPositionX(), hit->LocalPositionY(), hit->LocalPositionZ());
-  //std::cout << "  Light count: " << new_light_count << std::endl;
   hit->setPhotonCount(new_light_count);
   hit->setEnergyCharge(new_edep);
 }

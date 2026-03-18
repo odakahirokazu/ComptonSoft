@@ -109,4 +109,15 @@ void RealDetectorUnitLArTPC::applyRecombinationCorrection(DetectorHitVector &hit
   }
 }
 
+void RealDetectorUnitLArTPC::correctPhotonDetectionEfficiency(DetectorHitVector &hits) const {
+  for (auto &hit: hits) {
+    const auto photon_count = hit->PhotonCount();
+    const auto photon_count_error = hit->PhotonCountError();
+    const double corrected_photon_count = photon_count * photonDetectionEfficiencyInv_;
+    const double corrected_photon_count_error = photon_count_error * photonDetectionEfficiencyInv_; // propagation of uncertainty
+    hit->setPhotonCount(corrected_photon_count);
+    hit->setPhotonCountError(corrected_photon_count_error);
+  }
+}
+
 } /* namespace comptonsoft */

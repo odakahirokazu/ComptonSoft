@@ -70,7 +70,7 @@ private:
   bool excludeBranchingGammaDeposit_ = false; // only for escape detection by flag check
   bool excludeRayleighScattering_ = false;
   bool excludeGammaConversion_ = false;
-  int thresholdOfPixelz_ = -1;
+  double thresholdOfPosZ_ = 0.0;
   bool anodeUpside_ = true;
   size_t numLastHits_ = 0;
   EscapeDetectionMethod escapeDetectionMethod_ = EscapeDetectionMethod::TOTAL_ENERGY_DEPOSITION;

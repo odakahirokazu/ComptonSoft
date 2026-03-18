@@ -35,7 +35,7 @@ bool EventReconstructionWithKnownOrder::loadParameters(boost::property_tree::ptr
     return false;
   }
   numLastHits_ = pt.get<int>("known_order.num_last_hits", 0);
-  thresholdOfPixelz_ = pt.get<int>("known_order.threshold_of_pixelz", -1);
+  thresholdOfPosZ_ = pt.get<double>("known_order.threshold_of_posz", 1*unit::km/unit::mm) * unit::mm;
   noiseLevelParam0_ = pt.get<double>("known_order.noise_level_param0", 0.0);
   noiseLevelParam1_ = pt.get<double>("known_order.noise_level_param1", 0.0);
   noiseLevelParam2_ = pt.get<double>("known_order.noise_level_param2", 0.0);
@@ -64,7 +64,7 @@ bool EventReconstructionWithKnownOrder::loadParameters(boost::property_tree::ptr
   std::cout << "  exclude_rayleigh_scattering: " << excludeRayleighScattering_ << std::endl;
   std::cout << "  exclude_gamma_conversion: " << excludeGammaConversion_ << std::endl;
   std::cout << "  num_last_hits: " << numLastHits_ << std::endl;
-  std::cout << "  threshold_of_pixelz: " << thresholdOfPixelz_ << std::endl;
+  std::cout << "  threshold_of_posz: " << thresholdOfPosZ_ / unit::mm << " mm" << std::endl;
   std::cout << "  noise_level_param0: " << noiseLevelParam0_ << std::endl;
   std::cout << "  noise_level_param1: " << noiseLevelParam1_ << std::endl;
   std::cout << "  noise_level_param2: " << noiseLevelParam2_ << std::endl;
@@ -80,13 +80,17 @@ bool EventReconstructionWithKnownOrder::loadParameters(boost::property_tree::ptr
 bool EventReconstructionWithKnownOrder::reconstruct(const std::vector<DetectorHit_sptr> &hits, const BasicComptonEvent &baseEvent, std::vector<BasicComptonEvent_sptr> &eventsReconstructed) {
   const auto num_hits = hits.size();
   if (num_hits < 2) {
-    std::cerr << "Error: Not enough hits to reconstruct event. Number of hits: " << num_hits << ", Event ID: " << hits[0]->EventID() << std::endl;
+    if (verbose_ > 0) {
+      std::cerr << "Error: Not enough hits to reconstruct event. Number of hits: " << num_hits << ", Event ID: " << hits[0]->EventID() << std::endl;
+    }
     return false;
   }
 
   for (const auto &hit: hits) {
     if (excludeGammaConversion_ && hit->isProcess(process::GammaConversion)) {
-      std::cerr << "Excluding event (TrackID=" << hit->TrackID() << ") due to gamma conversion." << std::endl;
+      if (verbose_ > 0) {
+        std::cerr << "Excluding event (TrackID=" << hit->TrackID() << ") due to gamma conversion." << std::endl;
+      }
       return false;
     }
   }
@@ -125,7 +129,7 @@ bool EventReconstructionWithKnownOrder::reconstruct(const std::vector<DetectorHi
   if (numLastHits_ > 0 && numLastHits_ < hits_used) {
     hits_used = numLastHits_;
   }
-  if (verbose_ > 0) {
+  if (verbose_ > 1) {
     std::cout << "Reconstructing event ID: " << ordered_hits[0]->EventID() << " with " << num_hits << " (" << hits_used << ") hits." << std::endl;
     for (size_t i = 0; i < ordered_hits.size(); ++i) {
       std::cout << "  Hit " << i << ":"
@@ -172,11 +176,15 @@ bool EventReconstructionWithKnownOrder::reconstruct(const std::vector<DetectorHi
   if ((processMode_ != 1) && is_escaped) {
     const auto result = reconstructEscapeEvent(ordered_hits, eventReconstructed);
     if (!result) {
-      std::cerr << "Error: Failed to reconstruct escape event." << std::endl;
+      if (verbose_ > 0) {
+        std::cerr << "Error: Failed to reconstruct escape event." << std::endl;
+      }
       return false;
     }
     if (eventReconstructed->CosThetaE() < -1.0 || eventReconstructed->CosThetaE() > 1.0) {
-      std::cerr << "Error: Unphysical CosThetaE value after reconstruction: " << eventReconstructed->CosThetaE() << std::endl;
+      if (verbose_ > 0) {
+        std::cerr << "Error: Unphysical CosThetaE value after reconstruction: " << eventReconstructed->CosThetaE() << std::endl;
+      }
       return false;
     }
     eventsReconstructed.push_back(eventReconstructed);
@@ -184,17 +192,23 @@ bool EventReconstructionWithKnownOrder::reconstruct(const std::vector<DetectorHi
   else if ((processMode_ != 2) && !is_escaped) {
     const auto result = reconstructFullDepositEvent(ordered_hits, eventReconstructed);
     if (!result) {
-      std::cerr << "Error: Failed to reconstruct full deposit event." << std::endl;
+      if (verbose_ > 0) {
+        std::cerr << "Error: Failed to reconstruct full deposit event." << std::endl;
+      }
       return false;
     }
     if (eventReconstructed->CosThetaE() < -1.0 || eventReconstructed->CosThetaE() > 1.0) {
-      std::cerr << "Error: Unphysical CosThetaE value after reconstruction: " << eventReconstructed->CosThetaE() << std::endl;
+      if (verbose_ > 0) {
+        std::cerr << "Error: Unphysical CosThetaE value after reconstruction: " << eventReconstructed->CosThetaE() << std::endl;
+      }
       return false;
     }
     eventsReconstructed.push_back(eventReconstructed);
   }
   else {
-    std::cerr << "Event type does not match process mode. Skip..." << std::endl;
+    if (verbose_ > 0) {
+      std::cerr << "Event type does not match process mode. Skip..." << std::endl;
+    }
     return false;
   }
   if (verbose_ > 0) {
@@ -207,10 +221,12 @@ bool EventReconstructionWithKnownOrder::reconstruct(const std::vector<DetectorHi
     std::cout << "  CosThetaE: " << eventReconstructed->CosThetaE() << std::endl;
   }
   if (eventReconstructed->CosThetaE() < -1.0 || eventReconstructed->CosThetaE() > 1.0) {
-    std::cerr << "Warning: Unphysical CosThetaE value: " << eventReconstructed->CosThetaE() << std::endl;
-    std::cerr << "  Event ID: " << eventReconstructed->EventID() << std::endl;
-    std::cerr << "  Initial energy: " << initialEnergy_ / unit::keV << " keV" << std::endl;
-    std::cerr << "  Total energy deposit: " << eventReconstructed->TotalEnergyDeposit() / unit::keV << " keV" << std::endl;
+    if (verbose_ > 0) {
+      std::cerr << "Warning: Unphysical CosThetaE value: " << eventReconstructed->CosThetaE() << std::endl;
+      std::cerr << "  Event ID: " << eventReconstructed->EventID() << std::endl;
+      std::cerr << "  Initial energy: " << initialEnergy_ / unit::keV << " keV" << std::endl;
+      std::cerr << "  Total energy deposit: " << eventReconstructed->TotalEnergyDeposit() / unit::keV << " keV" << std::endl;
+    }
   }
   return true;
 }
@@ -250,10 +266,10 @@ uint8_t EventReconstructionWithKnownOrder::checkEvent(const std::vector<Detector
       }
       break;
     }
-    if (thresholdOfPixelz_ >= 0 && ((anodeUpside_ && hit->VoxelZ() >= thresholdOfPixelz_) || (!anodeUpside_ && hit->VoxelZ() <= thresholdOfPixelz_))) {
+    if (((anodeUpside_ && hit->PositionZ() >= thresholdOfPosZ_) || (!anodeUpside_ && hit->PositionZ() <= thresholdOfPosZ_))) {
       flag |= flags::TO_BE_EXCLUDED;
       if (verbose_ > 1) {
-        std::cout << "  Hit pixel Z (" << hit->VoxelZ() << ") >= threshold_of_pixelz (" << thresholdOfPixelz_ << "). Mark event to be excluded." << std::endl;
+        std::cout << "  Hit position Z (" << hit->PositionZ() << ") >= threshold_of_posz (" << thresholdOfPosZ_ << "). Mark event to be excluded." << std::endl;
       }
       break;
     }
@@ -284,7 +300,9 @@ bool EventReconstructionWithKnownOrder::reconstructEscapeEvent(const std::vector
   double escaped_energy;
   const bool success = estimateEscapedEnergy(ordered_hits, escaped_energy);
   if (!success) {
-    std::cerr << "Error: Failed to estimate escaped energy." << std::endl;
+    if (verbose_ > 0) {
+      std::cerr << "Error: Failed to estimate escaped energy." << std::endl;
+    }
     return false;
   }
   if (verbose_ > 1) {
@@ -293,10 +311,12 @@ bool EventReconstructionWithKnownOrder::reconstructEscapeEvent(const std::vector
   const double total_edep = total_energy_deposits(ordered_hits);
   const double total_energy = total_edep + escaped_energy;
   if (total_energy > initialEnergy_ + 100 * unit::keV) {
-    std::cout << "Warning: total energy deposit + escaped energy > initial energy: " << total_energy / unit::keV << " keV > " << initialEnergy_ / unit::keV << " keV" << std::endl;
-    std::cout << "eventID: " << eventReconstructed->EventID() << std::endl;
-    std::cout << "  total energy deposit: " << total_edep / unit::keV << " keV" << std::endl;
-    std::cout << "  escaped energy: " << escaped_energy / unit::keV << " keV" << std::endl;
+    if (verbose_ > 0) {
+      std::cout << "Warning: total energy deposit + escaped energy > initial energy: " << total_energy / unit::keV << " keV > " << initialEnergy_ / unit::keV << " keV" << std::endl;
+      std::cout << "eventID: " << eventReconstructed->EventID() << std::endl;
+      std::cout << "  total energy deposit: " << total_edep / unit::keV << " keV" << std::endl;
+      std::cout << "  escaped energy: " << escaped_energy / unit::keV << " keV" << std::endl;
+    }
   }
   eventReconstructed->setHit2Energy(total_energy - ordered_hits[0]->Energy());
   eventReconstructed->setTotalEnergyDeposit(total_energy);

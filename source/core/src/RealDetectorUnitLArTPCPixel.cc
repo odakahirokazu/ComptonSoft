@@ -88,14 +88,10 @@ void RealDetectorUnitLArTPCPixel::reconstruct(const DetectorHitVector &hitSignal
 void RealDetectorUnitLArTPCPixel::determinePosition(DetectorHitVector &hits) const {
   for (auto &hit: hits) {
     const PixelID pixel = hit->Pixel();
-    if (hit->DepthSensingMode() == 1) {
-      hit->setPosition(PositionWithDepth(pixel, hit->LocalPositionZ()));
-      hit->setLocalPosition(LocalPositionWithDepth(pixel, hit->LocalPositionZ()));
-    }
-    else {
-      hit->setPosition(Position(pixel));
-      hit->setLocalPosition(LocalPosition(pixel));
-    }
+    
+    // LArTPC has capablity to determine the position in 3D, so depth sensing mode is always on.
+    hit->setPosition(PositionWithDepth(pixel, hit->LocalPositionZ()));
+    hit->setLocalPosition(LocalPositionWithDepth(pixel, hit->LocalPositionZ()));
     hit->setPositionError(PositionError(hit->LocalPositionError()));
   }
 }
@@ -112,6 +108,17 @@ void RealDetectorUnitLArTPCPixel::applyRecombinationCorrection(DetectorHitVector
     const double corrected_epi_error = wexc * std::sqrt(std::pow(epi_error / wion, 2) + std::pow(photon_count_error, 2)); // propagation of uncertainty
     hit->setEPI(corrected_epi);
     hit->setEPIError(corrected_epi_error);
+  }
+}
+
+void RealDetectorUnitLArTPCPixel::correctPhotonDetectionEfficiency(DetectorHitVector &hits) const {
+  for (auto &hit: hits) {
+    const auto photon_count = hit->PhotonCount();
+    const auto photon_count_error = hit->PhotonCountError();
+    const double corrected_photon_count = photon_count * photonDetectionEfficiencyInv_;
+    const double corrected_photon_count_error = photon_count_error * photonDetectionEfficiencyInv_; // propagation of uncertainty
+    hit->setPhotonCount(corrected_photon_count);
+    hit->setPhotonCountError(corrected_photon_count_error);
   }
 }
 
