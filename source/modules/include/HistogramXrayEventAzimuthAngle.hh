@@ -53,9 +53,11 @@ public:
   void drawCanvas(TCanvas* canvas, std::vector<std::string>* filenames) override;
 
 private:
-  int numBins_ = 1;
+  int numBins_ = 16;
   double angleMin_ = 0.0;
-  double angleMax_ = 1.0;
+  double angleMax_ = 360.0;
+  double angleOffset_ = 0.0;
+  double anglePeriod_ = 360.0;
   std::string collectionModule_;
   std::string outputName_;
   

@@ -22,6 +22,8 @@
 #include <iostream>
 #include <cmath>
 
+#include "AstroUnits.hh"
+
 namespace comptonsoft
 {
 
@@ -92,6 +94,9 @@ void XrayEvent::reduce()
 
 double XrayEvent::calculateEventAngle() const
 {
+  using std::atan2;
+  using anlgeant4::constant::twopi;
+
   const int size = EventSize();
   const int center = size/2;
   double x(0.0), y(0.0);
@@ -106,7 +111,10 @@ double XrayEvent::calculateEventAngle() const
       }
     }
   }
-  return std::atan2(y, x);
+
+  const double phi = atan2(y, x);
+  const double phi_positive = (phi>=0.0) ? phi : (phi+twopi);
+  return phi_positive;
 }
 
 } /* namespace comptonsoft */
