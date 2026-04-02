@@ -42,6 +42,7 @@ double PolarizedXrayEvent::calculateEventAngle() const
   using std::atan;
   using std::cos;
   using std::sin;
+  using anlgeant4::constant::pi;
   using anlgeant4::constant::halfpi;
 
   const int size = EventSize();
@@ -69,13 +70,14 @@ double PolarizedXrayEvent::calculateEventAngle() const
   }
 
   const double tan2phi = 2 * u11/(u20 - u02);
-  const double two_phi1 = atan(tan2phi);
-  const double phi1 = 0.5*two_phi1;
-  const double phi2 = 0.5*two_phi1 + halfpi;
+  const double two_phi = atan(tan2phi);
+  const double phi1 = 0.5*two_phi;
+  const double phi2 = 0.5*two_phi + halfpi;
 
   const double A = (u20-u02)*cos(2.0*phi1) + u11*sin(2.0*phi1);
   const double phi = (A>=0.0) ? phi1 : phi2;
-  return phi;
+  const double phi_positive = (phi>=0.0) ? phi : (phi+pi);
+  return phi_positive;
 }
 
 } /* namespace comptonsoft */
