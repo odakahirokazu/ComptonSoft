@@ -52,12 +52,12 @@ ANLStatus ReadHitTree::mod_initialize()
   
   get_module_NC("CSHitCollection", &hitCollection_);
 
-  hittree_ = new TChain("hittree");
+  hittree_ = std::make_unique<TChain>("hittree");
   for (const std::string& filename: fileList_) {
     hittree_->Add(filename.c_str());
   }
 
-  treeIO_->setTree(hittree_);
+  treeIO_->setTree(hittree_.get());
   if (hittree_->GetBranch("ini_energy")) {
     setInitialInformationStored();
     setWeightStored();

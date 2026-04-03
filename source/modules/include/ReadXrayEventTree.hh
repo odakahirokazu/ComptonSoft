@@ -28,6 +28,7 @@
 #define COMPTONSOFT_ReadXrayEventTree_H 1
 
 #include <anlnext/BasicModule.hh>
+#include <memory>
 
 class TChain;
 
@@ -38,10 +39,11 @@ class XrayEventTreeIO;
 
 class ReadXrayEventTree : public anlnext::BasicModule
 {
-  DEFINE_ANL_MODULE(ReadXrayEventTree, 1.1);
+  DEFINE_ANL_MODULE(ReadXrayEventTree, 1.2);
   // ENABLE_PARALLEL_RUN();
 public:
   ReadXrayEventTree();
+  ~ReadXrayEventTree();
   
 protected:
   ReadXrayEventTree(const ReadXrayEventTree&);
@@ -56,7 +58,7 @@ private:
   std::vector<std::string> fileList_;
   int eventSize_ = 1;
 
-  TChain* tree_;
+  std::unique_ptr<TChain> tree_;
   int64_t numEntries_ = 0;
   int64_t entryIndex_ = 0;
 

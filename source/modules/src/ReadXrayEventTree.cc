@@ -34,6 +34,8 @@ ReadXrayEventTree::ReadXrayEventTree()
 {
 }
 
+ReadXrayEventTree::~ReadXrayEventTree() = default;
+
 ANLStatus ReadXrayEventTree::mod_define()
 {
   define_parameter("file_list", &mod_class::fileList_);
@@ -46,13 +48,13 @@ ANLStatus ReadXrayEventTree::mod_initialize()
 {
   get_module_NC("XrayEventCollection", &collection_);
   
-  tree_ = new TChain("xetree");
+  tree_ = std::make_unique<TChain>("xetree");
   for (const std::string& filename: fileList_) {
     tree_->Add(filename.c_str());
   }
 
   treeIO_->setEventSize(eventSize_);
-  treeIO_->setTree(tree_);
+  treeIO_->setTree(tree_.get());
   treeIO_->setBranchAddresses();
 
   numEntries_ = tree_->GetEntries();

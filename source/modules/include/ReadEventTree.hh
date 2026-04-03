@@ -26,6 +26,7 @@
 #include <vector>
 #include <string>
 #include <cstdint>
+#include <memory>
 #include "DetectorHit_sptr.hh"
 
 class TChain;
@@ -42,7 +43,7 @@ class EventTreeIOWithInitialInfo;
  */
 class ReadEventTree : public VCSModule, public anlgeant4::InitialInformation
 {
-  DEFINE_ANL_MODULE(ReadEventTree, 2.1);
+  DEFINE_ANL_MODULE(ReadEventTree, 2.2);
 public:
   ReadEventTree();
   ~ReadEventTree();
@@ -60,7 +61,7 @@ protected:
 private:
   std::vector<std::string> fileList_;
 
-  TChain* tree_;
+  std::unique_ptr<TChain> tree_;
   int64_t numEntries_ = 0;
   int64_t entryIndex_ = 0;
 

@@ -26,6 +26,8 @@
 #include <vector>
 #include <string>
 #include <cstdint>
+#include <memory>
+
 #include "DetectorHit_sptr.hh"
 
 class TChain;
@@ -42,7 +44,7 @@ class HitTreeIOWithInitialInfo;
  */
 class ReadHitTree : public VCSModule, public anlgeant4::InitialInformation
 {
-  DEFINE_ANL_MODULE(ReadHitTree, 2.1);
+  DEFINE_ANL_MODULE(ReadHitTree, 2.2);
 public:
   ReadHitTree();
   ~ReadHitTree();
@@ -59,7 +61,7 @@ private:
   std::vector<std::string> fileList_;
   bool trustNumHits_;
 
-  TChain* hittree_;
+  std::unique_ptr<TChain> hittree_;
   int64_t numEntries_ = 0;
   int64_t entryIndex_ = 0;
 
