@@ -15,6 +15,7 @@ EventReconstructionWithKnownOrder::~EventReconstructionWithKnownOrder() = defaul
 bool EventReconstructionWithKnownOrder::loadParameters(boost::property_tree::ptree &pt) {
   processMode_ = pt.get<int>("known_order.process_mode", 0);
   initialEnergy_ = pt.get<double>("known_order.initial_energy") * unit::keV;
+  assumeInitialEnergy_ = pt.get<bool>("known_order.assume_initial_gammaray_energy", false);
   excludeEscapeBranchingGamma_ = pt.get<bool>("known_order.exclude_escape_branching_gamma", false);
   excludeBranchingGammaDeposit_ = pt.get<bool>("known_order.exclude_branching_gamma_deposit", false);
   excludeRayleighScattering_ = pt.get<bool>("known_order.exclude_rayleigh_scattering", false);
@@ -34,7 +35,13 @@ bool EventReconstructionWithKnownOrder::loadParameters(boost::property_tree::ptr
     std::cerr << "Error: Unknown escape detection method mode: " << escape_method_mode << std::endl;
     return false;
   }
-  numLastHits_ = pt.get<int>("known_order.num_last_hits", 0);
+  if (!assumeInitialEnergy_) {
+    numLastHits_ = pt.get<int>("known_order.num_last_hits", 0);
+  }
+  else {
+    std::cout << "Assuming initial energy for all events. Setting num_last_hits to 2." << std::endl;
+    numLastHits_ = 2;
+  }
   thresholdOfPosZ_ = pt.get<double>("known_order.threshold_of_posz", 1*unit::km/unit::mm) * unit::mm;
   noiseLevelParam0_ = pt.get<double>("known_order.noise_level_param0", 0.0);
   noiseLevelParam1_ = pt.get<double>("known_order.noise_level_param1", 0.0);
@@ -54,6 +61,7 @@ bool EventReconstructionWithKnownOrder::loadParameters(boost::property_tree::ptr
   std::cout << "--- EventReconstructionWithKnownOrder v2---" << std::endl;
   std::cout << "  process_mode: " << processMode_ << std::endl;
   std::cout << "  initial_energy: " << initialEnergy_ / unit::keV << " keV" << std::endl;
+  std::cout << "  assume_initial_energy: " << assumeInitialEnergy_ << std::endl;
   std::cout << "  escape detection method: " << ((escapeDetectionMethod_ == EscapeDetectionMethod::TOTAL_ENERGY_DEPOSITION ? "Total Energy Deposition" : (escapeDetectionMethod_ == EscapeDetectionMethod::PHOTOABSORPTION_CHECK ? "Photoabsorption Check" : "Flag Check"))) << std::endl;
   if (escapeDetectionMethod_ == EscapeDetectionMethod::PHOTOABSORPTION_CHECK)
     std::cout << "    tolerance: " << tolerance_ / unit::keV << " keV" << std::endl;
@@ -173,7 +181,16 @@ bool EventReconstructionWithKnownOrder::reconstruct(const std::vector<DetectorHi
   if (ordered_hits.size() > hits_used && numLastHits_ > 0) {
     is_escaped = true; // Escape event if not all hits are used
   }
-  if ((processMode_ != 1) && is_escaped) {
+  if (assumeInitialEnergy_) {
+    const auto result = reconstuctUnderAssumedInitialEnergy(ordered_hits, eventReconstructed, is_escaped);
+    if (!result) {
+      if (verbose_ > 0) {
+        std::cerr << "Error: Failed to reconstruct event under assumed initial energy." << std::endl;
+      }
+      return false;
+    }
+  }
+  else if ((processMode_ != 1) && is_escaped) {
     const auto result = reconstructEscapeEvent(ordered_hits, eventReconstructed);
     if (!result) {
       if (verbose_ > 0) {
@@ -181,13 +198,6 @@ bool EventReconstructionWithKnownOrder::reconstruct(const std::vector<DetectorHi
       }
       return false;
     }
-    if (eventReconstructed->CosThetaE() < -1.0 || eventReconstructed->CosThetaE() > 1.0) {
-      if (verbose_ > 0) {
-        std::cerr << "Error: Unphysical CosThetaE value after reconstruction: " << eventReconstructed->CosThetaE() << std::endl;
-      }
-      return false;
-    }
-    eventsReconstructed.push_back(eventReconstructed);
   }
   else if ((processMode_ != 2) && !is_escaped) {
     const auto result = reconstructFullDepositEvent(ordered_hits, eventReconstructed);
@@ -197,13 +207,6 @@ bool EventReconstructionWithKnownOrder::reconstruct(const std::vector<DetectorHi
       }
       return false;
     }
-    if (eventReconstructed->CosThetaE() < -1.0 || eventReconstructed->CosThetaE() > 1.0) {
-      if (verbose_ > 0) {
-        std::cerr << "Error: Unphysical CosThetaE value after reconstruction: " << eventReconstructed->CosThetaE() << std::endl;
-      }
-      return false;
-    }
-    eventsReconstructed.push_back(eventReconstructed);
   }
   else {
     if (verbose_ > 0) {
@@ -211,6 +214,13 @@ bool EventReconstructionWithKnownOrder::reconstruct(const std::vector<DetectorHi
     }
     return false;
   }
+  if (eventReconstructed->CosThetaE() < -1.0 || eventReconstructed->CosThetaE() > 1.0) {
+      if (verbose_ > 0) {
+        std::cerr << "Error: Unphysical CosThetaE value after reconstruction: " << eventReconstructed->CosThetaE() << std::endl;
+      }
+      return false;
+    }
+  eventsReconstructed.push_back(eventReconstructed);
   if (verbose_ > 0) {
     std::cout << "  Total energy deposit: " << eventReconstructed->TotalEnergyDeposit() / unit::keV << " keV" << std::endl;
     std::cout << "  Delta energy: " << (initialEnergy_ - eventReconstructed->IncidentEnergy()) / unit::keV << " keV" << std::endl;
@@ -338,6 +348,17 @@ bool EventReconstructionWithKnownOrder::reconstructFullDepositEvent(const std::v
   eventReconstructed->setLikelihood(fixedLikelihood_);
   constexpr double reconstruction_fraction = 1.0;
   eventReconstructed->setReconstructionFraction(reconstruction_fraction);
+  return true;
+}
+bool EventReconstructionWithKnownOrder::reconstuctUnderAssumedInitialEnergy(const std::vector<DetectorHit_sptr> &ordered_hits, BasicComptonEvent_sptr &eventReconstructed, bool is_escape) {
+  if (verbose_ > 0) {
+    std::cout << "  Reconstructing event under assumed initial energy." << std::endl;
+  }
+  eventReconstructed->setHit2Energy(initialEnergy_ - ordered_hits[0]->Energy());
+  eventReconstructed->setTotalEnergyDeposit(total_energy_deposits(ordered_hits));
+  eventReconstructed->setEscapeFlag(is_escape);
+  eventReconstructed->setLikelihood(fixedLikelihood_);
+  eventReconstructed->setReconstructionFraction(1.0);
   return true;
 }
 bool EventReconstructionWithKnownOrder::isEscapeEvent(uint8_t detectFlag) const {

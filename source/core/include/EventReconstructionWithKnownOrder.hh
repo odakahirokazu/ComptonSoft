@@ -57,6 +57,7 @@ protected:
   bool sortByRealTime(std::vector<DetectorHit_sptr> &hits);
   bool reconstructEscapeEvent(const std::vector<DetectorHit_sptr> &ordered_hits, BasicComptonEvent_sptr &eventReconstructed);
   bool reconstructFullDepositEvent(const std::vector<DetectorHit_sptr> &ordered_hits, BasicComptonEvent_sptr &eventReconstructed);
+  bool reconstuctUnderAssumedInitialEnergy(const std::vector<DetectorHit_sptr> &ordered_hits, BasicComptonEvent_sptr &eventReconstructed, bool is_escape);
   uint8_t checkEvent(const std::vector<DetectorHit_sptr> &ordered_hits);
   bool isEscapeEvent(uint8_t detectFlag) const;
 
@@ -64,6 +65,7 @@ private:
   static constexpr double fixedLikelihood_ = 1.;
   static constexpr double tolerance_ = 1e-3 * anlgeant4::unit::keV; // for photoabsorption check
   int processMode_ = 0; // 0: full + escape, 1: full only, 2: escape only
+  bool assumeInitialEnergy_ = false;
   double initialEnergy_ = 0.0;
   int verbose_ = 0;
   bool excludeEscapeBranchingGamma_ = false; // only for escape detection by flag check

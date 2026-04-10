@@ -50,7 +50,7 @@ double ModifiedBoxModel::electronDeDx(double dedx, double electricField) const {
       nQuantaWithFluctuations = 0;
     }
     //std::cout << "nQuantaWithFluctuations: " << nQuantaWithFluctuations << std::endl;
-    double p = new_dedx / dedx;
+    const double p = new_dedx / dedx;
     if (p < 0.0) {
       return 0.0;
     }
