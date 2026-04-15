@@ -136,7 +136,8 @@ void LArTPCDeviceSimulation::applyRecombination(DetectorHit_sptr &hit) {
     return;
   }
   if (!hit->isContinuousProcess()) {
-    hit->setPhotonCount(recombinationModel_->lightYield(edep, 1.0));
+    hit->setPhotonCount(recombinationModel_->lightYield(edep, 1.0) * PhotonEfficiency(hit->LocalPositionX(), hit->LocalPositionY(), hit->LocalPositionZ()));
+    //hit->setPhotonCount(recombinationModel_->lightYield(edep, 1.0));
     hit->setEnergyCharge(edep);
     return;
   }
@@ -145,7 +146,8 @@ void LArTPCDeviceSimulation::applyRecombination(DetectorHit_sptr &hit) {
   if (!getdEdxSpline()) {
     const double step_length = (hit->PostStepPointPosition() - hit->PreStepPointPosition()).mag();
     if (step_length <= 0.0) {
-      hit->setPhotonCount(recombinationModel_->lightYield(edep, 1.0));
+      hit->setPhotonCount(recombinationModel_->lightYield(edep, 1.0) * PhotonEfficiency(hit->LocalPositionX(), hit->LocalPositionY(), hit->LocalPositionZ()));
+      //hit->setPhotonCount(recombinationModel_->lightYield(edep, 1.0));
       hit->setEnergyCharge(edep);
       return;
     }
@@ -155,7 +157,8 @@ void LArTPCDeviceSimulation::applyRecombination(DetectorHit_sptr &hit) {
     const double ken = hit->KineticEnergy();
     dedx = getdEdxFromKineticEnergy(ken);
     if (dedx <= 0.0) {
-      hit->setPhotonCount(recombinationModel_->lightYield(edep, 1.0));
+      hit->setPhotonCount(recombinationModel_->lightYield(edep, 1.0) * PhotonEfficiency(hit->LocalPositionX(), hit->LocalPositionY(), hit->LocalPositionZ()));
+      //hit->setPhotonCount(recombinationModel_->lightYield(edep, 1.0));
       hit->setEnergyCharge(edep);
       return;
     }
