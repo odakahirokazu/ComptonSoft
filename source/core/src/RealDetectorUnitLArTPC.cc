@@ -82,11 +82,7 @@ void RealDetectorUnitLArTPC::reconstruct(const DetectorHitVector& hitSignals,
   }
   correctPhotonDetectionEfficiency(hitsReconstructed);
   if (isRecombinationCorrectionEnabled()) {
-    applyRecombinationCorrection(hitsReconstructed);
-    for (auto &hit: hitsReconstructed) {
-      hit->setEnergy(hit->EPI());
-      hit->setEnergyError(hit->EPIError());
-    }
+    correctRecombination(hitsReconstructed);
   }
 }
 
@@ -100,19 +96,25 @@ void RealDetectorUnitLArTPC::determinePosition(DetectorHitVector& hits) const
   }
 }
 
-void RealDetectorUnitLArTPC::applyRecombinationCorrection(DetectorHitVector &hits) {
+void RealDetectorUnitLArTPC::correctRecombination(DetectorHitVector &hits) const {
+  for (auto &hit: hits) {
+    applyRecombinationCorrection(hit);
+  }
+}
+
+void RealDetectorUnitLArTPC::applyRecombinationCorrection(DetectorHit_sptr &hit) const {
   const auto wexc = Wexc();
   const auto wion = Wion();
-  for (auto &hit: hits) {
-    const auto epi = hit->EPI();
-    const auto epi_error = hit->EPIError();
-    const auto photon_count = hit->PhotonCount();
-    const auto photon_count_error = hit->PhotonCountError();
-    const double corrected_epi = (epi / wion + photon_count) * wexc;
-    const double corrected_epi_error = wexc * std::sqrt(std::pow(epi_error / wion, 2) + std::pow(photon_count_error, 2)); // propagation of uncertainty
-    hit->setEPI(corrected_epi);
-    hit->setEPIError(corrected_epi_error);
-  }
+  const auto epi = hit->EPI();
+  const auto epi_error = hit->EPIError();
+  const auto photon_count = hit->PhotonCount();
+  const auto photon_count_error = hit->PhotonCountError();
+  const double corrected_epi = (epi / wion + photon_count) * wexc;
+  const double corrected_epi_error = wexc * std::sqrt(std::pow(epi_error / wion, 2) + std::pow(photon_count_error, 2)); // propagation of uncertainty
+  hit->setEPI(corrected_epi);
+  hit->setEPIError(corrected_epi_error);
+  hit->setEnergy(corrected_epi);
+  hit->setEnergyError(corrected_epi_error);
 }
 
 void RealDetectorUnitLArTPC::correctPhotonDetectionEfficiency(DetectorHitVector &hits) const {

@@ -71,15 +71,16 @@ public:
   void correctPhotonDetectionEfficiency(DetectorHitVector &hits) const;
   
   void printDetectorParameters(std::ostream& os) const override;
+  void applyRecombinationCorrection(DetectorHit_sptr &hits) const override;
   
 protected:
   bool setReconstructionDetails(int mode) override;
   void reconstruct(const DetectorHitVector& hitSignals,
                    DetectorHitVector& hitsReconstructed) override;
+  void correctRecombination(DetectorHitVector &hits) const;
 
 private:
   void determinePosition(DetectorHitVector& hits) const;
-  void applyRecombinationCorrection(DetectorHitVector &hits);
 
 private:
   ElectrodeSide readoutElectrode_;
