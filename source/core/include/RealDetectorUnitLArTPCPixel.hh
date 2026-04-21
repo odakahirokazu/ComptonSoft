@@ -22,14 +22,21 @@
 
 #include "VRealDetectorUnit.hh"
 #include "CLHEP/Units/SystemOfUnits.h"
+#include "TH1I.h"
+#include "TFile.h"
+#include "VGainFunction.hh"
 
+class TH1I;
+class TFile;
 namespace comptonsoft {
+class VGainFunction;
 
 /**
  * A class of a LArTPCPixel detector unit.
  * @author Shota Arai
  * @date 2026-02-17
  * @date 2026-02-21 | added recombination correction
+ * @date 2026-04-18 | implemented recombination correction with charge only
  */
 class RealDetectorUnitLArTPCPixel: public VRealDetectorUnit {
 public:
@@ -50,8 +57,8 @@ public:
     return (ReadoutElectrode() != ElectrodeSide::Undefined &&
             ReadoutElectrode() != BottomSideElectrode());
   }
-  bool isRecombinationCorrectionEnabled() const { return isRecombinationCorrectionEnabled_; }
-  bool setRecombinationCorrectionEnabled(bool v) { return isRecombinationCorrectionEnabled_ = v; }
+  int recombinationCorrectionMode() const { return recombinationCorrectionMode_; }
+  void setRecombinationCorrectionMode(int v) { recombinationCorrectionMode_ = v; }
 
   void setWion(double v) { Wion_ = v; }
   double Wion() const { return Wion_; }
@@ -64,6 +71,7 @@ public:
   
   void printDetectorParameters(std::ostream& os) const override;
   void applyRecombinationCorrection(DetectorHit_sptr &hits) const override;
+  void setRecombinationCorrectionFile(const std::string &filename, const std::string &meta_tree_name);
 
 protected:
   bool setReconstructionDetails(int mode) override;
@@ -73,10 +81,17 @@ protected:
     
 private:
   void determinePosition(DetectorHitVector &hits) const;
+  std::tuple<double, double> applyRecombinationCorrectionWithLight(DetectorHit_sptr &hit) const;
+  std::tuple<double, double> applyRecombinationCorrectionWithCorrectionFile(DetectorHit_sptr &hit) const;
 
 private:
   ElectrodeSide readoutElectrode_;
-  bool isRecombinationCorrectionEnabled_ = true;
+
+  int recombinationCorrectionMode_ = 1; // 0: off, 1: using light and charge, 2: using charge only
+  std::vector<VGainFunction *>recombinationCorrectionFunction_;
+  TH1I *recombinationCorrectionZMapping_ = nullptr;
+  TFile *recombinationCorrectionFile_ = nullptr;
+
   double Wion_ = 23.6 * CLHEP::eV; // Ionization energy in liquid argon
   double Wexc_ = 19.5 * CLHEP::eV; // Excitation energy in liquid argon
   double photonDetectionEfficiencyInv_ = 1.0; // Inverse of photon detection efficiency

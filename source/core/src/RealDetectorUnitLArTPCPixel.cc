@@ -23,6 +23,14 @@
 #include <iterator>
 #include <list>
 #include <utility>
+#include <string>
+#include <vector>
+#include "TFile.h"
+#include "TTree.h"
+#include "TSpline.h"
+#include "TF1.h"
+#include "GainFunctionTF1.hh"
+#include "GainFunctionSpline.hh"
 
 namespace comptonsoft {
 
@@ -35,7 +43,11 @@ RealDetectorUnitLArTPCPixel::~RealDetectorUnitLArTPCPixel() = default;
 
 void RealDetectorUnitLArTPCPixel::printDetectorParameters(std::ostream &os) const {
   VRealDetectorUnit::printDetectorParameters(os);
-  os << "  Recombination correction: " << isRecombinationCorrectionEnabled()<< "\n";
+  os << "  Recombination correction: " << recombinationCorrectionMode() << "\n";
+  if (recombinationCorrectionMode() == 2) {
+    os << "  Recombination correction File: " << (recombinationCorrectionFile_ ? recombinationCorrectionFile_->GetName() : "None") << "\n";
+    os << "  Number of zbins: " << (recombinationCorrectionZMapping_ ? recombinationCorrectionZMapping_->GetNbinsX() : 0) << "\n";
+  }
   os << "  Wion: " << Wion_/CLHEP::eV << " eV" << "\n";
   os << "  Wexc: " << Wexc_/CLHEP::eV << " eV" << "\n";
 }
@@ -82,12 +94,8 @@ void RealDetectorUnitLArTPCPixel::reconstruct(const DetectorHitVector &hitSignal
     }
   }
   correctPhotonDetectionEfficiency(hitsReconstructed);
-  if (isRecombinationCorrectionEnabled()) {
+  if (recombinationCorrectionMode() > 0) {
     correctRecombination(hitsReconstructed);
-    for (auto &hit: hitsReconstructed) {
-      hit->setEnergy(hit->EPI());
-      hit->setEnergyError(hit->EPIError());
-    }
   }
 }
 
@@ -102,13 +110,7 @@ void RealDetectorUnitLArTPCPixel::determinePosition(DetectorHitVector &hits) con
   }
 }
 
-void RealDetectorUnitLArTPCPixel::correctRecombination(DetectorHitVector &hits) const {
-  for (auto& hit: hits) {
-    applyRecombinationCorrection(hit);
-  }
-}
- 
-void RealDetectorUnitLArTPCPixel::applyRecombinationCorrection(DetectorHit_sptr &hit) const {
+std::tuple<double, double> RealDetectorUnitLArTPCPixel::applyRecombinationCorrectionWithLight(DetectorHit_sptr &hit) const {
   const auto wexc = Wexc();
   const auto wion = Wion();
   const auto epi = hit->EPI();
@@ -117,10 +119,104 @@ void RealDetectorUnitLArTPCPixel::applyRecombinationCorrection(DetectorHit_sptr 
   const auto photon_count_error = hit->PhotonCountError();
   const double corrected_epi = (epi / wion + photon_count) * wexc;
   const double corrected_epi_error = wexc * std::sqrt(std::pow(epi_error / wion, 2) + std::pow(photon_count_error, 2)); // propagation of uncertainty
+  return std::make_tuple(corrected_epi, corrected_epi_error);
+}
+
+std::tuple<double, double> RealDetectorUnitLArTPCPixel::applyRecombinationCorrectionWithCorrectionFile(DetectorHit_sptr &hit) const {
+    if (!recombinationCorrectionZMapping_ || recombinationCorrectionFunction_.empty()) {
+    throw std::runtime_error("RealDetectorUnitLArTPCPixel::applyRecombinationCorrectionWithCorrectionFile: Recombination correction function is not set.");
+  }
+  const auto z = hit->PositionZ() / CLHEP::cm;
+  const int bin = recombinationCorrectionZMapping_->FindBin(z);
+  if (bin < 1 || bin > recombinationCorrectionZMapping_->GetNbinsX()) {
+    return std::make_tuple(0, 0); // Forced to return zero if the hit is out of the z range of the correction file
+  }
+  const int index = static_cast<int>(recombinationCorrectionZMapping_->GetBinContent(bin));
+  if (index < 0 || index >= static_cast<int>(recombinationCorrectionFunction_.size())) {
+    throw std::runtime_error("RealDetectorUnitLArTPCPixel::applyRecombinationCorrectionWithCorrectionFile: Correction function index is out of range: " + std::to_string(index));
+  }
+  const auto correction_func = recombinationCorrectionFunction_[index];
+  const auto epi = hit->EPI() / CLHEP::keV;
+  const auto epi_error = hit->EPIError() / CLHEP::keV;
+  const double factor = correction_func->eval(epi) / epi;
+  const double corrected_epi = epi * factor * CLHEP::keV;
+  const double corrected_epi_error = epi_error * factor * CLHEP::keV; // propagation of uncertainty
+  return std::tuple<double, double>(corrected_epi, corrected_epi_error);
+}
+
+void RealDetectorUnitLArTPCPixel::correctRecombination(DetectorHitVector &hits) const {
+  for (auto& hit: hits) {
+    applyRecombinationCorrection(hit);
+  }
+}
+ 
+void RealDetectorUnitLArTPCPixel::applyRecombinationCorrection(DetectorHit_sptr &hit) const {
+  double corrected_epi, corrected_epi_error;
+  if (recombinationCorrectionMode() == 1) {
+    std::tie(corrected_epi, corrected_epi_error) = applyRecombinationCorrectionWithLight(hit);
+  }
+  else if (recombinationCorrectionMode() == 2) {
+    std::tie(corrected_epi, corrected_epi_error) = applyRecombinationCorrectionWithCorrectionFile(hit);
+  }
+  else {
+    // No correction
+    return;
+  }
   hit->setEPI(corrected_epi);
   hit->setEPIError(corrected_epi_error);
-  hit->setEnergy(corrected_epi);
-  hit->setEnergyError(corrected_epi_error);
+}
+
+void RealDetectorUnitLArTPCPixel::setRecombinationCorrectionFile(const std::string &filename, const std::string &meta_tree_name) {
+  if (filename.empty()) {
+    return;
+  }
+  recombinationCorrectionFile_= TFile::Open(filename.c_str(), "READ");
+  if (!recombinationCorrectionFile_ || recombinationCorrectionFile_->IsZombie()) {
+    throw std::runtime_error("RealDetectorUnitLArTPCPixel::setRecombinationCorrectionFile: Cannot open file: " + filename);
+  }
+  double bin_z_min;
+  double bin_z_max;
+  std::string *object_name = nullptr;
+  TTree *meta_tree = dynamic_cast<TTree *>(recombinationCorrectionFile_->Get(meta_tree_name.c_str()));
+  if (!meta_tree) {
+    throw std::runtime_error("RealDetectorUnitLArTPCPixel::setRecombinationCorrectionFile: Cannot find meta tree: " + meta_tree_name);
+  }
+  std::vector<double> bins_z;
+  std::vector<std::string> object_name_vec;
+  meta_tree->SetBranchAddress("bin_z_min", &bin_z_min);
+  meta_tree->SetBranchAddress("bin_z_max", &bin_z_max);
+  meta_tree->SetBranchAddress("object_name", &object_name);
+  bins_z.reserve(meta_tree->GetEntries());
+  object_name_vec.reserve(meta_tree->GetEntries());
+  for (int i = 0; i < meta_tree->GetEntries(); ++i) {
+    meta_tree->GetEntry(i);
+    bins_z.push_back(bin_z_min);
+    object_name_vec.emplace_back(*object_name);
+  }
+  bins_z.push_back(bin_z_max);
+  recombinationCorrectionZMapping_ = new TH1I("recombinationCorrectionZMapping", "Recombination Correction Z Mapping", bins_z.size()-1, bins_z.data());
+  for (int i = 0; i < static_cast<int>(object_name_vec.size()); ++i) {
+    recombinationCorrectionZMapping_->SetBinContent(i+1, i);
+    auto func = recombinationCorrectionFile_->Get(object_name_vec[i].c_str());
+    if (!func) {
+      throw std::runtime_error("RealDetectorUnitLArTPCPixel::setRecombinationCorrectionFile: Cannot find function: " + object_name_vec[i]);
+    }
+    if (func->InheritsFrom(TSpline::Class())) {
+      auto gain_func = new GainFunctionSpline();
+      gain_func->set(dynamic_cast<TSpline *>(func));
+      recombinationCorrectionFunction_.push_back(gain_func);
+    }
+    else if (func->InheritsFrom(TF1::Class())) {
+      auto gain_func = new GainFunctionTF1();
+      gain_func->set(dynamic_cast<TF1 *>(func));
+      recombinationCorrectionFunction_.push_back(gain_func);
+    }
+    else {
+      throw std::runtime_error("RealDetectorUnitLArTPCPixel::setRecombinationCorrectionFile: Object is neither TSpline nor TF1: " + object_name_vec[i]);
+    }
+  }
+  delete meta_tree;
+  meta_tree = nullptr;
 }
 
 void RealDetectorUnitLArTPCPixel::correctPhotonDetectionEfficiency(DetectorHitVector &hits) const {

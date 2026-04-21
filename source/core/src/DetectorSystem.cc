@@ -1036,16 +1036,6 @@ void DetectorSystem::setupDetectorParameters(const DetectorSystem::ParametersNod
         }
       }
     }
-    if (auto o = parameters.graph_file_for_epi_compensation) {
-      if (ds1) {
-        if (auto o2 = parameters.graph_list_name_for_epi_compensation){
-          ds1->setResponseFileForEPICompensation(*o, *o2);
-        }
-        else{
-          ds1->setResponseFileForEPICompensation(*o);
-        }
-      }
-    }
 
   }
   
@@ -1071,17 +1061,6 @@ void DetectorSystem::setupDetectorParameters(const DetectorSystem::ParametersNod
         }
         else{
           ds1->setdEdxFile(*o);
-        }
-      }
-    }
-    
-    if (auto o = parameters.graph_file_for_epi_compensation) {
-      if (ds1) {
-        if (auto o2 = parameters.graph_list_name_for_epi_compensation) {
-          ds1->setResponseFileForEPICompensation(*o, *o2);
-        }
-        else {
-          ds1->setResponseFileForEPICompensation(*o);
         }
       }
     }
@@ -1407,7 +1386,7 @@ void DetectorSystem::setupReconstructionParameters(const DetectorSystem::Paramet
     RealDetectorUnitLArTPC* ds1 = dynamic_cast<RealDetectorUnitLArTPC*>(detector);
     if (ds1) {
       if (auto o = parameters.recombination_correction) {
-        ds1->setRecombinationCorrectionEnabled(*o);
+        ds1->setRecombinationCorrectionMode(*o);
       }
       if (auto o = parameters.photon_efficiency) {
         ds1->setPhotonDetectionEfficiency(*o);
@@ -1419,6 +1398,12 @@ void DetectorSystem::setupReconstructionParameters(const DetectorSystem::Paramet
       if (auto o5 = parameters.w_ion) {
         const double value = (*o5) * unit::eV;
         ds1->setWion(value);
+      }
+      if (auto o = parameters.recombination_correction_file) {
+        const std::string tree_name = parameters.meta_name_for_recombination_correction ? *parameters.meta_name_for_recombination_correction : "meta";
+        if (ds1) {
+          ds1->setRecombinationCorrectionFile(*o, tree_name);
+        }
       }
     }
   }
@@ -1426,7 +1411,7 @@ void DetectorSystem::setupReconstructionParameters(const DetectorSystem::Paramet
     RealDetectorUnitLArTPCPixel* ds1 = dynamic_cast<RealDetectorUnitLArTPCPixel*>(detector);
     if (ds1) {
       if (auto o = parameters.recombination_correction) {
-        ds1->setRecombinationCorrectionEnabled(*o);
+        ds1->setRecombinationCorrectionMode(*o);
       }
       if (auto o = parameters.photon_efficiency) {
         ds1->setPhotonDetectionEfficiency(*o);
@@ -1438,6 +1423,12 @@ void DetectorSystem::setupReconstructionParameters(const DetectorSystem::Paramet
       if (auto o5 = parameters.w_ion) {
         const double value = (*o5) * unit::eV;
         ds1->setWion(value);
+      }
+      if (auto o = parameters.recombination_correction_file) {
+        const std::string tree_name = parameters.meta_name_for_recombination_correction ? *parameters.meta_name_for_recombination_correction : "meta";
+        if (ds1) {
+          ds1->setRecombinationCorrectionFile(*o, tree_name);
+        }
       }
     }
   }
@@ -1602,12 +1593,6 @@ load(const boost::property_tree::ptree& node)
   if (auto o=node.get_optional<int>("pedestal_generation.<xmlattr>.flag")) {
     pedestal_generation_flag = o;
   }
-  if (auto o = node.get_optional<std::string>("compensation.<xmlattr>.graph_file_for_epi_compensation")) {
-    graph_file_for_epi_compensation = o;
-  }
-  if (auto o = node.get_optional<std::string>("compensation.<xmlattr>.graph_list_name_for_epi_compensation")) {
-    graph_list_name_for_epi_compensation = o;
-  }
   if (auto o=node.get_optional<int>("reconstruction.<xmlattr>.mode")) {
     reconstruction_mode = o;
   }
@@ -1640,6 +1625,12 @@ load(const boost::property_tree::ptree& node)
   }
   if (auto o=node.get_optional<double>("reconstruction.<xmlattr>.w_exc")) {
     w_exc = o;
+  }
+  if (auto o = node.  get_optional<std::string>("reconstruction.<xmlattr>.recombination_correction_file")) {
+    recombination_correction_file = o;
+  }
+  if (auto o = node.get_optional<std::string>("reconstruction.<xmlattr>.meta_name_for_recombination_correction")) {
+    meta_name_for_recombination_correction = o;
   }
   if (auto o=node.get_optional<std::string>("recombination.<xmlattr>.filename")) {
     recombination_configuration_file = o;

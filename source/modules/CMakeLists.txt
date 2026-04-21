@@ -93,6 +93,7 @@ set(CS_MODULES
   src/SelectFullDeposit.cc
   src/ComptonEventFilter.cc
   src/SelectEventsOnFocalPlane.cc
+  src/CorrectRecombination.cc
   src/SelectTime.cc
   src/FilterByGoodTimeIntervals.cc
   ### analysis ROOT trees & histograms
@@ -148,6 +149,8 @@ add_library(CSModules SHARED
   ${CS_MODULES}
   ${CS_FITSIO_MODULES}
   ${CS_HSQUICKLOOK_MODULES}
+  src/SetEnergy.cc
+  src/NumHitsInDetectorFilter.cc
   )
 
 target_link_libraries(CSModules

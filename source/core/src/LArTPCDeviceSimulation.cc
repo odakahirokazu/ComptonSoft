@@ -28,7 +28,6 @@ void LArTPCDeviceSimulation::printSimulationParameters(std::ostream &os) const {
   else {
     os << "  No recombination model is set.\n";
   }
-  os << "  Response graph list for EPI compensation: " << responseGraphListForEPICompensation_.size() << " graphs loaded. Name header is " << (responseGraphListForEPICompensation_.empty() ? "none" : responseGraphListForEPICompensation_[0]->GetName()) << "\n";
   os << "  dEdx spline: " << (dedxSpline_ ? dedxSpline_->GetName() : "not set") << "\n";
 }
 double LArTPCDeviceSimulation::DiffusionSigmaAnode3D(double z, double &longitudinal, double &transverse) {
@@ -59,64 +58,6 @@ double LArTPCDeviceSimulation::DiffusionSigmaAnode3D(double z, double &longitudi
 }
 double LArTPCDeviceSimulation::DiffusionSigmaCathode(double) {
   return 0.0; // hole diffusion is not considered
-}
-
-std::tuple<double, double> LArTPCDeviceSimulation::compensateEPI(const PixelID &sp, std::tuple<double, double> ePI) const {
-  const auto graph = getResponseGraphListForEPICompensation();
-
-  auto new_epi = DeviceSimulation::compensateEPI(sp, ePI);
-  if (graph.size() > 0) {
-    int iz = sp.Z();
-    if (iz >= 0 && zIndicesForEPI_[iz] < static_cast<int>(graph.size())) {
-      const double ePI_value = std::get<0>(new_epi);
-      const double ePI_error = std::get<1>(new_epi);
-      double new_e = graph[zIndicesForEPI_[iz]]->Eval(ePI_value / keV, nullptr, "S") * keV;
-      if (new_e > 0.0) {
-        double rate = ePI_value / new_e;
-        double compensated_ePI_error = ePI_error / rate;
-        new_epi = std::make_tuple(new_e, compensated_ePI_error);
-      }
-    }
-    else {
-      std::cerr << "LArTPCDeviceSimulation::compensateEPI: Warning! Z index out of range for spline list: " << iz << " " << zIndicesForEPI_[iz] << std::endl;
-    }
-  }
-  return new_epi;
-}
-
-void LArTPCDeviceSimulation::setResponseFileForEPICompensation(const std::string &filename, const std::string &graph_name) {
-  if (filename.empty()) {
-    return;
-  }
-  TFile *file = TFile::Open(filename.c_str(), "READ");
-  if (!file || file->IsZombie()) {
-    throw std::runtime_error("LArTPCDeviceSimulation::setResponseFileForEPICompensation: Cannot open file: " + filename);
-  }
-  int nz = 0, nb = 0;
-  std::vector<int> *pixelz_map = nullptr;
-  if (auto meta = (TTree *)file->Get("meta")) {
-    meta->SetBranchAddress("N_pixelz", &nz);
-    meta->SetBranchAddress("N_bins", &nb);
-    meta->SetBranchAddress("pixelz_mapping", &pixelz_map);
-    meta->GetEntry(0);
-    if (!pixelz_map) {
-      throw std::runtime_error("LArTPCDeviceSimulation::setResponseFileForEPICompensation: pixelz_mapping not found in meta tree.");
-    }
-    zIndicesForEPI_ = *pixelz_map;
-  }
-  responseFileForEPICompensation_ = file;
-  const auto num_div = zIndicesForEPI_.back() + 1;
-  for (int iz = 0; iz < num_div; ++iz) {
-    auto graph = dynamic_cast<TGraph *>(file->Get(Form("%s%d", graph_name.c_str(), iz)));
-    if (!graph) {
-      throw std::runtime_error(Form("LArTPCDeviceSimulation::setResponseFileForEPICompensation: Cannot find spline: %s%d", graph_name.c_str(), iz));
-    }
-    responseGraphListForEPICompensation_.push_back(graph);
-  }
-  if (getNumVoxelZ() > nz) {
-    std::cerr << "LArTPCDeviceSimulation::setResponseFileForEPICompensation: Warning! Number of Z voxels (" << getNumVoxelZ()
-              << ") is larger than number of splines loaded (" << nz << ")." << std::endl;
-  }
 }
 
 void LArTPCDeviceSimulation::instantiateRecombinationModel(const std::string &config_filename) {

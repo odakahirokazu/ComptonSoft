@@ -26,12 +26,15 @@
 #include "ReadDataFile_NB0.hh"
 #include "CorrectPHA.hh"
 #include "RecalculateEPI.hh"
+#include "CorrectRecombination.hh"
+#include "SetEnergy.hh"
 #include "CalculatePedestalLevels.hh"
 #include "InitialConditionFilter.hh"
 #include "WeightByInitialDirection.hh"
 #include "RecalculateSimulationNoise.hh"
 #include "ComptonModeFilter.hh"
 #include "SelectFullDeposit.hh"
+#include "NumHitsInDetectorFilter.hh"
 #include "ComptonEventFilter.hh"
 #include "SelectEventsOnFocalPlane.hh"
 #include "SelectTime.hh"
@@ -398,6 +401,22 @@ class CorrectPHA : public VCSModule
 public:
   CorrectPHA();
   ~CorrectPHA();
+};
+
+
+class CorrectRecombination : public VCSModule
+{
+public:
+  CorrectRecombination();
+  ~CorrectRecombination();
+};
+
+
+class SetEnergy : public anlnext::BasicModule
+{
+public:
+  SetEnergy();
+  ~SetEnergy();
 };
 
 
@@ -973,6 +992,14 @@ class SelectEventsWithDetectorSpectrum : public anlnext::BasicModule
 public:
   SelectEventsWithDetectorSpectrum();
   ~SelectEventsWithDetectorSpectrum();
+};
+
+
+class NumHitsInDetectorFilter : public anlnext::BasicModule
+{
+public:
+  NumHitsInDetectorFilter();
+  ~NumHitsInDetectorFilter();
 };
 
 

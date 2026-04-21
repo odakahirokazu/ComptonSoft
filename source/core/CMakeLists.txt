@@ -28,6 +28,7 @@ set(CS_CORE_CLASSES
   src/GainFunctionLinear.cc
   src/GainFunctionCubic.cc
   src/GainFunctionSpline.cc
+  src/GainFunctionTF1.cc
   src/MultiChannelData.cc
   src/VChannelMap.cc
   src/ChannelMap.cc
