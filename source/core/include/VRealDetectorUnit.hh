@@ -273,7 +273,7 @@ public:
   void recalculateEPI();
   void assignReadoutInfo();
 
-  virtual void applyRecombinationCorrection(DetectorHit_sptr &/*hits*/) const {}
+  virtual void applyRecombinationCorrection(DetectorHitVector &/*hits*/) const {}
 
   void insertDetectorHit(DetectorHit_sptr hit) override
   { detectorHits_.push_back(hit); }

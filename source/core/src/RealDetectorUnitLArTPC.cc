@@ -48,7 +48,7 @@ RealDetectorUnitLArTPC::~RealDetectorUnitLArTPC() {
 void RealDetectorUnitLArTPC::printDetectorParameters(std::ostream &os) const {
   VRealDetectorUnit::printDetectorParameters(os);
   os << "  Recombination correction: " << recombinationCorrectionMode()<< "\n";
-  if (recombinationCorrectionMode() == 2) {
+  if (recombinationCorrectionMode() == 2 || recombinationCorrectionMode() == 3) {
     os << "  Recombination correction File: " << (recombinationCorrectionFile_ ? recombinationCorrectionFile_->GetName() : "None") << "\n";
     os << "  Number of zbins: " << (recombinationCorrectionZMapping_ ? recombinationCorrectionZMapping_->GetNbinsX() : 0) << "\n";
   }
@@ -99,7 +99,7 @@ void RealDetectorUnitLArTPC::reconstruct(const DetectorHitVector& hitSignals,
   }
   correctPhotonDetectionEfficiency(hitsReconstructed);
   if (recombinationCorrectionMode() > 0) {
-    correctRecombination(hitsReconstructed);
+    applyRecombinationCorrection(hitsReconstructed);
   }
 }
 
@@ -113,7 +113,7 @@ void RealDetectorUnitLArTPC::determinePosition(DetectorHitVector& hits) const
   }
 }
 
-std::tuple<double, double> RealDetectorUnitLArTPC::applyRecombinationCorrectionWithLight(DetectorHit_sptr &hit) const {
+std::tuple<double, double> RealDetectorUnitLArTPC::applyRecombinationCorrectionWithLight(const DetectorHit_sptr &hit) const {
   const auto wexc = Wexc();
   const auto wion = Wion();
   const auto epi = hit->EPI();
@@ -125,7 +125,7 @@ std::tuple<double, double> RealDetectorUnitLArTPC::applyRecombinationCorrectionW
   return std::make_tuple(corrected_epi, corrected_epi_error);
 }
 
-std::tuple<double, double> RealDetectorUnitLArTPC::applyRecombinationCorrectionWithCorrectionFile(DetectorHit_sptr &hit) const {
+std::tuple<double, double> RealDetectorUnitLArTPC::applyRecombinationCorrectionWithCorrectionFile(const DetectorHit_sptr &hit) const {
   if (!recombinationCorrectionZMapping_ || recombinationCorrectionFunction_.empty()) {
     throw std::runtime_error("RealDetectorUnitLArTPC::applyRecombinationCorrectionWithCorrectionFile: Recombination correction function is not set.");
   }
@@ -147,28 +147,41 @@ std::tuple<double, double> RealDetectorUnitLArTPC::applyRecombinationCorrectionW
   return std::tuple<double, double>(corrected_epi, corrected_epi_error);
 }
 
-void RealDetectorUnitLArTPC::correctRecombination(DetectorHitVector &hits) const {
-  for (auto &hit: hits) {
-    applyRecombinationCorrection(hit);
-  }
-}
-
-void RealDetectorUnitLArTPC::applyRecombinationCorrection(DetectorHit_sptr &hit) const {
-  double corrected_epi, corrected_epi_error;
+void RealDetectorUnitLArTPC::applyRecombinationCorrection(DetectorHitVector &hits) const {
+ double corrected_epi, corrected_epi_error;
   if (recombinationCorrectionMode() == 1) {
-    std::tie(corrected_epi, corrected_epi_error) = applyRecombinationCorrectionWithLight(hit);
+    for (auto &hit: hits) {
+      std::tie(corrected_epi, corrected_epi_error) = applyRecombinationCorrectionWithLight(hit);
+      hit->setEPI(corrected_epi);
+      hit->setEPIError(corrected_epi_error);
+    }
   }
   else if (recombinationCorrectionMode() == 2) {
-    std::tie(corrected_epi, corrected_epi_error) = applyRecombinationCorrectionWithCorrectionFile(hit);
+    for (auto &hit: hits) {
+      std::tie(corrected_epi, corrected_epi_error) = applyRecombinationCorrectionWithCorrectionFile(hit);
+      hit->setEPI(corrected_epi);
+      hit->setEPIError(corrected_epi_error);
+    } 
+  }
+  else if (recombinationCorrectionMode() == 3) {
+    if (hits.size() == 1) {
+      std::tie(corrected_epi, corrected_epi_error) = applyRecombinationCorrectionWithLight(hits[0]);
+      hits[0]->setEPI(corrected_epi);
+      hits[0]->setEPIError(corrected_epi_error);
+    }
+    else {
+      // If there are multiple hits, apply correction with light only to avoid the complexity of handling multiple hits with the correction file.
+      for (auto &hit: hits) {
+        std::tie(corrected_epi, corrected_epi_error) = applyRecombinationCorrectionWithCorrectionFile(hit);
+        hit->setEPI(corrected_epi);
+        hit->setEPIError(corrected_epi_error);
+      }
+    }
   }
   else {
     // No correction
     return;
   }
-  hit->setEPI(corrected_epi);
-  hit->setEPIError(corrected_epi_error);
-  hit->setEnergy(corrected_epi);
-  hit->setEnergyError(corrected_epi_error);
 }
 
 void RealDetectorUnitLArTPC::setRecombinationCorrectionFile(const std::string &filename, const std::string &meta_tree_name) {

@@ -78,19 +78,18 @@ public:
   void correctPhotonDetectionEfficiency(DetectorHitVector &hits) const;
   
   void printDetectorParameters(std::ostream& os) const override;
-  void applyRecombinationCorrection(DetectorHit_sptr &hits) const override;
+  void applyRecombinationCorrection(DetectorHitVector &hits) const override;
   void setRecombinationCorrectionFile(const std::string &filename, const std::string &meta_tree_name);
 
 protected:
   bool setReconstructionDetails(int mode) override;
   void reconstruct(const DetectorHitVector& hitSignals,
                    DetectorHitVector& hitsReconstructed) override;
-  void correctRecombination(DetectorHitVector &hits) const;
 
 private:
   void determinePosition(DetectorHitVector& hits) const;
-  std::tuple<double, double> applyRecombinationCorrectionWithLight(DetectorHit_sptr &hit) const;
-  std::tuple<double, double> applyRecombinationCorrectionWithCorrectionFile(DetectorHit_sptr &hit) const;
+  std::tuple<double, double> applyRecombinationCorrectionWithLight(const DetectorHit_sptr &hit) const;
+  std::tuple<double, double> applyRecombinationCorrectionWithCorrectionFile(const DetectorHit_sptr &hit) const;
 
 private:
   ElectrodeSide readoutElectrode_;
