@@ -104,6 +104,9 @@ set(CS_CORE_CLASSES
   src/RIDecayProperties.cc
   src/RIDecayChains.cc
   src/RIDecayCalculation.cc
+  src/NanoGRAMSTPCTreeUtil.cc
+  src/TPCTreeIO.cc
+  #src/NanoGRAMSEvent.cc
   )
 
 if(CS_USE_ORT)

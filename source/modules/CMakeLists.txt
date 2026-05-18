@@ -15,6 +15,12 @@ include_directories(
   ${BOOST_INC_DIR}
   )
 
+find_package(HDF5 REQUIRED COMPONENTS C)
+
+include_directories(
+  ${HDF5_INCLUDE_DIRS}
+  )
+
 link_directories(
   /usr/local/lib
   ${ANLNEXT_LIB_DIR}
@@ -120,6 +126,8 @@ set(CS_MODULES
   src/ExtractPhotoelectronTrajectory.cc
   ### others
   src/QuickAnalysisForDSD.cc
+  src/NanoGRAMSDataReduction.cc
+  src/NanoGRAMSCalibrationStep1.cc
   )
 
 if(CS_USE_FITSIO)
@@ -169,6 +177,7 @@ target_link_libraries(CSModules
   ${SIMX_LIB}
   ${ORT_LIB}
   ${ADD_LIB}
+  ${HDF5_LIBRARIES}
   )
 
 install(TARGETS CSModules LIBRARY DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
