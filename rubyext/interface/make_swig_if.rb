@@ -148,6 +148,10 @@ clAH = [
   ANL::SWIGClass.new("WriteHXIEventFITS", false, 'USE_FITSIO'),
   ANL::SWIGClass.new("FilterByGoodTimeIntervalsForSGD", false, 'USE_FITSIO'),
   ANL::SWIGClass.new("FilterByGoodTimeIntervalsForHXI", false, 'USE_FITSIO'),
+
+  ANL::SWIGClass.new("NanoGRAMSDataReduction.hh"),
+  ANL::SWIGClass.new("NanoGRAMSCalibrationStep1")
+  ,
 ]
 
 classList = clMod + clSim + clAH
