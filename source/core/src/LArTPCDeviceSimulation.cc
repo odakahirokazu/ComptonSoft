@@ -85,7 +85,7 @@ void LArTPCDeviceSimulation::applyRecombination(DetectorHit_sptr &hit) {
   
   double dedx = 0.0;
   if (!getdEdxSpline()) {
-    const double step_length = (hit->PostStepPointPosition() - hit->PreStepPointPosition()).mag();
+    const double step_length = hit->StepLength();
     if (step_length <= 0.0) {
       hit->setPhotonCount(recombinationModel_->lightYield(edep, 1.0) * PhotonEfficiency(hit->LocalPositionX(), hit->LocalPositionY(), hit->LocalPositionZ()));
       //hit->setPhotonCount(recombinationModel_->lightYield(edep, 1.0));
@@ -133,6 +133,14 @@ void LArTPCDeviceSimulation::setdEdxFile(const std::string &filename, const std:
   dedxSpline_ = (TSpline *)(file->Get(spline_name.c_str()));
   if (!dedxSpline_) {
     throw std::runtime_error("LArTPCDeviceSimulation::setdEdxFile: Cannot find spline: " + spline_name);
+  }
+}
+void LArTPCDeviceSimulation::makeRawDetectorHits() {
+  auto& raw_hits = getRawHits();
+  for (auto& hit : raw_hits) {
+    applyRecombination(hit);
+    hit->setDeDx(hit->EnergyCharge() / hit->StepLength());
+    insertDetectorHit(hit);
   }
 }
 } // namespace comptonsoft

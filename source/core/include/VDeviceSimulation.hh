@@ -185,7 +185,7 @@ public:
   bool isPedestalEnabled() const { return pedestalEnabled_; }
 
   void makeDetectorHits();
-  void makeRawDetectorHits();
+  virtual void makeRawDetectorHits();
 
   void prepareForTimingProcess();
   bool isSelfTriggered() const;
@@ -255,6 +255,7 @@ protected:
 
   int NumberOfRawHits() const { return RawHits_.size(); }
   DetectorHit_sptr getRawHit(int i) { return RawHits_[i]; }
+  DetectorHitVector& getRawHits() { return RawHits_; }
 
   void insertSimulatedHit(DetectorHit_sptr hit)
   { SimulatedHits_.push_back(hit); }

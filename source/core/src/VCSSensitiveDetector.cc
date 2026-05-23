@@ -113,8 +113,7 @@ VCSSensitiveDetector::ProcessHits(G4Step* aStep, G4TouchableHistory* )
   hit->setRealPosition(position);
   hit->setRealTime(aTrack->GetGlobalTime());
 
-  hit->setPreStepPointPosition(aStep->GetPreStepPoint()->GetPosition());
-  hit->setPostStepPointPosition(aStep->GetPostStepPoint()->GetPosition());
+  hit->setStepLength(aStep->GetStepLength());
   hit->setKineticEnergy(kineticEnergy);
 
   for (G4int i = touchable->GetHistoryDepth()-1; i >= 0; i--) {

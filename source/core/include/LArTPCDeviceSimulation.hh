@@ -39,6 +39,7 @@ public:
   void setdEdxFile(const std::string &filename, const std::string &spline_name="dedx_spline");
   TSpline *getdEdxSpline() const { return dedxSpline_; }
   
+  void makeRawDetectorHits() override;
 
 
 
