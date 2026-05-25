@@ -113,6 +113,7 @@ public:
     boost::optional<double> timing_resolution_trigger = boost::none;
     boost::optional<double> timing_resolution_energy_measurement = boost::none;
     boost::optional<int> pedestal_generation_flag = boost::none;
+    boost::optional<int> recombination_dedx_mode = boost::none;
     boost::optional<std::string> recombination_dedx_file = boost::none;
     boost::optional<std::string> recombination_dedx_spline_name = boost::none;
     ChannelNodeContents channel_properties;

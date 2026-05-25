@@ -38,11 +38,10 @@ public:
   double getdEdxFromKineticEnergy(double kineticEnergy) const;
   void setdEdxFile(const std::string &filename, const std::string &spline_name="dedx_spline");
   TSpline *getdEdxSpline() const { return dedxSpline_; }
-  
+  int dEdxMode() const { return dedxMode_; }
+  void setdEdxMode(int mode) { dedxMode_ = mode; }
+
   void makeRawDetectorHits() override;
-
-
-
   const VLArRecombinationModel* recombinationModel() const override { return recombinationModel_.get(); }
 
 private:
@@ -53,6 +52,7 @@ private:
 
   TFile *dedxFile_ = nullptr;
   TSpline *dedxSpline_ = nullptr;
+  int dedxMode_ = 0; // 0: from step information, 1: from kinetic energy
   std::vector<int> zIndicesForEPI_;
 };
 } // namespace comptonsoft

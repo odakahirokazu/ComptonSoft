@@ -57,7 +57,6 @@ VCSSensitiveDetector::ProcessHits(G4Step* aStep, G4TouchableHistory* )
 
   uint32_t processFlag = 0;
   const G4VProcess* process = aStep->GetPostStepPoint()->GetProcessDefinedStep();
-  bool isContinuous = false;
   if (process) {
     G4String processName = process->GetProcessName();
     if(processName.find("phot") != std::string::npos) {
@@ -75,16 +74,13 @@ VCSSensitiveDetector::ProcessHits(G4Step* aStep, G4TouchableHistory* )
     else if(processName.find("brem") != std::string::npos) {
       processFlag = process::Bremsstrahlung;
     }
-    if (process->isAlongStepDoItIsEnabled()) {
-      isContinuous = true;
-    }
   }
 
   const G4ParticleDefinition* particleDefinition = aTrack->GetDefinition();
   if (particleDefinition->GetParticleType() == "nucleus") {
     processFlag |= process::NucleusHit;
   }
-  const auto kineticEnergy = aTrack->GetKineticEnergy();
+  const auto kineticEnergy = aStep->GetPreStepPoint()->GetKineticEnergy();
 
   if (edep==0.0 && processFlag==0) { return true; }
   
@@ -94,7 +90,6 @@ VCSSensitiveDetector::ProcessHits(G4Step* aStep, G4TouchableHistory* )
   hit->setEnergyDeposit(edep);
   hit->setProcess(processFlag);
   hit->setParticle(particleDefinition->GetPDGEncoding());
-  hit->setContinuousProcess(isContinuous);
 
   G4ThreeVector position;
   switch (aStep->GetPostStepPoint()->GetStepStatus()) 

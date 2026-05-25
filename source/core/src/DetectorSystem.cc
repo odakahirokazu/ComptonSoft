@@ -1026,6 +1026,9 @@ void DetectorSystem::setupDetectorParameters(const DetectorSystem::ParametersNod
     if (auto o = parameters.recombination_configuration_file) {
       ds->instantiateRecombinationModel(*o);
     }
+    if (auto o = parameters.recombination_dedx_mode) {
+      ds1->setdEdxMode(*o);
+    }
     if (auto o = parameters.recombination_dedx_file) {
       if (ds1) {
         if (auto o2 = parameters.recombination_dedx_spline_name ){
@@ -1053,6 +1056,9 @@ void DetectorSystem::setupDetectorParameters(const DetectorSystem::ParametersNod
     }
     if (auto o = parameters.recombination_configuration_file) {
       ds->instantiateRecombinationModel(*o);
+    }
+    if (auto o = parameters.recombination_dedx_mode) {
+      ds1->setdEdxMode(*o);
     }
     if (auto o = parameters.recombination_dedx_file) {
       if (ds1) {
@@ -1634,6 +1640,9 @@ load(const boost::property_tree::ptree& node)
   }
   if (auto o=node.get_optional<std::string>("recombination.<xmlattr>.filename")) {
     recombination_configuration_file = o;
+  }
+  if (auto o = node.get_optional<int>("recombination.<xmlattr>.dedx_mode")) {
+    recombination_dedx_mode = o;
   }
   if (auto o = node.get_optional<std::string>("recombination.<xmlattr>.dedx_file")) {
     recombination_dedx_file = o;
