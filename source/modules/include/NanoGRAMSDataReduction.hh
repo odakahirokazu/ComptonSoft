@@ -46,13 +46,13 @@ public:
   anlnext::ANLStatus mod_end_run() override;
 
   bool hasCurrentEvent() const { return current_has_event_; }
-  std::int64_t currentEventId() const { return current_event_id_; }
-  std::int64_t currentRawEventId() const { return current_raw_event_id_; }
-  const std::vector<ngUtil::StreamingFecHit>& currentEventHits() const
+  int64_t currentEventId() const { return current_event_id_; }
+  int64_t currentRawEventId() const { return current_raw_event_id_; }
+  const std::vector<ngUtil::RawFECHit>& currentEventHits() const
   {
     return current_event_hits_;
   }
-  const std::string& rawHitFilePath() const { return cfg_.output_file_path; }
+  const std::string& rawHitFilePath() const { return rawhitdata_file_; }
 
 private:
   std::string config_file_;
@@ -61,13 +61,13 @@ private:
 
   ngUtil::Config cfg_;
   std::unique_ptr<TFile> input_file_;
-  std::unique_ptr<ngUtil::StreamingProcessor> processor_;
+  std::unique_ptr<ngUtil::TPCTreeRawHitReader> raw_hit_reader_;
   std::unique_ptr<ngUtil::RawHitTreeOutputWriter> writer_;
-  std::int64_t gamma_events_ = 0;
+  int64_t gamma_events_ = 0;
   bool current_has_event_ = false;
-  std::int64_t current_event_id_ = -1;
-  std::int64_t current_raw_event_id_ = -1;
-  std::vector<ngUtil::StreamingFecHit> current_event_hits_;
+  int64_t current_event_id_ = -1;
+  int64_t current_raw_event_id_ = -1;
+  std::vector<ngUtil::RawFECHit> current_event_hits_;
 };
 
 } /* namespace comptonsoft */

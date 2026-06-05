@@ -1,0 +1,852 @@
+diff --git a/source/core/src/NanoGRAMSTPCTreeUtil.cc b/source/core/src/NanoGRAMSTPCTreeUtil.cc
+index 44056f4..9ae6370 100644
+--- a/source/core/src/NanoGRAMSTPCTreeUtil.cc
++++ b/source/core/src/NanoGRAMSTPCTreeUtil.cc
+@@ -29,10 +29,12 @@
+ #include <boost/property_tree/json_parser.hpp>
+ #include <boost/property_tree/ptree.hpp>
+ #include <cmath>
++#include <cstdint>
+ #include <filesystem>
+ #include <iostream>
+ #include <limits>
+ #include <memory>
++#include <optional>
+ #include <stdexcept>
+ #include <utility>
+ 
+@@ -44,159 +46,10 @@ namespace ngUtil
+ namespace
+ {
+ 
+-using PixelAdc = std::array<double, kNPixel>;
+-using PixelMask = std::array<std::uint8_t, kNPixel>;
+-
+-struct Geometry
+-{
+-  std::array<std::array<std::pair<int, int>, kNPixel>, kDefaultFecNum> xy_of_ch{};
+-  std::array<std::array<std::vector<int>, kNPixel>, kDefaultFecNum> cross_neighbors{};
+-  std::array<std::array<std::vector<int>, kNPixel>, kDefaultFecNum> diag_neighbors{};
+-  std::array<std::vector<int>, kDefaultFecNum> periphery{};
+-};
+-
+-struct TreeShape
+-{
+-  std::int64_t n_entries = 0;
+-  int reg_len = 0;
+-  int waveform_total_len = 0;
+-  int waveform_len = 0;
+-  int waveform_len_ds = 0;
+-  int reference_ch = 0;
+-};
+-
+ bool hasBranch(TTree* tree, const std::string& name);
+-int leafLen(TTree* tree, const std::string& branch_name);
++void requireBranch(TTree* tree, const std::string& name);
+ std::string leafType(TTree* tree, const std::string& branch_name);
+ 
+-class OptionalIntBranch
+-{
+-public:
+-  void bind(TTree* tree, const std::string& name)
+-  {
+-    branch_name_ = name;
+-    if (!hasBranch(tree, name)) {
+-      kind_ = Kind::Missing;
+-      return;
+-    }
+-
+-    const std::string type = leafType(tree, name);
+-    if (type == "UInt_t") {
+-      kind_ = Kind::UInt32;
+-      tree->SetBranchAddress(name.c_str(), &u32_);
+-    } else if (type == "Int_t" || type == "int") {
+-      kind_ = Kind::Int32;
+-      tree->SetBranchAddress(name.c_str(), &i32_);
+-    } else if (type == "UShort_t") {
+-      kind_ = Kind::UInt16;
+-      tree->SetBranchAddress(name.c_str(), &u16_);
+-    } else if (type == "Short_t" || type == "short") {
+-      kind_ = Kind::Int16;
+-      tree->SetBranchAddress(name.c_str(), &i16_);
+-    } else {
+-      throw std::runtime_error("Unsupported scalar branch type for " + name + ": " + type);
+-    }
+-  }
+-
+-  bool present() const { return kind_ != Kind::Missing; }
+-
+-  int value() const
+-  {
+-    switch (kind_) {
+-      case Kind::UInt32:
+-        return static_cast<int>(u32_);
+-      case Kind::Int32:
+-        return static_cast<int>(i32_);
+-      case Kind::UInt16:
+-        return static_cast<int>(u16_);
+-      case Kind::Int16:
+-        return static_cast<int>(i16_);
+-      case Kind::Missing:
+-        return 0;
+-    }
+-
+-    return 0;
+-  }
+-
+-  const std::string& branchName() const { return branch_name_; }
+-
+-private:
+-  enum class Kind { Missing, UInt32, Int32, UInt16, Int16 };
+-
+-  Kind kind_ = Kind::Missing;
+-  std::string branch_name_;
+-  std::uint32_t u32_ = 0;
+-  std::int32_t i32_ = 0;
+-  std::uint16_t u16_ = 0;
+-  std::int16_t i16_ = 0;
+-};
+-
+-struct InputBranches
+-{
+-  InputBranches() = default;
+-
+-  InputBranches(const TreeShape& shape, int fec_num)
+-      : wave_compress(shape.reg_len, 0),
+-        registered(std::make_unique<bool[]>(shape.reg_len)),
+-        adc(fec_num * kNPixel, 0),
+-        drift(fec_num, 0),
+-        ti(fec_num, 0),
+-        waveform(shape.waveform_total_len, 0)
+-  {
+-  }
+-
+-  std::vector<std::uint16_t> wave_compress;
+-  std::unique_ptr<bool[]> registered;
+-  std::vector<std::uint16_t> adc;
+-  std::vector<std::uint32_t> drift;
+-  std::vector<std::uint32_t> ti;
+-  std::vector<std::int16_t> waveform;
+-  OptionalIntBranch error_branch;
+-};
+-
+-struct SelectionContext
+-{
+-  Geometry geom;
+-  bool include_diag = false;
+-  std::vector<PixelMask> masks;
+-  std::vector<int> min_periph_hits;
+-};
+-
+-struct TimingState
+-{
+-  bool ready = false;
+-  bool warned_wave_compress_channels = false;
+-  bool warned_wave_compress_entries = false;
+-  int reference_wave_compress = 0;
+-  double timebin_ns = 0.0;
+-  int late_index = 0;
+-};
+-
+-class FecTimingState
+-{
+-public:
+-  explicit FecTimingState(int fec_num)
+-      : overflow_(fec_num, 0), prev_ti_(fec_num, 0), have_prev_ti_(fec_num, 0)
+-  {
+-  }
+-
+-  std::uint64_t absoluteTi(int fec, std::uint32_t ti_value)
+-  {
+-    if (have_prev_ti_[fec] && ti_value < prev_ti_[fec]) {
+-      overflow_[fec] += (std::uint64_t{1} << 32);
+-    }
+-    const std::uint64_t ti_abs = static_cast<std::uint64_t>(ti_value) + overflow_[fec];
+-    prev_ti_[fec] = ti_value;
+-    have_prev_ti_[fec] = 1;
+-    return ti_abs;
+-  }
+-
+-private:
+-  std::vector<std::uint64_t> overflow_;
+-  std::vector<std::uint32_t> prev_ti_;
+-  std::vector<std::uint8_t> have_prev_ti_;
+-};
+-
+ struct LightStatus
+ {
+   bool valid_any = false;
+@@ -204,7 +57,7 @@ struct LightStatus
+   bool pileup = false;
+ };
+ 
+-const std::array<std::array<int, kNPixel>, 4> kPlotNumAll = {{
++constexpr std::array<std::array<int, kNPixel>, kFecNum> kPlotNumAll = {{
+     {0, 8, 23, 24, 39, 40, 55, 63,
+      1, 9, 22, 25, 38, 41, 54, 62,
+      2, 10, 21, 26, 37, 42, 53, 61,
+@@ -244,19 +97,11 @@ bool hasBranch(TTree* tree, const std::string& name)
+   return tree->GetBranch(name.c_str()) != nullptr;
+ }
+ 
+-int leafLen(TTree* tree, const std::string& branch_name)
++void requireBranch(TTree* tree, const std::string& name)
+ {
+-  TBranch* branch = tree->GetBranch(branch_name.c_str());
+-  if (!branch) {
+-    throw std::runtime_error("Missing required branch: " + branch_name);
+-  }
+-
+-  TLeaf* leaf = static_cast<TLeaf*>(branch->GetListOfLeaves()->At(0));
+-  if (!leaf) {
+-    throw std::runtime_error("Branch has no leaf: " + branch_name);
++  if (!hasBranch(tree, name)) {
++    throw std::runtime_error("Missing required branch: " + name);
+   }
+-
+-  return leaf->GetLenStatic() > 0 ? leaf->GetLenStatic() : leaf->GetLen();
+ }
+ 
+ std::string leafType(TTree* tree, const std::string& branch_name)
+@@ -287,12 +132,12 @@ std::vector<int> readIntVector(const boost::property_tree::ptree& pt,
+   return values;
+ }
+ 
+-std::map<int, std::vector<int>> readExcludePixels(const boost::property_tree::ptree& pt, int fec_num)
++std::map<int, std::vector<int>> readExcludePixels(const boost::property_tree::ptree& pt)
+ {
+   std::map<int, std::vector<int>> exclude_pix;
+-  for (int fec = 0; fec < fec_num; ++fec) {
+-    exclude_pix[fec] = {0, 63};
+-  }
++  // for (int fec = 0; fec < kFecNum; ++fec) {
++  //  exclude_pix[fec] = {0, 63};
++  // }
+ 
+   const auto node = pt.get_child_optional("exclude_pix");
+   if (!node) {
+@@ -313,47 +158,80 @@ std::map<int, std::vector<int>> readExcludePixels(const boost::property_tree::pt
+ 
+ void readLightConfig(Config& cfg, const boost::property_tree::ptree& pt)
+ {
+-  cfg.delay_counts = pt.get<int>("delay_counts", cfg.delay_counts);
+-  cfg.downsample_every = pt.get<int>("downsample_every", cfg.downsample_every);
+-
+-  cfg.light_peak_thr_mV = pt.get<double>("light_peak_thr_mV", cfg.light_peak_thr_mV);
+-  cfg.late_window_us = pt.get<double>("late_window_us", cfg.late_window_us);
+-  cfg.late_peak_thr_mV = pt.get<double>("late_peak_thr_mV", cfg.late_peak_thr_mV);
++  cfg.delay_counts        = pt.get<int>("delay_counts",           cfg.delay_counts);
++  cfg.light_peak_thr_mV   = pt.get<double>("light_peak_thr_mV",   cfg.light_peak_thr_mV);
++  cfg.late_window_us      = pt.get<double>("late_window_us",      cfg.late_window_us);
++  cfg.late_peak_thr_mV    = pt.get<double>("late_peak_thr_mV",    cfg.late_peak_thr_mV);
+   cfg.timebin_ns_override = pt.get<double>("timebin_ns_override", cfg.timebin_ns_override);
+ 
+-  cfg.delay_units = pt.get<std::string>("delay_units", cfg.delay_units);
++  //cfg.delay_units    = pt.get<std::string>("delay_units", cfg.delay_units);
+   cfg.light_channels = readIntVector(pt, "light_channels", cfg.light_channels);
++
++  std::cout << "readLightConfig()" << std::endl;
++  std::cout << "delay_counts:        " << cfg.delay_counts        << std::endl;
++  std::cout << "light_peak_thr_mV:   " << cfg.light_peak_thr_mV   << std::endl;
++  std::cout << "late_window_us:      " << cfg.late_window_us      << std::endl;
++  std::cout << "late_peak_thr_mV:    " << cfg.late_peak_thr_mV    << std::endl;
++  std::cout << "timebin_ns_override: " << cfg.timebin_ns_override << std::endl;
++
++  // cfg.downsample_every = pt.get<int>("downsample_every", cfg.downsample_every);
++  // std::cout << "downsample_every:    " << cfg.downsample_every << std::endl;
+ }
+ 
+ void readChargeConfig(Config& cfg, const boost::property_tree::ptree& pt)
+ {
+-  cfg.pix_min = pt.get<int>("pix_min", cfg.pix_min);
+-  cfg.pix_max = pt.get<int>("pix_max", cfg.pix_max);
+-  cfg.circ_min_hits = pt.get<int>("circ_min_hits", cfg.circ_min_hits);
+-
+-  cfg.adc_min = pt.get<double>("adc_min", cfg.adc_min);
+-  cfg.adc_max = pt.get<double>("adc_max", cfg.adc_max);
+-  cfg.circ_thr = pt.get<double>("circ_thr", cfg.circ_thr);
+-  cfg.spread_thr = pt.get<double>("spread_thr", cfg.spread_thr);
++  cfg.pix_min           = pt.get<int>(   "pix_min",           cfg.pix_min);
++  cfg.pix_max           = pt.get<int>(   "pix_max",           cfg.pix_max);
++  cfg.circ_min_hits     = pt.get<int>(   "circ_min_hits",     cfg.circ_min_hits);
++  cfg.adc_min           = pt.get<double>("adc_min",           cfg.adc_min);
++  cfg.adc_max           = pt.get<double>("adc_max",           cfg.adc_max);
++  cfg.circ_thr          = pt.get<double>("circ_thr",          cfg.circ_thr);
++  cfg.spread_thr        = pt.get<double>("spread_thr",        cfg.spread_thr);
+   cfg.drift_time_max_us = pt.get<double>("drift_time_max_us", cfg.drift_time_max_us);
+-  cfg.noise_th = pt.get<double>("noise_th", cfg.noise_th);
+-  cfg.circ_min_ratio = pt.get<double>("circ_min_ratio", cfg.circ_min_ratio);
+-
+-  cfg.exclude_pix = readExcludePixels(pt, cfg.fec_num);
++  cfg.noise_th          = pt.get<double>("noise_th",          cfg.noise_th);
++  cfg.circ_min_ratio    = pt.get<double>("circ_min_ratio",    cfg.circ_min_ratio);
++
++  cfg.exclude_pix = readExcludePixels(pt);
++
++  std::cout << "pix_min: "           << cfg.pix_min           << std::endl;
++  std::cout << "pix_max: "           << cfg.pix_max           << std::endl;
++  std::cout << "circ_min_hits: "     << cfg.circ_min_hits     << std::endl;
++  std::cout << "adc_min: "           << cfg.adc_min           << std::endl;
++  std::cout << "adc_max: "           << cfg.adc_max           << std::endl;
++  std::cout << "circ_thr: "          << cfg.circ_thr          << std::endl;
++  std::cout << "spread_thr: "        << cfg.spread_thr        << std::endl;
++  std::cout << "drift_time_max_us: " << cfg.drift_time_max_us << std::endl;
++  std::cout << "noise_th: "          << cfg.noise_th          << std::endl;
++  std::cout << "circ_min_ratio: "    << cfg.circ_min_ratio    << std::endl;
++
++  for (int fec = 0; fec < kFecNum; ++fec) {
++    const std::vector<int> pix_vec = cfg.exclude_pix[fec];
++    std::cout << fec << ": [ ";
++    int index = 0;
++    for (const auto& pix : pix_vec) {
++      if (index == 0) {
++        std::cout << pix;
++      } else {
++        std::cout << ", " << pix;
++      }
++      ++index;
++    }
++    std::cout << " ]" << std::endl;
++  }
+ }
+ 
+-double delayFactor(const Config& cfg)
+-{
+-  return cfg.delay_units == "samples" ? 1.0 : 8.0;
+-}
++// double delayFactor(const Config& cfg)
++//{
++//  return cfg.delay_units == "samples" ? 1.0 : 8.0;
++//}
+ 
+ int lowerBoundTimeIndex(double late_window_us,
+                         double trigger_delay_ns,
+                         double dt_ns,
+-                        int waveform_len_ds)
++                        int waveform_len)
+ {
+   if (dt_ns <= 0.0) {
+-    return waveform_len_ds;
++    return waveform_len;
+   }
+ 
+   const double raw = (late_window_us * 1000.0 + trigger_delay_ns) / dt_ns;
+@@ -361,8 +239,8 @@ int lowerBoundTimeIndex(double late_window_us,
+   if (idx < 0) {
+     idx = 0;
+   }
+-  if (idx > waveform_len_ds) {
+-    idx = waveform_len_ds;
++  if (idx > waveform_len) {
++    idx = waveform_len;
+   }
+   return idx;
+ }
+@@ -392,7 +270,7 @@ Geometry buildGeometry()
+ {
+   Geometry geom;
+ 
+-  for (int fec = 0; fec < kDefaultFecNum; ++fec) {
++  for (int fec = 0; fec < kFecNum; ++fec) {
+     const auto& disp_to_ch = kPlotNumAll[fec];
+ 
+     for (int xx = 0; xx < 8; ++xx) {
+@@ -472,48 +350,36 @@ PixelMask buildMaskIn(const Config& cfg, int fec)
+ 
+ TreeShape inspectTreeShape(TTree* tree, const Config& cfg)
+ {
+-  const int adc_len     = leafLen(tree, "adc");
+-  const int drift_len   = leafLen(tree, "drift_time");
+-  const int ti_len      = leafLen(tree, "ti");
+-  const int reg_len     = leafLen(tree, "registered");
+-  const int waveform_total_len = leafLen(tree, "waveform");
+-  const int wcmp_len           = leafLen(tree, "wave_compress");
++  requireBranch(tree, "adc");
++  requireBranch(tree, "drift_time");
++  requireBranch(tree, "ti");
++  requireBranch(tree, "registered");
++  requireBranch(tree, "waveform");
++  requireBranch(tree, "wave_compress");
+ 
+-  if (adc_len != cfg.fec_num * kNPixel) {
+-    throw std::runtime_error("adc branch length does not match fec_num * 64.");
+-  }
+-  if (drift_len != cfg.fec_num || ti_len != cfg.fec_num) {
+-    throw std::runtime_error("drift_time/ti branch length does not match fec_num.");
+-  }
+-  if (reg_len <= 0 || waveform_total_len % reg_len != 0 || wcmp_len != reg_len) {
+-    throw std::runtime_error("light waveform branch dimensions are inconsistent.");
++  if (kReferenceLightChannel < 0 || kReferenceLightChannel >= kLightChannelNum) {
++    throw std::runtime_error("kReferenceLightChannel is outside the light channel range.");
+   }
+   for (int ch : cfg.light_channels) {
+-    if (ch < 0 || ch >= reg_len) {
+-      throw std::runtime_error(
+-          "Configured light channel is outside registered/waveform dimensions.");
++    if (ch < 0 || ch >= kLightChannelNum) {
++      throw std::runtime_error("Configured light channel is outside the fixed light channel range.");
+     }
+   }
+ 
+   TreeShape shape;
+-  shape.n_entries = static_cast<std::int64_t>(tree->GetEntries());
+-  shape.reg_len            = reg_len;
+-  shape.waveform_total_len = waveform_total_len;
+-  shape.waveform_len       = waveform_total_len / reg_len;
+-  shape.waveform_len_ds    = (shape.waveform_len + cfg.downsample_every - 1) / cfg.downsample_every;
+-  shape.reference_ch = reg_len > 4 ? 4 : 0;
++  shape.n_entries = static_cast<int64_t>(tree->GetEntries());
+   return shape;
+ }
+ 
+-InputBranches bindInputBranches(TTree* tree, const Config& cfg, const TreeShape& shape)
++InputBranches bindInputBranches(TTree* tree, const Config& cfg)
+ {
+-  InputBranches branches(shape, cfg.fec_num);
+-  tree->SetBranchAddress("adc", branches.adc.data());
+-  tree->SetBranchAddress("drift_time", branches.drift.data());
+-  tree->SetBranchAddress("ti", branches.ti.data());
+-  tree->SetBranchAddress("waveform", branches.waveform.data());
++  InputBranches branches;
++  tree->SetBranchAddress("adc",           branches.adc.data());
++  tree->SetBranchAddress("drift_time",    branches.drift.data());
++  tree->SetBranchAddress("ti",            branches.ti.data());
++  tree->SetBranchAddress("waveform",      branches.waveform.data());
+   tree->SetBranchAddress("wave_compress", branches.wave_compress.data());
+-  tree->SetBranchAddress("registered", branches.registered.get());
++  tree->SetBranchAddress("registered",    branches.registered.get());
+   branches.error_branch.bind(tree, cfg.error_flag_branch);
+   return branches;
+ }
+@@ -523,10 +389,10 @@ SelectionContext buildSelectionContext(const Config& cfg)
+   SelectionContext ctx;
+   ctx.geom = buildGeometry();
+   ctx.include_diag = cfg.pix_max >= 3;
+-  ctx.masks.resize(static_cast<std::size_t>(cfg.fec_num));
+-  ctx.min_periph_hits.assign(static_cast<std::size_t>(cfg.fec_num), cfg.circ_min_hits);
++  ctx.masks.resize(static_cast<std::size_t>(kFecNum));
++  ctx.min_periph_hits.assign(static_cast<std::size_t>(kFecNum), cfg.circ_min_hits);
+ 
+-  for (int fec = 0; fec < cfg.fec_num; ++fec) {
++  for (int fec = 0; fec < kFecNum; ++fec) {
+     ctx.masks[fec] = buildMaskIn(cfg, fec);
+     const int perimeter = static_cast<int>(ctx.geom.periphery[fec].size());
+     ctx.min_periph_hits[fec] = std::max(
+@@ -540,7 +406,7 @@ TimingState makeTimingState(const Config& cfg, const TreeShape& shape)
+ {
+   TimingState timing;
+   timing.timebin_ns = cfg.timebin_ns_override;
+-  timing.late_index = shape.waveform_len_ds;
++  timing.late_index = shape.waveform_len;
+   return timing;
+ }
+ 
+@@ -559,10 +425,13 @@ void initializeTimingIfNeeded(TimingState& timing,
+                           : static_cast<double>(timing.reference_wave_compress);
+ 
+   const double trigger_delay_ns =
+-      static_cast<double>(cfg.delay_counts) * delayFactor(cfg) * timing.timebin_ns;
+-  const double dt_ns = timing.timebin_ns * static_cast<double>(cfg.downsample_every);
++      static_cast<double>(cfg.delay_counts) * 8.0 * timing.timebin_ns;
++  // const double trigger_delay_ns =
++  //     static_cast<double>(cfg.delay_counts) * delayFactor(cfg) * timing.timebin_ns;
++  const double dt_ns = timing.timebin_ns;
++  // const double dt_ns = timing.timebin_ns * static_cast<double>(cfg.downsample_every);
+   timing.late_index =
+-      lowerBoundTimeIndex(cfg.late_window_us, trigger_delay_ns, dt_ns, shape.waveform_len_ds);
++      lowerBoundTimeIndex(cfg.late_window_us, trigger_delay_ns, dt_ns, shape.waveform_len);
+ 
+   std::cout << "[INFO] entries=" << shape.n_entries
+             << " waveform_len=" << shape.waveform_len
+@@ -614,14 +483,18 @@ LightStatus analyzeLightEvent(const Config& cfg,
+     double late_peak = -std::numeric_limits<double>::infinity();
+     const int waveform_offset = light_ch * shape.waveform_len;
+ 
+-    int ds_idx = 0;
+-    for (int raw_idx = 0; raw_idx < shape.waveform_len; raw_idx += cfg.downsample_every, ++ds_idx) {
++    // int ds_idx = 0;
++    // for (int raw_idx = 0; raw_idx < shape.waveform_len;
++    //      raw_idx += cfg.downsample_every, ++ds_idx) {
++    for (int raw_idx = 0; raw_idx < shape.waveform_len; ++raw_idx) {
+       const double mv =
+           static_cast<double>(branches.waveform[waveform_offset + raw_idx]) * cfg.adc2mv;
+       if (mv > peak) {
+         peak = mv;
+       }
+-      if (ds_idx >= late_index && mv > late_peak) {
++      // The downsampled path used ds_idx here.
++      // if (ds_idx >= late_index && mv > late_peak) {
++      if (raw_idx >= late_index && mv > late_peak) {
+         late_peak = mv;
+       }
+     }
+@@ -645,7 +518,7 @@ bool selectFecEvent(const Config& cfg,
+                     bool subset_mask,
+                     bool light_cosmic,
+                     bool light_pileup,
+-                    std::vector<std::int16_t>& hit_channels,
++                    std::vector<int16_t>& hit_channels,
+                     std::vector<float>& hit_adcs)
+ {
+   hit_channels.clear();
+@@ -747,7 +620,7 @@ bool selectFecEvent(const Config& cfg,
+       if (!selected[ch]) {
+         continue;
+       }
+-      hit_channels.push_back(static_cast<std::int16_t>(ch));
++      hit_channels.push_back(static_cast<int16_t>(ch));
+       hit_adcs.push_back(static_cast<float>(adc_sub[ch]));
+     }
+   }
+@@ -801,9 +674,9 @@ std::vector<StreamingFecHit> collectEventHits(const Config& cfg,
+                                               const LightStatus& light)
+ {
+   std::vector<StreamingFecHit> event_hits;
+-  event_hits.reserve(static_cast<std::size_t>(cfg.fec_num));
++  event_hits.reserve(static_cast<std::size_t>(kFecNum));
+ 
+-  for (int fec = 0; fec < cfg.fec_num; ++fec) {
++  for (int fec = 0; fec < kFecNum; ++fec) {
+     auto hit = buildFecHit(cfg, selection, branches, timing, fec, subset_mask, light);
+     if (hit) {
+       event_hits.push_back(std::move(*hit));
+@@ -815,207 +688,184 @@ std::vector<StreamingFecHit> collectEventHits(const Config& cfg,
+ 
+ } // namespace
+ 
+-class StreamingProcessor::Impl
+-{
+-public:
+-  Impl(TTree* tree, const Config& cfg)
+-      : tree_(tree),
+-        cfg_(cfg),
+-        shape_(inspectTreeShape(tree_, cfg_)),
+-        branches_(bindInputBranches(tree_, cfg_, shape_)),
+-        selection_(buildSelectionContext(cfg_)),
+-        timing_(makeTimingState(cfg_, shape_)),
+-        fec_timing_(cfg_.fec_num)
+-  {
++void IntBranch::bind(TTree* tree, const std::string& name)
++{
++  if (!hasBranch(tree, name)) {
++    throw std::runtime_error("Missing required branch: " + name);
++  }
++
++  const std::string type = leafType(tree, name);
++  if (type == "UInt_t") {
++    kind_ = Kind::UInt32;
++    tree->SetBranchAddress(name.c_str(), &u32_);
++  } else if (type == "Int_t" || type == "int") {
++    kind_ = Kind::Int32;
++    tree->SetBranchAddress(name.c_str(), &i32_);
++  } else if (type == "UShort_t") {
++    kind_ = Kind::UInt16;
++    tree->SetBranchAddress(name.c_str(), &u16_);
++  } else if (type == "Short_t" || type == "short") {
++    kind_ = Kind::Int16;
++    tree->SetBranchAddress(name.c_str(), &i16_);
++  } else {
++    throw std::runtime_error("Unsupported scalar branch type for " + name + ": " + type);
+   }
++}
+ 
+-  bool hasErrorBranch() const { return branches_.error_branch.present(); }
+-
+-  const std::string& errorBranchName() const { return branches_.error_branch.branchName(); }
+-
+-  bool processNext(std::int64_t& raw_event_id, std::vector<StreamingFecHit>& event_hits)
+-  {
+-    if (current_entry_ >= shape_.n_entries) {
+-      return false;
+-    }
+-
+-    raw_event_id = current_entry_;
+-    tree_->GetEntry(current_entry_);
+-
+-    initializeTimingIfNeeded(timing_, cfg_, shape_, branches_);
+-    warnWaveCompressIfNeeded(timing_, cfg_, shape_, branches_);
+-
+-    const int err = branches_.error_branch.present() ? branches_.error_branch.value() : 0;
+-    const bool tpc_ok = branches_.error_branch.present() ? (err == 0) : true;
+-    const bool light_ok = branches_.error_branch.present() ? (err == 0 || err == 4) : true;
+-    const LightStatus light = analyzeLightEvent(cfg_, shape_, branches_, light_ok, timing_.late_index);
+-    const bool subset_mask = tpc_ok && light.valid_any;
+-
+-    event_hits = collectEventHits(cfg_, selection_, branches_, fec_timing_, subset_mask, light);
+-    ++current_entry_;
+-    return true;
++int IntBranch::value() const
++{
++  switch (kind_) {
++    case Kind::UInt32:
++      return static_cast<int>(u32_);
++    case Kind::Int32:
++      return static_cast<int>(i32_);
++    case Kind::UInt16:
++      return static_cast<int>(u16_);
++    case Kind::Int16:
++      return static_cast<int>(i16_);
++    case Kind::Unbound:
++      return 0;
+   }
+ 
+-private:
+-  TTree* tree_ = nullptr;
+-  Config cfg_;
+-  TreeShape shape_;
+-  InputBranches branches_;
+-  SelectionContext selection_;
+-  TimingState timing_;
+-  FecTimingState fec_timing_;
+-  std::int64_t current_entry_ = 0;
+-};
++  return 0;
++}
+ 
+-class RawHitTreeOutputWriter::Impl
++FecTimingState::FecTimingState()
++    : overflow_(kFecNum, 0), prev_ti_(kFecNum, 0), have_prev_ti_(kFecNum, 0)
+ {
+-public:
+-  explicit Impl(const Config& cfg)
+-      : output_path_(prepareOutputPath(cfg.output_file_path)),
+-        file_(output_path_.string().c_str(), "RECREATE"),
+-        tree_(cfg.output_tree_name.c_str(), cfg.output_tree_name.c_str())
+-  {
+-    if (file_.IsZombie()) {
+-      throw std::runtime_error("Failed to create output ROOT file: " + output_path_.string());
+-    }
++}
+ 
+-    tree_.SetDirectory(&file_);
+-    bindBranches();
+-  }
+-
+-  void fillEvent(std::int64_t event_id,
+-                 std::int64_t raw_event_id,
+-                 const std::vector<StreamingFecHit>& hits)
+-  {
+-    eventid_ = event_id;
+-    raweventid_ = raw_event_id;
+-    num_hits_ = static_cast<std::int32_t>(hits.size());
+-
+-    for (std::size_t ih = 0; ih < hits.size(); ++ih) {
+-      const auto& hit = hits[ih];
+-      ihit_ = static_cast<std::int16_t>(ih);
+-      ti_ = static_cast<std::int64_t>(hit.ti);
+-      fecid_ = static_cast<std::int16_t>(hit.fec);
+-      drifttime_ = static_cast<float>(hit.drift_us);
+-
+-      for (std::size_t j = 0; j < hit.channels.size(); ++j) {
+-        ch_ = hit.channels[j];
+-        adc_ = j < hit.adcs.size() ? hit.adcs[j] : std::numeric_limits<float>::quiet_NaN();
+-        tree_.Fill();
+-      }
+-    }
++uint64_t FecTimingState::absoluteTi(int fec, uint32_t ti_value)
++{
++  if (have_prev_ti_[fec] && ti_value < prev_ti_[fec]) {
++    overflow_[fec] += (uint64_t{1} << 32);
+   }
+-
+-  std::string close()
+-  {
+-    file_.cd();
+-    tree_.Write();
+-    file_.Write();
+-    const auto entries = tree_.GetEntries();
+-    file_.Close();
+-
+-    std::cout << "[ROOT] Saved file: " << output_path_.string()
+-              << " (entries=" << entries << ")\n";
+-    return output_path_.string();
+-  }
+-
+-private:
+-  void bindBranches()
+-  {
+-    tree_.Branch("eventid", &eventid_, "eventid/L");
+-    tree_.Branch("raweventid", &raweventid_, "raweventid/L");
+-    tree_.Branch("ihit", &ihit_, "ihit/S");
+-    tree_.Branch("ti", &ti_, "ti/L");
+-    tree_.Branch("num_hits", &num_hits_, "num_hits/I");
+-    tree_.Branch("adc", &adc_, "adc/F");
+-    tree_.Branch("fecid", &fecid_, "fecid/S");
+-    tree_.Branch("ch", &ch_, "ch/S");
+-    tree_.Branch("drifttime", &drifttime_, "drifttime/F");
+-  }
+-
+-  std::filesystem::path output_path_;
+-  TFile file_;
+-  TTree tree_;
+-  std::int64_t eventid_ = 0;
+-  std::int64_t raweventid_ = 0;
+-  std::int16_t ihit_ = 0;
+-  std::int64_t ti_ = 0;
+-  std::int32_t num_hits_ = 0;
+-  float adc_ = 0.0F;
+-  std::int16_t fecid_ = 0;
+-  std::int16_t ch_ = 0;
+-  float drifttime_ = 0.0F;
+-};
++  const uint64_t ti_abs = static_cast<uint64_t>(ti_value) + overflow_[fec];
++  prev_ti_[fec] = ti_value;
++  have_prev_ti_[fec] = 1;
++  return ti_abs;
++}
+ 
+ void readConfig(Config& cfg, const std::string& config_path)
+ {
+   boost::property_tree::ptree pt;
+   boost::property_tree::read_json(config_path, pt);
+ 
+-  cfg.file_path = pt.get<std::string>("file_path", cfg.file_path);
+-  cfg.output_file_path = pt.get<std::string>("output_file_path", cfg.output_file_path);
+-  cfg.error_flag_branch = pt.get<std::string>("error_flag_branch", cfg.error_flag_branch);
+-
+   if (const auto light = pt.get_child_optional("light")) {
+     readLightConfig(cfg, *light);
+-  } else {
+-    readLightConfig(cfg, pt);
+   }
+ 
+   if (const auto charge = pt.get_child_optional("charge")) {
+     readChargeConfig(cfg, *charge);
+-  } else {
+-    readChargeConfig(cfg, pt);
+   }
+ 
+-  if (cfg.fec_num <= 0 || cfg.fec_num > static_cast<int>(kPlotNumAll.size())) {
+-    throw std::runtime_error("fec_num must be between 1 and 4 for the current mapping table.");
+-  }
+-  if (cfg.downsample_every <= 0) {
+-    throw std::runtime_error("downsample_every must be positive.");
+-  }
++  static_assert(kFecNum == static_cast<int>(kPlotNumAll.size()),
++                "kPlotNumAll must match kFecNum.");
++
++  // if (cfg.downsample_every <= 0) {
++  //   throw std::runtime_error("downsample_every must be positive.");
++  // }
+ }
+ 
+ StreamingProcessor::StreamingProcessor(TTree* tree, const Config& cfg)
+-    : impl_(std::make_unique<Impl>(tree, cfg))
++    : tree_(tree),
++      cfg_(cfg),
++      shape_(inspectTreeShape(tree_, cfg_)),
++      branches_(bindInputBranches(tree_, cfg_, shape_)),
++      selection_(buildSelectionContext(cfg_)),
++      timing_(makeTimingState(cfg_, shape_)),
++      fec_timing_()
+ {
+ }
+ 
+ StreamingProcessor::~StreamingProcessor() = default;
+ 
+-bool StreamingProcessor::hasErrorBranch() const
++bool StreamingProcessor::processNext(int64_t& raw_event_id,
++                                     std::vector<StreamingFecHit>& event_hits)
+ {
+-  return impl_->hasErrorBranch();
+-}
++  if (current_entry_ >= shape_.n_entries) {
++    return false;
++  }
+ 
+-const std::string& StreamingProcessor::errorBranchName() const
+-{
+-  return impl_->errorBranchName();
+-}
++  raw_event_id = current_entry_;
++  tree_->GetEntry(current_entry_);
+ 
+-bool StreamingProcessor::processNext(std::int64_t& raw_event_id,
+-                                     std::vector<StreamingFecHit>& event_hits)
+-{
+-  return impl_->processNext(raw_event_id, event_hits);
++  initializeTimingIfNeeded(timing_, cfg_, shape_, branches_);
++  warnWaveCompressIfNeeded(timing_, cfg_, shape_, branches_);
++
++  const int err = branches_.error_branch.value();
++  const bool tpc_ok = (err == 0);
++  const bool light_ok = (err == 0 || err == 4);
++  const LightStatus light = analyzeLightEvent(cfg_, shape_, branches_, light_ok, timing_.late_index);
++  const bool subset_mask = tpc_ok && light.valid_any;
++
++  event_hits = collectEventHits(cfg_, selection_, branches_, fec_timing_, subset_mask, light);
++  ++current_entry_;
++  return true;
+ }
+ 
+-RawHitTreeOutputWriter::RawHitTreeOutputWriter(const Config& cfg)
+-    : impl_(std::make_unique<Impl>(cfg))
++RawHitTreeOutputWriter::RawHitTreeOutputWriter(const std::string& output_file_path)
++    : output_path_(prepareOutputPath(output_file_path)),
++      file_(std::make_unique<TFile>(output_path_.string().c_str(), "RECREATE")),
++      tree_(std::make_unique<TTree>(kRawHitTreeName, kRawHitTreeName))
+ {
++  if (file_->IsZombie()) {
++    throw std::runtime_error("Failed to create output ROOT file: " + output_path_.string());
++  }
++
++  tree_->SetDirectory(file_.get());
++  bindBranches();
+ }
+ 
+ RawHitTreeOutputWriter::~RawHitTreeOutputWriter() = default;
+ 
+-void RawHitTreeOutputWriter::fillEvent(std::int64_t event_id,
+-                                       std::int64_t raw_event_id,
++void RawHitTreeOutputWriter::fillEvent(int64_t event_id,
++                                       int64_t raw_event_id,
+                                        const std::vector<StreamingFecHit>& hits)
+ {
+-  impl_->fillEvent(event_id, raw_event_id, hits);
++  eventid_ = event_id;
++  raweventid_ = raw_event_id;
++  num_hits_ = static_cast<int32_t>(hits.size());
++
++  for (std::size_t ih = 0; ih < hits.size(); ++ih) {
++    const auto& hit = hits[ih];
++    ihit_ = static_cast<int16_t>(ih);
++    ti_ = static_cast<int64_t>(hit.ti);
++    fecid_ = static_cast<int16_t>(hit.fec);
++    drifttime_ = static_cast<float>(hit.drift_us);
++
++    for (std::size_t j = 0; j < hit.channels.size(); ++j) {
++      ch_ = hit.channels[j];
++      adc_ = j < hit.adcs.size() ? hit.adcs[j] : std::numeric_limits<float>::quiet_NaN();
++      tree_->Fill();
++    }
++  }
+ }
+ 
+ std::string RawHitTreeOutputWriter::close()
+ {
+-  return impl_->close();
++  file_->cd();
++  tree_->Write();
++  file_->Write();
++  const auto entries = tree_->GetEntries();
++  file_->Close();
++
++  std::cout << "[ROOT] Saved file: " << output_path_.string()
++            << " (entries=" << entries << ")\n";
++  return output_path_.string();
++}
++
++void RawHitTreeOutputWriter::bindBranches()
++{
++  tree_->Branch("eventid",     &eventid_,    "eventid/L");
++  tree_->Branch("raweventid",  &raweventid_, "raweventid/L");
++  tree_->Branch("ihit",        &ihit_,       "ihit/S");
++  tree_->Branch("ti",          &ti_,         "ti/L");
++  tree_->Branch("num_hits",    &num_hits_,   "num_hits/I");
++  tree_->Branch("adc",         &adc_,        "adc/F");
++  tree_->Branch("fecid",       &fecid_,      "fecid/S");
++  tree_->Branch("ch",          &ch_,         "ch/S");
++  tree_->Branch("drifttime",   &drifttime_,  "drifttime/F");
+ }
+ 
+ } /* namespace ngUtil */

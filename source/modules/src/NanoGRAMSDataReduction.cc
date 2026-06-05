@@ -50,52 +50,42 @@ ANLStatus NanoGRAMSDataReduction::mod_initialize()
   }
 
   ngUtil::readConfig(cfg_, config_file_);
-  if (!tpctree_file_.empty()) {
-    cfg_.file_path = tpctree_file_;
-  }
-  if (!rawhitdata_file_.empty()) {
-    cfg_.output_file_path = rawhitdata_file_;
-  }
 
-  if (cfg_.file_path.empty()) {
+  if (tpctree_file_.empty()) {
     throw std::runtime_error("TPC tree input file path is empty.");
   }
 
-  input_file_ = std::make_unique<TFile>(cfg_.file_path.c_str(), "READ");
+  input_file_ = std::make_unique<TFile>(tpctree_file_.c_str(), "READ");
   if (input_file_->IsZombie()) {
-    throw std::runtime_error("Failed to open input ROOT file: " + cfg_.file_path);
+    throw std::runtime_error("Failed to open input ROOT file: " + tpctree_file_);
   }
 
-  TTree* tree = dynamic_cast<TTree*>(input_file_->Get(cfg_.tree_name.c_str()));
-  if (!tree) {
-    throw std::runtime_error("Missing TTree '" + cfg_.tree_name + "' in " + cfg_.file_path);
+  TTree* tpc_tree = dynamic_cast<TTree*>(input_file_->Get(ngUtil::kTpcTreeName));
+  if (!tpc_tree) {
+    throw std::runtime_error("Missing TTree '" + std::string(ngUtil::kTpcTreeName) +
+                             "' in " + tpctree_file_);
   }
 
-  processor_ = std::make_unique<ngUtil::StreamingProcessor>(tree, cfg_);
-  if (!cfg_.output_file_path.empty()) {
-    writer_ = std::make_unique<ngUtil::RawHitTreeOutputWriter>(cfg_);
+  raw_hit_reader_ = std::make_unique<ngUtil::TPCTreeRawHitReader>(tpc_tree, cfg_);
+  if (!rawhitdata_file_.empty()) {
+    writer_ = std::make_unique<ngUtil::RawHitTreeOutputWriter>(rawhitdata_file_);
   } else {
-    std::cout << "[INFO] raw hit tree output is disabled.\n";
+    std::cout << "[INFO] rawhittree output is disabled.\n";
   }
-  gamma_events_ = 0;
-  current_has_event_ = false;
-  current_event_id_ = -1;
+  gamma_events_         = 0;
+  current_has_event_    = false;
+  current_event_id_     = -1;
   current_raw_event_id_ = -1;
   current_event_hits_.clear();
-
-  if (!processor_->hasErrorBranch()) {
-    std::cout << "[INFO] error branch '" << processor_->errorBranchName()
-              << "' not found; treating all events as OK.\n";
-  }
 
   return AS_OK;
 }
 
 ANLStatus NanoGRAMSDataReduction::mod_analyze()
 {
-  std::int64_t raw_event_id = 0;
-  std::vector<ngUtil::StreamingFecHit> event_hits;
-  if (!processor_ || !processor_->processNext(raw_event_id, event_hits)) {
+  int64_t raw_event_id = 0;
+  std::vector<ngUtil::RawFECHit> event_hits;
+  if (!raw_hit_reader_ || !raw_hit_reader_->processNext(raw_event_id, event_hits)) {
     return AS_QUIT;
   }
 
@@ -126,7 +116,7 @@ ANLStatus NanoGRAMSDataReduction::mod_end_run()
     std::cout << "Total gamma events: " << gamma_events_ << "\n";
   }
 
-  processor_.reset();
+  raw_hit_reader_.reset();
   input_file_.reset();
   current_has_event_ = false;
   current_event_hits_.clear();

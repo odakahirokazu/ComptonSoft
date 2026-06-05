@@ -27,11 +27,11 @@
 namespace comptonsoft
 {
 
-constexpr int NUM_CH_LIGHT = 8;
+constexpr int NUM_CH_LIGHT       = 8;
 constexpr int NUM_CHARGE_READOUT = 4;
-constexpr int NUM_CH_CHARGE = 64;
-constexpr int MAX_WAVENUM = 8000;
-constexpr std::uint32_t CLOCK_PER_TI_UNIT = 16;
+constexpr int NUM_CH_CHARGE      = 64;
+constexpr int MAX_WAVENUM        = 8000;
+constexpr uint32_t CLOCK_PER_TI_UNIT = 16;
 
 class NanoGRAMSEvent
 {
@@ -41,100 +41,100 @@ public:
   int NumRegistered() const { return numRegistered_; }
 
   const auto& GetTI() const { return ti_; }
-  void SetTI(const std::array<std::uint32_t, NUM_CHARGE_READOUT>& ti) { ti_ = ti; }
+  void SetTI(const std::array<uint32_t, NUM_CHARGE_READOUT>& ti) { ti_ = ti; }
 
   const auto& GetLiveTime() const { return liveTime_; }
-  void SetLiveTime(const std::array<std::uint32_t, NUM_CHARGE_READOUT>& live_time)
+  void SetLiveTime(const std::array<uint32_t, NUM_CHARGE_READOUT>& live_time)
   {
     liveTime_ = live_time;
   }
 
   const auto& GetIntegralLiveTime() const { return integralLiveTime_; }
   void SetIntegralLiveTime(
-      const std::array<std::uint32_t, NUM_CHARGE_READOUT>& integral_live_time)
+      const std::array<uint32_t, NUM_CHARGE_READOUT>& integral_live_time)
   {
     integralLiveTime_ = integral_live_time;
   }
 
   const auto& GetEventFlags() const { return eventFlags_; }
-  void SetEventFlags(const std::array<std::uint32_t, NUM_CHARGE_READOUT>& event_flags)
+  void SetEventFlags(const std::array<uint32_t, NUM_CHARGE_READOUT>& event_flags)
   {
     eventFlags_ = event_flags;
   }
 
   const auto& GetFlagPseudo() const { return flagPseudo_; }
-  void SetFlagPseudo(const std::array<std::uint16_t, NUM_CHARGE_READOUT>& flag_pseudo)
+  void SetFlagPseudo(const std::array<uint16_t, NUM_CHARGE_READOUT>& flag_pseudo)
   {
     flagPseudo_ = flag_pseudo;
   }
 
   const auto& GetFlagNotrigForcedTrigger() const { return flagNotrigForcedTrigger_; }
   void SetFlagNotrigForcedTrigger(
-      const std::array<std::uint16_t, NUM_CHARGE_READOUT>& flag_notrig_forced_trigger)
+      const std::array<uint16_t, NUM_CHARGE_READOUT>& flag_notrig_forced_trigger)
   {
     flagNotrigForcedTrigger_ = flag_notrig_forced_trigger;
   }
 
   const auto& GetFlagSelfTrig() const { return flagSelfTrig_; }
-  void SetFlagSelfTrig(const std::array<std::uint16_t, NUM_CHARGE_READOUT>& flag_self_trig)
+  void SetFlagSelfTrig(const std::array<uint16_t, NUM_CHARGE_READOUT>& flag_self_trig)
   {
     flagSelfTrig_ = flag_self_trig;
   }
 
   const auto& GetDriftTime() const { return driftTime_; }
-  void SetDriftTime(const std::array<std::uint32_t, NUM_CHARGE_READOUT>& drift_time)
+  void SetDriftTime(const std::array<uint32_t, NUM_CHARGE_READOUT>& drift_time)
   {
     driftTime_ = drift_time;
   }
 
   auto GetLightTriggerIndex() const { return lightTriggerIndex_; }
-  void SetLightTriggerIndex(std::uint32_t light_trigger_index)
+  void SetLightTriggerIndex(uint32_t light_trigger_index)
   {
     lightTriggerIndex_ = light_trigger_index;
   }
 
   const auto& GetUnixTime() const { return unixTime_; }
-  void SetUnixTime(const std::array<std::uint32_t, NUM_CHARGE_READOUT>& unix_time)
+  void SetUnixTime(const std::array<uint32_t, NUM_CHARGE_READOUT>& unix_time)
   {
     unixTime_ = unix_time;
   }
 
   const auto& GetArrayChFlag() const { return arrayChFlag_; }
   void SetArrayChFlag(
-      const std::array<std::array<std::uint32_t, 3>, NUM_CHARGE_READOUT>& array_ch_flag)
+      const std::array<std::array<uint32_t, 3>, NUM_CHARGE_READOUT>& array_ch_flag)
   {
     arrayChFlag_ = array_ch_flag;
   }
 
   const auto& GetArrayADC() const { return arrayAdc_; }
   void SetArrayADC(
-      const std::array<std::array<std::uint16_t, NUM_CH_CHARGE>, NUM_CHARGE_READOUT>& array_adc)
+      const std::array<std::array<uint16_t, NUM_CH_CHARGE>, NUM_CHARGE_READOUT>& array_adc)
   {
     arrayAdc_ = array_adc;
   }
 
   const auto& GetArrayRef() const { return arrayRef_; }
-  void SetArrayRef(const std::array<std::uint16_t, NUM_CHARGE_READOUT>& array_ref)
+  void SetArrayRef(const std::array<uint16_t, NUM_CHARGE_READOUT>& array_ref)
   {
     arrayRef_ = array_ref;
   }
 
   const auto& GetArrayCmn() const { return arrayCmn_; }
-  void SetArrayCmn(const std::array<std::uint16_t, NUM_CHARGE_READOUT>& array_cmn)
+  void SetArrayCmn(const std::array<uint16_t, NUM_CHARGE_READOUT>& array_cmn)
   {
     arrayCmn_ = array_cmn;
   }
 
   const auto& GetArrayIndex() const { return arrayIndex_; }
   void SetArrayIndex(
-      const std::array<std::array<std::uint16_t, NUM_CH_CHARGE>, NUM_CHARGE_READOUT>&
+      const std::array<std::array<uint16_t, NUM_CH_CHARGE>, NUM_CHARGE_READOUT>&
           array_index)
   {
     arrayIndex_ = array_index;
   }
 
   const auto& GetArrayHitNum() const { return arrayHitnum_; }
-  void SetArrayHitNum(const std::array<std::uint16_t, NUM_CHARGE_READOUT>& array_hitnum)
+  void SetArrayHitNum(const std::array<uint16_t, NUM_CHARGE_READOUT>& array_hitnum)
   {
     arrayHitnum_ = array_hitnum;
   }
@@ -146,13 +146,13 @@ public:
   }
 
   const auto& GetEventIDLight() const { return eventIdLight_; }
-  void SetEventIDLight(const std::array<std::uint32_t, NUM_CH_LIGHT>& event_id_light)
+  void SetEventIDLight(const std::array<uint32_t, NUM_CH_LIGHT>& event_id_light)
   {
     eventIdLight_ = event_id_light;
   }
 
   const auto& GetEventIDCharge() const { return eventIdCharge_; }
-  void SetEventIDCharge(const std::array<std::uint32_t, NUM_CHARGE_READOUT>& event_id_charge)
+  void SetEventIDCharge(const std::array<uint32_t, NUM_CHARGE_READOUT>& event_id_charge)
   {
     eventIdCharge_ = event_id_charge;
   }
@@ -163,39 +163,39 @@ public:
     goodEvent_ = good_event;
   }
 
-  const auto& GetFecIndex() const { return fecIndex_; }
-  void SetFecIndex(const std::array<std::uint32_t, NUM_CHARGE_READOUT>& fec_index)
+  const auto& GetFECIndex() const { return fecIndex_; }
+  void SetFecIndex(const std::array<uint32_t, NUM_CHARGE_READOUT>& fec_index)
   {
     fecIndex_ = fec_index;
   }
 
   const auto& GetRealTime() const { return realTime_; }
-  void SetRealTime(const std::array<std::uint64_t, NUM_CH_LIGHT>& real_time)
+  void SetRealTime(const std::array<uint64_t, NUM_CH_LIGHT>& real_time)
   {
     realTime_ = real_time;
   }
 
   const auto& GetRealTimePrecise() const { return realTimePrecise_; }
-  void SetRealTimePrecise(const std::array<std::uint8_t, NUM_CH_LIGHT>& real_time_precise)
+  void SetRealTimePrecise(const std::array<uint8_t, NUM_CH_LIGHT>& real_time_precise)
   {
     realTimePrecise_ = real_time_precise;
   }
 
   const auto& GetChannel() const { return ch_; }
-  void SetChannel(const std::array<std::uint16_t, NUM_CH_LIGHT>& channel) { ch_ = channel; }
+  void SetChannel(const std::array<uint16_t, NUM_CH_LIGHT>& channel) { ch_ = channel; }
 
   const auto& GetQDC() const { return qdc_; }
-  void SetQDC(const std::array<std::uint16_t, NUM_CH_LIGHT>& qdc) { qdc_ = qdc; }
+  void SetQDC(const std::array<uint16_t, NUM_CH_LIGHT>& qdc) { qdc_ = qdc; }
 
   const auto& GetWaveNum() const { return waveNum_; }
-  void SetWaveNum(const std::array<std::uint16_t, NUM_CH_LIGHT>& wave_num)
+  void SetWaveNum(const std::array<uint16_t, NUM_CH_LIGHT>& wave_num)
   {
     waveNum_ = wave_num;
   }
 
   const auto& GetWaveData() const { return waveData_; }
   void SetWaveData(
-      const std::array<std::array<std::int16_t, MAX_WAVENUM>, NUM_CH_LIGHT>& wave_data)
+      const std::array<std::array<int16_t, MAX_WAVENUM>, NUM_CH_LIGHT>& wave_data)
   {
     waveData_ = wave_data;
   }
@@ -207,53 +207,53 @@ public:
   }
 
   const auto& GetTriggerID() const { return triggerid_; }
-  void SetTriggerID(std::uint32_t trigger_id) { triggerid_ = trigger_id; }
+  void SetTriggerID(uint32_t trigger_id) { triggerid_ = trigger_id; }
 
   const auto& GetTrigger() const { return trigger_; }
   void SetTrigger(const std::array<bool, NUM_CH_LIGHT>& trigger) { trigger_ = trigger; }
 
   const auto& GetWaveCompress() const { return waveCompress_; }
-  void SetWaveCompress(const std::array<std::uint16_t, NUM_CH_LIGHT>& wave_compress)
+  void SetWaveCompress(const std::array<uint16_t, NUM_CH_LIGHT>& wave_compress)
   {
     waveCompress_ = wave_compress;
   }
 
 private:
-  std::array<std::uint32_t, NUM_CHARGE_READOUT> ti_{};
-  std::array<std::uint32_t, NUM_CHARGE_READOUT> liveTime_{};
-  std::array<std::uint32_t, NUM_CHARGE_READOUT> integralLiveTime_{};
-  std::array<std::uint32_t, NUM_CHARGE_READOUT> eventFlags_{};
-  std::array<std::uint16_t, NUM_CHARGE_READOUT> flagPseudo_{};
-  std::array<std::uint16_t, NUM_CHARGE_READOUT> flagNotrigForcedTrigger_{};
-  std::array<std::uint16_t, NUM_CHARGE_READOUT> flagSelfTrig_{};
-  std::array<std::uint32_t, NUM_CHARGE_READOUT> driftTime_{};
-  std::uint32_t lightTriggerIndex_ = 0;
-  std::array<std::uint32_t, NUM_CHARGE_READOUT> unixTime_{};
-  std::array<std::array<std::uint32_t, 3>, NUM_CHARGE_READOUT> arrayChFlag_{};
-  std::array<std::array<std::uint16_t, NUM_CH_CHARGE>, NUM_CHARGE_READOUT> arrayAdc_{};
-  std::array<std::uint16_t, NUM_CHARGE_READOUT> arrayRef_{};
-  std::array<std::uint16_t, NUM_CHARGE_READOUT> arrayCmn_{};
-  std::array<std::array<std::uint16_t, NUM_CH_CHARGE>, NUM_CHARGE_READOUT> arrayIndex_{};
-  std::array<std::uint16_t, NUM_CHARGE_READOUT> arrayHitnum_{};
+  std::array<uint32_t, NUM_CHARGE_READOUT> ti_{};
+  std::array<uint32_t, NUM_CHARGE_READOUT> liveTime_{};
+  std::array<uint32_t, NUM_CHARGE_READOUT> integralLiveTime_{};
+  std::array<uint32_t, NUM_CHARGE_READOUT> eventFlags_{};
+  std::array<uint16_t, NUM_CHARGE_READOUT> flagPseudo_{};
+  std::array<uint16_t, NUM_CHARGE_READOUT> flagNotrigForcedTrigger_{};
+  std::array<uint16_t, NUM_CHARGE_READOUT> flagSelfTrig_{};
+  std::array<uint32_t, NUM_CHARGE_READOUT> driftTime_{};
+  uint32_t lightTriggerIndex_ = 0;
+  std::array<uint32_t, NUM_CHARGE_READOUT> unixTime_{};
+  std::array<std::array<uint32_t, 3>, NUM_CHARGE_READOUT> arrayChFlag_{};
+  std::array<std::array<uint16_t, NUM_CH_CHARGE>, NUM_CHARGE_READOUT> arrayAdc_{};
+  std::array<uint16_t, NUM_CHARGE_READOUT> arrayRef_{};
+  std::array<uint16_t, NUM_CHARGE_READOUT> arrayCmn_{};
+  std::array<std::array<uint16_t, NUM_CH_CHARGE>, NUM_CHARGE_READOUT> arrayIndex_{};
+  std::array<uint16_t, NUM_CHARGE_READOUT> arrayHitnum_{};
   std::array<double, NUM_CHARGE_READOUT> arrayCmnEx_{};
   std::array<bool, NUM_CHARGE_READOUT> goodEvent_{};
-  std::array<std::uint32_t, NUM_CHARGE_READOUT> fecIndex_{};
+  std::array<uint32_t, NUM_CHARGE_READOUT> fecIndex_{};
 
   int numRegistered_ = 0;
-  std::uint16_t errorFlags_ = 0;
+  uint16_t errorFlags_ = 0;
 
-  std::array<std::uint64_t, NUM_CH_LIGHT> realTime_{};
-  std::array<std::uint8_t, NUM_CH_LIGHT> realTimePrecise_{};
-  std::array<std::uint16_t, NUM_CH_LIGHT> ch_{};
-  std::array<std::uint16_t, NUM_CH_LIGHT> qdc_{};
-  std::array<std::uint16_t, NUM_CH_LIGHT> waveNum_{};
-  std::array<std::array<std::int16_t, MAX_WAVENUM>, NUM_CH_LIGHT> waveData_{};
+  std::array<uint64_t, NUM_CH_LIGHT> realTime_{};
+  std::array<uint8_t, NUM_CH_LIGHT> realTimePrecise_{};
+  std::array<uint16_t, NUM_CH_LIGHT> ch_{};
+  std::array<uint16_t, NUM_CH_LIGHT> qdc_{};
+  std::array<uint16_t, NUM_CH_LIGHT> waveNum_{};
+  std::array<std::array<int16_t, MAX_WAVENUM>, NUM_CH_LIGHT> waveData_{};
   std::array<bool, NUM_CH_LIGHT> isWaveList_{};
-  std::uint32_t triggerid_ = 0;
+  uint32_t triggerid_ = 0;
   std::array<bool, NUM_CH_LIGHT> trigger_{};
-  std::array<std::uint16_t, NUM_CH_LIGHT> waveCompress_{};
-  std::array<std::uint32_t, NUM_CH_LIGHT> eventIdLight_{};
-  std::array<std::uint32_t, NUM_CHARGE_READOUT> eventIdCharge_{};
+  std::array<uint16_t, NUM_CH_LIGHT> waveCompress_{};
+  std::array<uint32_t, NUM_CH_LIGHT> eventIdLight_{};
+  std::array<uint32_t, NUM_CHARGE_READOUT> eventIdCharge_{};
 };
 
 using NanoGRAMSEvent_sptr = std::shared_ptr<NanoGRAMSEvent>;

@@ -54,46 +54,16 @@ namespace fs = std::filesystem;
 namespace
 {
 
-constexpr int kNumFec = ngUtil::kDefaultFecNum;
-constexpr int kNumChannels = ngUtil::kNPixel;
-constexpr int kNumGainParams = 4;
 constexpr double kPixelSize = 0.32 * unit::cm;
 
-using GainParamArray = std::array<double, kNumGainParams>;
-using GainMatrix = std::array<GainParamArray, kNumChannels>;
-using PositionTable = std::array<std::array<double, kNumChannels>, kNumFec>;
-using PixelIndexTable = std::array<std::int16_t, kNumChannels>;
-
-struct EnergyCalibrationConfig
-{
-  std::string gain_info_file;
-  std::string q_to_kev_spline_file;
-  int efield_v_cm = 500;
-  double temperature_k = 87.0;
-  double factor_energy = 1.0;
-  double max_time_us = 67.0;
-  int tp_channel = 17;
-  int ccal = 8;
-  std::array<double, kNumFec> tp_adc_values = {1.0, 1.0, 1.0, 1.0};
-};
-
-struct PositionCalibrationConfig
-{
-  double anode_pos_z_cm = 5.0;
-};
-
-struct CalibrationConfig
-{
-  EnergyCalibrationConfig energy;
-  PositionCalibrationConfig position;
-  fs::path config_dir;
-};
+using PositionTable = std::array<std::array<double, NUM_CH_CHARGE>, NUM_CHARGE_READOUT>;
+using PixelIndexTable = std::array<int16_t, NUM_CH_CHARGE>;
 
 constexpr PositionTable buildPosX()
 {
   PositionTable dict{};
-  for (int fec = 0; fec < kNumFec; ++fec) {
-    for (int ch = 0; ch < kNumChannels; ++ch) {
+  for (int fec = 0; fec < NUM_CHARGE_READOUT; ++fec) {
+    for (int ch = 0; ch < NUM_CH_CHARGE; ++ch) {
       if (fec == 0) {
         constexpr double offset_x = -1.28 * unit::cm;
         dict[fec][ch] = offset_x + kPixelSize * (ch / 8 - 3.5);
@@ -123,8 +93,8 @@ constexpr PositionTable buildPosX()
 constexpr PositionTable buildPosY()
 {
   PositionTable dict{};
-  for (int fec = 0; fec < kNumFec; ++fec) {
-    for (int ch = 0; ch < kNumChannels; ++ch) {
+  for (int fec = 0; fec < NUM_CHARGE_READOUT; ++fec) {
+    for (int ch = 0; ch < NUM_CH_CHARGE; ++ch) {
       if (fec == 0) {
         constexpr double offset_y = -1.28 * unit::cm;
         if ((ch < 16) || ((23 < ch) && (ch < 32)) || ((39 < ch) && (ch < 48))) {
@@ -154,8 +124,8 @@ constexpr PositionTable buildPosY()
 constexpr PixelIndexTable buildPixelX()
 {
   PixelIndexTable dict{};
-  for (int ch = 0; ch < kNumChannels; ++ch) {
-    dict[ch] = static_cast<std::int16_t>(ch / 8);
+  for (int ch = 0; ch < NUM_CH_CHARGE; ++ch) {
+    dict[ch] = static_cast<int16_t>(ch / 8);
   }
   return dict;
 }
@@ -163,11 +133,11 @@ constexpr PixelIndexTable buildPixelX()
 constexpr PixelIndexTable buildPixelY()
 {
   PixelIndexTable dict{};
-  for (int ch = 0; ch < kNumChannels; ++ch) {
+  for (int ch = 0; ch < NUM_CH_CHARGE; ++ch) {
     if ((ch < 16) || ((23 < ch) && (ch < 32)) || ((39 < ch) && (ch < 48))) {
-      dict[ch] = static_cast<std::int16_t>(7 - (ch % 8));
+      dict[ch] = static_cast<int16_t>(7 - (ch % 8));
     } else {
-      dict[ch] = static_cast<std::int16_t>(ch % 8);
+      dict[ch] = static_cast<int16_t>(ch % 8);
     }
   }
   return dict;
@@ -200,10 +170,11 @@ fs::path resolvePath(const fs::path& base_dir, const std::string& value)
   return base_dir / path;
 }
 
-std::array<double, kNumFec> readTpAdcValues(const boost::property_tree::ptree& pt,
-                                            const std::array<double, kNumFec>& default_value)
+std::array<double, NUM_CHARGE_READOUT> readTpAdcValues(
+    const boost::property_tree::ptree& pt,
+    const std::array<double, NUM_CHARGE_READOUT>& default_value)
 {
-  std::array<double, kNumFec> values = default_value;
+  std::array<double, NUM_CHARGE_READOUT> values = default_value;
   const auto node = pt.get_child_optional("tp_adc_values");
   if (!node) {
     return values;
@@ -315,134 +286,145 @@ GainMatrix loadCalibrationMatrix(const fs::path& gain_info_path, const std::stri
     throw std::runtime_error("Failed to read HDF5 dataset: " + dataset_path);
   }
 
-  for (int ch = 0; ch < kNumChannels; ++ch) {
-    for (int par = 0; par < kNumGainParams; ++par) {
-      matrix[ch][par] = values[static_cast<std::size_t>(kNumGainParams * ch + par)];
+  for (int ch = 0; ch < NUM_CH_CHARGE; ++ch) {
+    for (int par = 0; par < kNanoGRAMSNumGainParams; ++par) {
+      matrix[ch][par] = values[static_cast<std::size_t>(kNanoGRAMSNumGainParams * ch + par)];
     }
   }
 
   return matrix;
 }
 
-class TPCResponse
+} // namespace
+
+TPCResponse::TPCResponse()
+    : drift_velocity_(1.0e5 * unit::cm / unit::s),
+      anode_pos_z_(5.0 * unit::cm),
+      pixel_size_(kPixelSize),
+      z_height_lartpc_(10.0 * unit::cm),
+      pos_x_error_(pixel_size_ / std::sqrt(12.0)),
+      pos_y_error_(pixel_size_ / std::sqrt(12.0)),
+      pos_z_error_(0.1 * unit::cm)
 {
-public:
-  TPCResponse()
-  {
-    pos_x_error_ = pixel_size_ / std::sqrt(12.0);
-    pos_y_error_ = pixel_size_ / std::sqrt(12.0);
-    temperature_correction_factors_.fill(1.0);
+  temperature_correction_factors_.fill(1.0);
+}
+
+TPCResponse::~TPCResponse() = default;
+
+void TPCResponse::setDriftVelocity(double value)
+{
+  drift_velocity_ = value;
+}
+
+void TPCResponse::setAnodePosZ(double value)
+{
+  anode_pos_z_ = value;
+}
+
+double TPCResponse::posXError() const
+{
+  return pos_x_error_;
+}
+
+double TPCResponse::posYError() const
+{
+  return pos_y_error_;
+}
+
+double TPCResponse::posZError() const
+{
+  return pos_z_error_;
+}
+
+void TPCResponse::loadParamCoulomb2keVForSpline3D(const fs::path& spline_path, int efield_v_cm)
+{
+  spline_file_ = std::make_unique<TFile>(spline_path.string().c_str(), "READ");
+  if (!spline_file_ || spline_file_->IsZombie()) {
+    throw std::runtime_error("Failed to open spline ROOT file: " + spline_path.string());
   }
 
-  void setDriftVelocity(double value) { drift_velocity_ = value; }
-  void setAnodePosZ(double value) { anode_pos_z_ = value; }
+  const std::string efield_name = "E" + std::to_string(efield_v_cm);
+  spline_ = dynamic_cast<TSpline3*>(spline_file_->Get(efield_name.c_str()));
+  if (!spline_) {
+    throw std::runtime_error("Missing TSpline3 '" + efield_name + "' in " +
+                             spline_path.string());
+  }
 
-  double posXError() const { return pos_x_error_; }
-  double posYError() const { return pos_y_error_; }
-  double posZError() const { return pos_z_error_; }
+  const int knots = spline_->GetNp();
+  double y0 = 0.0;
+  double y1 = 0.0;
+  spline_->GetKnot(0, xmin_spline3d_, y0);
+  spline_->GetKnot(knots - 1, xmax_spline3d_, y1);
+}
 
-  void loadParamCoulomb2keVForSpline3D(const fs::path& spline_path, int efield_v_cm)
-  {
-    spline_file_ = std::make_unique<TFile>(spline_path.string().c_str(), "READ");
-    if (!spline_file_ || spline_file_->IsZombie()) {
-      throw std::runtime_error("Failed to open spline ROOT file: " + spline_path.string());
+void TPCResponse::loadParamGainMatrices(const fs::path& gain_info_path)
+{
+  for (int fec = 0; fec < NUM_CHARGE_READOUT; ++fec) {
+    const std::string prefix = "/FEC" + std::to_string(fec);
+    gain_matrices_adc_to_c_[fec] = loadCalibrationMatrix(gain_info_path, prefix + "/ADC2C");
+    gain_matrices_ccal_to_adc_[fec] =
+        loadCalibrationMatrix(gain_info_path, prefix + "/ccal2ADC");
+  }
+}
+
+void TPCResponse::applyTemperatureCorrection(
+    int tp_channel,
+    int ccal,
+    const std::array<double, NUM_CHARGE_READOUT>& tp_adc_values)
+{
+  for (int fec = 0; fec < NUM_CHARGE_READOUT; ++fec) {
+    const double measured = tp_adc_values[fec];
+    if (measured <= 0.0) {
+      throw std::runtime_error("tp_adc_values must be positive for all FECs.");
     }
 
-    const std::string efield_name = "E" + std::to_string(efield_v_cm);
-    spline_ = dynamic_cast<TSpline3*>(spline_file_->Get(efield_name.c_str()));
-    if (!spline_) {
-      throw std::runtime_error("Missing TSpline3 '" + efield_name + "' in " +
-                               spline_path.string());
-    }
-
-    const int knots = spline_->GetNp();
-    double y0 = 0.0;
-    double y1 = 0.0;
-    spline_->GetKnot(0, xmin_spline3d_, y0);
-    spline_->GetKnot(knots - 1, xmax_spline3d_, y1);
+    const GainParamArray& params = gain_matrices_ccal_to_adc_[fec][tp_channel];
+    const double room_temp_adc = cubic(ccal, params);
+    temperature_correction_factors_[fec] = room_temp_adc / measured;
   }
+}
 
-  void loadParamGainMatrices(const fs::path& gain_info_path)
-  {
-    for (int fec = 0; fec < kNumFec; ++fec) {
-      const std::string prefix = "/FEC" + std::to_string(fec);
-      gain_matrices_adc_to_c_[fec] = loadCalibrationMatrix(gain_info_path, prefix + "/ADC2C");
-      gain_matrices_ccal_to_adc_[fec] =
-          loadCalibrationMatrix(gain_info_path, prefix + "/ccal2ADC");
-    }
-  }
+double TPCResponse::temperatureCorrectionFactor(int fec) const
+{
+  return temperature_correction_factors_[fec];
+}
 
-  void applyTemperatureCorrection(int tp_channel,
-                                  int ccal,
-                                  const std::array<double, kNumFec>& tp_adc_values)
-  {
-    for (int fec = 0; fec < kNumFec; ++fec) {
-      const double measured = tp_adc_values[fec];
-      if (measured <= 0.0) {
-        throw std::runtime_error("tp_adc_values must be positive for all FECs.");
-      }
+double TPCResponse::convertADC2keVWithSpline3D(int fec, int ch, double adc) const
+{
+  const double charge_coulomb = convertADC2CWithSpline3D(fec, ch, adc) / unit::coulomb;
+  return spline_->Eval(charge_coulomb) * unit::keV;
+}
 
-      const GainParamArray& params = gain_matrices_ccal_to_adc_[fec][tp_channel];
-      const double room_temp_adc = cubic(ccal, params);
-      temperature_correction_factors_[fec] = room_temp_adc / measured;
-    }
-  }
+double TPCResponse::convertADC2CWithSpline3D(int fec, int ch, double adc) const
+{
+  const GainParamArray& params = gain_matrices_adc_to_c_[fec][ch];
+  double charge_coulomb = cubic(adc, params);
+  charge_coulomb = std::clamp(charge_coulomb, xmin_spline3d_, xmax_spline3d_);
+  return charge_coulomb * unit::coulomb;
+}
 
-  double temperatureCorrectionFactor(int fec) const
-  {
-    return temperature_correction_factors_[fec];
-  }
+double TPCResponse::convertDriftTime2PosZ(double drift_time) const
+{
+  return anode_pos_z_ - drift_time * drift_velocity_;
+}
 
-  double convertADC2keVWithSpline3D(int fec, int ch, double adc) const
-  {
-    const double charge_coulomb = convertADC2CWithSpline3D(fec, ch, adc) / unit::coulomb;
-    return spline_->Eval(charge_coulomb) * unit::keV;
-  }
+double TPCResponse::convertDriftTime2PosZScale(double drift_time, double max_time) const
+{
+  return z_height_lartpc_ * (0.5 - drift_time / max_time);
+}
 
-  double convertADC2CWithSpline3D(int fec, int ch, double adc) const
-  {
-    const GainParamArray& params = gain_matrices_adc_to_c_[fec][ch];
-    double charge_coulomb = cubic(adc, params);
-    charge_coulomb = std::clamp(charge_coulomb, xmin_spline3d_, xmax_spline3d_);
-    return charge_coulomb * unit::coulomb;
-  }
+double TPCResponse::cubic(double x, const GainParamArray& params)
+{
+  return params[0] * x * x * x + params[1] * x * x + params[2] * x + params[3];
+}
 
-  double convertDriftTime2PosZ(double drift_time) const
-  {
-    return anode_pos_z_ - drift_time * drift_velocity_;
-  }
-
-  double convertDriftTime2PosZScale(double drift_time, double max_time) const
-  {
-    return z_height_lartpc_ * (0.5 - drift_time / max_time);
-  }
-
-private:
-  static double cubic(double x, const GainParamArray& params)
-  {
-    return params[0] * x * x * x + params[1] * x * x + params[2] * x + params[3];
-  }
-
-  double drift_velocity_ = 1.0e5 * unit::cm / unit::s;
-  double anode_pos_z_ = 5.0 * unit::cm;
-  double pixel_size_ = kPixelSize;
-  double z_height_lartpc_ = 10.0 * unit::cm;
-  double pos_x_error_ = 0.0;
-  double pos_y_error_ = 0.0;
-  double pos_z_error_ = 0.1 * unit::cm;
-  TSpline3* spline_ = nullptr;
-  double xmin_spline3d_ = 0.0;
-  double xmax_spline3d_ = 0.0;
-  std::array<GainMatrix, kNumFec> gain_matrices_adc_to_c_{};
-  std::array<GainMatrix, kNumFec> gain_matrices_ccal_to_adc_{};
-  std::unique_ptr<TFile> spline_file_;
-  std::array<double, kNumFec> temperature_correction_factors_{};
-};
+namespace
+{
 
 std::vector<DetectorHit_sptr> buildCalibratedHits(
     const CalibrationConfig& config,
     const TPCResponse& response,
-    const std::vector<ngUtil::StreamingFecHit>& raw_hits)
+    const std::vector<ngUtil::RawFECHit>& raw_hits)
 {
   std::vector<DetectorHit_sptr> hits;
   hits.reserve(raw_hits.size());
@@ -450,7 +432,7 @@ std::vector<DetectorHit_sptr> buildCalibratedHits(
   const double max_time = config.energy.max_time_us * unit::us;
 
   for (const auto& raw_hit : raw_hits) {
-    if (raw_hit.fec < 0 || raw_hit.fec >= kNumFec) {
+    if (raw_hit.fec < 0 || raw_hit.fec >= NUM_CHARGE_READOUT) {
       throw std::runtime_error("FEC index out of range in NanoGRAMS calibration.");
     }
 
@@ -469,7 +451,7 @@ std::vector<DetectorHit_sptr> buildCalibratedHits(
     std::vector<double> energies(n, 0.0);
     for (std::size_t i = 0; i < n; ++i) {
       const int ch = raw_hit.channels[i];
-      if (ch < 0 || ch >= kNumChannels) {
+      if (ch < 0 || ch >= NUM_CH_CHARGE) {
         throw std::runtime_error("Channel index out of range in NanoGRAMS calibration.");
       }
 
@@ -501,7 +483,7 @@ std::vector<DetectorHit_sptr> buildCalibratedHits(
 
     const int channel = raw_hit.channels[max_index];
     auto hit = std::make_shared<DetectorHit>();
-    hit->setTI(static_cast<std::int64_t>(raw_hit.ti));
+    hit->setTI(static_cast<int64_t>(raw_hit.ti));
     hit->setDetectorChannelID(ChannelID::Undefined, raw_hit.fec, channel);
     hit->setReadoutChannelID(raw_hit.fec, raw_hit.fec, channel);
     hit->setVoxel(kPixelX[channel], kPixelY[channel], VoxelID::Undefined);
@@ -524,7 +506,7 @@ std::string deriveHitTreeOutputPath(const std::string& explicit_path,
   if (!rawhit_path.empty()) {
     const fs::path raw_path(rawhit_path);
     const std::string stem = raw_path.stem().string();
-    if (stem == "rawhit" || stem == "rawvata") {
+    if (stem == "rawhit" || stem == ngUtil::kRawHitTreeName || stem == "rawvata") {
       return (raw_path.parent_path() / "hittree.root").string();
     }
     return (raw_path.parent_path() / (stem + "_hittree.root")).string();
@@ -534,39 +516,6 @@ std::string deriveHitTreeOutputPath(const std::string& explicit_path,
 }
 
 } // namespace
-
-class NanoGRAMSCalibrationStep1::Impl
-{
-public:
-  explicit Impl(const std::string& config_file)
-      : config_(readCalibrationConfig(config_file))
-  {
-    const fs::path gain_info_path = resolvePath(config_.config_dir, config_.energy.gain_info_file);
-    const fs::path spline_path =
-        resolvePath(config_.config_dir, config_.energy.q_to_kev_spline_file);
-
-    response_.loadParamCoulomb2keVForSpline3D(spline_path, config_.energy.efield_v_cm);
-    response_.loadParamGainMatrices(gain_info_path);
-    response_.setDriftVelocity(electronDriftVelocity(
-        config_.energy.temperature_k * unit::kelvin,
-        config_.energy.efield_v_cm * unit::volt / unit::cm));
-    response_.setAnodePosZ(config_.position.anode_pos_z_cm * unit::cm);
-    response_.applyTemperatureCorrection(
-        config_.energy.tp_channel,
-        config_.energy.ccal,
-        config_.energy.tp_adc_values);
-  }
-
-  std::vector<DetectorHit_sptr> buildHits(
-      const std::vector<ngUtil::StreamingFecHit>& raw_hits) const
-  {
-    return buildCalibratedHits(config_, response_, raw_hits);
-  }
-
-private:
-  CalibrationConfig config_;
-  TPCResponse response_;
-};
 
 NanoGRAMSCalibrationStep1::NanoGRAMSCalibrationStep1() = default;
 
@@ -598,7 +547,23 @@ ANLStatus NanoGRAMSCalibrationStep1::mod_initialize()
   }
   get_module("NanoGRAMSDataReduction", &data_reduction_);
 
-  impl_ = std::make_unique<Impl>(config_file_);
+  calibration_config_ = readCalibrationConfig(config_file_);
+  const fs::path gain_info_path =
+      resolvePath(calibration_config_.config_dir, calibration_config_.energy.gain_info_file);
+  const fs::path spline_path =
+      resolvePath(calibration_config_.config_dir,
+                  calibration_config_.energy.q_to_kev_spline_file);
+
+  response_.loadParamCoulomb2keVForSpline3D(spline_path, calibration_config_.energy.efield_v_cm);
+  response_.loadParamGainMatrices(gain_info_path);
+  response_.setDriftVelocity(electronDriftVelocity(
+      calibration_config_.energy.temperature_k * unit::kelvin,
+      calibration_config_.energy.efield_v_cm * unit::volt / unit::cm));
+  response_.setAnodePosZ(calibration_config_.position.anode_pos_z_cm * unit::cm);
+  response_.applyTemperatureCorrection(
+      calibration_config_.energy.tp_channel,
+      calibration_config_.energy.ccal,
+      calibration_config_.energy.tp_adc_values);
 
   const std::string rawhit_path =
       rawhitdata_file_.empty() ? data_reduction_->rawHitFilePath() : rawhitdata_file_;
@@ -610,12 +575,12 @@ ANLStatus NanoGRAMSCalibrationStep1::mod_initialize()
     throw std::runtime_error("Failed to create hit tree ROOT file: " + output_path.string());
   }
 
-  hittree_ = new TTree("hittree", "hittree");
-  hittree_->SetDirectory(output_file_.get());
+  hit_tree_ = new TTree(ngUtil::kHitTreeName, ngUtil::kHitTreeName);
+  hit_tree_->SetDirectory(output_file_.get());
 
   tree_io_ = std::make_unique<HitTreeIOWithInitialInfo>();
   tree_io_->enableInitialInfoRecord();
-  tree_io_->setTree(hittree_);
+  tree_io_->setTree(hit_tree_);
   tree_io_->defineBranches();
   tree_io_->setInitialInfo(0.0, vector3_t(0.0, 0.0, 0.0), 0.0, vector3_t(0.0, 0.0, 0.0));
   tree_io_->setInitialPolarization(0.0, 0.0, 0.0);
@@ -632,7 +597,8 @@ ANLStatus NanoGRAMSCalibrationStep1::mod_analyze()
     return AS_OK;
   }
 
-  const auto hits = impl_->buildHits(data_reduction_->currentEventHits());
+  const auto hits =
+      buildCalibratedHits(calibration_config_, response_, data_reduction_->currentEventHits());
   if (hits.empty()) {
     return AS_OK;
   }
@@ -645,20 +611,19 @@ ANLStatus NanoGRAMSCalibrationStep1::mod_analyze()
 
 ANLStatus NanoGRAMSCalibrationStep1::mod_end_run()
 {
-  if (output_file_ && hittree_) {
+  if (output_file_ && hit_tree_) {
     output_file_->cd();
-    hittree_->Write();
+    hit_tree_->Write();
     output_file_->Write();
     std::cout << "[ROOT] Saved hit tree: " << output_file_->GetName()
               << " (events=" << written_events_
-              << ", entries=" << hittree_->GetEntries() << ")\n";
+              << ", entries=" << hit_tree_->GetEntries() << ")\n";
     output_file_->Close();
   }
 
   tree_io_.reset();
-  hittree_ = nullptr;
+  hit_tree_ = nullptr;
   output_file_.reset();
-  impl_.reset();
   data_reduction_ = nullptr;
   return AS_OK;
 }

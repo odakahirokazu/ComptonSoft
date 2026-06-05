@@ -35,40 +35,39 @@ void TPCTreeIO::SetBranchAddress(TTree* tree)
     return;
   }
 
-  tpctree_->SetBranchAddress("hitnum", arrayHitnum_.data());
-  tpctree_->SetBranchAddress("chflag", arrayChFlag_.data());
-  tpctree_->SetBranchAddress("cmn", arrayCmn_.data());
-  tpctree_->SetBranchAddress("adc", arrayAdc_.data());
-  tpctree_->SetBranchAddress("index", arrayIndex_.data());
-  tpctree_->SetBranchAddress("ref", arrayRef_.data());
-  tpctree_->SetBranchAddress("cmn_ex", arrayCmnEx_.data());
-  tpctree_->SetBranchAddress("ti", ti_.data());
-  tpctree_->SetBranchAddress("event_id_charge", eventIdCharge_.data());
-  tpctree_->SetBranchAddress("livetime", liveTime_.data());
-  tpctree_->SetBranchAddress("integral_livetime", integralLiveTime_.data());
-  tpctree_->SetBranchAddress("drift_time", driftTime_.data());
-  tpctree_->SetBranchAddress("light_trigger_index", &lightTriggerIndex_);
-  tpctree_->SetBranchAddress("unixtime", unixTime_.data());
-  tpctree_->SetBranchAddress("event_flags", eventFlags_.data());
-  tpctree_->SetBranchAddress("flag_pseudo", flagPseudo_.data());
-  tpctree_->SetBranchAddress(
-      "flag_notrig_forced_trigger", flagNotrigForcedTrigger_.data());
-  tpctree_->SetBranchAddress("flag_self_trig", flagSelfTrig_.data());
-  tpctree_->SetBranchAddress("fec_index", fecIndex_.data());
-  tpctree_->SetBranchAddress("good_event", goodEvent_.data());
+  tpctree_->SetBranchAddress("hitnum",                     arrayHitnum_.data());
+  tpctree_->SetBranchAddress("chflag",                     arrayChFlag_.data());
+  tpctree_->SetBranchAddress("cmn",                        arrayCmn_.data());
+  tpctree_->SetBranchAddress("adc",                        arrayAdc_.data());
+  tpctree_->SetBranchAddress("index",                      arrayIndex_.data());
+  tpctree_->SetBranchAddress("ref",                        arrayRef_.data());
+  tpctree_->SetBranchAddress("cmn_ex",                     arrayCmnEx_.data());
+  tpctree_->SetBranchAddress("ti",                         ti_.data());
+  tpctree_->SetBranchAddress("event_id_charge",            eventIdCharge_.data());
+  tpctree_->SetBranchAddress("livetime",                   liveTime_.data());
+  tpctree_->SetBranchAddress("integral_livetime",          integralLiveTime_.data());
+  tpctree_->SetBranchAddress("drift_time",                 driftTime_.data());
+  tpctree_->SetBranchAddress("light_trigger_index",        &lightTriggerIndex_);
+  tpctree_->SetBranchAddress("unixtime",                   unixTime_.data());
+  tpctree_->SetBranchAddress("event_flags",                eventFlags_.data());
+  tpctree_->SetBranchAddress("flag_pseudo",                flagPseudo_.data());
+  tpctree_->SetBranchAddress("flag_notrig_forced_trigger", flagNotrigForcedTrigger_.data());
+  tpctree_->SetBranchAddress("flag_self_trig",             flagSelfTrig_.data());
+  tpctree_->SetBranchAddress("fec_index",                  fecIndex_.data());
+  tpctree_->SetBranchAddress("good_event",                 goodEvent_.data());
 
-  tpctree_->SetBranchAddress("event_id_light", eventIdLight_.data());
-  tpctree_->SetBranchAddress("real_time", realTime_.data());
-  tpctree_->SetBranchAddress("real_time_frac", realTimePrecise_.data());
-  tpctree_->SetBranchAddress("ch", ch_.data());
-  tpctree_->SetBranchAddress("qdc", qdc_.data());
-  tpctree_->SetBranchAddress("wave_num", waveNum_.data());
-  tpctree_->SetBranchAddress("triggerid", &triggerid_);
-  tpctree_->SetBranchAddress("trigger", trigger_.data());
-  tpctree_->SetBranchAddress("wave_compress", waveCompress_.data());
-  tpctree_->SetBranchAddress("is_wavelist", isWaveList_.data());
-  tpctree_->SetBranchAddress("registered", registered_.data());
-  tpctree_->SetBranchAddress("error_flags", &errorFlags_);
+  tpctree_->SetBranchAddress("event_id_light",             eventIdLight_.data());
+  tpctree_->SetBranchAddress("real_time",                  realTime_.data());
+  tpctree_->SetBranchAddress("real_time_frac",             realTimePrecise_.data());
+  tpctree_->SetBranchAddress("ch",                         ch_.data());
+  tpctree_->SetBranchAddress("qdc",                        qdc_.data());
+  tpctree_->SetBranchAddress("wave_num",                   waveNum_.data());
+  tpctree_->SetBranchAddress("triggerid",                  &triggerid_);
+  tpctree_->SetBranchAddress("trigger",                    trigger_.data());
+  tpctree_->SetBranchAddress("wave_compress",              waveCompress_.data());
+  tpctree_->SetBranchAddress("is_wavelist",                isWaveList_.data());
+  tpctree_->SetBranchAddress("registered",                 registered_.data());
+  tpctree_->SetBranchAddress("error_flags",                &errorFlags_);
 }
 
 void TPCTreeIO::RetrieveEvent(NanoGRAMSEvent& event) const
