@@ -116,13 +116,20 @@ if(CS_USE_ORT)
     )
 endif()
 
+if(CS_USE_YAMLCPP)
+  set(CS_YAMLCPP_CLASSES
+    src/NanoGRAMSTPCTreeUtil.cc
+  )
+endif()
+
 add_library(CSCore SHARED
   ${CS_CORE_CLASSES}
   ${CS_ORT_CLASSES}
+  ${CS_YAMLCPP_CLASSES}
   )
 
 target_link_libraries(CSCore
-  ${ROOT_LIB} ${G4_LIB} ${CLHEP_LIB} ${ORT_LIB} ${ADD_LIB} ${BOOST_LIB})
+  ${ROOT_LIB} ${G4_LIB} ${CLHEP_LIB} ${ORT_LIB} ${ADD_LIB} ${BOOST_LIB} ${YAMLCPP_LIB})
 
 install(TARGETS CSCore LIBRARY DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
 

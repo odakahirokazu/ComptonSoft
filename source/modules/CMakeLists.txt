@@ -178,6 +178,7 @@ target_link_libraries(CSModules
   ${ORT_LIB}
   ${ADD_LIB}
   ${HDF5_LIBRARIES}
+  ${YAMLCPP_LIB}
   )
 
 install(TARGETS CSModules LIBRARY DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)

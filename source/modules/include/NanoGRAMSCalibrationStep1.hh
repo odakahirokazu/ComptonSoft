@@ -135,6 +135,7 @@ private:
   std::string config_file_;
   std::string rawhitdata_file_;
   std::string hittree_file_;
+  double energy_multiplication_factor_ = 1.0;
 
   const NanoGRAMSDataReduction* data_reduction_ = nullptr;
   std::unique_ptr<TFile> output_file_;

@@ -131,3 +131,14 @@ if(CS_USE_ORT)
   message("-- ORT_INC_DIR: ${ORT_INC_DIR}")
   message("-- ORT_LIB: ${ORT_LIB}")
 endif(CS_USE_ORT)
+
+### YAML-CPP ###
+if(CS_USE_YAMLCPP)
+  add_compile_definitions(CS_USE_YAMLCPP=1)
+
+  find_package(yaml-cpp CONFIG REQUIRED)
+
+  set(YAMLCPP_LIB yaml-cpp::yaml-cpp)
+
+  message("-- YAMLCPP_LIB: ${YAMLCPP_LIB}")
+endif(CS_USE_YAMLCPP)

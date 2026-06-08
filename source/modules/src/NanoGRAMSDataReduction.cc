@@ -89,13 +89,13 @@ ANLStatus NanoGRAMSDataReduction::mod_analyze()
     return AS_QUIT;
   }
 
-  current_has_event_ = false;
+  current_has_event_    = false;
   current_raw_event_id_ = raw_event_id;
   current_event_hits_.clear();
 
   if (!event_hits.empty()) {
-    current_has_event_ = true;
-    current_event_id_ = gamma_events_;
+    current_has_event_  = true;
+    current_event_id_   = gamma_events_;
     current_event_hits_ = event_hits;
     if (writer_) {
       writer_->fillEvent(current_event_id_, raw_event_id, current_event_hits_);

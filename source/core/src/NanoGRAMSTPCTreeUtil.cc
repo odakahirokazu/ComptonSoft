@@ -25,8 +25,8 @@
 
 #include <algorithm>
 #include <array>
-#include <boost/property_tree/json_parser.hpp>
-#include <boost/property_tree/ptree.hpp>
+//#include <boost/property_tree/json_parser.hpp>
+//#include <boost/property_tree/ptree.hpp>
 #include <cmath>
 #include <cstdint>
 #include <filesystem>
@@ -36,6 +36,7 @@
 #include <optional>
 #include <stdexcept>
 #include <utility>
+#include <yaml-cpp/yaml.h>
 
 namespace comptonsoft
 {
@@ -116,51 +117,60 @@ constexpr std::array<std::array<int, NUM_CH_CHARGE>, NUM_CHARGE_READOUT> kPlotNu
      56, 57, 58, 59, 60, 61, 62, 63}
 }};
 
-std::vector<int> readIntVector(const boost::property_tree::ptree& pt,
-                               const std::string& key,
-                               const std::vector<int>& default_value)
+//std::vector<int> readIntVector(const boost::property_tree::ptree& pt,
+//                               const std::string& key,
+//                               const std::vector<int>& default_value)
+//{
+//  const auto node = pt.get_child_optional(key);
+//  if (!node) {
+//    return default_value;
+//  }
+//
+//  std::vector<int> values;
+//  values.reserve(node->size());
+//  for (const auto& item : *node) {
+//    values.push_back(item.second.get_value<int>());
+//  }
+//  return values;
+//}
+
+//std::map<int, std::vector<int>> readExcludePixels(const boost::property_tree::ptree& pt)
+//{
+//  std::map<int, std::vector<int>> exclude_pix;
+//
+//  const auto node = pt.get_child_optional("exclude_pix");
+//  if (!node) {
+//    return exclude_pix;
+//  }
+//
+//  for (const auto& item : *node) {
+//    std::vector<int> pixels;
+//    pixels.reserve(item.second.size());
+//    for (const auto& pixel : item.second) {
+//      pixels.push_back(pixel.second.get_value<int>());
+//    }
+//    exclude_pix[std::stoi(item.first)] = std::move(pixels);
+//  }
+//
+//  return exclude_pix;
+//}
+
+//void readLightConfig(Config& cfg, const boost::property_tree::ptree& pt)
+void readLightConfig(Config& cfg, const YAML::Node& node)
 {
-  const auto node = pt.get_child_optional(key);
-  if (!node) {
-    return default_value;
-  }
+  //cfg.delay_counts      = pt.get<int>(   "delay_counts",      cfg.delay_counts);
+  //cfg.light_peak_thr_mV = pt.get<double>("light_peak_thr_mV", cfg.light_peak_thr_mV);
+  //cfg.late_window_us    = pt.get<double>("late_window_us",    cfg.late_window_us);
+  //cfg.late_peak_thr_mV  = pt.get<double>("late_peak_thr_mV",  cfg.late_peak_thr_mV);
+  //cfg.light_channels    = readIntVector(pt, "light_channels", cfg.light_channels);
+  //cfg.light_channels    = readIntVector(pt, "light_channels");
 
-  std::vector<int> values;
-  values.reserve(node->size());
-  for (const auto& item : *node) {
-    values.push_back(item.second.get_value<int>());
-  }
-  return values;
-}
-
-std::map<int, std::vector<int>> readExcludePixels(const boost::property_tree::ptree& pt)
-{
-  std::map<int, std::vector<int>> exclude_pix;
-
-  const auto node = pt.get_child_optional("exclude_pix");
-  if (!node) {
-    return exclude_pix;
-  }
-
-  for (const auto& item : *node) {
-    std::vector<int> pixels;
-    pixels.reserve(item.second.size());
-    for (const auto& pixel : item.second) {
-      pixels.push_back(pixel.second.get_value<int>());
-    }
-    exclude_pix[std::stoi(item.first)] = std::move(pixels);
-  }
-
-  return exclude_pix;
-}
-
-void readLightConfig(Config& cfg, const boost::property_tree::ptree& pt)
-{
-  cfg.delay_counts      = pt.get<int>(   "delay_counts",      cfg.delay_counts);
-  cfg.light_peak_thr_mV = pt.get<double>("light_peak_thr_mV", cfg.light_peak_thr_mV);
-  cfg.late_window_us    = pt.get<double>("late_window_us",    cfg.late_window_us);
-  cfg.late_peak_thr_mV  = pt.get<double>("late_peak_thr_mV",  cfg.late_peak_thr_mV);
-  cfg.light_channels    = readIntVector(pt, "light_channels", cfg.light_channels);
+  const auto nodeLight  = node["light"];
+  cfg.delay_counts      = nodeLight[   "delay_counts"].as<int>();
+  cfg.light_peak_thr_mV = nodeLight["light_peak_thr_mV"].as<double>();
+  cfg.late_window_us    = nodeLight["late_window_us"].as<double>();
+  cfg.late_peak_thr_mV  = nodeLight["late_peak_thr_mV"].as<double>();
+  cfg.light_channels    = nodeLight["light_channels"].as<std::vector<int>>();
 
   std::cout << "readLightConfig()" << std::endl;
   std::cout << "delay_counts:        " << cfg.delay_counts        << std::endl;
@@ -181,20 +191,39 @@ void readLightConfig(Config& cfg, const boost::property_tree::ptree& pt)
   std::cout << " ]" << std::endl;
 }
 
-void readChargeConfig(Config& cfg, const boost::property_tree::ptree& pt)
+//void readChargeConfig(Config& cfg, const boost::property_tree::ptree& pt)
+void readChargeConfig(Config& cfg, const YAML::Node& node)
 {
-  cfg.pix_min           = pt.get<int>(   "pix_min",           cfg.pix_min);
-  cfg.pix_max           = pt.get<int>(   "pix_max",           cfg.pix_max);
-  cfg.circ_min_hits     = pt.get<int>(   "circ_min_hits",     cfg.circ_min_hits);
-  cfg.adc_min           = pt.get<double>("adc_min",           cfg.adc_min);
-  cfg.adc_max           = pt.get<double>("adc_max",           cfg.adc_max);
-  cfg.circ_thr          = pt.get<double>("circ_thr",          cfg.circ_thr);
-  cfg.spread_thr        = pt.get<double>("spread_thr",        cfg.spread_thr);
-  cfg.drift_time_max_us = pt.get<double>("drift_time_max_us", cfg.drift_time_max_us);
-  cfg.noise_th          = pt.get<double>("noise_th",          cfg.noise_th);
-  cfg.circ_min_ratio    = pt.get<double>("circ_min_ratio",    cfg.circ_min_ratio);
+  //cfg.pix_min           = pt.get<int>(   "pix_min",           cfg.pix_min);
+  //cfg.pix_max           = pt.get<int>(   "pix_max",           cfg.pix_max);
+  //cfg.circ_min_hits     = pt.get<int>(   "circ_min_hits",     cfg.circ_min_hits);
+  //cfg.adc_min           = pt.get<double>("adc_min",           cfg.adc_min);
+  //cfg.adc_max           = pt.get<double>("adc_max",           cfg.adc_max);
+  //cfg.circ_thr          = pt.get<double>("circ_thr",          cfg.circ_thr);
+  //cfg.spread_thr        = pt.get<double>("spread_thr",        cfg.spread_thr);
+  //cfg.drift_time_max_us = pt.get<double>("drift_time_max_us", cfg.drift_time_max_us);
+  //cfg.noise_th          = pt.get<double>("noise_th",          cfg.noise_th);
+  //cfg.circ_min_ratio    = pt.get<double>("circ_min_ratio",    cfg.circ_min_ratio);
+  const auto nodeCharge = node["charge"];
+  cfg.pix_min           = nodeCharge["pix_min"].as<int>();
+  cfg.pix_max           = nodeCharge["pix_max"].as<int>();
+  cfg.circ_min_hits     = nodeCharge["circ_min_hits"].as<int>();
+  cfg.adc_min           = nodeCharge["adc_min"].as<double>();
+  cfg.adc_max           = nodeCharge["adc_max"].as<double>();
+  cfg.circ_thr          = nodeCharge["circ_thr"].as<double>();
+  cfg.spread_thr        = nodeCharge["spread_thr"].as<double>();
+  cfg.drift_time_max_us = nodeCharge["drift_time_max_us"].as<double>();
+  cfg.noise_th          = nodeCharge["noise_th"].as<double>();
+  cfg.circ_min_ratio    = nodeCharge["circ_min_ratio"].as<double>();
 
-  cfg.exclude_pix = readExcludePixels(pt);
+  //cfg.exclude_pix = readExcludePixels(pt);
+  //std::map<int, std::vector<int>> exclude_pix;
+  for (const auto& item : nodeCharge["exclude_pix"]) {
+      int key = item.first.as<int>();
+      std::vector<int> values = item.second.as<std::vector<int>>();
+
+      cfg.exclude_pix[key] = values;
+  }
 
   std::cout << "pix_min: "           << cfg.pix_min           << std::endl;
   std::cout << "pix_max: "           << cfg.pix_max           << std::endl;
@@ -241,7 +270,13 @@ int lowerBoundTimeIndex(double late_window_us,
 
 double waveCompressToTimebinNs(uint16_t wave_compress)
 {
-  return std::ldexp(1.0, static_cast<int>(wave_compress));
+    //if((0<=wave_compress)&&(wave_compress<=8)){
+    //    return std::ldexp(1.0, static_cast<int>(wave_compress));
+    //} else{
+    //    std::cout << "Warning: wave_compress < 0 or wavecompress > 8" << std::endl;
+    //    return 1.0;
+    //}
+    return 32.0; //temporary
 }
 
 std::filesystem::path prepareOutputPath(const std::string& output_file_path)
@@ -694,16 +729,19 @@ uint64_t FECTITracker::absoluteTi(int fec, uint32_t ti_value)
 
 void readConfig(Config& cfg, const std::string& config_path)
 {
-  boost::property_tree::ptree pt;
-  boost::property_tree::read_json(config_path, pt);
+  //boost::property_tree::ptree pt;
+  //boost::property_tree::read_json(config_path, pt);
+  const auto configNode = YAML::LoadFile(config_path);
 
-  if (const auto light = pt.get_child_optional("light")) {
-    readLightConfig(cfg, *light);
-  }
+  //if (const auto light = pt.get_child_optional("light")) {
+    //readLightConfig(cfg, *light);
+  readLightConfig(cfg, configNode);
+  //}
 
-  if (const auto charge = pt.get_child_optional("charge")) {
-    readChargeConfig(cfg, *charge);
-  }
+  //if (const auto charge = pt.get_child_optional("charge")) {
+    //readChargeConfig(cfg, *charge);
+  readChargeConfig(cfg, configNode);
+  //}
 
   static_assert(NUM_CHARGE_READOUT == static_cast<int>(kPlotNumAll.size()),
                 "kPlotNumAll must match NUM_CHARGE_READOUT.");
@@ -764,7 +802,8 @@ RawHitTreeOutputWriter::RawHitTreeOutputWriter(const std::string& output_file_pa
     throw std::runtime_error("Failed to create output ROOT file: " + output_path_.string());
   }
 
-  rawhit_tree_->SetDirectory(file_.get());
+  // Keep ownership in rawhit_tree_; otherwise ROOT may delete it again with the TFile.
+  rawhit_tree_->SetDirectory(nullptr);
   bindBranches();
 }
 

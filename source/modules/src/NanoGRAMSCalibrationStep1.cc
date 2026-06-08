@@ -209,15 +209,15 @@ CalibrationConfig readCalibrationConfig(const std::string& config_file)
     throw std::runtime_error("Missing 'calibration.energy' section in config file: " + config_file);
   }
 
-  cfg.energy.gain_info_file = energy->get<std::string>("gain_info_file");
+  cfg.energy.gain_info_file       = energy->get<std::string>("gain_info_file");
   cfg.energy.q_to_kev_spline_file = energy->get<std::string>("q_to_kev_spline_file");
-  cfg.energy.efield_v_cm = energy->get<int>("efield_v_cm", cfg.energy.efield_v_cm);
-  cfg.energy.temperature_k = energy->get<double>("temperature_k", cfg.energy.temperature_k);
-  cfg.energy.factor_energy = energy->get<double>("factor_energy", cfg.energy.factor_energy);
-  cfg.energy.max_time_us = energy->get<double>("max_time_us", cfg.energy.max_time_us);
-  cfg.energy.tp_channel = energy->get<int>("tp_channel", cfg.energy.tp_channel);
-  cfg.energy.ccal = energy->get<int>("ccal", cfg.energy.ccal);
-  cfg.energy.tp_adc_values = readTpAdcValues(*energy, cfg.energy.tp_adc_values);
+  cfg.energy.efield_v_cm          = energy->get<int>("efield_v_cm", cfg.energy.efield_v_cm);
+  cfg.energy.temperature_k        = energy->get<double>("temperature_k", cfg.energy.temperature_k);
+  cfg.energy.factor_energy        = energy->get<double>("factor_energy", cfg.energy.factor_energy);
+  cfg.energy.max_time_us          = energy->get<double>("max_time_us", cfg.energy.max_time_us);
+  cfg.energy.tp_channel           = energy->get<int>("tp_channel", cfg.energy.tp_channel);
+  cfg.energy.ccal                 = energy->get<int>("ccal", cfg.energy.ccal);
+  cfg.energy.tp_adc_values        = readTpAdcValues(*energy, cfg.energy.tp_adc_values);
 
   if (const auto position = calibration->get_child_optional("position")) {
     cfg.position.anode_pos_z_cm =
@@ -441,10 +441,10 @@ std::vector<DetectorHit_sptr> buildCalibratedHits(
       continue;
     }
 
-    double total_energy = 0.0;
-    double posx = 0.0;
-    double posy = 0.0;
-    double posz = 0.0;
+    double total_energy   = 0.0;
+    double posx           = 0.0;
+    double posy           = 0.0;
+    double posz           = 0.0;
     std::size_t max_index = 0;
     double max_energy = -std::numeric_limits<double>::infinity();
 
@@ -523,10 +523,9 @@ NanoGRAMSCalibrationStep1::~NanoGRAMSCalibrationStep1() = default;
 
 ANLStatus NanoGRAMSCalibrationStep1::mod_define()
 {
-  define_parameter("config_file", &mod_class::config_file_);
+  define_parameter("config_file",     &mod_class::config_file_);
   define_parameter("rawhitdata_file", &mod_class::rawhitdata_file_);
-  define_parameter("hittree_file", &mod_class::hittree_file_);
-  define_parameter("hitdata_file", &mod_class::hittree_file_);
+  define_parameter("hittree_file",    &mod_class::hittree_file_);
   return AS_OK;
 }
 
