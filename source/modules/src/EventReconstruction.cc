@@ -39,6 +39,7 @@
 #if CS_USE_ORT
 #include "NeuralNetST2022EventReconstructionAlgorithm.hh"
 #endif
+#include "NanoGRAMSEventReconstructionAlgorithm.hh"
 
 using namespace anlnext;
 
@@ -126,6 +127,9 @@ ANLStatus EventReconstruction::mod_initialize()
     m_Reconstruction.reset(new NeuralNetST2022EventReconstructionAlgorithm);
   }
 #endif /* CS_USE_ORT */
+  else if (ReconstructionMethodName()=="NanoGRAMS") {
+    m_Reconstruction.reset(new NanoGRAMSEventReconstructionAlgorithm);
+  }
   else {
     std::cout << "Unknown reconstruction method is given: " << ReconstructionMethodName()
               << std::endl;

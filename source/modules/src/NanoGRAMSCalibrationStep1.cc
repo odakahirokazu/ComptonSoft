@@ -22,22 +22,19 @@
 #include "NanoGRAMSDataReduction.hh"
 
 #include <TFile.h>
-#include <TSpline.h>
 #include <TTree.h>
 
 #include <algorithm>
 #include <array>
-#include <boost/property_tree/json_parser.hpp>
-#include <boost/property_tree/ptree.hpp>
 #include <cmath>
 #include <filesystem>
-#include <hdf5.h>
 #include <iostream>
 #include <limits>
 #include <memory>
 #include <stdexcept>
 #include <string>
 #include <vector>
+#include <yaml-cpp/yaml.h>
 
 #include "AstroUnits.hh"
 #include "DetectorHit.hh"
@@ -56,7 +53,7 @@ namespace
 
 constexpr double kPixelSize = 0.32 * unit::cm;
 
-using PositionTable = std::array<std::array<double, NUM_CH_EACH_VATA>, NUM_VATA>;
+using PositionTable   = std::array<std::array<double, NUM_CH_EACH_VATA>, NUM_VATA>;
 using PixelIndexTable = std::array<int16_t, NUM_CH_EACH_VATA>;
 
 constexpr PositionTable buildPosX()
@@ -143,8 +140,8 @@ constexpr PixelIndexTable buildPixelY()
   return dict;
 }
 
-const PositionTable kPosX = buildPosX();
-const PositionTable kPosY = buildPosY();
+const PositionTable kPosX     = buildPosX();
+const PositionTable kPosY     = buildPosY();
 const PixelIndexTable kPixelX = buildPixelX();
 const PixelIndexTable kPixelY = buildPixelY();
 
@@ -170,59 +167,48 @@ fs::path resolvePath(const fs::path& base_dir, const std::string& value)
   return base_dir / path;
 }
 
-std::array<double, NUM_VATA> readTpAdcValues(
-    const boost::property_tree::ptree& pt,
-    const std::array<double, NUM_VATA>& default_value)
-{
-  std::array<double, NUM_VATA> values = default_value;
-  const auto node = pt.get_child_optional("tp_adc_values");
-  if (!node) {
-    return values;
-  }
-
-  std::size_t index = 0;
-  for (const auto& item : *node) {
-    if (index >= values.size()) {
-      break;
-    }
-    values[index] = item.second.get_value<double>();
-    ++index;
-  }
-  return values;
-}
-
 CalibrationConfig readCalibrationConfig(const std::string& config_file)
 {
-  boost::property_tree::ptree pt;
-  boost::property_tree::read_json(config_file, pt);
-
-  const auto calibration = pt.get_child_optional("calibration");
-  if (!calibration) {
-    throw std::runtime_error("Missing 'calibration' section in config file: " + config_file);
-  }
+  const auto config_node = YAML::LoadFile(config_file);
+  const auto node_calibration = config_node["calibration"];
 
   CalibrationConfig cfg;
   cfg.config_dir = fs::absolute(fs::path(config_file)).parent_path();
 
-  const auto energy = calibration->get_child_optional("energy");
-  if (!energy) {
-    throw std::runtime_error("Missing 'calibration.energy' section in config file: " + config_file);
-  }
+  const auto node_energy   = node_calibration["energy"];
+  const auto node_position = node_calibration["position"];
 
-  cfg.energy.gain_info_file       = energy->get<std::string>("gain_info_file");
-  cfg.energy.q_to_kev_spline_file = energy->get<std::string>("q_to_kev_spline_file");
-  cfg.energy.efield_v_cm          = energy->get<int>("efield_v_cm", cfg.energy.efield_v_cm);
-  cfg.energy.temperature_k        = energy->get<double>("temperature_k", cfg.energy.temperature_k);
-  cfg.energy.factor_energy        = energy->get<double>("factor_energy", cfg.energy.factor_energy);
-  cfg.energy.max_time_us          = energy->get<double>("max_time_us", cfg.energy.max_time_us);
-  cfg.energy.tp_channel           = energy->get<int>("tp_channel", cfg.energy.tp_channel);
-  cfg.energy.ccal                 = energy->get<int>("ccal", cfg.energy.ccal);
-  cfg.energy.tp_adc_values        = readTpAdcValues(*energy, cfg.energy.tp_adc_values);
+  cfg.energy.gain_info_file       = node_energy["gain_info_file"].as<std::string>();
+  cfg.energy.q_to_kev_spline_file = node_energy["q_to_kev_spline_file"].as<std::string>();
+  cfg.energy.factor_energy        = node_energy["factor_energy"].as<double>();
+  cfg.energy.max_time_us          = node_energy["max_time_us"].as<double>();
+  cfg.energy.tp_channel           = node_energy["tp_channel"].as<int>();
+  cfg.energy.ccal                 = node_energy["ccal"].as<int>();
+  cfg.energy.tp_adc_values        = node_energy["tp_adc_values"].as<std::array<double, NUM_VATA>>();
 
-  if (const auto position = calibration->get_child_optional("position")) {
-    cfg.position.anode_pos_z_cm =
-        position->get<double>("anode_pos_z_cm", cfg.position.anode_pos_z_cm);
+  cfg.general.efield_v_cm         = config_node["general"]["efield_v_cm"].as<int>();
+  cfg.general.temperature_k       = config_node["general"]["temperature_k"].as<double>();
+  cfg.position.anode_pos_z_cm     = node_position["anode_pos_z_cm"].as<double>();
+
+  std::cout << "gain_info_file"       << cfg.energy.gain_info_file << std::endl;
+  std::cout << "q_to_kev_spline_file" << cfg.energy.q_to_kev_spline_file << std::endl;
+  std::cout << "efield_v_cm"          << cfg.general.efield_v_cm   << std::endl;
+  std::cout << "temperature_k"        << cfg.general.temperature_k << std::endl;
+  std::cout << "factor_energy"        << cfg.energy.factor_energy  << std::endl;
+  std::cout << "max_time_us"          << cfg.energy.max_time_us    << std::endl;
+  std::cout << "tp_channel"           << cfg.energy.tp_channel     << std::endl;
+  std::cout << "ccal"                 << cfg.energy.ccal           << std::endl;
+  std::cout << "tp_adc_values [ ";
+  for (std::size_t i = 0; i < cfg.energy.tp_adc_values.size(); ++i) {
+    if (i != 0) {
+      std::cout << ", ";
+    }
+    std::cout << cfg.energy.tp_adc_values[i];
   }
+  std::cout << " ]" << std::endl;
+
+  std::cout << "anode_pos_z_cm"       << cfg.position.anode_pos_z_cm << std::endl;
+
 
   return cfg;
 }
@@ -248,182 +234,9 @@ double electronDriftVelocity(double temperature, double e_field)
   return vd_nodim * unit::mm / unit::us;
 }
 
-GainMatrix loadCalibrationMatrix(const fs::path& gain_info_path, const std::string& dataset_path)
-{
-  GainMatrix matrix{};
-
-  const hid_t file = H5Fopen(gain_info_path.string().c_str(), H5F_ACC_RDONLY, H5P_DEFAULT);
-  if (file < 0) {
-    throw std::runtime_error("Failed to open HDF5 file: " + gain_info_path.string());
-  }
-
-  const hid_t dataset = H5Dopen2(file, dataset_path.c_str(), H5P_DEFAULT);
-  if (dataset < 0) {
-    H5Fclose(file);
-    throw std::runtime_error("Failed to open HDF5 dataset: " + dataset_path);
-  }
-
-  const hid_t space = H5Dget_space(dataset);
-  if (space < 0) {
-    H5Dclose(dataset);
-    H5Fclose(file);
-    throw std::runtime_error("Failed to query HDF5 dataspace: " + dataset_path);
-  }
-
-  const int ndims = H5Sget_simple_extent_ndims(space);
-  std::vector<hsize_t> dims(static_cast<std::size_t>(ndims), 0);
-  H5Sget_simple_extent_dims(space, dims.data(), nullptr);
-
-  std::vector<double> values(dims[0] * dims[1], 0.0);
-  const herr_t status =
-      H5Dread(dataset, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, values.data());
-
-  H5Sclose(space);
-  H5Dclose(dataset);
-  H5Fclose(file);
-
-  if (status < 0) {
-    throw std::runtime_error("Failed to read HDF5 dataset: " + dataset_path);
-  }
-
-  for (int ch = 0; ch < NUM_CH_EACH_VATA; ++ch) {
-    for (int par = 0; par < kNanoGRAMSNumGainParams; ++par) {
-      matrix[ch][par] = values[static_cast<std::size_t>(kNanoGRAMSNumGainParams * ch + par)];
-    }
-  }
-
-  return matrix;
-}
-
-} // namespace
-
-TPCResponse::TPCResponse()
-    : drift_velocity_(1.0e5 * unit::cm / unit::s),
-      anode_pos_z_(5.0 * unit::cm),
-      pixel_size_(kPixelSize),
-      z_height_lartpc_(10.0 * unit::cm),
-      pos_x_error_(pixel_size_ / std::sqrt(12.0)),
-      pos_y_error_(pixel_size_ / std::sqrt(12.0)),
-      pos_z_error_(0.1 * unit::cm)
-{
-  temperature_correction_factors_.fill(1.0);
-}
-
-TPCResponse::~TPCResponse() = default;
-
-void TPCResponse::setDriftVelocity(double value)
-{
-  drift_velocity_ = value;
-}
-
-void TPCResponse::setAnodePosZ(double value)
-{
-  anode_pos_z_ = value;
-}
-
-double TPCResponse::posXError() const
-{
-  return pos_x_error_;
-}
-
-double TPCResponse::posYError() const
-{
-  return pos_y_error_;
-}
-
-double TPCResponse::posZError() const
-{
-  return pos_z_error_;
-}
-
-void TPCResponse::loadParamCoulomb2keVForSpline3D(const fs::path& spline_path, int efield_v_cm)
-{
-  spline_file_ = std::make_unique<TFile>(spline_path.string().c_str(), "READ");
-  if (!spline_file_ || spline_file_->IsZombie()) {
-    throw std::runtime_error("Failed to open spline ROOT file: " + spline_path.string());
-  }
-
-  const std::string efield_name = "E" + std::to_string(efield_v_cm);
-  spline_ = dynamic_cast<TSpline3*>(spline_file_->Get(efield_name.c_str()));
-  if (!spline_) {
-    throw std::runtime_error("Missing TSpline3 '" + efield_name + "' in " +
-                             spline_path.string());
-  }
-
-  const int knots = spline_->GetNp();
-  double y0 = 0.0;
-  double y1 = 0.0;
-  spline_->GetKnot(0, xmin_spline3d_, y0);
-  spline_->GetKnot(knots - 1, xmax_spline3d_, y1);
-}
-
-void TPCResponse::loadParamGainMatrices(const fs::path& gain_info_path)
-{
-  for (int fec = 0; fec < NUM_VATA; ++fec) {
-    const std::string prefix = "/FEC" + std::to_string(fec);
-    gain_matrices_adc_to_c_[fec] = loadCalibrationMatrix(gain_info_path, prefix + "/ADC2C");
-    gain_matrices_ccal_to_adc_[fec] =
-        loadCalibrationMatrix(gain_info_path, prefix + "/ccal2ADC");
-  }
-}
-
-void TPCResponse::applyTemperatureCorrection(
-    int tp_channel,
-    int ccal,
-    const std::array<double, NUM_VATA>& tp_adc_values)
-{
-  for (int fec = 0; fec < NUM_VATA; ++fec) {
-    const double measured = tp_adc_values[fec];
-    if (measured <= 0.0) {
-      throw std::runtime_error("tp_adc_values must be positive for all FECs.");
-    }
-
-    const GainParamArray& params = gain_matrices_ccal_to_adc_[fec][tp_channel];
-    const double room_temp_adc = cubic(ccal, params);
-    temperature_correction_factors_[fec] = room_temp_adc / measured;
-  }
-}
-
-double TPCResponse::temperatureCorrectionFactor(int fec) const
-{
-  return temperature_correction_factors_[fec];
-}
-
-double TPCResponse::convertADC2keVWithSpline3D(int fec, int ch, double adc) const
-{
-  const double charge_coulomb = convertADC2CWithSpline3D(fec, ch, adc) / unit::coulomb;
-  return spline_->Eval(charge_coulomb) * unit::keV;
-}
-
-double TPCResponse::convertADC2CWithSpline3D(int fec, int ch, double adc) const
-{
-  const GainParamArray& params = gain_matrices_adc_to_c_[fec][ch];
-  double charge_coulomb = cubic(adc, params);
-  charge_coulomb = std::clamp(charge_coulomb, xmin_spline3d_, xmax_spline3d_);
-  return charge_coulomb * unit::coulomb;
-}
-
-double TPCResponse::convertDriftTime2PosZ(double drift_time) const
-{
-  return anode_pos_z_ - drift_time * drift_velocity_;
-}
-
-double TPCResponse::convertDriftTime2PosZScale(double drift_time, double max_time) const
-{
-  return z_height_lartpc_ * (0.5 - drift_time / max_time);
-}
-
-double TPCResponse::cubic(double x, const GainParamArray& params)
-{
-  return params[0] * x * x * x + params[1] * x * x + params[2] * x + params[3];
-}
-
-namespace
-{
-
 std::vector<DetectorHit_sptr> buildCalibratedHits(
     const CalibrationConfig& config,
-    const TPCResponse& response,
+    const TPCProperty& tpc_property,
     const std::vector<ngUtil::RawFECHit>& raw_hits)
 {
   std::vector<DetectorHit_sptr> hits;
@@ -456,9 +269,10 @@ std::vector<DetectorHit_sptr> buildCalibratedHits(
       }
 
       const double corrected_adc =
-          static_cast<double>(raw_hit.adcs[i]) * response.temperatureCorrectionFactor(raw_hit.fec);
+          static_cast<double>(raw_hit.adcs[i]) *
+          tpc_property.temperatureCorrectionFactor(raw_hit.fec);
       const double energy =
-          response.convertADC2keVWithSpline3D(raw_hit.fec, ch, corrected_adc);
+          tpc_property.convertADC2keVWithSpline3D(raw_hit.fec, ch, corrected_adc);
       energies[i] = energy;
       total_energy += energy;
 
@@ -478,7 +292,7 @@ std::vector<DetectorHit_sptr> buildCalibratedHits(
       posx += weight * kPosX[raw_hit.fec][ch];
       posy += weight * kPosY[raw_hit.fec][ch];
       posz += weight *
-              response.convertDriftTime2PosZScale(raw_hit.drift_us * unit::us, max_time);
+              tpc_property.convertDriftTime2PosZScale(raw_hit.drift_us * unit::us, max_time);
     }
 
     const int channel = raw_hit.channels[max_index];
@@ -489,27 +303,19 @@ std::vector<DetectorHit_sptr> buildCalibratedHits(
     hit->setVoxel(kPixelX[channel], kPixelY[channel], VoxelID::Undefined);
     hit->setEnergy(total_energy * config.energy.factor_energy);
     hit->setPosition(posx, posy, posz);
-    hit->setPositionError(response.posXError(), response.posYError(), response.posZError());
+    hit->setPositionError(tpc_property.posXError(),
+                          tpc_property.posYError(),
+                          tpc_property.posZError());
     hits.push_back(std::move(hit));
   }
 
   return hits;
 }
 
-std::string deriveHitTreeOutputPath(const std::string& explicit_path,
-                                    const std::string& rawhit_path)
+std::string deriveHitTreeOutputPath(const std::string& explicit_path)
 {
   if (!explicit_path.empty()) {
     return explicit_path;
-  }
-
-  if (!rawhit_path.empty()) {
-    const fs::path raw_path(rawhit_path);
-    const std::string stem = raw_path.stem().string();
-    if (stem == "rawhit" || stem == ngUtil::kRawHitTreeName || stem == "rawvata") {
-      return (raw_path.parent_path() / "hittree.root").string();
-    }
-    return (raw_path.parent_path() / (stem + "_hittree.root")).string();
   }
 
   return "hittree.root";
@@ -523,8 +329,6 @@ NanoGRAMSCalibrationStep1::~NanoGRAMSCalibrationStep1() = default;
 
 ANLStatus NanoGRAMSCalibrationStep1::mod_define()
 {
-  define_parameter("config_file",     &mod_class::config_file_);
-  define_parameter("rawhitdata_file", &mod_class::rawhitdata_file_);
   define_parameter("hittree_file",    &mod_class::hittree_file_);
   return AS_OK;
 }
@@ -536,38 +340,33 @@ ANLStatus NanoGRAMSCalibrationStep1::mod_initialize()
     return status;
   }
 
-  if (config_file_.empty()) {
-    throw std::runtime_error("Calibration config_file is empty.");
-  }
-
   if (!exist_module("NanoGRAMSDataReduction")) {
     throw std::runtime_error(
         "NanoGRAMSCalibrationStep1 requires NanoGRAMSDataReduction in the same ANL chain.");
   }
   get_module("NanoGRAMSDataReduction", &data_reduction_);
 
-  calibration_config_ = readCalibrationConfig(config_file_);
+  calibration_config_ = readCalibrationConfig(data_reduction_->configFilePath());
   const fs::path gain_info_path =
       resolvePath(calibration_config_.config_dir, calibration_config_.energy.gain_info_file);
   const fs::path spline_path =
       resolvePath(calibration_config_.config_dir,
                   calibration_config_.energy.q_to_kev_spline_file);
 
-  response_.loadParamCoulomb2keVForSpline3D(spline_path, calibration_config_.energy.efield_v_cm);
-  response_.loadParamGainMatrices(gain_info_path);
-  response_.setDriftVelocity(electronDriftVelocity(
-      calibration_config_.energy.temperature_k * unit::kelvin,
-      calibration_config_.energy.efield_v_cm * unit::volt / unit::cm));
-  response_.setAnodePosZ(calibration_config_.position.anode_pos_z_cm * unit::cm);
-  response_.applyTemperatureCorrection(
+  tpc_property_.loadParamCoulomb2keVForSpline3D(spline_path,
+                                                calibration_config_.general.efield_v_cm);
+  tpc_property_.loadParamGainMatrices(gain_info_path);
+  tpc_property_.setDriftVelocity(electronDriftVelocity(
+      calibration_config_.general.temperature_k * unit::kelvin,
+      calibration_config_.general.efield_v_cm * unit::volt / unit::cm));
+  tpc_property_.setAnodePosZ(calibration_config_.position.anode_pos_z_cm * unit::cm);
+  tpc_property_.applyTemperatureCorrection(
       calibration_config_.energy.tp_channel,
       calibration_config_.energy.ccal,
       calibration_config_.energy.tp_adc_values);
 
-  const std::string rawhit_path =
-      rawhitdata_file_.empty() ? data_reduction_->rawHitFilePath() : rawhitdata_file_;
   const fs::path output_path =
-      prepareOutputPath(deriveHitTreeOutputPath(hittree_file_, rawhit_path));
+      prepareOutputPath(deriveHitTreeOutputPath(hittree_file_));
 
   output_file_ = std::make_unique<TFile>(output_path.string().c_str(), "RECREATE");
   if (!output_file_ || output_file_->IsZombie()) {
@@ -597,7 +396,9 @@ ANLStatus NanoGRAMSCalibrationStep1::mod_analyze()
   }
 
   const auto hits =
-      buildCalibratedHits(calibration_config_, response_, data_reduction_->currentEventHits());
+      buildCalibratedHits(calibration_config_,
+                          tpc_property_,
+                          data_reduction_->currentEventHits());
   if (hits.empty()) {
     return AS_OK;
   }

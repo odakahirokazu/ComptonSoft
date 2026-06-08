@@ -73,8 +73,6 @@ ANLStatus NanoGRAMSDataReduction::mod_initialize()
     std::cout << "[INFO] rawhittree output is disabled.\n";
   }
   gamma_events_         = 0;
-  current_has_event_    = false;
-  current_event_id_     = -1;
   current_raw_event_id_ = -1;
   current_event_hits_.clear();
 
@@ -89,16 +87,13 @@ ANLStatus NanoGRAMSDataReduction::mod_analyze()
     return AS_QUIT;
   }
 
-  current_has_event_    = false;
   current_raw_event_id_ = raw_event_id;
   current_event_hits_.clear();
 
   if (!event_hits.empty()) {
-    current_has_event_  = true;
-    current_event_id_   = gamma_events_;
     current_event_hits_ = event_hits;
     if (writer_) {
-      writer_->fillEvent(current_event_id_, raw_event_id, current_event_hits_);
+      writer_->fillEvent(gamma_events_, raw_event_id, current_event_hits_);
     }
     ++gamma_events_;
   }
@@ -108,17 +103,16 @@ ANLStatus NanoGRAMSDataReduction::mod_analyze()
 
 ANLStatus NanoGRAMSDataReduction::mod_end_run()
 {
+
+  std::cout << "Total gamma events: " << gamma_events_ << "\n";
+
   if (writer_) {
-    std::cout << "Total gamma events: " << gamma_events_ << "\n";
     writer_->close();
     writer_.reset();
-  } else {
-    std::cout << "Total gamma events: " << gamma_events_ << "\n";
   }
 
   raw_hit_reader_.reset();
   input_file_.reset();
-  current_has_event_ = false;
   current_event_hits_.clear();
   return AS_OK;
 }
