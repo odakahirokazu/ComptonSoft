@@ -56,14 +56,14 @@ namespace
 
 constexpr double kPixelSize = 0.32 * unit::cm;
 
-using PositionTable = std::array<std::array<double, NUM_CH_CHARGE>, NUM_CHARGE_READOUT>;
-using PixelIndexTable = std::array<int16_t, NUM_CH_CHARGE>;
+using PositionTable = std::array<std::array<double, NUM_CH_EACH_VATA>, NUM_VATA>;
+using PixelIndexTable = std::array<int16_t, NUM_CH_EACH_VATA>;
 
 constexpr PositionTable buildPosX()
 {
   PositionTable dict{};
-  for (int fec = 0; fec < NUM_CHARGE_READOUT; ++fec) {
-    for (int ch = 0; ch < NUM_CH_CHARGE; ++ch) {
+  for (int fec = 0; fec < NUM_VATA; ++fec) {
+    for (int ch = 0; ch < NUM_CH_EACH_VATA; ++ch) {
       if (fec == 0) {
         constexpr double offset_x = -1.28 * unit::cm;
         dict[fec][ch] = offset_x + kPixelSize * (ch / 8 - 3.5);
@@ -93,8 +93,8 @@ constexpr PositionTable buildPosX()
 constexpr PositionTable buildPosY()
 {
   PositionTable dict{};
-  for (int fec = 0; fec < NUM_CHARGE_READOUT; ++fec) {
-    for (int ch = 0; ch < NUM_CH_CHARGE; ++ch) {
+  for (int fec = 0; fec < NUM_VATA; ++fec) {
+    for (int ch = 0; ch < NUM_CH_EACH_VATA; ++ch) {
       if (fec == 0) {
         constexpr double offset_y = -1.28 * unit::cm;
         if ((ch < 16) || ((23 < ch) && (ch < 32)) || ((39 < ch) && (ch < 48))) {
@@ -124,7 +124,7 @@ constexpr PositionTable buildPosY()
 constexpr PixelIndexTable buildPixelX()
 {
   PixelIndexTable dict{};
-  for (int ch = 0; ch < NUM_CH_CHARGE; ++ch) {
+  for (int ch = 0; ch < NUM_CH_EACH_VATA; ++ch) {
     dict[ch] = static_cast<int16_t>(ch / 8);
   }
   return dict;
@@ -133,7 +133,7 @@ constexpr PixelIndexTable buildPixelX()
 constexpr PixelIndexTable buildPixelY()
 {
   PixelIndexTable dict{};
-  for (int ch = 0; ch < NUM_CH_CHARGE; ++ch) {
+  for (int ch = 0; ch < NUM_CH_EACH_VATA; ++ch) {
     if ((ch < 16) || ((23 < ch) && (ch < 32)) || ((39 < ch) && (ch < 48))) {
       dict[ch] = static_cast<int16_t>(7 - (ch % 8));
     } else {
@@ -170,11 +170,11 @@ fs::path resolvePath(const fs::path& base_dir, const std::string& value)
   return base_dir / path;
 }
 
-std::array<double, NUM_CHARGE_READOUT> readTpAdcValues(
+std::array<double, NUM_VATA> readTpAdcValues(
     const boost::property_tree::ptree& pt,
-    const std::array<double, NUM_CHARGE_READOUT>& default_value)
+    const std::array<double, NUM_VATA>& default_value)
 {
-  std::array<double, NUM_CHARGE_READOUT> values = default_value;
+  std::array<double, NUM_VATA> values = default_value;
   const auto node = pt.get_child_optional("tp_adc_values");
   if (!node) {
     return values;
@@ -286,7 +286,7 @@ GainMatrix loadCalibrationMatrix(const fs::path& gain_info_path, const std::stri
     throw std::runtime_error("Failed to read HDF5 dataset: " + dataset_path);
   }
 
-  for (int ch = 0; ch < NUM_CH_CHARGE; ++ch) {
+  for (int ch = 0; ch < NUM_CH_EACH_VATA; ++ch) {
     for (int par = 0; par < kNanoGRAMSNumGainParams; ++par) {
       matrix[ch][par] = values[static_cast<std::size_t>(kNanoGRAMSNumGainParams * ch + par)];
     }
@@ -359,7 +359,7 @@ void TPCResponse::loadParamCoulomb2keVForSpline3D(const fs::path& spline_path, i
 
 void TPCResponse::loadParamGainMatrices(const fs::path& gain_info_path)
 {
-  for (int fec = 0; fec < NUM_CHARGE_READOUT; ++fec) {
+  for (int fec = 0; fec < NUM_VATA; ++fec) {
     const std::string prefix = "/FEC" + std::to_string(fec);
     gain_matrices_adc_to_c_[fec] = loadCalibrationMatrix(gain_info_path, prefix + "/ADC2C");
     gain_matrices_ccal_to_adc_[fec] =
@@ -370,9 +370,9 @@ void TPCResponse::loadParamGainMatrices(const fs::path& gain_info_path)
 void TPCResponse::applyTemperatureCorrection(
     int tp_channel,
     int ccal,
-    const std::array<double, NUM_CHARGE_READOUT>& tp_adc_values)
+    const std::array<double, NUM_VATA>& tp_adc_values)
 {
-  for (int fec = 0; fec < NUM_CHARGE_READOUT; ++fec) {
+  for (int fec = 0; fec < NUM_VATA; ++fec) {
     const double measured = tp_adc_values[fec];
     if (measured <= 0.0) {
       throw std::runtime_error("tp_adc_values must be positive for all FECs.");
@@ -432,7 +432,7 @@ std::vector<DetectorHit_sptr> buildCalibratedHits(
   const double max_time = config.energy.max_time_us * unit::us;
 
   for (const auto& raw_hit : raw_hits) {
-    if (raw_hit.fec < 0 || raw_hit.fec >= NUM_CHARGE_READOUT) {
+    if (raw_hit.fec < 0 || raw_hit.fec >= NUM_VATA) {
       throw std::runtime_error("FEC index out of range in NanoGRAMS calibration.");
     }
 
@@ -451,7 +451,7 @@ std::vector<DetectorHit_sptr> buildCalibratedHits(
     std::vector<double> energies(n, 0.0);
     for (std::size_t i = 0; i < n; ++i) {
       const int ch = raw_hit.channels[i];
-      if (ch < 0 || ch >= NUM_CH_CHARGE) {
+      if (ch < 0 || ch >= NUM_CH_EACH_VATA) {
         throw std::runtime_error("Channel index out of range in NanoGRAMS calibration.");
       }
 

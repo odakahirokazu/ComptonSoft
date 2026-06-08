@@ -66,7 +66,7 @@ ANLStatus NanoGRAMSDataReduction::mod_initialize()
                              "' in " + tpctree_file_);
   }
 
-  raw_hit_reader_ = std::make_unique<ngUtil::TPCTreeRawHitReader>(tpc_tree, cfg_);
+  raw_hit_reader_ = std::make_unique<ngUtil::TPCTreeReader>(tpc_tree, cfg_);
   if (!rawhitdata_file_.empty()) {
     writer_ = std::make_unique<ngUtil::RawHitTreeOutputWriter>(rawhitdata_file_);
   } else {
