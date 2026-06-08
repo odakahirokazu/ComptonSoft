@@ -38,15 +38,17 @@ public:
   void setEMPhysicsModel(EMModel v) { EMModel_ = v; }
   EMModel getEMPhysicsModel() const { return EMModel_; }
 
-  void setEMOptions(bool fluo, bool auger, bool pixe)
+  void setEMOptions(bool fluo, bool auger, bool pixe, bool ignoreCut)
   {
     EMOptionFluo_ = fluo;
     EMOptionAuger_ = auger;
     EMOptionPIXE_ = pixe;
+    EMOptionAugerIgnoreCut_ = ignoreCut;
   }
   bool EMOptionFluo() const { return EMOptionFluo_; }
   bool EMOptionAuger() const { return EMOptionAuger_; }
   bool EMOptionPIXE() const { return EMOptionPIXE_; }
+  bool EMOptionAugerIgnoreCut() const { return EMOptionAugerIgnoreCut_; }
 
   void setElectronRangeParameters(double ratio, double finalRange)
   {
@@ -70,6 +72,7 @@ private:
   bool EMOptionFluo_ = true;
   bool EMOptionAuger_ = false;
   bool EMOptionPIXE_ = false;
+  bool EMOptionAugerIgnoreCut_ = true;
   double electronRangeRatio_;
   double electronFinalRange_;
   HadronModel hadronModel_ = HadronModel::BIC;

@@ -57,6 +57,7 @@ private:
   bool m_EMOptionFluo;
   bool m_EMOptionAuger;
   bool m_EMOptionPIXE;
+  bool m_EMOptionDeexcitationIgnoreCut;
   double m_ElectronRangeRatio;
   double m_ElectronFinalRange;
   bool m_HadronHP;

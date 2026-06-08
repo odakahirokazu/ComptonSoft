@@ -41,6 +41,7 @@ PhysicsListManager::PhysicsListManager()
     m_EMOptionFluo(true),
     m_EMOptionAuger(false),
     m_EMOptionPIXE(false),
+    m_EMOptionDeexcitationIgnoreCut(true),
     m_ElectronRangeRatio(0.2),
     m_ElectronFinalRange(100.0*CLHEP::um),
     m_HadronHP(false),
@@ -63,6 +64,7 @@ ANLStatus PhysicsListManager::mod_define()
   register_parameter(&m_EMOptionFluo, "em_option_fluo");
   register_parameter(&m_EMOptionAuger, "em_option_auger");
   register_parameter(&m_EMOptionPIXE, "em_option_pixe");
+  register_parameter(&m_EMOptionDeexcitationIgnoreCut, "em_option_deexcitation_ignore_cut");
   register_parameter(&m_ElectronRangeRatio, "electron_range_ratio");
   register_parameter(&m_ElectronFinalRange, "electron_final_range", CLHEP::cm, "cm");
   register_parameter(&m_HadronHP, "hadron_hp");
@@ -81,6 +83,7 @@ ANLStatus PhysicsListManager::mod_pre_initialize()
       hide_parameter("em_option_fluo");
       hide_parameter("em_option_auger");
       hide_parameter("em_option_pixe");
+      hide_parameter("em_option_deexcitation_ignore_cut");
       hide_parameter("electron_range_ratio");
       hide_parameter("electron_final_range");
     }
@@ -90,6 +93,7 @@ ANLStatus PhysicsListManager::mod_pre_initialize()
     hide_parameter("customized_em");
     hide_parameter("em_option_fluo");
     hide_parameter("em_option_auger");
+    hide_parameter("em_option_deexcitation_ignore_cut");
     hide_parameter("em_option_pixe");
     hide_parameter("electron_range_ratio");
     hide_parameter("electron_final_range");
@@ -114,7 +118,7 @@ ANLStatus PhysicsListManager::mod_initialize()
     else {
       m_PhysicsOption.setEMPhysicsModel(CSPhysicsOption::EMModel::CustomizedLivermore);
     }
-    m_PhysicsOption.setEMOptions(m_EMOptionFluo, m_EMOptionAuger, m_EMOptionPIXE);
+    m_PhysicsOption.setEMOptions(m_EMOptionFluo, m_EMOptionAuger, m_EMOptionPIXE, m_EMOptionDeexcitationIgnoreCut);
     m_PhysicsOption.setElectronRangeParameters(m_ElectronRangeRatio, m_ElectronFinalRange);
   }
   else {

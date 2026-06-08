@@ -75,7 +75,8 @@ CSPhysicsList::CSPhysicsList(CSPhysicsOption option)
     CustomizedEmLivermorePhysics* physicsEM = new CustomizedEmLivermorePhysics;
     physicsEM->setEMOptions(option.EMOptionFluo(),
                             option.EMOptionAuger(),
-                            option.EMOptionPIXE());
+                            option.EMOptionPIXE(),
+                            option.EMOptionAugerIgnoreCut());
     physicsEM->setElectronRangeParameters(option.ElectronRangeRatio(),
                                           option.ElectronFinalRange());
     this->RegisterPhysics(physicsEM);
@@ -84,7 +85,8 @@ CSPhysicsList::CSPhysicsList(CSPhysicsOption option)
     CustomizedEmLivermorePolarizedPhysics* physicsEM = new CustomizedEmLivermorePolarizedPhysics;
     physicsEM->setEMOptions(option.EMOptionFluo(),
                             option.EMOptionAuger(),
-                            option.EMOptionPIXE());
+                            option.EMOptionPIXE(),
+                            option.EMOptionAugerIgnoreCut());
     physicsEM->setElectronRangeParameters(option.ElectronRangeRatio(),
                                           option.ElectronFinalRange());
     this->RegisterPhysics(physicsEM);

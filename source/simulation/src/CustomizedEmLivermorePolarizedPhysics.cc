@@ -152,12 +152,13 @@ CustomizedEmLivermorePolarizedPhysics::CustomizedEmLivermorePolarizedPhysics(G4i
 CustomizedEmLivermorePolarizedPhysics::~CustomizedEmLivermorePolarizedPhysics()
 {}
 
-void CustomizedEmLivermorePolarizedPhysics::setEMOptions(bool fluo, bool auger, bool pixe)
+void CustomizedEmLivermorePolarizedPhysics::setEMOptions(bool fluo, bool auger, bool pixe, bool ignoreCut)
 {
   G4EmParameters* param = G4EmParameters::Instance();
   param->SetFluo(fluo);
   param->SetAuger(auger);
   param->SetPixe(pixe);
+  param->SetDeexcitationIgnoreCut(ignoreCut);
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

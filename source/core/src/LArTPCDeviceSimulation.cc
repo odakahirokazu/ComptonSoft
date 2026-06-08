@@ -1,5 +1,6 @@
 #include "LArTPCDeviceSimulation.hh"
 #include "AstroUnits.hh"
+#include "G4ParticleTable.hh"
 #include "CLHEP/Units/SystemOfUnits.h"
 #include "CLHEP/Random/RandGauss.h"
 #include "LArEFieldModel.hh"
@@ -28,6 +29,7 @@ void LArTPCDeviceSimulation::printSimulationParameters(std::ostream &os) const {
   else {
     os << "  No recombination model is set.\n";
   }
+  os << "  dEdx mode: " << (dEdxMode() == 0 ? "from step information" : (dEdxMode() == 1 ? "from kinetic energy" : "unknown")) << "\n";
   os << "  dEdx spline: " << (dedxSpline_ ? dedxSpline_->GetName() : "not set") << "\n";
 }
 double LArTPCDeviceSimulation::DiffusionSigmaAnode3D(double z, double &longitudinal, double &transverse) {
@@ -69,47 +71,76 @@ void LArTPCDeviceSimulation::applyRecombination(DetectorHit_sptr &hit) {
   if (!recombinationModel_) {
     hit->setPhotonCount(0.0);
     hit->setEnergyCharge(edep);
+    hit->addFlags(flag::RecombinationNotApplied);
     return;
   }
   if (edep <= 0.0) {
     hit->setPhotonCount(0.0);
     hit->setEnergyCharge(0.0);
+    hit->addFlags(flag::RecombinationNotApplied);
     return;
   }
-  if (!hit->isContinuousProcess()) {
-    hit->setPhotonCount(recombinationModel_->lightYield(edep, 1.0) * PhotonEfficiency(hit->LocalPositionX(), hit->LocalPositionY(), hit->LocalPositionZ()));
-    //hit->setPhotonCount(recombinationModel_->lightYield(edep, 1.0));
-    hit->setEnergyCharge(edep);
-    return;
+  double dedx = 0.0;
+  auto particle = hit->Particle();
+  auto partDef = G4ParticleTable::GetParticleTable()->FindParticle(particle);
+  if (partDef->GetPDGCharge() == 0) { 
+    if (dEdxMode() == 0) {
+      hit->setPhotonCount(recombinationModel_->lightYield(edep, 1.0) * PhotonEfficiency(hit->LocalPositionX(), hit->LocalPositionY(), hit->LocalPositionZ()));
+      hit->setEnergyCharge(edep);
+      hit->addFlags(flag::RecombinationNotApplied);
+      return;
+    }
+    else if (dEdxMode() == 1) {
+      const double ken = hit->EnergyDeposit();
+      dedx = getdEdxFromKineticEnergy(ken);
+      if (dedx <= 0.0) {
+        hit->setPhotonCount(recombinationModel_->lightYield(edep, 1.0) * PhotonEfficiency(hit->LocalPositionX(), hit->LocalPositionY(), hit->LocalPositionZ()));
+        hit->setEnergyCharge(edep);
+        hit->addFlags(flag::RecombinationNotApplied);
+        std::cout << "Warning: dEdx is zero or negative for kinetic energy: " << ken / keV << " keV. Recombination is not applied for this hit." << std::endl;
+        return;
+      }  
+      const double recombination_factor = recombinationModel_->getRecombinationFactor(dedx, BiasVoltage() / getThickness());
+      const auto new_edep = std::max(edep * recombination_factor, 0.0);
+      const auto new_light_count = recombinationModel_->lightYield(edep, recombination_factor) * PhotonEfficiency(hit->LocalPositionX(), hit->LocalPositionY(), hit->LocalPositionZ());
+      hit->setPhotonCount(new_light_count);
+      hit->setEnergyCharge(new_edep);
+      hit->addFlags(flag::RecombinationApplied);
+      return;
+    }
   }
   
-  double dedx = 0.0;
-  if (!getdEdxSpline()) {
+  if (dEdxMode() == 0) {
     const double step_length = hit->StepLength();
     if (step_length <= 0.0) {
       hit->setPhotonCount(recombinationModel_->lightYield(edep, 1.0) * PhotonEfficiency(hit->LocalPositionX(), hit->LocalPositionY(), hit->LocalPositionZ()));
-      //hit->setPhotonCount(recombinationModel_->lightYield(edep, 1.0));
       hit->setEnergyCharge(edep);
+      hit->addFlags(flag::RecombinationNotApplied);
+      std::cout << "Warning: step length is zero or negative for kinetic energy: " << step_length / cm << " cm. Recombination is not applied for this hit." << std::endl;
       return;
     }
     dedx = edep / step_length;
   }
-  else {
+  else if (dEdxMode() == 1) {
     const double ken = hit->KineticEnergy();
     dedx = getdEdxFromKineticEnergy(ken);
     if (dedx <= 0.0) {
       hit->setPhotonCount(recombinationModel_->lightYield(edep, 1.0) * PhotonEfficiency(hit->LocalPositionX(), hit->LocalPositionY(), hit->LocalPositionZ()));
-      //hit->setPhotonCount(recombinationModel_->lightYield(edep, 1.0));
-      hit->setEnergyCharge(edep);
+      hit->setEnergyCharge(0);
+      hit->addFlags(flag::RecombinationNotApplied);
+      std::cerr << "Warning: dEdx is zero or negative for kinetic energy: " << dedx/keV*cm << " keV/cm. Recombination is not applied for this hit." << std::endl;
       return;
     }
-    
+  }
+  else {
+    throw std::runtime_error("LArTPCDeviceSimulation::applyRecombination: Invalid dEdx mode: " + std::to_string(dEdxMode()));
   }
   const double recombination_factor = recombinationModel_->getRecombinationFactor(dedx, BiasVoltage() / getThickness());
   const auto new_edep = std::max(edep * recombination_factor, 0.0);
   const auto new_light_count = recombinationModel_->lightYield(edep, recombination_factor) * PhotonEfficiency(hit->LocalPositionX(), hit->LocalPositionY(), hit->LocalPositionZ());
   hit->setPhotonCount(new_light_count);
   hit->setEnergyCharge(new_edep);
+  hit->addFlags(flag::RecombinationApplied);
 }
 
 double LArTPCDeviceSimulation::getdEdxFromKineticEnergy(double kineticEnergy) const {
@@ -121,6 +152,7 @@ double LArTPCDeviceSimulation::getdEdxFromKineticEnergy(double kineticEnergy) co
   }
   return dedxSpline_->Eval(kineticEnergy / keV) * keV / cm;
 }
+
 void LArTPCDeviceSimulation::setdEdxFile(const std::string &filename, const std::string &spline_name) {
   if (filename.empty()) {
     return;
@@ -138,8 +170,8 @@ void LArTPCDeviceSimulation::setdEdxFile(const std::string &filename, const std:
 void LArTPCDeviceSimulation::makeRawDetectorHits() {
   auto& raw_hits = getRawHits();
   for (auto& hit : raw_hits) {
+    //hit->setdEdx(hit->EnergyDeposit() / hit->StepLength());
     applyRecombination(hit);
-    hit->setDeDx(hit->EnergyCharge() / hit->StepLength());
     insertDetectorHit(hit);
   }
 }

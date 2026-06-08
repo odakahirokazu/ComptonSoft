@@ -31,6 +31,9 @@ bool EventReconstructionWithKnownOrder::loadParameters(boost::property_tree::ptr
   else if (escape_method_mode == 2) {
     escapeDetectionMethod_ = EscapeDetectionMethod::FLAG_CHECK;
   }
+  else if (escape_method_mode == 3) {
+    escapeDetectionMethod_ = EscapeDetectionMethod::ALWAYS_ESCAPE;
+  }
   else {
     std::cerr << "Error: Unknown escape detection method mode: " << escape_method_mode << std::endl;
     return false;
@@ -62,7 +65,7 @@ bool EventReconstructionWithKnownOrder::loadParameters(boost::property_tree::ptr
   std::cout << "  process_mode: " << processMode_ << std::endl;
   std::cout << "  initial_energy: " << initialEnergy_ / unit::keV << " keV" << std::endl;
   std::cout << "  assume_initial_energy: " << assumeInitialEnergy_ << std::endl;
-  std::cout << "  escape detection method: " << ((escapeDetectionMethod_ == EscapeDetectionMethod::TOTAL_ENERGY_DEPOSITION ? "Total Energy Deposition" : (escapeDetectionMethod_ == EscapeDetectionMethod::PHOTOABSORPTION_CHECK ? "Photoabsorption Check" : "Flag Check"))) << std::endl;
+  std::cout << "  escape detection method: " << ((escapeDetectionMethod_ == EscapeDetectionMethod::TOTAL_ENERGY_DEPOSITION ? "Total Energy Deposition" : (escapeDetectionMethod_ == EscapeDetectionMethod::PHOTOABSORPTION_CHECK ? "Photoabsorption Check" : (escapeDetectionMethod_ == EscapeDetectionMethod::FLAG_CHECK ? "Flag Check" : "Always Escape")))) << std::endl;
   if (escapeDetectionMethod_ == EscapeDetectionMethod::PHOTOABSORPTION_CHECK)
     std::cout << "    tolerance: " << tolerance_ / unit::keV << " keV" << std::endl;
   if (escapeDetectionMethod_ == EscapeDetectionMethod::FLAG_CHECK) {
@@ -88,6 +91,12 @@ bool EventReconstructionWithKnownOrder::loadParameters(boost::property_tree::ptr
 bool EventReconstructionWithKnownOrder::reconstruct(const std::vector<DetectorHit_sptr> &hits, const BasicComptonEvent &baseEvent, std::vector<BasicComptonEvent_sptr> &eventsReconstructed) {
   const auto num_hits = hits.size();
   if (num_hits < 2) {
+    if (verbose_ > 0) {
+      std::cerr << "Error: Not enough hits to reconstruct event. Number of hits: " << num_hits << ", Event ID: " << hits[0]->EventID() << std::endl;
+    }
+    return false;
+  }
+  else if (num_hits < 3 && escapeDetectionMethod_ == EscapeDetectionMethod::ALWAYS_ESCAPE) {
     if (verbose_ > 0) {
       std::cerr << "Error: Not enough hits to reconstruct event. Number of hits: " << num_hits << ", Event ID: " << hits[0]->EventID() << std::endl;
     }
@@ -178,6 +187,7 @@ bool EventReconstructionWithKnownOrder::reconstruct(const std::vector<DetectorHi
     return false;
   }
   bool is_escaped = isEscapeEvent(detect_flag);
+  eventReconstructed->setFlags(detect_flag);// before set is escape at the next line, set flags.
   if (ordered_hits.size() > hits_used && numLastHits_ > 0) {
     is_escaped = true; // Escape event if not all hits are used
   }
@@ -370,6 +380,9 @@ bool EventReconstructionWithKnownOrder::isEscapeEvent(uint8_t detectFlag) const 
   }
   else if (escapeDetectionMethod_ == EscapeDetectionMethod::FLAG_CHECK) {
     return (detectFlag & flags::IS_ESCAPED);
+  }
+  else if (escapeDetectionMethod_ == EscapeDetectionMethod::ALWAYS_ESCAPE) {
+    return true;
   }
   throw std::runtime_error("Error: Unknown escape detection method.");
 }

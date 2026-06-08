@@ -46,7 +46,7 @@ public:
   void ConstructParticle() override;
   void ConstructProcess() override;
 
-  void setEMOptions(bool fluo, bool auger, bool pixe);
+  void setEMOptions(bool fluo, bool auger, bool pixe, bool ignoreCut);
   void setElectronRangeParameters(double ratio, double finalRange)
   {
     e_range_ratio_ = ratio;

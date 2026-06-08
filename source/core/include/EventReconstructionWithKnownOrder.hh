@@ -16,7 +16,8 @@ constexpr uint8_t TO_BE_EXCLUDED = 0x4U;
 enum class EscapeDetectionMethod {
   TOTAL_ENERGY_DEPOSITION = 0,
   PHOTOABSORPTION_CHECK = 1,
-  FLAG_CHECK = 2
+  FLAG_CHECK = 2,
+  ALWAYS_ESCAPE = 3
 };
 class EventReconstructionWithKnownOrder: public VEventReconstructionAlgorithm {
 public:

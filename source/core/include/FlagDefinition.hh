@@ -58,6 +58,8 @@ constexpr uint64_t BranchingGammaIncluded        = 0x8000u;
 constexpr uint64_t SelfTriggered = 0x10000u;
 constexpr uint64_t Triggered     = 0x20000u;
 constexpr uint64_t HasRayleighScattering = 0x40000u;
+constexpr uint64_t RecombinationApplied = 0x80000u;
+constexpr uint64_t RecombinationNotApplied = 0x100000u;
 }
 
 namespace channel_status {

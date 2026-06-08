@@ -142,6 +142,7 @@ CustomizedEmLivermorePhysics::CustomizedEmLivermorePhysics(G4int ver, const G4St
   param->SetMscStepLimitType(fUseDistanceToBoundary);
   param->SetLateralDisplacementAlg96(false);
   param->SetFluo(true);
+  param->SetDeexcitationIgnoreCut(true);
   SetPhysicsType(bElectromagnetic);
 }
 
@@ -150,12 +151,13 @@ CustomizedEmLivermorePhysics::CustomizedEmLivermorePhysics(G4int ver, const G4St
 CustomizedEmLivermorePhysics::~CustomizedEmLivermorePhysics()
 {}
 
-void CustomizedEmLivermorePhysics::setEMOptions(bool fluo, bool auger, bool pixe)
+void CustomizedEmLivermorePhysics::setEMOptions(bool fluo, bool auger, bool pixe, bool ignoreCut)
 {
   G4EmParameters* param = G4EmParameters::Instance();
   param->SetFluo(fluo);
   param->SetAuger(auger);
   param->SetPixe(pixe);
+  param->SetDeexcitationIgnoreCut(ignoreCut);
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
