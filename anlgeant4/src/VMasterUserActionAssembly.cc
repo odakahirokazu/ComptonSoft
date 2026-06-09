@@ -42,6 +42,10 @@ VMasterUserActionAssembly::~VMasterUserActionAssembly() = default;
 
 void VMasterUserActionAssembly::appendUserActions(VAppendableUserActionAssembly* user_action_assembly)
 {
+  // Prevent duplicate registration (can happen in MT mode when Build() is called per worker)
+  for (VAppendableUserActionAssembly* existing : userActionsAppended_) {
+    if (existing == user_action_assembly) { return; }
+  }
   userActionsAppended_.push_back(user_action_assembly);
 }
 

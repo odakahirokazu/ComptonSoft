@@ -31,8 +31,8 @@ Geant4MTBody::Geant4MTBody()
     m_RandomInitialStatusFileName("RandomSeed_i.dat"),
     m_RandomFinalStatusFileName("RandomSeed_f.dat"),
     m_VerboseLevel(0),
+    m_NumberOfEvents(100),
     m_NumberOfThreads(2),
-    m_NEvents(100),
     m_PrimaryGen(nullptr),
     m_UserActionAssembly(nullptr)
 {
@@ -47,16 +47,13 @@ ANLStatus Geant4MTBody::mod_define()
   set_parameter_question("Random initialization mode (0: auto, 1: interger, 2: state file)");
   register_parameter(&m_RandomSeed1, "random_seed");
   register_parameter(&m_OutputRandomStatus, "output_random_status");
-  register_parameter(&m_RandomInitialStatusFileName,
-                     "random_initial_status_file");
-  register_parameter(&m_RandomFinalStatusFileName,
-                     "random_final_status_file");
-
+  register_parameter(&m_RandomInitialStatusFileName, "random_initial_status_file");
+  register_parameter(&m_RandomFinalStatusFileName, "random_final_status_file");
   register_parameter(&m_VerboseLevel, "verbose");
   register_parameter(&m_UserCommands, "commands");
-  
+  register_parameter(&m_NumberOfEvents, "number_of_events");
   register_parameter(&m_NumberOfThreads, "number_of_threads");
-  register_parameter(&m_NEvents, "n_events");
+
   
   return AS_OK;
 }
@@ -181,7 +178,7 @@ ANLStatus Geant4MTBody::mod_begin_run()
 ANLStatus Geant4MTBody::mod_analyze()
 {
   if (m_EventIndex == 0) {
-    m_G4RunManager->BeamOn(m_NEvents);
+    m_G4RunManager->BeamOn(m_NumberOfEvents);
   }
   ++m_EventIndex;
 

@@ -57,8 +57,9 @@ private:
   int m_VerboseLevel;
   std::vector<std::string> m_UserCommands;
 
+  int m_NumberOfEvents;
   int m_NumberOfThreads;
-  int m_NEvents;
+
   
   VANLPrimaryGen* m_PrimaryGen;
   VUserActionAssembly* m_UserActionAssembly;
