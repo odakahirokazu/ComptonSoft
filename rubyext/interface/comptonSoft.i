@@ -188,7 +188,7 @@
 #ifdef USE_FITSIO
 #include "FilterByGoodTimeIntervalsForHXI.hh"
 #endif
-#include "NanoGRAMSCalibrationStep1.hh"
+#include "NanoGRAMSCalibration.hh"
 #include "NanoGRAMSDataReduction.hh"
 
 #include "class_list_anlGeant4.hh"
@@ -1297,12 +1297,12 @@ public:
   ~NanoGRAMSDataReduction() override;
 };
 
-class NanoGRAMSCalibrationStep1 : public VCSModule
+class NanoGRAMSCalibration : public VCSModule
 {
 
 public:
-  NanoGRAMSCalibrationStep1();
-  ~NanoGRAMSCalibrationStep1() override;
+  NanoGRAMSCalibration();
+  ~NanoGRAMSCalibration() override;
 };
 
 }

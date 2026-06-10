@@ -22,6 +22,7 @@
 #include <TFile.h>
 #include <TTree.h>
 
+#include <filesystem>
 #include <iostream>
 #include <stdexcept>
 
@@ -29,6 +30,23 @@ using namespace anlnext;
 
 namespace comptonsoft
 {
+
+namespace
+{
+
+std::string deriveQuickLookFilePath(const std::string& explicit_path,
+                                    const std::string& tpc_tree_file)
+{
+  if (!explicit_path.empty()) {
+    return explicit_path;
+  }
+
+  const std::filesystem::path input_path(tpc_tree_file);
+  const std::string stem = input_path.stem().string();
+  return (input_path.parent_path() / (stem + "_quicklook.root")).string();
+}
+
+} // namespace
 
 NanoGRAMSDataReduction::NanoGRAMSDataReduction() = default;
 
@@ -39,6 +57,8 @@ ANLStatus NanoGRAMSDataReduction::mod_define()
   define_parameter("config_file",     &mod_class::config_file_);
   define_parameter("tpctree_file",    &mod_class::tpctree_file_);
   define_parameter("rawhitdata_file", &mod_class::rawhitdata_file_);
+  define_parameter("make_quicklook_tree", &mod_class::make_quicklook_tree_);
+  define_parameter("quicklook_file",      &mod_class::quicklook_file_);
   return AS_OK;
 }
 
@@ -67,6 +87,16 @@ ANLStatus NanoGRAMSDataReduction::mod_initialize()
   }
 
   raw_hit_reader_ = std::make_unique<ngUtil::TPCTreeReader>(tpc_tree, cfg_);
+  if (make_quicklook_tree_) {
+    const std::string output_file =
+        deriveQuickLookFilePath(quicklook_file_, tpctree_file_);
+    quicklook_writer_ = std::make_unique<ngUtil::QuickLookTreeOutputWriter>(
+        output_file,
+        raw_hit_reader_->currentBuffer().layout());
+  } else {
+    std::cout << "[INFO] tpcquicklook output is disabled.\n";
+  }
+
   if (!rawhitdata_file_.empty()) {
     writer_ = std::make_unique<ngUtil::RawHitTreeOutputWriter>(rawhitdata_file_);
   } else {
@@ -90,6 +120,12 @@ ANLStatus NanoGRAMSDataReduction::mod_analyze()
   current_raw_event_id_ = raw_event_id;
   current_event_hits_.clear();
 
+  if (quicklook_writer_) {
+    quicklook_writer_->fillEvent(raw_event_id,
+                                 raw_hit_reader_->currentEventType(),
+                                 raw_hit_reader_->currentBuffer());
+  }
+
   if (!event_hits.empty()) {
     current_event_hits_ = event_hits;
     if (writer_) {
@@ -109,6 +145,10 @@ ANLStatus NanoGRAMSDataReduction::mod_end_run()
   if (writer_) {
     writer_->close();
     writer_.reset();
+  }
+  if (quicklook_writer_) {
+    quicklook_writer_->close();
+    quicklook_writer_.reset();
   }
 
   raw_hit_reader_.reset();

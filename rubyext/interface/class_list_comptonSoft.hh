@@ -132,5 +132,5 @@ class WriteHXIEventFITS;
 class FilterByGoodTimeIntervalsForSGD;
 class FilterByGoodTimeIntervalsForHXI;
 class NanoGRAMSDataReduction.hh;
-class NanoGRAMSCalibrationStep1.hh;
+class NanoGRAMSCalibration.hh;
 }

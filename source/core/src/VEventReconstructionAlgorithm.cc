@@ -21,6 +21,10 @@
 #include <boost/property_tree/json_parser.hpp>
 #include "DetectorHit.hh"
 
+#if CS_USE_YAMLCPP
+#include <yaml-cpp/yaml.h>
+#endif /* CS_USE_YAMLCPP */
+
 namespace comptonsoft {
 
 VEventReconstructionAlgorithm::VEventReconstructionAlgorithm()
@@ -33,9 +37,40 @@ VEventReconstructionAlgorithm::~VEventReconstructionAlgorithm() = default;
 bool VEventReconstructionAlgorithm::readParameterFile()
 {
   boost::property_tree::ptree pt;
-  boost::property_tree::json_parser::read_json(ParameterFile().c_str(), pt);
+
+  try {
+      boost::property_tree::json_parser::read_json(ParameterFile().c_str(), pt);
+  }
+  catch (const boost::property_tree::json_parser::json_parser_error& e) {
+      std::cerr << "Failed to read JSON file: " << ParameterFile().c_str() << "\n";
+      std::cerr << e.what() << std::endl;
+      return false;
+  }
+  catch (const std::exception& e) {
+      std::cerr << "Unexpected error while reading file: "
+                << e.what() << std::endl;
+      return false;
+  }
+
   return loadParameters(pt);
 }
+
+#if CS_USE_YAMLCPP
+bool VEventReconstructionAlgorithm::readParameterYAMLFile()
+{
+  YAML::Node configNode;
+  try {
+      configNode = YAML::LoadFile(ParameterFile().c_str());
+  }
+  catch (const YAML::Exception& e) {
+      std::cerr << "Failed to load YAML file: " << ParameterFile().c_str() << std::endl;
+      std::cerr << e.what() << std::endl;
+      return false;
+  }
+
+  return loadParametersYAML(configNode);
+}
+#endif /* CS_USE_YAMLCPP */
 
 double total_energy_deposits(const std::vector<DetectorHit_sptr>& hits)
 {

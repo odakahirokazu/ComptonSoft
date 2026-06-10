@@ -127,7 +127,7 @@ set(CS_MODULES
   ### others
   src/QuickAnalysisForDSD.cc
   src/NanoGRAMSDataReduction.cc
-  src/NanoGRAMSCalibrationStep1.cc
+  src/NanoGRAMSCalibration.cc
   )
 
 if(CS_USE_FITSIO)

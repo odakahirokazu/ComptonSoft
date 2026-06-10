@@ -40,32 +40,33 @@ public:
   NanoGRAMSDataReduction();
   ~NanoGRAMSDataReduction() override;
 
-  anlnext::ANLStatus mod_define() override;
+  anlnext::ANLStatus mod_define()     override;
   anlnext::ANLStatus mod_initialize() override;
-  anlnext::ANLStatus mod_analyze() override;
-  anlnext::ANLStatus mod_end_run() override;
+  anlnext::ANLStatus mod_analyze()    override;
+  anlnext::ANLStatus mod_end_run()    override;
 
-  bool hasCurrentEvent() const { return current_has_event_; }
-  int64_t currentEventId() const { return current_event_id_; }
+  bool hasCurrentEvent() const { return !current_event_hits_.empty(); }
+  int64_t currentEventId() const { return hasCurrentEvent() ? gamma_events_ - 1 : -1; }
   int64_t currentRawEventId() const { return current_raw_event_id_; }
   const std::vector<ngUtil::RawFECHit>& currentEventHits() const
   {
     return current_event_hits_;
   }
-  const std::string& rawHitFilePath() const { return rawhitdata_file_; }
+  const std::string& configFilePath() const { return config_file_; }
 
 private:
   std::string config_file_;
   std::string tpctree_file_;
   std::string rawhitdata_file_;
+  bool make_quicklook_tree_ = false;
+  std::string quicklook_file_;
 
   ngUtil::Config cfg_;
   std::unique_ptr<TFile> input_file_;
-  std::unique_ptr<ngUtil::TPCTreeRawHitReader> raw_hit_reader_;
+  std::unique_ptr<ngUtil::TPCTreeReader> raw_hit_reader_;
   std::unique_ptr<ngUtil::RawHitTreeOutputWriter> writer_;
-  int64_t gamma_events_ = 0;
-  bool current_has_event_ = false;
-  int64_t current_event_id_ = -1;
+  std::unique_ptr<ngUtil::QuickLookTreeOutputWriter> quicklook_writer_;
+  int64_t gamma_events_         = 0;
   int64_t current_raw_event_id_ = -1;
   std::vector<ngUtil::RawFECHit> current_event_hits_;
 };

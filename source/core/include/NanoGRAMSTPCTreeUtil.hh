@@ -36,6 +36,7 @@
 #include <utility>
 #include <vector>
 
+#include "AstroUnits.hh"
 #include "NanoGRAMSEvent.hh"
 
 class TFile;
@@ -43,13 +44,18 @@ class TTree;
 
 namespace comptonsoft
 {
+namespace unit = anlgeant4::unit;
+
 namespace ngUtil
 {
 
 constexpr const char* kTpcTreeName    = "tpctree";
 constexpr const char* kRawHitTreeName = "rawhittree";
 constexpr const char* kHitTreeName    = "hittree";
-constexpr const char* kErrorFlagsBranchName = "error_flags";
+constexpr const char* kQuickLookTreeName = "tpcquicklook";
+
+constexpr double dpp_response_time = 0.68 * unit::us;
+constexpr double clk_to_us = 0.01; //consider 1clk=10ns
 
 struct Config
 {
@@ -59,15 +65,20 @@ struct Config
   int pix_max       = 0;
   int circ_min_hits = 0;
 
-  double adc2mv              = (1.0 / 8192.0) * 1000.0;
-  double adc_min             = 0.0;
-  double adc_max             = 0.0;
-  double light_peak_thr_mV   = 0.0;
-  double circ_thr            = 0.0;
-  double spread_thr          = 0.0;
-  double drift_time_max_us   = 0.0;
-  double late_window_us      = 0.0;
-  double late_peak_thr_mV    = 0.0;
+  double adc2mv           = (1.0 / 8192.0) * 1000.0;
+  double adc_min          = 0.0;
+  double adc_max          = 0.0;
+  double light_gamma_thr  = 0.0;
+  double light_cosmic_thr = 0.0;
+  double circ_thr         = 0.0;
+  double spread_thr       = 0.0;
+  double drift_time_max   = 0.0 * unit::us;
+  //double late_window      = 0.0;
+  //double late_peak_thr    = 0.0;
+  double pre_roi_window      = 0.0;
+  double pre_roi_peak_thr    = 0.0;
+  double post_roi_window     = 0.0;
+  double post_roi_peak_thr   = 0.0;
   double noise_th            = 0.0;
   double circ_min_ratio      = 0.0;
   double timebin_ns_override = 0.0;
@@ -80,69 +91,73 @@ struct RawFECHit
 {
   int fec           = 0;
   uint64_t ti       = 0;
-  double drift_us   = 0.0;
+  double drift_time = 0.0 * unit::us;
   std::vector<int16_t> channels;
   std::vector<float>   adcs;
 };
 
+enum class TPCEventType : int16_t
+{
+  Error  = -1,
+  Other  = 0,
+  Gamma  = 1,
+  Cosmic = 2,
+  PileUp = 3,
+};
+
 void readConfig(Config& cfg, const std::string& config_path);
 
-using PixelAdc  = std::array<double, NUM_CH_CHARGE>;
-using PixelMask = std::array<uint8_t, NUM_CH_CHARGE>;
+using PixelAdc  = std::array<double,  NUM_CH_EACH_VATA>;
+using PixelMask = std::array<uint8_t, NUM_CH_EACH_VATA>;
 
 struct FECChannelGeometry
 {
-  std::array<std::array<std::pair<int, int>, NUM_CH_CHARGE>, NUM_CHARGE_READOUT> xy_of_ch{};
-  std::array<std::array<std::vector<int>, NUM_CH_CHARGE>, NUM_CHARGE_READOUT> cross_neighbors{};
-  std::array<std::array<std::vector<int>, NUM_CH_CHARGE>, NUM_CHARGE_READOUT> diag_neighbors{};
-  std::array<std::vector<int>, NUM_CHARGE_READOUT> periphery{};
+  std::array<std::array<std::pair<int, int>, NUM_CH_EACH_VATA>, NUM_VATA> xy_of_ch{};
+  std::array<std::array<std::vector<int>, NUM_CH_EACH_VATA>, NUM_VATA> cross_neighbors{};
+  std::array<std::array<std::vector<int>, NUM_CH_EACH_VATA>, NUM_VATA> diag_neighbors{};
+  std::array<std::vector<int>, NUM_VATA> periphery{};
 };
 
 struct TPCTreeLayout
 {
   int64_t n_entries      = 0;
-  int reg_len            = NUM_CH_LIGHT;
+  int num_dpp_enable_ch  = NUM_CH_DPP_ON;
   int waveform_total_len = 0;
   int waveform_len       = 0;
-  // int waveform_len_ds    = 0;
 };
 
-struct TPCTreeEntryData
+class TPCTreeBuffer
 {
-  explicit TPCTreeEntryData(int waveform_len)
-      : wave_compress(NUM_CH_LIGHT, 0),
-        registered(std::make_unique<bool[]>(NUM_CH_LIGHT)),
-        adc(NUM_CHARGE_READOUT * NUM_CH_CHARGE, 0),
-        drift(NUM_CHARGE_READOUT, 0),
-        ti(NUM_CHARGE_READOUT, 0),
-        waveform(NUM_CH_LIGHT * waveform_len, 0)
-  {
-  }
+public:
+  explicit TPCTreeBuffer(TTree* tpc_tree);
 
-  std::vector<uint16_t> wave_compress;
-  std::unique_ptr<bool[]> registered;
-  std::vector<uint16_t> adc;
-  std::vector<uint32_t> drift;
-  std::vector<uint32_t> ti;
-  std::vector<int16_t> waveform;
+  const TPCTreeLayout& layout() const { return layout_; }
+  int64_t nEntries() const { return layout_.n_entries; }
+  void getEntry(int64_t entry);
+
+  std::vector<uint16_t>   wave_compress;
+  std::unique_ptr<bool[]> dpp_enable_channels;
+  std::vector<uint16_t>   adc;
+  std::vector<uint32_t>   drift_time;
+  std::vector<uint32_t>   ti;
+  std::vector<int16_t>    waveform;
   uint16_t error_flags = 0;
-};
 
-struct FECSelectionContext
-{
-  FECChannelGeometry geom;
-  bool include_diag = false;
-  std::vector<PixelMask> masks;
-  std::vector<int> min_periph_hits;
+private:
+  void bindBranches(TTree* tpc_tree);
+
+  TTree* tpc_tree_ = nullptr;
+  TPCTreeLayout layout_;
 };
 
 struct LightTimingState
 {
   bool ready = false;
-  bool warned_wave_compress_entries = false;
-  std::array<uint16_t, NUM_CH_LIGHT> wave_compress{};
-  std::array<double, NUM_CH_LIGHT> timebin_ns{};
-  std::array<int, NUM_CH_LIGHT> late_index{};
+  std::array<uint16_t, NUM_CH_DPP_ON> wave_compress{};
+  std::array<double,   NUM_CH_DPP_ON> timebin{};
+  //std::array<int,      NUM_CH_DPP_ON> late_index{};
+  std::array<int,      NUM_CH_DPP_ON> pre_roi_index{};
+  std::array<int,      NUM_CH_DPP_ON> post_roi_index{};
 };
 
 class FECTITracker
@@ -154,26 +169,55 @@ public:
 private:
   std::vector<uint64_t> overflow_;
   std::vector<uint32_t> prev_ti_;
-  std::vector<uint8_t> have_prev_ti_;
+  std::vector<uint8_t>  have_prev_ti_;
 };
 
-class TPCTreeRawHitReader
+class FECChargeSelector
 {
 public:
-  TPCTreeRawHitReader(TTree* tpc_tree, const Config& cfg);
-  ~TPCTreeRawHitReader();
+  explicit FECChargeSelector(const Config& cfg);
 
-  bool processNext(int64_t& raw_event_id, std::vector<RawFECHit>& event_hits);
+  std::vector<RawFECHit> selectHits(const TPCTreeBuffer& tpc_tree_buffer,
+                                    FECTITracker& fec_ti_tracker,
+                                    bool subset_mask,
+                                    bool light_cosmic,
+                                    bool light_pileup) const;
 
 private:
-  TTree* tpc_tree_ = nullptr;
+  bool fillSelectedChannels(const PixelAdc& adc_values,
+                            int fec,
+                            double drift_time,
+                            bool subset_mask,
+                            bool light_cosmic,
+                            bool light_pileup,
+                            std::vector<int16_t>& channels,
+                            std::vector<float>& adcs) const;
+
+  const Config& cfg_;
+  FECChannelGeometry geom_;
+  bool include_diag_ = false;
+  std::array<PixelMask, NUM_VATA> masks_{};
+  std::array<int, NUM_VATA> min_periph_hits_{};
+};
+
+class TPCTreeReader
+{
+public:
+  TPCTreeReader(TTree* tpc_tree, const Config& cfg);
+  ~TPCTreeReader();
+
+  bool processNext(int64_t& raw_event_id, std::vector<RawFECHit>& event_hits);
+  const TPCTreeBuffer& currentBuffer() const { return tpc_tree_buffer_; }
+  TPCEventType currentEventType() const { return current_event_type_; }
+
+private:
   Config cfg_;
-  TPCTreeLayout tpc_tree_layout_;
-  TPCTreeEntryData tpc_tree_entry_data_;
-  FECSelectionContext fec_selection_;
-  LightTimingState light_timing_;
-  FECTITracker fec_ti_tracker_;
+  TPCTreeBuffer       tpc_tree_buffer_;
+  FECChargeSelector   fec_selector_;
+  LightTimingState    light_timing_;
+  FECTITracker        fec_ti_tracker_;
   int64_t current_entry_ = 0;
+  TPCEventType current_event_type_ = TPCEventType::Error;
 };
 
 class RawHitTreeOutputWriter
@@ -184,13 +228,13 @@ public:
 
   void fillEvent(int64_t event_id,
                  int64_t raw_event_id,
-                 const std::vector<RawFECHit>& hits);
+                 const   std::vector<RawFECHit>& hits);
   std::string close();
 
 private:
   void bindBranches();
 
-  std::filesystem::path output_path_;
+  std::filesystem::path  output_path_;
   std::unique_ptr<TFile> file_;
   std::unique_ptr<TTree> rawhit_tree_;
   int64_t eventid_    = 0;
@@ -198,10 +242,52 @@ private:
   int16_t ihit_       = 0;
   int64_t ti_         = 0;
   int32_t num_hits_   = 0;
-  float adc_          = 0.0F;
+  float adc_          = 0.0;
   int16_t fecid_      = 0;
   int16_t ch_         = 0;
-  float drifttime_    = 0.0F;
+  float drifttime_    = 0.0 * unit::us;
+};
+
+class QuickLookTreeOutputWriter
+{
+public:
+  explicit QuickLookTreeOutputWriter(const std::string& output_file_path,
+                                     const TPCTreeLayout& tpc_tree_layout);
+  ~QuickLookTreeOutputWriter();
+
+  void fillEvent(int64_t raw_event_id,
+                 TPCEventType event_type,
+                 const TPCTreeBuffer& tpc_tree_buffer);
+  std::string close();
+
+private:
+  void bindBranches();
+  void fillCmnSubtractedAdc(TPCEventType event_type,
+                            const TPCTreeBuffer& tpc_tree_buffer);
+
+  std::filesystem::path  output_path_;
+  std::unique_ptr<TFile> file_;
+  std::unique_ptr<TTree> quicklook_tree_;
+  int waveform_len_ = 0;
+  std::string adc_leaflist_;
+  std::string cmn_leaflist_;
+  std::string ti_leaflist_;
+  std::string drift_leaflist_;
+  std::string wave_compress_leaflist_;
+  std::string registered_leaflist_;
+  std::string waveform_leaflist_;
+
+  int64_t raw_event_id_ = 0;
+  int16_t event_type_   = 0;
+  int16_t cmn_method_   = 0;
+  int32_t waveform_len_branch_ = 0;
+  std::vector<float> adc_cmn_sub_;
+  std::array<float, NUM_VATA> cmn_{};
+  std::array<uint32_t, NUM_VATA> ti_{};
+  std::array<uint32_t, NUM_VATA> drift_time_{};
+  std::array<uint16_t, NUM_CH_DPP_ON> wave_compress_{};
+  std::array<bool, NUM_CH_DPP_ON> registered_{};
+  std::vector<int16_t> waveform_;
 };
 
 } /* namespace ngUtil */

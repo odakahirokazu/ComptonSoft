@@ -141,7 +141,12 @@ ANLStatus EventReconstruction::mod_initialize()
 
   if (m_ParameterFile != "") {
     m_Reconstruction->setParameterFile(m_ParameterFile);
-    const bool paramLoaded = m_Reconstruction->readParameterFile();
+    bool paramLoaded = m_Reconstruction->readParameterFile();
+#if CS_USE_YAMLCPP
+    if (!paramLoaded) {
+      paramLoaded = m_Reconstruction->readParameterYAMLFile();
+    }
+#endif /* CS_USE_YAMLCPP */
     if (!paramLoaded) {
       return AS_QUIT_ERROR;
     }

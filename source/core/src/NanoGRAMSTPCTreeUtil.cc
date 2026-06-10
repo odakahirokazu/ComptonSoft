@@ -25,15 +25,13 @@
 
 #include <algorithm>
 #include <array>
-//#include <boost/property_tree/json_parser.hpp>
-//#include <boost/property_tree/ptree.hpp>
 #include <cmath>
 #include <cstdint>
 #include <filesystem>
 #include <iostream>
 #include <limits>
 #include <memory>
-#include <optional>
+#include <numeric>
 #include <stdexcept>
 #include <utility>
 #include <yaml-cpp/yaml.h>
@@ -49,40 +47,20 @@ namespace
 struct LightStatus
 {
   bool valid_any = false;
+  bool gamma  = false;
   bool cosmic = false;
-  bool pileup = false;
-};
+  //bool pileup    = false;
+  bool pileup_pre_roi  = false;
+  bool pileup_post_roi = false;
 
-struct FECSelectionInput
-{
-  const Config& cfg;
-  const FECSelectionContext& fec_selection;
-  const PixelAdc& adc_values;
-  const LightStatus& light;
-  int fec = 0;
-  double drift_us = 0.0;
-  bool subset_mask = false;
-};
-
-struct FECSelectionResult
-{
-  bool accepted = false;
-  std::vector<int16_t> channels;
-  std::vector<float> adcs;
-};
-
-struct FECHitBuildContext
-{
-  const Config& cfg;
-  const FECSelectionContext& fec_selection;
-  const TPCTreeEntryData& tpc_tree_entry_data;
-  FECTITracker& fec_ti_tracker;
-  const LightStatus& light;
-  bool subset_mask = false;
+  bool hasPileup() const
+  {
+    return pileup_pre_roi || pileup_post_roi;
+  }
 };
 
 //from lower right
-constexpr std::array<std::array<int, NUM_CH_CHARGE>, NUM_CHARGE_READOUT> kPlotNumAll = {{
+constexpr std::array<std::array<int, NUM_CH_EACH_VATA>, NUM_VATA> kPlotNumAll = {{
     {0, 8, 23, 24, 39, 40, 55, 63,
      1, 9, 22, 25, 38, 41, 54, 62,
      2, 10, 21, 26, 37, 42, 53, 61,
@@ -117,66 +95,30 @@ constexpr std::array<std::array<int, NUM_CH_CHARGE>, NUM_CHARGE_READOUT> kPlotNu
      56, 57, 58, 59, 60, 61, 62, 63}
 }};
 
-//std::vector<int> readIntVector(const boost::property_tree::ptree& pt,
-//                               const std::string& key,
-//                               const std::vector<int>& default_value)
-//{
-//  const auto node = pt.get_child_optional(key);
-//  if (!node) {
-//    return default_value;
-//  }
-//
-//  std::vector<int> values;
-//  values.reserve(node->size());
-//  for (const auto& item : *node) {
-//    values.push_back(item.second.get_value<int>());
-//  }
-//  return values;
-//}
-
-//std::map<int, std::vector<int>> readExcludePixels(const boost::property_tree::ptree& pt)
-//{
-//  std::map<int, std::vector<int>> exclude_pix;
-//
-//  const auto node = pt.get_child_optional("exclude_pix");
-//  if (!node) {
-//    return exclude_pix;
-//  }
-//
-//  for (const auto& item : *node) {
-//    std::vector<int> pixels;
-//    pixels.reserve(item.second.size());
-//    for (const auto& pixel : item.second) {
-//      pixels.push_back(pixel.second.get_value<int>());
-//    }
-//    exclude_pix[std::stoi(item.first)] = std::move(pixels);
-//  }
-//
-//  return exclude_pix;
-//}
-
-//void readLightConfig(Config& cfg, const boost::property_tree::ptree& pt)
 void readLightConfig(Config& cfg, const YAML::Node& node)
 {
-  //cfg.delay_counts      = pt.get<int>(   "delay_counts",      cfg.delay_counts);
-  //cfg.light_peak_thr_mV = pt.get<double>("light_peak_thr_mV", cfg.light_peak_thr_mV);
-  //cfg.late_window_us    = pt.get<double>("late_window_us",    cfg.late_window_us);
-  //cfg.late_peak_thr_mV  = pt.get<double>("late_peak_thr_mV",  cfg.late_peak_thr_mV);
-  //cfg.light_channels    = readIntVector(pt, "light_channels", cfg.light_channels);
-  //cfg.light_channels    = readIntVector(pt, "light_channels");
-
-  const auto nodeLight  = node["light"];
-  cfg.delay_counts      = nodeLight[   "delay_counts"].as<int>();
-  cfg.light_peak_thr_mV = nodeLight["light_peak_thr_mV"].as<double>();
-  cfg.late_window_us    = nodeLight["late_window_us"].as<double>();
-  cfg.late_peak_thr_mV  = nodeLight["late_peak_thr_mV"].as<double>();
-  cfg.light_channels    = nodeLight["light_channels"].as<std::vector<int>>();
+  const auto nodeLight = node["light"];
+  cfg.delay_counts     = nodeLight["delay_counts"].as<int>();
+  //cfg.light_peak_thr   = nodeLight["light_peak_thr_mV"].as<double>() * (unit::volt/1000.0);
+  cfg.light_gamma_thr  = nodeLight["light_gamma_thr_mV"].as<double>() * (unit::volt/1000.0);
+  cfg.light_cosmic_thr = nodeLight["light_cosmic_thr_mV"].as<double>() * (unit::volt/1000.0);
+  cfg.pre_roi_window   = nodeLight["pre_roi_window_us"].as<double>() * unit::us;
+  cfg.post_roi_window  = nodeLight["post_roi_window_us"].as<double>() * unit::us;
+  cfg.pre_roi_peak_thr = nodeLight["pre_roi_peak_thr_mV"].as<double>() * (unit::volt/1000.0);
+  cfg.post_roi_peak_thr = nodeLight["post_roi_peak_thr_mV"].as<double>() * (unit::volt/1000.0);
+  cfg.light_channels   = nodeLight["light_channels"].as<std::vector<int>>();
+  //cfg.late_window      = nodeLight["late_window_us"].as<double>() * unit::us;
 
   std::cout << "readLightConfig()" << std::endl;
-  std::cout << "delay_counts:        " << cfg.delay_counts        << std::endl;
-  std::cout << "light_peak_thr_mV:   " << cfg.light_peak_thr_mV   << std::endl;
-  std::cout << "late_window_us:      " << cfg.late_window_us      << std::endl;
-  std::cout << "late_peak_thr_mV:    " << cfg.late_peak_thr_mV    << std::endl;
+  std::cout << "delay_counts:       " << cfg.delay_counts << std::endl;
+  //std::cout << "light_peak_thr_mV:  " << cfg.light_peak_thr / (unit::volt/1000.0) << std::endl;
+  std::cout << "light_gamma_thr_mV:  "  << cfg.light_gamma_thr / (unit::volt/1000.0) << std::endl;
+  std::cout << "light_cosmic_thr_mV:  " << cfg.light_cosmic_thr / (unit::volt/1000.0) << std::endl;
+  std::cout << "pre_roi_window_us:  "   << cfg.pre_roi_window / unit::us << std::endl;
+  std::cout << "post_roi_window_us: "   << cfg.post_roi_window / unit::us << std::endl;
+  std::cout << "pre_roi_peak_thr_mV:  " << cfg.pre_roi_peak_thr  / (unit::volt/1000.0) << std::endl;
+  std::cout << "post_roi_peak_thr_mV: " << cfg.post_roi_peak_thr  / (unit::volt/1000.0) << std::endl;
+  //std::cout << "late_window_us:      " << cfg.late_window / unit::us << std::endl;
 
   std::cout << "light_channels: [ ";
   bool first_light_channel = true;
@@ -191,19 +133,8 @@ void readLightConfig(Config& cfg, const YAML::Node& node)
   std::cout << " ]" << std::endl;
 }
 
-//void readChargeConfig(Config& cfg, const boost::property_tree::ptree& pt)
 void readChargeConfig(Config& cfg, const YAML::Node& node)
 {
-  //cfg.pix_min           = pt.get<int>(   "pix_min",           cfg.pix_min);
-  //cfg.pix_max           = pt.get<int>(   "pix_max",           cfg.pix_max);
-  //cfg.circ_min_hits     = pt.get<int>(   "circ_min_hits",     cfg.circ_min_hits);
-  //cfg.adc_min           = pt.get<double>("adc_min",           cfg.adc_min);
-  //cfg.adc_max           = pt.get<double>("adc_max",           cfg.adc_max);
-  //cfg.circ_thr          = pt.get<double>("circ_thr",          cfg.circ_thr);
-  //cfg.spread_thr        = pt.get<double>("spread_thr",        cfg.spread_thr);
-  //cfg.drift_time_max_us = pt.get<double>("drift_time_max_us", cfg.drift_time_max_us);
-  //cfg.noise_th          = pt.get<double>("noise_th",          cfg.noise_th);
-  //cfg.circ_min_ratio    = pt.get<double>("circ_min_ratio",    cfg.circ_min_ratio);
   const auto nodeCharge = node["charge"];
   cfg.pix_min           = nodeCharge["pix_min"].as<int>();
   cfg.pix_max           = nodeCharge["pix_max"].as<int>();
@@ -212,12 +143,10 @@ void readChargeConfig(Config& cfg, const YAML::Node& node)
   cfg.adc_max           = nodeCharge["adc_max"].as<double>();
   cfg.circ_thr          = nodeCharge["circ_thr"].as<double>();
   cfg.spread_thr        = nodeCharge["spread_thr"].as<double>();
-  cfg.drift_time_max_us = nodeCharge["drift_time_max_us"].as<double>();
+  cfg.drift_time_max    = nodeCharge["drift_time_max_us"].as<double>() * unit::us;
   cfg.noise_th          = nodeCharge["noise_th"].as<double>();
   cfg.circ_min_ratio    = nodeCharge["circ_min_ratio"].as<double>();
 
-  //cfg.exclude_pix = readExcludePixels(pt);
-  //std::map<int, std::vector<int>> exclude_pix;
   for (const auto& item : nodeCharge["exclude_pix"]) {
       int key = item.first.as<int>();
       std::vector<int> values = item.second.as<std::vector<int>>();
@@ -232,11 +161,11 @@ void readChargeConfig(Config& cfg, const YAML::Node& node)
   std::cout << "adc_max: "           << cfg.adc_max           << std::endl;
   std::cout << "circ_thr: "          << cfg.circ_thr          << std::endl;
   std::cout << "spread_thr: "        << cfg.spread_thr        << std::endl;
-  std::cout << "drift_time_max_us: " << cfg.drift_time_max_us << std::endl;
+  std::cout << "drift_time_max_us: " << cfg.drift_time_max / unit::us << std::endl;
   std::cout << "noise_th: "          << cfg.noise_th          << std::endl;
   std::cout << "circ_min_ratio: "    << cfg.circ_min_ratio    << std::endl;
 
-  for (int fec = 0; fec < NUM_CHARGE_READOUT; ++fec) {
+  for (int fec = 0; fec < NUM_VATA; ++fec) {
     const std::vector<int> pix_vec = cfg.exclude_pix[fec];
     std::cout << fec << ": [ ";
     int index = 0;
@@ -252,12 +181,12 @@ void readChargeConfig(Config& cfg, const YAML::Node& node)
   }
 }
 
-int lowerBoundTimeIndex(double late_window_us,
-                        double trigger_delay_ns,
-                        double dt_ns,
+int lowerBoundTimeIndex(double time_window,
+                        double trigger_delay,
+                        double dt,
                         int waveform_len)
 {
-  const double raw = (late_window_us * 1000.0 + trigger_delay_ns) / dt_ns;
+  const double raw = (time_window + trigger_delay) / dt;
   int idx = static_cast<int>(std::ceil(raw - 1e-12));
   if (idx < 0) {
     idx = 0;
@@ -268,7 +197,7 @@ int lowerBoundTimeIndex(double late_window_us,
   return idx;
 }
 
-double waveCompressToTimebinNs(uint16_t wave_compress)
+double waveCompressToTimebin(uint16_t wave_compress)
 {
     //if((0<=wave_compress)&&(wave_compress<=8)){
     //    return std::ldexp(1.0, static_cast<int>(wave_compress));
@@ -276,7 +205,8 @@ double waveCompressToTimebinNs(uint16_t wave_compress)
     //    std::cout << "Warning: wave_compress < 0 or wavecompress > 8" << std::endl;
     //    return 1.0;
     //}
-    return 32.0; //temporary
+    //return 32.0 * unit::ns; //temporary
+    return static_cast<double>(wave_compress) * unit::ns;
 }
 
 std::filesystem::path prepareOutputPath(const std::string& output_file_path)
@@ -295,16 +225,27 @@ std::filesystem::path prepareOutputPath(const std::string& output_file_path)
 
 double median64(const PixelAdc& values)
 {
-  std::array<double, NUM_CH_CHARGE> sorted = values;
+  std::array<double, NUM_CH_EACH_VATA> sorted = values;
   std::sort(sorted.begin(), sorted.end());
   return 0.5 * (sorted[31] + sorted[32]);
+}
+
+double lowerMean(const PixelAdc& values, int n_values)
+{
+  std::array<double, NUM_CH_EACH_VATA> sorted = values;
+  std::sort(sorted.begin(), sorted.end());
+  n_values = std::clamp(n_values, 1, NUM_CH_EACH_VATA);
+  const double sum = std::accumulate(sorted.begin(),
+                                     sorted.begin() + n_values,
+                                     0.0);
+  return sum / static_cast<double>(n_values);
 }
 
 FECChannelGeometry buildFECChannelGeometry()
 {
   FECChannelGeometry geom;
 
-  for (int fec = 0; fec < NUM_CHARGE_READOUT; ++fec) {
+  for (int fec = 0; fec < NUM_VATA; ++fec) {
     const auto& disp_to_ch = kPlotNumAll[fec];
 
     for (int xx = 0; xx < 8; ++xx) {
@@ -314,7 +255,7 @@ FECChannelGeometry buildFECChannelGeometry()
       }
     }
 
-    for (int ch = 0; ch < NUM_CH_CHARGE; ++ch) {
+    for (int ch = 0; ch < NUM_CH_EACH_VATA; ++ch) {
       const auto [x, y] = geom.xy_of_ch[fec][ch];
 
       for (const auto& delta : {std::pair<int, int>{-1, 0},
@@ -339,6 +280,7 @@ FECChannelGeometry buildFECChannelGeometry()
         }
       }
     }
+
 
     std::vector<int> periphery;
     for (int xx = 0; xx < 8; ++xx) {
@@ -373,7 +315,7 @@ PixelMask buildMaskIn(const Config& cfg, int fec)
   const auto it = cfg.exclude_pix.find(fec);
   if (it != cfg.exclude_pix.end()) {
     for (int ch : it->second) {
-      if (0 <= ch && ch < NUM_CH_CHARGE) {
+      if (0 <= ch && ch < NUM_CH_EACH_VATA) {
         mask[ch] = 0;
       }
     }
@@ -384,7 +326,7 @@ PixelMask buildMaskIn(const Config& cfg, int fec)
 int waveformTotalLength(TTree* tpc_tree)
 {
   const int total_len = tpc_tree->GetLeaf("waveform")->GetLenStatic();
-  if (total_len <= 0 || total_len % NUM_CH_LIGHT != 0) {
+  if (total_len <= 0 || total_len % NUM_CH_DPP_ON != 0) {
     throw std::runtime_error("Unexpected waveform branch length.");
   }
   return total_len;
@@ -395,325 +337,117 @@ TPCTreeLayout inspectTPCTreeLayout(TTree* tpc_tree)
   TPCTreeLayout tpc_tree_layout;
   tpc_tree_layout.n_entries          = static_cast<int64_t>(tpc_tree->GetEntries());
   tpc_tree_layout.waveform_total_len = waveformTotalLength(tpc_tree);
-  tpc_tree_layout.waveform_len       = tpc_tree_layout.waveform_total_len / NUM_CH_LIGHT;
+  tpc_tree_layout.waveform_len       = tpc_tree_layout.waveform_total_len / NUM_CH_DPP_ON;
 
   std::cout << "inspectTPCTreeLayout()" << std::endl;
-  std::cout << "n_entries:          " << tpc_tree_layout.n_entries          << std::endl;
-  std::cout << "reg_len:            " << tpc_tree_layout.reg_len            << std::endl;
-  std::cout << "waveform_total_len: " << tpc_tree_layout.waveform_total_len << std::endl;
-  std::cout << "waveform_len:       " << tpc_tree_layout.waveform_len       << std::endl;
+  std::cout << "n_entries:          "   << tpc_tree_layout.n_entries         << std::endl;
+  std::cout << "num_dpp_enable_ch:  "   << tpc_tree_layout.num_dpp_enable_ch << std::endl;
+  std::cout << "waveform_len:       "   << tpc_tree_layout.waveform_len      << std::endl;
   return tpc_tree_layout;
-}
-
-void bindTPCTreeEntryData(TTree* tpc_tree, TPCTreeEntryData& tpc_tree_entry_data)
-{
-  tpc_tree->SetBranchAddress("adc",           tpc_tree_entry_data.adc.data());
-  tpc_tree->SetBranchAddress("drift_time",    tpc_tree_entry_data.drift.data());
-  tpc_tree->SetBranchAddress("ti",            tpc_tree_entry_data.ti.data());
-  tpc_tree->SetBranchAddress("waveform",      tpc_tree_entry_data.waveform.data());
-  tpc_tree->SetBranchAddress("wave_compress", tpc_tree_entry_data.wave_compress.data());
-  tpc_tree->SetBranchAddress("registered",    tpc_tree_entry_data.registered.get());
-  tpc_tree->SetBranchAddress("error_flags",   &tpc_tree_entry_data.error_flags);
-}
-
-FECSelectionContext buildFECSelectionContext(const Config& cfg)
-{
-  FECSelectionContext ctx;
-  ctx.geom         = buildFECChannelGeometry();
-  ctx.include_diag = cfg.pix_max >= 3; //discussion needed
-  ctx.masks.resize(static_cast<std::size_t>(NUM_CHARGE_READOUT));
-  ctx.min_periph_hits.assign(static_cast<std::size_t>(NUM_CHARGE_READOUT), cfg.circ_min_hits);
-
-  for (int fec=0;fec<NUM_CHARGE_READOUT;++fec) {
-    ctx.masks[fec] = buildMaskIn(cfg, fec);
-    const int perimeter = static_cast<int>(ctx.geom.periphery[fec].size());
-    ctx.min_periph_hits[fec] = std::max(
-        cfg.circ_min_hits, static_cast<int>(std::ceil(cfg.circ_min_ratio * perimeter)));
-  }
-
-  return ctx;
 }
 
 LightTimingState makeLightTimingState(const TPCTreeLayout& tpc_tree_layout)
 {
   LightTimingState light_timing;
-  light_timing.late_index.fill(tpc_tree_layout.waveform_len);
+  light_timing.pre_roi_index.fill(0);
+  light_timing.post_roi_index.fill(tpc_tree_layout.waveform_len);
   return light_timing;
 }
 
-void initializeLightTimingIfNeeded(LightTimingState& light_timing,
-                                   const Config& cfg,
-                                   const TPCTreeLayout& tpc_tree_layout,
-                                   const TPCTreeEntryData& tpc_tree_entry_data)
+void recordLightTimingFromCurrentEntry(LightTimingState& light_timing,
+                                       const Config& cfg,
+                                       const TPCTreeBuffer& tpc_tree_buffer)
 {
-  if (light_timing.ready) {
-    return;
-  }
-
+  const TPCTreeLayout& tpc_tree_layout = tpc_tree_buffer.layout();
   std::cout << "[INFO] entries=" << tpc_tree_layout.n_entries
             << " waveform_len=" << tpc_tree_layout.waveform_len
             << " delay_counts=" << cfg.delay_counts << "\n";
 
-  for (int light_ch = 0; light_ch < tpc_tree_layout.reg_len; ++light_ch) {
-    const uint16_t wave_compress = tpc_tree_entry_data.wave_compress[light_ch];
-    const double dt_ns = waveCompressToTimebinNs(wave_compress);
-    const double trigger_delay_ns = static_cast<double>(cfg.delay_counts) * 8.0 * dt_ns;
+  for (int light_ch = 0; light_ch < tpc_tree_layout.num_dpp_enable_ch; ++light_ch) {
+    const uint16_t wave_compress = tpc_tree_buffer.wave_compress[light_ch];
+    const double dt = waveCompressToTimebin(wave_compress);
+    const double trigger_delay = static_cast<double>(cfg.delay_counts) * 8.0 * dt;
 
     light_timing.wave_compress[light_ch] = wave_compress;
-    light_timing.timebin_ns[light_ch] = dt_ns;
-    light_timing.late_index[light_ch] =
-        lowerBoundTimeIndex(cfg.late_window_us,
-                            trigger_delay_ns,
-                            dt_ns,
+    light_timing.timebin[light_ch] = dt;
+    light_timing.pre_roi_index[light_ch] =
+        lowerBoundTimeIndex(-cfg.pre_roi_window,
+                            trigger_delay,
+                            dt,
+                            tpc_tree_layout.waveform_len);
+    light_timing.post_roi_index[light_ch] =
+        lowerBoundTimeIndex(cfg.post_roi_window,
+                            trigger_delay,
+                            dt,
                             tpc_tree_layout.waveform_len);
 
-    std::cout << "[INFO] light_ch=" << light_ch
-              << " wave_compress=" << static_cast<int>(light_timing.wave_compress[light_ch])
-              << " timebin_ns=" << light_timing.timebin_ns[light_ch]
-              << " late_index=" << light_timing.late_index[light_ch] << "\n";
+    std::cout << "[INFO] light_ch=" << light_ch << "\n";
+    std::cout << " wave_compress="  << static_cast<int>(light_timing.wave_compress[light_ch]) << "\n";
+    std::cout << " timebin_ns="     << light_timing.timebin[light_ch] / unit::ns << "\n";
+    std::cout << " pre_roi_index="  << light_timing.pre_roi_index[light_ch]  << "\n";
+    std::cout << " post_roi_index=" << light_timing.post_roi_index[light_ch] << "\n";
   }
 
   light_timing.ready = true;
 }
 
-void warnWaveCompressChangedIfNeeded(LightTimingState& light_timing,
-                                     const TPCTreeLayout& tpc_tree_layout,
-                                     const TPCTreeEntryData& tpc_tree_entry_data)
-{
-  if (light_timing.warned_wave_compress_entries) {
-    return;
-  }
-
-  for (int light_ch = 0; light_ch < tpc_tree_layout.reg_len; ++light_ch) {
-    const uint16_t current_wave_compress = tpc_tree_entry_data.wave_compress[light_ch];
-    if (current_wave_compress == light_timing.wave_compress[light_ch]) {
-      continue;
-    }
-
-    std::cerr << "[WARN] wave_compress changed across entries for light_ch=" << light_ch
-              << "; first=" << static_cast<int>(light_timing.wave_compress[light_ch])
-              << " current=" << static_cast<int>(current_wave_compress)
-              << ". Continuing with first-entry timing.\n";
-    light_timing.warned_wave_compress_entries = true;
-    return;
-  }
-}
-
 LightStatus analyzeLightEvent(const Config& cfg,
-                              const TPCTreeLayout& tpc_tree_layout,
-                              const TPCTreeEntryData& tpc_tree_entry_data,
+                              const TPCTreeBuffer& tpc_tree_buffer,
                               const LightTimingState& light_timing,
                               bool light_ok)
 {
   LightStatus status;
+  const TPCTreeLayout& tpc_tree_layout = tpc_tree_buffer.layout();
 
   for (int light_ch : cfg.light_channels) {
-    status.valid_any = status.valid_any || (light_ok && tpc_tree_entry_data.registered[light_ch]);
+    if (light_ch < 0 || light_ch >= tpc_tree_layout.num_dpp_enable_ch) {
+      continue;
+    }
+    if (!light_ok || !tpc_tree_buffer.dpp_enable_channels[light_ch]) {
+      continue;
+    }
+    status.valid_any = true;
 
-    double peak      = -std::numeric_limits<double>::infinity();
-    double late_peak = -std::numeric_limits<double>::infinity();
+    double peak          = -std::numeric_limits<double>::infinity() * unit::volt;
+    double pre_roi_peak  = -std::numeric_limits<double>::infinity() * unit::volt;
+    double post_roi_peak = -std::numeric_limits<double>::infinity() * unit::volt;
     const int waveform_offset = light_ch * tpc_tree_layout.waveform_len;
-    const int late_index = light_timing.late_index[light_ch];
+    const int pre_roi_index   = light_timing.pre_roi_index[light_ch];
+    const int post_roi_index  = light_timing.post_roi_index[light_ch];
 
     for (int raw_idx = 0; raw_idx < tpc_tree_layout.waveform_len; ++raw_idx) {
-      const double mv =
-          static_cast<double>(tpc_tree_entry_data.waveform[waveform_offset + raw_idx]) * cfg.adc2mv;
-      if (mv > peak) {
-        peak = mv;
-      }
-      if (raw_idx >= late_index && mv > late_peak) {
-        late_peak = mv;
-      }
-    }
-
-    status.cosmic = status.cosmic || (std::isfinite(peak) && peak >= cfg.light_peak_thr_mV);
-    status.pileup =
-        status.pileup || (std::isfinite(late_peak) && late_peak >= cfg.late_peak_thr_mV);
-  }
-
-  return status;
-}
-
-FECSelectionResult selectFECEvent(const FECSelectionInput& input)
-{
-  const Config& cfg                 = input.cfg;
-  const FECChannelGeometry& geom    = input.fec_selection.geom;
-  const PixelMask& mask_in          = input.fec_selection.masks[input.fec];
-  const PixelAdc& adc_values        = input.adc_values;
-  const int fec                     = input.fec;
-  const int min_periph_hits         = input.fec_selection.min_periph_hits[input.fec];
-  const bool include_diag           = input.fec_selection.include_diag;
-  const bool subset_mask            = input.subset_mask;
-  const bool light_cosmic           = input.light.cosmic;
-  const bool light_pileup           = input.light.pileup;
-
-  FECSelectionResult result;
-
-  PixelAdc adc_sub{};
-  const double cmn = median64(adc_values);
-  for (int ch = 0; ch < NUM_CH_CHARGE; ++ch) {
-    adc_sub[ch] = adc_values[ch] - cmn;
-  }
-
-  bool pile_up = !std::isfinite(input.drift_us) || input.drift_us >= cfg.drift_time_max_us;
-
-  int count_periph = 0;
-  for (int ch : geom.periphery[fec]) {
-    if (adc_sub[ch] > cfg.circ_thr) {
-      ++count_periph;
-    }
-  }
-
-  bool circle_noise = count_periph >= min_periph_hits;
-  const double edge_sum = (std::isfinite(adc_sub[0]) ? adc_sub[0] : 0.0) +
-                          (std::isfinite(adc_sub[63]) ? adc_sub[63] : 0.0);
-  circle_noise = circle_noise || (edge_sum > cfg.noise_th);
-
-  bool cosmic = light_cosmic;
-  pile_up = pile_up || light_pileup;
-
-  int core_idx = 0;
-  double core_val = -std::numeric_limits<double>::infinity();
-  for (int ch = 0; ch < NUM_CH_CHARGE; ++ch) {
-    const double value = mask_in[ch] ? adc_sub[ch] : -std::numeric_limits<double>::infinity();
-    if (value > core_val) {
-      core_val = value;
-      core_idx = ch;
-    }
-  }
-
-  const bool core_has_val = core_val > cfg.adc_min;
-  PixelMask selected{};
-  selected.fill(0);
-
-  int adopted_count = 0;
-  bool extra_high = false;
-  if (core_has_val) {
-    std::vector<int> selected_list;
-    selected_list.push_back(core_idx);
-
-    PixelMask allowed{};
-    allowed.fill(0);
-    allowed[core_idx] = 1;
-    for (int ch : geom.cross_neighbors[fec][core_idx]) {
-      allowed[ch] = 1;
-    }
-    if (include_diag) {
-      for (int ch : geom.diag_neighbors[fec][core_idx]) {
-        allowed[ch] = 1;
-      }
-    }
-
-    for (int ch = 0; ch < NUM_CH_CHARGE; ++ch) {
-      if (mask_in[ch] && !allowed[ch] && adc_sub[ch] > cfg.adc_min) {
-        extra_high = true;
-        break;
-      }
-    }
-
-    for (int ch : geom.cross_neighbors[fec][core_idx]) {
-      if (mask_in[ch] && adc_sub[ch] > cfg.spread_thr) {
-        selected_list.push_back(ch);
-      }
-    }
-    if (include_diag) {
-      for (int ch : geom.diag_neighbors[fec][core_idx]) {
-        if (mask_in[ch] && adc_sub[ch] > cfg.spread_thr) {
-          selected_list.push_back(ch);
+      const double voltage =
+          static_cast<double>(tpc_tree_buffer.waveform[waveform_offset + raw_idx]) * cfg.adc2mv * (unit::volt/1000.0);
+      if (raw_idx < pre_roi_index) {
+        if (voltage > pre_roi_peak) {
+          pre_roi_peak = voltage;
+        }
+      } else if (raw_idx > post_roi_index) {
+        if (voltage > post_roi_peak) {
+          post_roi_peak = voltage;
+        }
+      } else {
+        if (voltage > peak) {
+          peak = voltage;
         }
       }
     }
-
-    for (int ch : selected_list) {
-      selected[ch] = 1;
-    }
-    adopted_count = static_cast<int>(selected_list.size());
-
-    if (adopted_count == 3 &&
-        collinear3(geom, fec, selected_list[0], selected_list[1], selected_list[2])) {
-      cosmic = true;
-    }
+    status.cosmic          = status.cosmic || (peak > cfg.light_cosmic_thr);
+    status.pileup_pre_roi  = status.pileup_pre_roi || (pre_roi_peak > cfg.pre_roi_peak_thr);
+    status.pileup_post_roi = status.pileup_post_roi || (post_roi_peak > cfg.post_roi_peak_thr);
+    status.gamma           = status.gamma || (peak > cfg.light_gamma_thr);
+    //status.pileup =
+    //    status.pileup || (pre_roi_peak > cfg.pre_roi_peak_thr) ||(post_roi_peak > cfg.post_roi_peak_thr);
   }
-
-  const bool count_ok = adopted_count >= cfg.pix_min && adopted_count <= cfg.pix_max;
-  const bool base_valid = !pile_up && !circle_noise && core_has_val;
-  const bool event_mask = base_valid && count_ok && !cosmic && !extra_high;
-  const bool event_mask_subset = event_mask && subset_mask;
-
-  if (event_mask) {
-    for (int ch = 0; ch < NUM_CH_CHARGE; ++ch) {
-      if (!selected[ch]) {
-        continue;
-      }
-      result.channels.push_back(static_cast<int16_t>(ch));
-      result.adcs.push_back(static_cast<float>(adc_sub[ch]));
-    }
-  }
-
-  result.accepted = event_mask_subset;
-  return result;
-}
-
-std::optional<RawFECHit>
-buildFECHit(FECHitBuildContext& context, int fec)
-{
-  const Config& cfg = context.cfg;
-  const TPCTreeEntryData& tpc_tree_entry_data = context.tpc_tree_entry_data;
-
-  PixelAdc adc_values{};
-  for (int pix = 0; pix < NUM_CH_CHARGE; ++pix) {
-    adc_values[pix] =
-        static_cast<double>(tpc_tree_entry_data.adc[fec * NUM_CH_CHARGE + pix]);
-  }
-  constexpr double dpp_response_time_us = 0.68;
-  constexpr double clk_to_us = 0.01; //consider 1clk=10ns
-
-  RawFECHit hit;
-  hit.fec      = fec;
-  hit.ti       = context.fec_ti_tracker.absoluteTi(fec, tpc_tree_entry_data.ti[fec]);
-  hit.drift_us = static_cast<double>(tpc_tree_entry_data.drift[fec]) * clk_to_us
-               + dpp_response_time_us;
-
-  const FECSelectionInput input{
-      cfg,
-      context.fec_selection,
-      adc_values,
-      context.light,
-      fec,
-      hit.drift_us,
-      context.subset_mask};
-  FECSelectionResult selection_result = selectFECEvent(input);
-  if (!selection_result.accepted || selection_result.channels.empty()) {
-    return std::nullopt;
-  }
-
-  hit.channels = std::move(selection_result.channels);
-  hit.adcs = std::move(selection_result.adcs);
-  return hit;
-}
-
-std::vector<RawFECHit>
-collectEventHits(FECHitBuildContext& context)
-{
-  std::vector<RawFECHit> event_hits;
-  event_hits.reserve(static_cast<std::size_t>(NUM_CHARGE_READOUT));
-
-  for (int fec = 0; fec < NUM_CHARGE_READOUT; ++fec) {
-    auto hit = buildFECHit(context, fec);
-    if (hit) {
-      event_hits.push_back(std::move(*hit));
-    }
-  }
-
-  return event_hits;
+  return status;
 }
 
 } // namespace
 
 FECTITracker::FECTITracker()
-    : overflow_(NUM_CHARGE_READOUT, 0),
-      prev_ti_(NUM_CHARGE_READOUT, 0),
-      have_prev_ti_(NUM_CHARGE_READOUT, 0)
+    : overflow_(NUM_VATA, 0),
+      prev_ti_(NUM_VATA, 0),
+      have_prev_ti_(NUM_VATA, 0)
 {}
 
 uint64_t FECTITracker::absoluteTi(int fec, uint32_t ti_value)
@@ -727,68 +461,274 @@ uint64_t FECTITracker::absoluteTi(int fec, uint32_t ti_value)
   return ti_abs;
 }
 
+FECChargeSelector::FECChargeSelector(const Config& cfg)
+    : cfg_(cfg),
+      geom_(buildFECChannelGeometry()),
+      include_diag_(cfg_.pix_max >= 3) //discussion needed
+{
+  for (int fec = 0; fec < NUM_VATA; ++fec) {
+    masks_[fec] = buildMaskIn(cfg_, fec);
+    const int perimeter = static_cast<int>(geom_.periphery[fec].size());
+    min_periph_hits_[fec] =
+        std::max(cfg_.circ_min_hits,
+                 static_cast<int>(std::ceil(cfg_.circ_min_ratio * perimeter)));
+  }
+}
+
+std::vector<RawFECHit>
+FECChargeSelector::selectHits(const TPCTreeBuffer& tpc_tree_buffer,
+                              FECTITracker& fec_ti_tracker,
+                              bool subset_mask,
+                              bool light_cosmic,
+                              bool light_pileup) const
+{
+  std::vector<RawFECHit> event_hits;
+  event_hits.reserve(static_cast<std::size_t>(NUM_VATA));
+
+  for (int fec = 0; fec < NUM_VATA; ++fec) {
+    PixelAdc adc_values{};
+    for (int pix = 0; pix < NUM_CH_EACH_VATA; ++pix) {
+      adc_values[pix] =
+          static_cast<double>(tpc_tree_buffer.adc[fec * NUM_CH_EACH_VATA + pix]);
+    }
+
+    RawFECHit hit;
+    hit.fec        = fec;
+    hit.ti         = fec_ti_tracker.absoluteTi(fec, tpc_tree_buffer.ti[fec]);
+    hit.drift_time = static_cast<double>(tpc_tree_buffer.drift_time[fec]) * clk_to_us * unit::us + dpp_response_time;
+
+    const bool accepted =
+        fillSelectedChannels(adc_values,
+                             fec,
+                             hit.drift_time,
+                             subset_mask,
+                             light_cosmic,
+                             light_pileup,
+                             hit.channels,
+                             hit.adcs);
+    if (accepted) {
+      event_hits.push_back(std::move(hit));
+    }
+  }
+
+  return event_hits;
+}
+
+bool FECChargeSelector::fillSelectedChannels(const PixelAdc& adc_values,
+                                             int fec,
+                                             double drift_time,
+                                             bool subset_mask,
+                                             bool light_cosmic,
+                                             bool light_pileup,
+                                             std::vector<int16_t>& channels,
+                                             std::vector<float>& adcs) const
+{
+  channels.clear();
+  adcs.clear();
+
+  const PixelMask& mask_in  = masks_[fec];
+  const int min_periph_hits = min_periph_hits_[fec];
+
+  PixelAdc adc_sub{};
+  const double cmn = median64(adc_values);
+  for (int ch = 0; ch < NUM_CH_EACH_VATA; ++ch) {
+    adc_sub[ch] = adc_values[ch] - cmn;
+  }
+
+  bool pile_up = !std::isfinite(drift_time) || drift_time >= cfg_.drift_time_max;
+
+  int count_periph = 0;
+  for (int ch : geom_.periphery[fec]) {
+    if (adc_sub[ch] > cfg_.circ_thr) {
+      ++count_periph;
+    }
+  }
+
+  bool circle_noise = count_periph >= min_periph_hits;
+  const double edge_sum = (std::isfinite(adc_sub[0]) ? adc_sub[0] : 0.0) +
+                          (std::isfinite(adc_sub[63]) ? adc_sub[63] : 0.0);
+  circle_noise = circle_noise || (edge_sum > cfg_.noise_th);
+
+  bool cosmic = light_cosmic;
+  pile_up = pile_up || light_pileup;
+
+  int core_idx = 0;
+  double core_val = -std::numeric_limits<double>::infinity();
+  for (int ch = 0; ch < NUM_CH_EACH_VATA; ++ch) {
+    const double value = mask_in[ch] ? adc_sub[ch] : -std::numeric_limits<double>::infinity();
+    if (value > core_val) {
+      core_val = value;
+      core_idx = ch;
+    }
+  }
+
+  const bool core_has_val = core_val > cfg_.adc_min;
+  PixelMask selected{};
+  selected.fill(0);
+
+  int adopted_count = 0;
+  bool extra_high = false;
+  if (core_has_val) {
+    std::vector<int> selected_list;
+    selected_list.push_back(core_idx);
+
+    PixelMask allowed{};
+    allowed.fill(0);
+    allowed[core_idx] = 1;
+    for (int ch : geom_.cross_neighbors[fec][core_idx]) {
+      allowed[ch] = 1;
+    }
+    if (include_diag_) {
+      for (int ch : geom_.diag_neighbors[fec][core_idx]) {
+        allowed[ch] = 1;
+      }
+    }
+
+    for (int ch = 0; ch < NUM_CH_EACH_VATA; ++ch) {
+      if (mask_in[ch] && !allowed[ch] && adc_sub[ch] > cfg_.adc_min) {
+        extra_high = true;
+        break;
+      }
+    }
+
+    for (int ch : geom_.cross_neighbors[fec][core_idx]) {
+      if (mask_in[ch] && adc_sub[ch] > cfg_.spread_thr) {
+        selected_list.push_back(ch);
+      }
+    }
+    if (include_diag_) {
+      for (int ch : geom_.diag_neighbors[fec][core_idx]) {
+        if (mask_in[ch] && adc_sub[ch] > cfg_.spread_thr) {
+          selected_list.push_back(ch);
+        }
+      }
+    }
+
+    for (int ch : selected_list) {
+      selected[ch] = 1;
+    }
+    adopted_count = static_cast<int>(selected_list.size());
+
+    if (adopted_count == 3 &&
+        collinear3(geom_, fec, selected_list[0], selected_list[1], selected_list[2])) {
+      cosmic = true;
+    }
+  }
+
+  const bool count_ok   = adopted_count >= cfg_.pix_min && adopted_count <= cfg_.pix_max;
+  const bool base_valid = !pile_up && !circle_noise && core_has_val;
+  const bool event_mask = base_valid && count_ok && !cosmic && !extra_high;
+
+  if (event_mask) {
+    for (int ch = 0; ch < NUM_CH_EACH_VATA; ++ch) {
+      if (!selected[ch]) {
+        continue;
+      }
+      channels.push_back(static_cast<int16_t>(ch));
+      adcs.push_back(static_cast<float>(adc_sub[ch]));
+    }
+  }
+
+  return event_mask && subset_mask && !channels.empty();
+}
+
 void readConfig(Config& cfg, const std::string& config_path)
 {
-  //boost::property_tree::ptree pt;
-  //boost::property_tree::read_json(config_path, pt);
   const auto configNode = YAML::LoadFile(config_path);
 
-  //if (const auto light = pt.get_child_optional("light")) {
-    //readLightConfig(cfg, *light);
   readLightConfig(cfg, configNode);
-  //}
-
-  //if (const auto charge = pt.get_child_optional("charge")) {
-    //readChargeConfig(cfg, *charge);
   readChargeConfig(cfg, configNode);
-  //}
 
-  static_assert(NUM_CHARGE_READOUT == static_cast<int>(kPlotNumAll.size()),
-                "kPlotNumAll must match NUM_CHARGE_READOUT.");
+  static_assert(NUM_VATA == static_cast<int>(kPlotNumAll.size()),
+                "kPlotNumAll must match NUM_VATA.");
 
 }
 
-TPCTreeRawHitReader::TPCTreeRawHitReader(TTree* tpc_tree, const Config& cfg)
-    : tpc_tree_(tpc_tree),
-      cfg_(cfg),
-      tpc_tree_layout_(inspectTPCTreeLayout(tpc_tree_)),
-      tpc_tree_entry_data_(tpc_tree_layout_.waveform_len),
-      fec_selection_(buildFECSelectionContext(cfg_)),
-      light_timing_(makeLightTimingState(tpc_tree_layout_)),
+TPCTreeBuffer::TPCTreeBuffer(TTree* tpc_tree)
+    : tpc_tree_(tpc_tree)
+{
+  if (!tpc_tree_) {
+    throw std::runtime_error("TPCTreeBuffer received a null TTree pointer.");
+  }
+
+  layout_ = inspectTPCTreeLayout(tpc_tree_);
+
+  wave_compress.assign(NUM_CH_DPP_ON, 0);
+  dpp_enable_channels = std::make_unique<bool[]>(NUM_CH_DPP_ON);
+  adc.assign(NUM_VATA * NUM_CH_EACH_VATA, 0);
+  drift_time.assign(NUM_VATA, 0);
+  ti.assign(NUM_VATA, 0);
+  waveform.assign(NUM_CH_DPP_ON * layout_.waveform_len, 0);
+
+  bindBranches(tpc_tree_);
+}
+
+void TPCTreeBuffer::getEntry(int64_t entry)
+{
+  tpc_tree_->GetEntry(entry);
+}
+
+void TPCTreeBuffer::bindBranches(TTree* tpc_tree)
+{
+  tpc_tree->SetBranchAddress("adc",           adc.data());
+  tpc_tree->SetBranchAddress("drift_time",    drift_time.data());
+  tpc_tree->SetBranchAddress("ti",            ti.data());
+  tpc_tree->SetBranchAddress("waveform",      waveform.data());
+  tpc_tree->SetBranchAddress("wave_compress", wave_compress.data());
+  tpc_tree->SetBranchAddress("registered",    dpp_enable_channels.get());
+  tpc_tree->SetBranchAddress("error_flags",   &error_flags);
+}
+
+TPCTreeReader::TPCTreeReader(TTree* tpc_tree, const Config& cfg)
+    : cfg_(cfg),
+      tpc_tree_buffer_(tpc_tree),
+      fec_selector_(cfg_),
+      light_timing_(makeLightTimingState(tpc_tree_buffer_.layout())),
       fec_ti_tracker_()
 {
-  bindTPCTreeEntryData(tpc_tree_, tpc_tree_entry_data_);
+  if (tpc_tree_buffer_.nEntries() > 0) {
+    tpc_tree_buffer_.getEntry(0);
+    recordLightTimingFromCurrentEntry(light_timing_, cfg_, tpc_tree_buffer_);
+  }
 }
 
-TPCTreeRawHitReader::~TPCTreeRawHitReader() = default;
+TPCTreeReader::~TPCTreeReader() = default;
 
-bool TPCTreeRawHitReader::processNext(int64_t& raw_event_id,
-                                      std::vector<RawFECHit>& event_hits)
+bool TPCTreeReader::processNext(int64_t& raw_event_id,
+                                std::vector<RawFECHit>& event_hits)
 {
-  if (current_entry_ >= tpc_tree_layout_.n_entries) {
+  if (current_entry_ >= tpc_tree_buffer_.nEntries()) {
     return false;
   }
 
   raw_event_id = current_entry_;
-  tpc_tree_->GetEntry(current_entry_);
+  tpc_tree_buffer_.getEntry(current_entry_);
 
-  initializeLightTimingIfNeeded(light_timing_, cfg_, tpc_tree_layout_, tpc_tree_entry_data_);
-  warnWaveCompressChangedIfNeeded(light_timing_, tpc_tree_layout_, tpc_tree_entry_data_);
+  //discuss intepretation of the error_flags
+  const int err = static_cast<int>(tpc_tree_buffer_.error_flags);
+  const bool tpc_ok   = (err == 0);
+  const bool light_ok = (err == 0 || err == 4);
+  const LightStatus light_status = analyzeLightEvent(cfg_, tpc_tree_buffer_,
+                                                     light_timing_, light_ok);
+  const bool light_pileup = light_status.hasPileup();
+  const bool subset_mask  = tpc_ok && light_status.gamma;
 
-  const int err = static_cast<int>(tpc_tree_entry_data_.error_flags);
-  const bool tpc_ok       = (err == 0);
-  const bool light_ok     = (err == 0 || err == 4);
-  const LightStatus light =
-      analyzeLightEvent(cfg_,
-                        tpc_tree_layout_,
-                        tpc_tree_entry_data_,
-                        light_timing_,
-                        light_ok);
-  const bool subset_mask  = tpc_ok && light.valid_any;
-
-  FECHitBuildContext hit_context{
-      cfg_, fec_selection_, tpc_tree_entry_data_, fec_ti_tracker_, light, subset_mask};
-  event_hits = collectEventHits(hit_context);
+  event_hits = fec_selector_.selectHits(tpc_tree_buffer_,
+                                        fec_ti_tracker_,
+                                        subset_mask,
+                                        light_status.cosmic,
+                                        light_pileup);
+  if (!tpc_ok) {
+    current_event_type_ = TPCEventType::Error;
+  } else if (light_pileup) {
+    current_event_type_ = TPCEventType::PileUp;
+  } else if (light_status.cosmic) {
+    current_event_type_ = TPCEventType::Cosmic;
+  } else if (light_status.gamma && !event_hits.empty()) {
+    current_event_type_ = TPCEventType::Gamma;
+  } else {
+    current_event_type_ = TPCEventType::Other;
+  }
   ++current_entry_;
   return true;
 }
@@ -817,12 +757,12 @@ void RawHitTreeOutputWriter::fillEvent(int64_t event_id,
   raweventid_ = raw_event_id;
   num_hits_   = static_cast<int32_t>(hits.size());
 
-  for (std::size_t ih = 0; ih < hits.size(); ++ih) {
+  for (std::size_t ih=0;ih<hits.size();++ih) {
     const auto& hit = hits[ih];
     ihit_      = static_cast<int16_t>(ih);
     ti_        = static_cast<int64_t>(hit.ti);
     fecid_     = static_cast<int16_t>(hit.fec);
-    drifttime_ = static_cast<float>(hit.drift_us);
+    drifttime_ = static_cast<float>(hit.drift_time);
 
     for (std::size_t j = 0; j < hit.channels.size(); ++j) {
       ch_  = hit.channels[j];
@@ -856,6 +796,117 @@ void RawHitTreeOutputWriter::bindBranches()
   rawhit_tree_->Branch("fecid",       &fecid_,      "fecid/S");
   rawhit_tree_->Branch("ch",          &ch_,         "ch/S");
   rawhit_tree_->Branch("drifttime",   &drifttime_,  "drifttime/F");
+}
+
+QuickLookTreeOutputWriter::QuickLookTreeOutputWriter(
+    const std::string& output_file_path,
+    const TPCTreeLayout& tpc_tree_layout)
+    : output_path_(prepareOutputPath(output_file_path)),
+      file_(std::make_unique<TFile>(output_path_.string().c_str(), "RECREATE")),
+      quicklook_tree_(std::make_unique<TTree>(kQuickLookTreeName, kQuickLookTreeName)),
+      waveform_len_(tpc_tree_layout.waveform_len),
+      waveform_len_branch_(tpc_tree_layout.waveform_len)
+{
+  if (file_->IsZombie()) {
+    throw std::runtime_error("Failed to create quicklook ROOT file: " +
+                             output_path_.string());
+  }
+
+  adc_cmn_sub_.assign(NUM_VATA * NUM_CH_EACH_VATA, 0.0f);
+  waveform_.assign(NUM_CH_DPP_ON * waveform_len_, 0);
+  quicklook_tree_->SetDirectory(nullptr);
+  bindBranches();
+}
+
+QuickLookTreeOutputWriter::~QuickLookTreeOutputWriter() = default;
+
+void QuickLookTreeOutputWriter::fillEvent(int64_t raw_event_id,
+                                          TPCEventType event_type,
+                                          const TPCTreeBuffer& tpc_tree_buffer)
+{
+  if (event_type == TPCEventType::Error) {
+    return;
+  }
+
+  raw_event_id_ = raw_event_id;
+  event_type_   = static_cast<int16_t>(event_type);
+  cmn_method_   = (event_type == TPCEventType::Cosmic) ? 1 : 0;
+
+  for (int fec = 0; fec < NUM_VATA; ++fec) {
+    ti_[fec]         = tpc_tree_buffer.ti[fec];
+    drift_time_[fec] = tpc_tree_buffer.drift_time[fec];
+  }
+
+  for (int ch = 0; ch < NUM_CH_DPP_ON; ++ch) {
+    wave_compress_[ch] = tpc_tree_buffer.wave_compress[ch];
+    registered_[ch]    = tpc_tree_buffer.dpp_enable_channels[ch];
+  }
+  waveform_ = tpc_tree_buffer.waveform;
+
+  fillCmnSubtractedAdc(event_type, tpc_tree_buffer);
+  quicklook_tree_->Fill();
+}
+
+std::string QuickLookTreeOutputWriter::close()
+{
+  file_->cd();
+  quicklook_tree_->Write();
+  file_->Write();
+  const auto entries = quicklook_tree_->GetEntries();
+  file_->Close();
+
+  std::cout << "[ROOT] Saved quicklook file: " << output_path_.string()
+            << " (entries=" << entries << ")\n";
+  return output_path_.string();
+}
+
+void QuickLookTreeOutputWriter::bindBranches()
+{
+  adc_leaflist_           = "adc_cmn_sub[" + std::to_string(NUM_VATA) + "][" +
+                              std::to_string(NUM_CH_EACH_VATA) + "]/F";
+  cmn_leaflist_           = "cmn[" + std::to_string(NUM_VATA) + "]/F";
+  ti_leaflist_            = "ti[" + std::to_string(NUM_VATA) + "]/i";
+  drift_leaflist_         = "drift_time[" + std::to_string(NUM_VATA) + "]/i";
+  wave_compress_leaflist_ = "wave_compress[" + std::to_string(NUM_CH_DPP_ON) + "]/s";
+  registered_leaflist_    = "registered[" + std::to_string(NUM_CH_DPP_ON) + "]/O";
+  waveform_leaflist_      = "waveform[" + std::to_string(NUM_CH_DPP_ON) + "][" +
+                            std::to_string(waveform_len_) + "]/S";
+
+  quicklook_tree_->Branch("raw_event_id", &raw_event_id_, "raw_event_id/L");
+  quicklook_tree_->Branch("event_type",   &event_type_,   "event_type/S");
+  quicklook_tree_->Branch("cmn_method",   &cmn_method_,   "cmn_method/S");
+  quicklook_tree_->Branch("waveform_len", &waveform_len_branch_, "waveform_len/I");
+  quicklook_tree_->Branch("adc_cmn_sub",  adc_cmn_sub_.data(),  adc_leaflist_.c_str());
+  quicklook_tree_->Branch("cmn",          cmn_.data(),          cmn_leaflist_.c_str());
+  quicklook_tree_->Branch("ti",           ti_.data(),           ti_leaflist_.c_str());
+  quicklook_tree_->Branch("drift_time",   drift_time_.data(),   drift_leaflist_.c_str());
+  quicklook_tree_->Branch("wave_compress", wave_compress_.data(),
+                                                                wave_compress_leaflist_.c_str());
+  quicklook_tree_->Branch("registered",   registered_.data(),   registered_leaflist_.c_str());
+  quicklook_tree_->Branch("waveform",     waveform_.data(),     waveform_leaflist_.c_str());
+}
+
+void QuickLookTreeOutputWriter::fillCmnSubtractedAdc(
+    TPCEventType event_type,
+    const TPCTreeBuffer& tpc_tree_buffer)
+{
+  for (int fec = 0; fec < NUM_VATA; ++fec) {
+    PixelAdc adc_values{};
+    for (int ch = 0; ch < NUM_CH_EACH_VATA; ++ch) {
+      adc_values[ch] =
+          static_cast<double>(tpc_tree_buffer.adc[fec * NUM_CH_EACH_VATA + ch]);
+    }
+
+    const double cmn = (event_type == TPCEventType::Cosmic)
+        ? lowerMean(adc_values, 10)
+        : median64(adc_values);
+    cmn_[fec] = static_cast<float>(cmn);
+
+    for (int ch = 0; ch < NUM_CH_EACH_VATA; ++ch) {
+      adc_cmn_sub_[fec * NUM_CH_EACH_VATA + ch] =
+          static_cast<float>(adc_values[ch] - cmn);
+    }
+  }
 }
 
 } /* namespace ngUtil */

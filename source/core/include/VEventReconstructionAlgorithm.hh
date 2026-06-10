@@ -26,6 +26,9 @@
 #include <boost/property_tree/ptree.hpp>
 #include "DetectorHit_sptr.hh"
 #include "BasicComptonEvent.hh"
+#if CS_USE_YAMLCPP
+#include <yaml-cpp/yaml.h>
+#endif /* CS_USE_YAMLCPP */
 
 namespace comptonsoft {
 
@@ -59,6 +62,10 @@ public:
   std::string ParameterFile() const { return parameterFile_; }
   bool readParameterFile();
 
+#if CS_USE_YAMLCPP
+  bool readParameterYAMLFile();
+#endif /* CS_USE_YAMLCPP */
+
   virtual void initializeEvent() = 0;
   
   /**
@@ -75,6 +82,11 @@ public:
 protected:
   virtual bool loadParameters(boost::property_tree::ptree&)
   { return true; }
+
+#if CS_USE_YAMLCPP
+  virtual bool loadParametersYAML(YAML::Node&)
+  { return true; }
+#endif /* CS_USE_YAMLCPP */
 
 private:
   int minHits_;

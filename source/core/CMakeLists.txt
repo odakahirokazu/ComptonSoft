@@ -1,3 +1,5 @@
+find_package(HDF5 REQUIRED COMPONENTS C)
+
 include_directories(include
   ${ANLG4_INC_DIR}
   ${ROOT_INC_DIR}
@@ -6,6 +8,7 @@ include_directories(include
   ${ORT_INC_DIR}
   ${ADD_INC_DIR}
   ${BOOST_INC_DIR}
+  ${HDF5_INCLUDE_DIRS}
 )
 
 link_directories(
@@ -68,6 +71,7 @@ set(CS_CORE_CLASSES
   src/HY2020EventReconstructionAlgorithm.cc
   src/OberlackAlgorithm.cc
   src/TangoAlgorithm.cc
+  src/NanoGRAMSEventReconstructionAlgorithm.cc
   ### sensitive detector
   src/VCSSensitiveDetector.cc
   ### manager
@@ -104,6 +108,7 @@ set(CS_CORE_CLASSES
   src/RIDecayProperties.cc
   src/RIDecayChains.cc
   src/RIDecayCalculation.cc
+  src/NanoGRAMSTPCProperty.cc
   src/NanoGRAMSTPCTreeUtil.cc
   src/TPCTreeIO.cc
   #src/NanoGRAMSEvent.cc
@@ -129,7 +134,8 @@ add_library(CSCore SHARED
   )
 
 target_link_libraries(CSCore
-  ${ROOT_LIB} ${G4_LIB} ${CLHEP_LIB} ${ORT_LIB} ${ADD_LIB} ${BOOST_LIB} ${YAMLCPP_LIB})
+  ${ROOT_LIB} ${G4_LIB} ${CLHEP_LIB} ${ORT_LIB} ${ADD_LIB} ${BOOST_LIB}
+  ${HDF5_LIBRARIES} ${YAMLCPP_LIB})
 
 install(TARGETS CSCore LIBRARY DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
 

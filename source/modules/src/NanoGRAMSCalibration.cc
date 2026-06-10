@@ -17,7 +17,7 @@
  *                                                                       *
  *************************************************************************/
 
-#include "NanoGRAMSCalibrationStep1.hh"
+#include "NanoGRAMSCalibration.hh"
 
 #include "NanoGRAMSDataReduction.hh"
 
@@ -181,33 +181,24 @@ CalibrationConfig readCalibrationConfig(const std::string& config_file)
   cfg.energy.gain_info_file       = node_energy["gain_info_file"].as<std::string>();
   cfg.energy.q_to_kev_spline_file = node_energy["q_to_kev_spline_file"].as<std::string>();
   cfg.energy.factor_energy        = node_energy["factor_energy"].as<double>();
-  cfg.energy.max_time_us          = node_energy["max_time_us"].as<double>();
+  cfg.energy.max_time             = node_energy["max_time_us"].as<double>() * unit::us;
   cfg.energy.tp_channel           = node_energy["tp_channel"].as<int>();
   cfg.energy.ccal                 = node_energy["ccal"].as<int>();
-  cfg.energy.tp_adc_values        = node_energy["tp_adc_values"].as<std::array<double, NUM_VATA>>();
 
-  cfg.general.efield_v_cm         = config_node["general"]["efield_v_cm"].as<int>();
-  cfg.general.temperature_k       = config_node["general"]["temperature_k"].as<double>();
-  cfg.position.anode_pos_z_cm     = node_position["anode_pos_z_cm"].as<double>();
+  cfg.general.efield       = config_node["general"]["efield_v_cm"].as<int>() * unit::volt / unit::cm;
+  cfg.general.temperature  = config_node["general"]["temperature_k"].as<double>() * unit::kelvin;
+  cfg.position.anode_pos_z = node_position["anode_pos_z_cm"].as<double>() * unit::cm;
 
-  std::cout << "gain_info_file"       << cfg.energy.gain_info_file << std::endl;
-  std::cout << "q_to_kev_spline_file" << cfg.energy.q_to_kev_spline_file << std::endl;
-  std::cout << "efield_v_cm"          << cfg.general.efield_v_cm   << std::endl;
-  std::cout << "temperature_k"        << cfg.general.temperature_k << std::endl;
-  std::cout << "factor_energy"        << cfg.energy.factor_energy  << std::endl;
-  std::cout << "max_time_us"          << cfg.energy.max_time_us    << std::endl;
-  std::cout << "tp_channel"           << cfg.energy.tp_channel     << std::endl;
-  std::cout << "ccal"                 << cfg.energy.ccal           << std::endl;
-  std::cout << "tp_adc_values [ ";
-  for (std::size_t i = 0; i < cfg.energy.tp_adc_values.size(); ++i) {
-    if (i != 0) {
-      std::cout << ", ";
-    }
-    std::cout << cfg.energy.tp_adc_values[i];
-  }
-  std::cout << " ]" << std::endl;
+  std::cout << "gain_info_file: "       << cfg.energy.gain_info_file << std::endl;
+  std::cout << "q_to_kev_spline_file: " << cfg.energy.q_to_kev_spline_file << std::endl;
+  std::cout << "efield_v_cm: "          << cfg.general.efield / (unit::volt/unit::cm)  << std::endl;
+  std::cout << "temperature_k: "        << cfg.general.temperature / unit::kelvin<< std::endl;
+  std::cout << "factor_energy: "        << cfg.energy.factor_energy  << std::endl;
+  std::cout << "max_time_us: "          << cfg.energy.max_time / unit::us    << std::endl;
+  std::cout << "tp_channel: "           << cfg.energy.tp_channel     << std::endl;
+  std::cout << "ccal: "                 << cfg.energy.ccal           << std::endl;
 
-  std::cout << "anode_pos_z_cm"       << cfg.position.anode_pos_z_cm << std::endl;
+  std::cout << "anode_pos_z_cm: "       << cfg.position.anode_pos_z / unit::cm << std::endl;
 
 
   return cfg;
@@ -242,7 +233,7 @@ std::vector<DetectorHit_sptr> buildCalibratedHits(
   std::vector<DetectorHit_sptr> hits;
   hits.reserve(raw_hits.size());
 
-  const double max_time = config.energy.max_time_us * unit::us;
+  const double max_time = config.energy.max_time;
 
   for (const auto& raw_hit : raw_hits) {
     if (raw_hit.fec < 0 || raw_hit.fec >= NUM_VATA) {
@@ -254,12 +245,12 @@ std::vector<DetectorHit_sptr> buildCalibratedHits(
       continue;
     }
 
-    double total_energy   = 0.0;
-    double posx           = 0.0;
-    double posy           = 0.0;
-    double posz           = 0.0;
+    double total_energy   = 0.0 * unit::keV;
+    double posx           = 0.0 * unit::cm;
+    double posy           = 0.0 * unit::cm;
+    double posz           = 0.0 * unit::cm;
     std::size_t max_index = 0;
-    double max_energy = -std::numeric_limits<double>::infinity();
+    double max_energy     = -std::numeric_limits<double>::infinity() * unit::keV;
 
     std::vector<double> energies(n, 0.0);
     for (std::size_t i = 0; i < n; ++i) {
@@ -273,12 +264,12 @@ std::vector<DetectorHit_sptr> buildCalibratedHits(
           tpc_property.temperatureCorrectionFactor(raw_hit.fec);
       const double energy =
           tpc_property.convertADC2keVWithSpline3D(raw_hit.fec, ch, corrected_adc);
-      energies[i] = energy;
+      energies[i]   = energy;
       total_energy += energy;
 
       if (energy > max_energy) {
         max_energy = energy;
-        max_index = i;
+        max_index  = i;
       }
     }
 
@@ -292,13 +283,39 @@ std::vector<DetectorHit_sptr> buildCalibratedHits(
       posx += weight * kPosX[raw_hit.fec][ch];
       posy += weight * kPosY[raw_hit.fec][ch];
       posz += weight *
-              tpc_property.convertDriftTime2PosZScale(raw_hit.drift_us * unit::us, max_time);
+              tpc_property.convertDriftTime2PosZScale(raw_hit.drift_time, max_time);
     }
 
     const int channel = raw_hit.channels[max_index];
     auto hit = std::make_shared<DetectorHit>();
     hit->setTI(static_cast<int64_t>(raw_hit.ti));
     hit->setDetectorChannelID(ChannelID::Undefined, raw_hit.fec, channel);
+
+    if((-2.56 * unit::cm < posx)&&(posx < 2.56 * unit::cm)&&(-2.56 * unit::cm < posy)&&(posy < 2.56 * unit::cm)){
+        if(posx > 0.0 * unit::cm){
+            if(posy > 0.0 * unit::cm){
+                hit->setDetectorID(2);
+            } else {
+                hit->setDetectorID(1);
+            }
+
+        } else{
+            if(posy > 0.0 * unit::cm){
+                hit->setDetectorID(3);
+            } else {
+                hit->setDetectorID(0);
+            }
+        }
+    } else {
+        hit->setDetectorID(-1);
+    }
+
+    //std::cout << "FEC" << raw_hit.fec << "/" << channel << "-ch/";
+    //std::cout << raw_hit.drift_time/unit::us << "us: ";
+    //std::cout << "x=" << posx/unit::cm << "cm, ";
+    //std::cout << "y=" << posy/unit::cm << "cm, ";
+    //std::cout << "z=" << posz/unit::cm << "cm" << std::endl;
+
     hit->setReadoutChannelID(raw_hit.fec, raw_hit.fec, channel);
     hit->setVoxel(kPixelX[channel], kPixelY[channel], VoxelID::Undefined);
     hit->setEnergy(total_energy * config.energy.factor_energy);
@@ -323,17 +340,20 @@ std::string deriveHitTreeOutputPath(const std::string& explicit_path)
 
 } // namespace
 
-NanoGRAMSCalibrationStep1::NanoGRAMSCalibrationStep1() = default;
+NanoGRAMSCalibration::NanoGRAMSCalibration() = default;
 
-NanoGRAMSCalibrationStep1::~NanoGRAMSCalibrationStep1() = default;
+NanoGRAMSCalibration::~NanoGRAMSCalibration() = default;
 
-ANLStatus NanoGRAMSCalibrationStep1::mod_define()
+ANLStatus NanoGRAMSCalibration::mod_define()
 {
-  define_parameter("hittree_file",    &mod_class::hittree_file_);
+  define_parameter("hittree_file", &mod_class::hittree_file_);
+  define_parameter("gain_tp_hash", &mod_class::gain_tp_dict_);
+  define_map_key("fec", "0");
+  add_value_element("gain", &mod_class::gain_tp_value_);
   return AS_OK;
 }
 
-ANLStatus NanoGRAMSCalibrationStep1::mod_initialize()
+ANLStatus NanoGRAMSCalibration::mod_initialize()
 {
   const ANLStatus status = VCSModule::mod_initialize();
   if (status != AS_OK) {
@@ -342,11 +362,25 @@ ANLStatus NanoGRAMSCalibrationStep1::mod_initialize()
 
   if (!exist_module("NanoGRAMSDataReduction")) {
     throw std::runtime_error(
-        "NanoGRAMSCalibrationStep1 requires NanoGRAMSDataReduction in the same ANL chain.");
+        "NanoGRAMSCalibration requires NanoGRAMSDataReduction in the same ANL chain.");
   }
   get_module("NanoGRAMSDataReduction", &data_reduction_);
 
   calibration_config_ = readCalibrationConfig(data_reduction_->configFilePath());
+
+  for(int i=0;i<NUM_VATA;i++){
+    std::string fec_id_str = std::to_string(i);
+    calibration_config_.energy.tp_adc_values[i] = gain_tp_dict_[fec_id_str];
+  }
+  std::cout << "tp_adc_values [ ";
+  for (std::size_t i = 0; i < calibration_config_.energy.tp_adc_values.size(); ++i) {
+    if (i != 0) {
+      std::cout << ", ";
+    }
+    std::cout << calibration_config_.energy.tp_adc_values[i];
+  }
+  std::cout << " ]" << std::endl;
+
   const fs::path gain_info_path =
       resolvePath(calibration_config_.config_dir, calibration_config_.energy.gain_info_file);
   const fs::path spline_path =
@@ -354,12 +388,12 @@ ANLStatus NanoGRAMSCalibrationStep1::mod_initialize()
                   calibration_config_.energy.q_to_kev_spline_file);
 
   tpc_property_.loadParamCoulomb2keVForSpline3D(spline_path,
-                                                calibration_config_.general.efield_v_cm);
+                                                calibration_config_.general.efield);
   tpc_property_.loadParamGainMatrices(gain_info_path);
   tpc_property_.setDriftVelocity(electronDriftVelocity(
-      calibration_config_.general.temperature_k * unit::kelvin,
-      calibration_config_.general.efield_v_cm * unit::volt / unit::cm));
-  tpc_property_.setAnodePosZ(calibration_config_.position.anode_pos_z_cm * unit::cm);
+                                    calibration_config_.general.temperature, 
+                                    calibration_config_.general.efield));
+  tpc_property_.setAnodePosZ(calibration_config_.position.anode_pos_z);
   tpc_property_.applyTemperatureCorrection(
       calibration_config_.energy.tp_channel,
       calibration_config_.energy.ccal,
@@ -389,7 +423,7 @@ ANLStatus NanoGRAMSCalibrationStep1::mod_initialize()
   return AS_OK;
 }
 
-ANLStatus NanoGRAMSCalibrationStep1::mod_analyze()
+ANLStatus NanoGRAMSCalibration::mod_analyze()
 {
   if (!data_reduction_ || !data_reduction_->hasCurrentEvent()) {
     return AS_OK;
@@ -409,7 +443,7 @@ ANLStatus NanoGRAMSCalibrationStep1::mod_analyze()
   return AS_OK;
 }
 
-ANLStatus NanoGRAMSCalibrationStep1::mod_end_run()
+ANLStatus NanoGRAMSCalibration::mod_end_run()
 {
   if (output_file_ && hit_tree_) {
     output_file_->cd();
