@@ -1,0 +1,44 @@
+<?xml version="1.0" ?>
+<?xml-stylesheet type="text/xsl" href="https://raw.githubusercontent.com/odakahirokazu/ComptonSoft/master/xmlstyle/detector_parameters_v3.xsl" ?>
+
+<detector_parameters>
+  <name>LArBox detector</name>
+  <comment>2022-04-27 | Hiro Odaka</comment>
+  <auto_position flag="0" />
+  <sensitive_detector_not_found_warning flag="1" />
+  <data>
+    <sensitive_detector type="2DPixel" name="LArTPC.log">
+      <common>
+        <parameters>
+          <upside anode="1" pixel="1" />
+          <depth_sensing mode="1" resolution="0.1" />
+          <quenching factor="0.6" />
+          <temperature value="87.0" />
+          <efield bias="3000.0" mode="1" />
+          <charge_collection mode="2" >
+            <mutau electron="1.0e-1" hole="1.0e-5" />
+            <!-- tau=300us, v=muE=1.0mm/us, E=300V/cm -->
+          </charge_collection>
+          <diffusion mode="2">
+            <constant anode="0.1" />
+          </diffusion>
+          <timing_resolution trigger="3.0e-7" energy_measurement="1.0e-6" />
+          <channel_properties>
+            <disable status="0" />
+            <trigger_discrimination center="150.0" sigma="24.0" />
+            <noise_level param0="5.0" param1="0.036" param2="0.0" />
+            <compensation factor="1.0" />
+            <threshold value="25.0" />
+          </channel_properties>
+          <reconstruction mode="1" />
+        </parameters>
+      </common>
+      <detector_list id_method="path" layer_offset="1">
+        <detector id="0" path="PassiveChamber_out/ChamberVacuum/PassiveChamber_in/PassiveLAr/LArTPC0" />
+        <detector id="1" path="PassiveChamber_out/ChamberVacuum/PassiveChamber_in/PassiveLAr/LArTPC1" />
+        <detector id="2" path="PassiveChamber_out/ChamberVacuum/PassiveChamber_in/PassiveLAr/LArTPC2" />
+        <detector id="3" path="PassiveChamber_out/ChamberVacuum/PassiveChamber_in/PassiveLAr/LArTPC3" />
+      </detector_list>
+    </sensitive_detector>
+  </data>
+</detector_parameters>

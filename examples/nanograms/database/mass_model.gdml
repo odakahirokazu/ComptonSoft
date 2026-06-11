@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<gdml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://service-spi.web.cern.ch/service-spi/app/releases/GDML/schema/gdml.xsd">
+  <define>
+    <quantity name="gasPhaseHeight" type="length" value="450.0" unit="mm"/>
+    <quantity name="liquidPhaseHeight" type="length" value="780.0-gasPhaseHeight" unit="mm"/>
+    <quantity name="chamberThicknessIn" type="length" value="3.0" unit="mm"/>
+    <quantity name="chamberThicknessOut" type="length" value="4.0" unit="mm"/>
+  </define>
+  <materials>
+    <element Z="6" formula="C" name="carbon">
+      <atom value="12.0107"/>
+    </element>
+    <element Z="24" formula="Cr" name="chromium">
+      <atom value="51.9961"/>
+    </element>
+    <element Z="26" formula="Fe" name="iron">
+      <atom value="55.8450"/>
+    </element>
+    <element Z="28" formula="Ni" name="nickel">
+      <atom value="58.6934"/>
+    </element>
+    <material Z="1" name="Vacuum" state="gas">
+      <D unit="g/cm3" value="1e-12" />
+      <atom unit="g/mole" value="1"/>
+    </material>
+    <material Z="18" name="LAr" state="liquid">
+      <D unit="g/cm3" value="1.3954" />
+      <atom unit="g/mole" value="39.948"/>
+    </material>
+    <material Z="13" name="Al" state="solid">
+      <D unit="g/cm3" value="2.70" />
+    </material>
+    <material Z="18" name="GAr" state="gas">
+      <D unit="g/cm3" value="0.001784" />
+      <atom unit="g/mole" value="39.948"/>
+    </material>
+    <material formula="STEEL_STAINLESS_Fe7Cr2Ni" name="STEEL_STAINLESS_Fe7Cr2Ni">
+      <D unit="g/cm3" value="7.9300"/>
+      <fraction n="0.0010" ref="carbon"/>
+      <fraction n="0.1792" ref="chromium"/>
+      <fraction n="0.7298" ref="iron"/>
+      <fraction n="0.0900" ref="nickel"/>
+    </material>
+  </materials>
+
+  <solids>
+    <box    lunit="mm" name="World.box"  x="5000.0" y="5000.0" z="5000.0" />
+    <box    lunit="mm" name="LArTPC.box" x="25.6"   y="25.6"   z="100.0" />
+    <eltube lunit="mm" name="GAr.tube"   dx="250.0" dy="250.0" dz="gasPhaseHeight/2" />
+    <eltube lunit="mm" name="LAr.tube"   dx="250.0" dy="250.0" dz="liquidPhaseHeight/2" />
+    <eltube lunit="mm" name="chamber_in_R.tube"  dx="253.0" dy="253.0" dz="390.0" />
+    <eltube lunit="mm" name="chamber_out_r.tube" dx="290.0" dy="290.0" dz="390.0" />
+    <eltube lunit="mm" name="chamber_out_R.tube" dx="294.0" dy="294.0" dz="390.0" />
+    <box    lunit="mm" name=".box"    x="" y="" z="" />
+    <box    lunit="mm" name="collimator_bottom.box" x=""   y=""   z="" />
+
+  </solids>
+
+  <structure>
+    <volume name="LArTPC.log">
+      <materialref ref="LAr" />
+      <solidref    ref="LArTPC.box" />
+    </volume>
+
+    <volume name="PassiveGAr.log">
+      <materialref ref="GAr" />
+      <solidref ref="GAr.tube" />
+    </volume>
+
+    <volume name="PassiveLAr.log">
+      <materialref ref="LAr" />
+      <solidref ref="LAr.tube" />
+      <physvol name="LArTPC0">
+          <volumeref ref="LArTPC.log" />
+          <position name="LArTPC0.pos"   unit="mm" x="132.2" y="-12.8" z="265.0-liquidPhaseHeight/2" />
+      </physvol>
+      <physvol name="LArTPC1">
+          <volumeref ref="LArTPC.log" />
+          <position name="LArTPC1.pos"   unit="mm" x="157.8" y="-12.8" z="265.0-liquidPhaseHeight/2" />
+      </physvol>
+      <physvol name="LArTPC2">
+          <volumeref ref="LArTPC.log" />
+          <position name="LArTPC2.pos"   unit="mm" x="157.8" y="12.8" z="265.0-liquidPhaseHeight/2" />
+      </physvol>
+      <physvol name="LArTPC3">
+          <volumeref ref="LArTPC.log" />
+          <position name="LArTPC3.pos"   unit="mm" x="132.2" y="12.8" z="265.0-liquidPhaseHeight/2" />
+      </physvol>
+    </volume>
+
+    <volume name="PassiveChamber_in.log">
+      <materialref ref="STEEL_STAINLESS_Fe7Cr2Ni" />
+      <solidref ref="chamber_in_R.tube" />
+      <physvol name="PassiveLAr">
+          <volumeref ref="PassiveLAr.log" />
+          <position name="PassiveLAr.pos" unit="mm" x="0.0" y="0.0" z="-gasPhaseHeight/2" />
+      </physvol>
+      <physvol name="PassiveGAr">
+          <volumeref ref="PassiveGAr.log" />
+          <position name="PassiveGAr.pos" unit="mm" x="0.0" y="0.0" z="390.0-gasPhaseHeight/2" />
+      </physvol>
+    </volume>
+
+    <volume name="ChamberVacuum.log">
+        <materialref ref="Vacuum" />
+        <solidref ref="chamber_out_r.tube" />
+        <physvol name="PassiveChamber_in">
+            <volumeref ref="PassiveChamber_in.log" />
+            <position name="PassiveChamber_in.pos" unit="mm" x="0.0" y="0.0" z="0.0" />
+        </physvol>
+    </volume>
+
+    <volume name="PassiveChamber_out.log">
+      <materialref ref="STEEL_STAINLESS_Fe7Cr2Ni" />
+      <solidref ref="chamber_out_R.tube" />
+        <physvol name="ChamberVacuum">
+            <volumeref ref="ChamberVacuum.log" />
+            <position name="ChamberVacuum.pos" unit="mm" x="0.0" y="0.0" z="0.0" />
+        </physvol>
+    </volume>
+
+    <volume name="World.log">
+      <materialref ref="Vacuum" />
+      <solidref ref="World.box" />
+      <physvol name="PassiveChamber_out">
+        <volumeref ref="PassiveChamber_out.log" />
+        <position name="PassiveChamber_out.pos" unit="mm" x="0.0" y="0.0" z="0.0" />
+      </physvol>
+    </volume>
+  </structure>
+  <setup name="Default" version="1.0">
+    <world ref="World.log" />
+  </setup>
+</gdml>

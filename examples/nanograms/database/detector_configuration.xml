@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="https://raw.githubusercontent.com/odakahirokazu/ComptonSoft/master/xmlstyle/detector_configuration_v6.xsl" ?>
+
+<configuration>
+  <name>LArBox detector</name>
+  <comment>2026-06-09 | Satoshi Takashima</comment>
+  <length_unit>cm</length_unit>
+  <detectors>
+    <detector id="0" type="2DPixel" name="LArTPC:0">
+      <geometry x="2.56" y="2.56" z="10.0" />
+      <offset x="0.0" y="0.0" z="0.0" />
+      <pixel number_x="8" number_y="8" size_x="0.32" size_y="0.32" />
+      <position x="-1.28" y="-1.28" z="0.0" />
+      <xaxis_direction x="+1.0" y="0.0"  z="0.0" />
+      <yaxis_direction x="0.0"  y="+1.0" z="0.0" />
+      <zaxis_direction x="0.0"  y="0.0" z="+1.0" />
+      <sections>
+        <section num_channels="64" electronde_side="anode" />
+      </sections>
+    </detector>
+
+    <detector id="1" type="2DPixel" name="LArTPC:1">
+      <geometry x="2.56" y="2.56" z="10.0" />
+      <offset x="0.0" y="0.0" z="0.0" />
+      <pixel number_x="8" number_y="8" size_x="0.32" size_y="0.32" />
+      <position x="1.28" y="-1.28" z="0.0" />
+      <xaxis_direction x="+1.0" y="0.0"  z="0.0" />
+      <yaxis_direction x="0.0"  y="+1.0" z="0.0" />
+      <zaxis_direction x="0.0"  y="0.0" z="+1.0" />
+      <sections>
+        <section num_channels="64" electronde_side="anode" />
+      </sections>
+    </detector>
+
+    <detector id="2" type="2DPixel" name="LArTPC:2">
+      <geometry x="2.56" y="2.56" z="10.0" />
+      <offset x="0.0" y="0.0" z="0.0" />
+      <pixel number_x="8" number_y="8" size_x="0.32" size_y="0.32" />
+      <position x="1.28" y="1.28" z="0.0" />
+      <xaxis_direction x="+1.0" y="0.0"  z="0.0" />
+      <yaxis_direction x="0.0"  y="+1.0" z="0.0" />
+      <zaxis_direction x="0.0"  y="0.0" z="+1.0" />
+      <sections>
+        <section num_channels="64" electronde_side="anode" />
+      </sections>
+    </detector>
+
+    <detector id="3" type="2DPixel" name="LArTPC:3">
+      <geometry x="2.56" y="2.56" z="10.0" />
+      <offset x="0.0" y="0.0" z="0.0" />
+      <pixel number_x="8" number_y="8" size_x="0.32" size_y="0.32"/>
+      <position x="-1.28" y="1.28" z="0.0" />
+      <xaxis_direction x="+1.0" y="0.0"  z="0.0" />
+      <yaxis_direction x="0.0"  y="+1.0" z="0.0" />
+      <zaxis_direction x="0.0"  y="0.0" z="+1.0" />
+      <sections>
+        <section num_channels="64" electronde_side="anode" />
+      </sections>
+    </detector>
+  </detectors>
+  <readout>
+    <module id="0">
+        <section detector_id="0" section="0" />
+        <section detector_id="1" section="0" />
+        <section detector_id="2" section="0" />
+        <section detector_id="3" section="0" />
+    </module>
+  </readout>
+  <groups>
+    <group name="Any">
+      <detector id="0" />
+      <detector id="1" />
+      <detector id="2" />
+      <detector id="3" />
+    </group>
+    <group name="D0">
+      <detector id="0" />
+    </group>
+    <group name="D1">
+      <detector id="1" />
+    </group>
+    <group name="D2">
+      <detector id="2" />
+    </group>
+    <group name="D3">
+      <detector id="3" />
+    </group>
+    <hit_pattern name="1hit" short_name="1hit" bit="0">
+      <group name="Any" />
+    </hit_pattern>
+    <hit_pattern name="2hit" short_name="2hit" bit="1">
+      <group name="Any" /><group name="Any" />
+    </hit_pattern>
+    <hit_pattern name="3hit" short_name="3hit" bit="2">
+      <group name="Any" /><group name="Any" /><group name="Any" />
+    </hit_pattern>
+    <hit_pattern name="4hit" short_name="4hit" bit="3">
+      <group name="Any" /><group name="Any" /><group name="Any" /><group name="Any" />
+    </hit_pattern>
+  </groups>
+</configuration>

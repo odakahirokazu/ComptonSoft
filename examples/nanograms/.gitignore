@@ -1,0 +1,6 @@
+.DS_Store
+subproducts
+quicklook/quicklook_plots
+data/*/hittree.root
+data/*/quicklook_tree.root
+data/*/cetree.root
