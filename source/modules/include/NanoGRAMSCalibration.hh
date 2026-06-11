@@ -28,7 +28,7 @@
 #include <map>
 
 #include "NanoGRAMSTPCProperty.hh"
-#include "NanoGRAMSTPCTreeUtil.hh"
+#include "NanoGRAMSTPCDataProcessor.hh"
 #include "VCSModule.hh"
 
 class TFile;
@@ -37,13 +37,13 @@ class TTree;
 namespace comptonsoft
 {
 
-namespace ngUtil
+namespace grams
 {
 struct RawFECHit;
 }
 
 class HitTreeIOWithInitialInfo;
-class NanoGRAMSDataReduction;
+class NanoGRAMSHitExtraction;
 
 struct EnergyCalibrationConfig
 {
@@ -93,7 +93,7 @@ private:
   std::map<std::string, double> gain_tp_dict_;
   double gain_tp_value_ = 0.0;
 
-  const NanoGRAMSDataReduction* data_reduction_ = nullptr;
+  const NanoGRAMSHitExtraction* data_reduction_ = nullptr;
   std::unique_ptr<TFile> output_file_;
   TTree* hit_tree_ = nullptr;
   std::unique_ptr<HitTreeIOWithInitialInfo> tree_io_;

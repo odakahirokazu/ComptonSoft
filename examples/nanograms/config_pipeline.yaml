@@ -12,8 +12,8 @@ light:
     pre_roi_peak_thr_mV: 15.0
     post_roi_peak_thr_mV: 15.0
 charge: 
-    adc_min: 18.0
-    adc_max: 1000.0
+    adu_min: 18.0
+    adu_max: 1000.0
     pix_min: 1
     pix_max: 3
     circ_thr: 10.0

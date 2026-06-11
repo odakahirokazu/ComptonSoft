@@ -17,47 +17,55 @@
  *                                                                       *
  *************************************************************************/
 
-/**
- * @file NanoGRAMSLightAnalysis.hh
- * @brief Light waveform analysis helpers for NanoGRAMS data reduction.
- * @author Satoshi Takashima
- * @date 2026-06-11
- */
+#ifndef COMPTONSOFT_NanoGRAMSConfig_H
+#define COMPTONSOFT_NanoGRAMSConfig_H 1
 
-#ifndef COMPTONSOFT_NanoGRAMSLightAnalysis_H
-#define COMPTONSOFT_NanoGRAMSLightAnalysis_H 1
-
+#include <map>
 #include <string>
+#include <vector>
 
-#include "NanoGRAMSTPCDataProcessor.hh"
+#include "AstroUnits.hh"
 
 namespace comptonsoft
 {
 namespace grams
 {
 
-struct LightStatus
+struct Config
 {
-  bool valid_any = false;
-  bool gamma = false;
-  bool cosmic = false;
-  bool pileup_pre_roi = false;
-  bool pileup_post_roi = false;
+  int daq_time      = 0;
+  int delay_counts  = 0;
+  int pix_min       = 0;
+  int pix_max       = 0;
+  int circ_min_hits = 0;
 
-  bool hasPileup() const
-  {
-    return pileup_pre_roi || pileup_post_roi;
-  }
+  double adc2mv           = (1.0 / 8192.0) * 1000.0;
+  double adu_min          = 0.0;
+  double adu_max          = 0.0;
+  double light_gamma_thr  = 0.0;
+  double light_cosmic_thr = 0.0;
+  double circ_thr         = 0.0;
+  double spread_thr       = 0.0;
+  double drift_time_max   = 0.0 * anlgeant4::unit::us;
+  //double late_window      = 0.0;
+  //double late_peak_thr    = 0.0;
+  double pre_roi_window      = 0.0;
+  double pre_roi_peak_thr    = 0.0;
+  double post_roi_window     = 0.0;
+  double post_roi_peak_thr   = 0.0;
+  double noise_th            = 0.0;
+  double circ_min_ratio      = 0.0;
+  double timebin_ns_override = 0.0;
+  double cross_fec_merge_drift_time_tolerance = -1.0 * anlgeant4::unit::us;
+
+  std::vector<int> light_channels = {4, 6, 5, 7};
+  std::string light_waveform_analysis = "average";
+  std::map<int, std::vector<int>> exclude_pix;
 };
 
-std::string normalizeLightWaveformAnalysis(const std::string& mode);
-
-LightStatus analyzeLightEvent(const Config& cfg,
-                              const TPCTreeBuffer& tpc_tree_buffer,
-                              const LightTimingState& light_timing,
-                              bool light_ok);
+void readConfig(Config& cfg, const std::string& config_path);
 
 } /* namespace grams */
 } /* namespace comptonsoft */
 
-#endif /* COMPTONSOFT_NanoGRAMSLightAnalysis_H */
+#endif /* COMPTONSOFT_NanoGRAMSConfig_H */

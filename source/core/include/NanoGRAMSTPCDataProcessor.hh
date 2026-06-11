@@ -18,26 +18,25 @@
  *************************************************************************/
 
 /**
- * @file NanoGRAMSTPCTreeUtil.hh
- * @brief Public utility API for NanoGRAMS data reduction.
+ * @file NanoGRAMSTPCDataProcessor.hh
+ * @brief TPC tree processing and output writers for NanoGRAMS data reduction.
  * @author Satoshi Takashima
  * @date 2026-05-17
  */
 
-#ifndef COMPTONSOFT_NanoGRAMSTPCTreeUtil_H
-#define COMPTONSOFT_NanoGRAMSTPCTreeUtil_H 1
+#ifndef COMPTONSOFT_NanoGRAMSTPCDataProcessor_H
+#define COMPTONSOFT_NanoGRAMSTPCDataProcessor_H 1
 
 #include <array>
 #include <cstdint>
 #include <filesystem>
-#include <map>
 #include <memory>
 #include <string>
-#include <utility>
 #include <vector>
 
 #include "AstroUnits.hh"
-#include "NanoGRAMSEvent.hh"
+#include "NanoGRAMSConfig.hh"
+#include "NanoGRAMSFECGeometry.hh"
 
 class TFile;
 class TTree;
@@ -46,55 +45,28 @@ namespace comptonsoft
 {
 namespace unit = anlgeant4::unit;
 
-namespace ngUtil
+namespace grams
 {
-
-constexpr const char* kTpcTreeName    = "tpctree";
-constexpr const char* kRawHitTreeName = "rawhittree";
-constexpr const char* kHitTreeName    = "hittree";
-constexpr const char* kQuickLookTreeName = "tpcquicklook";
-
-constexpr double dpp_response_time = 0.68 * unit::us;
-constexpr double clk_to_us = 0.01; //consider 1clk=10ns
-
-struct Config
-{
-  int daq_time      = 0;
-  int delay_counts  = 0;
-  int pix_min       = 0;
-  int pix_max       = 0;
-  int circ_min_hits = 0;
-
-  double adc2mv           = (1.0 / 8192.0) * 1000.0;
-  double adc_min          = 0.0;
-  double adc_max          = 0.0;
-  double light_gamma_thr  = 0.0;
-  double light_cosmic_thr = 0.0;
-  double circ_thr         = 0.0;
-  double spread_thr       = 0.0;
-  double drift_time_max   = 0.0 * unit::us;
-  //double late_window      = 0.0;
-  //double late_peak_thr    = 0.0;
-  double pre_roi_window      = 0.0;
-  double pre_roi_peak_thr    = 0.0;
-  double post_roi_window     = 0.0;
-  double post_roi_peak_thr   = 0.0;
-  double noise_th            = 0.0;
-  double circ_min_ratio      = 0.0;
-  double timebin_ns_override = 0.0;
-
-  std::vector<int> light_channels = {4, 6, 5, 7};
-  std::string light_waveform_analysis = "average";
-  std::map<int, std::vector<int>> exclude_pix;
-};
 
 struct RawFECHit
 {
   int fec           = 0;
   uint64_t ti       = 0;
   double drift_time = 0.0 * unit::us;
+  std::vector<int16_t> channel_fecs;
   std::vector<int16_t> channels;
-  std::vector<float>   adcs;
+  std::vector<float>   adus;
+};
+
+struct FECSelectionInput
+{
+  const std::array<PixelADU, NUM_VATA>& adu_cmn_sub_values;
+  const std::array<double, NUM_VATA>& drift_times;
+  std::array<PixelMask, NUM_VATA>& claimed_pixels;
+  int fec = 0;
+  bool subset_mask = false;
+  bool light_cosmic = false;
+  bool light_pileup = false;
 };
 
 enum class TPCEventType : int16_t
@@ -104,19 +76,6 @@ enum class TPCEventType : int16_t
   Gamma  = 1,
   Cosmic = 2,
   PileUp = 3,
-};
-
-void readConfig(Config& cfg, const std::string& config_path);
-
-using PixelAdc  = std::array<double,  NUM_CH_EACH_VATA>;
-using PixelMask = std::array<uint8_t, NUM_CH_EACH_VATA>;
-
-struct FECChannelGeometry
-{
-  std::array<std::array<std::pair<int, int>, NUM_CH_EACH_VATA>, NUM_VATA> xy_of_ch{};
-  std::array<std::array<std::vector<int>, NUM_CH_EACH_VATA>, NUM_VATA> cross_neighbors{};
-  std::array<std::array<std::vector<int>, NUM_CH_EACH_VATA>, NUM_VATA> diag_neighbors{};
-  std::array<std::vector<int>, NUM_VATA> periphery{};
 };
 
 struct TPCTreeLayout
@@ -185,14 +144,7 @@ public:
                                     bool light_pileup) const;
 
 private:
-  bool fillSelectedChannels(const PixelAdc& adc_values,
-                            int fec,
-                            double drift_time,
-                            bool subset_mask,
-                            bool light_cosmic,
-                            bool light_pileup,
-                            std::vector<int16_t>& channels,
-                            std::vector<float>& adcs) const;
+  bool fillSelectedChannels(const FECSelectionInput& input, RawFECHit& hit) const;
 
   const Config& cfg_;
   FECChannelGeometry geom_;
@@ -243,7 +195,7 @@ private:
   int16_t ihit_       = 0;
   int64_t ti_         = 0;
   int32_t num_hits_   = 0;
-  float adc_          = 0.0;
+  float adu_          = 0.0;
   int16_t fecid_      = 0;
   int16_t ch_         = 0;
   float drifttime_    = 0.0 * unit::us;
@@ -263,14 +215,14 @@ public:
 
 private:
   void bindBranches();
-  void fillCmnSubtractedAdc(TPCEventType event_type,
+  void fillCmnSubtractedADU(TPCEventType event_type,
                             const TPCTreeBuffer& tpc_tree_buffer);
 
   std::filesystem::path  output_path_;
   std::unique_ptr<TFile> file_;
   std::unique_ptr<TTree> quicklook_tree_;
   int waveform_len_ = 0;
-  std::string adc_leaflist_;
+  std::string adu_leaflist_;
   std::string cmn_leaflist_;
   std::string ti_leaflist_;
   std::string drift_leaflist_;
@@ -282,7 +234,7 @@ private:
   int16_t event_type_   = 0;
   int16_t cmn_method_   = 0;
   int32_t waveform_len_branch_ = 0;
-  std::vector<float> adc_cmn_sub_;
+  std::vector<float> adu_cmn_sub_;
   std::array<float, NUM_VATA> cmn_{};
   std::array<uint32_t, NUM_VATA> ti_{};
   std::array<uint32_t, NUM_VATA> drift_time_{};
@@ -291,7 +243,7 @@ private:
   std::vector<int16_t> waveform_;
 };
 
-} /* namespace ngUtil */
+} /* namespace grams */
 } /* namespace comptonsoft */
 
-#endif /* COMPTONSOFT_NanoGRAMSTPCTreeUtil_H */
+#endif /* COMPTONSOFT_NanoGRAMSTPCDataProcessor_H */

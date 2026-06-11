@@ -189,7 +189,7 @@
 #include "FilterByGoodTimeIntervalsForHXI.hh"
 #endif
 #include "NanoGRAMSCalibration.hh"
-#include "NanoGRAMSDataReduction.hh"
+#include "NanoGRAMSHitExtraction.hh"
 
 #include "class_list_anlGeant4.hh"
 #include "comptonsoft_basic_classes.hh"
@@ -1290,11 +1290,11 @@ public:
 
 #endif
 
-class NanoGRAMSDataReduction : public VCSModule
+class NanoGRAMSHitExtraction : public VCSModule
 {
 public:
-  NanoGRAMSDataReduction();
-  ~NanoGRAMSDataReduction() override;
+  NanoGRAMSHitExtraction();
+  ~NanoGRAMSHitExtraction() override;
 };
 
 class NanoGRAMSCalibration : public VCSModule

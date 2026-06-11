@@ -17,7 +17,7 @@
  *                                                                       *
  *************************************************************************/
 
-#include "NanoGRAMSTPCTreeUtil.hh"
+#include "NanoGRAMSTPCDataProcessor.hh"
 #include "NanoGRAMSLightAnalysis.hh"
 
 #include <TFile.h>
@@ -35,190 +35,14 @@
 #include <numeric>
 #include <stdexcept>
 #include <utility>
-#include <yaml-cpp/yaml.h>
 
 namespace comptonsoft
 {
-namespace ngUtil
+namespace grams
 {
 
 namespace
 {
-
-//from lower right
-constexpr std::array<std::array<int, NUM_CH_EACH_VATA>, NUM_VATA> kPlotNumAll = {{
-    {0, 8, 23, 24, 39, 40, 55, 63,
-     1, 9, 22, 25, 38, 41, 54, 62,
-     2, 10, 21, 26, 37, 42, 53, 61,
-     3, 11, 20, 27, 36, 43, 52, 60,
-     4, 12, 19, 28, 35, 44, 51, 59,
-     5, 13, 18, 29, 34, 45, 50, 58,
-     6, 14, 17, 30, 33, 46, 49, 57,
-     7, 15, 16, 31, 32, 47, 48, 56},
-    {63, 62, 61, 60, 59, 58, 57, 56,
-     55, 54, 53, 52, 51, 50, 49, 48,
-     40, 41, 42, 43, 44, 45, 46, 47,
-     39, 38, 37, 36, 35, 34, 33, 32,
-     24, 25, 26, 27, 28, 29, 30, 31,
-     23, 22, 21, 20, 19, 18, 17, 16,
-     8, 9, 10, 11, 12, 13, 14, 15,
-     0, 1, 2, 3, 4, 5, 6, 7},
-    {56, 48, 47, 32, 31, 16, 15, 7,
-     57, 49, 46, 33, 30, 17, 14, 6,
-     58, 50, 45, 34, 29, 18, 13, 5,
-     59, 51, 44, 35, 28, 19, 12, 4,
-     60, 52, 43, 36, 27, 20, 11, 3,
-     61, 53, 42, 37, 26, 21, 10, 2,
-     62, 54, 41, 38, 25, 22, 9, 1,
-     63, 55, 40, 39, 24, 23, 8, 0},
-    {7, 6, 5, 4, 3, 2, 1, 0,
-     15, 14, 13, 12, 11, 10, 9, 8,
-     16, 17, 18, 19, 20, 21, 22, 23,
-     31, 30, 29, 28, 27, 26, 25, 24,
-     32, 33, 34, 35, 36, 37, 38, 39,
-     47, 46, 45, 44, 43, 42, 41, 40,
-     48, 49, 50, 51, 52, 53, 54, 55,
-     56, 57, 58, 59, 60, 61, 62, 63}
-}};
-
-FECChannelGeometry buildFECChannelGeometry();
-
-bool isPeripheralToken(const YAML::Node& node)
-{
-  if (!node.IsScalar()) {
-    return false;
-  }
-
-  const std::string token = node.as<std::string>();
-  return token == "peripheral" || token == "periphery";
-}
-
-void appendExcludePixel(std::vector<int>& pixels, const YAML::Node& node)
-{
-  const int pix = node.as<int>();
-  if (pix < 0 || pix >= NUM_CH_EACH_VATA) {
-    throw std::runtime_error("exclude_pix contains a pixel outside 0-63.");
-  }
-  pixels.push_back(pix);
-}
-
-std::vector<int> readExcludePixelList(const YAML::Node& node,
-                                      int fec,
-                                      const FECChannelGeometry& geom)
-{
-  std::vector<int> pixels;
-
-  if (isPeripheralToken(node)) {
-    pixels = geom.periphery[fec];
-  } else if (node.IsSequence()) {
-    for (const auto& item : node) {
-      if (isPeripheralToken(item)) {
-        pixels.insert(pixels.end(), geom.periphery[fec].begin(), geom.periphery[fec].end());
-      } else {
-        appendExcludePixel(pixels, item);
-      }
-    }
-  } else {
-    appendExcludePixel(pixels, node);
-  }
-
-  std::sort(pixels.begin(), pixels.end());
-  pixels.erase(std::unique(pixels.begin(), pixels.end()), pixels.end());
-  return pixels;
-}
-
-void readLightConfig(Config& cfg, const YAML::Node& node)
-{
-  const auto nodeLight = node["light"];
-  cfg.delay_counts     = nodeLight["delay_counts"].as<int>();
-  //cfg.light_peak_thr   = nodeLight["light_peak_thr_mV"].as<double>() * (unit::volt/1000.0);
-  cfg.light_gamma_thr  = nodeLight["light_gamma_thr_mV"].as<double>() * (unit::volt/1000.0);
-  cfg.light_cosmic_thr = nodeLight["light_cosmic_thr_mV"].as<double>() * (unit::volt/1000.0);
-  cfg.pre_roi_window   = nodeLight["pre_roi_window_us"].as<double>() * unit::us;
-  cfg.post_roi_window  = nodeLight["post_roi_window_us"].as<double>() * unit::us;
-  cfg.pre_roi_peak_thr = nodeLight["pre_roi_peak_thr_mV"].as<double>() * (unit::volt/1000.0);
-  cfg.post_roi_peak_thr = nodeLight["post_roi_peak_thr_mV"].as<double>() * (unit::volt/1000.0);
-  cfg.light_channels   = nodeLight["light_channels"].as<std::vector<int>>();
-  cfg.light_waveform_analysis = normalizeLightWaveformAnalysis(
-      nodeLight["waveform_analysis"] ?
-      nodeLight["waveform_analysis"].as<std::string>() :
-      cfg.light_waveform_analysis);
-  //cfg.late_window      = nodeLight["late_window_us"].as<double>() * unit::us;
-
-  std::cout << "readLightConfig()" << std::endl;
-  std::cout << "delay_counts:       " << cfg.delay_counts << std::endl;
-  //std::cout << "light_peak_thr_mV:  " << cfg.light_peak_thr / (unit::volt/1000.0) << std::endl;
-  std::cout << "light_gamma_thr_mV:  "  << cfg.light_gamma_thr / (unit::volt/1000.0) << std::endl;
-  std::cout << "light_cosmic_thr_mV:  " << cfg.light_cosmic_thr / (unit::volt/1000.0) << std::endl;
-  std::cout << "pre_roi_window_us:  "   << cfg.pre_roi_window / unit::us << std::endl;
-  std::cout << "post_roi_window_us: "   << cfg.post_roi_window / unit::us << std::endl;
-  std::cout << "pre_roi_peak_thr_mV:  " << cfg.pre_roi_peak_thr  / (unit::volt/1000.0) << std::endl;
-  std::cout << "post_roi_peak_thr_mV: " << cfg.post_roi_peak_thr  / (unit::volt/1000.0) << std::endl;
-  std::cout << "waveform_analysis:   " << cfg.light_waveform_analysis << std::endl;
-  //std::cout << "late_window_us:      " << cfg.late_window / unit::us << std::endl;
-
-  std::cout << "light_channels: [ ";
-  bool first_light_channel = true;
-  for (const int light_ch : cfg.light_channels) {
-    if (first_light_channel) {
-      std::cout << light_ch;
-      first_light_channel = false;
-    } else {
-      std::cout << ", " << light_ch;
-    }
-  }
-  std::cout << " ]" << std::endl;
-}
-
-void readChargeConfig(Config& cfg, const YAML::Node& node)
-{
-  const auto nodeCharge = node["charge"];
-  cfg.pix_min           = nodeCharge["pix_min"].as<int>();
-  cfg.pix_max           = nodeCharge["pix_max"].as<int>();
-  cfg.circ_min_hits     = nodeCharge["circ_min_hits"].as<int>();
-  cfg.adc_min           = nodeCharge["adc_min"].as<double>();
-  cfg.adc_max           = nodeCharge["adc_max"].as<double>();
-  cfg.circ_thr          = nodeCharge["circ_thr"].as<double>();
-  cfg.spread_thr        = nodeCharge["spread_thr"].as<double>();
-  cfg.drift_time_max    = nodeCharge["drift_time_max_us"].as<double>() * unit::us;
-  cfg.noise_th          = nodeCharge["noise_th"].as<double>();
-  cfg.circ_min_ratio    = nodeCharge["circ_min_ratio"].as<double>();
-
-  const FECChannelGeometry geom = buildFECChannelGeometry();
-  for (const auto& item : nodeCharge["exclude_pix"]) {
-    const int fec = item.first.as<int>();
-    if (fec < 0 || fec >= NUM_VATA) {
-      throw std::runtime_error("exclude_pix contains an FEC outside 0-3.");
-    }
-    cfg.exclude_pix[fec] = readExcludePixelList(item.second, fec, geom);
-  }
-
-  std::cout << "pix_min: "           << cfg.pix_min           << std::endl;
-  std::cout << "pix_max: "           << cfg.pix_max           << std::endl;
-  std::cout << "circ_min_hits: "     << cfg.circ_min_hits     << std::endl;
-  std::cout << "adc_min: "           << cfg.adc_min           << std::endl;
-  std::cout << "adc_max: "           << cfg.adc_max           << std::endl;
-  std::cout << "circ_thr: "          << cfg.circ_thr          << std::endl;
-  std::cout << "spread_thr: "        << cfg.spread_thr        << std::endl;
-  std::cout << "drift_time_max_us: " << cfg.drift_time_max / unit::us << std::endl;
-  std::cout << "noise_th: "          << cfg.noise_th          << std::endl;
-  std::cout << "circ_min_ratio: "    << cfg.circ_min_ratio    << std::endl;
-
-  for (int fec = 0; fec < NUM_VATA; ++fec) {
-    const std::vector<int> pix_vec = cfg.exclude_pix[fec];
-    std::cout << fec << ": [ ";
-    int index = 0;
-    for (const auto& pix : pix_vec) {
-      if (index == 0) {
-        std::cout << pix;
-      } else {
-        std::cout << ", " << pix;
-      }
-      ++index;
-    }
-    std::cout << " ]" << std::endl;
-  }
-}
 
 int lowerBoundTimeIndex(double time_window,
                         double trigger_delay,
@@ -262,14 +86,14 @@ std::filesystem::path prepareOutputPath(const std::string& output_file_path)
   return output_path;
 }
 
-double median64(const PixelAdc& values)
+double median64(const PixelADU& values)
 {
   std::array<double, NUM_CH_EACH_VATA> sorted = values;
   std::sort(sorted.begin(), sorted.end());
   return 0.5 * (sorted[31] + sorted[32]);
 }
 
-double lowerMean(const PixelAdc& values, int n_values)
+double lowerMean(const PixelADU& values, int n_values)
 {
   std::array<double, NUM_CH_EACH_VATA> sorted = values;
   std::sort(sorted.begin(), sorted.end());
@@ -280,86 +104,52 @@ double lowerMean(const PixelAdc& values, int n_values)
   return sum / static_cast<double>(n_values);
 }
 
-FECChannelGeometry buildFECChannelGeometry()
+std::pair<int, double> findCoreChannel(const PixelADU& adu_cmn_sub,
+                                       const PixelMask& mask)
 {
-  FECChannelGeometry geom;
+  int core_ch = 0;
+  double core_value = -std::numeric_limits<double>::infinity();
 
-  for (int fec = 0; fec < NUM_VATA; ++fec) {
-    const auto& disp_to_ch = kPlotNumAll[fec];
-
-    for (int xx = 0; xx < 8; ++xx) {
-      for (int yy = 0; yy < 8; ++yy) {
-        const int ch = disp_to_ch[xx * 8 + yy];
-        geom.xy_of_ch[fec][ch] = {xx, yy};
-      }
+  for (int ch = 0; ch < NUM_CH_EACH_VATA; ++ch) {
+    const double value = mask[ch] ? adu_cmn_sub[ch] :
+                                    -std::numeric_limits<double>::infinity();
+    if (value > core_value) {
+      core_value = value;
+      core_ch = ch;
     }
-
-    for (int ch = 0; ch < NUM_CH_EACH_VATA; ++ch) {
-      const auto [x, y] = geom.xy_of_ch[fec][ch];
-
-      for (const auto& delta : {std::pair<int, int>{-1, 0},
-                                std::pair<int, int>{1, 0},
-                                std::pair<int, int>{0, -1},
-                                std::pair<int, int>{0, 1}}) {
-        const int xx = x + delta.first;
-        const int yy = y + delta.second;
-        if (0 <= xx && xx < 8 && 0 <= yy && yy < 8) {
-          geom.cross_neighbors[fec][ch].push_back(disp_to_ch[xx * 8 + yy]);
-        }
-      }
-
-      for (const auto& delta : {std::pair<int, int>{-1, -1},
-                                std::pair<int, int>{-1, 1},
-                                std::pair<int, int>{1, -1},
-                                std::pair<int, int>{1, 1}}) {
-        const int xx = x + delta.first;
-        const int yy = y + delta.second;
-        if (0 <= xx && xx < 8 && 0 <= yy && yy < 8) {
-          geom.diag_neighbors[fec][ch].push_back(disp_to_ch[xx * 8 + yy]);
-        }
-      }
-    }
-
-
-    std::vector<int> periphery;
-    for (int xx = 0; xx < 8; ++xx) {
-      for (int yy = 0; yy < 8; ++yy) {
-        if (xx == 0 || xx == 7 || yy == 0 || yy == 7) {
-          periphery.push_back(disp_to_ch[xx * 8 + yy]);
-        }
-      }
-    }
-
-    std::sort(periphery.begin(), periphery.end());
-    periphery.erase(std::unique(periphery.begin(), periphery.end()), periphery.end());
-    geom.periphery[fec] = std::move(periphery);
   }
 
-  return geom;
+  return {core_ch, core_value};
 }
 
-bool collinear3(const FECChannelGeometry& geom, int fec, int a, int b, int c)
+bool isPeripheryPixel(const FECChannelGeometry& geom, int fec, int ch)
 {
-  const auto [x1, y1] = geom.xy_of_ch[fec][a];
-  const auto [x2, y2] = geom.xy_of_ch[fec][b];
-  const auto [x3, y3] = geom.xy_of_ch[fec][c];
+  const auto& periphery = geom.periphery[fec];
+  return std::find(periphery.begin(), periphery.end(), ch) != periphery.end();
+}
+
+bool containsPixel(const std::vector<std::pair<int, int>>& pixels,
+                   int fec,
+                   int ch)
+{
+  return std::find(pixels.begin(), pixels.end(), std::pair<int, int>{fec, ch}) !=
+         pixels.end();
+}
+
+void addPixelIfNew(std::vector<std::pair<int, int>>& pixels, int fec, int ch)
+{
+  if (!containsPixel(pixels, fec, ch)) {
+    pixels.push_back({fec, ch});
+  }
+}
+
+bool collinear3Global(const FECChannelGeometry& geom,
+                      const std::vector<std::pair<int, int>>& pixels)
+{
+  const auto [x1, y1] = geom.global_xy_of_ch[pixels[0].first][pixels[0].second];
+  const auto [x2, y2] = geom.global_xy_of_ch[pixels[1].first][pixels[1].second];
+  const auto [x3, y3] = geom.global_xy_of_ch[pixels[2].first][pixels[2].second];
   return (x2 - x1) * (y3 - y1) == (y2 - y1) * (x3 - x1);
-}
-
-PixelMask buildMaskIn(const Config& cfg, int fec)
-{
-  PixelMask mask{};
-  mask.fill(1);
-
-  const auto it = cfg.exclude_pix.find(fec);
-  if (it != cfg.exclude_pix.end()) {
-    for (int ch : it->second) {
-      if (0 <= ch && ch < NUM_CH_EACH_VATA) {
-        mask[ch] = 0;
-      }
-    }
-  }
-  return mask;
 }
 
 int waveformTotalLength(TTree* tpc_tree)
@@ -455,7 +245,7 @@ FECChargeSelector::FECChargeSelector(const Config& cfg)
       include_diag_(cfg_.pix_max >= 3) //discussion needed
 {
   for (int fec = 0; fec < NUM_VATA; ++fec) {
-    masks_[fec] = buildMaskIn(cfg_, fec);
+    masks_[fec] = buildFECMask(cfg_, fec);
     const int perimeter = static_cast<int>(geom_.periphery[fec].size());
     min_periph_hits_[fec] =
         std::max(cfg_.circ_min_hits,
@@ -473,27 +263,55 @@ FECChargeSelector::selectHits(const TPCTreeBuffer& tpc_tree_buffer,
   std::vector<RawFECHit> event_hits;
   event_hits.reserve(static_cast<std::size_t>(NUM_VATA));
 
+  std::array<PixelADU, NUM_VATA> adu_cmn_sub_values{};
+  std::array<double, NUM_VATA> drift_times{};
+  std::array<uint64_t, NUM_VATA> ti_values{};
+  std::array<double, NUM_VATA> core_values{};
+  std::array<int, NUM_VATA> fec_order{};
+
   for (int fec = 0; fec < NUM_VATA; ++fec) {
-    PixelAdc adc_values{};
+    PixelADU adu_values{};
     for (int pix = 0; pix < NUM_CH_EACH_VATA; ++pix) {
-      adc_values[pix] =
+      adu_values[pix] =
           static_cast<double>(tpc_tree_buffer.adc[fec * NUM_CH_EACH_VATA + pix]);
     }
 
+    const double cmn = median64(adu_values);
+    for (int ch = 0; ch < NUM_CH_EACH_VATA; ++ch) {
+      adu_cmn_sub_values[fec][ch] = adu_values[ch] - cmn;
+    }
+
+    drift_times[fec] =
+        static_cast<double>(tpc_tree_buffer.drift_time[fec]) * kClkToUs * unit::us +
+        kDppResponseTime;
+    ti_values[fec] = fec_ti_tracker.absoluteTi(fec, tpc_tree_buffer.ti[fec]);
+    core_values[fec] = findCoreChannel(adu_cmn_sub_values[fec], masks_[fec]).second;
+    fec_order[fec] = fec;
+  }
+
+  std::sort(fec_order.begin(), fec_order.end(), [&](int lhs, int rhs) {
+    return core_values[lhs] > core_values[rhs];
+  });
+
+  std::array<PixelMask, NUM_VATA> claimed_pixels{};
+  for (auto& mask : claimed_pixels) {
+    mask.fill(0);
+  }
+
+  for (int fec : fec_order) {
     RawFECHit hit;
     hit.fec        = fec;
-    hit.ti         = fec_ti_tracker.absoluteTi(fec, tpc_tree_buffer.ti[fec]);
-    hit.drift_time = static_cast<double>(tpc_tree_buffer.drift_time[fec]) * clk_to_us * unit::us + dpp_response_time;
+    hit.ti         = ti_values[fec];
+    hit.drift_time = drift_times[fec];
 
-    const bool accepted =
-        fillSelectedChannels(adc_values,
-                             fec,
-                             hit.drift_time,
-                             subset_mask,
-                             light_cosmic,
-                             light_pileup,
-                             hit.channels,
-                             hit.adcs);
+    FECSelectionInput selection_input{adu_cmn_sub_values,
+                                      drift_times,
+                                      claimed_pixels,
+                                      fec,
+                                      subset_mask,
+                                      light_cosmic,
+                                      light_pileup};
+    const bool accepted = fillSelectedChannels(selection_input, hit);
     if (accepted) {
       event_hits.push_back(std::move(hit));
     }
@@ -502,63 +320,45 @@ FECChargeSelector::selectHits(const TPCTreeBuffer& tpc_tree_buffer,
   return event_hits;
 }
 
-bool FECChargeSelector::fillSelectedChannels(const PixelAdc& adc_values,
-                                             int fec,
-                                             double drift_time,
-                                             bool subset_mask,
-                                             bool light_cosmic,
-                                             bool light_pileup,
-                                             std::vector<int16_t>& channels,
-                                             std::vector<float>& adcs) const
+bool FECChargeSelector::fillSelectedChannels(const FECSelectionInput& input,
+                                             RawFECHit& hit) const
 {
-  channels.clear();
-  adcs.clear();
+  hit.channel_fecs.clear();
+  hit.channels.clear();
+  hit.adus.clear();
 
+  const int fec = input.fec;
   const PixelMask& mask_in  = masks_[fec];
   const int min_periph_hits = min_periph_hits_[fec];
-
-  PixelAdc adc_sub{};
-  const double cmn = median64(adc_values);
-  for (int ch = 0; ch < NUM_CH_EACH_VATA; ++ch) {
-    adc_sub[ch] = adc_values[ch] - cmn;
-  }
+  const PixelADU& adu_cmn_sub = input.adu_cmn_sub_values[fec];
+  const double drift_time = input.drift_times[fec];
 
   bool pile_up = !std::isfinite(drift_time) || drift_time >= cfg_.drift_time_max;
 
   int count_periph = 0;
   for (int ch : geom_.periphery[fec]) {
-    if (adc_sub[ch] > cfg_.circ_thr) {
+    if (adu_cmn_sub[ch] > cfg_.circ_thr) {
       ++count_periph;
     }
   }
 
   bool circle_noise = count_periph >= min_periph_hits;
-  const double edge_sum = (std::isfinite(adc_sub[0]) ? adc_sub[0] : 0.0) +
-                          (std::isfinite(adc_sub[63]) ? adc_sub[63] : 0.0);
+  const double edge_sum = (std::isfinite(adu_cmn_sub[0]) ? adu_cmn_sub[0] : 0.0) +
+                          (std::isfinite(adu_cmn_sub[63]) ? adu_cmn_sub[63] : 0.0);
   circle_noise = circle_noise || (edge_sum > cfg_.noise_th);
 
-  bool cosmic = light_cosmic;
-  pile_up = pile_up || light_pileup;
+  bool cosmic = input.light_cosmic;
+  pile_up = pile_up || input.light_pileup;
 
-  int core_idx = 0;
-  double core_val = -std::numeric_limits<double>::infinity();
-  for (int ch = 0; ch < NUM_CH_EACH_VATA; ++ch) {
-    const double value = mask_in[ch] ? adc_sub[ch] : -std::numeric_limits<double>::infinity();
-    if (value > core_val) {
-      core_val = value;
-      core_idx = ch;
-    }
-  }
-
-  const bool core_has_val = core_val > cfg_.adc_min;
-  PixelMask selected{};
-  selected.fill(0);
+  const auto [core_idx, core_val] = findCoreChannel(adu_cmn_sub, mask_in);
+  const bool core_has_val =
+      core_val > cfg_.adu_min && !input.claimed_pixels[fec][core_idx];
 
   int adopted_count = 0;
   bool extra_high = false;
+  std::vector<std::pair<int, int>> selected_pixels;
   if (core_has_val) {
-    std::vector<int> selected_list;
-    selected_list.push_back(core_idx);
+    selected_pixels.push_back({fec, core_idx});
 
     PixelMask allowed{};
     allowed.fill(0);
@@ -572,33 +372,60 @@ bool FECChargeSelector::fillSelectedChannels(const PixelAdc& adc_values,
       }
     }
 
+    auto addCandidatePixel = [&](int candidate_fec, int ch) {
+      if (masks_[candidate_fec][ch] &&
+          !input.claimed_pixels[candidate_fec][ch] &&
+          input.adu_cmn_sub_values[candidate_fec][ch] > cfg_.spread_thr) {
+        addPixelIfNew(selected_pixels, candidate_fec, ch);
+      }
+    };
+
     for (int ch = 0; ch < NUM_CH_EACH_VATA; ++ch) {
-      if (mask_in[ch] && !allowed[ch] && adc_sub[ch] > cfg_.adc_min) {
+      if (mask_in[ch] && !allowed[ch] && adu_cmn_sub[ch] > cfg_.adu_min) {
         extra_high = true;
         break;
       }
     }
 
     for (int ch : geom_.cross_neighbors[fec][core_idx]) {
-      if (mask_in[ch] && adc_sub[ch] > cfg_.spread_thr) {
-        selected_list.push_back(ch);
-      }
+      addCandidatePixel(fec, ch);
     }
     if (include_diag_) {
       for (int ch : geom_.diag_neighbors[fec][core_idx]) {
-        if (mask_in[ch] && adc_sub[ch] > cfg_.spread_thr) {
-          selected_list.push_back(ch);
-        }
+        addCandidatePixel(fec, ch);
       }
     }
 
-    for (int ch : selected_list) {
-      selected[ch] = 1;
-    }
-    adopted_count = static_cast<int>(selected_list.size());
+    const bool can_merge_neighbor_section =
+        cfg_.cross_fec_merge_drift_time_tolerance >= 0.0 &&
+        isPeripheryPixel(geom_, fec, core_idx);
 
-    if (adopted_count == 3 &&
-        collinear3(geom_, fec, selected_list[0], selected_list[1], selected_list[2])) {
+    auto addNeighborSectionPixel = [&](const std::pair<int, int>& pixel) {
+      if (!can_merge_neighbor_section) {
+        return;
+      }
+
+      const int neighbor_fec = pixel.first;
+      const int neighbor_ch  = pixel.second;
+      const double drift_delta = std::abs(input.drift_times[neighbor_fec] - drift_time);
+      if (std::isfinite(drift_delta) &&
+          drift_delta <= cfg_.cross_fec_merge_drift_time_tolerance) {
+        addCandidatePixel(neighbor_fec, neighbor_ch);
+      }
+    };
+
+    for (const auto& pixel : geom_.cross_section_neighbors[fec][core_idx]) {
+      addNeighborSectionPixel(pixel);
+    }
+    if (include_diag_) {
+      for (const auto& pixel : geom_.diag_section_neighbors[fec][core_idx]) {
+        addNeighborSectionPixel(pixel);
+      }
+    }
+
+    adopted_count = static_cast<int>(selected_pixels.size());
+
+    if (adopted_count == 3 && collinear3Global(geom_, selected_pixels)) {
       cosmic = true;
     }
   }
@@ -607,29 +434,18 @@ bool FECChargeSelector::fillSelectedChannels(const PixelAdc& adc_values,
   const bool base_valid = !pile_up && !circle_noise && core_has_val;
   const bool event_mask = base_valid && count_ok && !cosmic && !extra_high;
 
-  if (event_mask) {
-    for (int ch = 0; ch < NUM_CH_EACH_VATA; ++ch) {
-      if (!selected[ch]) {
-        continue;
-      }
-      channels.push_back(static_cast<int16_t>(ch));
-      adcs.push_back(static_cast<float>(adc_sub[ch]));
+  if (event_mask && input.subset_mask) {
+    for (const auto& pixel : selected_pixels) {
+      const int selected_fec = pixel.first;
+      const int ch = pixel.second;
+      input.claimed_pixels[selected_fec][ch] = 1;
+      hit.channel_fecs.push_back(static_cast<int16_t>(selected_fec));
+      hit.channels.push_back(static_cast<int16_t>(ch));
+      hit.adus.push_back(static_cast<float>(input.adu_cmn_sub_values[selected_fec][ch]));
     }
   }
 
-  return event_mask && subset_mask && !channels.empty();
-}
-
-void readConfig(Config& cfg, const std::string& config_path)
-{
-  const auto configNode = YAML::LoadFile(config_path);
-
-  readLightConfig(cfg, configNode);
-  readChargeConfig(cfg, configNode);
-
-  static_assert(NUM_VATA == static_cast<int>(kPlotNumAll.size()),
-                "kPlotNumAll must match NUM_VATA.");
-
+  return event_mask && input.subset_mask && !hit.channels.empty();
 }
 
 TPCTreeBuffer::TPCTreeBuffer(TTree* tpc_tree)
@@ -749,12 +565,13 @@ void RawHitTreeOutputWriter::fillEvent(int64_t event_id,
     const auto& hit = hits[ih];
     ihit_      = static_cast<int16_t>(ih);
     ti_        = static_cast<int64_t>(hit.ti);
-    fecid_     = static_cast<int16_t>(hit.fec);
     drifttime_ = static_cast<float>(hit.drift_time);
 
     for (std::size_t j = 0; j < hit.channels.size(); ++j) {
+      fecid_ = j < hit.channel_fecs.size() ? hit.channel_fecs[j] :
+                                            static_cast<int16_t>(hit.fec);
       ch_  = hit.channels[j];
-      adc_ = j < hit.adcs.size() ? hit.adcs[j] : std::numeric_limits<float>::quiet_NaN();
+      adu_ = j < hit.adus.size() ? hit.adus[j] : std::numeric_limits<float>::quiet_NaN();
       rawhit_tree_->Fill();
     }
   }
@@ -780,7 +597,7 @@ void RawHitTreeOutputWriter::bindBranches()
   rawhit_tree_->Branch("ihit",        &ihit_,       "ihit/S");
   rawhit_tree_->Branch("ti",          &ti_,         "ti/L");
   rawhit_tree_->Branch("num_hits",    &num_hits_,   "num_hits/I");
-  rawhit_tree_->Branch("adc",         &adc_,        "adc/F");
+  rawhit_tree_->Branch("adu",         &adu_,        "adu/F");
   rawhit_tree_->Branch("fecid",       &fecid_,      "fecid/S");
   rawhit_tree_->Branch("ch",          &ch_,         "ch/S");
   rawhit_tree_->Branch("drifttime",   &drifttime_,  "drifttime/F");
@@ -800,7 +617,7 @@ QuickLookTreeOutputWriter::QuickLookTreeOutputWriter(
                              output_path_.string());
   }
 
-  adc_cmn_sub_.assign(NUM_VATA * NUM_CH_EACH_VATA, 0.0f);
+  adu_cmn_sub_.assign(NUM_VATA * NUM_CH_EACH_VATA, 0.0f);
   waveform_.assign(NUM_CH_DPP_ON * waveform_len_, 0);
   quicklook_tree_->SetDirectory(nullptr);
   bindBranches();
@@ -831,7 +648,7 @@ void QuickLookTreeOutputWriter::fillEvent(int64_t raw_event_id,
   }
   waveform_ = tpc_tree_buffer.waveform;
 
-  fillCmnSubtractedAdc(event_type, tpc_tree_buffer);
+  fillCmnSubtractedADU(event_type, tpc_tree_buffer);
   quicklook_tree_->Fill();
 }
 
@@ -850,7 +667,7 @@ std::string QuickLookTreeOutputWriter::close()
 
 void QuickLookTreeOutputWriter::bindBranches()
 {
-  adc_leaflist_           = "adc_cmn_sub[" + std::to_string(NUM_VATA) + "][" +
+  adu_leaflist_           = "adu_cmn_sub[" + std::to_string(NUM_VATA) + "][" +
                               std::to_string(NUM_CH_EACH_VATA) + "]/F";
   cmn_leaflist_           = "cmn[" + std::to_string(NUM_VATA) + "]/F";
   ti_leaflist_            = "ti[" + std::to_string(NUM_VATA) + "]/i";
@@ -864,7 +681,7 @@ void QuickLookTreeOutputWriter::bindBranches()
   quicklook_tree_->Branch("event_type",   &event_type_,   "event_type/S");
   quicklook_tree_->Branch("cmn_method",   &cmn_method_,   "cmn_method/S");
   quicklook_tree_->Branch("waveform_len", &waveform_len_branch_, "waveform_len/I");
-  quicklook_tree_->Branch("adc_cmn_sub",  adc_cmn_sub_.data(),  adc_leaflist_.c_str());
+  quicklook_tree_->Branch("adu_cmn_sub",  adu_cmn_sub_.data(),  adu_leaflist_.c_str());
   quicklook_tree_->Branch("cmn",          cmn_.data(),          cmn_leaflist_.c_str());
   quicklook_tree_->Branch("ti",           ti_.data(),           ti_leaflist_.c_str());
   quicklook_tree_->Branch("drift_time",   drift_time_.data(),   drift_leaflist_.c_str());
@@ -874,28 +691,28 @@ void QuickLookTreeOutputWriter::bindBranches()
   quicklook_tree_->Branch("waveform",     waveform_.data(),     waveform_leaflist_.c_str());
 }
 
-void QuickLookTreeOutputWriter::fillCmnSubtractedAdc(
+void QuickLookTreeOutputWriter::fillCmnSubtractedADU(
     TPCEventType event_type,
     const TPCTreeBuffer& tpc_tree_buffer)
 {
   for (int fec = 0; fec < NUM_VATA; ++fec) {
-    PixelAdc adc_values{};
+    PixelADU adu_values{};
     for (int ch = 0; ch < NUM_CH_EACH_VATA; ++ch) {
-      adc_values[ch] =
+      adu_values[ch] =
           static_cast<double>(tpc_tree_buffer.adc[fec * NUM_CH_EACH_VATA + ch]);
     }
 
     const double cmn = (event_type == TPCEventType::Cosmic)
-        ? lowerMean(adc_values, 10)
-        : median64(adc_values);
+        ? lowerMean(adu_values, 10)
+        : median64(adu_values);
     cmn_[fec] = static_cast<float>(cmn);
 
     for (int ch = 0; ch < NUM_CH_EACH_VATA; ++ch) {
-      adc_cmn_sub_[fec * NUM_CH_EACH_VATA + ch] =
-          static_cast<float>(adc_values[ch] - cmn);
+      adu_cmn_sub_[fec * NUM_CH_EACH_VATA + ch] =
+          static_cast<float>(adu_values[ch] - cmn);
     }
   }
 }
 
-} /* namespace ngUtil */
+} /* namespace grams */
 } /* namespace comptonsoft */

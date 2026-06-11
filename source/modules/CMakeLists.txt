@@ -126,7 +126,7 @@ set(CS_MODULES
   src/ExtractPhotoelectronTrajectory.cc
   ### others
   src/QuickAnalysisForDSD.cc
-  src/NanoGRAMSDataReduction.cc
+  src/NanoGRAMSHitExtraction.cc
   src/NanoGRAMSCalibration.cc
   )
 

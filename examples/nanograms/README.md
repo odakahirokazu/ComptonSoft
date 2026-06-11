@@ -3,7 +3,14 @@
 ## Download sample data
 Download data of Run10 from below link
 
-https://drive.google.com/drive/folders/1YndL2YL--97KLRYWP-ZWbz2emPajRk3L?usp=sharing
+https://drive.google.com/drive/folders/1EK_Q2g5pwMILerbwJzrgySzq8NcVql4G?usp=sharing
+
+Move the test data to the proper directory
+
+```
+  mv /path/to/data /path/to/ComptonSoft/example/nanograms
+  cd /path/to/ComptonSoft/example/nanograms
+```
 
 ## Produce table files for calibration
 ```

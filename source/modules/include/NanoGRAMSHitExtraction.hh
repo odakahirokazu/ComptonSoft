@@ -17,14 +17,14 @@
  *                                                                       *
  *************************************************************************/
 
-#ifndef COMPTONSOFT_NanoGRAMSDataReduction_H
-#define COMPTONSOFT_NanoGRAMSDataReduction_H 1
+#ifndef COMPTONSOFT_NanoGRAMSHitExtraction_H
+#define COMPTONSOFT_NanoGRAMSHitExtraction_H 1
 
 #include <cstdint>
 #include <memory>
 #include <string>
 
-#include "NanoGRAMSTPCTreeUtil.hh"
+#include "NanoGRAMSTPCDataProcessor.hh"
 #include "VCSModule.hh"
 
 class TFile;
@@ -32,13 +32,13 @@ class TFile;
 namespace comptonsoft
 {
 
-class NanoGRAMSDataReduction : public VCSModule
+class NanoGRAMSHitExtraction : public VCSModule
 {
-  DEFINE_ANL_MODULE(NanoGRAMSDataReduction, 1.0);
+  DEFINE_ANL_MODULE(NanoGRAMSHitExtraction, 1.0);
 
 public:
-  NanoGRAMSDataReduction();
-  ~NanoGRAMSDataReduction() override;
+  NanoGRAMSHitExtraction();
+  ~NanoGRAMSHitExtraction() override;
 
   anlnext::ANLStatus mod_define()     override;
   anlnext::ANLStatus mod_initialize() override;
@@ -48,7 +48,7 @@ public:
   bool hasCurrentEvent() const { return !current_event_hits_.empty(); }
   int64_t currentEventId() const { return hasCurrentEvent() ? gamma_events_ - 1 : -1; }
   int64_t currentRawEventId() const { return current_raw_event_id_; }
-  const std::vector<ngUtil::RawFECHit>& currentEventHits() const
+  const std::vector<grams::RawFECHit>& currentEventHits() const
   {
     return current_event_hits_;
   }
@@ -58,19 +58,18 @@ private:
   std::string config_file_;
   std::string tpctree_file_;
   std::string rawhitdata_file_;
-  bool make_quicklook_tree_ = false;
   std::string quicklook_file_;
 
-  ngUtil::Config cfg_;
+  grams::Config cfg_;
   std::unique_ptr<TFile> input_file_;
-  std::unique_ptr<ngUtil::TPCTreeReader> raw_hit_reader_;
-  std::unique_ptr<ngUtil::RawHitTreeOutputWriter> writer_;
-  std::unique_ptr<ngUtil::QuickLookTreeOutputWriter> quicklook_writer_;
+  std::unique_ptr<grams::TPCTreeReader> tpc_tree_reader_;
+  std::unique_ptr<grams::RawHitTreeOutputWriter> rawhit_tree_writer_;
+  std::unique_ptr<grams::QuickLookTreeOutputWriter> quicklook_tree_writer_;
   int64_t gamma_events_         = 0;
   int64_t current_raw_event_id_ = -1;
-  std::vector<ngUtil::RawFECHit> current_event_hits_;
+  std::vector<grams::RawFECHit> current_event_hits_;
 };
 
 } /* namespace comptonsoft */
 
-#endif /* COMPTONSOFT_NanoGRAMSDataReduction_H */
+#endif /* COMPTONSOFT_NanoGRAMSHitExtraction_H */

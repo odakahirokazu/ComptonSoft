@@ -149,7 +149,7 @@ clAH = [
   ANL::SWIGClass.new("FilterByGoodTimeIntervalsForSGD", false, 'USE_FITSIO'),
   ANL::SWIGClass.new("FilterByGoodTimeIntervalsForHXI", false, 'USE_FITSIO'),
 
-  ANL::SWIGClass.new("NanoGRAMSDataReduction.hh"),
+  ANL::SWIGClass.new("NanoGRAMSHitExtraction.hh"),
   ANL::SWIGClass.new("NanoGRAMSCalibration")
   ,
 ]

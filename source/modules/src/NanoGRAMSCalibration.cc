@@ -19,7 +19,7 @@
 
 #include "NanoGRAMSCalibration.hh"
 
-#include "NanoGRAMSDataReduction.hh"
+#include "NanoGRAMSHitExtraction.hh"
 
 #include <TFile.h>
 #include <TTree.h>
@@ -228,7 +228,7 @@ double electronDriftVelocity(double temperature, double e_field)
 std::vector<DetectorHit_sptr> buildCalibratedHits(
     const CalibrationConfig& config,
     const TPCProperty& tpc_property,
-    const std::vector<ngUtil::RawFECHit>& raw_hits)
+    const std::vector<grams::RawFECHit>& raw_hits)
 {
   std::vector<DetectorHit_sptr> hits;
   hits.reserve(raw_hits.size());
@@ -240,7 +240,7 @@ std::vector<DetectorHit_sptr> buildCalibratedHits(
       throw std::runtime_error("FEC index out of range in NanoGRAMS calibration.");
     }
 
-    const std::size_t n = std::min(raw_hit.channels.size(), raw_hit.adcs.size());
+    const std::size_t n = std::min(raw_hit.channels.size(), raw_hit.adus.size());
     if (n == 0) {
       continue;
     }
@@ -253,18 +253,25 @@ std::vector<DetectorHit_sptr> buildCalibratedHits(
     double max_energy     = -std::numeric_limits<double>::infinity() * unit::keV;
 
     std::vector<double> energies(n, 0.0);
+    std::vector<int> channel_fecs(n, raw_hit.fec);
     for (std::size_t i = 0; i < n; ++i) {
+      const int fec = i < raw_hit.channel_fecs.size() ? raw_hit.channel_fecs[i] :
+                                                     raw_hit.fec;
       const int ch = raw_hit.channels[i];
+      if (fec < 0 || fec >= NUM_VATA) {
+        throw std::runtime_error("FEC index out of range in NanoGRAMS calibration.");
+      }
       if (ch < 0 || ch >= NUM_CH_EACH_VATA) {
         throw std::runtime_error("Channel index out of range in NanoGRAMS calibration.");
       }
 
-      const double corrected_adc =
-          static_cast<double>(raw_hit.adcs[i]) *
-          tpc_property.temperatureCorrectionFactor(raw_hit.fec);
+      const double corrected_adu =
+          static_cast<double>(raw_hit.adus[i]) *
+          tpc_property.temperatureCorrectionFactor(fec);
       const double energy =
-          tpc_property.convertADC2keVWithSpline3D(raw_hit.fec, ch, corrected_adc);
+          tpc_property.convertADC2keVWithSpline3D(fec, ch, corrected_adu);
       energies[i]   = energy;
+      channel_fecs[i] = fec;
       total_energy += energy;
 
       if (energy > max_energy) {
@@ -279,17 +286,19 @@ std::vector<DetectorHit_sptr> buildCalibratedHits(
 
     for (std::size_t i = 0; i < n; ++i) {
       const int ch = raw_hit.channels[i];
+      const int fec = channel_fecs[i];
       const double weight = energies[i] / total_energy;
-      posx += weight * kPosX[raw_hit.fec][ch];
-      posy += weight * kPosY[raw_hit.fec][ch];
+      posx += weight * kPosX[fec][ch];
+      posy += weight * kPosY[fec][ch];
       posz += weight *
               tpc_property.convertDriftTime2PosZScale(raw_hit.drift_time, max_time);
     }
 
     const int channel = raw_hit.channels[max_index];
+    const int channel_fec = channel_fecs[max_index];
     auto hit = std::make_shared<DetectorHit>();
     hit->setTI(static_cast<int64_t>(raw_hit.ti));
-    hit->setDetectorChannelID(ChannelID::Undefined, raw_hit.fec, channel);
+    hit->setDetectorChannelID(ChannelID::Undefined, channel_fec, channel);
 
     if((-2.56 * unit::cm < posx)&&(posx < 2.56 * unit::cm)&&(-2.56 * unit::cm < posy)&&(posy < 2.56 * unit::cm)){
         if(posx > 0.0 * unit::cm){
@@ -316,7 +325,7 @@ std::vector<DetectorHit_sptr> buildCalibratedHits(
     //std::cout << "y=" << posy/unit::cm << "cm, ";
     //std::cout << "z=" << posz/unit::cm << "cm" << std::endl;
 
-    hit->setReadoutChannelID(raw_hit.fec, raw_hit.fec, channel);
+    hit->setReadoutChannelID(channel_fec, channel_fec, channel);
     hit->setVoxel(kPixelX[channel], kPixelY[channel], VoxelID::Undefined);
     hit->setEnergy(total_energy * config.energy.factor_energy);
     hit->setPosition(posx, posy, posz);
@@ -360,11 +369,11 @@ ANLStatus NanoGRAMSCalibration::mod_initialize()
     return status;
   }
 
-  if (!exist_module("NanoGRAMSDataReduction")) {
+  if (!exist_module("NanoGRAMSHitExtraction")) {
     throw std::runtime_error(
-        "NanoGRAMSCalibration requires NanoGRAMSDataReduction in the same ANL chain.");
+        "NanoGRAMSCalibration requires NanoGRAMSHitExtraction in the same ANL chain.");
   }
-  get_module("NanoGRAMSDataReduction", &data_reduction_);
+  get_module("NanoGRAMSHitExtraction", &data_reduction_);
 
   calibration_config_ = readCalibrationConfig(data_reduction_->configFilePath());
 
@@ -407,7 +416,7 @@ ANLStatus NanoGRAMSCalibration::mod_initialize()
     throw std::runtime_error("Failed to create hit tree ROOT file: " + output_path.string());
   }
 
-  hit_tree_ = new TTree(ngUtil::kHitTreeName, ngUtil::kHitTreeName);
+  hit_tree_ = new TTree(grams::kHitTreeName, grams::kHitTreeName);
   hit_tree_->SetDirectory(output_file_.get());
 
   tree_io_ = std::make_unique<HitTreeIOWithInitialInfo>();

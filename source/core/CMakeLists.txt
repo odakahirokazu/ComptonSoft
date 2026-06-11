@@ -109,8 +109,10 @@ set(CS_CORE_CLASSES
   src/RIDecayChains.cc
   src/RIDecayCalculation.cc
   src/NanoGRAMSTPCProperty.cc
+  src/NanoGRAMSFECGeometry.cc
+  src/NanoGRAMSConfig.cc
   src/NanoGRAMSLightAnalysis.cc
-  src/NanoGRAMSTPCTreeUtil.cc
+  src/NanoGRAMSTPCDataProcessor.cc
   src/TPCTreeIO.cc
   #src/NanoGRAMSEvent.cc
   )
@@ -124,7 +126,6 @@ endif()
 
 if(CS_USE_YAMLCPP)
   set(CS_YAMLCPP_CLASSES
-    src/NanoGRAMSTPCTreeUtil.cc
   )
 endif()
 

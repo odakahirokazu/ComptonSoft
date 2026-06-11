@@ -9,11 +9,10 @@ class MyApp < ANL::ANLApp
   def setup
     add_namespace ComptonSoft
 
-    chain :NanoGRAMSDataReduction
+    chain :NanoGRAMSHitExtraction
     with_parameters(
       config_file:     "config_pipeline.yaml",
       tpctree_file:    @tpc_tree_file,
-      make_quicklook_tree: true,
       quicklook_file:  @quicklook_file,
     )
 

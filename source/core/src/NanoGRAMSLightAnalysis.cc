@@ -27,7 +27,7 @@
 
 namespace comptonsoft
 {
-namespace ngUtil
+namespace grams
 {
 
 namespace
@@ -219,5 +219,5 @@ LightStatus analyzeLightEvent(const Config& cfg,
                            cfg.light_waveform_analysis);
 }
 
-} /* namespace ngUtil */
+} /* namespace grams */
 } /* namespace comptonsoft */

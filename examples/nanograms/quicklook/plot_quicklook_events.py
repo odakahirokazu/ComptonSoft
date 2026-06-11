@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Plot NanoGRAMS quicklook TTree entries.
 
-The input file is expected to contain the optional NanoGRAMSDataReduction
-``tpcquicklook`` tree with branches such as ``adc_cmn_sub[4][64]``,
+The input file is expected to contain the optional NanoGRAMSHitExtraction
+``tpcquicklook`` tree with branches such as ``adu_cmn_sub[4][64]``,
 ``drift_time[4]``, and ``waveform[8][N]``.
 """
 
@@ -215,12 +215,12 @@ def select_entries(tree, cfg: PlotConfig) -> list[int]:
     return entries
 
 
-def fec_adc_panel(adc_cmn_sub: np.ndarray, fec: int) -> np.ndarray:
+def fec_adu_panel(adu_cmn_sub: np.ndarray, fec: int) -> np.ndarray:
     image = np.full((8, 8), np.nan, dtype=float)
     for row in range(8):
         for col in range(8):
             ch = PLOT_NUM_ALL[fec, row, col]
-            image[row, col] = adc_cmn_sub[fec, ch]
+            image[row, col] = adu_cmn_sub[fec, ch]
     return image
 
 
@@ -228,18 +228,18 @@ def fec_channel_number_panel(fec: int) -> np.ndarray:
     return PLOT_NUM_ALL[fec]
 
 
-def charge_color_limits(adc_cmn_sub: np.ndarray, cfg: PlotConfig) -> tuple[float, float]:
-    finite_adc = adc_cmn_sub[np.isfinite(adc_cmn_sub)]
+def charge_color_limits(adu_cmn_sub: np.ndarray, cfg: PlotConfig) -> tuple[float, float]:
+    finite_adu = adu_cmn_sub[np.isfinite(adu_cmn_sub)]
     vmin = cfg.charge_vmin if cfg.charge_vmin is not None else 0.0
     vmax = cfg.charge_vmax
     if vmax is None:
         scale = cfg.charge_scale.lower()
-        if finite_adc.size == 0:
+        if finite_adu.size == 0:
             vmax = vmin + 1.0
         elif scale == "max":
-            vmax = float(np.max(finite_adc))
+            vmax = float(np.max(finite_adu))
         elif scale == "percentile":
-            vmax = float(np.percentile(finite_adc, cfg.charge_percentile_vmax))
+            vmax = float(np.percentile(finite_adu, cfg.charge_percentile_vmax))
         else:
             raise ValueError("charge.scale must be max or percentile.")
 
@@ -310,12 +310,12 @@ def plot_entry(entry: int, arrays: dict[str, np.ndarray], cfg: PlotConfig, outdi
     event_type = int(arrays["event_type"][entry])
     cmn_method = int(arrays["cmn_method"][entry])
     waveform_len = int(arrays["waveform_len"][entry])
-    adc_cmn_sub = np.asarray(arrays["adc_cmn_sub"][entry], dtype=float).reshape(4, 64)
+    adu_cmn_sub = np.asarray(arrays["adu_cmn_sub"][entry], dtype=float).reshape(4, 64)
     drift_counts = np.asarray(arrays["drift_time"][entry], dtype=float).reshape(4)
     waveforms = np.asarray(arrays["waveform"][entry]).reshape(8, waveform_len)
     wave_compress = np.asarray(arrays["wave_compress"][entry]).reshape(8)
 
-    vmin, vmax = charge_color_limits(adc_cmn_sub, cfg)
+    vmin, vmax = charge_color_limits(adu_cmn_sub, cfg)
     norm = Normalize(vmin=vmin, vmax=vmax)
 
     fig = plt.figure(figsize=(6.0, 7.2), constrained_layout=True)
@@ -340,7 +340,7 @@ def plot_entry(entry: int, arrays: dict[str, np.ndarray], cfg: PlotConfig, outdi
     for fec, row_index, col_index in fec_layout:
         extent = panel_extent(row_index, col_index, charge_gap)
         im = ax_charge.imshow(
-            fec_adc_panel(adc_cmn_sub, fec),
+            fec_adu_panel(adu_cmn_sub, fec),
             origin="upper",
             extent=extent,
             cmap=cfg.cmap,
@@ -389,7 +389,7 @@ def plot_entry(entry: int, arrays: dict[str, np.ndarray], cfg: PlotConfig, outdi
     ax_charge.set_ylabel("Y (cm)")
 
     cbar = fig.colorbar(im, ax=ax_charge, pad=0.02, shrink=0.96)
-    cbar.set_label("ADC - CMN")
+    cbar.set_label("ADU - CMN")
 
     peak_ch = strongest_light_channel(waveforms, cfg)
     peak_voltage = baseline_subtracted_waveform(waveforms[peak_ch], cfg)
@@ -463,17 +463,21 @@ def main() -> None:
         print("No entries selected.")
         return
 
+    tree_branches = set(tree.keys())
+    charge_branch = "adu_cmn_sub" if "adu_cmn_sub" in tree_branches else "adc_cmn_sub"
     branches = [
         "raw_event_id",
         "event_type",
         "cmn_method",
         "waveform_len",
-        "adc_cmn_sub",
+        charge_branch,
         "drift_time",
         "waveform",
         "wave_compress",
     ]
     arrays = tree.arrays(branches, library="np")
+    if charge_branch != "adu_cmn_sub":
+        arrays["adu_cmn_sub"] = arrays[charge_branch]
     for index, entry in enumerate(entries, 1):
         plot_entry(entry, arrays, cfg, outdir)
         if index % 20 == 0 or index == len(entries):

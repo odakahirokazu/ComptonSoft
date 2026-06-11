@@ -17,47 +17,41 @@
  *                                                                       *
  *************************************************************************/
 
-/**
- * @file NanoGRAMSLightAnalysis.hh
- * @brief Light waveform analysis helpers for NanoGRAMS data reduction.
- * @author Satoshi Takashima
- * @date 2026-06-11
- */
+#ifndef COMPTONSOFT_NanoGRAMSFECGeometry_H
+#define COMPTONSOFT_NanoGRAMSFECGeometry_H 1
 
-#ifndef COMPTONSOFT_NanoGRAMSLightAnalysis_H
-#define COMPTONSOFT_NanoGRAMSLightAnalysis_H 1
+#include <array>
+#include <cstdint>
+#include <utility>
+#include <vector>
 
-#include <string>
-
-#include "NanoGRAMSTPCDataProcessor.hh"
+#include "NanoGRAMSConstants.hh"
 
 namespace comptonsoft
 {
 namespace grams
 {
 
-struct LightStatus
-{
-  bool valid_any = false;
-  bool gamma = false;
-  bool cosmic = false;
-  bool pileup_pre_roi = false;
-  bool pileup_post_roi = false;
+using PixelADU  = std::array<double,  NUM_CH_EACH_VATA>;
+using PixelMask = std::array<uint8_t, NUM_CH_EACH_VATA>;
 
-  bool hasPileup() const
-  {
-    return pileup_pre_roi || pileup_post_roi;
-  }
+struct Config;
+
+struct FECChannelGeometry
+{
+  std::array<std::array<std::pair<int, int>, NUM_CH_EACH_VATA>, NUM_VATA> xy_of_ch{};
+  std::array<std::array<std::pair<int, int>, NUM_CH_EACH_VATA>, NUM_VATA> global_xy_of_ch{};
+  std::array<std::array<std::vector<int>, NUM_CH_EACH_VATA>, NUM_VATA> cross_neighbors{};
+  std::array<std::array<std::vector<int>, NUM_CH_EACH_VATA>, NUM_VATA> diag_neighbors{};
+  std::array<std::array<std::vector<std::pair<int, int>>, NUM_CH_EACH_VATA>, NUM_VATA> cross_section_neighbors{};
+  std::array<std::array<std::vector<std::pair<int, int>>, NUM_CH_EACH_VATA>, NUM_VATA> diag_section_neighbors{};
+  std::array<std::vector<int>, NUM_VATA> periphery{};
 };
 
-std::string normalizeLightWaveformAnalysis(const std::string& mode);
-
-LightStatus analyzeLightEvent(const Config& cfg,
-                              const TPCTreeBuffer& tpc_tree_buffer,
-                              const LightTimingState& light_timing,
-                              bool light_ok);
+FECChannelGeometry buildFECChannelGeometry();
+PixelMask buildFECMask(const Config& cfg, int fec);
 
 } /* namespace grams */
 } /* namespace comptonsoft */
 
-#endif /* COMPTONSOFT_NanoGRAMSLightAnalysis_H */
+#endif /* COMPTONSOFT_NanoGRAMSFECGeometry_H */
