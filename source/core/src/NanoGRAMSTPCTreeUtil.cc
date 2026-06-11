@@ -18,6 +18,7 @@
  *************************************************************************/
 
 #include "NanoGRAMSTPCTreeUtil.hh"
+#include "NanoGRAMSLightAnalysis.hh"
 
 #include <TFile.h>
 #include <TLeaf.h>
@@ -43,21 +44,6 @@ namespace ngUtil
 
 namespace
 {
-
-struct LightStatus
-{
-  bool valid_any = false;
-  bool gamma  = false;
-  bool cosmic = false;
-  //bool pileup    = false;
-  bool pileup_pre_roi  = false;
-  bool pileup_post_roi = false;
-
-  bool hasPileup() const
-  {
-    return pileup_pre_roi || pileup_post_roi;
-  }
-};
 
 //from lower right
 constexpr std::array<std::array<int, NUM_CH_EACH_VATA>, NUM_VATA> kPlotNumAll = {{
@@ -95,6 +81,52 @@ constexpr std::array<std::array<int, NUM_CH_EACH_VATA>, NUM_VATA> kPlotNumAll = 
      56, 57, 58, 59, 60, 61, 62, 63}
 }};
 
+FECChannelGeometry buildFECChannelGeometry();
+
+bool isPeripheralToken(const YAML::Node& node)
+{
+  if (!node.IsScalar()) {
+    return false;
+  }
+
+  const std::string token = node.as<std::string>();
+  return token == "peripheral" || token == "periphery";
+}
+
+void appendExcludePixel(std::vector<int>& pixels, const YAML::Node& node)
+{
+  const int pix = node.as<int>();
+  if (pix < 0 || pix >= NUM_CH_EACH_VATA) {
+    throw std::runtime_error("exclude_pix contains a pixel outside 0-63.");
+  }
+  pixels.push_back(pix);
+}
+
+std::vector<int> readExcludePixelList(const YAML::Node& node,
+                                      int fec,
+                                      const FECChannelGeometry& geom)
+{
+  std::vector<int> pixels;
+
+  if (isPeripheralToken(node)) {
+    pixels = geom.periphery[fec];
+  } else if (node.IsSequence()) {
+    for (const auto& item : node) {
+      if (isPeripheralToken(item)) {
+        pixels.insert(pixels.end(), geom.periphery[fec].begin(), geom.periphery[fec].end());
+      } else {
+        appendExcludePixel(pixels, item);
+      }
+    }
+  } else {
+    appendExcludePixel(pixels, node);
+  }
+
+  std::sort(pixels.begin(), pixels.end());
+  pixels.erase(std::unique(pixels.begin(), pixels.end()), pixels.end());
+  return pixels;
+}
+
 void readLightConfig(Config& cfg, const YAML::Node& node)
 {
   const auto nodeLight = node["light"];
@@ -107,6 +139,10 @@ void readLightConfig(Config& cfg, const YAML::Node& node)
   cfg.pre_roi_peak_thr = nodeLight["pre_roi_peak_thr_mV"].as<double>() * (unit::volt/1000.0);
   cfg.post_roi_peak_thr = nodeLight["post_roi_peak_thr_mV"].as<double>() * (unit::volt/1000.0);
   cfg.light_channels   = nodeLight["light_channels"].as<std::vector<int>>();
+  cfg.light_waveform_analysis = normalizeLightWaveformAnalysis(
+      nodeLight["waveform_analysis"] ?
+      nodeLight["waveform_analysis"].as<std::string>() :
+      cfg.light_waveform_analysis);
   //cfg.late_window      = nodeLight["late_window_us"].as<double>() * unit::us;
 
   std::cout << "readLightConfig()" << std::endl;
@@ -118,6 +154,7 @@ void readLightConfig(Config& cfg, const YAML::Node& node)
   std::cout << "post_roi_window_us: "   << cfg.post_roi_window / unit::us << std::endl;
   std::cout << "pre_roi_peak_thr_mV:  " << cfg.pre_roi_peak_thr  / (unit::volt/1000.0) << std::endl;
   std::cout << "post_roi_peak_thr_mV: " << cfg.post_roi_peak_thr  / (unit::volt/1000.0) << std::endl;
+  std::cout << "waveform_analysis:   " << cfg.light_waveform_analysis << std::endl;
   //std::cout << "late_window_us:      " << cfg.late_window / unit::us << std::endl;
 
   std::cout << "light_channels: [ ";
@@ -147,11 +184,13 @@ void readChargeConfig(Config& cfg, const YAML::Node& node)
   cfg.noise_th          = nodeCharge["noise_th"].as<double>();
   cfg.circ_min_ratio    = nodeCharge["circ_min_ratio"].as<double>();
 
+  const FECChannelGeometry geom = buildFECChannelGeometry();
   for (const auto& item : nodeCharge["exclude_pix"]) {
-      int key = item.first.as<int>();
-      std::vector<int> values = item.second.as<std::vector<int>>();
-
-      cfg.exclude_pix[key] = values;
+    const int fec = item.first.as<int>();
+    if (fec < 0 || fec >= NUM_VATA) {
+      throw std::runtime_error("exclude_pix contains an FEC outside 0-3.");
+    }
+    cfg.exclude_pix[fec] = readExcludePixelList(item.second, fec, geom);
   }
 
   std::cout << "pix_min: "           << cfg.pix_min           << std::endl;
@@ -389,57 +428,6 @@ void recordLightTimingFromCurrentEntry(LightTimingState& light_timing,
   }
 
   light_timing.ready = true;
-}
-
-LightStatus analyzeLightEvent(const Config& cfg,
-                              const TPCTreeBuffer& tpc_tree_buffer,
-                              const LightTimingState& light_timing,
-                              bool light_ok)
-{
-  LightStatus status;
-  const TPCTreeLayout& tpc_tree_layout = tpc_tree_buffer.layout();
-
-  for (int light_ch : cfg.light_channels) {
-    if (light_ch < 0 || light_ch >= tpc_tree_layout.num_dpp_enable_ch) {
-      continue;
-    }
-    if (!light_ok || !tpc_tree_buffer.dpp_enable_channels[light_ch]) {
-      continue;
-    }
-    status.valid_any = true;
-
-    double peak          = -std::numeric_limits<double>::infinity() * unit::volt;
-    double pre_roi_peak  = -std::numeric_limits<double>::infinity() * unit::volt;
-    double post_roi_peak = -std::numeric_limits<double>::infinity() * unit::volt;
-    const int waveform_offset = light_ch * tpc_tree_layout.waveform_len;
-    const int pre_roi_index   = light_timing.pre_roi_index[light_ch];
-    const int post_roi_index  = light_timing.post_roi_index[light_ch];
-
-    for (int raw_idx = 0; raw_idx < tpc_tree_layout.waveform_len; ++raw_idx) {
-      const double voltage =
-          static_cast<double>(tpc_tree_buffer.waveform[waveform_offset + raw_idx]) * cfg.adc2mv * (unit::volt/1000.0);
-      if (raw_idx < pre_roi_index) {
-        if (voltage > pre_roi_peak) {
-          pre_roi_peak = voltage;
-        }
-      } else if (raw_idx > post_roi_index) {
-        if (voltage > post_roi_peak) {
-          post_roi_peak = voltage;
-        }
-      } else {
-        if (voltage > peak) {
-          peak = voltage;
-        }
-      }
-    }
-    status.cosmic          = status.cosmic || (peak > cfg.light_cosmic_thr);
-    status.pileup_pre_roi  = status.pileup_pre_roi || (pre_roi_peak > cfg.pre_roi_peak_thr);
-    status.pileup_post_roi = status.pileup_post_roi || (post_roi_peak > cfg.post_roi_peak_thr);
-    status.gamma           = status.gamma || (peak > cfg.light_gamma_thr);
-    //status.pileup =
-    //    status.pileup || (pre_roi_peak > cfg.pre_roi_peak_thr) ||(post_roi_peak > cfg.post_roi_peak_thr);
-  }
-  return status;
 }
 
 } // namespace

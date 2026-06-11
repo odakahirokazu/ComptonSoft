@@ -84,6 +84,7 @@ struct Config
   double timebin_ns_override = 0.0;
 
   std::vector<int> light_channels = {4, 6, 5, 7};
+  std::string light_waveform_analysis = "average";
   std::map<int, std::vector<int>> exclude_pix;
 };
 

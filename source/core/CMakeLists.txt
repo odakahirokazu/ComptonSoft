@@ -109,6 +109,7 @@ set(CS_CORE_CLASSES
   src/RIDecayChains.cc
   src/RIDecayCalculation.cc
   src/NanoGRAMSTPCProperty.cc
+  src/NanoGRAMSLightAnalysis.cc
   src/NanoGRAMSTPCTreeUtil.cc
   src/TPCTreeIO.cc
   #src/NanoGRAMSEvent.cc
