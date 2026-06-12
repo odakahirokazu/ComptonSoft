@@ -151,6 +151,7 @@ add_library(CSModules SHARED
   ${CS_HSQUICKLOOK_MODULES}
   src/SetEnergy.cc
   src/NumHitsInDetectorFilter.cc
+  src/EvaluateEventRateForNanoGRAMS.cc
   )
 
 target_link_libraries(CSModules
