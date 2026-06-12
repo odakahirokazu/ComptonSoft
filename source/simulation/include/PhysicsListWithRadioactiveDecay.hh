@@ -20,7 +20,10 @@
 #ifndef COMPTONSOFT_PhysicsListWithRadioactiveDecay_H
 #define COMPTONSOFT_PhysicsListWithRadioactiveDecay_H 1
 
+#include <limits>
 #include "G4RadioactiveDecayPhysics.hh"
+#include "G4HadronicParameters.hh"
+
 
 namespace comptonsoft
 {
@@ -36,6 +39,7 @@ class PhysicsListWithRadioactiveDecay : public PhysicsList_t
 public:
   PhysicsListWithRadioactiveDecay()
   {
+    G4HadronicParameters::Instance()->SetTimeThresholdForRadioactiveDecay(std::numeric_limits<double>::max());
     this->RegisterPhysics( new G4RadioactiveDecayPhysics );
   }
 

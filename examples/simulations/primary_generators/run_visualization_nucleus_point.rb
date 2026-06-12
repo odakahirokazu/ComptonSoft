@@ -3,8 +3,6 @@
 require 'comptonsoft'
 
 def run_simulation(num)
-  energy = 122.1 # keV
-
   sim = ComptonSoft::Simulation.new
   sim.random_seed = 0
   sim.set_gdml "database/mass_model.gdml"

@@ -19,6 +19,8 @@
 
 #include "CSPhysicsList.hh"
 
+#include <limits>
+
 #include "globals.hh"
 #include "AstroUnits.hh"
 
@@ -37,6 +39,7 @@
 #include "G4StoppingPhysics.hh"
 #include "G4IonPhysics.hh"
 #include "G4RadioactiveDecayPhysics.hh"
+#include "G4HadronicParameters.hh"
 
 #include "CustomizedEmLivermorePhysics.hh"
 #include "CustomizedEmLivermorePolarizedPhysics.hh"
@@ -153,6 +156,7 @@ CSPhysicsList::CSPhysicsList(CSPhysicsOption option)
   
   // Radioactive decay
   if (option.isRadioactiveDecayEnabled()) {
+    G4HadronicParameters::Instance()->SetTimeThresholdForRadioactiveDecay(std::numeric_limits<double>::max());
     this->RegisterPhysics( new G4RadioactiveDecayPhysics );
   }
 }
