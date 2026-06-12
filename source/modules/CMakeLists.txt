@@ -96,6 +96,10 @@ set(CS_MODULES
   src/CorrectRecombination.cc
   src/SelectTime.cc
   src/FilterByGoodTimeIntervals.cc
+  src/SetEnergy.cc
+  src/SetPosition.cc
+  src/NumHitsInDetectorFilter.cc
+  src/EliminateLowEnergyHits.cc
   ### analysis ROOT trees & histograms
   src/WriteHitTree.cc
   src/ReadHitTree.cc
@@ -151,7 +155,6 @@ add_library(CSModules SHARED
   ${CS_HSQUICKLOOK_MODULES}
   src/SetEnergy.cc
   src/NumHitsInDetectorFilter.cc
-  src/EvaluateEventRateForNanoGRAMS.cc
   )
 
 target_link_libraries(CSModules

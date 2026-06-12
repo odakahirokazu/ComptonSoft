@@ -71,6 +71,7 @@ module ComptonSoft
     define_setup_module("primary_generator")
     define_setup_module("user_action")
     define_setup_module("pickup_data", array: true)
+    define_setup_module("event_action", array: true)
     define_setup_module("event_selection")
     define_setup_module("tree_output")
     define_setup_module("visualization", :VisualizeG4Geom)
@@ -204,6 +205,10 @@ module ComptonSoft
                       verbose: @verbose)
 
       chain @make_detector_hits_module
+      
+      if event_action_list = module_list_of_event_action
+        event_action_list.each{|m| chain_with_parameters(m) }
+      end
 
       unless @make_detector_hits_module==:MakeRawHits
         chain_with_parameters module_of_event_selection
