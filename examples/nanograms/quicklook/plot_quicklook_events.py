@@ -67,6 +67,7 @@ EVENT_TYPE_LABELS = {
     1: "gamma",
     2: "cosmic",
     3: "pileup",
+    4: "time_up",
 }
 
 
@@ -292,11 +293,28 @@ def strongest_light_channel(waveforms: np.ndarray, cfg: PlotConfig) -> int:
         if ch < 0 or ch >= waveforms.shape[0]:
             continue
         voltage = baseline_subtracted_waveform(waveforms[ch], cfg)
+        if not np.any(np.isfinite(voltage)):
+            continue
         peak = np.nanmax(voltage)
         if peak > best_peak:
             best_peak = peak
             best_ch = ch
     return best_ch
+
+
+def expand_waveforms_by_dpp_channel(waveforms: np.ndarray,
+                                    registered: np.ndarray,
+                                    waveform_len: int) -> np.ndarray:
+    expanded = np.full((registered.size, waveform_len), np.nan, dtype=float)
+    waveform_slot = 0
+    for dpp_ch, is_registered in enumerate(registered):
+        if not is_registered:
+            continue
+        if waveform_slot >= waveforms.shape[0]:
+            break
+        expanded[dpp_ch] = waveforms[waveform_slot]
+        waveform_slot += 1
+    return expanded
 
 
 def plot_entry(entry: int, arrays: dict[str, np.ndarray], cfg: PlotConfig, outdir: Path) -> None:
@@ -310,9 +328,13 @@ def plot_entry(entry: int, arrays: dict[str, np.ndarray], cfg: PlotConfig, outdi
     event_type = int(arrays["event_type"][entry])
     cmn_method = int(arrays["cmn_method"][entry])
     waveform_len = int(arrays["waveform_len"][entry])
+    waveform_num_channels = int(arrays.get("waveform_num_channels", [8])[entry])
     adu_cmn_sub = np.asarray(arrays["adu_cmn_sub"][entry], dtype=float).reshape(4, 64)
     drift_counts = np.asarray(arrays["drift_time"][entry], dtype=float).reshape(4)
-    waveforms = np.asarray(arrays["waveform"][entry]).reshape(8, waveform_len)
+    registered = np.asarray(arrays["registered"][entry], dtype=bool).reshape(8)
+    waveforms_flat = np.asarray(arrays["waveform"][entry]).reshape(waveform_num_channels,
+                                                                   waveform_len)
+    waveforms = expand_waveforms_by_dpp_channel(waveforms_flat, registered, waveform_len)
     wave_compress = np.asarray(arrays["wave_compress"][entry]).reshape(8)
 
     vmin, vmax = charge_color_limits(adu_cmn_sub, cfg)
@@ -393,7 +415,7 @@ def plot_entry(entry: int, arrays: dict[str, np.ndarray], cfg: PlotConfig, outdi
 
     peak_ch = strongest_light_channel(waveforms, cfg)
     peak_voltage = baseline_subtracted_waveform(waveforms[peak_ch], cfg)
-    peak_index = int(np.nanargmax(peak_voltage))
+    peak_index = int(np.nanargmax(peak_voltage)) if np.any(np.isfinite(peak_voltage)) else 0
 
     average_waveforms = []
     reference_dt_us = waveform_dt_us(int(wave_compress[peak_ch]), cfg)
@@ -454,7 +476,7 @@ def main() -> None:
     cfg    = load_config("config_plot.yaml")
     outdir = Path(cfg.outdir)
     outdir.mkdir(parents=True, exist_ok=True)
-    for event_label in ("cosmic", "gamma", "pileup", "other"):
+    for event_label in ("cosmic", "gamma", "pileup", "time_up", "other"):
         (outdir / event_label).mkdir(parents=True, exist_ok=True)
 
     tree = open_tree(cfg.quicklook_file, cfg.tree)
@@ -472,10 +494,15 @@ def main() -> None:
         "waveform_len",
         charge_branch,
         "drift_time",
+        "registered",
         "waveform",
         "wave_compress",
     ]
+    if "waveform_num_channels" in tree_branches:
+        branches.append("waveform_num_channels")
     arrays = tree.arrays(branches, library="np")
+    if "waveform_num_channels" not in arrays:
+        arrays["waveform_num_channels"] = np.full(tree.num_entries, 8, dtype=np.int32)
     if charge_branch != "adu_cmn_sub":
         arrays["adu_cmn_sub"] = arrays[charge_branch]
     for index, entry in enumerate(entries, 1):

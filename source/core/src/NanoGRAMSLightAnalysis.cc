@@ -52,10 +52,10 @@ std::vector<int> collectValidLightChannels(const Config& cfg,
   }
 
   for (const int light_ch : cfg.light_channels) {
-    if (light_ch < 0 || light_ch >= tpc_tree_layout.num_dpp_enable_ch) {
+    if (light_ch < 0 || light_ch >= tpc_tree_layout.num_dpp_registered_slots) {
       continue;
     }
-    if (!tpc_tree_buffer.dpp_enable_channels[light_ch]) {
+    if (!tpc_tree_buffer.registered_channels[light_ch]) {
       continue;
     }
     valid_channels.push_back(light_ch);
@@ -87,7 +87,11 @@ double lightVoltageAtSample(const Config& cfg,
                             int raw_idx)
 {
   const int waveform_len = tpc_tree_buffer.layout().waveform_len;
-  const int waveform_offset = light_ch * waveform_len;
+  const int waveform_slot = tpc_tree_buffer.waveformSlotForDPPChannel(light_ch);
+  if (waveform_slot < 0) {
+    return std::numeric_limits<double>::quiet_NaN() * unit::volt;
+  }
+  const int waveform_offset = waveform_slot * waveform_len;
   return static_cast<double>(tpc_tree_buffer.waveform[waveform_offset + raw_idx]) *
          cfg.adc2mv * (unit::volt / 1000.0);
 }

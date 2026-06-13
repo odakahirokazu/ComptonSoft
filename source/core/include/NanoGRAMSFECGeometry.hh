@@ -37,18 +37,18 @@ using PixelMask = std::array<uint8_t, NUM_CH_EACH_VATA>;
 
 struct Config;
 
-struct FECChannelGeometry
+struct AnodeChannelTopology
 {
-  std::array<std::array<std::pair<int, int>, NUM_CH_EACH_VATA>, NUM_VATA> xy_of_ch{};
-  std::array<std::array<std::pair<int, int>, NUM_CH_EACH_VATA>, NUM_VATA> global_xy_of_ch{};
-  std::array<std::array<std::vector<int>, NUM_CH_EACH_VATA>, NUM_VATA> cross_neighbors{};
-  std::array<std::array<std::vector<int>, NUM_CH_EACH_VATA>, NUM_VATA> diag_neighbors{};
+  std::array<std::array<std::pair<int, int>, NUM_CH_EACH_VATA>, NUM_VATA> section_grid_of_channel{};
+  std::array<std::array<std::pair<int, int>, NUM_CH_EACH_VATA>, NUM_VATA> anode_grid_of_channel{};
+  std::array<std::array<std::vector<int>, NUM_CH_EACH_VATA>, NUM_VATA> section_cross_neighbors{};
+  std::array<std::array<std::vector<int>, NUM_CH_EACH_VATA>, NUM_VATA> section_diag_neighbors{};
   std::array<std::array<std::vector<std::pair<int, int>>, NUM_CH_EACH_VATA>, NUM_VATA> cross_section_neighbors{};
   std::array<std::array<std::vector<std::pair<int, int>>, NUM_CH_EACH_VATA>, NUM_VATA> diag_section_neighbors{};
   std::array<std::vector<int>, NUM_VATA> periphery{};
 };
 
-FECChannelGeometry buildFECChannelGeometry();
+AnodeChannelTopology buildAnodeChannelTopology();
 PixelMask buildFECMask(const Config& cfg, int fec);
 
 } /* namespace grams */

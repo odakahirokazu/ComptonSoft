@@ -38,7 +38,7 @@ ANLStatus NanoGRAMSHitExtraction::mod_define()
 {
   define_parameter("config_file",         &mod_class::config_file_);
   define_parameter("tpctree_file",        &mod_class::tpctree_file_);
-  define_parameter("rawhitdata_file",     &mod_class::rawhitdata_file_);
+  define_parameter("rawhittree_file",     &mod_class::rawhittree_file_);
   define_parameter("quicklook_file",      &mod_class::quicklook_file_);
   return AS_OK;
 }
@@ -76,8 +76,8 @@ ANLStatus NanoGRAMSHitExtraction::mod_initialize()
     std::cout << "[INFO] tpcquicklook output is disabled.\n";
   }
 
-  if (!rawhitdata_file_.empty()) {
-    rawhit_tree_writer_ = std::make_unique<grams::RawHitTreeOutputWriter>(rawhitdata_file_);
+  if (!rawhittree_file_.empty()) {
+    rawhit_tree_writer_ = std::make_unique<grams::RawHitTreeOutputWriter>(rawhittree_file_);
   } else {
     std::cout << "[INFO] rawhittree output is disabled.\n";
   }

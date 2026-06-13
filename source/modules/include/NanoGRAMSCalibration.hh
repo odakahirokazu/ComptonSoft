@@ -20,16 +20,14 @@
 #ifndef COMPTONSOFT_NanoGRAMSCalibration_H
 #define COMPTONSOFT_NanoGRAMSCalibration_H 1
 
-#include <array>
 #include <cstdint>
-#include <filesystem>
+#include <map>
 #include <memory>
 #include <string>
-#include <map>
 
-#include "NanoGRAMSTPCProperty.hh"
-#include "NanoGRAMSTPCDataProcessor.hh"
+#include "NanoGRAMSCalibrationData.hh"
 #include "VCSModule.hh"
+#include "NanoGRAMSTPCProperty.hh"
 
 class TFile;
 class TTree;
@@ -37,43 +35,8 @@ class TTree;
 namespace comptonsoft
 {
 
-namespace grams
-{
-struct RawFECHit;
-}
-
 class HitTreeIOWithInitialInfo;
 class NanoGRAMSHitExtraction;
-
-struct EnergyCalibrationConfig
-{
-  std::string gain_info_file;
-  std::string q_to_kev_spline_file;
-  double factor_energy = 1.0;
-  double max_time = 67.0 * unit::us;
-  int tp_channel = 17;
-  int ccal = 8;
-  std::array<double, NUM_VATA> tp_adc_values = {1.0, 1.0, 1.0, 1.0};
-};
-
-struct PositionCalibrationConfig
-{
-  double anode_pos_z = 5.0 * unit::cm;
-};
-
-struct GeneralConfig
-{
-  double temperature = 0.0 * unit::kelvin;
-  double efield = 0 * unit::volt / unit::cm;
-};
-
-struct CalibrationConfig
-{
-  EnergyCalibrationConfig energy;
-  PositionCalibrationConfig position;
-  GeneralConfig general;
-  std::filesystem::path config_dir;
-};
 
 class NanoGRAMSCalibration : public VCSModule
 {
@@ -90,6 +53,7 @@ public:
 
 private:
   std::string hittree_file_;
+  std::string gain_tp_file_;
   std::map<std::string, double> gain_tp_dict_;
   double gain_tp_value_ = 0.0;
 

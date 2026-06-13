@@ -63,8 +63,8 @@ struct FECSelectionInput
   const std::array<PixelADU, NUM_VATA>& adu_cmn_sub_values;
   const std::array<double, NUM_VATA>& drift_times;
   std::array<PixelMask, NUM_VATA>& claimed_pixels;
-  int fec = 0;
-  bool subset_mask = false;
+  int fec           = 0;
+  bool charge_selection_enabled = false;
   bool light_cosmic = false;
   bool light_pileup = false;
 };
@@ -76,14 +76,16 @@ enum class TPCEventType : int16_t
   Gamma  = 1,
   Cosmic = 2,
   PileUp = 3,
+  TimeUp = 4,
 };
 
 struct TPCTreeLayout
 {
-  int64_t n_entries      = 0;
-  int num_dpp_enable_ch  = NUM_CH_DPP_ON;
-  int waveform_total_len = 0;
-  int waveform_len       = 0;
+  int64_t n_entries             = 0;
+  int num_dpp_registered_slots  = NUM_CH_DPP_MAX;
+  int waveform_num_channels     = 0;
+  int waveform_flattened_length = 0;
+  int waveform_len              = 0;
 };
 
 class TPCTreeBuffer
@@ -94,9 +96,11 @@ public:
   const TPCTreeLayout& layout() const { return layout_; }
   int64_t nEntries() const { return layout_.n_entries; }
   void getEntry(int64_t entry);
+  void updateWaveformLayoutFromRegisteredChannels();
+  int waveformSlotForDPPChannel(int dpp_ch) const;
 
-  std::vector<uint16_t>   wave_compress;
-  std::unique_ptr<bool[]> dpp_enable_channels;
+  std::array<uint16_t, NUM_CH_DPP_MAX> wave_compress{};
+  std::array<bool,     NUM_CH_DPP_MAX> registered_channels{};
   std::vector<uint16_t>   adc;
   std::vector<uint32_t>   drift_time;
   std::vector<uint32_t>   ti;
@@ -108,16 +112,16 @@ private:
 
   TTree* tpc_tree_ = nullptr;
   TPCTreeLayout layout_;
+  std::array<int, NUM_CH_DPP_MAX> waveform_slot_of_dpp_channel_{};
 };
 
 struct LightTimingState
 {
   bool ready = false;
-  std::array<uint16_t, NUM_CH_DPP_ON> wave_compress{};
-  std::array<double,   NUM_CH_DPP_ON> timebin{};
-  //std::array<int,      NUM_CH_DPP_ON> late_index{};
-  std::array<int,      NUM_CH_DPP_ON> pre_roi_index{};
-  std::array<int,      NUM_CH_DPP_ON> post_roi_index{};
+  std::array<uint16_t, NUM_CH_DPP_MAX> wave_compress{};
+  std::array<double,   NUM_CH_DPP_MAX> timebin{};
+  std::array<int,      NUM_CH_DPP_MAX> pre_roi_index{};
+  std::array<int,      NUM_CH_DPP_MAX> post_roi_index{};
 };
 
 class FECTITracker
@@ -139,15 +143,26 @@ public:
 
   std::vector<RawFECHit> selectHits(const TPCTreeBuffer& tpc_tree_buffer,
                                     FECTITracker& fec_ti_tracker,
-                                    bool subset_mask,
+                                    bool charge_selection_enabled,
                                     bool light_cosmic,
                                     bool light_pileup) const;
 
 private:
   bool fillSelectedChannels(const FECSelectionInput& input, RawFECHit& hit) const;
+  bool isTimeUp(const FECSelectionInput& input) const;
+  bool isRejectedByTiming(const FECSelectionInput& input) const;
+  bool isCircleNoise(const FECSelectionInput& input) const;
+  PixelMask buildAllowedPixelMask(int fec, int core_ch) const;
+  bool hasExtraHighPixel(const FECSelectionInput& input,
+                         const PixelMask& allowed_pixels) const;
+  std::vector<std::pair<int, int>> collectClusterPixels(const FECSelectionInput& input,
+                                                        int core_ch) const;
+  void fillHitChannels(const FECSelectionInput& input,
+                       const std::vector<std::pair<int, int>>& selected_pixels,
+                       RawFECHit& hit) const;
 
   const Config& cfg_;
-  FECChannelGeometry geom_;
+  AnodeChannelTopology anode_topology_;
   bool include_diag_ = false;
   std::array<PixelMask, NUM_VATA> masks_{};
   std::array<int, NUM_VATA> min_periph_hits_{};
@@ -222,6 +237,7 @@ private:
   std::unique_ptr<TFile> file_;
   std::unique_ptr<TTree> quicklook_tree_;
   int waveform_len_ = 0;
+  int waveform_num_channels_ = 0;
   std::string adu_leaflist_;
   std::string cmn_leaflist_;
   std::string ti_leaflist_;
@@ -234,12 +250,13 @@ private:
   int16_t event_type_   = 0;
   int16_t cmn_method_   = 0;
   int32_t waveform_len_branch_ = 0;
+  int32_t waveform_num_channels_branch_ = 0;
   std::vector<float> adu_cmn_sub_;
   std::array<float, NUM_VATA> cmn_{};
   std::array<uint32_t, NUM_VATA> ti_{};
   std::array<uint32_t, NUM_VATA> drift_time_{};
-  std::array<uint16_t, NUM_CH_DPP_ON> wave_compress_{};
-  std::array<bool, NUM_CH_DPP_ON> registered_{};
+  std::array<uint16_t, NUM_CH_DPP_MAX> wave_compress_{};
+  std::array<bool, NUM_CH_DPP_MAX> registered_{};
   std::vector<int16_t> waveform_;
 };
 

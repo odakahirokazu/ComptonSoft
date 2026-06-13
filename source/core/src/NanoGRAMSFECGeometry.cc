@@ -46,9 +46,9 @@ std::pair<int, int> sectionOrigin(int fec)
 
 } // namespace
 
-FECChannelGeometry buildFECChannelGeometry()
+AnodeChannelTopology buildAnodeChannelTopology()
 {
-  FECChannelGeometry geom;
+  AnodeChannelTopology topology;
   std::array<std::array<std::pair<int, int>, kTPCPlaneSidePixels>,
              kTPCPlaneSidePixels> global_to_fec_ch{};
   for (auto& col : global_to_fec_ch) {
@@ -56,20 +56,20 @@ FECChannelGeometry buildFECChannelGeometry()
   }
 
   for (int fec = 0; fec < NUM_VATA; ++fec) {
-    const auto& disp_to_ch = kPlotNumAll[fec];
+    const auto& grid_to_ch = kFECSectionGridToChannel[fec];
     const auto [origin_x, origin_y] = sectionOrigin(fec);
 
     for (int xx = 0; xx < kFECSectionSidePixels; ++xx) {
       for (int yy = 0; yy < kFECSectionSidePixels; ++yy) {
-        const int ch = disp_to_ch[xx * kFECSectionSidePixels + yy];
-        geom.xy_of_ch[fec][ch] = {xx, yy};
-        geom.global_xy_of_ch[fec][ch] = {origin_x + xx, origin_y + yy};
+        const int ch = grid_to_ch[xx * kFECSectionSidePixels + yy];
+        topology.section_grid_of_channel[fec][ch] = {xx, yy};
+        topology.anode_grid_of_channel[fec][ch] = {origin_x + xx, origin_y + yy};
         global_to_fec_ch[origin_x + xx][origin_y + yy] = {fec, ch};
       }
     }
 
     for (int ch = 0; ch < NUM_CH_EACH_VATA; ++ch) {
-      const auto [x, y] = geom.xy_of_ch[fec][ch];
+      const auto [x, y] = topology.section_grid_of_channel[fec][ch];
 
       for (const auto& delta : {std::pair<int, int>{-1, 0},
                                 std::pair<int, int>{1, 0},
@@ -79,8 +79,8 @@ FECChannelGeometry buildFECChannelGeometry()
         const int yy = y + delta.second;
         if (0 <= xx && xx < kFECSectionSidePixels &&
             0 <= yy && yy < kFECSectionSidePixels) {
-          geom.cross_neighbors[fec][ch].push_back(
-              disp_to_ch[xx * kFECSectionSidePixels + yy]);
+          topology.section_cross_neighbors[fec][ch].push_back(
+              grid_to_ch[xx * kFECSectionSidePixels + yy]);
         }
       }
 
@@ -92,8 +92,8 @@ FECChannelGeometry buildFECChannelGeometry()
         const int yy = y + delta.second;
         if (0 <= xx && xx < kFECSectionSidePixels &&
             0 <= yy && yy < kFECSectionSidePixels) {
-          geom.diag_neighbors[fec][ch].push_back(
-              disp_to_ch[xx * kFECSectionSidePixels + yy]);
+          topology.section_diag_neighbors[fec][ch].push_back(
+              grid_to_ch[xx * kFECSectionSidePixels + yy]);
         }
       }
     }
@@ -103,19 +103,19 @@ FECChannelGeometry buildFECChannelGeometry()
       for (int yy = 0; yy < kFECSectionSidePixels; ++yy) {
         if (xx == 0 || xx == kFECSectionSidePixels - 1 ||
             yy == 0 || yy == kFECSectionSidePixels - 1) {
-          periphery.push_back(disp_to_ch[xx * kFECSectionSidePixels + yy]);
+          periphery.push_back(grid_to_ch[xx * kFECSectionSidePixels + yy]);
         }
       }
     }
 
     std::sort(periphery.begin(), periphery.end());
     periphery.erase(std::unique(periphery.begin(), periphery.end()), periphery.end());
-    geom.periphery[fec] = std::move(periphery);
+    topology.periphery[fec] = std::move(periphery);
   }
 
   for (int fec = 0; fec < NUM_VATA; ++fec) {
     for (int ch = 0; ch < NUM_CH_EACH_VATA; ++ch) {
-      const auto [global_x, global_y] = geom.global_xy_of_ch[fec][ch];
+      const auto [global_x, global_y] = topology.anode_grid_of_channel[fec][ch];
 
       for (const auto& delta : {std::pair<int, int>{-1, 0},
                                 std::pair<int, int>{1, 0},
@@ -127,7 +127,7 @@ FECChannelGeometry buildFECChannelGeometry()
             0 <= yy && yy < kTPCPlaneSidePixels) {
           const auto [other_fec, other_ch] = global_to_fec_ch[xx][yy];
           if (other_fec >= 0 && other_fec != fec) {
-            geom.cross_section_neighbors[fec][ch].push_back({other_fec, other_ch});
+            topology.cross_section_neighbors[fec][ch].push_back({other_fec, other_ch});
           }
         }
       }
@@ -142,14 +142,14 @@ FECChannelGeometry buildFECChannelGeometry()
             0 <= yy && yy < kTPCPlaneSidePixels) {
           const auto [other_fec, other_ch] = global_to_fec_ch[xx][yy];
           if (other_fec >= 0 && other_fec != fec) {
-            geom.diag_section_neighbors[fec][ch].push_back({other_fec, other_ch});
+            topology.diag_section_neighbors[fec][ch].push_back({other_fec, other_ch});
           }
         }
       }
     }
   }
 
-  return geom;
+  return topology;
 }
 
 PixelMask buildFECMask(const Config& cfg, int fec)

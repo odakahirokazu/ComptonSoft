@@ -41,10 +41,11 @@ constexpr double kClkToUs         = 0.01; // 1 clock = 10 ns
 constexpr int kFECSectionSidePixels = 8;
 constexpr int kTPCPlaneSidePixels   = 2 * kFECSectionSidePixels;
 
-// Pixel channel map for each FEC section, counted from the lower-right corner.
-constexpr std::array<std::array<int, NUM_CH_EACH_VATA>, NUM_VATA> kPlotNumAll = {{
-    {0, 8, 23, 24, 39, 40, 55, 63,
-     1, 9, 22, 25, 38, 41, 54, 62,
+// Channel number at each local 8x8 grid point of a FEC section.
+// The flattened index is x * kFECSectionSidePixels + y.
+constexpr std::array<std::array<int, NUM_CH_EACH_VATA>, NUM_VATA> kFECSectionGridToChannel = {{
+    {0,  8, 23, 24, 39, 40, 55, 63,
+     1,  9, 22, 25, 38, 41, 54, 62,
      2, 10, 21, 26, 37, 42, 53, 61,
      3, 11, 20, 27, 36, 43, 52, 60,
      4, 12, 19, 28, 35, 44, 51, 59,
@@ -57,18 +58,18 @@ constexpr std::array<std::array<int, NUM_CH_EACH_VATA>, NUM_VATA> kPlotNumAll = 
      39, 38, 37, 36, 35, 34, 33, 32,
      24, 25, 26, 27, 28, 29, 30, 31,
      23, 22, 21, 20, 19, 18, 17, 16,
-     8, 9, 10, 11, 12, 13, 14, 15,
-     0, 1, 2, 3, 4, 5, 6, 7},
+     8,   9, 10, 11, 12, 13, 14, 15,
+     0,   1,  2,  3,  4,  5,  6,  7},
     {56, 48, 47, 32, 31, 16, 15, 7,
      57, 49, 46, 33, 30, 17, 14, 6,
      58, 50, 45, 34, 29, 18, 13, 5,
      59, 51, 44, 35, 28, 19, 12, 4,
      60, 52, 43, 36, 27, 20, 11, 3,
      61, 53, 42, 37, 26, 21, 10, 2,
-     62, 54, 41, 38, 25, 22, 9, 1,
-     63, 55, 40, 39, 24, 23, 8, 0},
-    {7, 6, 5, 4, 3, 2, 1, 0,
-     15, 14, 13, 12, 11, 10, 9, 8,
+     62, 54, 41, 38, 25, 22,  9, 1,
+     63, 55, 40, 39, 24, 23,  8, 0},
+    { 7,  6,  5,  4,  3,  2,  1, 0,
+     15, 14, 13, 12, 11, 10,  9,  8,
      16, 17, 18, 19, 20, 21, 22, 23,
      31, 30, 29, 28, 27, 26, 25, 24,
      32, 33, 34, 35, 36, 37, 38, 39,
@@ -77,8 +78,8 @@ constexpr std::array<std::array<int, NUM_CH_EACH_VATA>, NUM_VATA> kPlotNumAll = 
      56, 57, 58, 59, 60, 61, 62, 63}
 }};
 
-static_assert(NUM_VATA == static_cast<int>(kPlotNumAll.size()),
-              "kPlotNumAll must match NUM_VATA.");
+static_assert(NUM_VATA == static_cast<int>(kFECSectionGridToChannel.size()),
+              "kFECSectionGridToChannel must match NUM_VATA.");
 
 } /* namespace grams */
 } /* namespace comptonsoft */

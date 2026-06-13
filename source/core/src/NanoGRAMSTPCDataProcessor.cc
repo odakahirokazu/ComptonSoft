@@ -50,16 +50,10 @@ int lowerBoundTimeIndex(double time_window,
                         int waveform_len)
 {
   const double raw = (time_window + trigger_delay) / dt;
-  int idx = static_cast<int>(std::ceil(raw - 1e-12));
-  if (idx < 0) {
-    idx = 0;
-  }
-  if (idx > waveform_len) {
-    idx = waveform_len;
-  }
-  return idx;
+  return std::clamp(static_cast<int>(std::ceil(raw - 1e-12)), 0, waveform_len);
 }
 
+//How to define "wave_compress"?
 double waveCompressToTimebin(uint16_t wave_compress)
 {
     //if((0<=wave_compress)&&(wave_compress<=8)){
@@ -122,9 +116,9 @@ std::pair<int, double> findCoreChannel(const PixelADU& adu_cmn_sub,
   return {core_ch, core_value};
 }
 
-bool isPeripheryPixel(const FECChannelGeometry& geom, int fec, int ch)
+bool isPeripheryPixel(const AnodeChannelTopology& topology, int fec, int ch)
 {
-  const auto& periphery = geom.periphery[fec];
+  const auto& periphery = topology.periphery[fec];
   return std::find(periphery.begin(), periphery.end(), ch) != periphery.end();
 }
 
@@ -143,35 +137,56 @@ void addPixelIfNew(std::vector<std::pair<int, int>>& pixels, int fec, int ch)
   }
 }
 
-bool collinear3Global(const FECChannelGeometry& geom,
+bool collinear3Global(const AnodeChannelTopology& topology,
                       const std::vector<std::pair<int, int>>& pixels)
 {
-  const auto [x1, y1] = geom.global_xy_of_ch[pixels[0].first][pixels[0].second];
-  const auto [x2, y2] = geom.global_xy_of_ch[pixels[1].first][pixels[1].second];
-  const auto [x3, y3] = geom.global_xy_of_ch[pixels[2].first][pixels[2].second];
+  const auto [x1, y1] =
+      topology.anode_grid_of_channel[pixels[0].first][pixels[0].second];
+  const auto [x2, y2] =
+      topology.anode_grid_of_channel[pixels[1].first][pixels[1].second];
+  const auto [x3, y3] =
+      topology.anode_grid_of_channel[pixels[2].first][pixels[2].second];
   return (x2 - x1) * (y3 - y1) == (y2 - y1) * (x3 - x1);
 }
 
-int waveformTotalLength(TTree* tpc_tree)
+double driftTimeFromClock(uint32_t drift_time_count)
 {
-  const int total_len = tpc_tree->GetLeaf("waveform")->GetLenStatic();
-  if (total_len <= 0 || total_len % NUM_CH_DPP_ON != 0) {
+  return static_cast<double>(drift_time_count) * kClkToUs * unit::us + kDppResponseTime;
+}
+
+bool hasTimeUp(const Config& cfg, const TPCTreeBuffer& tpc_tree_buffer)
+{
+  for (int fec = 0; fec < NUM_VATA; ++fec) {
+    if (driftTimeFromClock(tpc_tree_buffer.drift_time[fec]) >= cfg.drift_time_max) {
+      return true;
+    }
+  }
+  return false;
+}
+
+int waveformFlattenedLength(TTree* tpc_tree)
+{
+  const int flattened_len = tpc_tree->GetLeaf("waveform")->GetLenStatic();
+  if (flattened_len <= 0) {
     throw std::runtime_error("Unexpected waveform branch length.");
   }
-  return total_len;
+  return flattened_len;
 }
 
 TPCTreeLayout inspectTPCTreeLayout(TTree* tpc_tree)
 {
   TPCTreeLayout tpc_tree_layout;
-  tpc_tree_layout.n_entries          = static_cast<int64_t>(tpc_tree->GetEntries());
-  tpc_tree_layout.waveform_total_len = waveformTotalLength(tpc_tree);
-  tpc_tree_layout.waveform_len       = tpc_tree_layout.waveform_total_len / NUM_CH_DPP_ON;
+  tpc_tree_layout.n_entries =
+      static_cast<int64_t>(tpc_tree->GetEntries());
+  tpc_tree_layout.waveform_flattened_length =
+      waveformFlattenedLength(tpc_tree);
 
   std::cout << "inspectTPCTreeLayout()" << std::endl;
-  std::cout << "n_entries:          "   << tpc_tree_layout.n_entries         << std::endl;
-  std::cout << "num_dpp_enable_ch:  "   << tpc_tree_layout.num_dpp_enable_ch << std::endl;
-  std::cout << "waveform_len:       "   << tpc_tree_layout.waveform_len      << std::endl;
+  std::cout << "n_entries:                   " << tpc_tree_layout.n_entries << std::endl;
+  std::cout << "num_dpp_registered_slots:    "
+            << tpc_tree_layout.num_dpp_registered_slots << std::endl;
+  std::cout << "waveform_flattened_length:   "
+            << tpc_tree_layout.waveform_flattened_length << std::endl;
   return tpc_tree_layout;
 }
 
@@ -179,7 +194,7 @@ LightTimingState makeLightTimingState(const TPCTreeLayout& tpc_tree_layout)
 {
   LightTimingState light_timing;
   light_timing.pre_roi_index.fill(0);
-  light_timing.post_roi_index.fill(tpc_tree_layout.waveform_len);
+  light_timing.post_roi_index.fill(tpc_tree_layout.waveform_len-1);
   return light_timing;
 }
 
@@ -190,9 +205,13 @@ void recordLightTimingFromCurrentEntry(LightTimingState& light_timing,
   const TPCTreeLayout& tpc_tree_layout = tpc_tree_buffer.layout();
   std::cout << "[INFO] entries=" << tpc_tree_layout.n_entries
             << " waveform_len=" << tpc_tree_layout.waveform_len
+            << " waveform_num_channels=" << tpc_tree_layout.waveform_num_channels
             << " delay_counts=" << cfg.delay_counts << "\n";
 
-  for (int light_ch = 0; light_ch < tpc_tree_layout.num_dpp_enable_ch; ++light_ch) {
+  for (int light_ch = 0; light_ch < tpc_tree_layout.num_dpp_registered_slots; ++light_ch) {
+    if (!tpc_tree_buffer.registered_channels[light_ch]) {
+      continue;
+    }
     const uint16_t wave_compress = tpc_tree_buffer.wave_compress[light_ch];
     const double dt = waveCompressToTimebin(wave_compress);
     const double trigger_delay = static_cast<double>(cfg.delay_counts) * 8.0 * dt;
@@ -241,12 +260,12 @@ uint64_t FECTITracker::absoluteTi(int fec, uint32_t ti_value)
 
 FECChargeSelector::FECChargeSelector(const Config& cfg)
     : cfg_(cfg),
-      geom_(buildFECChannelGeometry()),
+      anode_topology_(buildAnodeChannelTopology()),
       include_diag_(cfg_.pix_max >= 3) //discussion needed
 {
   for (int fec = 0; fec < NUM_VATA; ++fec) {
     masks_[fec] = buildFECMask(cfg_, fec);
-    const int perimeter = static_cast<int>(geom_.periphery[fec].size());
+    const int perimeter = static_cast<int>(anode_topology_.periphery[fec].size());
     min_periph_hits_[fec] =
         std::max(cfg_.circ_min_hits,
                  static_cast<int>(std::ceil(cfg_.circ_min_ratio * perimeter)));
@@ -256,7 +275,7 @@ FECChargeSelector::FECChargeSelector(const Config& cfg)
 std::vector<RawFECHit>
 FECChargeSelector::selectHits(const TPCTreeBuffer& tpc_tree_buffer,
                               FECTITracker& fec_ti_tracker,
-                              bool subset_mask,
+                              bool charge_selection_enabled,
                               bool light_cosmic,
                               bool light_pileup) const
 {
@@ -281,12 +300,10 @@ FECChargeSelector::selectHits(const TPCTreeBuffer& tpc_tree_buffer,
       adu_cmn_sub_values[fec][ch] = adu_values[ch] - cmn;
     }
 
-    drift_times[fec] =
-        static_cast<double>(tpc_tree_buffer.drift_time[fec]) * kClkToUs * unit::us +
-        kDppResponseTime;
-    ti_values[fec] = fec_ti_tracker.absoluteTi(fec, tpc_tree_buffer.ti[fec]);
+    drift_times[fec] = driftTimeFromClock(tpc_tree_buffer.drift_time[fec]);
+    ti_values[fec]   = fec_ti_tracker.absoluteTi(fec, tpc_tree_buffer.ti[fec]);
     core_values[fec] = findCoreChannel(adu_cmn_sub_values[fec], masks_[fec]).second;
-    fec_order[fec] = fec;
+    fec_order[fec]   = fec;
   }
 
   std::sort(fec_order.begin(), fec_order.end(), [&](int lhs, int rhs) {
@@ -308,7 +325,7 @@ FECChargeSelector::selectHits(const TPCTreeBuffer& tpc_tree_buffer,
                                       drift_times,
                                       claimed_pixels,
                                       fec,
-                                      subset_mask,
+                                      charge_selection_enabled,
                                       light_cosmic,
                                       light_pileup};
     const bool accepted = fillSelectedChannels(selection_input, hit);
@@ -320,6 +337,136 @@ FECChargeSelector::selectHits(const TPCTreeBuffer& tpc_tree_buffer,
   return event_hits;
 }
 
+bool FECChargeSelector::isTimeUp(const FECSelectionInput& input) const
+{
+  const double drift_time = input.drift_times[input.fec];
+  return !std::isfinite(drift_time) || drift_time >= cfg_.drift_time_max;
+}
+
+bool FECChargeSelector::isRejectedByTiming(const FECSelectionInput& input) const
+{
+  return input.light_pileup || isTimeUp(input);
+}
+
+bool FECChargeSelector::isCircleNoise(const FECSelectionInput& input) const
+{
+  const int fec = input.fec;
+  const PixelADU& adu_cmn_sub = input.adu_cmn_sub_values[fec];
+
+  int count_periph = 0;
+  for (int ch : anode_topology_.periphery[fec]) {
+    if (adu_cmn_sub[ch] > cfg_.circ_thr) {
+      ++count_periph;
+    }
+  }
+
+  const double edge_sum = (std::isfinite(adu_cmn_sub[0]) ? adu_cmn_sub[0] : 0.0) +
+                          (std::isfinite(adu_cmn_sub[63]) ? adu_cmn_sub[63] : 0.0);
+  return count_periph >= min_periph_hits_[fec] || edge_sum > cfg_.noise_th;
+}
+
+PixelMask FECChargeSelector::buildAllowedPixelMask(int fec, int core_ch) const
+{
+  PixelMask allowed{};
+  allowed.fill(0);
+  allowed[core_ch] = 1;
+  for (int ch : anode_topology_.section_cross_neighbors[fec][core_ch]) {
+    allowed[ch] = 1;
+  }
+  if (include_diag_) {
+    for (int ch : anode_topology_.section_diag_neighbors[fec][core_ch]) {
+      allowed[ch] = 1;
+    }
+  }
+  return allowed;
+}
+
+bool FECChargeSelector::hasExtraHighPixel(const FECSelectionInput& input,
+                                          const PixelMask& allowed_pixels) const
+{
+  const int fec = input.fec;
+  const PixelMask& mask_in = masks_[fec];
+  const PixelADU& adu_cmn_sub = input.adu_cmn_sub_values[fec];
+
+  for (int ch = 0; ch < NUM_CH_EACH_VATA; ++ch) {
+    if (mask_in[ch] && !allowed_pixels[ch] && adu_cmn_sub[ch] > cfg_.adu_min) {
+      return true;
+    }
+  }
+  return false;
+}
+
+std::vector<std::pair<int, int>>
+FECChargeSelector::collectClusterPixels(const FECSelectionInput& input,
+                                        int core_ch) const
+{
+  const int fec = input.fec;
+  std::vector<std::pair<int, int>> selected_pixels;
+  selected_pixels.push_back({fec, core_ch});
+
+  auto addCandidatePixel = [&](int candidate_fec, int ch) {
+    if (masks_[candidate_fec][ch] &&
+        !input.claimed_pixels[candidate_fec][ch] &&
+        input.adu_cmn_sub_values[candidate_fec][ch] > cfg_.spread_thr) {
+      addPixelIfNew(selected_pixels, candidate_fec, ch);
+    }
+  };
+
+  for (int ch : anode_topology_.section_cross_neighbors[fec][core_ch]) {
+    addCandidatePixel(fec, ch);
+  }
+  if (include_diag_) {
+    for (int ch : anode_topology_.section_diag_neighbors[fec][core_ch]) {
+      addCandidatePixel(fec, ch);
+    }
+  }
+
+  const bool can_merge_neighbor_section =
+      cfg_.cross_fec_merge_drift_time_tolerance >= 0.0 &&
+      isPeripheryPixel(anode_topology_, fec, core_ch);
+
+  auto addNeighborSectionPixel = [&](const std::pair<int, int>& pixel) {
+    if (!can_merge_neighbor_section) {
+      return;
+    }
+
+    const int neighbor_fec = pixel.first;
+    const int neighbor_ch  = pixel.second;
+    const double drift_delta = std::abs(input.drift_times[neighbor_fec] -
+                                        input.drift_times[fec]);
+    if (std::isfinite(drift_delta) &&
+        drift_delta <= cfg_.cross_fec_merge_drift_time_tolerance) {
+      addCandidatePixel(neighbor_fec, neighbor_ch);
+    }
+  };
+
+  for (const auto& pixel : anode_topology_.cross_section_neighbors[fec][core_ch]) {
+    addNeighborSectionPixel(pixel);
+  }
+  if (include_diag_) {
+    for (const auto& pixel : anode_topology_.diag_section_neighbors[fec][core_ch]) {
+      addNeighborSectionPixel(pixel);
+    }
+  }
+
+  return selected_pixels;
+}
+
+void FECChargeSelector::fillHitChannels(
+    const FECSelectionInput& input,
+    const std::vector<std::pair<int, int>>& selected_pixels,
+    RawFECHit& hit) const
+{
+  for (const auto& pixel : selected_pixels) {
+    const int selected_fec = pixel.first;
+    const int ch = pixel.second;
+    input.claimed_pixels[selected_fec][ch] = 1;
+    hit.channel_fecs.push_back(static_cast<int16_t>(selected_fec));
+    hit.channels.push_back(static_cast<int16_t>(ch));
+    hit.adus.push_back(static_cast<float>(input.adu_cmn_sub_values[selected_fec][ch]));
+  }
+}
+
 bool FECChargeSelector::fillSelectedChannels(const FECSelectionInput& input,
                                              RawFECHit& hit) const
 {
@@ -328,124 +475,34 @@ bool FECChargeSelector::fillSelectedChannels(const FECSelectionInput& input,
   hit.adus.clear();
 
   const int fec = input.fec;
-  const PixelMask& mask_in  = masks_[fec];
-  const int min_periph_hits = min_periph_hits_[fec];
+  const PixelMask& mask_in = masks_[fec];
   const PixelADU& adu_cmn_sub = input.adu_cmn_sub_values[fec];
-  const double drift_time = input.drift_times[fec];
-
-  bool pile_up = !std::isfinite(drift_time) || drift_time >= cfg_.drift_time_max;
-
-  int count_periph = 0;
-  for (int ch : geom_.periphery[fec]) {
-    if (adu_cmn_sub[ch] > cfg_.circ_thr) {
-      ++count_periph;
-    }
+  const auto [core_ch, core_adu] = findCoreChannel(adu_cmn_sub, mask_in);
+  if (core_adu <= cfg_.adu_min || input.claimed_pixels[fec][core_ch]) {
+    return false;
   }
 
-  bool circle_noise = count_periph >= min_periph_hits;
-  const double edge_sum = (std::isfinite(adu_cmn_sub[0]) ? adu_cmn_sub[0] : 0.0) +
-                          (std::isfinite(adu_cmn_sub[63]) ? adu_cmn_sub[63] : 0.0);
-  circle_noise = circle_noise || (edge_sum > cfg_.noise_th);
+  const PixelMask allowed_pixels = buildAllowedPixelMask(fec, core_ch);
+  const std::vector<std::pair<int, int>> selected_pixels =
+      collectClusterPixels(input, core_ch);
+  const int adopted_count = static_cast<int>(selected_pixels.size());
+  const bool count_ok = adopted_count >= cfg_.pix_min && adopted_count <= cfg_.pix_max;
+  const bool cosmic = input.light_cosmic ||
+                      (adopted_count == 3 &&
+                       collinear3Global(anode_topology_, selected_pixels));
+  const bool event_mask =
+      input.charge_selection_enabled &&
+      !isRejectedByTiming(input) &&
+      !isCircleNoise(input) &&
+      count_ok &&
+      !cosmic &&
+      !hasExtraHighPixel(input, allowed_pixels);
 
-  bool cosmic = input.light_cosmic;
-  pile_up = pile_up || input.light_pileup;
-
-  const auto [core_idx, core_val] = findCoreChannel(adu_cmn_sub, mask_in);
-  const bool core_has_val =
-      core_val > cfg_.adu_min && !input.claimed_pixels[fec][core_idx];
-
-  int adopted_count = 0;
-  bool extra_high = false;
-  std::vector<std::pair<int, int>> selected_pixels;
-  if (core_has_val) {
-    selected_pixels.push_back({fec, core_idx});
-
-    PixelMask allowed{};
-    allowed.fill(0);
-    allowed[core_idx] = 1;
-    for (int ch : geom_.cross_neighbors[fec][core_idx]) {
-      allowed[ch] = 1;
-    }
-    if (include_diag_) {
-      for (int ch : geom_.diag_neighbors[fec][core_idx]) {
-        allowed[ch] = 1;
-      }
-    }
-
-    auto addCandidatePixel = [&](int candidate_fec, int ch) {
-      if (masks_[candidate_fec][ch] &&
-          !input.claimed_pixels[candidate_fec][ch] &&
-          input.adu_cmn_sub_values[candidate_fec][ch] > cfg_.spread_thr) {
-        addPixelIfNew(selected_pixels, candidate_fec, ch);
-      }
-    };
-
-    for (int ch = 0; ch < NUM_CH_EACH_VATA; ++ch) {
-      if (mask_in[ch] && !allowed[ch] && adu_cmn_sub[ch] > cfg_.adu_min) {
-        extra_high = true;
-        break;
-      }
-    }
-
-    for (int ch : geom_.cross_neighbors[fec][core_idx]) {
-      addCandidatePixel(fec, ch);
-    }
-    if (include_diag_) {
-      for (int ch : geom_.diag_neighbors[fec][core_idx]) {
-        addCandidatePixel(fec, ch);
-      }
-    }
-
-    const bool can_merge_neighbor_section =
-        cfg_.cross_fec_merge_drift_time_tolerance >= 0.0 &&
-        isPeripheryPixel(geom_, fec, core_idx);
-
-    auto addNeighborSectionPixel = [&](const std::pair<int, int>& pixel) {
-      if (!can_merge_neighbor_section) {
-        return;
-      }
-
-      const int neighbor_fec = pixel.first;
-      const int neighbor_ch  = pixel.second;
-      const double drift_delta = std::abs(input.drift_times[neighbor_fec] - drift_time);
-      if (std::isfinite(drift_delta) &&
-          drift_delta <= cfg_.cross_fec_merge_drift_time_tolerance) {
-        addCandidatePixel(neighbor_fec, neighbor_ch);
-      }
-    };
-
-    for (const auto& pixel : geom_.cross_section_neighbors[fec][core_idx]) {
-      addNeighborSectionPixel(pixel);
-    }
-    if (include_diag_) {
-      for (const auto& pixel : geom_.diag_section_neighbors[fec][core_idx]) {
-        addNeighborSectionPixel(pixel);
-      }
-    }
-
-    adopted_count = static_cast<int>(selected_pixels.size());
-
-    if (adopted_count == 3 && collinear3Global(geom_, selected_pixels)) {
-      cosmic = true;
-    }
+  if (event_mask) {
+    fillHitChannels(input, selected_pixels, hit);
   }
 
-  const bool count_ok   = adopted_count >= cfg_.pix_min && adopted_count <= cfg_.pix_max;
-  const bool base_valid = !pile_up && !circle_noise && core_has_val;
-  const bool event_mask = base_valid && count_ok && !cosmic && !extra_high;
-
-  if (event_mask && input.subset_mask) {
-    for (const auto& pixel : selected_pixels) {
-      const int selected_fec = pixel.first;
-      const int ch = pixel.second;
-      input.claimed_pixels[selected_fec][ch] = 1;
-      hit.channel_fecs.push_back(static_cast<int16_t>(selected_fec));
-      hit.channels.push_back(static_cast<int16_t>(ch));
-      hit.adus.push_back(static_cast<float>(input.adu_cmn_sub_values[selected_fec][ch]));
-    }
-  }
-
-  return event_mask && input.subset_mask && !hit.channels.empty();
+  return event_mask && !hit.channels.empty();
 }
 
 TPCTreeBuffer::TPCTreeBuffer(TTree* tpc_tree)
@@ -457,12 +514,11 @@ TPCTreeBuffer::TPCTreeBuffer(TTree* tpc_tree)
 
   layout_ = inspectTPCTreeLayout(tpc_tree_);
 
-  wave_compress.assign(NUM_CH_DPP_ON, 0);
-  dpp_enable_channels = std::make_unique<bool[]>(NUM_CH_DPP_ON);
+  waveform_slot_of_dpp_channel_.fill(-1);
   adc.assign(NUM_VATA * NUM_CH_EACH_VATA, 0);
   drift_time.assign(NUM_VATA, 0);
   ti.assign(NUM_VATA, 0);
-  waveform.assign(NUM_CH_DPP_ON * layout_.waveform_len, 0);
+  waveform.assign(layout_.waveform_flattened_length, 0);
 
   bindBranches(tpc_tree_);
 }
@@ -472,6 +528,36 @@ void TPCTreeBuffer::getEntry(int64_t entry)
   tpc_tree_->GetEntry(entry);
 }
 
+void TPCTreeBuffer::updateWaveformLayoutFromRegisteredChannels()
+{
+  int waveform_num_channels = 0;
+  waveform_slot_of_dpp_channel_.fill(-1);
+  for (int dpp_ch = 0; dpp_ch < NUM_CH_DPP_MAX; ++dpp_ch) {
+    if (registered_channels[dpp_ch]) {
+      waveform_slot_of_dpp_channel_[dpp_ch] = waveform_num_channels;
+      ++waveform_num_channels;
+    }
+  }
+
+  if (waveform_num_channels <= 0 ){//||
+      //layout_.waveform_flattened_length % waveform_num_channels != 0) {
+    throw std::runtime_error("Unexpected waveform/registered channel layout.");
+  }
+
+  //layout_.waveform_num_channels = waveform_num_channels;
+  //layout_.waveform_len = layout_.waveform_flattened_length / waveform_num_channels;
+  layout_.waveform_num_channels = NUM_CH_DPP_MAX;
+  layout_.waveform_len = layout_.waveform_flattened_length / NUM_CH_DPP_MAX;
+}
+
+int TPCTreeBuffer::waveformSlotForDPPChannel(int dpp_ch) const
+{
+  if (dpp_ch < 0 || dpp_ch >= NUM_CH_DPP_MAX) {
+    return -1;
+  }
+  return waveform_slot_of_dpp_channel_[dpp_ch];
+}
+
 void TPCTreeBuffer::bindBranches(TTree* tpc_tree)
 {
   tpc_tree->SetBranchAddress("adc",           adc.data());
@@ -479,7 +565,7 @@ void TPCTreeBuffer::bindBranches(TTree* tpc_tree)
   tpc_tree->SetBranchAddress("ti",            ti.data());
   tpc_tree->SetBranchAddress("waveform",      waveform.data());
   tpc_tree->SetBranchAddress("wave_compress", wave_compress.data());
-  tpc_tree->SetBranchAddress("registered",    dpp_enable_channels.get());
+  tpc_tree->SetBranchAddress("registered",    registered_channels.data());
   tpc_tree->SetBranchAddress("error_flags",   &error_flags);
 }
 
@@ -487,11 +573,12 @@ TPCTreeReader::TPCTreeReader(TTree* tpc_tree, const Config& cfg)
     : cfg_(cfg),
       tpc_tree_buffer_(tpc_tree),
       fec_selector_(cfg_),
-      light_timing_(makeLightTimingState(tpc_tree_buffer_.layout())),
       fec_ti_tracker_()
 {
   if (tpc_tree_buffer_.nEntries() > 0) {
     tpc_tree_buffer_.getEntry(0);
+    tpc_tree_buffer_.updateWaveformLayoutFromRegisteredChannels();
+    light_timing_ = makeLightTimingState(tpc_tree_buffer_.layout());
     recordLightTimingFromCurrentEntry(light_timing_, cfg_, tpc_tree_buffer_);
   }
 }
@@ -515,11 +602,12 @@ bool TPCTreeReader::processNext(int64_t& raw_event_id,
   const LightStatus light_status = analyzeLightEvent(cfg_, tpc_tree_buffer_,
                                                      light_timing_, light_ok);
   const bool light_pileup = light_status.hasPileup();
-  const bool subset_mask  = tpc_ok && light_status.gamma;
+  const bool time_up      = hasTimeUp(cfg_, tpc_tree_buffer_);
+  const bool charge_selection_enabled = tpc_ok && light_status.gamma;
 
   event_hits = fec_selector_.selectHits(tpc_tree_buffer_,
                                         fec_ti_tracker_,
-                                        subset_mask,
+                                        charge_selection_enabled,
                                         light_status.cosmic,
                                         light_pileup);
   if (!tpc_ok) {
@@ -530,6 +618,8 @@ bool TPCTreeReader::processNext(int64_t& raw_event_id,
     current_event_type_ = TPCEventType::Cosmic;
   } else if (light_status.gamma && !event_hits.empty()) {
     current_event_type_ = TPCEventType::Gamma;
+  } else if (time_up) {
+    current_event_type_ = TPCEventType::TimeUp;
   } else {
     current_event_type_ = TPCEventType::Other;
   }
@@ -610,7 +700,9 @@ QuickLookTreeOutputWriter::QuickLookTreeOutputWriter(
       file_(std::make_unique<TFile>(output_path_.string().c_str(), "RECREATE")),
       quicklook_tree_(std::make_unique<TTree>(kQuickLookTreeName, kQuickLookTreeName)),
       waveform_len_(tpc_tree_layout.waveform_len),
-      waveform_len_branch_(tpc_tree_layout.waveform_len)
+      waveform_num_channels_(tpc_tree_layout.waveform_num_channels),
+      waveform_len_branch_(tpc_tree_layout.waveform_len),
+      waveform_num_channels_branch_(tpc_tree_layout.waveform_num_channels)
 {
   if (file_->IsZombie()) {
     throw std::runtime_error("Failed to create quicklook ROOT file: " +
@@ -618,7 +710,7 @@ QuickLookTreeOutputWriter::QuickLookTreeOutputWriter(
   }
 
   adu_cmn_sub_.assign(NUM_VATA * NUM_CH_EACH_VATA, 0.0f);
-  waveform_.assign(NUM_CH_DPP_ON * waveform_len_, 0);
+  waveform_.assign(waveform_num_channels_ * waveform_len_, 0);
   quicklook_tree_->SetDirectory(nullptr);
   bindBranches();
 }
@@ -642,9 +734,9 @@ void QuickLookTreeOutputWriter::fillEvent(int64_t raw_event_id,
     drift_time_[fec] = tpc_tree_buffer.drift_time[fec];
   }
 
-  for (int ch = 0; ch < NUM_CH_DPP_ON; ++ch) {
+  for (int ch = 0; ch < NUM_CH_DPP_MAX; ++ch) {
     wave_compress_[ch] = tpc_tree_buffer.wave_compress[ch];
-    registered_[ch]    = tpc_tree_buffer.dpp_enable_channels[ch];
+    registered_[ch]    = tpc_tree_buffer.registered_channels[ch];
   }
   waveform_ = tpc_tree_buffer.waveform;
 
@@ -672,15 +764,18 @@ void QuickLookTreeOutputWriter::bindBranches()
   cmn_leaflist_           = "cmn[" + std::to_string(NUM_VATA) + "]/F";
   ti_leaflist_            = "ti[" + std::to_string(NUM_VATA) + "]/i";
   drift_leaflist_         = "drift_time[" + std::to_string(NUM_VATA) + "]/i";
-  wave_compress_leaflist_ = "wave_compress[" + std::to_string(NUM_CH_DPP_ON) + "]/s";
-  registered_leaflist_    = "registered[" + std::to_string(NUM_CH_DPP_ON) + "]/O";
-  waveform_leaflist_      = "waveform[" + std::to_string(NUM_CH_DPP_ON) + "][" +
+  wave_compress_leaflist_ = "wave_compress[" + std::to_string(NUM_CH_DPP_MAX) + "]/s";
+  registered_leaflist_    = "registered[" + std::to_string(NUM_CH_DPP_MAX) + "]/O";
+  waveform_leaflist_      = "waveform[" + std::to_string(waveform_num_channels_) + "][" +
                             std::to_string(waveform_len_) + "]/S";
 
   quicklook_tree_->Branch("raw_event_id", &raw_event_id_, "raw_event_id/L");
   quicklook_tree_->Branch("event_type",   &event_type_,   "event_type/S");
   quicklook_tree_->Branch("cmn_method",   &cmn_method_,   "cmn_method/S");
   quicklook_tree_->Branch("waveform_len", &waveform_len_branch_, "waveform_len/I");
+  quicklook_tree_->Branch("waveform_num_channels",
+                          &waveform_num_channels_branch_,
+                          "waveform_num_channels/I");
   quicklook_tree_->Branch("adu_cmn_sub",  adu_cmn_sub_.data(),  adu_leaflist_.c_str());
   quicklook_tree_->Branch("cmn",          cmn_.data(),          cmn_leaflist_.c_str());
   quicklook_tree_->Branch("ti",           ti_.data(),           ti_leaflist_.c_str());

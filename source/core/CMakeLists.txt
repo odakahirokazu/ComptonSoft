@@ -111,6 +111,8 @@ set(CS_CORE_CLASSES
   src/NanoGRAMSTPCProperty.cc
   src/NanoGRAMSFECGeometry.cc
   src/NanoGRAMSConfig.cc
+  src/NanoGRAMSCalibrationData.cc
+  src/NanoGRAMSHitCalibrator.cc
   src/NanoGRAMSLightAnalysis.cc
   src/NanoGRAMSTPCDataProcessor.cc
   src/TPCTreeIO.cc

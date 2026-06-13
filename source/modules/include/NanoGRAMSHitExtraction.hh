@@ -53,11 +53,12 @@ public:
     return current_event_hits_;
   }
   const std::string& configFilePath() const { return config_file_; }
+  const std::string& tpcTreeFilePath() const { return tpctree_file_; }
 
 private:
   std::string config_file_;
   std::string tpctree_file_;
-  std::string rawhitdata_file_;
+  std::string rawhittree_file_;
   std::string quicklook_file_;
 
   grams::Config cfg_;
