@@ -102,7 +102,8 @@ ANLStatus NanoGRAMSHitExtraction::mod_analyze()
   if (quicklook_tree_writer_) {
     quicklook_tree_writer_->fillEvent(raw_event_id,
                                       tpc_tree_reader_->currentEventType(),
-                                      tpc_tree_reader_->currentBuffer());
+                                      tpc_tree_reader_->currentBuffer(),
+                                      event_hits);
   }
 
   if (!event_hits.empty()) {

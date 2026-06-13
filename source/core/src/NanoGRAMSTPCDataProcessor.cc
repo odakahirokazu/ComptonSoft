@@ -34,6 +34,7 @@
 #include <memory>
 #include <numeric>
 #include <stdexcept>
+#include <string>
 #include <utility>
 
 namespace comptonsoft
@@ -157,20 +158,55 @@ double driftTimeFromClock(uint32_t drift_time_count)
 bool hasTimeUp(const Config& cfg, const TPCTreeBuffer& tpc_tree_buffer)
 {
   for (int fec = 0; fec < NUM_VATA; ++fec) {
-    if (driftTimeFromClock(tpc_tree_buffer.drift_time[fec]) >= cfg.drift_time_max) {
-      return true;
+    if (driftTimeFromClock(tpc_tree_buffer.drift_time[fec]) < cfg.drift_time_max) {
+      return false;
     }
   }
-  return false;
+  return true;
 }
 
 int waveformFlattenedLength(TTree* tpc_tree)
 {
-  const int flattened_len = tpc_tree->GetLeaf("waveform")->GetLenStatic();
+  const TLeaf* leaf = tpc_tree->GetLeaf("waveform");
+  if (!leaf) {
+    throw std::runtime_error("Missing waveform branch.");
+  }
+
+  const int flattened_len = leaf->GetLenStatic();
   if (flattened_len <= 0) {
     throw std::runtime_error("Unexpected waveform branch length.");
   }
   return flattened_len;
+}
+
+int readStaticArrayDimension(const std::string& leaf_title, std::size_t& pos)
+{
+  const std::size_t begin = leaf_title.find('[', pos);
+  const std::size_t end = leaf_title.find(']', begin);
+  if (begin == std::string::npos || end == std::string::npos || end <= begin + 1) {
+    throw std::runtime_error("Failed to parse waveform branch dimensions: " + leaf_title);
+  }
+
+  pos = end + 1;
+  return std::stoi(leaf_title.substr(begin + 1, end - begin - 1));
+}
+
+std::pair<int, int> waveformStaticArrayShape(TTree* tpc_tree)
+{
+  const TLeaf* leaf = tpc_tree->GetLeaf("waveform");
+  if (!leaf) {
+    throw std::runtime_error("Missing waveform branch.");
+  }
+
+  const std::string leaf_title = leaf->GetTitle();
+  std::size_t pos = 0;
+  const int num_channels = readStaticArrayDimension(leaf_title, pos);
+  const int waveform_len = readStaticArrayDimension(leaf_title, pos);
+  if (num_channels <= 0 || waveform_len <= 0) {
+    throw std::runtime_error("Unexpected waveform branch dimensions: " + leaf_title);
+  }
+
+  return {num_channels, waveform_len};
 }
 
 TPCTreeLayout inspectTPCTreeLayout(TTree* tpc_tree)
@@ -180,11 +216,24 @@ TPCTreeLayout inspectTPCTreeLayout(TTree* tpc_tree)
       static_cast<int64_t>(tpc_tree->GetEntries());
   tpc_tree_layout.waveform_flattened_length =
       waveformFlattenedLength(tpc_tree);
+  const auto [waveform_num_channels, waveform_len] =
+      waveformStaticArrayShape(tpc_tree);
+  tpc_tree_layout.waveform_num_channels = waveform_num_channels;
+  tpc_tree_layout.waveform_len = waveform_len;
+
+  if (tpc_tree_layout.waveform_flattened_length !=
+      tpc_tree_layout.waveform_num_channels * tpc_tree_layout.waveform_len) {
+    throw std::runtime_error("Inconsistent waveform branch dimensions.");
+  }
 
   std::cout << "inspectTPCTreeLayout()" << std::endl;
   std::cout << "n_entries:                   " << tpc_tree_layout.n_entries << std::endl;
   std::cout << "num_dpp_registered_slots:    "
             << tpc_tree_layout.num_dpp_registered_slots << std::endl;
+  std::cout << "waveform_num_channels:       "
+            << tpc_tree_layout.waveform_num_channels << std::endl;
+  std::cout << "waveform_len:                "
+            << tpc_tree_layout.waveform_len << std::endl;
   std::cout << "waveform_flattened_length:   "
             << tpc_tree_layout.waveform_flattened_length << std::endl;
   return tpc_tree_layout;
@@ -405,8 +454,8 @@ FECChargeSelector::collectClusterPixels(const FECSelectionInput& input,
   selected_pixels.push_back({fec, core_ch});
 
   auto addCandidatePixel = [&](int candidate_fec, int ch) {
-    if (masks_[candidate_fec][ch] &&
-        !input.claimed_pixels[candidate_fec][ch] &&
+    // Excluded pixels cannot seed a cluster, but can be absorbed by a real core.
+    if (!input.claimed_pixels[candidate_fec][ch] &&
         input.adu_cmn_sub_values[candidate_fec][ch] > cfg_.spread_thr) {
       addPixelIfNew(selected_pixels, candidate_fec, ch);
     }
@@ -530,24 +579,28 @@ void TPCTreeBuffer::getEntry(int64_t entry)
 
 void TPCTreeBuffer::updateWaveformLayoutFromRegisteredChannels()
 {
-  int waveform_num_channels = 0;
   waveform_slot_of_dpp_channel_.fill(-1);
+
+  if (layout_.waveform_num_channels == NUM_CH_DPP_MAX) {
+    for (int dpp_ch = 0; dpp_ch < NUM_CH_DPP_MAX; ++dpp_ch) {
+      if (registered_channels[dpp_ch]) {
+        waveform_slot_of_dpp_channel_[dpp_ch] = dpp_ch;
+      }
+    }
+    return;
+  }
+
+  int registered_count = 0;
   for (int dpp_ch = 0; dpp_ch < NUM_CH_DPP_MAX; ++dpp_ch) {
     if (registered_channels[dpp_ch]) {
-      waveform_slot_of_dpp_channel_[dpp_ch] = waveform_num_channels;
-      ++waveform_num_channels;
+      waveform_slot_of_dpp_channel_[dpp_ch] = registered_count;
+      ++registered_count;
     }
   }
 
-  if (waveform_num_channels <= 0 ){//||
-      //layout_.waveform_flattened_length % waveform_num_channels != 0) {
+  if (registered_count <= 0 || layout_.waveform_num_channels != registered_count) {
     throw std::runtime_error("Unexpected waveform/registered channel layout.");
   }
-
-  //layout_.waveform_num_channels = waveform_num_channels;
-  //layout_.waveform_len = layout_.waveform_flattened_length / waveform_num_channels;
-  layout_.waveform_num_channels = NUM_CH_DPP_MAX;
-  layout_.waveform_len = layout_.waveform_flattened_length / NUM_CH_DPP_MAX;
 }
 
 int TPCTreeBuffer::waveformSlotForDPPChannel(int dpp_ch) const
@@ -719,7 +772,8 @@ QuickLookTreeOutputWriter::~QuickLookTreeOutputWriter() = default;
 
 void QuickLookTreeOutputWriter::fillEvent(int64_t raw_event_id,
                                           TPCEventType event_type,
-                                          const TPCTreeBuffer& tpc_tree_buffer)
+                                          const TPCTreeBuffer& tpc_tree_buffer,
+                                          const std::vector<RawFECHit>& hits)
 {
   if (event_type == TPCEventType::Error) {
     return;
@@ -741,6 +795,25 @@ void QuickLookTreeOutputWriter::fillEvent(int64_t raw_event_id,
   waveform_ = tpc_tree_buffer.waveform;
 
   fillCmnSubtractedADU(event_type, tpc_tree_buffer);
+
+  hit_pixel_fec_.clear();
+  hit_pixel_ch_.clear();
+  hit_pixel_adu_.clear();
+  hit_pixel_cluster_id_.clear();
+  for (std::size_t ihit = 0; ihit < hits.size(); ++ihit) {
+    const RawFECHit& hit = hits[ihit];
+    for (std::size_t j = 0; j < hit.channels.size(); ++j) {
+      hit_pixel_fec_.push_back(j < hit.channel_fecs.size()
+                                   ? hit.channel_fecs[j]
+                                   : static_cast<int16_t>(hit.fec));
+      hit_pixel_ch_.push_back(hit.channels[j]);
+      hit_pixel_adu_.push_back(j < hit.adus.size()
+                                   ? hit.adus[j]
+                                   : std::numeric_limits<float>::quiet_NaN());
+      hit_pixel_cluster_id_.push_back(static_cast<int16_t>(ihit));
+    }
+  }
+
   quicklook_tree_->Fill();
 }
 
@@ -784,6 +857,10 @@ void QuickLookTreeOutputWriter::bindBranches()
                                                                 wave_compress_leaflist_.c_str());
   quicklook_tree_->Branch("registered",   registered_.data(),   registered_leaflist_.c_str());
   quicklook_tree_->Branch("waveform",     waveform_.data(),     waveform_leaflist_.c_str());
+  quicklook_tree_->Branch("hit_pixel_fec",        &hit_pixel_fec_);
+  quicklook_tree_->Branch("hit_pixel_ch",         &hit_pixel_ch_);
+  quicklook_tree_->Branch("hit_pixel_adu",        &hit_pixel_adu_);
+  quicklook_tree_->Branch("hit_pixel_cluster_id", &hit_pixel_cluster_id_);
 }
 
 void QuickLookTreeOutputWriter::fillCmnSubtractedADU(

@@ -50,9 +50,8 @@ struct Config
   //double late_window      = 0.0;
   //double late_peak_thr    = 0.0;
   double pre_roi_window      = 0.0;
-  double pre_roi_peak_thr    = 0.0;
   double post_roi_window     = 0.0;
-  double post_roi_peak_thr   = 0.0;
+  double out_roi_peak_thr    = 0.0;
   double noise_th            = 0.0;
   double circ_min_ratio      = 0.0;
   double timebin_ns_override = 0.0;

@@ -22,6 +22,7 @@
 #include "NanoGRAMSConfig.hh"
 
 #include <algorithm>
+#include <array>
 
 namespace comptonsoft
 {
@@ -29,6 +30,20 @@ namespace grams
 {
 namespace
 {
+
+int channelAtSectionCoordinate(const std::array<int, NUM_CH_EACH_VATA>& grid_to_ch,
+                               int x,
+                               int y)
+{
+  const int row_from_top = kFECSectionSidePixels - 1 - y;
+  const int col_from_left = x;
+  return grid_to_ch[row_from_top * kFECSectionSidePixels + col_from_left];
+}
+
+std::pair<int, int> sectionCoordinate(int row_from_top, int col_from_left)
+{
+  return {col_from_left, kFECSectionSidePixels - 1 - row_from_top};
+}
 
 std::pair<int, int> sectionOrigin(int fec)
 {
@@ -59,12 +74,13 @@ AnodeChannelTopology buildAnodeChannelTopology()
     const auto& grid_to_ch = kFECSectionGridToChannel[fec];
     const auto [origin_x, origin_y] = sectionOrigin(fec);
 
-    for (int xx = 0; xx < kFECSectionSidePixels; ++xx) {
-      for (int yy = 0; yy < kFECSectionSidePixels; ++yy) {
-        const int ch = grid_to_ch[xx * kFECSectionSidePixels + yy];
-        topology.section_grid_of_channel[fec][ch] = {xx, yy};
-        topology.anode_grid_of_channel[fec][ch] = {origin_x + xx, origin_y + yy};
-        global_to_fec_ch[origin_x + xx][origin_y + yy] = {fec, ch};
+    for (int row = 0; row < kFECSectionSidePixels; ++row) {
+      for (int col = 0; col < kFECSectionSidePixels; ++col) {
+        const int ch = grid_to_ch[row * kFECSectionSidePixels + col];
+        const auto [x, y] = sectionCoordinate(row, col);
+        topology.section_grid_of_channel[fec][ch] = {x, y};
+        topology.anode_grid_of_channel[fec][ch] = {origin_x + x, origin_y + y};
+        global_to_fec_ch[origin_x + x][origin_y + y] = {fec, ch};
       }
     }
 
@@ -75,12 +91,12 @@ AnodeChannelTopology buildAnodeChannelTopology()
                                 std::pair<int, int>{1, 0},
                                 std::pair<int, int>{0, -1},
                                 std::pair<int, int>{0, 1}}) {
-        const int xx = x + delta.first;
-        const int yy = y + delta.second;
-        if (0 <= xx && xx < kFECSectionSidePixels &&
-            0 <= yy && yy < kFECSectionSidePixels) {
+        const int neighbor_x = x + delta.first;
+        const int neighbor_y = y + delta.second;
+        if (0 <= neighbor_x && neighbor_x < kFECSectionSidePixels &&
+            0 <= neighbor_y && neighbor_y < kFECSectionSidePixels) {
           topology.section_cross_neighbors[fec][ch].push_back(
-              grid_to_ch[xx * kFECSectionSidePixels + yy]);
+              channelAtSectionCoordinate(grid_to_ch, neighbor_x, neighbor_y));
         }
       }
 
@@ -88,22 +104,22 @@ AnodeChannelTopology buildAnodeChannelTopology()
                                 std::pair<int, int>{-1, 1},
                                 std::pair<int, int>{1, -1},
                                 std::pair<int, int>{1, 1}}) {
-        const int xx = x + delta.first;
-        const int yy = y + delta.second;
-        if (0 <= xx && xx < kFECSectionSidePixels &&
-            0 <= yy && yy < kFECSectionSidePixels) {
+        const int neighbor_x = x + delta.first;
+        const int neighbor_y = y + delta.second;
+        if (0 <= neighbor_x && neighbor_x < kFECSectionSidePixels &&
+            0 <= neighbor_y && neighbor_y < kFECSectionSidePixels) {
           topology.section_diag_neighbors[fec][ch].push_back(
-              grid_to_ch[xx * kFECSectionSidePixels + yy]);
+              channelAtSectionCoordinate(grid_to_ch, neighbor_x, neighbor_y));
         }
       }
     }
 
     std::vector<int> periphery;
-    for (int xx = 0; xx < kFECSectionSidePixels; ++xx) {
-      for (int yy = 0; yy < kFECSectionSidePixels; ++yy) {
-        if (xx == 0 || xx == kFECSectionSidePixels - 1 ||
-            yy == 0 || yy == kFECSectionSidePixels - 1) {
-          periphery.push_back(grid_to_ch[xx * kFECSectionSidePixels + yy]);
+    for (int x = 0; x < kFECSectionSidePixels; ++x) {
+      for (int y = 0; y < kFECSectionSidePixels; ++y) {
+        if (x == 0 || x == kFECSectionSidePixels - 1 ||
+            y == 0 || y == kFECSectionSidePixels - 1) {
+          periphery.push_back(channelAtSectionCoordinate(grid_to_ch, x, y));
         }
       }
     }
@@ -121,11 +137,11 @@ AnodeChannelTopology buildAnodeChannelTopology()
                                 std::pair<int, int>{1, 0},
                                 std::pair<int, int>{0, -1},
                                 std::pair<int, int>{0, 1}}) {
-        const int xx = global_x + delta.first;
-        const int yy = global_y + delta.second;
-        if (0 <= xx && xx < kTPCPlaneSidePixels &&
-            0 <= yy && yy < kTPCPlaneSidePixels) {
-          const auto [other_fec, other_ch] = global_to_fec_ch[xx][yy];
+        const int neighbor_x = global_x + delta.first;
+        const int neighbor_y = global_y + delta.second;
+        if (0 <= neighbor_x && neighbor_x < kTPCPlaneSidePixels &&
+            0 <= neighbor_y && neighbor_y < kTPCPlaneSidePixels) {
+          const auto [other_fec, other_ch] = global_to_fec_ch[neighbor_x][neighbor_y];
           if (other_fec >= 0 && other_fec != fec) {
             topology.cross_section_neighbors[fec][ch].push_back({other_fec, other_ch});
           }
@@ -136,11 +152,11 @@ AnodeChannelTopology buildAnodeChannelTopology()
                                 std::pair<int, int>{-1, 1},
                                 std::pair<int, int>{1, -1},
                                 std::pair<int, int>{1, 1}}) {
-        const int xx = global_x + delta.first;
-        const int yy = global_y + delta.second;
-        if (0 <= xx && xx < kTPCPlaneSidePixels &&
-            0 <= yy && yy < kTPCPlaneSidePixels) {
-          const auto [other_fec, other_ch] = global_to_fec_ch[xx][yy];
+        const int neighbor_x = global_x + delta.first;
+        const int neighbor_y = global_y + delta.second;
+        if (0 <= neighbor_x && neighbor_x < kTPCPlaneSidePixels &&
+            0 <= neighbor_y && neighbor_y < kTPCPlaneSidePixels) {
+          const auto [other_fec, other_ch] = global_to_fec_ch[neighbor_x][neighbor_y];
           if (other_fec >= 0 && other_fec != fec) {
             topology.diag_section_neighbors[fec][ch].push_back({other_fec, other_ch});
           }

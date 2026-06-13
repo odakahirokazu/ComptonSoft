@@ -90,8 +90,7 @@ void readLightConfig(Config& cfg, const YAML::Node& node)
   cfg.light_cosmic_thr = nodeLight["light_cosmic_thr_mV"].as<double>() * (unit::volt/1000.0);
   cfg.pre_roi_window   = nodeLight["pre_roi_window_us"].as<double>() * unit::us;
   cfg.post_roi_window  = nodeLight["post_roi_window_us"].as<double>() * unit::us;
-  cfg.pre_roi_peak_thr = nodeLight["pre_roi_peak_thr_mV"].as<double>() * (unit::volt/1000.0);
-  cfg.post_roi_peak_thr = nodeLight["post_roi_peak_thr_mV"].as<double>() * (unit::volt/1000.0);
+  cfg.out_roi_peak_thr = nodeLight["out_roi_peak_thr_mV"].as<double>() * (unit::volt/1000.0);
   cfg.light_channels   = nodeLight["light_channels"].as<std::vector<int>>();
   cfg.light_waveform_analysis = normalizeLightWaveformAnalysis(
       nodeLight["waveform_analysis"] ?
@@ -104,8 +103,7 @@ void readLightConfig(Config& cfg, const YAML::Node& node)
   std::cout << "light_cosmic_thr_mV:  " << cfg.light_cosmic_thr / (unit::volt/1000.0) << std::endl;
   std::cout << "pre_roi_window_us:  "   << cfg.pre_roi_window / unit::us << std::endl;
   std::cout << "post_roi_window_us: "   << cfg.post_roi_window / unit::us << std::endl;
-  std::cout << "pre_roi_peak_thr_mV:  " << cfg.pre_roi_peak_thr  / (unit::volt/1000.0) << std::endl;
-  std::cout << "post_roi_peak_thr_mV: " << cfg.post_roi_peak_thr  / (unit::volt/1000.0) << std::endl;
+  std::cout << "out_roi_peak_thr_mV: "  << cfg.out_roi_peak_thr  / (unit::volt/1000.0) << std::endl;
   std::cout << "waveform_analysis:   " << cfg.light_waveform_analysis << std::endl;
 
   std::cout << "light_channels: [ ";

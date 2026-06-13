@@ -41,8 +41,8 @@ constexpr double kClkToUs         = 0.01; // 1 clock = 10 ns
 constexpr int kFECSectionSidePixels = 8;
 constexpr int kTPCPlaneSidePixels   = 2 * kFECSectionSidePixels;
 
-// Channel number at each local 8x8 grid point of a FEC section.
-// The flattened index is x * kFECSectionSidePixels + y.
+// Channel number at each FEC section grid point in image order:
+// top-to-bottom rows, left-to-right columns.
 constexpr std::array<std::array<int, NUM_CH_EACH_VATA>, NUM_VATA> kFECSectionGridToChannel = {{
     {0,  8, 23, 24, 39, 40, 55, 63,
      1,  9, 22, 25, 38, 41, 54, 62,

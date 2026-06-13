@@ -117,9 +117,9 @@ void updateLightStatusFromPeaks(LightStatus& status,
 {
   status.cosmic = status.cosmic || (peaks.peak > cfg.light_cosmic_thr);
   status.pileup_pre_roi =
-      status.pileup_pre_roi || (peaks.pre_roi_peak > cfg.pre_roi_peak_thr);
+      status.pileup_pre_roi || (peaks.pre_roi_peak > cfg.out_roi_peak_thr);
   status.pileup_post_roi =
-      status.pileup_post_roi || (peaks.post_roi_peak > cfg.post_roi_peak_thr);
+      status.pileup_post_roi || (peaks.post_roi_peak > cfg.out_roi_peak_thr);
   status.gamma = status.gamma || (peaks.peak > cfg.light_gamma_thr);
 }
 

@@ -225,7 +225,8 @@ public:
 
   void fillEvent(int64_t raw_event_id,
                  TPCEventType event_type,
-                 const TPCTreeBuffer& tpc_tree_buffer);
+                 const TPCTreeBuffer& tpc_tree_buffer,
+                 const std::vector<RawFECHit>& hits);
   std::string close();
 
 private:
@@ -258,6 +259,10 @@ private:
   std::array<uint16_t, NUM_CH_DPP_MAX> wave_compress_{};
   std::array<bool, NUM_CH_DPP_MAX> registered_{};
   std::vector<int16_t> waveform_;
+  std::vector<int16_t> hit_pixel_fec_;
+  std::vector<int16_t> hit_pixel_ch_;
+  std::vector<float> hit_pixel_adu_;
+  std::vector<int16_t> hit_pixel_cluster_id_;
 };
 
 } /* namespace grams */
