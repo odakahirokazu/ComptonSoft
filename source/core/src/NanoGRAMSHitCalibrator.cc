@@ -164,8 +164,10 @@ std::vector<DetectorHit_sptr> buildCalibratedHits(
     std::vector<double> energies(n, 0.0);
     std::vector<int> channel_fecs(n, raw_hit.fec);
     for (std::size_t i = 0; i < n; ++i) {
-      const int fec = i < raw_hit.channel_fecs.size() ? raw_hit.channel_fecs[i] :
-                                                     raw_hit.fec;
+      int fec = raw_hit.fec;
+      if (i < raw_hit.channel_fecs.size()) {
+        fec = raw_hit.channel_fecs[i];
+      }
       const int ch = raw_hit.channels[i];
       if (fec < 0 || fec >= NUM_VATA) {
         throw std::runtime_error("FEC index out of range in NanoGRAMS calibration.");
@@ -230,7 +232,7 @@ std::vector<DetectorHit_sptr> buildCalibratedHits(
 
     hit->setReadoutChannelID(channel_fec, channel_fec, channel);
     hit->setVoxel(kPixelX[channel], kPixelY[channel], VoxelID::Undefined);
-    hit->setEnergy(total_energy * config.energy.factor_energy);
+    hit->setEnergy(total_energy);
     hit->setPosition(posx, posy, posz);
     hit->setPositionError(tpc_property.posXError(),
                           tpc_property.posYError(),

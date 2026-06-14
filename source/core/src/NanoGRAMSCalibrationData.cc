@@ -255,7 +255,6 @@ CalibrationConfig readCalibrationConfig(const std::string& config_file)
 
   cfg.energy.gain_info_file       = node_energy["gain_info_file"].as<std::string>();
   cfg.energy.q_to_kev_spline_file = node_energy["q_to_kev_spline_file"].as<std::string>();
-  cfg.energy.factor_energy        = node_energy["factor_energy"].as<double>();
   cfg.energy.max_time             = node_energy["max_time_us"].as<double>() * unit::us;
   cfg.energy.tp_channel           = node_energy["tp_channel"].as<int>();
   cfg.energy.ccal                 = node_energy["ccal"].as<int>();
@@ -270,7 +269,6 @@ CalibrationConfig readCalibrationConfig(const std::string& config_file)
   std::cout << "q_to_kev_spline_file: " << cfg.energy.q_to_kev_spline_file << std::endl;
   std::cout << "efield_v_cm: "          << cfg.general.efield / (unit::volt/unit::cm)  << std::endl;
   std::cout << "temperature_k: "        << cfg.general.temperature / unit::kelvin<< std::endl;
-  std::cout << "factor_energy: "        << cfg.energy.factor_energy  << std::endl;
   std::cout << "max_time_us: "          << cfg.energy.max_time / unit::us    << std::endl;
   std::cout << "tp_channel: "           << cfg.energy.tp_channel     << std::endl;
   std::cout << "ccal: "                 << cfg.energy.ccal           << std::endl;

@@ -54,7 +54,7 @@ int lowerBoundTimeIndex(double time_window,
   return std::clamp(static_cast<int>(std::ceil(raw - 1e-12)), 0, waveform_len);
 }
 
-//How to define "wave_compress"?
+// Temporary wave_compress interpretation.
 double waveCompressToTimebin(uint16_t wave_compress)
 {
     //if((0<=wave_compress)&&(wave_compress<=8)){
@@ -65,6 +65,16 @@ double waveCompressToTimebin(uint16_t wave_compress)
     //}
     //return 32.0 * unit::ns; //temporary
     return static_cast<double>(wave_compress) * unit::ns;
+}
+
+bool usesLightAnalysis(const Config& cfg)
+{
+  return cfg.light_event_selection_mode != LightEventSelectionMode::Disabled;
+}
+
+bool requiresLightGamma(const Config& cfg)
+{
+  return cfg.light_event_selection_mode == LightEventSelectionMode::GammaRequired;
 }
 
 std::filesystem::path prepareOutputPath(const std::string& output_file_path)
@@ -106,8 +116,10 @@ std::pair<int, double> findCoreChannel(const PixelADU& adu_cmn_sub,
   double core_value = -std::numeric_limits<double>::infinity();
 
   for (int ch = 0; ch < NUM_CH_EACH_VATA; ++ch) {
-    const double value = mask[ch] ? adu_cmn_sub[ch] :
-                                    -std::numeric_limits<double>::infinity();
+    double value = -std::numeric_limits<double>::infinity();
+    if (mask[ch]) {
+      value = adu_cmn_sub[ch];
+    }
     if (value > core_value) {
       core_value = value;
       core_ch = ch;
@@ -314,10 +326,10 @@ FECChargeSelector::FECChargeSelector(const Config& cfg)
 {
   for (int fec = 0; fec < NUM_VATA; ++fec) {
     masks_[fec] = buildFECMask(cfg_, fec);
-    const int perimeter = static_cast<int>(anode_topology_.periphery[fec].size());
     min_periph_hits_[fec] =
-        std::max(cfg_.circ_min_hits,
-                 static_cast<int>(std::ceil(cfg_.circ_min_ratio * perimeter)));
+        cfg_.circ_min_hits;
+        //std::max(cfg_.circ_min_hits,
+        //         static_cast<int>(std::ceil(cfg_.circ_min_ratio * perimeter)));
   }
 }
 
@@ -409,8 +421,13 @@ bool FECChargeSelector::isCircleNoise(const FECSelectionInput& input) const
     }
   }
 
-  const double edge_sum = (std::isfinite(adu_cmn_sub[0]) ? adu_cmn_sub[0] : 0.0) +
-                          (std::isfinite(adu_cmn_sub[63]) ? adu_cmn_sub[63] : 0.0);
+  double edge_sum = 0.0;
+  if (std::isfinite(adu_cmn_sub[0])) {
+    edge_sum += adu_cmn_sub[0];
+  }
+  if (std::isfinite(adu_cmn_sub[63])) {
+    edge_sum += adu_cmn_sub[63];
+  }
   return count_periph >= min_periph_hits_[fec] || edge_sum > cfg_.noise_th;
 }
 
@@ -652,25 +669,36 @@ bool TPCTreeReader::processNext(int64_t& raw_event_id,
   const int err = static_cast<int>(tpc_tree_buffer_.error_flags);
   const bool tpc_ok   = (err == 0);
   const bool light_ok = (err == 0 || err == 4);
-  const LightStatus light_status = analyzeLightEvent(cfg_, tpc_tree_buffer_,
-                                                     light_timing_, light_ok);
-  const bool light_pileup = light_status.hasPileup();
+  LightStatus light_status;
+  if (usesLightAnalysis(cfg_)) {
+    light_status = analyzeLightEvent(cfg_, tpc_tree_buffer_, light_timing_, light_ok);
+  }
+
+  bool light_pileup = false;
+  bool light_cosmic = false;
+  bool charge_selection_enabled = tpc_ok;
+  if (usesLightAnalysis(cfg_)) {
+    light_pileup = light_status.hasPileup();
+    light_cosmic = light_status.cosmic;
+    if (requiresLightGamma(cfg_)) {
+      charge_selection_enabled = tpc_ok && light_status.gamma;
+    }
+  }
   const bool time_up      = hasTimeUp(cfg_, tpc_tree_buffer_);
-  const bool charge_selection_enabled = tpc_ok && light_status.gamma;
 
   event_hits = fec_selector_.selectHits(tpc_tree_buffer_,
                                         fec_ti_tracker_,
                                         charge_selection_enabled,
-                                        light_status.cosmic,
+                                        light_cosmic,
                                         light_pileup);
   if (!tpc_ok) {
     current_event_type_ = TPCEventType::Error;
+  } else if (!event_hits.empty()) {
+    current_event_type_ = TPCEventType::Gamma;
   } else if (light_pileup) {
     current_event_type_ = TPCEventType::PileUp;
-  } else if (light_status.cosmic) {
+  } else if (light_cosmic) {
     current_event_type_ = TPCEventType::Cosmic;
-  } else if (light_status.gamma && !event_hits.empty()) {
-    current_event_type_ = TPCEventType::Gamma;
   } else if (time_up) {
     current_event_type_ = TPCEventType::TimeUp;
   } else {
@@ -711,10 +739,17 @@ void RawHitTreeOutputWriter::fillEvent(int64_t event_id,
     drifttime_ = static_cast<float>(hit.drift_time);
 
     for (std::size_t j = 0; j < hit.channels.size(); ++j) {
-      fecid_ = j < hit.channel_fecs.size() ? hit.channel_fecs[j] :
-                                            static_cast<int16_t>(hit.fec);
+      if (j < hit.channel_fecs.size()) {
+        fecid_ = hit.channel_fecs[j];
+      } else {
+        fecid_ = static_cast<int16_t>(hit.fec);
+      }
       ch_  = hit.channels[j];
-      adu_ = j < hit.adus.size() ? hit.adus[j] : std::numeric_limits<float>::quiet_NaN();
+      if (j < hit.adus.size()) {
+        adu_ = hit.adus[j];
+      } else {
+        adu_ = std::numeric_limits<float>::quiet_NaN();
+      }
       rawhit_tree_->Fill();
     }
   }
@@ -781,7 +816,10 @@ void QuickLookTreeOutputWriter::fillEvent(int64_t raw_event_id,
 
   raw_event_id_ = raw_event_id;
   event_type_   = static_cast<int16_t>(event_type);
-  cmn_method_   = (event_type == TPCEventType::Cosmic) ? 1 : 0;
+  cmn_method_ = 0;
+  if (event_type == TPCEventType::Cosmic) {
+    cmn_method_ = 1;
+  }
 
   for (int fec = 0; fec < NUM_VATA; ++fec) {
     ti_[fec]         = tpc_tree_buffer.ti[fec];
@@ -803,13 +841,17 @@ void QuickLookTreeOutputWriter::fillEvent(int64_t raw_event_id,
   for (std::size_t ihit = 0; ihit < hits.size(); ++ihit) {
     const RawFECHit& hit = hits[ihit];
     for (std::size_t j = 0; j < hit.channels.size(); ++j) {
-      hit_pixel_fec_.push_back(j < hit.channel_fecs.size()
-                                   ? hit.channel_fecs[j]
-                                   : static_cast<int16_t>(hit.fec));
+      if (j < hit.channel_fecs.size()) {
+        hit_pixel_fec_.push_back(hit.channel_fecs[j]);
+      } else {
+        hit_pixel_fec_.push_back(static_cast<int16_t>(hit.fec));
+      }
       hit_pixel_ch_.push_back(hit.channels[j]);
-      hit_pixel_adu_.push_back(j < hit.adus.size()
-                                   ? hit.adus[j]
-                                   : std::numeric_limits<float>::quiet_NaN());
+      if (j < hit.adus.size()) {
+        hit_pixel_adu_.push_back(hit.adus[j]);
+      } else {
+        hit_pixel_adu_.push_back(std::numeric_limits<float>::quiet_NaN());
+      }
       hit_pixel_cluster_id_.push_back(static_cast<int16_t>(ihit));
     }
   }
@@ -874,9 +916,10 @@ void QuickLookTreeOutputWriter::fillCmnSubtractedADU(
           static_cast<double>(tpc_tree_buffer.adc[fec * NUM_CH_EACH_VATA + ch]);
     }
 
-    const double cmn = (event_type == TPCEventType::Cosmic)
-        ? lowerMean(adu_values, 10)
-        : median64(adu_values);
+    double cmn = median64(adu_values);
+    if (event_type == TPCEventType::Cosmic) {
+      cmn = lowerMean(adu_values, 10);
+    }
     cmn_[fec] = static_cast<float>(cmn);
 
     for (int ch = 0; ch < NUM_CH_EACH_VATA; ++ch) {

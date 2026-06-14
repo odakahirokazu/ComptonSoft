@@ -173,8 +173,8 @@ PixelMask buildFECMask(const Config& cfg, int fec)
   PixelMask mask{};
   mask.fill(1);
 
-  const auto it = cfg.exclude_pix.find(fec);
-  if (it != cfg.exclude_pix.end()) {
+  const auto it = cfg.core_exclude_pix.find(fec);
+  if (it != cfg.core_exclude_pix.end()) {
     for (int ch : it->second) {
       if (0 <= ch && ch < NUM_CH_EACH_VATA) {
         mask[ch] = 0;

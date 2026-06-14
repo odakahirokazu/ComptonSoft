@@ -20,6 +20,9 @@
 #ifndef COMPTONSOFT_NanoGRAMSEventReconstructionAlgorithm_H
 #define COMPTONSOFT_NanoGRAMSEventReconstructionAlgorithm_H 1
 
+#include <array>
+
+#include "NanoGRAMSConstants.hh"
 #include "VEventReconstructionAlgorithm.hh"
 #include "TString.h"
 #include "TFile.h"
@@ -74,15 +77,17 @@ protected:
 private:
   void setTotalEnergyDepositsAndNumHits(const std::vector<DetectorHit_sptr>& hits);
   bool isSatisfyKinematics(const std::vector<DetectorHit_sptr>& ordered_hits, double incident_energy);
+  std::vector<DetectorHit_sptr> correctedHits(const std::vector<DetectorHit_sptr>& hits) const;
+  double energyCorrectionFactor(const DetectorHit_sptr& hit) const;
 
 private:
   double total_energy_deposits_;
   double num_hits_;
+  std::array<double, NUM_VATA> energy_correction_factors_{};
   std::vector<double> incident_energy_candidates_;
   bool is_escape_event_ = false;
 
   bool selecting_most_likely_order_ = true;
-  bool kinematics_check_ = true;
 };
 
 } /* namespace comptonsoft */

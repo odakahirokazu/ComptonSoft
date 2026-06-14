@@ -19,6 +19,8 @@
 
 #include "NanoGRAMSEventReconstructionAlgorithm.hh"
 #include <algorithm>
+#include <stdexcept>
+#include <utility>
 #include "AstroUnits.hh"
 #include "DetectorHit.hh"
 #include "ComptonConstraints.hh"
@@ -29,9 +31,103 @@ namespace comptonsoft {
 
 using namespace compton_constraints;
 
+namespace
+{
+
+std::array<double, NUM_VATA> defaultEnergyCorrectionFactors()
+{
+  std::array<double, NUM_VATA> factors{};
+  factors.fill(1.0);
+  return factors;
+}
+
+void validateEnergyCorrectionFactors(const std::array<double, NUM_VATA>& factors)
+{
+  for (int fec = 0; fec < NUM_VATA; ++fec) {
+    if (factors[fec] <= 0.0) {
+      throw std::runtime_error("energy_correction_factor values must be positive.");
+    }
+  }
+}
+
+void printEnergyCorrectionFactors(const std::array<double, NUM_VATA>& factors)
+{
+  std::cout << "energy_correction_factor: [ ";
+  for (int fec = 0; fec < NUM_VATA; ++fec) {
+    if (fec != 0) {
+      std::cout << ", ";
+    }
+    std::cout << factors[fec];
+  }
+  std::cout << " ]" << std::endl;
+}
+
+std::array<double, NUM_VATA>
+readEnergyCorrectionFactors(boost::property_tree::ptree& pt)
+{
+  std::array<double, NUM_VATA> factors = defaultEnergyCorrectionFactors();
+  auto node = pt.get_child_optional("energy_correction_factor");
+  if (!node) {
+    node = pt.get_child_optional("energy_correction_factors");
+  }
+  if (!node) {
+    return factors;
+  }
+  if (node->empty()) {
+    throw std::runtime_error("energy_correction_factor must be a length-4 array.");
+  }
+
+  int index = 0;
+  for (const auto& item : *node) {
+    if (index >= NUM_VATA) {
+      throw std::runtime_error("energy_correction_factor must contain exactly 4 values.");
+    }
+    factors[index] = item.second.get_value<double>();
+    ++index;
+  }
+  if (index != NUM_VATA) {
+    throw std::runtime_error("energy_correction_factor must contain exactly 4 values.");
+  }
+
+  validateEnergyCorrectionFactors(factors);
+  return factors;
+}
+
+#if CS_USE_YAMLCPP
+std::array<double, NUM_VATA>
+readEnergyCorrectionFactors(YAML::Node& node)
+{
+  std::array<double, NUM_VATA> factors = defaultEnergyCorrectionFactors();
+  YAML::Node factor_node = node["energy_correction_factor"];
+  if (!factor_node) {
+    factor_node = node["energy_correction_factors"];
+  }
+  if (!factor_node) {
+    return factors;
+  }
+  if (!factor_node.IsSequence()) {
+    throw std::runtime_error("energy_correction_factor must be a length-4 array.");
+  }
+
+  const std::vector<double> values = factor_node.as<std::vector<double>>();
+  if (values.size() != NUM_VATA) {
+    throw std::runtime_error("energy_correction_factor must contain exactly 4 values.");
+  }
+  for (int fec = 0; fec < NUM_VATA; ++fec) {
+    factors[fec] = values[fec];
+  }
+
+  validateEnergyCorrectionFactors(factors);
+  return factors;
+}
+#endif /* CS_USE_YAMLCPP */
+
+} // namespace
+
 NanoGRAMSEventReconstructionAlgorithm::NanoGRAMSEventReconstructionAlgorithm()
     : is_escape_event_(true)
 {
+  energy_correction_factors_.fill(1.0);
 }
 
 NanoGRAMSEventReconstructionAlgorithm::~NanoGRAMSEventReconstructionAlgorithm() = default;
@@ -39,6 +135,7 @@ NanoGRAMSEventReconstructionAlgorithm::~NanoGRAMSEventReconstructionAlgorithm() 
 bool NanoGRAMSEventReconstructionAlgorithm::loadParameters(boost::property_tree::ptree& pt)
 {
     incident_energy_candidates_.clear();
+    energy_correction_factors_ = readEnergyCorrectionFactors(pt);
 
     for (const auto& item : pt.get_child("incident_energy_candidates")) {
         incident_energy_candidates_.push_back(item.second.get_value<double>() * unit::keV);
@@ -48,6 +145,7 @@ bool NanoGRAMSEventReconstructionAlgorithm::loadParameters(boost::property_tree:
     for (double e : incident_energy_candidates_) {
         std::cout << e / unit::keV << " keV" << std::endl;
     }
+    printEnergyCorrectionFactors(energy_correction_factors_);
     std::cout << std::endl;;
 
     return true;
@@ -57,6 +155,8 @@ bool NanoGRAMSEventReconstructionAlgorithm::loadParameters(boost::property_tree:
 bool NanoGRAMSEventReconstructionAlgorithm::loadParametersYAML(YAML::Node& node)
 {
     incident_energy_candidates_.clear();
+    energy_correction_factors_ = readEnergyCorrectionFactors(node);
+
     std::vector<double> energy_values = node["incident_energy_candidates"].as<std::vector<double>>();
 
     for (const auto& energy_keV : energy_values) {
@@ -67,6 +167,7 @@ bool NanoGRAMSEventReconstructionAlgorithm::loadParametersYAML(YAML::Node& node)
     for (double e : incident_energy_candidates_) {
         std::cout << e / unit::keV << " keV" << std::endl;
     }
+    printEnergyCorrectionFactors(energy_correction_factors_);
     std::cout << std::endl;;
 
     return true;
@@ -82,13 +183,14 @@ reconstruct(const std::vector<DetectorHit_sptr>& hits,
             const BasicComptonEvent& baseEvent,
             std::vector<BasicComptonEvent_sptr>& eventsReconstructed)
 {
-  setTotalEnergyDepositsAndNumHits(hits);
+  const std::vector<DetectorHit_sptr> corrected_hits = correctedHits(hits);
+  setTotalEnergyDepositsAndNumHits(corrected_hits);
 
   bool result = false;
   if (num_hits_ != 2) {
       return false;
   } else{
-      result = reconstruct2HitEvent(hits, baseEvent, eventsReconstructed);
+      result = reconstruct2HitEvent(corrected_hits, baseEvent, eventsReconstructed);
   }
 
   if (result == true) {
@@ -178,6 +280,33 @@ void NanoGRAMSEventReconstructionAlgorithm::setTotalEnergyDepositsAndNumHits(con
   num_hits_ = hits.size();
 }
 
+std::vector<DetectorHit_sptr>
+NanoGRAMSEventReconstructionAlgorithm::correctedHits(
+    const std::vector<DetectorHit_sptr>& hits) const
+{
+  std::vector<DetectorHit_sptr> corrected_hits;
+  corrected_hits.reserve(hits.size());
+
+  for (const auto& hit : hits) {
+    const double correction_factor = energyCorrectionFactor(hit);
+    DetectorHit_sptr corrected_hit = hit->clone();
+    corrected_hit->setEnergy(hit->Energy() * correction_factor);
+    corrected_hit->setEnergyError(hit->EnergyError() * correction_factor);
+    corrected_hits.push_back(std::move(corrected_hit));
+  }
+
+  return corrected_hits;
+}
+
+double NanoGRAMSEventReconstructionAlgorithm::energyCorrectionFactor(
+    const DetectorHit_sptr& hit) const
+{
+  const int fec = hit->ReadoutModuleID();
+  if (fec < 0 || fec >= NUM_VATA) {
+    throw std::runtime_error("NanoGRAMS hit has an invalid readout FEC ID.");
+  }
+  return energy_correction_factors_[fec];
+}
 
 bool NanoGRAMSEventReconstructionAlgorithm::isSatisfyKinematics(const std::vector<DetectorHit_sptr>& ordered_hits, double incident_energy)
 {

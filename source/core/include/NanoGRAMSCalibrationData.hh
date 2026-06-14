@@ -35,7 +35,6 @@ struct EnergyCalibrationConfig
 {
   std::string gain_info_file;
   std::string q_to_kev_spline_file;
-  double factor_energy = 1.0;
   double max_time = 67.0 * anlgeant4::unit::us;
   int tp_channel = 17;
   int ccal = 8;

@@ -46,7 +46,13 @@ public:
   anlnext::ANLStatus mod_end_run()    override;
 
   bool hasCurrentEvent() const { return !current_event_hits_.empty(); }
-  int64_t currentEventId() const { return hasCurrentEvent() ? gamma_events_ - 1 : -1; }
+  int64_t currentEventId() const
+  {
+    if (hasCurrentEvent()) {
+      return gamma_events_ - 1;
+    }
+    return -1;
+  }
   int64_t currentRawEventId() const { return current_raw_event_id_; }
   const std::vector<grams::RawFECHit>& currentEventHits() const
   {
