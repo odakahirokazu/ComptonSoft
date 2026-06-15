@@ -127,7 +127,7 @@ reconstruct(const std::vector<DetectorHit_sptr>& hits,
 {
   setTotalEnergyDepositsAndNumHits(hits);
 
-  if (num_hits_ > MaxHits() || num_hits_< 2) {
+  if (num_hits_ > MaxHits() || num_hits_< MinHits()) {
     return false;
   }
 
