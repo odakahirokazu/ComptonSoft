@@ -65,10 +65,14 @@ protected:
   { return event_reconstruction_module_; }
   
 private:
+  void setupPlaneImageAxes();
+
   EventReconstruction* event_reconstruction_module_;
 
   vector3_t plane_normal_;
   vector3_t plane_point_;
+  vector3_t plane_yaxis_;
+  vector3_t plane_xaxis_;
 
   TH2D* hist_bp_all_;
   std::vector<TH2D*> hist_vec_;

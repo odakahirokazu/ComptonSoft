@@ -21,6 +21,7 @@
 
 #include <cmath>
 #include <random>
+#include <stdexcept>
 #include "AstroUnits.hh"
 #include "TDirectory.h"
 #include "BasicComptonEvent.hh"
@@ -37,6 +38,8 @@ BackProjection::BackProjection()
   : event_reconstruction_module_(nullptr),
     plane_normal_(0.0, 0.0, 1.0),
     plane_point_(0.0*unit::cm, 0.0*unit::cm, 10.0*unit::cm),
+    plane_yaxis_(0.0, 1.0, 0.0),
+    plane_xaxis_(1.0, 0.0, 0.0),
     num_pixel_x_(256), num_pixel_y_(256),
     range_x1_(-4.0*unit::cm), range_x2_(+4.0*unit::cm),
     range_y1_(-4.0*unit::cm), range_y2_(+4.0*unit::cm),
@@ -52,6 +55,7 @@ ANLStatus BackProjection::mod_define()
 {
   define_parameter("plane_normal", &mod_class::plane_normal_);
   define_parameter("plane_point", &mod_class::plane_point_, 1, pixel_unit_name_);
+  define_parameter("plane_yaxis", &mod_class::plane_yaxis_);
   define_parameter("num_pixel_x", &mod_class::num_pixel_x_);
   define_parameter("num_pixel_y", &mod_class::num_pixel_y_);
   define_parameter("x_min", &mod_class::range_x1_, 1, pixel_unit_name_);
@@ -69,6 +73,7 @@ ANLStatus BackProjection::mod_initialize()
   VCSModule::mod_initialize();
 
   get_module_NC("EventReconstruction", &event_reconstruction_module_);
+  setupPlaneImageAxes();
   
   mkdir();
   
@@ -123,7 +128,10 @@ ANLStatus BackProjection::mod_analyze()
       vector3_t cone_section;
       const bool positive = sectionConeAndPlane(cone_vertex, cone1, cone_section);
       if (positive) {
-        fillImage(cone_section.x()/PixelUnit(), cone_section.y()/PixelUnit(), weight);
+        const vector3_t local_position = cone_section - plane_point_;
+        const double x = local_position.dot(plane_xaxis_);
+        const double y = local_position.dot(plane_yaxis_);
+        fillImage(x/PixelUnit(), y/PixelUnit(), weight);
       }
     }
   }
@@ -143,11 +151,44 @@ void BackProjection::fillImage(double x, double y, double weight)
 
 bool BackProjection::sectionConeAndPlane(const vector3_t& vertex, const vector3_t& cone, vector3_t& cone_section)
 {
-  const double t = plane_normal_.dot(plane_point_-vertex)/plane_normal_.dot(cone);
+  const double denominator = plane_normal_.dot(cone);
+  if (std::abs(denominator) < 1.0e-12) {
+    return false;
+  }
+
+  const double t = plane_normal_.dot(plane_point_-vertex)/denominator;
   cone_section = vertex + t*cone;
 
   if (t < 0.0) { return false; }
   return true;
+}
+
+void BackProjection::setupPlaneImageAxes()
+{
+  if (plane_normal_.mag() <= 0.0) {
+    throw std::runtime_error("BackProjection: plane_normal must be non-zero.");
+  }
+  plane_normal_ = plane_normal_.unit();
+
+  const vector3_t yaxis_on_plane =
+      plane_yaxis_ - plane_yaxis_.dot(plane_normal_)*plane_normal_;
+  if (yaxis_on_plane.mag() <= 0.0) {
+    throw std::runtime_error(
+        "BackProjection: plane_yaxis must not be parallel to plane_normal.");
+  }
+  plane_yaxis_ = yaxis_on_plane.unit();
+  plane_xaxis_ = plane_yaxis_.cross(plane_normal_).unit();
+
+  std::cout << "BackProjection plane image axes" << "\n"
+            << "x-axis: (" << plane_xaxis_.x() << ", "
+                           << plane_xaxis_.y() << ", "
+                           << plane_xaxis_.z() << ")\n"
+            << "y-axis: (" << plane_yaxis_.x() << ", "
+                           << plane_yaxis_.y() << ", "
+                           << plane_yaxis_.z() << ")\n"
+            << "normal: (" << plane_normal_.x() << ", "
+                           << plane_normal_.y() << ", "
+                           << plane_normal_.z() << ")" << std::endl;
 }
 
 } /* namespace comptonsoft */

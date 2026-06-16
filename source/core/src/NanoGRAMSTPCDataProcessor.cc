@@ -24,6 +24,7 @@
 #include <TLeaf.h>
 #include <TTree.h>
 
+#include <format>
 #include <algorithm>
 #include <array>
 #include <cmath>
@@ -57,19 +58,34 @@ int lowerBoundTimeIndex(double time_window,
 // Temporary wave_compress interpretation.
 double waveCompressToTimebin(uint16_t wave_compress)
 {
-    //if((0<=wave_compress)&&(wave_compress<=8)){
-    //    return std::ldexp(1.0, static_cast<int>(wave_compress));
-    //} else{
-    //    std::cout << "Warning: wave_compress < 0 or wavecompress > 8" << std::endl;
-    //    return 1.0;
-    //}
-    //return 32.0 * unit::ns; //temporary
-    return static_cast<double>(wave_compress) * unit::ns;
+  return static_cast<double>(wave_compress) * unit::ns;
 }
 
 bool usesLightAnalysis(const Config& cfg)
 {
   return cfg.light_event_selection_mode != LightEventSelectionMode::Disabled;
+}
+
+bool isTPCDataUsable(int error_flags)
+{
+  if (error_flags == 0) {
+    return true;
+  }
+  if (error_flags == 4) {
+    return true;
+  }
+  return false;
+}
+
+bool isLightDataUsable(int error_flags)
+{
+  if (error_flags == 0) {
+    return true;
+  }
+  if (error_flags == 4) {
+    return true;
+  }
+  return false;
 }
 
 bool requiresLightGamma(const Config& cfg)
@@ -665,10 +681,9 @@ bool TPCTreeReader::processNext(int64_t& raw_event_id,
   raw_event_id = current_entry_;
   tpc_tree_buffer_.getEntry(current_entry_);
 
-  //discuss intepretation of the error_flags
   const int err = static_cast<int>(tpc_tree_buffer_.error_flags);
-  const bool tpc_ok   = (err == 0);
-  const bool light_ok = (err == 0 || err == 4);
+  const bool tpc_ok   = isTPCDataUsable(err);
+  const bool light_ok = isLightDataUsable(err);
   LightStatus light_status;
   if (usesLightAnalysis(cfg_)) {
     light_status = analyzeLightEvent(cfg_, tpc_tree_buffer_, light_timing_, light_ok);
@@ -810,10 +825,6 @@ void QuickLookTreeOutputWriter::fillEvent(int64_t raw_event_id,
                                           const TPCTreeBuffer& tpc_tree_buffer,
                                           const std::vector<RawFECHit>& hits)
 {
-  if (event_type == TPCEventType::Error) {
-    return;
-  }
-
   raw_event_id_ = raw_event_id;
   event_type_   = static_cast<int16_t>(event_type);
   cmn_method_ = 0;
@@ -874,15 +885,13 @@ std::string QuickLookTreeOutputWriter::close()
 
 void QuickLookTreeOutputWriter::bindBranches()
 {
-  adu_leaflist_           = "adu_cmn_sub[" + std::to_string(NUM_VATA) + "][" +
-                              std::to_string(NUM_CH_EACH_VATA) + "]/F";
-  cmn_leaflist_           = "cmn[" + std::to_string(NUM_VATA) + "]/F";
-  ti_leaflist_            = "ti[" + std::to_string(NUM_VATA) + "]/i";
-  drift_leaflist_         = "drift_time[" + std::to_string(NUM_VATA) + "]/i";
-  wave_compress_leaflist_ = "wave_compress[" + std::to_string(NUM_CH_DPP_MAX) + "]/s";
-  registered_leaflist_    = "registered[" + std::to_string(NUM_CH_DPP_MAX) + "]/O";
-  waveform_leaflist_      = "waveform[" + std::to_string(waveform_num_channels_) + "][" +
-                            std::to_string(waveform_len_) + "]/S";
+  adu_leaflist_           = std::format("adu_cmn_sub[{}][{}]/F", NUM_VATA, NUM_CH_EACH_VATA);
+  cmn_leaflist_           = std::format("cmn[{}]/F", NUM_VATA);
+  ti_leaflist_            = std::format("ti[{}]/i", NUM_VATA);
+  drift_leaflist_         = std::format("drift_time[{}]/i", NUM_VATA);
+  wave_compress_leaflist_ = std::format("wave_compress[{}]/s", NUM_CH_DPP_MAX);
+  registered_leaflist_    = std::format("registered[{}]/O", NUM_CH_DPP_MAX);
+  waveform_leaflist_      = std::format("waveform[{}][{}]/S", waveform_num_channels_, waveform_len_);
 
   quicklook_tree_->Branch("raw_event_id", &raw_event_id_, "raw_event_id/L");
   quicklook_tree_->Branch("event_type",   &event_type_,   "event_type/S");
@@ -896,7 +905,7 @@ void QuickLookTreeOutputWriter::bindBranches()
   quicklook_tree_->Branch("ti",           ti_.data(),           ti_leaflist_.c_str());
   quicklook_tree_->Branch("drift_time",   drift_time_.data(),   drift_leaflist_.c_str());
   quicklook_tree_->Branch("wave_compress", wave_compress_.data(),
-                                                                wave_compress_leaflist_.c_str());
+                          wave_compress_leaflist_.c_str());
   quicklook_tree_->Branch("registered",   registered_.data(),   registered_leaflist_.c_str());
   quicklook_tree_->Branch("waveform",     waveform_.data(),     waveform_leaflist_.c_str());
   quicklook_tree_->Branch("hit_pixel_fec",        &hit_pixel_fec_);

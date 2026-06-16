@@ -137,6 +137,14 @@ add_library(CSCore SHARED
   ${CS_YAMLCPP_CLASSES}
   )
 
+set_source_files_properties(
+  src/NanoGRAMSCalibrationData.cc
+  src/NanoGRAMSTPCDataProcessor.cc
+  src/NanoGRAMSTPCProperty.cc
+  PROPERTIES
+  COMPILE_OPTIONS "-std=c++20"
+)
+
 target_link_libraries(CSCore
   ${ROOT_LIB} ${G4_LIB} ${CLHEP_LIB} ${ORT_LIB} ${ADD_LIB} ${BOOST_LIB}
   ${HDF5_LIBRARIES} ${YAMLCPP_LIB})

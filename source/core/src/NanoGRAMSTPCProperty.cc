@@ -24,6 +24,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include <format>
 #include <hdf5.h>
 #include <stdexcept>
 #include <string>
@@ -138,11 +139,12 @@ void TPCProperty::loadParamCoulomb2keVForSpline3D(const fs::path& spline_path, d
     throw std::runtime_error("Failed to open spline ROOT file: " + spline_path.string());
   }
 
-  const std::string efield_name = "E" + std::to_string(efield_v_cm);
+  const std::string efield_name = std::format("E{}", efield_v_cm);
   spline_ = dynamic_cast<TSpline3*>(spline_file_->Get(efield_name.c_str()));
   if (!spline_) {
-    throw std::runtime_error("Missing TSpline3 '" + efield_name + "' in " +
-                             spline_path.string());
+    throw std::runtime_error(std::format("Missing TSpline3 '{}' in {}",
+                                         efield_name,
+                                         spline_path.string()));
   }
 
   const int knots = spline_->GetNp();
@@ -155,10 +157,11 @@ void TPCProperty::loadParamCoulomb2keVForSpline3D(const fs::path& spline_path, d
 void TPCProperty::loadParamGainMatrices(const fs::path& gain_info_path)
 {
   for (int fec = 0; fec < NUM_VATA; ++fec) {
-    const std::string prefix = "/FEC" + std::to_string(fec);
-    gain_matrices_adc_to_c_[fec] = loadCalibrationMatrix(gain_info_path, prefix + "/ADC2C");
+    const std::string prefix = std::format("/FEC{}", fec);
+    gain_matrices_adc_to_c_[fec] =
+        loadCalibrationMatrix(gain_info_path, std::format("{}/ADC2C", prefix));
     gain_matrices_ccal_to_adc_[fec] =
-        loadCalibrationMatrix(gain_info_path, prefix + "/ccal2ADC");
+        loadCalibrationMatrix(gain_info_path, std::format("{}/ccal2ADC", prefix));
   }
 }
 

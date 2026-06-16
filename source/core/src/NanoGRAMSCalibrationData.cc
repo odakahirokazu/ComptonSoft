@@ -23,6 +23,7 @@
 #include <cctype>
 #include <cmath>
 #include <ctime>
+#include <format>
 #include <fstream>
 #include <iostream>
 #include <limits>
@@ -148,15 +149,15 @@ std::vector<TestPulseGainRow> readTestPulseGainTable(const fs::path& csv_path)
   fec_columns.fill(-1);
   for (std::size_t i = 0; i < header.size(); ++i) {
     for (int fec = 0; fec < NUM_VATA; ++fec) {
-      if (header[i] == "FEC" + std::to_string(fec)) {
+      if (header[i] == std::format("FEC{}", fec)) {
         fec_columns[fec] = static_cast<int>(i);
       }
     }
   }
   for (int fec = 0; fec < NUM_VATA; ++fec) {
     if (fec_columns[fec] < 0) {
-      throw std::runtime_error("Missing FEC" + std::to_string(fec) +
-                               " column in test-pulse gain CSV.");
+      throw std::runtime_error(
+          std::format("Missing FEC{} column in test-pulse gain CSV.", fec));
     }
   }
 
@@ -232,8 +233,8 @@ std::array<double, NUM_VATA> interpolateTestPulseGains(
     }
 
     if (!std::isfinite(gains[fec]) || gains[fec] <= 0.0) {
-      throw std::runtime_error("No valid test-pulse gain for FEC" +
-                               std::to_string(fec) + ".");
+      throw std::runtime_error(
+          std::format("No valid test-pulse gain for FEC{}.", fec));
     }
   }
 
@@ -313,8 +314,8 @@ std::array<double, NUM_VATA> fixedTestPulseGainsFromHash(
   gains.fill(std::numeric_limits<double>::quiet_NaN());
 
   for (int fec = 0; fec < NUM_VATA; ++fec) {
-    const std::string numeric_key = std::to_string(fec);
-    const std::string fec_key = "FEC" + std::to_string(fec);
+    const std::string numeric_key = std::format("{}", fec);
+    const std::string fec_key = std::format("FEC{}", fec);
 
     if (const auto it = gain_tp_dict.find(numeric_key); it != gain_tp_dict.end()) {
       gains[fec] = it->second;
@@ -324,8 +325,9 @@ std::array<double, NUM_VATA> fixedTestPulseGainsFromHash(
 
     if (!std::isfinite(gains[fec]) || gains[fec] <= 0.0) {
       throw std::runtime_error(
-          "gain_tp_hash must provide positive values for FEC0-FEC3. "
-          "Missing or invalid FEC" + std::to_string(fec) + ".");
+          std::format("gain_tp_hash must provide positive values for FEC0-FEC3. "
+                      "Missing or invalid FEC{}.",
+                      fec));
     }
   }
 

@@ -35,8 +35,8 @@ namespace
 
 struct LightPeaks
 {
-  double peak = -std::numeric_limits<double>::infinity() * unit::volt;
-  double pre_roi_peak = -std::numeric_limits<double>::infinity() * unit::volt;
+  double peak          = -std::numeric_limits<double>::infinity() * unit::volt;
+  double pre_roi_peak  = -std::numeric_limits<double>::infinity() * unit::volt;
   double post_roi_peak = -std::numeric_limits<double>::infinity() * unit::volt;
 };
 

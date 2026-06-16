@@ -22,6 +22,7 @@
 #include <TFile.h>
 #include <TTree.h>
 
+#include <format>
 #include <iostream>
 #include <stdexcept>
 
@@ -63,11 +64,23 @@ ANLStatus NanoGRAMSHitExtraction::mod_initialize()
 
   TTree* tpc_tree = dynamic_cast<TTree*>(input_file_->Get(grams::kTpcTreeName));
   if (!tpc_tree) {
-    throw std::runtime_error("Missing TTree '" + std::string(grams::kTpcTreeName) +
-                             "' in " + tpctree_file_);
+    throw std::runtime_error(std::format("Missing TTree '{}' in {}",
+                                         grams::kTpcTreeName,
+                                         tpctree_file_));
   }
+  expected_tpc_entries_ = static_cast<int64_t>(tpc_tree->GetEntries());
+  std::cout << "[NanoGRAMSHitExtraction] input file: " << tpctree_file_ << "\n"
+            << "[NanoGRAMSHitExtraction] tpctree entries: "
+            << expected_tpc_entries_ << "\n";
 
   tpc_tree_reader_ = std::make_unique<grams::TPCTreeReader>(tpc_tree, cfg_);
+  const int64_t reader_entries = tpc_tree_reader_->currentBuffer().nEntries();
+  std::cout << "[NanoGRAMSHitExtraction] TPCTreeReader entries: "
+            << reader_entries << "\n";
+  if (reader_entries != expected_tpc_entries_) {
+    std::cout << "[NanoGRAMSHitExtraction] WARNING: TTree entries and "
+              << "TPCTreeReader entries differ.\n";
+  }
   if (!quicklook_file_.empty()) {
     quicklook_tree_writer_ = std::make_unique<grams::QuickLookTreeOutputWriter>(
         quicklook_file_,
@@ -82,6 +95,7 @@ ANLStatus NanoGRAMSHitExtraction::mod_initialize()
     std::cout << "[INFO] rawhittree output is disabled.\n";
   }
   gamma_events_         = 0;
+  processed_entries_    = 0;
   current_raw_event_id_ = -1;
   current_event_hits_.clear();
 
@@ -93,10 +107,14 @@ ANLStatus NanoGRAMSHitExtraction::mod_analyze()
   int64_t raw_event_id = 0;
   std::vector<grams::RawFECHit> event_hits;
   if (!tpc_tree_reader_ || !tpc_tree_reader_->processNext(raw_event_id, event_hits)) {
+    std::cout << "[NanoGRAMSHitExtraction] AS_QUIT after processing "
+              << processed_entries_ << " / "
+              << expected_tpc_entries_ << " tpctree entries.\n";
     return AS_QUIT;
   }
 
   current_raw_event_id_ = raw_event_id;
+  ++processed_entries_;
   current_event_hits_.clear();
 
   if (quicklook_tree_writer_) {
@@ -121,6 +139,8 @@ ANLStatus NanoGRAMSHitExtraction::mod_end_run()
 {
 
   std::cout << "Total gamma events: " << gamma_events_ << "\n";
+  std::cout << "Total processed tpctree entries: " << processed_entries_
+            << " / " << expected_tpc_entries_ << "\n";
 
   if (rawhit_tree_writer_) {
     rawhit_tree_writer_->close();

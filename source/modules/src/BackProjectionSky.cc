@@ -50,6 +50,7 @@ ANLStatus BackProjectionSky::mod_define()
 
   unregister_parameter("plane_normal");
   unregister_parameter("plane_point");
+  unregister_parameter("plane_yaxis");
   
   define_parameter("image_center_theta", &mod_class::image_center_theta_, unit::degree, "degree");
   define_parameter("image_center_phi",   &mod_class::image_center_phi_,   unit::degree, "degree");

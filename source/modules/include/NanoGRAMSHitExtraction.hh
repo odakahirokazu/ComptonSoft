@@ -62,10 +62,10 @@ public:
   const std::string& tpcTreeFilePath() const { return tpctree_file_; }
 
 private:
-  std::string config_file_;
-  std::string tpctree_file_;
-  std::string rawhittree_file_;
-  std::string quicklook_file_;
+  std::string config_file_     = "";
+  std::string tpctree_file_    = "";
+  std::string rawhittree_file_ = "";
+  std::string quicklook_file_  = "";
 
   grams::Config cfg_;
   std::unique_ptr<TFile> input_file_;
@@ -73,6 +73,8 @@ private:
   std::unique_ptr<grams::RawHitTreeOutputWriter> rawhit_tree_writer_;
   std::unique_ptr<grams::QuickLookTreeOutputWriter> quicklook_tree_writer_;
   int64_t gamma_events_         = 0;
+  int64_t processed_entries_    = 0;
+  int64_t expected_tpc_entries_ = 0;
   int64_t current_raw_event_id_ = -1;
   std::vector<grams::RawFECHit> current_event_hits_;
 };

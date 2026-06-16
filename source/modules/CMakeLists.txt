@@ -157,6 +157,12 @@ add_library(CSModules SHARED
   ${CS_HSQUICKLOOK_MODULES}
 )
 
+set_source_files_properties(
+  src/NanoGRAMSHitExtraction.cc
+  PROPERTIES
+  COMPILE_OPTIONS "-std=c++20"
+)
+
 target_compile_definitions(
   CSModules
   PRIVATE
