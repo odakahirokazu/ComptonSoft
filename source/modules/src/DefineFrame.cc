@@ -89,7 +89,7 @@ ANLStatus DefineFrame::mod_analyze()
     m_EventIndexInThisFrame = 0;
     m_CurrentEventID = eventID;
   }
-  
+
   m_InitialInfo->setEventID(frameID);
   for (DetectorHit_sptr hit: hits) {
     hit->setEventID(frameID);

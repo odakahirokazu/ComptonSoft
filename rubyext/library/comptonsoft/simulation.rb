@@ -48,6 +48,9 @@ module ComptonSoft
       @detector_info_verbose_level = 0
 
       ### Geant4 settings
+      @num_events_per_run = 1
+      @num_threads = 0
+      @print_beamon_time = false
       @random_seed = 0
       @verbose = 0
 
@@ -63,7 +66,7 @@ module ComptonSoft
     attr_accessor :output
 
     ### Geant4 settings
-    attr_accessor :random_seed, :verbose
+    attr_accessor :num_events_per_run, :num_threads, :print_beamon_time, :random_seed, :verbose
 
     ### ANL module setup.
     define_setup_module("geometry")
@@ -170,6 +173,7 @@ module ComptonSoft
       chain :SaveData
       with_parameters(output: @output)
 
+      chain :CSRawHitStore
       chain :CSHitCollection
       chain :ConstructDetectorForSimulation
       with_parameters(detector_configuration: @detector_configuration,
@@ -194,8 +198,18 @@ module ComptonSoft
       chain_with_parameters module_of_physics
 
       chain_with_parameters module_of_primary_generator
+
+      chain_with_parameters module_of_user_action
+
+      if pickup_list = module_list_of_pickup_data
+        pickup_list.each{|m| chain_with_parameters(m) }
+      end
+
       chain :Geant4Body
-      with_parameters(random_engine: "MTwistEngine",
+      with_parameters(num_events: @num_events_per_run,
+                      num_threads: @num_threads,
+                      print_beamon_time: @print_beamon_time,
+                      random_engine: "MTwistEngine",
                       random_initialization_mode: 1,
                       random_seed: @random_seed,
                       output_random_status: true,
@@ -210,12 +224,6 @@ module ComptonSoft
       end
 
       chain_with_parameters module_of_tree_output
-
-      chain_with_parameters module_of_user_action
-
-      if pickup_list = module_list_of_pickup_data
-        pickup_list.each{|m| chain_with_parameters(m) }
-      end
 
       if fits_output = module_of_fits_output
         chain_with_parameters fits_output

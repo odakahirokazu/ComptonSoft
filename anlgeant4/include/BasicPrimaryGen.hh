@@ -44,10 +44,11 @@ class VANLGeometry;
  * @date 2017-07-03 | 4.2 | Hirokazu Odaka | length unit is fixed to cm
  * @date 2020-04-13 | 5.0 | Hirokazu Odaka | remove polarization mode
  * @date 2024-03-08 | 6.0 | Hirokazu Odaka | nucleus
+ * @date 2026-06-17 | 7.0 | Hirokazu Odaka | Geant4-MT
  */
-class BasicPrimaryGen : public VANLPrimaryGen, public InitialInformation
+class BasicPrimaryGen : public VANLPrimaryGen
 {
-  DEFINE_ANL_MODULE(BasicPrimaryGen, 5.0);
+  DEFINE_ANL_MODULE(BasicPrimaryGen, 7.0);
 public:
   enum class SpectralShape {
     Undefined, Mono, PowerLaw, Gaussian, BlackBody, Histogram, User,
@@ -55,20 +56,20 @@ public:
 
   BasicPrimaryGen();
   ~BasicPrimaryGen();
-  
+
   anlnext::ANLStatus mod_define() override;
   anlnext::ANLStatus mod_pre_initialize() override;
   anlnext::ANLStatus mod_initialize() override;
   anlnext::ANLStatus mod_begin_run() override;
 
   G4VUserPrimaryGeneratorAction* create() override;
-  
+
   G4int Number() const { return number_; }
   double TotalEnergy() const { return totalEnergy_; }
 
   virtual void makePrimarySetting() = 0;
   virtual void confirmPrimarySetting();
-  void storeInitialCondition();
+  void storeInitialCondition(int event_id);
 
 protected:
   void setPrimary(double time0,
@@ -130,7 +131,7 @@ protected:
     energyDistribution_ = v;
     energyDistributionName_ = name;
   }
-  
+
   void enablePowerLawInput();
   void enableGaussianInput();
   void enableBlackBodyInput();
@@ -157,7 +158,7 @@ protected:
   double sampleFromBlackBody(double kT, double upper_limit_factor);
   double sampleFromBlackBody();
   double sampleFromHistogram();
-  
+
   virtual G4ThreeVector sampleDirection() { return direction_; }
   virtual G4ThreeVector samplePosition() { return position_; }
 
@@ -175,7 +176,6 @@ protected:
 
   void setRealTime(double v) { realTime_ = v; }
 
-
   std::string getEnergyDistributionName() const { return energyDistributionName_; }
   SpectralShape getEnergyDistribution() const { return  energyDistribution_; }
   double getEnergyMin() const { return energyMin_; }
@@ -188,6 +188,7 @@ protected:
 private:
   BasicPrimaryGeneratorAction* primaryGenerator_ = nullptr;
   const anlgeant4::VANLGeometry* geometry_ = nullptr;
+  anlgeant4::InitialInformation* initialInfo_ = nullptr;
 
   std::string particleName_;
 

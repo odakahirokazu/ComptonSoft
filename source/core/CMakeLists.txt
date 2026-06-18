@@ -1,5 +1,7 @@
-include_directories(include
+include_directories(
+  include
   ${ANLG4_INC_DIR}
+  ${ANLNEXT_INC_DIR}
   ${ROOT_INC_DIR}
   ${G4_INC_DIR}
   ${CLHEP_INC_DIR}
@@ -9,6 +11,7 @@ include_directories(include
 )
 
 link_directories(
+  ${ANLNEXT_LIB_DIR}
   ${ROOT_LIB_DIR}
   ${G4_LIB_DIR}
   ${CLHEP_LIB_DIR}
@@ -70,6 +73,8 @@ set(CS_CORE_CLASSES
   src/TangoAlgorithm.cc
   ### sensitive detector
   src/VCSSensitiveDetector.cc
+  ### raw hit store
+  src/CSRawHitStore.cc
   ### manager
   src/DetectorSystem.cc
   ### tree IO
@@ -120,7 +125,15 @@ add_library(CSCore SHARED
   )
 
 target_link_libraries(CSCore
-  ${ROOT_LIB} ${G4_LIB} ${CLHEP_LIB} ${ORT_LIB} ${ADD_LIB} ${BOOST_LIB})
+  ${ANLG4_LIB}
+  ${ANLNEXT_LIB}
+  ${ROOT_LIB}
+  ${G4_LIB}
+  ${CLHEP_LIB}
+  ${ORT_LIB}
+  ${ADD_LIB}
+  ${BOOST_LIB}
+)
 
 install(TARGETS CSCore LIBRARY DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
 

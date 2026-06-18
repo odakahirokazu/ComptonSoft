@@ -1,6 +1,6 @@
 /*************************************************************************
  *                                                                       *
- * Copyright (c) 2011 Shin Watanabe, Hirokazu Odaka                      *
+ * Copyright (c) 2011 Hirokazu Odaka                                     *
  *                                                                       *
  * This program is free software: you can redistribute it and/or modify  *
  * it under the terms of the GNU General Public License as published by  *
@@ -17,48 +17,29 @@
  *                                                                       *
  *************************************************************************/
 
-#ifndef ANLGEANT4_VMasterUserActionAssembly_H
-#define ANLGEANT4_VMasterUserActionAssembly_H 1
+#include "VANLPrimaryGen.hh"
 
-#include "VUserActionAssembly.hh"
-#include <list>
+#include "G4VUserPrimaryGeneratorAction.hh"
+#include "Geant4Body.hh"
+#include "AstroUnits.hh"
 
-class G4UserStackingAction;
+using namespace anlnext;
 
 namespace anlgeant4
 {
 
-class VAppendableUserActionAssembly;
-
-/**
- * Virtual master UserActionAssembly module
- * @author Hirokazu Odaka
- * @date 2017-06-29
- */
-class VMasterUserActionAssembly : public VUserActionAssembly
+VANLPrimaryGen::VANLPrimaryGen()
 {
-  DEFINE_ANL_MODULE(VMasterUserActionAssembly, 5.0);
-public:
-  VMasterUserActionAssembly();
-  virtual ~VMasterUserActionAssembly();
+  add_alias("VANLPrimaryGen");
+}
 
-  void registerUserActions(G4RunManager* run_manager) override;
+ANLStatus VANLPrimaryGen::mod_initialize()
+{
+  Geant4Body* geant4body = nullptr;
+  get_module_NC("Geant4Body", &geant4body);
+  geant4body->register_user_action(this);
 
-  bool hasStackingAction() const { return (stackingAction_!=nullptr); }
-  void appendUserActions(VAppendableUserActionAssembly* user_action_assembly);
-
-protected:
-  void setStackingAction(G4UserStackingAction* v) { stackingAction_ = v; }
-  void printSummary() override;
-
-private:
-  virtual void createUserActions() {}
-
-private:
-  G4UserStackingAction* stackingAction_ = nullptr;
-  std::list<VAppendableUserActionAssembly*> userActionsAppended_;
-};
+  return AS_OK;
+}
 
 } /* namespace anlgeant4 */
-
-#endif /* ANLGEANT4_VUserActionAssembly_H */

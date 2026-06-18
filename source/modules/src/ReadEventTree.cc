@@ -99,9 +99,6 @@ ANLStatus ReadEventTree::mod_analyze()
     setInitialTime(treeIO_->getInitialTime());
     setInitialPosition(treeIO_->getInitialPosition());
     setInitialPolarization(treeIO_->getInitialPolarization());
-  }
-  
-  if (WeightStored()) {
     setWeight(treeIO_->getWeight());
   }
 

@@ -36,6 +36,7 @@ namespace comptonsoft {
  * @date 2016-09-07
  * @date 2020-11-24 | add the particle branch
  * @date 2020-12-25 | add the track ID branch
+ * @date 2026-04-18 | add the run ID branch
  */
 class EventTreeIO
 {
@@ -52,13 +53,15 @@ public:
   virtual void defineBranches();
   virtual void setBranchAddresses();
 
-  void fillHits(int64_t eventID, const std::vector<DetectorHit_sptr>& hits);
+  void fillHits(int32_t runID, int32_t eventID, const std::vector<DetectorHit_sptr>& hits);
   void fillHits(const std::vector<DetectorHit_sptr>& hits)
-  { fillHits(-1, hits); }
-  void fillUndetectedEvent(int64_t eventID);
+  { fillHits(-1, -1, hits); }
 
-  int64_t getEventID() const { return eventid_; }
-  int64_t getNumberOfHits() const { return num_hits_; }
+  void fillUndetectedEvent(int32_t runID, int32_t eventID);
+
+  int32_t getRunID() const { return runid_; }
+  int32_t getEventID() const { return eventid_; }
+  int32_t getNumberOfHits() const { return num_hits_; }
   DetectorHit_sptr retrieveHit(std::size_t i) const;
   std::vector<DetectorHit_sptr> retrieveHits(int64_t& entry, bool get_entry=true);
   
@@ -68,7 +71,8 @@ private:
   /*
    * tree contents
    */
-  int64_t eventid_ = 0;
+  int32_t runid_ = 0;
+  int32_t eventid_ = 0;
   int32_t num_hits_ = 0;
   // measured data
   int64_t ti_ = 0;

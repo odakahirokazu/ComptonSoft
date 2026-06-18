@@ -1,7 +1,6 @@
 %module anlGeant4Py
 %{
 #include "Geant4Body.hh"
-#include "Geant4Simple.hh"
 #include "VANLPhysicsList.hh"
 #include "VANLGeometry.hh"
 #ifdef USE_GDML
@@ -13,6 +12,7 @@
 #include "VANLPrimaryGen.hh"
 #include "BasicPrimaryGen.hh"
 #include "PointSourcePrimaryGen.hh"
+#include "SphericalSourcePrimaryGen.hh"
 #include "PlaneWavePrimaryGen.hh"
 #include "PlaneWaveRectanglePrimaryGen.hh"
 #include "GaussianBeamPrimaryGen.hh"
@@ -21,8 +21,6 @@
 #include "NucleusPrimaryGen.hh"
 #include "NucleusPrimaryGenInVolume.hh"
 #include "VUserActionAssembly.hh"
-#include "VMasterUserActionAssembly.hh"
-#include "VAppendableUserActionAssembly.hh"
 #include "StandardUserActionAssembly.hh"
 #ifdef USE_VIS
 #include "VisualizeG4Geom.hh"
@@ -32,7 +30,7 @@
 %}
 
 
-%import(module="anlnext.anlnextpy") "anlnext/python/anlnextpy.i"
+%import(module="anlnext/anlnextpy") "anlnext/python/anlnextpy.i"
 
 namespace anlgeant4 {
 
@@ -41,14 +39,6 @@ class Geant4Body : public anlnext::BasicModule
 public:
   Geant4Body();
   ~Geant4Body();
-};
-
-
-class Geant4Simple : public anlnext::BasicModule
-{
-public:
-  Geant4Simple();
-  ~Geant4Simple();
 };
 
 
@@ -106,6 +96,14 @@ class PointSourcePrimaryGen : public BasicPrimaryGen
 public:
   PointSourcePrimaryGen();
   ~PointSourcePrimaryGen();
+};
+
+
+class SphericalSourcePrimaryGen : public PointSourcePrimaryGen
+{
+public:
+  SphericalSourcePrimaryGen();
+  ~SphericalSourcePrimaryGen();
 };
 
 
@@ -173,23 +171,7 @@ public:
 };
 
 
-class VMasterUserActionAssembly : public VUserActionAssembly
-{
-public:
-  VMasterUserActionAssembly();
-  virtual ~VMasterUserActionAssembly();
-};
-
-
-class VAppendableUserActionAssembly : public VUserActionAssembly
-{
-public:
-  VAppendableUserActionAssembly();
-  virtual ~VAppendableUserActionAssembly();
-};
-
-
-class StandardUserActionAssembly : public VMasterUserActionAssembly
+class StandardUserActionAssembly : public VUserActionAssembly
 {
 public:
   StandardUserActionAssembly();

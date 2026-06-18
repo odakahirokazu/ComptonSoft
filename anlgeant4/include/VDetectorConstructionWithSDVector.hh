@@ -1,6 +1,6 @@
 /*************************************************************************
  *                                                                       *
- * Copyright (c) 2011 Shin Watanabe, Hirokazu Odaka                      *
+ * Copyright (c) 2011 Hirokazu Odaka                                     *
  *                                                                       *
  * This program is free software: you can redistribute it and/or modify  *
  * it under the terms of the GNU General Public License as published by  *
@@ -17,29 +17,39 @@
  *                                                                       *
  *************************************************************************/
 
-#ifndef ANLGEANT4_ANLG4RunManager_H
-#define ANLGEANT4_ANLG4RunManager_H 1
+#ifndef ANLGEANT4_VDetectorConstructionWithSDVector_H
+#define ANLGEANT4_VDetectorConstructionWithSDVector_H 1
 
-#include "G4RunManager.hh"
-#include <anlnext/ANLStatus.hh>
+#include "G4VUserDetectorConstruction.hh"
+#include <vector>
+#include <utility>
+#include <string>
 
-namespace anlgeant4
-{
+class G4VSensitiveDetector;
+
+namespace anlgeant4 {
+
 /**
- * ANLG4RunManager : original implemenation came from ANLGeant4 for ANL++.
- *
- * @date 2017-06-21 | Hiro Odaka | add default constructor/desctructor
- * @date 2017-06-27 | Hiro Odaka | re-designed.
+ * Virtual detector construction with sensitive detector vector
+ * @author Hirokazu Odaka
  */
-class ANLG4RunManager : public G4RunManager
+class VDetectorConstructionWithSDVector : public G4VUserDetectorConstruction
 {
 public:
-  ANLG4RunManager() = default;
-  virtual ~ANLG4RunManager();
+  using SDVector = std::vector<std::pair<std::string, G4VSensitiveDetector*>>;
 
-  anlnext::ANLStatus performOneEvent(G4int i_event);
+public:
+  VDetectorConstructionWithSDVector();
+  ~VDetectorConstructionWithSDVector();
+
+  void ConstructSDandField() override;
+
+  void setSDs(const SDVector& v) { SDs_ = v; }
+
+private:
+  SDVector SDs_;
 };
 
 } /* namespace anlgeant4 */
 
-#endif /* ANLGEANT4_ANLG4RunManager_H */
+#endif /* ANLGEANT4_VDetectorConstructionWithSDVector_H */

@@ -30,6 +30,8 @@ namespace comptonsoft
 void MakeDetectorHitsWithTimingProcess::doProcessing()
 {
   DetectorSystem* detectorManager = getDetectorManager();
+  detectorManager->distributeRawHitsToDetectors();
+
   auto dsVector = detectorManager->getDeviceSimulationVector();
   for (auto ds: dsVector) {
     ds->prepareForTimingProcess();

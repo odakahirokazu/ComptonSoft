@@ -1,6 +1,6 @@
 /*************************************************************************
  *                                                                       *
- * Copyright (c) 2011 Shin Watanabe, Hirokazu Odaka                      *
+ * Copyright (c) 2011 Hirokazu Odaka                                     *
  *                                                                       *
  * This program is free software: you can redistribute it and/or modify  *
  * it under the terms of the GNU General Public License as published by  *
@@ -17,29 +17,40 @@
  *                                                                       *
  *************************************************************************/
 
-#ifndef ANLGEANT4_VAppendableUserActionAssembly_H
-#define ANLGEANT4_VAppendableUserActionAssembly_H 1
+#ifndef COMPTONSOFT_CSRawHitStore_H
+#define COMPTONSOFT_CSRawHitStore_H 1
 
-#include "VUserActionAssembly.hh"
+#include "VEventStore.hh"
 
-namespace anlgeant4
+#include "DetectorHit.hh"
+
+namespace comptonsoft
 {
 
 /**
- * Virtual appendable UserActionAssembly module
+ * Raw hit store module for ComptonSoft
  * @author Hirokazu Odaka
- * @date 2017-06-29
+ * @date 2026-06-16 | Hirokazu Odaka
  */
-class VAppendableUserActionAssembly : public VUserActionAssembly
+class CSRawHitStore : public anlgeant4::VEventStore
 {
-  DEFINE_ANL_MODULE(VAppendableUserActionAssembly, 5.0);
+  DEFINE_ANL_MODULE(CSRawHitStore, 1.0);
 public:
-  VAppendableUserActionAssembly();
-  virtual ~VAppendableUserActionAssembly();
+  CSRawHitStore();
+  virtual ~CSRawHitStore();
 
-  anlnext::ANLStatus mod_pre_initialize() override;
+  void initializeRun(int runID, int num_events) override;
+  void initializeEvent(int eventID) override;
+
+  void insertHit(const DetectorHit& hit);
+  void insertHit(DetectorHit&& hit);
+
+  const std::vector<DetectorHit>& getHits() const;
+
+private:
+  std::vector<std::vector<DetectorHit>> hits_vector_;
 };
 
-} /* namespace anlgeant4 */
+} /* namespace comptonsoft */
 
-#endif /* ANLGEANT4_VAppendableUserActionAssembly_H */
+#endif /* COMPTONSOFT_CSRawHitStore_H */

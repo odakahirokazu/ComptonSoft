@@ -21,6 +21,7 @@
 #include "AstroUnits.hh"
 #include "G4Track.hh"
 #include "G4VProcess.hh"
+#include "G4EventManager.hh"
 
 using namespace anlnext;
 
@@ -44,17 +45,20 @@ ANLStatus RadioactiveDecayUserActionAssembly::mod_define()
   return AS_OK;
 }
 
-void RadioactiveDecayUserActionAssembly::SteppingAction(const G4Step* aStep)
+void RadioactiveDecayUserActionAssembly::SteppingAction(const G4Step* step)
 {
-  G4Track* aTrack = aStep->GetTrack();
-  const double globalTime = aTrack->GetGlobalTime();
-  
-  if (aTrack->GetTrackID()==1 && aTrack->GetCurrentStepNumber()==1) {
+  G4Track* track = step->GetTrack();
+  const double globalTime = track->GetGlobalTime();
+
+  if (track->GetTrackID()==1 && track->GetCurrentStepNumber()==1) {
+    const G4Event* event = G4EventManager::GetEventManager()->GetConstCurrentEvent();
+    const int event_id = event->GetEventID();
+
     const G4String processName
-      = aStep->GetPostStepPoint()->GetProcessDefinedStep()->GetProcessName();
+      = step->GetPostStepPoint()->GetProcessDefinedStep()->GetProcessName();
     if (processName == radioactiveDecayProcessName_) {
       firstDecayTime_ = globalTime;
-      setInitialTime(firstDecayTime_);
+      setInitialTime(event_id, firstDecayTime_);
     }
     else {
       throw ANLException("RadioactiveDecayUserActionAssembly:Error---First step is not radioactive decay.");
@@ -63,7 +67,7 @@ void RadioactiveDecayUserActionAssembly::SteppingAction(const G4Step* aStep)
 
   const double timeFromFirstDecay = globalTime - firstDecayTime_;
   if (timeFromFirstDecay > terminationTime_) {
-    aTrack->SetTrackStatus(fKillTrackAndSecondaries);
+    track->SetTrackStatus(fKillTrackAndSecondaries);
     return;
   }
 }

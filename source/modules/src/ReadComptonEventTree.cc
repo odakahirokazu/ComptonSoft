@@ -83,7 +83,7 @@ ANLStatus ReadComptonEventTree::mod_analyze()
     return AS_QUIT;
   }
 
-  initializeEvent();
+  EventReconstruction::initializeEvent();
 
   cetree_->GetEntry(entryIndex_);
     
@@ -96,9 +96,6 @@ ANLStatus ReadComptonEventTree::mod_analyze()
     setInitialTime(treeIO_->getInitialTime());
     setInitialPosition(treeIO_->getInitialPosition());
     setInitialPolarization(treeIO_->getInitialPolarization());
-  }
-  
-  if (WeightStored()) {
     setWeight(treeIO_->getWeight());
   }
 

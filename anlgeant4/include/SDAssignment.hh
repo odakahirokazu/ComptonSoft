@@ -1,6 +1,6 @@
 /*************************************************************************
  *                                                                       *
- * Copyright (c) 2011 Shin Watanabe, Hirokazu Odaka                      *
+ * Copyright (c) 2011 Hirokazu Odaka                                     *
  *                                                                       *
  * This program is free software: you can redistribute it and/or modify  *
  * it under the terms of the GNU General Public License as published by  *
@@ -17,31 +17,40 @@
  *                                                                       *
  *************************************************************************/
 
-#include "UserActionAssemblyEventAction.hh"
-#include "VUserActionAssembly.hh"
+#ifndef ANLGEANT4_SDAssignment_H
+#define ANLGEANT4_SDAssignment_H 1
+
+#include <vector>
+#include <utility>
+#include <string>
+
+class G4VSensitiveDetector;
 
 namespace anlgeant4
 {
 
-UserActionAssemblyEventAction::UserActionAssemblyEventAction(const std::list<VUserActionAssembly*>& userActions)
-  : userActions_(userActions)
+/**
+ * SD assignment
+ * @author Hirokazu Odaka
+ * @date 2026-06-17
+ */
+class SDAssignment
 {
-}
- 
-UserActionAssemblyEventAction::~UserActionAssemblyEventAction() = default;
+public:
+  using SDVector = std::vector<std::pair<std::string, G4VSensitiveDetector*>>;
 
-void UserActionAssemblyEventAction::BeginOfEventAction(const G4Event* anEvent)
-{
-  for (VUserActionAssembly* ua: userActions_) {
-    ua->EventActionAtBeginning(anEvent);
-  }
-}
+public:
+  SDAssignment();
 
-void UserActionAssemblyEventAction::EndOfEventAction(const G4Event* anEvent)
-{
-  for (VUserActionAssembly* ua: userActions_) {
-    ua->EventActionAtEnd(anEvent);
-  }
-}
+  void registerSD(const std::string& logical_volume_name, G4VSensitiveDetector* sd);
+
+protected:
+  SDVector getSDs() const { return SD_vector_; }
+
+private:
+  SDVector SD_vector_;
+};
 
 } /* namespace anlgeant4 */
+
+#endif /* ANLGEANT4_SDAssignment_H */

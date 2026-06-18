@@ -36,7 +36,8 @@ EventTreeIO::~EventTreeIO() = default;
 
 void EventTreeIO::defineBranches()
 {
-  tree_->Branch("eventid",        &eventid_,              "eventid/L");
+  tree_->Branch("runid",          &runid_,                "runid/I");
+  tree_->Branch("eventid",        &eventid_,              "eventid/I");
   tree_->Branch("num_hits",       &num_hits_,             "num_hits/I");
   
   // measured data
@@ -83,6 +84,7 @@ void EventTreeIO::defineBranches()
 
 void EventTreeIO::setBranchAddresses()
 {
+  tree_->SetBranchAddress("runid",          &runid_);
   tree_->SetBranchAddress("eventid",        &eventid_);
   tree_->SetBranchAddress("num_hits",       &num_hits_);
 
@@ -128,7 +130,8 @@ void EventTreeIO::setBranchAddresses()
   tree_->SetBranchAddress("grade",          &grade_);
 }
 
-void EventTreeIO::fillHits(const int64_t eventID,
+void EventTreeIO::fillHits(const int32_t runID,
+                           const int32_t eventID,
                            const std::vector<DetectorHit_sptr>& hits)
 {
   const int NumHits = hits.size();
@@ -137,6 +140,7 @@ void EventTreeIO::fillHits(const int64_t eventID,
   num_hits_ = NumHits;
 
   const DetectorHit_sptr& hit = hits[0];
+  runid_ = (runID >= 0) ? runID : hit->RunID();
   eventid_ = (eventID >= 0) ? eventID : hit->EventID();
   ti_ = hit->TI();
   instrument_ = hit->InstrumentID();
@@ -181,9 +185,10 @@ void EventTreeIO::fillHits(const int64_t eventID,
   tree_->Fill();
 }
 
-void EventTreeIO::fillUndetectedEvent(const int64_t eventID)
+void EventTreeIO::fillUndetectedEvent(const int32_t runID, const int32_t eventID)
 {
   num_hits_ = 0;
+  runid_ = (runID >= 0) ? runID : 0;
   eventid_ = (eventID >= 0) ? eventID : 0;
   ti_ = 0;
   instrument_ = 0;
@@ -197,6 +202,7 @@ void EventTreeIO::fillUndetectedEvent(const int64_t eventID)
 DetectorHit_sptr EventTreeIO::retrieveHit(std::size_t i) const
 {
   DetectorHit_sptr hit(new DetectorHit);
+  hit->setRunID(runid_);
   hit->setEventID(eventid_);
   hit->setTI(ti_);
   hit->setInstrumentID(instrument_);

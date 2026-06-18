@@ -17,31 +17,47 @@
  *                                                                       *
  *************************************************************************/
 
-#include "UserActionAssemblyEventAction.hh"
-#include "VUserActionAssembly.hh"
+#include "CSRawHitStore.hh"
+#include "DetectorHit_sptr.hh"
+#include "DetectorSystem.hh"
 
-namespace anlgeant4
-{
+using namespace anlnext;
 
-UserActionAssemblyEventAction::UserActionAssemblyEventAction(const std::list<VUserActionAssembly*>& userActions)
-  : userActions_(userActions)
-{
-}
- 
-UserActionAssemblyEventAction::~UserActionAssemblyEventAction() = default;
+namespace comptonsoft {
 
-void UserActionAssemblyEventAction::BeginOfEventAction(const G4Event* anEvent)
+CSRawHitStore::CSRawHitStore() = default;
+
+CSRawHitStore::~CSRawHitStore() = default;
+
+void CSRawHitStore::initializeRun(int runID, int num_events)
 {
-  for (VUserActionAssembly* ua: userActions_) {
-    ua->EventActionAtBeginning(anEvent);
+  VEventStore::initializeRun(runID, num_events);
+  hits_vector_.resize(num_events);
+  for (auto& hits: hits_vector_) {
+    hits.clear();
   }
 }
 
-void UserActionAssemblyEventAction::EndOfEventAction(const G4Event* anEvent)
+void CSRawHitStore::initializeEvent(int eventID)
 {
-  for (VUserActionAssembly* ua: userActions_) {
-    ua->EventActionAtEnd(anEvent);
-  }
+  VEventStore::initializeEvent(eventID);
 }
 
-} /* namespace anlgeant4 */
+void CSRawHitStore::insertHit(const DetectorHit& hit)
+{
+  const size_t event_index = static_cast<size_t>(hit.EventID());
+  hits_vector_[event_index].push_back(hit);
+}
+
+void CSRawHitStore::insertHit(DetectorHit&& hit)
+{
+  const size_t event_index = static_cast<size_t>(hit.EventID());
+  hits_vector_[event_index].push_back(hit);
+}
+
+const std::vector<DetectorHit>& CSRawHitStore::getHits() const
+{
+  return hits_vector_[read_index()];
+}
+
+} // namespace comptonsoft

@@ -1,6 +1,6 @@
 /*************************************************************************
  *                                                                       *
- * Copyright (c) 2011 Shin Watanabe, Hirokazu Odaka                      *
+ * Copyright (c) 2011 Hirokazu Odaka                                     *
  *                                                                       *
  * This program is free software: you can redistribute it and/or modify  *
  * it under the terms of the GNU General Public License as published by  *
@@ -17,24 +17,20 @@
  *                                                                       *
  *************************************************************************/
 
-#include "VAppendableUserActionAssembly.hh"
-#include "VMasterUserActionAssembly.hh"
+#include "SDAssignment.hh"
 
-using namespace anlnext;
+#include "G4VSensitiveDetector.hh"
+#include "G4VUserDetectorConstruction.hh"
 
 namespace anlgeant4
 {
 
-VAppendableUserActionAssembly::VAppendableUserActionAssembly() = default;
-VAppendableUserActionAssembly::~VAppendableUserActionAssembly() = default;
+SDAssignment::SDAssignment() = default;
 
-ANLStatus VAppendableUserActionAssembly::mod_pre_initialize()
+void SDAssignment::registerSD(const std::string& logical_volume_name,
+                              G4VSensitiveDetector* sd)
 {
-  VMasterUserActionAssembly* master;
-  get_module_IFNC("VMasterUserActionAssembly", &master);
-  master->appendUserActions(this);
-
-  return AS_OK;
+  SD_vector_.push_back(std::make_pair(logical_volume_name, sd))  ;
 }
 
 } /* namespace anlgeant4 */

@@ -37,15 +37,15 @@ void UserActionAssemblyTrackingAction::PreUserTrackingAction(const G4Track* aTra
   fpTrackingManager->SetStoreTrajectory(true);
   fpTrackingManager->SetTrajectory(new G4Trajectory(aTrack));
   
-  for (VUserActionAssembly* pud: userActions_) {
-    pud->TrackActionAtBeginning(aTrack);
+  for (VUserActionAssembly* ua: userActions_) {
+    ua->TrackActionAtBeginning(aTrack);
   }
 }
 
 void UserActionAssemblyTrackingAction::PostUserTrackingAction(const G4Track* aTrack)
 {
-  for (VUserActionAssembly* pud: userActions_) {
-    pud->TrackActionAtEnd(aTrack);
+  for (VUserActionAssembly* ua: userActions_) {
+    ua->TrackActionAtEnd(aTrack);
   }
 }
 

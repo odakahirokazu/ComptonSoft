@@ -36,8 +36,7 @@ namespace anlgeant4
 {
 
 BasicPrimaryGen::BasicPrimaryGen()
-  : InitialInformation(true),
-    particleName_("gamma"),
+  : particleName_("gamma"),
     nucleus_atomic_number_(0),
     nucleus_mass_number_(0),
     nucleus_excitation_energy_(0.0),
@@ -56,7 +55,6 @@ BasicPrimaryGen::BasicPrimaryGen()
     kT_(10.0*unit::keV)
 {
   add_alias("BasicPrimaryGen");
-  add_alias("InitialInformation");
 }
 
 BasicPrimaryGen::~BasicPrimaryGen() = default;
@@ -116,7 +114,7 @@ ANLStatus BasicPrimaryGen::mod_pre_initialize()
   }
 
   disableDefaultEnergyInput();
-  
+
   if (energyDistribution_==SpectralShape::Undefined) {
     if (energyDistributionName_=="user") {
       energyDistribution_ = SpectralShape::User;
@@ -162,6 +160,8 @@ ANLStatus BasicPrimaryGen::mod_initialize()
     std::cout << "Energy min is reset to 1.0e-9 keV." << std::endl;
   }
 
+  get_module_IFNC("InitialInformation", &initialInfo_);
+
   if (energyDistribution_ == SpectralShape::Histogram) {
     if (spectrumEnergy_.size() != spectrumPhotons_.size()+1) {
       std::cout << "Spectral historam binning is invalid.\n"
@@ -172,8 +172,8 @@ ANLStatus BasicPrimaryGen::mod_initialize()
 
     buildSpectrumPhotonIntegral();
   }
-  
-  return AS_OK;
+
+  return VANLPrimaryGen::mod_initialize();
 }
 
 ANLStatus BasicPrimaryGen::mod_begin_run()
@@ -196,16 +196,15 @@ void BasicPrimaryGen::confirmPrimarySetting()
   number_++;
   totalEnergy_ += energy_;
   primaryGenerator_->Set(time_, position_, energy_, direction_, polarization_);
-  storeInitialCondition();
 }
 
-void BasicPrimaryGen::storeInitialCondition()
+void BasicPrimaryGen::storeInitialCondition(int event_id)
 {
-  setInitialEnergy(energy_);
-  setInitialDirection(direction_);
-  setInitialTime(time_);
-  setInitialPosition(position_);
-  setInitialPolarization(polarization_);
+  initialInfo_->setInitialEnergy(event_id, energy_);
+  initialInfo_->setInitialDirection(event_id,direction_);
+  initialInfo_->setInitialTime(event_id,time_);
+  initialInfo_->setInitialPosition(event_id,position_);
+  initialInfo_->setInitialPolarization(event_id,polarization_);
 }
 
 void BasicPrimaryGen::setDefinition(G4ParticleDefinition* def)

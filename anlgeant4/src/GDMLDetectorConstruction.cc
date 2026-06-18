@@ -22,15 +22,14 @@
 #include "G4VPhysicalVolume.hh"
 #include "G4VisAttributes.hh"
 
-using namespace anlgeant4;
-
+namespace anlgeant4
+{
 
 GDMLDetectorConstruction::
 GDMLDetectorConstruction(const std::string& geom_file_name, bool validate)
   : m_GeometryFileName(geom_file_name), m_Validate(validate)
 {
 }
-
 
 G4VPhysicalVolume* GDMLDetectorConstruction::Construct()
 {
@@ -40,3 +39,5 @@ G4VPhysicalVolume* GDMLDetectorConstruction::Construct()
   world->GetLogicalVolume()->SetVisAttributes(G4VisAttributes::GetInvisible());
   return world;
 }
+
+} /* namespace anlgeant4 */

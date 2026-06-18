@@ -1,6 +1,6 @@
 /*************************************************************************
  *                                                                       *
- * Copyright (c) 2011 Tamotsu Sato, Hirokazu Odaka                       *
+ * Copyright (c) 2011 Shin Watanabe, Hirokazu Odaka                      *
  *                                                                       *
  * This program is free software: you can redistribute it and/or modify  *
  * it under the terms of the GNU General Public License as published by  *
@@ -17,60 +17,39 @@
  *                                                                       *
  *************************************************************************/
 
-#ifndef COMPTONSOFT_SampleOpticalDepth_H
-#define COMPTONSOFT_SampleOpticalDepth_H 1
+#ifndef ANLGEANT4_ActionInitialization_H
+#define ANLGEANT4_ActionInitialization_H 1
 
+#include <list>
+#include "G4VUserActionInitialization.hh"
+#include "VANLPrimaryGen.hh"
 #include "VUserActionAssembly.hh"
 
-class TTree;
-class G4VEmProcess;
-
-namespace anlgeant4 {
-
-class InitialInformation;
-
-}
-
-namespace comptonsoft {
+namespace anlgeant4
+{
 
 /**
- * @author Hirokazu Odaka, Tamotsu Sato
- * @date 2017-07-29 | Hirokazu Odaka | new design of VAppendableUserActionAssembly, code cleanup.
- * @date 2026-04-15 | use VUserActionAssembly
+ * UserActionInitialization
+ * @author Hirokazu Odaka
+ * @date 2026-04-15
  */
-class SampleOpticalDepth : public anlgeant4::VUserActionAssembly
+class ActionInitialization : public G4VUserActionInitialization
 {
-  DEFINE_ANL_MODULE(SampleOpticalDepth, 3.0);
 public:
-  SampleOpticalDepth();
-  
-  anlnext::ANLStatus mod_define() override;
-  anlnext::ANLStatus mod_initialize() override;
+  ActionInitialization();
+  virtual ~ActionInitialization();
 
-  void EventActionAtBeginning(const G4Event*) override;
-  void EventActionAtEnd(const G4Event*) override;
-  void SteppingAction(const G4Step* aStep) override;
-  
+  void registerUserAction(VANLPrimaryGen* primary_gen);
+  void registerUserAction(VUserActionAssembly* uaa);
+
+  void BuildForMaster() const override;
+  void Build() const override;
+
 private:
-  double energy_;
-  std::string processName_;
-  std::string particleName_;
-  
-  const anlgeant4::InitialInformation* initialInfo_ = nullptr;
-  G4VEmProcess* process_ = nullptr;
-
-  TTree* tree_ = nullptr;
-  
-  double ini_posx_ = 0.0;
-  double ini_posy_ = 0.0;
-  double ini_posz_ = 0.0;
-  double ini_dirx_ = 0.0;
-  double ini_diry_ = 0.0;
-  double ini_dirz_ = 0.0;
-  double length_ = 0.0;
-  double tau_ = 0.0;
+  VANLPrimaryGen* primary_generation_module_ = nullptr;
+  std::list<VUserActionAssembly*> user_action_assemblies_;
 };
 
-} /* namespace comptonsoft */
+} /* namespace anlgeant4 */
 
-#endif /* COMPTONSOFT_SampleOpticalDepth_H */
+#endif /* ANLGEANT4_ActionInitialization_H */

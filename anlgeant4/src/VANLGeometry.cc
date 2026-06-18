@@ -18,6 +18,9 @@
  *************************************************************************/
 
 #include "VANLGeometry.hh"
+
+#include "G4VUserDetectorConstruction.hh"
+
 #include "AstroUnits.hh"
 
 using namespace anlnext;

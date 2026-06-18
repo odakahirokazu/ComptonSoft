@@ -38,6 +38,7 @@ namespace comptonsoft {
  * @date 2020-09-02 | add error branches
  * @date 2020-11-20 | change the types of reconstruction_fraction and likelihood
  * @date 2022-05-19 | add hit1-/hit2-pixelz
+ * @date 2026-04-18 | add run ID
  */
 class ComptonEventTreeIO
 {
@@ -51,11 +52,13 @@ public:
   virtual void defineBranches();
   virtual void setBranchAddresses();
 
-  void fillEvent(int64_t eventID,
+  void fillEvent(int32_t runID,
+                 int32_t eventID,
                  int numCases,
                  const BasicComptonEvent& event);
 
-  void fillEvents(int64_t eventID,
+  void fillEvents(int32_t runID,
+                  int32_t eventID,
                   const std::vector<BasicComptonEvent_sptr>& events);
 
   BasicComptonEvent retrieveEvent() const;
@@ -69,7 +72,8 @@ private:
   /*
    * tree contents
    */
-  uint64_t eventid_ = 0u;
+  int32_t runid_ = 0;
+  int32_t eventid_ = 0;
   int16_t num_reconstruction_cases_ = 0;
   int16_t num_hits_ = 0;
 

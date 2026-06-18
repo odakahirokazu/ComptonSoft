@@ -1,5 +1,6 @@
 %module comptonSoft
 %{
+#include "CSRawHitStore.hh"
 #include "ConstructDetector.hh"
 #include "ConstructDetectorForSimulation.hh"
 #include "VCSModule.hh"
@@ -200,6 +201,14 @@
 %import(module="anlgeant4/anlGeant4") "anlGeant4.i"
 
 namespace comptonsoft {
+
+class CSRawHitStore : public anlgeant4::VEventStore
+{
+public:
+  CSRawHitStore();
+  virtual ~CSRawHitStore();
+};
+
 
 class ConstructDetector : public anlnext::BasicModule
 {
@@ -572,7 +581,7 @@ class ReadComptonEventTree : public EventReconstruction
 {
 public:
   ReadComptonEventTree();
-  ~ReadComptonEventTree() = default;
+  ~ReadComptonEventTree();
 };
 
 
@@ -782,6 +791,7 @@ class ReadXrayEventTree : public anlnext::BasicModule
 {
 public:
   ReadXrayEventTree();
+  ~ReadXrayEventTree();
 };
 
 
@@ -1112,21 +1122,21 @@ public:
 
 #endif
 
-class SampleOpticalDepth : public anlgeant4::VAppendableUserActionAssembly
+class SampleOpticalDepth : public anlgeant4::VUserActionAssembly
 {
 public:
   SampleOpticalDepth();
 };
 
 
-class ScatteringPickUpData : public anlgeant4::VAppendableUserActionAssembly
+class ScatteringPickUpData : public anlgeant4::VUserActionAssembly
 {
 public:
   ScatteringPickUpData();
 };
 
 
-class ObservationPickUpData : public anlgeant4::VAppendableUserActionAssembly
+class ObservationPickUpData : public anlgeant4::VUserActionAssembly
 {
 public:
   ObservationPickUpData();

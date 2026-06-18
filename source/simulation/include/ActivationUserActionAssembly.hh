@@ -61,13 +61,17 @@ public:
   virtual ~ActivationUserActionAssembly();
   
   anlnext::ANLStatus mod_define() override;
+  anlnext::ANLStatus mod_initialize() override;
   
-  void RunActionAtBeginning(const G4Run*) override;
+  void RunActionAtBeginning(const G4Run* run) override;
   void RunActionAtEnd(const G4Run* run) override;
   void TrackActionAtBeginning(const G4Track* track) override;
+
+  bool isSteppingActionEffective() const override { return true; }
   void SteppingAction(const G4Step* step) override;
 
-  void createUserActions() override;
+  bool isStackingActionEffective() const override { return true; }
+  G4UserStackingAction* createStackingAction() const override;
   
 protected:
   void SetInitialEnergy(double var) { m_InitialEnergy = var; }

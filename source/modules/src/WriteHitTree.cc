@@ -61,9 +61,11 @@ ANLStatus WriteHitTree::mod_initialize()
 
 ANLStatus WriteHitTree::mod_analyze()
 {
-  int64_t eventID = -1;
+  int32_t runID = -1;
+  int32_t eventID = -1;
   
   if (initialInfo_) {
+    runID = initialInfo_->RunID();
     eventID = initialInfo_->EventID();
     treeIO_->setInitialInfo(initialInfo_->InitialEnergy(),
                             initialInfo_->InitialDirection(),
@@ -73,6 +75,7 @@ ANLStatus WriteHitTree::mod_analyze()
     treeIO_->setWeight(initialInfo_->Weight());
   }
   else {
+    runID = 0;
     eventID = get_loop_index();
   }
 
@@ -81,7 +84,7 @@ ANLStatus WriteHitTree::mod_analyze()
     const std::vector<DetectorHit_sptr>& hits
       = hitCollection_->getHits(timeGroup);
     if (hits.size() > 0) {
-      treeIO_->fillHits(eventID, hits);
+      treeIO_->fillHits(runID, eventID, hits);
       set_evs("WriteHitTree:Fill");
     }
   }

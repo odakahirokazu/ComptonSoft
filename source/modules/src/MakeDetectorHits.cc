@@ -28,6 +28,8 @@ namespace comptonsoft
 void MakeDetectorHits::doProcessing()
 {
   DetectorSystem* detectorManager = getDetectorManager();
+  detectorManager->distributeRawHitsToDetectors();
+
   for (auto ds: detectorManager->getDeviceSimulationVector()) {
     ds->makeDetectorHits();
   }

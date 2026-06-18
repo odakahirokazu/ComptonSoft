@@ -32,8 +32,8 @@ UserActionAssemblySteppingAction::~UserActionAssemblySteppingAction() = default;
 
 void UserActionAssemblySteppingAction::UserSteppingAction(const G4Step* aStep)
 {
-  for (VUserActionAssembly* pud: userActions_) {
-    pud->SteppingAction(aStep);
+  for (VUserActionAssembly* ua: userActions_) {
+    ua->SteppingAction(aStep);
   }
 }
 

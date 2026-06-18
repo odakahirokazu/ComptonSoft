@@ -6,6 +6,7 @@ name = 'comptonSoft'
 namespace = 'comptonsoft'
 
 clMod = [
+  ANL::SWIGClass.new("CSRawHitStore"),
   ANL::SWIGClass.new("ConstructDetector"),
   ANL::SWIGClass.new("ConstructDetectorForSimulation"),
   ANL::SWIGClass.new("VCSModule"),
@@ -153,6 +154,7 @@ clAH = [
 classList = clMod + clSim + clAH
 classList.each{|s|
   s.include_path = ["../../source/modules/include",
+    "../../source/core/include",
     "../../source/simulation/include",
     "../../source/astroh/include",
   ]

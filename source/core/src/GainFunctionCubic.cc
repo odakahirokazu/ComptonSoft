@@ -20,16 +20,21 @@
 #include "GainFunctionCubic.hh"
 #include <limits>
 
-namespace comptonsoft
-{
+namespace comptonsoft {
 
 GainFunctionCubic::GainFunctionCubic()
-  : c0_(0.0), c1_(1.0), c2_(0.0), c3_(0.0)
+  : c0_(0.0),
+    c1_(1.0),
+    c2_(0.0),
+    c3_(0.0)
 {
 }
 
 GainFunctionCubic::GainFunctionCubic(double c0, double c1, double c2, double c3)
-  : c0_(c0), c1_(c1), c2_(c2), c3_(c3)
+  : c0_(c0),
+    c1_(c1),
+    c2_(c2),
+    c3_(c3)
 {
 }
 
@@ -45,17 +50,18 @@ double GainFunctionCubic::RangeMax() const
   return +std::numeric_limits<double>::max();
 }
 
-double GainFunctionCubic::eval(double x) const
-{
-  return c0_ + c1_*x + c2_*x*x + c3_*x*x*x;
-}
-
 void GainFunctionCubic::set(double c0, double c1, double c2, double c3)
 {
   c0_ = c0;
   c1_ = c1;
   c2_ = c2;
   c3_ = c3;
+}
+
+// clang-format off
+double GainFunctionCubic::eval(double x) const
+{
+  return c0_ + c1_*x + c2_*x*x + c3_*x*x*x;
 }
 
 } /* namespace comptonsoft */

@@ -60,7 +60,6 @@ ANLStatus ReadHitTree::mod_initialize()
   treeIO_->setTree(hittree_.get());
   if (hittree_->GetBranch("ini_energy")) {
     setInitialInformationStored();
-    setWeightStored();
     treeIO_->enableInitialInfoRecord();
   }
   else {
@@ -102,9 +101,6 @@ ANLStatus ReadHitTree::mod_analyze()
     setInitialTime(treeIO_->getInitialTime());
     setInitialPosition(treeIO_->getInitialPosition());
     setInitialPolarization(treeIO_->getInitialPolarization());
-  }
-  
-  if (WeightStored()) {
     setWeight(treeIO_->getWeight());
   }
 

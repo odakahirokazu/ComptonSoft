@@ -24,6 +24,8 @@
 #include "VRealDetectorUnit.hh"
 #include "DeviceSimulation.hh"
 #include "DetectorSystem.hh"
+#include "VANLGeometry.hh"
+#include "CSRawHitStore.hh"
 
 using namespace anlnext;
 
@@ -54,7 +56,15 @@ ANLStatus ConstructDetectorForSimulation::mod_initialize()
   }
 
   DetectorSystem* detectorManager = getDetectorManager();
-  
+
+  anlgeant4::VANLGeometry* geometry_module = nullptr;
+  get_module_NC("VANLGeometry", &geometry_module);
+  detectorManager->registerGeant4SensitiveDetectors(geometry_module);
+
+  CSRawHitStore* hit_store = nullptr;
+  get_module_NC("CSRawHitStore", &hit_store);
+  detectorManager->setRawHitStore(hit_store);
+
   if (VerboseLevel() > 0) {
     std::cout << "\n\n";
     std::cout << "######  Simulation parameters  ######\n\n";
@@ -69,17 +79,6 @@ ANLStatus ConstructDetectorForSimulation::mod_initialize()
     }
   }
 
-  return AS_OK;
-}
-
-ANLStatus ConstructDetectorForSimulation::mod_begin_run()
-{
-  if (!exist_module("Geant4Body")) {
-    return AS_OK;
-  }
-
-  DetectorSystem* detectorManager = getDetectorManager();
-  detectorManager->registerGeant4SensitiveDetectors();
   return AS_OK;
 }
 

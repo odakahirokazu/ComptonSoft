@@ -65,9 +65,11 @@ ANLStatus WriteEventTree::mod_initialize()
 
 ANLStatus WriteEventTree::mod_analyze()
 {
-  int64_t eventID = -1;
+  int32_t runID = -1;
+  int32_t eventID = -1;
   
   if (initialInfo_) {
+    runID = initialInfo_->RunID();
     eventID = initialInfo_->EventID();
     treeIO_->setInitialInfo(initialInfo_->InitialEnergy(),
                             initialInfo_->InitialDirection(),
@@ -77,6 +79,7 @@ ANLStatus WriteEventTree::mod_analyze()
     treeIO_->setWeight(initialInfo_->Weight());
   }
   else {
+    runID = 0;
     eventID = get_loop_index();
   }
 
@@ -86,7 +89,7 @@ ANLStatus WriteEventTree::mod_analyze()
     const std::vector<DetectorHit_sptr>& hits
       = hitCollection_->getHits(timeGroup);
     if (hits.size() > 0) {
-      treeIO_->fillHits(eventID, hits);
+      treeIO_->fillHits(runID, eventID, hits);
       filled = true;
     }
   }
@@ -95,7 +98,7 @@ ANLStatus WriteEventTree::mod_analyze()
     set_evs("WriteEventTree:Fill");
   }
   else if (notice_undetected_) {
-    treeIO_->fillUndetectedEvent(eventID);
+    treeIO_->fillUndetectedEvent(runID, eventID);
     set_evs("WriteEventTree:FillUndetected");
   }
 

@@ -20,15 +20,29 @@
 #include "InitialInformation.hh"
 #include <anlnext/BasicModule.hh>
 
-anlgeant4::
+namespace anlgeant4 {
+
 InitialInformation::InitialInformation(bool stored, anlnext::BasicModule* mod)
-  : stored_(stored), weight_stored_(stored),
-    energy_(0.0), direction_(0.0, 0.0, -1.0),
-    time_(0.0), position_(0.0, 0.0, 0.0),
-    polarization_(0.0, 0.0, 0.0),
-    event_id_(-1), weight_(1.0)
+  : stored_(stored),
+    run_id_(-1)
 {
   if (mod) {
     mod->add_alias("InitialInformation");
   }
+
+  primary_vector_.resize(1);
 }
+
+void InitialInformation::initializeRun(int runID, int num_events)
+{
+  setRunID(runID);
+  primary_vector_.assign(num_events, PrimaryData());
+  index_ = 0;
+}
+
+void InitialInformation::initializeEvent(int eventID)
+{
+  primary_vector_[eventID].event_id_ = eventID;
+}
+
+} /* namespace anlgeant4 */

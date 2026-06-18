@@ -22,13 +22,12 @@
 
 #include <anlnext/BasicModule.hh>
 
+class G4Run;
 class G4Event;
 class G4Track;
 class G4Step;
-class G4Run;
-
-class G4RunManager;
 class G4UserStackingAction;
+
 
 namespace anlgeant4
 {
@@ -38,13 +37,16 @@ namespace anlgeant4
  * @author Hirokazu Odaka
  * @date 2012-05-30 | Hirokazu Odaka | redesign (originally came from VPickUpData by Shin Watanabe)
  * @date 2017-06-28 | Hirokazu Odaka | redesign, rename class and methods
+ * @date 2026-04-15 | Hirokazu Odaka | redesign
  */
 class VUserActionAssembly : public anlnext::BasicModule
 {
-  DEFINE_ANL_MODULE(VUserActionAssembly, 5.0);
+  DEFINE_ANL_MODULE(VUserActionAssembly, 6.0);
 public:
   VUserActionAssembly();
   virtual ~VUserActionAssembly();
+
+  anlnext::ANLStatus mod_initialize() override;
 
   virtual void RunActionAtBeginning(const G4Run*) {}
   virtual void RunActionAtEnd(const G4Run*) {}
@@ -55,20 +57,11 @@ public:
   virtual void TrackActionAtBeginning(const G4Track*) {}
   virtual void TrackActionAtEnd(const G4Track*) {}
 
+  virtual bool isSteppingActionEffective() const { return false; }
   virtual void SteppingAction(const G4Step*) {}
 
-  bool isSteppingActionEnabled() const { return steppingActionEnabled_; }
-
-  virtual void registerUserActions(G4RunManager* run_manager);
-
-protected:
-  void enableSteppingAction() { steppingActionEnabled_ = true; }
-  void disableSteppingAction() { steppingActionEnabled_ = false; }
-
-  virtual void printSummary();
-
-private:
-  bool steppingActionEnabled_ = true;
+  virtual bool isStackingActionEffective() const { return false; }
+  virtual G4UserStackingAction* createStackingAction() const { return nullptr; }
 };
 
 } /* namespace anlgeant4 */

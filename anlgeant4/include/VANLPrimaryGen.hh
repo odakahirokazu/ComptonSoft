@@ -32,17 +32,17 @@ namespace anlgeant4
  * @author Shin Watanabe, Hirokazu Odaka
  * @date xxxx-xx-xx
  * @date 2011-xx-xx
+ * @date 2026-04-15 | 5.0 | register this action to Geant4Body
  */
 class VANLPrimaryGen : public anlnext::BasicModule
 {
-  DEFINE_ANL_MODULE(VANLPrimaryGen, 4.0);
+  DEFINE_ANL_MODULE(VANLPrimaryGen, 5.0);
 public: 
-  VANLPrimaryGen()
-  {
-    add_alias("VANLPrimaryGen");
-  }
+  VANLPrimaryGen();
   
   virtual G4VUserPrimaryGeneratorAction* create() = 0;
+
+  anlnext::ANLStatus mod_initialize() override;
 };
 
 } /* namespace anlgeant4 */

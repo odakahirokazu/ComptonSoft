@@ -65,13 +65,15 @@ ANLStatus ActivationUserActionAssembly::mod_define()
   return AS_OK;
 }
 
-void ActivationUserActionAssembly::createUserActions()
+ANLStatus ActivationUserActionAssembly::mod_initialize()
 {
-  setStackingAction(new ActivationStackingAction);
+  return StandardUserActionAssembly::mod_initialize();
 }
 
-void ActivationUserActionAssembly::RunActionAtBeginning(const G4Run*)
+void ActivationUserActionAssembly::RunActionAtBeginning(const G4Run* run)
 {
+  StandardUserActionAssembly::RunActionAtBeginning(run);
+  
   const G4String filename(m_FilenameBase+".root");
   m_AnalysisManager->SetNtupleDirectoryName("activation");
   m_AnalysisManager->OpenFile(filename);
@@ -147,6 +149,11 @@ void ActivationUserActionAssembly::SteppingAction(const G4Step* step)
       }
     }
   }
+}
+
+G4UserStackingAction* ActivationUserActionAssembly::createStackingAction() const
+{
+  return new ActivationStackingAction;
 }
 
 int ActivationUserActionAssembly::NumberOfVolumes()

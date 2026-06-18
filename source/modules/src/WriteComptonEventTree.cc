@@ -67,9 +67,11 @@ ANLStatus WriteComptonEventTree::mod_initialize()
 
 ANLStatus WriteComptonEventTree::mod_analyze()
 {
-  int64_t eventID = -1;
+  int32_t runID = -1;
+  int32_t eventID = -1;
   
   if (initialInfo_) {
+    runID = initialInfo_->RunID();
     eventID = initialInfo_->EventID();
     treeIO_->setInitialInfo(initialInfo_->InitialEnergy(),
                             initialInfo_->InitialDirection(),
@@ -79,10 +81,11 @@ ANLStatus WriteComptonEventTree::mod_analyze()
     treeIO_->setWeight(initialInfo_->Weight());
   }
   else {
+    runID = 0;
     eventID = get_loop_index();
   }
 
-  treeIO_->fillEvents(eventID, eventReconstruction_->getReconstructedEvents());
+  treeIO_->fillEvents(runID, eventID, eventReconstruction_->getReconstructedEvents());
   
   return AS_OK;
 }

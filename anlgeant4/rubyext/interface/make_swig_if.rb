@@ -5,7 +5,6 @@ name = 'anlGeant4'
 namespace = 'anlgeant4'
 classList = [
   ANL::SWIGClass.new('Geant4Body'),
-  ANL::SWIGClass.new('Geant4Simple'),
   ANL::SWIGClass.new('VANLPhysicsList', true),
   ANL::SWIGClass.new('VANLGeometry', true),
   ANL::SWIGClass.new('ReadGDML', false, "USE_GDML"),
@@ -22,10 +21,9 @@ classList = [
   ANL::SWIGClass.new('NucleusPrimaryGen'),
   ANL::SWIGClass.new('NucleusPrimaryGenInVolume'),
   ANL::SWIGClass.new('VUserActionAssembly'),
-  ANL::SWIGClass.new('VMasterUserActionAssembly'),
-  ANL::SWIGClass.new('VAppendableUserActionAssembly'),
   ANL::SWIGClass.new('StandardUserActionAssembly'),
   ANL::SWIGClass.new('VisualizeG4Geom', false, 'USE_VIS'),
+  ANL::SWIGClass.new('VEventStore'),
 ]
 
 m = ANL::SWIGModule.new(name, classList, namespace)

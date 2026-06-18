@@ -1,4 +1,5 @@
 namespace comptonsoft {
+class CSRawHitStore;
 class ConstructDetector;
 class ConstructDetectorForSimulation;
 class VCSModule;

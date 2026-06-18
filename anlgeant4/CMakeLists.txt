@@ -12,7 +12,7 @@ endif(ANLG4_USE_GDML)
 
 if(ANLG4_USE_VIS OR ANLG4_USE_VIS_QT)
   set(VIS_CLASSES
-    src/VisualizeG4Geom.cc 
+    src/VisualizeG4Geom.cc
     )
   if(ANLG4_USE_VIS)
     add_definitions(-DANLG4_USE_VIS)
@@ -29,7 +29,7 @@ if(ANLG4_USE_VIS OR ANLG4_USE_VIS_QT)
 endif()
 
 add_definitions(-DANLNEXT_USE_HEPVECTOR)
- 
+
 include_directories(include
   ${CLHEP_INC_DIR}
   ${G4_INC_DIR}
@@ -48,9 +48,7 @@ link_directories(
 
 add_library(${TARGET_LIBRARY} SHARED
   src/InitialInformation.cc
-  src/ANLG4RunManager.cc
   src/Geant4Body.cc
-  src/Geant4Simple.cc
   src/BasicPrimaryGeneratorAction.cc
   src/BasicPrimaryGen.cc
   src/PointSourcePrimaryGen.cc
@@ -68,10 +66,13 @@ add_library(${TARGET_LIBRARY} SHARED
   src/UserActionAssemblyTrackingAction.cc
   src/UserActionAssemblySteppingAction.cc
   src/VUserActionAssembly.cc
-  src/VMasterUserActionAssembly.cc
-  src/VAppendableUserActionAssembly.cc
+  src/ActionInitialization.cc
   src/StandardUserActionAssembly.cc
+  src/VDetectorConstructionWithSDVector.cc
+  src/SDAssignment.cc
   src/VANLGeometry.cc
+  src/VANLPrimaryGen.cc
+  src/VEventStore.cc
   ${GDML_CLASSES}
   ${VIS_CLASSES}
   )

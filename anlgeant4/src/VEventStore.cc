@@ -17,31 +17,55 @@
  *                                                                       *
  *************************************************************************/
 
-#include "UserActionAssemblyEventAction.hh"
-#include "VUserActionAssembly.hh"
+#include "VEventStore.hh"
+
+using namespace anlnext;
 
 namespace anlgeant4
 {
 
-UserActionAssemblyEventAction::UserActionAssemblyEventAction(const std::list<VUserActionAssembly*>& userActions)
-  : userActions_(userActions)
+VEventStore::VEventStore()
+  : InitialInformation(true, this)
 {
-}
- 
-UserActionAssemblyEventAction::~UserActionAssemblyEventAction() = default;
-
-void UserActionAssemblyEventAction::BeginOfEventAction(const G4Event* anEvent)
-{
-  for (VUserActionAssembly* ua: userActions_) {
-    ua->EventActionAtBeginning(anEvent);
-  }
+  add_alias("VEventStore");
+  add_alias("Geant4EventStore");
 }
 
-void UserActionAssemblyEventAction::EndOfEventAction(const G4Event* anEvent)
+VEventStore::~VEventStore() = default;
+
+void VEventStore::initializeRun(int runID, int num_events)
 {
-  for (VUserActionAssembly* ua: userActions_) {
-    ua->EventActionAtEnd(anEvent);
+  eventid_vector_.resize(num_events, 0);
+  read_index_ = 0;
+  postprocess_ready_ = false;
+
+  InitialInformation::initializeRun(runID, num_events);
+}
+
+void VEventStore::finalizeRun()
+{
+  postprocess_ready_ = true;
+}
+
+void VEventStore::initializeEvent(int eventID)
+{
+  eventid_vector_[eventID] = eventID;
+  InitialInformation::initializeEvent(eventID);
+}
+
+ANLStatus VEventStore::mod_analyze()
+{
+  if (postprocess_ready_) {
+    read_index_++;
   }
+
+  InitialInformation::set_read_index(read_index_);
+
+  if (read_index_ < eventid_vector_.size()) {
+    set_evs("Geant4Body:DataStored");
+  }
+
+  return AS_OK;
 }
 
 } /* namespace anlgeant4 */

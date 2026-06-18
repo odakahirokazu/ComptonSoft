@@ -1,6 +1,5 @@
 namespace anlgeant4 {
 class Geant4Body;
-class Geant4Simple;
 class VANLPhysicsList;
 class VANLGeometry;
 class ReadGDML;
@@ -17,8 +16,7 @@ class PrimaryGenUniformSourceInVolume;
 class NucleusPrimaryGen;
 class NucleusPrimaryGenInVolume;
 class VUserActionAssembly;
-class VMasterUserActionAssembly;
-class VAppendableUserActionAssembly;
 class StandardUserActionAssembly;
 class VisualizeG4Geom;
+class VEventStore;
 }

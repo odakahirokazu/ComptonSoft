@@ -35,6 +35,10 @@
 
 class TFile;
 
+namespace anlgeant4 {
+class SDAssignment;
+}
+
 namespace comptonsoft {
 
 enum class ElectrodeSide;
@@ -42,6 +46,7 @@ class MultiChannelData;
 class ChannelMap;
 class DeviceSimulation;
 class VCSSensitiveDetector;
+class CSRawHitStore;
 
 /**
  * A manager class of a whole detector system.
@@ -51,6 +56,7 @@ class VCSSensitiveDetector;
  * @date 2016-08-22 | new XML scheme (version 4)
  * @date 2018-03-09 | new XML schema (detector config v5, detector parameters v2)
  * @date 2020-03-30 | new XML schema (channel properties v2, detector parameters v3)
+ * @date 2026-06-16 | raw hit store
  */
 class DetectorSystem : private boost::noncopyable
 {
@@ -124,7 +130,7 @@ public:
 
     void load(const boost::property_tree::ptree& node);
   };
-  
+
 public:
   DetectorSystem();
   virtual ~DetectorSystem();
@@ -236,7 +242,12 @@ public:
   void readDetectorConfiguration(const std::string& filename);
   bool isConstructed() const { return detectorConstructed_; }
   void readDetectorParameters(const std::string& filename);
-  void registerGeant4SensitiveDetectors();
+  void registerGeant4SensitiveDetectors(anlgeant4::SDAssignment* geometry_module);
+
+  // Simulation raw hit
+  void setRawHitStore(CSRawHitStore* hit_store);
+  void insertRawHit(DetectorHit&& hit);
+  void distributeRawHitsToDetectors();
 
   // for an event loop
   void initializeEvent();
@@ -267,7 +278,7 @@ private:
                                DeviceSimulation* ds);
   void setupReconstructionParameters(const DetectorSystem::ParametersNodeContents parameters,
                                      VRealDetectorUnit* detector);
-  
+
 private:
   bool MCSimulation_;
   bool simAutoPosition_;
@@ -285,7 +296,9 @@ private:
 
   std::map<std::string, std::unique_ptr<DetectorGroup>> detectorGroupMap_;
   std::vector<HitPattern> hitPatterns_;
-  
+
+  CSRawHitStore* hitStore_ = nullptr;
+
 private:
   DetectorSystem(const DetectorSystem&) = delete;
   DetectorSystem(DetectorSystem&&) = delete;

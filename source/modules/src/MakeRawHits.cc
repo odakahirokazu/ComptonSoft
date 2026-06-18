@@ -35,6 +35,8 @@ anlnext::ANLStatus MakeRawHits::mod_define()
 void MakeRawHits::doProcessing()
 {
   DetectorSystem* detectorManager = getDetectorManager();
+  detectorManager->distributeRawHitsToDetectors();
+
   for (auto ds: detectorManager->getDeviceSimulationVector()) {
     ds->makeRawDetectorHits();
   }

@@ -32,15 +32,15 @@ UserActionAssemblyRunAction::~UserActionAssemblyRunAction() = default;
 
 void UserActionAssemblyRunAction::BeginOfRunAction(const G4Run* aRun)
 {
-  for (VUserActionAssembly* pud: userActions_) {
-    pud->RunActionAtBeginning(aRun);
+  for (VUserActionAssembly* ua: userActions_) {
+    ua->RunActionAtBeginning(aRun);
   }
 }
 
 void UserActionAssemblyRunAction::EndOfRunAction(const G4Run* aRun)
 {
-  for (VUserActionAssembly* pud: userActions_) {
-    pud->RunActionAtEnd(aRun);
+  for (VUserActionAssembly* ua: userActions_) {
+    ua->RunActionAtEnd(aRun);
   }
 }
 

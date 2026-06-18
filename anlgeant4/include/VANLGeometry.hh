@@ -21,8 +21,10 @@
 #define ANLGEANT4_VANLGeometry_H 1
 
 #include <anlnext/BasicModule.hh>
+#include "SDAssignment.hh"
 
 class G4VUserDetectorConstruction;
+
 
 namespace anlgeant4
 {
@@ -34,10 +36,12 @@ namespace anlgeant4
  * @date 2012-05-30
  * @date 2013-08-18 | H. Odaka | length unit, surface check
  * @date 2017-07-03 | 4.2 | H. Odaka | length unit is fixed to cm
+ * @date 2026-04-17 | 5.0 | H. Odaka | SD map
  */
-class VANLGeometry : public anlnext::BasicModule
+class VANLGeometry : public anlnext::BasicModule, public SDAssignment
 {
-  DEFINE_ANL_MODULE(VANLGeometry, 4.2);
+  DEFINE_ANL_MODULE(VANLGeometry, 5.0);
+
 public:
   VANLGeometry();
 

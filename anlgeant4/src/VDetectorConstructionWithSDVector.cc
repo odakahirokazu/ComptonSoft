@@ -17,57 +17,29 @@
  *                                                                       *
  *************************************************************************/
 
-#ifndef ANLGEANT4_Geant4Simple_H
-#define ANLGEANT4_Geant4Simple_H 1
+#include "VDetectorConstructionWithSDVector.hh"
+#include "G4VSensitivedetector.hh"
+#include "G4SDManager.hh"
 
-#include <string>
-#include <memory>
-#include <anlnext/BasicModule.hh>
-#include "globals.hh"
-
-namespace CLHEP
-{
-class HepRandomEngine;
-}
-
-class G4RunManager;
 
 namespace anlgeant4
 {
 
-/**
- * Simple Geant4 run manager 
- * @author Hirokazu Odaka
- * @date 2017-07-28 | 3.0, re-designed.
- */
-class Geant4Simple : public anlnext::BasicModule
+VDetectorConstructionWithSDVector::VDetectorConstructionWithSDVector() = default;
+
+VDetectorConstructionWithSDVector::~VDetectorConstructionWithSDVector() = default;
+
+void VDetectorConstructionWithSDVector::ConstructSDandField()
 {
-  DEFINE_ANL_MODULE(Geant4Simple, 3.0);
-public: 
-  Geant4Simple();
-  ~Geant4Simple();
-  
-  anlnext::ANLStatus mod_define() override;
-  anlnext::ANLStatus mod_initialize() override;
-  anlnext::ANLStatus mod_analyze() override;
+  auto* sdManager = G4SDManager::GetSDMpointer();
 
-protected:
-  virtual void set_user_initializations();
-  virtual void set_user_primary_generator_action();
-  virtual void set_user_defined_actions();
-  virtual void apply_commands();
-
-private:
-  std::unique_ptr<G4RunManager> m_G4RunManager;
-  std::unique_ptr<CLHEP::HepRandomEngine> m_RandomEnginePtr;
-
-  std::string m_RandomEngine;
-  int m_RandomSeed1;
-  
-  int m_NumberOfTrial;
-  int m_VerboseLevel;
-};
+  for (const auto& pair: SDs_) {
+    const std::string& logical_volume_name = pair.first;
+    const G4VSensitiveDetector* sd = pair.second;
+    G4VSensitiveDetector* sd1 = sd->Clone();
+    sdManager->AddNewDetector(sd1);
+    SetSensitiveDetector(logical_volume_name, sd1);
+  }
+}
 
 } /* namespace anlgeant4 */
-
-#endif /* ANLGEANT4_Geant4Simple_H */

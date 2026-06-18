@@ -36,7 +36,8 @@ ComptonEventTreeIO::~ComptonEventTreeIO() = default;
 
 void ComptonEventTreeIO::defineBranches()
 {
-  cetree_->Branch("eventid", &eventid_, "eventid/l");
+  cetree_->Branch("runid", &runid_, "runid/I");
+  cetree_->Branch("eventid", &eventid_, "eventid/I");
   cetree_->Branch("num_reconstruction_cases", &num_reconstruction_cases_, "num_reconstruction_cases/S");
   cetree_->Branch("num_hits", &num_hits_, "num_hits/S");
 
@@ -101,6 +102,7 @@ void ComptonEventTreeIO::defineBranches()
 
 void ComptonEventTreeIO::setBranchAddresses()
 {
+  cetree_->SetBranchAddress("runid", &runid_);
   cetree_->SetBranchAddress("eventid", &eventid_);
   cetree_->SetBranchAddress("num_reconstruction_cases", &num_reconstruction_cases_);
   cetree_->SetBranchAddress("num_hits", &num_hits_);
@@ -164,10 +166,12 @@ void ComptonEventTreeIO::setBranchAddresses()
   cetree_->SetBranchAddress("reconstruction_fraction", &reconstruction_fraction_);
 }
 
-void ComptonEventTreeIO::fillEvent(const int64_t eventID,
+void ComptonEventTreeIO::fillEvent(const int32_t runID,
+                                   const int32_t eventID,
                                    const int numCases,
                                    const BasicComptonEvent& event)
 {
+  runid_ = (runID >= 0) ? runID : event.RunID();
   eventid_ = (eventID >= 0) ? eventID : event.EventID();
   num_reconstruction_cases_ = numCases;
   num_hits_ = event.NumberOfHits();
@@ -242,12 +246,13 @@ void ComptonEventTreeIO::fillEvent(const int64_t eventID,
   cetree_->Fill();
 }
 
-void ComptonEventTreeIO::fillEvents(const int64_t eventID,
+void ComptonEventTreeIO::fillEvents(const int32_t runID,
+                                    const int32_t eventID,
                                     const std::vector<BasicComptonEvent_sptr>& events)
 {
   const int numCases = events.size();
   for (const auto& e: events) {
-    fillEvent(eventID, numCases, *e);
+    fillEvent(runID, eventID, numCases, *e);
   }
 }
 
@@ -260,6 +265,7 @@ BasicComptonEvent ComptonEventTreeIO::retrieveEvent() const
 
 void ComptonEventTreeIO::retrieveEvent(BasicComptonEvent& event) const
 {
+  event.setRunID(runid_);
   event.setEventID(eventid_);
   event.setNumberOfHits(num_hits_);
   

@@ -1,7 +1,6 @@
 %module anlGeant4
 %{
 #include "Geant4Body.hh"
-#include "Geant4Simple.hh"
 #include "VANLPhysicsList.hh"
 #include "VANLGeometry.hh"
 #ifdef USE_GDML
@@ -22,12 +21,11 @@
 #include "NucleusPrimaryGen.hh"
 #include "NucleusPrimaryGenInVolume.hh"
 #include "VUserActionAssembly.hh"
-#include "VMasterUserActionAssembly.hh"
-#include "VAppendableUserActionAssembly.hh"
 #include "StandardUserActionAssembly.hh"
 #ifdef USE_VIS
 #include "VisualizeG4Geom.hh"
 #endif
+#include "VEventStore.hh"
 
 
 %}
@@ -42,14 +40,6 @@ class Geant4Body : public anlnext::BasicModule
 public:
   Geant4Body();
   ~Geant4Body();
-};
-
-
-class Geant4Simple : public anlnext::BasicModule
-{
-public:
-  Geant4Simple();
-  ~Geant4Simple();
 };
 
 
@@ -182,23 +172,7 @@ public:
 };
 
 
-class VMasterUserActionAssembly : public VUserActionAssembly
-{
-public:
-  VMasterUserActionAssembly();
-  virtual ~VMasterUserActionAssembly();
-};
-
-
-class VAppendableUserActionAssembly : public VUserActionAssembly
-{
-public:
-  VAppendableUserActionAssembly();
-  virtual ~VAppendableUserActionAssembly();
-};
-
-
-class StandardUserActionAssembly : public VMasterUserActionAssembly
+class StandardUserActionAssembly : public VUserActionAssembly
 {
 public:
   StandardUserActionAssembly();
@@ -214,5 +188,13 @@ public:
 };
 
 #endif
+
+class VEventStore : public anlnext::BasicModule
+{
+public:
+  VEventStore();
+  virtual ~VEventStore();
+};
+
 
 }

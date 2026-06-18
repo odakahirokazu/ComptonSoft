@@ -36,54 +36,68 @@ namespace anlgeant4 {
 class InitialInformation
 {
 public:
+  struct PrimaryData
+  {
+    int32_t event_id_ = -1;
+    double weight_ = 1.0;
+    double energy_ = 0.0;
+    G4ThreeVector direction_ = {0.0, 0.0, 0.0};
+    double time_ = 0.0;
+    G4ThreeVector position_ = {0.0, 0.0, 0.0};
+    G4ThreeVector polarization_ = {0.0, 0.0, 0.0};
+  };
+
+public:
   explicit InitialInformation(bool stored, anlnext::BasicModule* mod=nullptr);
 
   bool InitialInformationStored() const { return stored_; }
   void setInitialInformationStored(bool v=true) { stored_ = v; }
-  bool WeightStored() const { return weight_stored_; }
-  void setWeightStored(bool v=true) { weight_stored_ = v; }
 
-  double InitialEnergy() const              { return energy_; }
-  G4ThreeVector InitialDirection() const    { return direction_; }
-  double InitialTime() const                { return time_; }
-  G4ThreeVector InitialPosition() const     { return position_; }
-  G4ThreeVector InitialPolarization() const { return polarization_; }
-  
-  int64_t EventID() const { return event_id_; }
-  double Weight() const { return weight_; }
+  int32_t RunID() const { return run_id_; }
 
-  void setEventID(int64_t i) { event_id_ = i; }
+  int32_t EventID() const { return primary_vector_[index_].event_id_; }
+  double Weight() const { return primary_vector_[index_].weight_; }
+  double InitialEnergy() const { return primary_vector_[index_].energy_; }
+  G4ThreeVector InitialDirection() const { return primary_vector_[index_].direction_; }
+  double InitialTime() const { return primary_vector_[index_].time_; }
+  G4ThreeVector InitialPosition() const { return primary_vector_[index_].position_; }
+  G4ThreeVector InitialPolarization() const { return primary_vector_[index_].polarization_; }
 
-  void setInitialEnergy(double v)
-  { energy_ = v; }
-  void setInitialDirection(G4ThreeVector v)
-  { direction_ = v;    }
-  void setInitialDirection(double x, double y, double z)
-  { direction_.set(x, y, z); }
-  void setInitialTime(double v)
-  { time_ = v; }
-  void setInitialPosition(G4ThreeVector v)
-  { position_ = v; }
-  void setInitialPosition(double x, double y, double z)
-  { position_.set(x, y, z); }
-  void setInitialPolarization(G4ThreeVector v)
-  { polarization_ = v; }
-  void setInitialPolarization(double x, double y, double z)
-  { polarization_.set(x, y, z); }
-  
-  void setWeight(double v) { weight_ = v; }
+  void setRunID(int32_t i) { run_id_ = i; }
+
+  void setEventID(size_t i, int32_t v) { primary_vector_[i].event_id_ = v; }
+  void setWeight(size_t i, double v) { primary_vector_[i].weight_ = v; }
+  void setInitialEnergy(size_t i, double v) { primary_vector_[i].energy_ = v; }
+  void setInitialDirection(size_t i, G4ThreeVector v){ primary_vector_[i].direction_ = v;    }
+  void setInitialDirection(size_t i, double x, double y, double z) { primary_vector_[i].direction_.set(x, y, z); }
+  void setInitialTime(size_t i, double v) { primary_vector_[i].time_ = v; }
+  void setInitialPosition(size_t i, G4ThreeVector v) { primary_vector_[i].position_ = v; }
+  void setInitialPosition(size_t i, double x, double y, double z) { primary_vector_[i].position_.set(x, y, z); }
+  void setInitialPolarization(size_t i, G4ThreeVector v) { primary_vector_[i].polarization_ = v; }
+  void setInitialPolarization(size_t i, double x, double y, double z) { primary_vector_[i].polarization_.set(x, y, z); }
+
+  // setters for a single event mode
+  void setEventID(int32_t v) { primary_vector_[0].event_id_ = v; }
+  void setWeight(double v) { primary_vector_[0].weight_ = v; }
+  void setInitialEnergy(double v) { primary_vector_[0].energy_ = v; }
+  void setInitialDirection(G4ThreeVector v){ primary_vector_[0].direction_ = v;    }
+  void setInitialDirection(double x, double y, double z) { primary_vector_[0].direction_.set(x, y, z); }
+  void setInitialTime(double v) { primary_vector_[0].time_ = v; }
+  void setInitialPosition(G4ThreeVector v) { primary_vector_[0].position_ = v; }
+  void setInitialPosition(double x, double y, double z) { primary_vector_[0].position_.set(x, y, z); }
+  void setInitialPolarization(G4ThreeVector v) { primary_vector_[0].polarization_ = v; }
+  void setInitialPolarization(double x, double y, double z) { primary_vector_[0].polarization_.set(x, y, z); }
+
+protected:
+  void initializeRun(int runID, int num_events);
+  void initializeEvent(int eventID);
+  void set_read_index(size_t i) { index_ = i; }
 
 private:
   bool stored_;
-  bool weight_stored_;
-
-  double energy_;
-  G4ThreeVector direction_;
-  double time_;
-  G4ThreeVector position_;
-  G4ThreeVector polarization_;
-  int64_t event_id_;
-  double weight_;
+  int32_t run_id_;
+  std::vector<PrimaryData> primary_vector_;
+  size_t index_ = 0;
 };
 
 } /* namespace anlgeant4 */

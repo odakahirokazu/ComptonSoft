@@ -31,7 +31,7 @@ def run_simulation(num, random, output)
 end
 
 ### main ###
-num = 100000
+num = 1000000
 output = "simulation.root"
 random = 0
 run_simulation(num, random, output)

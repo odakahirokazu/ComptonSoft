@@ -21,6 +21,7 @@
 
 #include "G4ParticleGun.hh"
 #include "G4ParticleTable.hh"
+#include "G4Event.hh"
 #include "AstroUnits.hh"
 #include "BasicPrimaryGen.hh"
 
@@ -47,7 +48,7 @@ BasicPrimaryGeneratorAction::BasicPrimaryGeneratorAction(G4String particle_name)
     m_Time(0.0), m_Position(0.0, 0.0, 0.0),
     m_Energy(10.0*unit::keV), m_Direction(1.0, 0.0, 0.0)
 {
-  G4ParticleDefinition* particle = 
+  G4ParticleDefinition* particle =
     G4ParticleTable::GetParticleTable()->FindParticle(particle_name);
   m_ParticleGun->SetParticleDefinition(particle);
 }
@@ -56,9 +57,11 @@ BasicPrimaryGeneratorAction::~BasicPrimaryGeneratorAction() = default;
 
 void BasicPrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
 {
+  const int event_id = anEvent->GetEventID();
   if (m_GeneratorSetting) {
     m_GeneratorSetting->makePrimarySetting();
     m_GeneratorSetting->confirmPrimarySetting();
+    m_GeneratorSetting->storeInitialCondition(event_id);
   }
 
   m_ParticleGun->SetParticleTime(m_Time);

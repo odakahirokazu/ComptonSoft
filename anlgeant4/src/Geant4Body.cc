@@ -20,15 +20,16 @@
 #include "Geant4Body.hh"
 
 #include <ctime>
+#include <chrono>
 #include <boost/lexical_cast.hpp>
 
-#include "ANLG4RunManager.hh"
-
+#include "G4RunManagerFactory.hh"
 #include "G4VUserDetectorConstruction.hh"
 #include "G4VUserPhysicsList.hh"
 #include "G4VUserPrimaryGeneratorAction.hh"
 #include "G4UImanager.hh"
 
+#include "ActionInitialization.hh"
 #include "VANLGeometry.hh"
 #include "VANLPhysicsList.hh"
 #include "VANLPrimaryGen.hh"
@@ -40,8 +41,10 @@ namespace anlgeant4
 {
 
 Geant4Body::Geant4Body()
-  : m_G4RunManager(new ANLG4RunManager),
-    m_EventIndex(0),
+  : run_manager_(nullptr),
+    action_initialization_(nullptr),
+    num_events_(1000),
+    num_threads_(0),
     m_RandomEngine("MTwistEngine"),
     m_RandomInitMode(1),
     m_RandomSeed1(0),
@@ -56,6 +59,10 @@ Geant4Body::~Geant4Body() = default;
 
 ANLStatus Geant4Body::mod_define()
 {
+  define_parameter("num_events", &mod_class::num_events_);
+  define_parameter("num_threads", &mod_class::num_threads_);
+  define_parameter("print_beamon_time", &mod_class::print_beamon_time_);
+
   register_parameter(&m_RandomEngine, "random_engine");
   register_parameter(&m_RandomInitMode, "random_initialization_mode");
   set_parameter_question("Random initialization mode (0: auto, 1: interger, 2: state file)");
@@ -68,12 +75,23 @@ ANLStatus Geant4Body::mod_define()
 
   register_parameter(&m_VerboseLevel, "verbose");
   register_parameter(&m_UserCommands, "commands");
-  
+
+  return AS_OK;
+}
+
+ANLStatus Geant4Body::mod_pre_initialize()
+{
+  run_manager_.reset( G4RunManagerFactory::CreateRunManager(G4RunManagerType::Default) );
+  action_initialization_ = new ActionInitialization;
+
   return AS_OK;
 }
 
 ANLStatus Geant4Body::mod_initialize()
 {
+  define_evs("Geant4Body:BeamOn");
+  define_evs("Geant4Body:DataStored");
+
   if (m_RandomInitMode==0 || m_RandomInitMode==1 || m_RandomInitMode==2) {
     initialize_random_generator();
   }
@@ -84,11 +102,13 @@ ANLStatus Geant4Body::mod_initialize()
   }
 
   set_user_initializations();
-  set_user_primary_generator_action();
-  set_user_defined_actions();
   apply_commands();
 
-  m_G4RunManager->Initialize();
+  if (num_threads_ > 0) {
+    run_manager_->SetNumberOfThreads(num_threads_);
+  }
+
+  run_manager_->Initialize();
 
   return AS_OK;
 }
@@ -107,7 +127,7 @@ void Geant4Body::initialize_random_generator()
     m_RandomEnginePtr.reset(new CLHEP::HepJamesRandom);
     CLHEP::HepRandom::setTheEngine(m_RandomEnginePtr.get());
   }
-  
+
   if (m_RandomInitMode==0) {
     m_RandomSeed1 = std::time(0);
     CLHEP::HepRandom::setTheSeed(m_RandomSeed1);
@@ -132,31 +152,27 @@ void Geant4Body::initialize_random_generator()
 
 void Geant4Body::set_user_initializations()
 {
-  VANLGeometry* geometry;
-  get_module_NC("VANLGeometry", &geometry);
-  G4VUserDetectorConstruction* userDetectorConstruction = geometry->create();
-  m_G4RunManager->SetUserInitialization(userDetectorConstruction);
-  
-  VANLPhysicsList* physics;
-  get_module_NC("VANLPhysicsList", &physics);
-  G4VUserPhysicsList* userPhysicsList = physics->create();
-  m_G4RunManager->SetUserInitialization(userPhysicsList);
+  VANLGeometry* geometry_module = nullptr;
+  get_module_NC("VANLGeometry", &geometry_module);
+  G4VUserDetectorConstruction* user_detector_construction = geometry_module->create();
+  run_manager_->SetUserInitialization(user_detector_construction);
+
+  VANLPhysicsList* physics_module = nullptr;
+  get_module_NC("VANLPhysicsList", &physics_module);
+  G4VUserPhysicsList* user_physics_list = physics_module->create();
+  run_manager_->SetUserInitialization(user_physics_list);
+
+  run_manager_->SetUserInitialization(action_initialization_);
 }
 
-void Geant4Body::set_user_primary_generator_action()
+void Geant4Body::register_user_action(VANLPrimaryGen* primary_gen)
 {
-  VANLPrimaryGen* primaryGen;
-  get_module_NC("VANLPrimaryGen", &primaryGen);
-  G4VUserPrimaryGeneratorAction* userPrimaryGeneratorAction
-    = primaryGen->create();
-  m_G4RunManager->SetUserAction(userPrimaryGeneratorAction);
+  action_initialization_->registerUserAction(primary_gen);
 }
 
-void Geant4Body::set_user_defined_actions()
+void Geant4Body::register_user_action(VUserActionAssembly* uaa)
 {
-  VUserActionAssembly* userActionAssembly;
-  get_module_NC("VUserActionAssembly", &userActionAssembly);
-  userActionAssembly->registerUserActions(m_G4RunManager.get());
+  action_initialization_->registerUserAction(uaa);
 }
 
 void Geant4Body::apply_commands()
@@ -165,7 +181,7 @@ void Geant4Body::apply_commands()
   using boost::str;
 
   G4UImanager* ui = G4UImanager::GetUIpointer();
-  
+
   std::vector<std::string> presetCommands;
   presetCommands.push_back( str(format("/run/verbose %d") % m_VerboseLevel) );
   presetCommands.push_back( str(format("/event/verbose %d") % m_VerboseLevel) );
@@ -187,32 +203,35 @@ void Geant4Body::apply_commands()
 
 ANLStatus Geant4Body::mod_begin_run()
 {
-  const G4bool cond = m_G4RunManager->ConfirmBeamOnCondition();
-  if (cond) {
-    m_G4RunManager->ConstructScoringWorlds();
-    m_G4RunManager->RunInitialization();
-    m_G4RunManager->InitializeEventLoop(0, nullptr, 0);
-  }
-  else {
-    return AS_QUIT_ERROR;
-  }
-
   return AS_OK;
 }
 
 ANLStatus Geant4Body::mod_analyze()
 {
-  const ANLStatus status = m_G4RunManager->performOneEvent(m_EventIndex);
-  ++m_EventIndex;
+  if (!evs("Geant4Body:DataStored")) {
+    set_evs("Geant4Body:BeamOn");
 
-  return status;
+    const auto t0 = std::chrono::steady_clock::now();
+
+    run_manager_->BeamOn(num_events_);
+
+    const auto t1 = std::chrono::steady_clock::now();
+    const double duration =
+      std::chrono::duration<double>(t1 - t0).count();
+
+    if (print_beamon_time_) {
+      std::cout << "BeamOn time: " << duration << " s"
+                << "  events: " << num_events_
+                << "  rate: " << num_events_ / duration << " events/s"
+                << std::endl;
+    }
+  }
+
+  return AS_OK;
 }
 
 ANLStatus Geant4Body::mod_end_run()
 {
-  m_G4RunManager->TerminateEventLoop();
-  m_G4RunManager->RunTermination();
-
   return AS_OK;
 }
 
@@ -222,7 +241,7 @@ ANLStatus Geant4Body::mod_finalize()
     CLHEP::HepRandom::saveEngineStatus(m_RandomFinalStatusFileName.c_str());
   }
 
-  m_G4RunManager.reset(nullptr);
+  run_manager_.reset(nullptr);
 
   return AS_OK;
 }

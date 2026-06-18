@@ -34,6 +34,7 @@
 #include "G4LogicalVolumeStore.hh"
 
 #include "AstroUnits.hh"
+#include "SDAssignment.hh"
 #include "RealDetectorUnitFactory.hh"
 #include "SimDetectorUnitFactory.hh"
 #include "RealDetectorUnit2DPixel.hh"
@@ -47,6 +48,7 @@
 #include "GainFunctionCubic.hh"
 #include "DeviceSimulation.hh"
 #include "CSSensitiveDetector.hh"
+#include "CSRawHitStore.hh"
 
 namespace unit = anlgeant4::unit;
 
@@ -125,21 +127,11 @@ void DetectorSystem::printDetectorGroups() const
   std::cout << std::endl;
 }
 
-void DetectorSystem::registerGeant4SensitiveDetectors()
+void DetectorSystem::registerGeant4SensitiveDetectors(anlgeant4::SDAssignment* sd_assignment)
 {
-  for (auto& sd: sensitiveDetectorVector_) {
-    G4String name = sd->GetName();
-    G4SDManager::GetSDMpointer()->AddNewDetector(sd);
-    G4LogicalVolume* logicalVolume =
-      G4LogicalVolumeStore::GetInstance()->GetVolume(name);
-    if (logicalVolume) {
-      logicalVolume->SetSensitiveDetector(sd);
-    }
-    else {
-      std::ostringstream message;
-      message << "Error: Logical volume = " << name << " is not found.\n";
-      BOOST_THROW_EXCEPTION( CSException(message.str()) );
-    }
+  for (auto sd: sensitiveDetectorVector_) {
+    const std::string logical_volume_name = sd->GetName();
+    sd_assignment->registerSD(logical_volume_name, sd);
   }
 }
 
@@ -275,7 +267,7 @@ void DetectorSystem::loadDetectorConfigurationRootNode(const boost::property_tre
   using boost::property_tree::ptree;
   using boost::optional;
   using boost::format;
-  
+
   optional<std::string> name = RootNode.get_optional<std::string>("configuration.name");
   if (name) {
     std::cout << "Name: " << *name << std::endl;
@@ -313,7 +305,7 @@ void DetectorSystem::loadDetectorConfigurationRootNode(const boost::property_tre
   detectorConstructed_ = true;
 
   loadDCReadoutNode(configurationNode.find("readout")->second);
-  
+
   optional<const ptree&> groupsNode = configurationNode.get_child_optional("groups");
   if (groupsNode) {
     loadDCGroupsNode(*groupsNode);
@@ -334,7 +326,7 @@ void DetectorSystem::loadDCDetectorsNode(const boost::property_tree::ptree& Dete
   else {
     factory.reset(new RealDetectorUnitFactory);
   }
-  
+
   int detectorIndex = 0;
   for (const ptree::value_type& v: DetectorsNode.get_child("")) {
     if (v.first == "detector") {
@@ -408,7 +400,7 @@ loadDCDetectorNode(const boost::property_tree::ptree& DetectorNode,
       BOOST_THROW_EXCEPTION( CSException(message.str()) );
     }
   }
-  
+
   // offset
   {
     const optional<double> offset_x = DetectorNode.get_optional<double>("offset.<xmlattr>.x");
@@ -429,7 +421,7 @@ loadDCDetectorNode(const boost::property_tree::ptree& DetectorNode,
       BOOST_THROW_EXCEPTION( CSException(message.str()) );
     }
   }
-  
+
   // pixel
   {
     const optional<int> number_x = DetectorNode.get_optional<int>("pixel.<xmlattr>.number_x");
@@ -455,7 +447,7 @@ loadDCDetectorNode(const boost::property_tree::ptree& DetectorNode,
       BOOST_THROW_EXCEPTION( CSException(message.str()) );
     }
   }
-  
+
   // position
   {
     const optional<double> x = DetectorNode.get_optional<double>("position.<xmlattr>.x");
@@ -534,7 +526,7 @@ loadDCDetectorNode(const boost::property_tree::ptree& DetectorNode,
       }
 
       if (detector->checkType(DetectorType::DoubleSidedStripDetector)) {
-        RealDetectorUnit2DStrip* detectorUnitStrip = 
+        RealDetectorUnit2DStrip* detectorUnitStrip =
           dynamic_cast<RealDetectorUnit2DStrip*>(detector);
         if (detectorUnitStrip == nullptr) {
           std::ostringstream message;
@@ -550,7 +542,7 @@ loadDCDetectorNode(const boost::property_tree::ptree& DetectorNode,
   if ( sectionsNode != DetectorNode.not_found() ) {
     loadDCDetectorSectionsNode(sectionsNode->second, prioritySide, detector);
   }
-  
+
   if (isMCSimulation()) {
     DeviceSimulation* deviceSimulation = dynamic_cast<DeviceSimulation*>(detector);
     if (deviceSimulation == nullptr) {
@@ -571,7 +563,7 @@ loadDCDetectorSectionsNode(const boost::property_tree::ptree& SectionsNode,
   using boost::property_tree::ptree;
   using boost::optional;
   using boost::format;
-  
+
   for (const ptree::value_type& v: SectionsNode.get_child("")) {
     if (v.first == "section") {
       const ptree& sectionNode = v.second;
@@ -651,7 +643,7 @@ void DetectorSystem::loadDCReadoutNode(const boost::property_tree::ptree& Readou
 void DetectorSystem::loadDCGroupsNode(const boost::property_tree::ptree& GroupsNode)
 {
   using boost::property_tree::ptree;
-  
+
   for (const ptree::value_type& v: GroupsNode.get_child("")) {
     if (v.first == "group") {
       const ptree& groupNode = v.second;
@@ -689,7 +681,7 @@ loadDetectorParametersRootNode(const boost::property_tree::ptree& RootNode,
   using boost::property_tree::ptree;
   using boost::optional;
   using boost::format;
-  
+
   std::cout << "Name: " << RootNode.get<std::string>("detector_parameters.name") << std::endl;
 
   const ptree& mainNode = RootNode.find("detector_parameters")->second;
@@ -732,7 +724,7 @@ void DetectorSystem::
 loadDetectorParametersDataNode(const boost::property_tree::ptree& DataNode)
 {
   using boost::property_tree::ptree;
-  
+
   for (const ptree::value_type& v: DataNode.get_child("")) {
     if (v.first == "sensitive_detector") {
       const ptree& node = v.second;
@@ -750,7 +742,7 @@ void DetectorSystem::loadDPDetectorSetNode(const boost::property_tree::ptree& Se
 {
   using boost::property_tree::ptree;
   using boost::optional;
-  
+
   const optional<std::string> name = SetNode.get_optional<std::string>("<xmlattr>.name");
   const optional<std::string> prefix = SetNode.get_optional<std::string>("<xmlattr>.prefix");
   const optional<std::string> type = SetNode.get_optional<std::string>("<xmlattr>.type");
@@ -817,7 +809,7 @@ void DetectorSystem::loadDPDetectorSetNode(const boost::property_tree::ptree& Se
     if (layerOffset) {
       sensitiveDetector->SetLayerOffset(*layerOffset);
     }
-  
+
     sensitiveDetectorVector_.push_back(sensitiveDetector);
     sensitiveDetector->SetDetectorSystem(this);
     if (simAutoPosition_) { sensitiveDetector->SetPositionCalculation(); }
@@ -873,7 +865,7 @@ void DetectorSystem::setupDetectorParameters(const DetectorSystem::ParametersNod
                                              VRealDetectorUnit* detector)
 {
   using boost::optional;
-  
+
   const int NumSections = detector->NumberOfMultiChannelData();
   for (int section=0; section<NumSections; section++) {
     MultiChannelData* mcd = detector->getMultiChannelData(section);
@@ -1077,7 +1069,7 @@ void DetectorSystem::setupDetectorParameters(const DetectorSystem::ParametersNod
       ds->buildCCEMap();
     }
   }
-  
+
   if (auto o = parameters.diffusion_mode) {
     const int mode = *o;
     ds->setDiffusionMode(mode);
@@ -1096,7 +1088,7 @@ void DetectorSystem::setupDetectorParameters(const DetectorSystem::ParametersNod
       ds->setDiffusionSigmaConstantAnode(value);
     }
   }
-  
+
   if (auto o = parameters.timing_resolution_trigger) {
     const double value = (*o)*unit::second;
     ds->setTimingResolutionForTrigger(value);
@@ -1126,7 +1118,7 @@ void DetectorSystem::setupDetectorParameters(const DetectorSystem::ParametersNod
         (ds1->isXStripSideCathode()) ?
         parameters.channel_properties_anode :
         parameters.channel_properties_cathode;
-    
+
       constexpr int XSIDE = 1;
       constexpr int YSIDE = 2;
       for (int side: {XSIDE, YSIDE}) {
@@ -1136,7 +1128,7 @@ void DetectorSystem::setupDetectorParameters(const DetectorSystem::ParametersNod
         const ChannelNodeContents& strip_info = (side==XSIDE) ?
           xstrip_info :
           ystrip_info;
-        
+
         if (auto o = strip_info.disable_status) {
           ds->setChannelDisabledToSelected(*o, selector);
         }
@@ -1301,7 +1293,7 @@ load(const boost::property_tree::ptree& node)
 {
   using boost::optional;
   using boost::property_tree::ptree;
-  
+
   if (auto o=node.get_optional<int>("upside.<xmlattr>.anode")) {
     upside_anode = o;
   }
@@ -1420,6 +1412,26 @@ load(const boost::property_tree::ptree& node)
         channel_properties.load(channelsNode);
       }
     }
+  }
+}
+
+void DetectorSystem::setRawHitStore(CSRawHitStore* hit_store)
+{
+  hitStore_ = hit_store;
+}
+
+void DetectorSystem::insertRawHit(DetectorHit&& hit)
+{
+  hitStore_->insertHit(hit);
+}
+
+void DetectorSystem::distributeRawHitsToDetectors()
+{
+  const std::vector<DetectorHit>& hits = hitStore_->getHits();
+  for (const DetectorHit& hit: hits) {
+    const int detectorID = hit.DetectorID();
+    auto hit_copy = std::make_shared<DetectorHit>(hit);
+    getDeviceSimulationByID(detectorID)->insertRawHit(hit_copy);
   }
 }
 

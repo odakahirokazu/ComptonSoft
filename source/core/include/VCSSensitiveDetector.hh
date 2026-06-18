@@ -23,6 +23,7 @@
 #include "G4VSensitiveDetector.hh"
 #include <set>
 
+
 namespace comptonsoft
 {
 
@@ -35,6 +36,7 @@ class DetectorSystem;
  * @date 2011-04-04
  * @date 2014-11-14
  * @date 2025-06-24
+ * @date 2026-06-17
  */
 class VCSSensitiveDetector : public G4VSensitiveDetector
 {
@@ -45,7 +47,13 @@ public:
    */
   explicit VCSSensitiveDetector(G4String name);
   virtual ~VCSSensitiveDetector();
-  
+
+protected:
+  VCSSensitiveDetector(const VCSSensitiveDetector& r) = default;
+
+public:
+  void Initialize(G4HCofThisEvent*) override;
+
   /**
    * a mandatory method to process geant4 raw hits
    */
@@ -73,7 +81,7 @@ public:
 
   void SetLayerOffset(int v) { layerOffset_ = v; }
   int LayerOffset() const { return layerOffset_; }
-  
+
   /**
    * @return a detector ID associated with the given touchable.
    */
@@ -83,13 +91,14 @@ protected:
   void InsertIntoPositionCalculationSet(int detectorID)
   { positionCalculationSet_.insert(detectorID); }
   G4String HierarchyString(const G4VTouchable* touchable) const;
-  
+
 private:
   bool positionCalculation_;
   bool SDCheck_;
   int layerOffset_;
   comptonsoft::DetectorSystem* detectorSystem_;
   std::set<int> positionCalculationSet_;
+  int currentEventID_;
 };
 
 inline G4String VCSSensitiveDetector::

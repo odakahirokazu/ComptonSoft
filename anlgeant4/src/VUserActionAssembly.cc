@@ -19,7 +19,7 @@
 
 #include "VUserActionAssembly.hh"
 
-#include "G4RunManager.hh"
+#include "Geant4Body.hh"
 
 #include "UserActionAssemblyRunAction.hh"
 #include "UserActionAssemblyEventAction.hh"
@@ -33,46 +33,17 @@ namespace anlgeant4
 
 VUserActionAssembly::VUserActionAssembly()
 {
-  add_alias("VUserActionAssembly", ModuleAccess::ConflictOption::yield);
-  add_alias("UserActionAssembly", ModuleAccess::ConflictOption::yield);
 }
 
 VUserActionAssembly::~VUserActionAssembly() = default;
 
-void VUserActionAssembly::registerUserActions(G4RunManager* run_manager)
+ANLStatus VUserActionAssembly::mod_initialize()
 {
-  std::list<VUserActionAssembly*> userActions;
-  userActions.push_back(this);
-  
-  UserActionAssemblyRunAction* runAction = new UserActionAssemblyRunAction(userActions);
-  UserActionAssemblyEventAction* eventAction = new UserActionAssemblyEventAction(userActions);
-  UserActionAssemblyTrackingAction* trackingAction = new UserActionAssemblyTrackingAction(userActions);
+  Geant4Body* geant4body = nullptr;
+  get_module_NC("Geant4Body", &geant4body);
+  geant4body->register_user_action(this);
 
-  run_manager->SetUserAction(runAction);
-  run_manager->SetUserAction(eventAction);
-  run_manager->SetUserAction(trackingAction);
-
-  if (isSteppingActionEnabled()) {
-    UserActionAssemblySteppingAction* steppingAction = new UserActionAssemblySteppingAction(userActions);
-    run_manager->SetUserAction(steppingAction);
-  }
-  
-  printSummary();
-}
-
-void VUserActionAssembly::printSummary()
-{
-  std::cout << "\n";
-  std::cout << "Registration of user-defined actions\n";
-  if (isSteppingActionEnabled()) {
-    std::cout << "  stepping actions are enabled.\n";
-  }
-  else {
-    std::cout << "  stepping actions are disabled.\n";
-  }
-  std::cout << "Master  : " << this->module_id() << " ";
-  std::cout << "\n";
-  std::cout << std::endl;
+  return AS_OK;
 }
 
 } /* namespace anlgeant4 */

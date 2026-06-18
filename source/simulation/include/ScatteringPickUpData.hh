@@ -20,7 +20,7 @@
 #ifndef COMPTONSOFT_ScatteringPickUpData_H
 #define COMPTONSOFT_ScatteringPickUpData_H 1
 
-#include "VAppendableUserActionAssembly.hh"
+#include "VUserActionAssembly.hh"
 
 class TTree;
 
@@ -33,10 +33,11 @@ namespace comptonsoft {
  * @date 2008-08-27
  * @date 2011-04-08
  * @date 2017-06-29 | redesign of VAppendableUserActionAssembly
+ * @date 2026-04-15 | use VUserActionAssembly
  */
-class ScatteringPickUpData : public anlgeant4::VAppendableUserActionAssembly
+class ScatteringPickUpData : public anlgeant4::VUserActionAssembly
 {
-  DEFINE_ANL_MODULE(ScatteringPickUpData, 3.0);
+  DEFINE_ANL_MODULE(ScatteringPickUpData, 4.0);
 public:
   ScatteringPickUpData();
   
