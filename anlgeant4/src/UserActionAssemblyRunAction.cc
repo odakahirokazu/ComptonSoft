@@ -23,7 +23,7 @@
 namespace anlgeant4
 {
 
-UserActionAssemblyRunAction::UserActionAssemblyRunAction(const std::list<VUserActionAssembly*>& userActions)
+UserActionAssemblyRunAction::UserActionAssemblyRunAction(const std::vector<VUserActionAssembly*>& userActions)
   : userActions_(userActions)
 {
 }

@@ -51,6 +51,7 @@ module ComptonSoft
       @num_events_per_run = 1
       @num_threads = 0
       @print_beamon_time = false
+      @output_random_status = false
       @random_seed = 0
       @verbose = 0
 
@@ -66,7 +67,8 @@ module ComptonSoft
     attr_accessor :output
 
     ### Geant4 settings
-    attr_accessor :num_events_per_run, :num_threads, :print_beamon_time, :random_seed, :verbose
+    attr_accessor :num_events_per_run, :num_threads, :print_beamon_time
+    attr_accessor :output_random_status, :random_seed, :verbose
 
     ### ANL module setup.
     define_setup_module("geometry")
@@ -212,7 +214,7 @@ module ComptonSoft
                       random_engine: "MTwistEngine",
                       random_initialization_mode: 1,
                       random_seed: @random_seed,
-                      output_random_status: true,
+                      output_random_status: @output_random_status,
                       random_initial_status_file: @output.sub(/.root/, "")+"_seed_i.dat",
                       random_final_status_file: @output.sub(/.root/, "")+"_seed_f.dat",
                       verbose: @verbose)
@@ -237,9 +239,7 @@ module ComptonSoft
     def setup_minimal()
       add_namespace ComptonSoft
 
-      unless module_of_user_action()
-        set_user_action :StandardUserActionAssembly
-      end
+      chain :CSRawHitStore
 
       chain_with_parameters module_of_geometry
 
@@ -250,18 +250,19 @@ module ComptonSoft
 
       chain_with_parameters module_of_primary_generator
 
+      chain :StandardUserActionAssembly
+
       chain :Geant4Body
-      with_parameters(random_engine: "MTwistEngine",
+      with_parameters(num_events: @num_events_per_run,
+                      num_threads: 1,
+                      print_beamon_time: @print_beamon_time,
+                      random_engine: "MTwistEngine",
                       random_initialization_mode: 1,
                       random_seed: @random_seed,
-                      output_random_status: false,
+                      output_random_status: @output_random_status,
+                      random_initial_status_file: @output.sub(/.root/, "")+"_seed_i.dat",
+                      random_final_status_file: @output.sub(/.root/, "")+"_seed_f.dat",
                       verbose: @verbose)
-
-      chain_with_parameters module_of_user_action
-
-      if pickup_list = module_list_of_pickup_data
-        pickup_list.each{|m| chain_with_parameters(m) }
-      end
 
       if vis = module_of_visualization
         chain_with_parameters vis

@@ -21,7 +21,7 @@
 #define ANLGEANT4_UserActionAssemblyEventAction_H 1
 
 #include "G4UserEventAction.hh"
-#include <list>
+#include <vector>
 
 namespace anlgeant4
 {
@@ -38,7 +38,7 @@ class VUserActionAssembly;
 class UserActionAssemblyEventAction : public G4UserEventAction
 {
 public:
-  explicit UserActionAssemblyEventAction(const std::list<VUserActionAssembly*>& userActions);
+  explicit UserActionAssemblyEventAction(const std::vector<VUserActionAssembly*>& userActions);
   virtual ~UserActionAssemblyEventAction();
 
 public:
@@ -46,7 +46,7 @@ public:
   void EndOfEventAction(const G4Event* anEvent) override;
 
 private:
-  std::list<VUserActionAssembly*> userActions_;
+  std::vector<VUserActionAssembly*> userActions_;
 };
 
 } /* namespace anlgeant4 */

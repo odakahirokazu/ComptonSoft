@@ -54,6 +54,7 @@ class CSHitCollection;
 class AHStandardUserActionAssembly : public anlgeant4::StandardUserActionAssembly
 {
   DEFINE_ANL_MODULE(AHStandardUserActionAssembly, 2.0);
+  ENABLE_PARALLEL_RUN();
 public:
   AHStandardUserActionAssembly();
   virtual ~AHStandardUserActionAssembly();

@@ -6,6 +6,7 @@ def run_simulation(num)
   energy = 122.1 # keV
 
   sim = ComptonSoft::Simulation.new
+  sim_num_events_per_run = 10
   sim.random_seed = 0
   sim.set_gdml "database/mass_model.gdml"
   sim.set_physics(radioactive_decay: true)
@@ -21,5 +22,4 @@ def run_simulation(num)
 end
 
 ### main ###
-num = 500
-run_simulation(num)
+run_simulation(1)

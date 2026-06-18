@@ -21,6 +21,8 @@
 #define ANLGEANT4_VUserActionAssembly_H 1
 
 #include <anlnext/BasicModule.hh>
+#include <memory>
+
 
 class G4Run;
 class G4Event;
@@ -42,6 +44,7 @@ namespace anlgeant4
 class VUserActionAssembly : public anlnext::BasicModule
 {
   DEFINE_ANL_MODULE(VUserActionAssembly, 6.0);
+  ENABLE_PARALLEL_RUN();
 public:
   VUserActionAssembly();
   virtual ~VUserActionAssembly();
@@ -62,6 +65,8 @@ public:
 
   virtual bool isStackingActionEffective() const { return false; }
   virtual G4UserStackingAction* createStackingAction() const { return nullptr; }
+
+  virtual std::unique_ptr<VUserActionAssembly> createUserActionAssembly() const;
 };
 
 } /* namespace anlgeant4 */

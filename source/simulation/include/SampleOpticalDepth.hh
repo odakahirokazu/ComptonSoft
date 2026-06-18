@@ -41,6 +41,7 @@ namespace comptonsoft {
 class SampleOpticalDepth : public anlgeant4::VUserActionAssembly
 {
   DEFINE_ANL_MODULE(SampleOpticalDepth, 3.0);
+  ENABLE_PARALLEL_RUN();
 public:
   SampleOpticalDepth();
   

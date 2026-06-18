@@ -21,7 +21,7 @@
 #define ANLGEANT4_UserActionAssemblyTrackingAction_H 1
 
 #include "G4UserTrackingAction.hh"
-#include <list>
+#include <vector>
 
 namespace anlgeant4
 {
@@ -39,14 +39,14 @@ class VUserActionAssembly;
 class UserActionAssemblyTrackingAction : public G4UserTrackingAction
 {
 public:
-  explicit UserActionAssemblyTrackingAction(const std::list<VUserActionAssembly*>& userActions);
+  explicit UserActionAssemblyTrackingAction(const std::vector<VUserActionAssembly*>& userActions);
   virtual ~UserActionAssemblyTrackingAction();
 
   void PreUserTrackingAction(const G4Track* aTrack) override;
   void PostUserTrackingAction(const G4Track* aTrack) override;
 
 private:
-  std::list<VUserActionAssembly*> userActions_;
+  std::vector<VUserActionAssembly*> userActions_;
 };
 
 } /* namespace anlgeant4 */

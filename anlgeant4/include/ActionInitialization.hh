@@ -20,7 +20,7 @@
 #ifndef ANLGEANT4_ActionInitialization_H
 #define ANLGEANT4_ActionInitialization_H 1
 
-#include <list>
+#include <mutex>
 #include "G4VUserActionInitialization.hh"
 #include "VANLPrimaryGen.hh"
 #include "VUserActionAssembly.hh"
@@ -45,9 +45,14 @@ public:
   void BuildForMaster() const override;
   void Build() const override;
 
+protected:
+  std::vector<VUserActionAssembly*> create_user_action_assemblies() const;
+
 private:
   VANLPrimaryGen* primary_generation_module_ = nullptr;
-  std::list<VUserActionAssembly*> user_action_assemblies_;
+  std::vector<VUserActionAssembly*> user_action_assemblies_original_;
+  mutable std::mutex mutex_;
+  mutable std::vector<std::vector<std::unique_ptr<VUserActionAssembly>>> user_action_assemblies_vector_;
 };
 
 } /* namespace anlgeant4 */

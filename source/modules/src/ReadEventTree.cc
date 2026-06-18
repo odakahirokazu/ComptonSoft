@@ -47,7 +47,7 @@ ANLStatus ReadEventTree::mod_define()
 ANLStatus ReadEventTree::mod_initialize()
 {
   VCSModule::mod_initialize();
-  
+
   get_module_NC("CSHitCollection", &hitCollection_);
 
   tree_ = std::make_unique<TChain>("eventtree");
@@ -74,9 +74,11 @@ ANLStatus ReadEventTree::mod_initialize()
 ANLStatus ReadEventTree::mod_begin_run()
 {
   if (numEntries_ == 0) { return AS_OK; }
-  
+
   tree_->GetEntry(0);
-  const int64_t EventID = treeIO_->getEventID();
+  const int32_t RunID = treeIO_->getRunID();
+  const int32_t EventID = treeIO_->getEventID();
+  setRunID(RunID);
   setEventID(EventID);
 
   return AS_OK;
@@ -90,7 +92,9 @@ ANLStatus ReadEventTree::mod_analyze()
 
   tree_->GetEntry(entryIndex_);
 
-  const int64_t EventID = treeIO_->getEventID();
+  const int32_t RunID = treeIO_->getRunID();
+  const int32_t EventID = treeIO_->getEventID();
+  setRunID(RunID);
   setEventID(EventID);
 
   if (InitialInformationStored()) {
@@ -106,7 +110,7 @@ ANLStatus ReadEventTree::mod_analyze()
   for (auto& hit: hits) {
     insertHit(hit);
   }
-  
+
   return AS_OK;
 }
 

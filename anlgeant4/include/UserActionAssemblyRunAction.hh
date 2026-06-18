@@ -21,7 +21,7 @@
 #define ANLGEANT4_UserActionAssemblyRunAction_H 1
 
 #include "G4UserRunAction.hh"
-#include <list>
+#include <vector>
 
 namespace anlgeant4
 {
@@ -38,7 +38,7 @@ class VUserActionAssembly;
 class UserActionAssemblyRunAction : public G4UserRunAction
 {
 public:
-  explicit UserActionAssemblyRunAction(const std::list<VUserActionAssembly*>& userActions);
+  explicit UserActionAssemblyRunAction(const std::vector<VUserActionAssembly*>& userActions);
   virtual ~UserActionAssemblyRunAction();
 
 public:
@@ -46,7 +46,7 @@ public:
   void EndOfRunAction(const G4Run* aRun) override;
 
 private:
-  std::list<VUserActionAssembly*> userActions_;
+  std::vector<VUserActionAssembly*> userActions_;
 };
 
 } /* namespace anlgeant4 */

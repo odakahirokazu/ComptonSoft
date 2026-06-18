@@ -21,7 +21,7 @@
 #define ANLGEANT4_UserActionAssemblySteppingAction_H 1
 
 #include "G4UserSteppingAction.hh"
-#include <list>
+#include <vector>
 
 namespace anlgeant4
 {
@@ -38,13 +38,13 @@ class VUserActionAssembly;
 class UserActionAssemblySteppingAction : public G4UserSteppingAction
 {
 public:
-  explicit UserActionAssemblySteppingAction(const std::list<VUserActionAssembly*>& userActions);
+  explicit UserActionAssemblySteppingAction(const std::vector<VUserActionAssembly*>& userActions);
   ~UserActionAssemblySteppingAction();
 
   void UserSteppingAction(const G4Step*) override;
 
 private:
-  std::list<VUserActionAssembly*> userActions_;
+  std::vector<VUserActionAssembly*> userActions_;
 };
 
 } /* namespace anlgeant4 */

@@ -69,7 +69,7 @@ ANLStatus DefineFrame::mod_analyze()
     return AS_QUIT_ERROR;
   }
 
-  const int64_t eventID = m_InitialInfo->EventID();
+  const int32_t eventID = m_InitialInfo->EventID();
 
   std::vector<DetectorHit_sptr>& hits = m_HitCollection->getHits(0);
   if (hits.size()==0) {

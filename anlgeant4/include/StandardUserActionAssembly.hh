@@ -38,6 +38,7 @@ class VEventStore;
 class StandardUserActionAssembly : public VUserActionAssembly
 {
   DEFINE_ANL_MODULE(StandardUserActionAssembly, 6.0);
+  ENABLE_PARALLEL_RUN();
 public:
   StandardUserActionAssembly();
 

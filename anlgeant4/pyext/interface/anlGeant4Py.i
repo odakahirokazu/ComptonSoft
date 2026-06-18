@@ -25,12 +25,13 @@
 #ifdef USE_VIS
 #include "VisualizeG4Geom.hh"
 #endif
+#include "VEventStore.hh"
 
 
 %}
 
 
-%import(module="anlnext/anlnextpy") "anlnext/python/anlnextpy.i"
+%import(module="anlnext.anlnextpy") "anlnext/python/anlnextpy.i"
 
 namespace anlgeant4 {
 
@@ -187,5 +188,13 @@ public:
 };
 
 #endif
+
+class VEventStore : public anlnext::BasicModule
+{
+public:
+  VEventStore();
+  virtual ~VEventStore();
+};
+
 
 }

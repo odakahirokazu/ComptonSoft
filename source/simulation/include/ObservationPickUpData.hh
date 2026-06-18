@@ -37,6 +37,7 @@ namespace comptonsoft {
 class ObservationPickUpData : public anlgeant4::VUserActionAssembly
 {
   DEFINE_ANL_MODULE(ObservationPickUpData, 3.0);
+  ENABLE_PARALLEL_RUN();
 public:
   ObservationPickUpData();
   ~ObservationPickUpData() = default;

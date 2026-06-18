@@ -23,7 +23,7 @@
 namespace anlgeant4
 {
 
-UserActionAssemblySteppingAction::UserActionAssemblySteppingAction(const std::list<VUserActionAssembly*>& userActions)
+UserActionAssemblySteppingAction::UserActionAssemblySteppingAction(const std::vector<VUserActionAssembly*>& userActions)
   : userActions_(userActions)
 {
 }

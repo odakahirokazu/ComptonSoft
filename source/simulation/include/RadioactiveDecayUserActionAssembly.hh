@@ -38,6 +38,7 @@ namespace comptonsoft {
 class RadioactiveDecayUserActionAssembly : public anlgeant4::StandardUserActionAssembly
 {
   DEFINE_ANL_MODULE(RadioactiveDecayUserActionAssembly, 3.1);
+  ENABLE_PARALLEL_RUN();
 public:
   RadioactiveDecayUserActionAssembly();
   

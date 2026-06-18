@@ -46,12 +46,29 @@ void ActionInitialization::registerUserAction(VANLPrimaryGen* primary_gen)
 
 void ActionInitialization::registerUserAction(VUserActionAssembly* uaa)
 {
-  user_action_assemblies_.push_back(uaa);
+  user_action_assemblies_original_.push_back(uaa);
+}
+
+std::vector<VUserActionAssembly*> ActionInitialization::create_user_action_assemblies() const
+{
+  std::vector<VUserActionAssembly*> uaa_vector;
+  std::vector<std::unique_ptr<VUserActionAssembly>> uaa_vector_owner;
+  for (const VUserActionAssembly* uaa: user_action_assemblies_original_) {
+    std::unique_ptr<VUserActionAssembly> uaa_created = uaa->createUserActionAssembly();
+    uaa_vector.push_back(uaa_created.get());
+    uaa_vector_owner.push_back(std::move(uaa_created));
+  }
+
+  std::lock_guard<std::mutex> lock(mutex_);
+  user_action_assemblies_vector_.push_back(std::move(uaa_vector_owner));
+
+  return uaa_vector;
 }
 
 void ActionInitialization::BuildForMaster() const
 {
-  UserActionAssemblyRunAction* runAction = new UserActionAssemblyRunAction(user_action_assemblies_);
+  std::vector<VUserActionAssembly*> user_action_assemblies = create_user_action_assemblies();
+  UserActionAssemblyRunAction* runAction = new UserActionAssemblyRunAction(user_action_assemblies);
   SetUserAction(runAction);
 }
 
@@ -60,38 +77,40 @@ void ActionInitialization::Build() const
   G4VUserPrimaryGeneratorAction* primary_generator = primary_generation_module_->create();
   SetUserAction(primary_generator);
 
+  std::vector<VUserActionAssembly*> user_action_assemblies = create_user_action_assemblies();
+
   if (!G4Threading::IsMultithreadedApplication()) {
-    UserActionAssemblyRunAction* runAction = new UserActionAssemblyRunAction(user_action_assemblies_);
+    UserActionAssemblyRunAction* runAction = new UserActionAssemblyRunAction(user_action_assemblies);
     SetUserAction(runAction);
   }
 
-  UserActionAssemblyEventAction* eventAction = new UserActionAssemblyEventAction(user_action_assemblies_);
-  UserActionAssemblyTrackingAction* trackingAction = new UserActionAssemblyTrackingAction(user_action_assemblies_);
+  UserActionAssemblyEventAction* eventAction = new UserActionAssemblyEventAction(user_action_assemblies);
+  UserActionAssemblyTrackingAction* trackingAction = new UserActionAssemblyTrackingAction(user_action_assemblies);
   SetUserAction(eventAction);
   SetUserAction(trackingAction);
 
   const bool stepping_action_effective =
-    std::accumulate(user_action_assemblies_.begin(),
-                    user_action_assemblies_.end(),
+    std::accumulate(user_action_assemblies.begin(),
+                    user_action_assemblies.end(),
                     false,
                     [](bool acc, VUserActionAssembly* uaa){ return acc || uaa->isSteppingActionEffective(); });
   if (stepping_action_effective) {
-    UserActionAssemblySteppingAction* steppingAction = new UserActionAssemblySteppingAction(user_action_assemblies_);
+    UserActionAssemblySteppingAction* steppingAction = new UserActionAssemblySteppingAction(user_action_assemblies);
     SetUserAction(steppingAction);
   }
 
   const int stacking_action_number =
-    std::count_if(user_action_assemblies_.begin(),
-                  user_action_assemblies_.end(),
+    std::count_if(user_action_assemblies_original_.begin(),
+                  user_action_assemblies_original_.end(),
                   [](VUserActionAssembly* uaa){ return uaa->isStackingActionEffective(); });
   if (stacking_action_number==0) {
     ; // do nothing
   }
   else if (stacking_action_number==1) {
     VUserActionAssembly* uaa_stacking_action  =
-      *std::find_if(user_action_assemblies_.begin(),
-                          user_action_assemblies_.end(),
-                          [](VUserActionAssembly* uaa){ return uaa->isStackingActionEffective(); });
+      *std::find_if(user_action_assemblies_original_.begin(),
+                    user_action_assemblies_original_.end(),
+                    [](VUserActionAssembly* uaa){ return uaa->isStackingActionEffective(); });
     SetUserAction(uaa_stacking_action->createStackingAction());
   }
   else {

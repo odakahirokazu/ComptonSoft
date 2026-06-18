@@ -81,7 +81,7 @@ ANLStatus Geant4Body::mod_define()
 
 ANLStatus Geant4Body::mod_pre_initialize()
 {
-  run_manager_.reset( G4RunManagerFactory::CreateRunManager(G4RunManagerType::Default) );
+  run_manager_.reset(G4RunManagerFactory::CreateRunManager(G4RunManagerType::Default));
   action_initialization_ = new ActionInitialization;
 
   return AS_OK;

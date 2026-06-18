@@ -55,7 +55,7 @@ ANLStatus ReadComptonEventTree::mod_initialize()
   define_evs("EventReconstruction:OK");
   define_evs("EventReconstruction:NG");
   initializeHitPatternData();
-  
+
   cetree_ = std::make_unique<TChain>("cetree");
   for (const std::string& filename: fileList_) {
     cetree_->Add(filename.c_str());
@@ -86,8 +86,10 @@ ANLStatus ReadComptonEventTree::mod_analyze()
   EventReconstruction::initializeEvent();
 
   cetree_->GetEntry(entryIndex_);
-    
-  const int64_t EventID = treeIO_->getEventID();
+
+  const int32_t RunID = treeIO_->getRunID();
+  const int32_t EventID = treeIO_->getEventID();
+  setRunID(RunID);
   setEventID(EventID);
 
   if (InitialInformationStored()) {
@@ -112,7 +114,7 @@ ANLStatus ReadComptonEventTree::mod_analyze()
       return AS_QUIT;
     }
     cetree_->GetEntry(entryIndex_);
-  } while (treeIO_->getEventID() == EventID);
+  } while (treeIO_->getEventID() == EventID && treeIO_->getRunID() == RunID);
 
   return AS_OK;
 }

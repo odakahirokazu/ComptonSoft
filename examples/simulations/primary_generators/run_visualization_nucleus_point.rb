@@ -4,6 +4,7 @@ require 'comptonsoft'
 
 def run_simulation(num)
   sim = ComptonSoft::Simulation.new
+  sim.num_events_per_run = 20
   sim.random_seed = 0
   sim.set_gdml "database/mass_model.gdml"
   sim.set_physics(radioactive_decay: true)
@@ -19,5 +20,4 @@ def run_simulation(num)
 end
 
 ### main ###
-num = 500
-run_simulation(num)
+run_simulation(1)

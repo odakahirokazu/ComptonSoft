@@ -46,4 +46,10 @@ ANLStatus VUserActionAssembly::mod_initialize()
   return AS_OK;
 }
 
+std::unique_ptr<VUserActionAssembly> VUserActionAssembly::createUserActionAssembly() const
+{
+  std::unique_ptr<anlnext::BasicModule> m = this->clone();
+  return std::unique_ptr<VUserActionAssembly>(static_cast<VUserActionAssembly*>(m.release()));
+}
+
 } /* namespace anlgeant4 */

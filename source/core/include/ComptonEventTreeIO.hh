@@ -30,7 +30,7 @@ namespace comptonsoft {
 
 
 /**
- * 
+ *
  * @author Hirokazu Odaka
  * @date 2014-12-02
  * @date 2015-10-10
@@ -64,8 +64,9 @@ public:
   BasicComptonEvent retrieveEvent() const;
   void retrieveEvent(BasicComptonEvent& event) const;
 
-  int64_t getEventID() const { return eventid_; }
-  
+  int32_t getRunID() const { return runid_; }
+  int32_t getEventID() const { return eventid_; }
+
 private:
   TTree* cetree_;
 

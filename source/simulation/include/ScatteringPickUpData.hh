@@ -38,6 +38,7 @@ namespace comptonsoft {
 class ScatteringPickUpData : public anlgeant4::VUserActionAssembly
 {
   DEFINE_ANL_MODULE(ScatteringPickUpData, 4.0);
+  ENABLE_PARALLEL_RUN();
 public:
   ScatteringPickUpData();
   

@@ -18,4 +18,5 @@ class NucleusPrimaryGenInVolume;
 class VUserActionAssembly;
 class StandardUserActionAssembly;
 class VisualizeG4Geom;
+class VEventStore;
 }

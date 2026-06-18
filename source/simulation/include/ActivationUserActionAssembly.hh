@@ -53,7 +53,8 @@ namespace comptonsoft {
 class ActivationUserActionAssembly : public anlgeant4::StandardUserActionAssembly
 {
   DEFINE_ANL_MODULE(ActivationUserActionAssembly, 4.0);
-
+  ENABLE_PARALLEL_RUN();
+private:
   typedef std::map<std::string, int> volume_map_t;
   typedef std::map<int64_t, IsotopeInfo> data_map_t;
 public:

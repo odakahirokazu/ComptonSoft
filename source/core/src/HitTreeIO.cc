@@ -42,7 +42,7 @@ void HitTreeIO::defineBranches()
   hittree_->Branch("eventid",          &eventid_,          "eventid/I");
   hittree_->Branch("ihit",             &ihit_,             "ihit/S");
   hittree_->Branch("num_hits",         &num_hits_,         "num_hits/I");
-  
+
   // measured data
   hittree_->Branch("ti",               &ti_,               "ti/L");
   hittree_->Branch("instrument",       &instrument_,       "instrument/S");
@@ -60,7 +60,7 @@ void HitTreeIO::defineBranches()
   hittree_->Branch("epi_error",        &epi_error_,        "epi_error/F");
   hittree_->Branch("flag_data",        &flag_data_,        "flag_data/l");
   hittree_->Branch("flags",            &flags_,            "flags/l");
-  
+
   // simulation
   hittree_->Branch("trackid",          &trackid_,          "trackid/I");
   hittree_->Branch("particle",         &particle_,         "particle/I");
@@ -209,7 +209,7 @@ void HitTreeIO::fillHits(const int32_t runID,
     time_ = hit->Time() / unit::second;
     time_error_ = hit->TimeError() / unit::second;
     grade_ = hit->Grade();
-    
+
     hittree_->Fill();
   }
 }
@@ -261,8 +261,8 @@ std::vector<DetectorHit_sptr> HitTreeIO::retrieveHits(int64_t& entry,
     hittree_->GetEntry(entry);
   }
 
-  const int64_t ThisRunID = runid_;
-  const int64_t ThisEventID = eventid_;
+  const int32_t ThisRunID = runid_;
+  const int32_t ThisEventID = eventid_;
   const int numHits = getNumberOfHits();
   for (int i=0; i<numHits; i++) {
     if (i != 0) {
@@ -275,7 +275,7 @@ std::vector<DetectorHit_sptr> HitTreeIO::retrieveHits(int64_t& entry,
         BOOST_THROW_EXCEPTION( CSException(message.str()) );
       }
     }
-    
+
     DetectorHit_sptr hit = retrieveHit();
     hits.push_back(std::move(hit));
   }

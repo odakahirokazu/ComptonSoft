@@ -25,7 +25,7 @@
 namespace anlgeant4
 {
 
-UserActionAssemblyTrackingAction::UserActionAssemblyTrackingAction(const std::list<VUserActionAssembly*>& userActions)
+UserActionAssemblyTrackingAction::UserActionAssemblyTrackingAction(const std::vector<VUserActionAssembly*>& userActions)
   : userActions_(userActions)
 {
 }
