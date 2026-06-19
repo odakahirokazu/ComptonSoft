@@ -45,7 +45,7 @@ Geant4Body::Geant4Body()
     action_initialization_(nullptr),
     num_events_(1000),
     num_threads_(0),
-    m_RandomEngine("MTwistEngine"),
+    m_RandomEngine("MixMaxRng"),
     m_RandomInitMode(1),
     m_RandomSeed1(0),
     m_OutputRandomStatus(true),
@@ -81,6 +81,15 @@ ANLStatus Geant4Body::mod_define()
 
 ANLStatus Geant4Body::mod_pre_initialize()
 {
+  if (m_RandomInitMode==0 || m_RandomInitMode==1 || m_RandomInitMode==2) {
+    initialize_random_generator();
+  }
+  else {
+    std::cout << "Invalid value [Random initialization mode] : "
+              << m_RandomInitMode << std::endl;
+    return AS_QUIT_ERROR;
+  }
+
   run_manager_.reset(G4RunManagerFactory::CreateRunManager(G4RunManagerType::Default));
   action_initialization_ = new ActionInitialization;
 
@@ -91,15 +100,6 @@ ANLStatus Geant4Body::mod_initialize()
 {
   define_evs("Geant4Body:BeamOn");
   define_evs("Geant4Body:DataStored");
-
-  if (m_RandomInitMode==0 || m_RandomInitMode==1 || m_RandomInitMode==2) {
-    initialize_random_generator();
-  }
-  else {
-    std::cout << "Invalid value [Random initialization mode] : "
-              << m_RandomInitMode << std::endl;
-    return AS_QUIT_ERROR;
-  }
 
   set_user_initializations();
   apply_commands();
@@ -115,7 +115,11 @@ ANLStatus Geant4Body::mod_initialize()
 
 void Geant4Body::initialize_random_generator()
 {
-  if (m_RandomEngine=="MTwistEngine") {
+  if (m_RandomEngine=="MixMaxRng") {
+    m_RandomEnginePtr.reset(new CLHEP::MixMaxRng);
+    CLHEP::HepRandom::setTheEngine(m_RandomEnginePtr.get());
+  }
+  else if (m_RandomEngine=="MTwistEngine") {
     m_RandomEnginePtr.reset(new CLHEP::MTwistEngine);
     CLHEP::HepRandom::setTheEngine(m_RandomEnginePtr.get());
   }

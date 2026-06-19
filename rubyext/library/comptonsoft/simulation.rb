@@ -48,7 +48,7 @@ module ComptonSoft
       @detector_info_verbose_level = 0
 
       ### Geant4 settings
-      @num_events_per_run = 1
+      @num_events_per_run = 1000
       @num_threads = 0
       @print_beamon_time = false
       @output_random_status = false
@@ -211,7 +211,7 @@ module ComptonSoft
       with_parameters(num_events: @num_events_per_run,
                       num_threads: @num_threads,
                       print_beamon_time: @print_beamon_time,
-                      random_engine: "MTwistEngine",
+                      random_engine: "MixMaxRng",
                       random_initialization_mode: 1,
                       random_seed: @random_seed,
                       output_random_status: @output_random_status,

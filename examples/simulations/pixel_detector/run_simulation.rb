@@ -6,6 +6,7 @@ def run_simulation(num, random, output)
   energy = 59.5 # keV
 
   sim = ComptonSoft::Simulation.new
+  sim.num_events_per_run = 1000
   sim.output = output
   sim.random_seed = random
   sim.verbose = 0
@@ -31,7 +32,7 @@ def run_simulation(num, random, output)
 end
 
 ### main ###
-num = 1000000
+num = 400000
 output = "simulation.root"
-random = 0
+random = 10
 run_simulation(num, random, output)
