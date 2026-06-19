@@ -73,7 +73,6 @@ ANLStatus SelectEventsWithCelestialSpectrum::mod_initialize()
 {
   get_module_NC("CSHitCollection", &hitCollection_);
   get_module_IFNC("InitialInformation", &initialInfo_);
-  initialInfo_->setWeightStored(true);
 
   ANLStatus status = AS_OK;
   if (assignPosition_) {
