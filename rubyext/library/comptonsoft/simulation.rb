@@ -51,7 +51,6 @@ module ComptonSoft
       @num_events_per_run = 1000
       @num_threads = 0
       @print_beamon_time = false
-      @output_random_status = false
       @random_seed = 0
       @verbose = 0
 
@@ -212,11 +211,7 @@ module ComptonSoft
                       num_threads: @num_threads,
                       print_beamon_time: @print_beamon_time,
                       random_engine: "MixMaxRng",
-                      random_initialization_mode: 1,
                       random_seed: @random_seed,
-                      output_random_status: @output_random_status,
-                      random_initial_status_file: @output.sub(/.root/, "")+"_seed_i.dat",
-                      random_final_status_file: @output.sub(/.root/, "")+"_seed_f.dat",
                       verbose: @verbose)
 
       chain @make_detector_hits_module
@@ -257,11 +252,7 @@ module ComptonSoft
                       num_threads: 1,
                       print_beamon_time: @print_beamon_time,
                       random_engine: "MTwistEngine",
-                      random_initialization_mode: 1,
                       random_seed: @random_seed,
-                      output_random_status: @output_random_status,
-                      random_initial_status_file: @output.sub(/.root/, "")+"_seed_i.dat",
-                      random_final_status_file: @output.sub(/.root/, "")+"_seed_f.dat",
                       verbose: @verbose)
 
       if vis = module_of_visualization

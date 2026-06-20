@@ -59,7 +59,7 @@ protected:
   G4ThreeVector sample_direction() const override;
   G4ThreeVector sample_position() const override;
 
-  G4ThreeVector SourcePosition() { return m_SourcePosition; }
+  G4ThreeVector source_position() const { return m_SourcePosition; }
 
 private:
   G4ThreeVector m_SourcePosition;

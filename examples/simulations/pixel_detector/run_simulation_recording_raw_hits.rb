@@ -6,7 +6,6 @@ def run_simulation(num, random, output)
   energy = 59.5 # keV
 
   sim = ComptonSoft::Simulation.new
-  sim.num_threads = 2
   sim.output = output
   sim.random_seed = random
   sim.verbose = 0

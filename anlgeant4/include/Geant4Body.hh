@@ -61,9 +61,6 @@ public:
   anlnext::ANLStatus mod_end_run() override;
   anlnext::ANLStatus mod_finalize() override;
 
-  void set_verbose_level(G4int v) { m_VerboseLevel = v; }
-  G4int get_verbose_level() { return m_VerboseLevel; }
-
   void register_user_action(VANLPrimaryGen* primary_gen);
   void register_user_action(VUserActionAssembly* uaa);
 
@@ -75,21 +72,17 @@ protected:
 private:
   std::unique_ptr<G4RunManager> run_manager_;
   ActionInitialization* action_initialization_;
-  std::unique_ptr<CLHEP::HepRandomEngine> m_RandomEnginePtr;
+  std::unique_ptr<CLHEP::HepRandomEngine> random_engine_ptr_;
 
   int num_events_ = 1;
   int num_threads_ = 0;
   bool print_beamon_time_ = false;
+  std::string random_engine_;
+  int random_seed_;
+  int verbose_level_;
+  std::vector<std::string> user_commands_;
 
-  std::string m_RandomEngine;
-  int m_RandomInitMode;
-  int m_RandomSeed1;
-  bool m_OutputRandomStatus;
-  std::string m_RandomInitialStatusFileName;
-  std::string m_RandomFinalStatusFileName;
-
-  int m_VerboseLevel;
-  std::vector<std::string> m_UserCommands;
+  int random_seed_initial_;
 };
 
 } /* namespace anlgeant4 */

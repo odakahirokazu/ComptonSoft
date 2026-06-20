@@ -45,13 +45,10 @@ Geant4Body::Geant4Body()
     action_initialization_(nullptr),
     num_events_(1000),
     num_threads_(0),
-    m_RandomEngine("MixMaxRng"),
-    m_RandomInitMode(1),
-    m_RandomSeed1(0),
-    m_OutputRandomStatus(true),
-    m_RandomInitialStatusFileName("RandomSeed_i.dat"),
-    m_RandomFinalStatusFileName("RandomSeed_f.dat"),
-    m_VerboseLevel(0)
+    random_engine_("MixMaxRng"),
+    random_seed_(0),
+    verbose_level_(0),
+    random_seed_initial_(0)
 {
 }
 
@@ -62,34 +59,20 @@ ANLStatus Geant4Body::mod_define()
   define_parameter("num_events", &mod_class::num_events_);
   define_parameter("num_threads", &mod_class::num_threads_);
   define_parameter("print_beamon_time", &mod_class::print_beamon_time_);
+  define_parameter("random_engine", &mod_class::random_engine_);
+  define_parameter("random_engine", &mod_class::random_engine_);
+  define_parameter("random_seed", &mod_class::random_seed_);
+  define_parameter("verbose", &mod_class::verbose_level_);
+  define_parameter("commands", &mod_class::user_commands_);
 
-  register_parameter(&m_RandomEngine, "random_engine");
-  register_parameter(&m_RandomInitMode, "random_initialization_mode");
-  set_parameter_question("Random initialization mode (0: auto, 1: interger, 2: state file)");
-  register_parameter(&m_RandomSeed1, "random_seed");
-  register_parameter(&m_OutputRandomStatus, "output_random_status");
-  register_parameter(&m_RandomInitialStatusFileName,
-                     "random_initial_status_file");
-  register_parameter(&m_RandomFinalStatusFileName,
-                     "random_final_status_file");
-
-  register_parameter(&m_VerboseLevel, "verbose");
-  register_parameter(&m_UserCommands, "commands");
+  define_result("random_seed_initial", &mod_class::random_seed_initial_);
 
   return AS_OK;
 }
 
 ANLStatus Geant4Body::mod_pre_initialize()
 {
-  if (m_RandomInitMode==0 || m_RandomInitMode==1 || m_RandomInitMode==2) {
-    initialize_random_generator();
-  }
-  else {
-    std::cout << "Invalid value [Random initialization mode] : "
-              << m_RandomInitMode << std::endl;
-    return AS_QUIT_ERROR;
-  }
-
+  initialize_random_generator();
   run_manager_.reset(G4RunManagerFactory::CreateRunManager(G4RunManagerType::Default));
   action_initialization_ = new ActionInitialization;
 
@@ -115,43 +98,38 @@ ANLStatus Geant4Body::mod_initialize()
 
 void Geant4Body::initialize_random_generator()
 {
-  if (m_RandomEngine=="MixMaxRng") {
-    m_RandomEnginePtr.reset(new CLHEP::MixMaxRng);
-    CLHEP::HepRandom::setTheEngine(m_RandomEnginePtr.get());
+  if (random_engine_ == "MixMaxRng") {
+    random_engine_ptr_.reset(new CLHEP::MixMaxRng);
   }
-  else if (m_RandomEngine=="MTwistEngine") {
-    m_RandomEnginePtr.reset(new CLHEP::MTwistEngine);
-    CLHEP::HepRandom::setTheEngine(m_RandomEnginePtr.get());
+  else if (random_engine_ == "MTwistEngine") {
+    random_engine_ptr_.reset(new CLHEP::MTwistEngine);
   }
-  else if (m_RandomEngine=="RanecuEngine") {
-    m_RandomEnginePtr.reset(new CLHEP::RanecuEngine);
-    CLHEP::HepRandom::setTheEngine(m_RandomEnginePtr.get());
+  else if (random_engine_ == "RanecuEngine") {
+    random_engine_ptr_.reset(new CLHEP::RanecuEngine);
   }
-  else if (m_RandomEngine=="HepJamesRandom") {
-    m_RandomEnginePtr.reset(new CLHEP::HepJamesRandom);
-    CLHEP::HepRandom::setTheEngine(m_RandomEnginePtr.get());
+  else if (random_engine_ == "HepJamesRandom") {
+    random_engine_ptr_.reset(new CLHEP::HepJamesRandom);
   }
 
-  if (m_RandomInitMode==0) {
-    m_RandomSeed1 = std::time(0);
-    CLHEP::HepRandom::setTheSeed(m_RandomSeed1);
-    std::cout << "Random seed: " << m_RandomSeed1 << std::endl;
+  CLHEP::HepRandom::setTheEngine(random_engine_ptr_.get());
 
-    if (m_OutputRandomStatus) {
-      CLHEP::HepRandom::saveEngineStatus(m_RandomInitialStatusFileName.c_str());
-    }
+  if (random_seed_ == 0) {
+    random_seed_initial_ = std::time(0);
   }
-  else if (m_RandomInitMode==1) {
-    CLHEP::HepRandom::setTheSeed(m_RandomSeed1);
-    std::cout << "Random seed: " << m_RandomSeed1 << std::endl;
+  else {
+    random_seed_initial_ = random_seed_;
+  }
 
-    if (m_OutputRandomStatus) {
-      CLHEP::HepRandom::saveEngineStatus(m_RandomInitialStatusFileName.c_str());
-    }
+  CLHEP::HepRandom::setTheSeed(random_seed_initial_);
+
+  std::cout << '\n'
+            << "Random generator initialization\n"
+            << "  Random engine : " << random_engine_ << '\n'
+            << "  Random seed   : " << random_seed_initial_ << '\n';
+  if (random_seed_ == 0) {
+    std::cout << "  Random seed 0 was input ===> set the current time\n";
   }
-  else if (m_RandomInitMode==2) {
-    CLHEP::HepRandom::restoreEngineStatus(m_RandomInitialStatusFileName.c_str());
-  }
+  std::cout << std::endl;
 }
 
 void Geant4Body::set_user_initializations()
@@ -187,9 +165,9 @@ void Geant4Body::apply_commands()
   G4UImanager* ui = G4UImanager::GetUIpointer();
 
   std::vector<std::string> presetCommands;
-  presetCommands.push_back( str(format("/run/verbose %d") % m_VerboseLevel) );
-  presetCommands.push_back( str(format("/event/verbose %d") % m_VerboseLevel) );
-  presetCommands.push_back( str(format("/tracking/verbose %d") % m_VerboseLevel) );
+  presetCommands.push_back( str(format("/run/verbose %d") % verbose_level_) );
+  presetCommands.push_back( str(format("/event/verbose %d") % verbose_level_) );
+  presetCommands.push_back( str(format("/tracking/verbose %d") % verbose_level_) );
 
   std::cout << "\nApplying preset commands:" << std::endl;
   for (const std::string& com: presetCommands) {
@@ -198,7 +176,7 @@ void Geant4Body::apply_commands()
   }
 
   std::cout << "\nApplying user commands:" << std::endl;
-  for (const std::string& com: m_UserCommands) {
+  for (const std::string& com: user_commands_) {
     std::cout << com << std::endl;
     ui->ApplyCommand(com);
   }
@@ -241,10 +219,6 @@ ANLStatus Geant4Body::mod_end_run()
 
 ANLStatus Geant4Body::mod_finalize()
 {
-  if (m_OutputRandomStatus) {
-    CLHEP::HepRandom::saveEngineStatus(m_RandomFinalStatusFileName.c_str());
-  }
-
   run_manager_.reset(nullptr);
 
   return AS_OK;
