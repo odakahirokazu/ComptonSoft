@@ -40,14 +40,12 @@ ANLStatus AHRayTracingPrimaryGen::mod_define()
   anlnext::ANLStatus status = BasicPrimaryGen::mod_define();
   if (status!=AS_OK) {
     return status;
-  }  
+  }
 
-  setParticleName("gamma");
-  
   register_parameter(&m_FileName, "filename");
   register_parameter(&m_offset, "position_offset", unit::mm, "mm");
   register_parameter(&m_EnergyResample, "energy_resample");
-  
+
   return AS_OK;
 }
 
@@ -65,7 +63,7 @@ ANLStatus AHRayTracingPrimaryGen::mod_initialize()
     fits_report_error(stderr, fits_status);
     return AS_QUIT_ERROR;
   }
-  
+
   std::string colname[NumColumns] = {"energy","x","y","xDirection","yDirection","zDirection"};
   int colid[NumColumns] = {0};
   ffmahd(fits, 2, IMAGE_HDU, &fits_status);
@@ -73,7 +71,7 @@ ANLStatus AHRayTracingPrimaryGen::mod_initialize()
     fits_report_error(stderr, fits_status);
     return AS_QUIT_ERROR;
   }
-  
+
   for(int i=0; i<NumColumns; ++i) {
     fits_get_colnum(fits, CASEINSEN, const_cast<char*>(colname[i].c_str()),
                     &colid[i], &fits_status);
@@ -82,18 +80,18 @@ ANLStatus AHRayTracingPrimaryGen::mod_initialize()
       return AS_QUIT_ERROR;
     }
   }
-  
+
   int nfound(0), anynull(0);
   long naxes[2] = {0, 0};
   fits_read_keys_lng(fits, (char*)"NAXIS", 1, 2, naxes, &nfound, &fits_status);
   m_EventNum = static_cast<int>(naxes[1]);
   std::cout << "FITS read >> " << nfound << " " << m_EventNum << " " << naxes[0] << " " << naxes[1] << std::endl;
-  
+
   if (fits_status) {
     fits_report_error(stderr, fits_status);
     return AS_QUIT_ERROR;
   }
-  
+
   double doublenull(0.0);
   for(int i=0; i<NumColumns; ++i){
     std::cout << "  ** Get " << colname[i] << std::endl;
@@ -107,7 +105,7 @@ ANLStatus AHRayTracingPrimaryGen::mod_initialize()
     }
     std::cout << "  ** -> OK "<< std::endl;
   }
-  
+
   fits_close_file(fits, &fits_status);
   if (fits_status) {
     fits_report_error(stderr, fits_status);
@@ -122,11 +120,11 @@ ANLStatus AHRayTracingPrimaryGen::mod_analyze()
   if (m_ID == m_EventNum) {
     return AS_QUIT;
   }
-    
+
   return BasicPrimaryGen::mod_analyze();
 }
 
-void AHRayTracingPrimaryGen::makePrimarySetting()
+PrimarySetting AHRayTracingPrimaryGen::make_primary_setting() const
 {
   const int id = m_ID;
   double energy = m_Columns[0][id]*unit::keV;
@@ -137,13 +135,17 @@ void AHRayTracingPrimaryGen::makePrimarySetting()
   const double yDirection = m_Columns[4][id];
   const double zDirection = m_Columns[5][id];
   const G4ThreeVector position = m_offset + G4ThreeVector(x, y, z);
-  const G4ThreeVector direction(xDirection, yDirection, zDirection);
+  const G4ThreeVector direction = G4ThreeVector(xDirection, yDirection, zDirection).unit();
   if (m_EnergyResample) {
-    energy = sampleEnergy();
+    energy = sample_energy();
   }
-  
-  setPrimary(position, energy, direction.unit());
+
+  G4ThreeVector polarization = unpolarized_vector(direction);
+
+  std::lock_guard<std::mutex> lock(mutex_);
   ++m_ID;
+
+  return PrimarySetting{energy, direction, 0.0, position, polarization};
 }
 
 } /* namespace comptonsoft */

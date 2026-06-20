@@ -39,14 +39,14 @@ ANLStatus GaussianBeamPrimaryGen::mod_define()
   PlaneWavePrimaryGen::mod_define();
 
   unregister_parameter("radius");
-  
-  register_parameter(&m_RSigma, "radial_sigma", LengthUnit(), LengthUnitName());
+
+  register_parameter(&m_RSigma, "radial_sigma", unit::cm, "cm");
   set_parameter_description("Radial sigma of the beam size.");
-  
+
   return AS_OK;
 }
 
-G4ThreeVector GaussianBeamPrimaryGen::samplePosition()
+G4ThreeVector GaussianBeamPrimaryGen::sample_position() const
 {
   const G4ThreeVector xaxis(DirectionOrthogonal());
   G4ThreeVector yaxis = xaxis;

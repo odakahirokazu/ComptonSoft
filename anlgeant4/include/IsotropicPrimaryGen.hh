@@ -17,6 +17,7 @@
  *                                                                       *
  *************************************************************************/
 
+#include "PrimarySetting.hh"
 #ifndef ANLGEANT4_IsotropicPrimaryGen_H
 #define ANLGEANT4_IsotropicPrimaryGen_H 1
 
@@ -40,12 +41,12 @@ class IsotropicPrimaryGen : public anlgeant4::BasicPrimaryGen
 public:
   IsotropicPrimaryGen();
   ~IsotropicPrimaryGen();
-  
+
   anlnext::ANLStatus mod_define() override;
   anlnext::ANLStatus mod_initialize() override;
   anlnext::ANLStatus mod_end_run() override;
 
-  void makePrimarySetting() override;
+  PrimarySetting make_primary_setting() const override;
 
 protected:
   double Radius() const { return m_Radius; }
@@ -57,7 +58,7 @@ protected:
 
   void setCoveringFactor (double v) { m_CoveringFactor = v; }
   void setIntensity(double v) { m_Intensity = v; }
-  
+
 private:
   G4ThreeVector m_CenterPosition;
   double m_Radius;

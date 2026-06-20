@@ -119,10 +119,10 @@ void PositionSamplerInVolume::defineVolumeSize()
   }
 }
 
-G4ThreeVector PositionSamplerInVolume::samplePosition()
+G4ThreeVector PositionSamplerInVolume::samplePosition() const
 {
   double posx(0.0), posy(0.0), posz(0.0);
-  
+
   const G4LogicalVolume* logvol = theVolume_->GetLogicalVolume();
   const G4VSolid* solid = logvol->GetSolid();
 
@@ -159,7 +159,7 @@ G4ThreeVector PositionSamplerInVolume::samplePosition()
   if (solid->Inside(position) != kInside) {
     goto position_sampling_start;
   }
-  
+
   for (std::size_t i=0; i<logvol->GetNoDaughters(); i++) {
     G4VPhysicalVolume* daughter = logvol->GetDaughter(i);
     G4ThreeVector posInDaughter = position;
@@ -184,7 +184,7 @@ G4ThreeVector PositionSamplerInVolume::samplePosition()
     }
     position += physivol->GetObjectTranslation();
   }
-  
+
   return position;
 }
 

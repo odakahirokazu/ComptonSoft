@@ -43,7 +43,7 @@ AHRadiationBackgroundPrimaryGen::~AHRadiationBackgroundPrimaryGen() = default;
 ANLStatus AHRadiationBackgroundPrimaryGen::mod_define()
 {
   anlgeant4::IsotropicPrimaryGen::mod_define();
-  disableDefaultEnergyInput();
+  disable_default_energy_input();
   register_parameter(&m_Filename, "filename");
   set_parameter_description("ROOT file of background radiation spectrum.");
   return AS_OK;
@@ -52,16 +52,16 @@ ANLStatus AHRadiationBackgroundPrimaryGen::mod_define()
 ANLStatus AHRadiationBackgroundPrimaryGen::mod_initialize()
 {
   anlgeant4::IsotropicPrimaryGen::mod_initialize();
-  
+
   m_File.reset(new TFile(m_Filename.c_str()));
   if ( m_File->IsZombie() ) {
     std::cout << "Cannot open " << m_Filename << " ! " << std::endl;
     return AS_QUIT_ERROR;
   }
-  
+
   TGraph* graph = (TGraph*) m_File->Get("Graph");
   const int N = graph->GetN();
-  
+
   double* x_array = graph->GetX(); // GeV
   std::vector<double> energies(N);
   for (int i=0; i<N; i++) {
@@ -72,7 +72,7 @@ ANLStatus AHRadiationBackgroundPrimaryGen::mod_initialize()
   double integralParticleIntensity(0.0);
   double integralEnergyIntensity(0.0);
   std::cout << "** output spectral information of particles **" << std::endl;
-  
+
   for (int bin=1; bin<=N; bin++) {
     const double energy = m_Hist->GetBinCenter(bin);
     const double differentialIntensity = graph->Eval(energy/unit::GeV) * (1.0/unit::s/unit::m2/unit::sr/unit::GeV);
@@ -84,7 +84,7 @@ ANLStatus AHRadiationBackgroundPrimaryGen::mod_initialize()
     integralEnergyIntensity += energyIntensity;
     std::cout << energy/unit::MeV << " [MeV] : " << differentialIntensity/(1.0/unit::s/unit::cm2/unit::sr/unit::MeV) << " [#/s/cm2/sr/MeV] " << std::endl;
   }
-  
+
   const double circleArea = Radius()*Radius()*CLHEP::pi;
   const double rate = integralParticleIntensity * circleArea * (4.0*CLHEP::pi*CoveringFactor());
 
@@ -95,7 +95,7 @@ ANLStatus AHRadiationBackgroundPrimaryGen::mod_initialize()
   return AS_OK;
 }
 
-G4double AHRadiationBackgroundPrimaryGen::sampleEnergy()
+G4double AHRadiationBackgroundPrimaryGen::sample_energy() const
 {
   return m_Hist->GetRandom();
 }

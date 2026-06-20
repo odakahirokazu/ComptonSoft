@@ -17,6 +17,7 @@
  *                                                                       *
  *************************************************************************/
 
+#include "PrimarySetting.hh"
 #ifndef ANLGEANT4_PointSourcePrimaryGen_H
 #define ANLGEANT4_PointSourcePrimaryGen_H 1
 
@@ -48,28 +49,28 @@ public:
   anlnext::ANLStatus mod_initialize() override;
   anlnext::ANLStatus mod_end_run() override;
 
-  void makePrimarySetting() override;
+  PrimarySetting make_primary_setting() const override;
 
 protected:
   void setSourcePosition(G4ThreeVector v) { m_SourcePosition = v; }
   void setCenterDirection(G4ThreeVector v) { m_CenterDirection = v; }
   void calculateRotation();
 
-  G4ThreeVector sampleDirection() override;
-  G4ThreeVector samplePosition() override;
+  G4ThreeVector sample_direction() const override;
+  G4ThreeVector sample_position() const override;
 
   G4ThreeVector SourcePosition() { return m_SourcePosition; }
 
 private:
   G4ThreeVector m_SourcePosition;
-  
+
   G4ThreeVector m_CenterDirection;
   double m_Theta0;
   double m_Theta1;
   double m_CosTheta0;
   double m_CosTheta1;
   double m_CoveringFactor;
-  
+
   double m_Luminosity;
 };
 

@@ -21,16 +21,15 @@
 #define ANLGEANT4_BasicPrimaryGen_H 1
 
 #include "VANLPrimaryGen.hh"
-#include "InitialInformation.hh"
-#include "G4ThreeVector.hh"
 
-class G4ParticleDefinition;
+#include <mutex>
+
+#include "InitialInformation.hh"
+#include "BasicPrimaryGeneratorAction.hh"
 
 namespace anlgeant4 {
 
-class BasicPrimaryGeneratorAction;
 class VANLGeometry;
-
 
 /**
  * ANLGeant4 PrimaryGen module
@@ -44,16 +43,18 @@ class VANLGeometry;
  * @date 2017-07-03 | 4.2 | Hirokazu Odaka | length unit is fixed to cm
  * @date 2020-04-13 | 5.0 | Hirokazu Odaka | remove polarization mode
  * @date 2024-03-08 | 6.0 | Hirokazu Odaka | nucleus
- * @date 2026-06-17 | 7.0 | Hirokazu Odaka | Geant4-MT
+ * @date 2026-06-20 | 7.0 | Hirokazu Odaka | Geant4-MT
  */
 class BasicPrimaryGen : public VANLPrimaryGen
 {
   DEFINE_ANL_MODULE(BasicPrimaryGen, 7.0);
+
 public:
   enum class SpectralShape {
-    Undefined, Mono, PowerLaw, Gaussian, BlackBody, Histogram, User,
+    undefined, mono, powerlaw, gaussian, blackbody, histogram, user,
   };
 
+public:
   BasicPrimaryGen();
   ~BasicPrimaryGen();
 
@@ -64,83 +65,30 @@ public:
 
   G4VUserPrimaryGeneratorAction* create() override;
 
-  G4int Number() const { return number_; }
-  double TotalEnergy() const { return totalEnergy_; }
-
-  virtual void makePrimarySetting() = 0;
-  virtual void confirmPrimarySetting();
-  void storeInitialCondition(int event_id);
+  const G4ParticleDefinition* particle_definition() const;
+  virtual PrimarySetting make_primary_setting() const = 0;
+  void confirm_primary_setting(int event_id, const PrimarySetting& primary_info);
 
 protected:
-  void setPrimary(double time0,
-                  G4ThreeVector position,
-                  double energy,
-                  G4ThreeVector direction,
-                  G4ThreeVector polarization)
+  void set_particle_definition(G4ParticleDefinition* particle_definition);
+  void set_particle_definition_by_name(const std::string& name);
+  void set_nucleus_definition(int atomic_number, int mass_number, double excitation_energy, int floating_level);
+
+  void set_energy_distribution(SpectralShape v, const std::string& name)
   {
-    time_ = time0;
-    position_ = position;
-    energy_ = energy;
-    direction_ = direction;
-    polarization_ = polarization;
+    energy_distribution_ = v;
+    energy_distribution_name_ = name;
   }
 
-  void setPrimary(double time0,
-                  G4ThreeVector position,
-                  double energy,
-                  G4ThreeVector direction)
-  {
-    time_ = time0;
-    position_ = position;
-    energy_ = energy;
-    direction_ = direction;
-  }
+  void enable_powerlaw_input();
+  void enable_gaussian_input();
+  void enable_blackbody_input();
+  void enable_histogram_input();
+  void disable_default_energy_input();
 
-  void setPrimary(G4ThreeVector position,
-                  double energy,
-                  G4ThreeVector direction,
-                  G4ThreeVector polarization)
-  {
-    position_ = position;
-    energy_ = energy;
-    direction_ = direction;
-    polarization_ = polarization;
-  }
+  void build_spectrum_photon_integral();
 
-  void setPrimary(G4ThreeVector position,
-                  double energy,
-                  G4ThreeVector direction)
-  {
-    position_ = position;
-    energy_ = energy;
-    direction_ = direction;
-  }
-
-  void setTime(double time0) { time_ = time0; }
-  void setPosition(G4ThreeVector position) { position_ = position; }
-  void setEnergy(double energy) { energy_ = energy; }
-  void setDirection(G4ThreeVector direction) { direction_ = direction; }
-  void setPolarization(G4ThreeVector polarization) { polarization_ = polarization; }
-
-  void setDefinition(G4ParticleDefinition* def);
-  void setParticleName(const std::string& name) { particleName_ = name; }
-  void setNucleusDefinition(int atomic_number, int mass_number, double excitation_energy, int floating_level);
-
-  void setEnergyDistribution(SpectralShape v, const std::string& name)
-  {
-    energyDistribution_ = v;
-    energyDistributionName_ = name;
-  }
-
-  void enablePowerLawInput();
-  void enableGaussianInput();
-  void enableBlackBodyInput();
-  void enableHistogramInput();
-  void disableDefaultEnergyInput();
-
-  void buildSpectrumPhotonIntegral();
-
-  virtual void printSpectralInfo();
+  virtual void print_spectral_info() const;
 
   /**
    * Sample a value of energy from energy distribution of the primaries.
@@ -150,82 +98,92 @@ protected:
    *
    * @return sampled energy
    */
-  virtual double sampleEnergy();
-  double sampleFromPowerLaw(double gamma, double e0, double e1);
-  double sampleFromPowerLaw();
-  double sampleFromGaussian(double mean, double sigma);
-  double sampleFromGaussian();
-  double sampleFromBlackBody(double kT, double upper_limit_factor);
-  double sampleFromBlackBody();
-  double sampleFromHistogram();
+  virtual double sample_energy() const;
+  double sample_from_powerlaw(double gamma, double e0, double e1) const;
+  double sample_from_powerlaw() const;
+  double sample_from_gaussian(double mean, double sigma) const;
+  double sample_from_gaussian() const;
+  double sample_from_blackbody(double kT, double upper_limit_factor) const;
+  double sample_from_blackbody() const;
+  double sample_from_histogram() const;
 
-  virtual G4ThreeVector sampleDirection() { return direction_; }
-  virtual G4ThreeVector samplePosition() { return position_; }
+  virtual G4ThreeVector sample_direction() const { return G4ThreeVector(0.0, 0.0, -1.0); }
+  virtual G4ThreeVector sample_position() const { return G4ThreeVector(0.0, 0.0, 0.0); }
 
-  void setUnpolarized();
+  G4ThreeVector unpolarized_vector(G4ThreeVector direction) const;
 
-  double LengthUnit() const;
-  std::string LengthUnitName() const;
+  void set_spectrum_energy(const std::vector<double>& v) { spectrum_energy_ = v; }
+  const std::vector<double>& spectrum_energy() const { return spectrum_energy_; }
+  void set_spectrum_photons(const std::vector<double>& v) { spectrum_photons_ = v; }
+  const std::vector<double>& spectrum_photons() const { return spectrum_photons_; }
 
-  void setSpectrumEnergy(const std::vector<double>& v) { spectrumEnergy_ = v; }
-  void setSpectrumPhotons(const std::vector<double>& v) { spectrumPhotons_ = v; }
-  std::vector<double>& SpectrumEnergy() { return spectrumEnergy_; }
-  const std::vector<double>& SpectrumEnergy() const { return spectrumEnergy_; }
-  std::vector <double>& SpectrumPhotons() { return spectrumPhotons_; }
-  const std::vector<double>& SpectrumPhotons() const { return spectrumPhotons_; }
+  std::string get_energy_distribution_name() const { return energy_distribution_name_; }
+  SpectralShape get_energy_distribution() const { return  energy_distribution_; }
+  double get_energy_min() const { return energy_min_; }
+  double get_energy_max() const { return energy_max_; }
+  double get_photon_index() const { return photon_index_; }
+  double get_energy_mean() const { return energy_mean_; }
+  double get_energy_sigma() const { return energy_sigma_; }
+  double get_energy_kT() const { return kT_; }
 
-  void setRealTime(double v) { realTime_ = v; }
+  /**
+   * statistical information
+   */
+  int number() const { return number_; }
+  double total_energy() const { return total_energy_; }
 
-  std::string getEnergyDistributionName() const { return energyDistributionName_; }
-  SpectralShape getEnergyDistribution() const { return  energyDistribution_; }
-  double getEnergyMin() const { return energyMin_; }
-  double getEnergyMax() const { return energyMax_; }
-  double getPhotonIndex() const { return photonIndex_; }
-  double getEnergyMean() const { return energyMean_; }
-  double getEnergySigma() const { return energySigma_; }
-  double getEnergykT() const { return kT_; }
+  void set_real_time(double v) { real_time_ = v; }
+  double real_time() const { return real_time_; }
 
 private:
-  BasicPrimaryGeneratorAction* primaryGenerator_ = nullptr;
+  void store_initial_condition(int event_id, const PrimarySetting& primary_info);
+
+private:
   const anlgeant4::VANLGeometry* geometry_ = nullptr;
-  anlgeant4::InitialInformation* initialInfo_ = nullptr;
+  anlgeant4::InitialInformation* initial_info_ = nullptr;
 
-  std::string particleName_;
+  /*
+   * statistical information
+   */
+  int number_;
+  double total_energy_;
+  double real_time_;
 
-  /* properties of a nucleus */
+  /*
+   * global particle information
+   */
+  G4ParticleDefinition* particle_definition_ = nullptr;
+  std::string particle_name_;
+
+  // nucleus
   int nucleus_atomic_number_;
   int nucleus_mass_number_;
   double nucleus_excitation_energy_;
   int nucleus_floating_level_;
 
-  double time_;
-  G4ThreeVector position_;
-  double energy_;
-  G4ThreeVector direction_;
-  G4ThreeVector polarization_;
-
-  G4int number_;
-  double totalEnergy_;
-  double realTime_;
-
-  G4ParticleDefinition* definition_;
-
-  /* properties for the energy distribution */
-  std::string energyDistributionName_;
-  SpectralShape energyDistribution_;
-  double energyMin_;
-  double energyMax_;
+  /*
+   * properties for the energy distribution
+   */
+  std::string energy_distribution_name_;
+  SpectralShape energy_distribution_;
+  double energy_min_;
+  double energy_max_;
   // power-law distribution
-  double photonIndex_;
+  double photon_index_;
   // Gaussin distribution
-  double energyMean_;
-  double energySigma_;
+  double energy_mean_;
+  double energy_sigma_;
   // black-body distribution
   double kT_;
   // histogram
-  std::vector<double> spectrumEnergy_;
-  std::vector<double> spectrumPhotons_;
-  std::vector<double> spectrumPhotonIntegral_;
+  std::vector<double> spectrum_energy_;
+  std::vector<double> spectrum_photons_;
+  std::vector<double> spectrum_photon_integral_;
+
+  /**
+   * for statistical info collection
+   */
+  std::mutex mutex_;
 };
 
 } /* namespace anlgeant4 */

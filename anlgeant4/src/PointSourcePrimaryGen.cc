@@ -21,6 +21,7 @@
 #include "Randomize.hh"
 #include "AstroUnits.hh"
 #include "VANLGeometry.hh"
+#include <G4ThreeVector.hh>
 
 using namespace anlnext;
 
@@ -42,9 +43,9 @@ ANLStatus PointSourcePrimaryGen::mod_define()
 {
   BasicPrimaryGen::mod_define();
 
-  enablePowerLawInput();
-  register_parameter(&m_SourcePosition, "position",
-                     LengthUnit(), LengthUnitName());
+  enable_powerlaw_input();
+
+  register_parameter(&m_SourcePosition, "position", unit::cm, "cm");
   set_parameter_description("Position of the source.");
   register_parameter(&m_CenterDirection, "direction");
   set_parameter_description("Center direction of the primaries.");
@@ -61,7 +62,7 @@ ANLStatus PointSourcePrimaryGen::mod_define()
 ANLStatus PointSourcePrimaryGen::mod_initialize()
 {
   using std::cos;
-  
+
   BasicPrimaryGen::mod_initialize();
   m_CenterDirection = m_CenterDirection.unit();
 
@@ -76,31 +77,29 @@ ANLStatus PointSourcePrimaryGen::mod_initialize()
   m_CosTheta0 = cos(m_Theta0);
   m_CosTheta1 = cos(m_Theta1);
   m_CoveringFactor = 0.5*(m_CosTheta0-m_CosTheta1);
-  
+
   std::cout << "--------" << std::endl;
   std::cout << "PrimaryGen status (point source)" << std::endl;
   std::cout << "  Source Position: "
             << posx/unit::cm << " " << posy/unit::cm << " " << posz/unit::cm << " cm" <<std::endl;
-  printSpectralInfo();
+  print_spectral_info();
   std::cout << "  Direction: "
-            << dirx << " " << diry << " " << dirz << '\n' 
+            << dirx << " " << diry << " " << dirz << '\n'
             << "    theta: " << m_Theta0/unit::degree << " - " << m_Theta1/unit::degree
             << " deg ( covering factor: " << m_CoveringFactor << " )"<< std::endl;
 
   return AS_OK;
 }
 
-void PointSourcePrimaryGen::makePrimarySetting()
+PrimarySetting PointSourcePrimaryGen::make_primary_setting() const
 {
-  const G4ThreeVector position = samplePosition();
-  const G4ThreeVector direction = sampleDirection();
-  const double energy = sampleEnergy();
-
-  setPrimary(position, energy, direction);
-  setUnpolarized();
+  const G4ThreeVector position = sample_position();
+  const G4ThreeVector direction = sample_direction();
+  const double energy = sample_energy();
+  return PrimarySetting{energy, direction, 0.0, position, unpolarized_vector(direction)};
 }
 
-G4ThreeVector PointSourcePrimaryGen::sampleDirection()
+G4ThreeVector PointSourcePrimaryGen::sample_direction() const
 {
   const double phi = CLHEP::twopi * G4UniformRand();
   const double cosTheta = m_CosTheta0+(m_CosTheta1-m_CosTheta0)*G4UniformRand();
@@ -110,7 +109,7 @@ G4ThreeVector PointSourcePrimaryGen::sampleDirection()
   return direction;
 }
 
-G4ThreeVector PointSourcePrimaryGen::samplePosition()
+G4ThreeVector PointSourcePrimaryGen::sample_position() const
 {
   return m_SourcePosition;
 }
@@ -120,17 +119,17 @@ ANLStatus PointSourcePrimaryGen::mod_end_run()
   double realTime = 0.;
   double pflux = 0.;
   if (m_CoveringFactor != 0.0) {
-    realTime = (TotalEnergy()/m_CoveringFactor)/m_Luminosity;
-    pflux = (Number()/m_CoveringFactor)/realTime;
+    realTime = (total_energy()/m_CoveringFactor)/m_Luminosity;
+    pflux = (number()/m_CoveringFactor)/realTime;
   }
-  setRealTime(realTime);
+  set_real_time(realTime);
 
   std::cout.setf(std::ios::scientific);
   std::cout << "PSPrimaryGen::mod_end_run \n"
-            << "  Number: " << Number() << "\n"
+            << "  Number: " << number() << "\n"
             << "  Luminosity: " << m_Luminosity/(unit::erg/unit::s) << " erg/s\n"
-            << "  Total Energy: " << TotalEnergy()/unit::keV << " keV = "
-            << TotalEnergy()/unit::erg << " erg\n"
+            << "  Total Energy: " << total_energy()/unit::keV << " keV = "
+            << total_energy()/unit::erg << " erg\n"
             << "  Covering Factor: " << m_CoveringFactor << "\n"
             << "  Real Time: " << realTime/unit::s << " s"
             << "  Photon rate: " << pflux/(1.0/unit::s) << " photons/s\n"

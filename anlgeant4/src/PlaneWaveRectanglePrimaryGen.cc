@@ -39,18 +39,18 @@ ANLStatus PlaneWaveRectanglePrimaryGen::mod_define()
   PlaneWavePrimaryGen::mod_define();
 
   unregister_parameter("radius");
-  
-  register_parameter(&m_SizeX, "size_x", LengthUnit(), LengthUnitName());
-  set_parameter_description("Size x of the rectangle where parimary particles are generated.");  
-  register_parameter(&m_SizeY, "size_y", LengthUnit(), LengthUnitName());
+
+  register_parameter(&m_SizeX, "size_x", unit::cm, "cm");
+  set_parameter_description("Size x of the rectangle where parimary particles are generated.");
+  register_parameter(&m_SizeY, "size_y", unit::cm, "cm");
   set_parameter_description("Size y of the rectangle where parimary particles are generated.");
   register_parameter(&m_RollAngle, "roll_angle", 1.0, "radian");
   set_parameter_description("Roll angle of the rectangle where parimary particles are generated.");
-  
+
   return AS_OK;
 }
 
-G4ThreeVector PlaneWaveRectanglePrimaryGen::samplePosition()
+G4ThreeVector PlaneWaveRectanglePrimaryGen::sample_position() const
 {
   // set position
   const double theta = m_RollAngle;

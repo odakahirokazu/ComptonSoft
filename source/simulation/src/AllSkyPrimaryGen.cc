@@ -50,7 +50,7 @@ ANLStatus AllSkyPrimaryGen::mod_define()
   if (status != AS_OK) {
     return status;
   }
- 
+
   define_parameter("filename", &mod_class::filename_);
   define_parameter("hdu_index_map", &mod_class::hdu_index_map_);
   define_parameter("hdu_index_energy", &mod_class::hdu_index_energy_);
@@ -98,7 +98,7 @@ ANLStatus AllSkyPrimaryGen::mod_initialize()
   fits->close();
   if (status != AS_OK) { return status; }
 
-  constructMaps(status); 
+  constructMaps(status);
   if (status != AS_OK) { return status; }
 
   calculateMapIntegrals(status);
@@ -110,7 +110,7 @@ ANLStatus AllSkyPrimaryGen::mod_initialize()
   return status;
 }
 
-void AllSkyPrimaryGen::makePrimarySetting()
+anlgeant4::PrimarySetting AllSkyPrimaryGen::make_primary_setting() const
 {
   using std::cos;
   using std::sin;
@@ -137,15 +137,11 @@ void AllSkyPrimaryGen::makePrimarySetting()
   const double photon_index = band_maps_[band_index][ipix].photon_index; // photon index at the current pix
   const double emin = band_maps_[band_index][ipix].emin;
   const double emax = band_maps_[band_index][ipix].emax;
-  const double energy = sampleFromPowerLaw(photon_index, emin, emax);
+  const double energy = sample_from_powerlaw(photon_index, emin, emax);
 
   const G4ThreeVector direction = (-v).unit();
 
-  setPrimary(position, energy, direction);
-
-#if 0
-  setUnpolarized();
-#endif
+  return anlgeant4::PrimarySetting{energy, direction, 0.0, position, unpolarized_vector(direction)};
 }
 
 ANLStatus AllSkyPrimaryGen::mod_end_run()
@@ -160,16 +156,16 @@ ANLStatus AllSkyPrimaryGen::mod_end_run()
   }
   const double radius = Radius();
   const double area = pi*radius*radius;
-  const double realTime = Number()/(totalPhotonFlux*area);
+  const double realTime = number()/(totalPhotonFlux*area);
 
-  setRealTime(realTime);
+  set_real_time(realTime);
 
   std::cout.setf(std::ios::scientific);
   std::cout << "AllSkyPrimaryGen::mod_end_run \n"
             << "  Input file: " << filename_ << "\n"
-            << "  Number (event number; photon number): " << Number() << "\n"
-            << "  Total Energy (=sum of sampled photon energy): " << TotalEnergy()/unit::keV << " keV = "
-            << TotalEnergy()/unit::erg << " erg\n"
+            << "  Number (event number; photon number): " << number() << "\n"
+            << "  Total Energy (=sum of sampled photon energy): " << total_energy()/unit::keV << " keV = "
+            << total_energy()/unit::erg << " erg\n"
             << "  Area: " << area/unit::cm2 << " cm2\n"
             << "  Real time : " << realTime/unit::s << " s\n"
             << "  Photon flux in " << band_maps_[0][0].emin / unit::keV << " to " << band_maps_[num_bands_-1][0].emax / unit::keV << " keV: " << totalPhotonFlux/(1.0/unit::cm2/unit::s) << " photons/cm2/s\n"
@@ -182,7 +178,7 @@ ANLStatus AllSkyPrimaryGen::mod_end_run()
 void AllSkyPrimaryGen::loadMultiBandImages(fitshandle* fits, int num_maps, ANLStatus& status)
 {
   using anlgeant4::constant::pi;
-  
+
   maps_.resize(num_maps);
   energies_.resize(num_maps);
 
@@ -221,7 +217,7 @@ void AllSkyPrimaryGen::loadMultiBandImages(fitshandle* fits, int num_maps, ANLSt
   auto it_energies = energies_.begin();
   while (it_maps!=maps_.end()) {
     const double energy = *it_energies;
-    if (energy < getEnergyMin() || getEnergyMax() < energy) {
+    if (energy < get_energy_min() || get_energy_max() < energy) {
       it_maps = maps_.erase(it_maps);
       it_energies = energies_.erase(it_energies);
     }
@@ -280,13 +276,13 @@ void AllSkyPrimaryGen::constructMapsMultiBand(ANLStatus& status)
 {
   using std::log;
   using std::pow;
-  
+
   band_maps_.resize(num_bands_);
 
   for (int i=0; i<num_bands_; i++) {
     const double emin = energies_[i];
     const double emax = energies_[i+1];
-    band_maps_[i].SetNside(num_side_, RING); 
+    band_maps_[i].SetNside(num_side_, RING);
 
     for (int ipix = 0; ipix < num_pixel_; ipix++) {
       const double nmin = maps_[i][ipix];
@@ -330,29 +326,29 @@ void AllSkyPrimaryGen::calculateMapIntegrals(ANLStatus& status)
   }
 
 #if 0
-  std::cout << "band_integrals_: " << band_integrals_.front() << " " << band_integrals_.back() << " " 
+  std::cout << "band_integrals_: " << band_integrals_.front() << " " << band_integrals_.back() << " "
                                    << band_integrals_.size() << std::endl;
   std::cout << "pixel_integrals_: " << pixel_integrals_.size() << std::endl;
-  std::cout << "pixel_integrals_[0]: " << pixel_integrals_[0].front() << " " << pixel_integrals_[0].back() << " " 
+  std::cout << "pixel_integrals_[0]: " << pixel_integrals_[0].front() << " " << pixel_integrals_[0].back() << " "
             << pixel_integrals_[0].size() << std::endl;
 #endif
 
   status = AS_OK;
 }
 
-int AllSkyPrimaryGen::sampleBandIndex()
+int AllSkyPrimaryGen::sampleBandIndex() const
 {
   const double r = G4UniformRand();
-  const std::vector<double>::const_iterator it = std::upper_bound(band_integrals_.begin(), 
+  const std::vector<double>::const_iterator it = std::upper_bound(band_integrals_.begin(),
                                                                   band_integrals_.end(), r);
   const int r0 = it - band_integrals_.begin() - 1;
   return r0;
 }
 
-int AllSkyPrimaryGen::samplePixel(int band_index)
+int AllSkyPrimaryGen::samplePixel(int band_index) const
 {
   const double r = G4UniformRand();
-  const std::vector<double>::const_iterator it = std::upper_bound(pixel_integrals_[band_index].begin(), 
+  const std::vector<double>::const_iterator it = std::upper_bound(pixel_integrals_[band_index].begin(),
                                                                   pixel_integrals_[band_index].end(), r);
   const int r0 = it - pixel_integrals_[band_index].begin() - 1;
   return r0;

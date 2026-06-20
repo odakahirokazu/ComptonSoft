@@ -30,6 +30,7 @@
 #include "MultiChannelData.hh"
 #include "VRealDetectorUnit.hh"
 #include "DeviceSimulation.hh"
+#include <G4Threading.hh>
 
 namespace comptonsoft {
 
@@ -97,35 +98,23 @@ VCSSensitiveDetector::ProcessHits(G4Step* step, G4TouchableHistory* )
   hit.setProcess(processFlag);
   hit.setParticle(particleDefinition->GetPDGEncoding());
 
-  G4ThreeVector position;
-  switch (step->GetPostStepPoint()->GetStepStatus())
-  {
-    case fPostStepDoItProc:
-      position = step->GetPostStepPoint()->GetPosition();
-      break;
-    case fAlongStepDoItProc:
-      position = 0.5*(step->GetPreStepPoint()->GetPosition() +
-                      step->GetPostStepPoint()->GetPosition());
-      break;
-    default:
-      position = step->GetPreStepPoint()->GetPosition();
-      break;
-  }
+  const G4ThreeVector pre_step_position = step->GetPreStepPoint()->GetPosition();
+  const G4ThreeVector post_step_position = step->GetPostStepPoint()->GetPosition();
+  const G4ThreeVector position = 0.5 * (pre_step_position + post_step_position);
+  hit.setPreStepPointPosition(pre_step_position);
+  hit.setPostStepPointPosition(post_step_position);
   hit.setRealPosition(position);
   hit.setRealTime(track->GetGlobalTime());
 
-  hit.setPreStepPointPosition(step->GetPreStepPoint()->GetPosition());
-  hit.setPostStepPointPosition(step->GetPostStepPoint()->GetPosition());
-
+  G4ThreeVector local_position = position;
   for (G4int i = touchable->GetHistoryDepth()-1; i >= 0; i--) {
    G4VPhysicalVolume* physicalVolume = touchable->GetVolume(i);
-    position += physicalVolume->GetFrameTranslation();
+    local_position += physicalVolume->GetFrameTranslation();
     if (physicalVolume->GetFrameRotation() != 0) {
-      position = (*physicalVolume->GetFrameRotation()) * position;
+      local_position = (*physicalVolume->GetFrameRotation()) * position;
     }
   }
-
-  hit.setLocalPosition(position);
+  hit.setLocalPosition(local_position);
 
   detectorSystem_->insertRawHit(std::move(hit));
 

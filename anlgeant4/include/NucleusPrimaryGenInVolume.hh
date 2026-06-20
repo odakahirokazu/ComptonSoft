@@ -17,6 +17,7 @@
  *                                                                       *
  *************************************************************************/
 
+#include "PrimarySetting.hh"
 #ifndef ANLGEANT4_NucleusPrimaryInVolume_H
 #define ANLGEANT4_NucleusPrimaryInVolume_H 1
 
@@ -37,7 +38,7 @@ namespace anlgeant4 {
 class NucleusPrimaryGenInVolume : public NucleusPrimaryGen
 {
   DEFINE_ANL_MODULE(NucleusPrimaryGenInVolume, 4.1);
-public: 
+public:
   NucleusPrimaryGenInVolume();
   ~NucleusPrimaryGenInVolume();
 
@@ -45,7 +46,7 @@ public:
   anlnext::ANLStatus mod_communicate() override;
   anlnext::ANLStatus mod_begin_run() override;
 
-  void makePrimarySetting() override;
+  PrimarySetting make_primary_setting() const override;
 
 private:
   anlgeant4::PositionSamplerInVolume m_PositionSampler;

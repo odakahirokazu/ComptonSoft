@@ -17,6 +17,7 @@
  *                                                                       *
  *************************************************************************/
 
+#include "PrimarySetting.hh"
 #ifndef ANLGEANT4_PrimaryGenUniformSourceInVolume_H
 #define ANLGEANT4_PrimaryGenUniformSourceInVolume_H 1
 
@@ -35,7 +36,7 @@ namespace anlgeant4
 class PrimaryGenUniformSourceInVolume : public PointSourcePrimaryGen
 {
   DEFINE_ANL_MODULE(PrimaryGenUniformSourceInVolume, 4.1);
-public: 
+public:
   PrimaryGenUniformSourceInVolume();
   ~PrimaryGenUniformSourceInVolume() = default;
 
@@ -43,7 +44,7 @@ public:
   anlnext::ANLStatus mod_initialize() override;
   anlnext::ANLStatus mod_begin_run() override;
 
-  void makePrimarySetting() override;
+  PrimarySetting make_primary_setting() const override;
 
 private:
   PositionSamplerInVolume m_PositionSampler;

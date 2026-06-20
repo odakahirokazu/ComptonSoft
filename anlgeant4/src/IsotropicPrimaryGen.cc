@@ -43,7 +43,8 @@ ANLStatus IsotropicPrimaryGen::mod_define()
 {
   BasicPrimaryGen::mod_define();
 
-  enablePowerLawInput();
+  enable_powerlaw_input();
+
   register_parameter(&m_CenterPosition, "center_position", unit::cm, "cm");
   set_parameter_description("Position of the sphere.");
   register_parameter(&m_Radius, "radius", unit::cm, "cm");
@@ -67,12 +68,12 @@ ANLStatus IsotropicPrimaryGen::mod_initialize()
   using std::cos;
   using std::acos;
   using std::sqrt;
-  
+
   BasicPrimaryGen::mod_initialize();
 
   m_CenterDirection = m_CenterDirection.unit();
   if (m_Distance < 0.0) { m_Distance = m_Radius; }
-  
+
   const double posx = m_CenterPosition.x();
   const double posy = m_CenterPosition.y();
   const double posz = m_CenterPosition.z();
@@ -95,12 +96,12 @@ ANLStatus IsotropicPrimaryGen::mod_initialize()
             << dirx << " " << diry << " " << dirz << std::endl;
   std::cout << "  Theta: "
             << m_ThetaMin/unit::degree << " - " << m_ThetaMax/unit::degree << " deg" << std::endl;
-  printSpectralInfo();
-  
+  print_spectral_info();
+
   return AS_OK;
 }
 
-void IsotropicPrimaryGen::makePrimarySetting()
+PrimarySetting IsotropicPrimaryGen::make_primary_setting() const
 {
   using std::cos;
   using std::sin;
@@ -114,7 +115,7 @@ void IsotropicPrimaryGen::makePrimarySetting()
                   m_Distance*sinTheta*sin(phi),
                   m_Distance*cosTheta);
   v.rotateUz(-m_CenterDirection);
-  
+
   G4ThreeVector v2 = v.orthogonal();
   v2.setMag( m_Radius * sqrt(G4UniformRand()) );
   const G4double chi = CLHEP::twopi * G4UniformRand();
@@ -124,9 +125,9 @@ void IsotropicPrimaryGen::makePrimarySetting()
   const G4ThreeVector direction = (-v).unit();
 
   // set energy
-  const double energy = sampleEnergy();
+  const double energy = sample_energy();
 
-  setPrimary(position, energy, direction);
+  return PrimarySetting{energy, direction, 0.0, position, unpolarized_vector(direction)};
 }
 
 ANLStatus IsotropicPrimaryGen::mod_end_run()
@@ -136,18 +137,18 @@ ANLStatus IsotropicPrimaryGen::mod_end_run()
   double realTime = 0.;
   double particleIntensity = 0.;
   if (m_CoveringFactor != 0.0) {
-    realTime = TotalEnergy()/(m_Intensity*area*solidAngle);
-    particleIntensity = Number()/area/realTime/solidAngle;
+    realTime = total_energy()/(m_Intensity*area*solidAngle);
+    particleIntensity = number()/area/realTime/solidAngle;
   }
 
-  setRealTime(realTime);
-  
+  set_real_time(realTime);
+
   std::cout.setf(std::ios::scientific);
   std::cout << "IsotropicPrimaryGen::mod_end_run \n"
-            << "  Number: " << Number() << "\n"
+            << "  Number: " << number() << "\n"
             << "  Intensity: " << m_Intensity/(unit::erg/unit::cm2/unit::s/unit::sr) << " erg/cm2/s/sr\n"
-            << "  Total Energy: " << TotalEnergy()/unit::keV << " keV = "
-            << TotalEnergy()/unit::erg << " erg\n"
+            << "  Total Energy: " << total_energy()/unit::keV << " keV = "
+            << total_energy()/unit::erg << " erg\n"
             << "  Covering Factor: " << m_CoveringFactor << "\n"
             << "  Area: " << area/unit::cm2 << " cm2\n"
             << "  Real time: " << realTime/unit::s << " s\n"

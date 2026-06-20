@@ -7,6 +7,7 @@ def run_simulation(num, random, output)
 
   sim = ComptonSoft::Simulation.new
   sim.num_events_per_run = 1000
+  sim.num_threads = 8
   sim.output = output
   sim.random_seed = random
   sim.verbose = 0
@@ -32,7 +33,7 @@ def run_simulation(num, random, output)
 end
 
 ### main ###
-num = 400000
+num = 100000
 output = "simulation.root"
 random = 10
 run_simulation(num, random, output)

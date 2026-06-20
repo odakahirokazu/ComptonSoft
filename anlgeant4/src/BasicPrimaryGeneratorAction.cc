@@ -20,65 +20,47 @@
 #include "BasicPrimaryGeneratorAction.hh"
 
 #include "G4ParticleGun.hh"
-#include "G4ParticleTable.hh"
 #include "G4Event.hh"
 #include "AstroUnits.hh"
 #include "BasicPrimaryGen.hh"
+
+#include <G4ParticleDefinition.hh>
+#include <mutex>
 
 namespace anlgeant4
 {
 
 BasicPrimaryGeneratorAction::BasicPrimaryGeneratorAction()
-  : m_ParticleGun(new G4ParticleGun(1)),
-    m_Time(0.0), m_Position(0.0, 0.0, 0.0),
-    m_Energy(10.0*unit::keV), m_Direction(1.0, 0.0, 0.0)
+  : particle_gun_(new G4ParticleGun(1))
 {
-}
-
-BasicPrimaryGeneratorAction::BasicPrimaryGeneratorAction(G4ParticleDefinition* definition)
-  : m_ParticleGun(new G4ParticleGun(1)),
-    m_Time(0.0), m_Position(0.0, 0.0, 0.0),
-    m_Energy(10.0*unit::keV), m_Direction(1.0, 0.0, 0.0)
-{
-  m_ParticleGun->SetParticleDefinition(definition);
-}
-
-BasicPrimaryGeneratorAction::BasicPrimaryGeneratorAction(G4String particle_name)
-  : m_ParticleGun(new G4ParticleGun(1)),
-    m_Time(0.0), m_Position(0.0, 0.0, 0.0),
-    m_Energy(10.0*unit::keV), m_Direction(1.0, 0.0, 0.0)
-{
-  G4ParticleDefinition* particle =
-    G4ParticleTable::GetParticleTable()->FindParticle(particle_name);
-  m_ParticleGun->SetParticleDefinition(particle);
 }
 
 BasicPrimaryGeneratorAction::~BasicPrimaryGeneratorAction() = default;
 
-void BasicPrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
+void BasicPrimaryGeneratorAction::GeneratePrimaries(G4Event* event)
 {
-  const int event_id = anEvent->GetEventID();
-  if (m_GeneratorSetting) {
-    m_GeneratorSetting->makePrimarySetting();
-    m_GeneratorSetting->confirmPrimarySetting();
-    m_GeneratorSetting->storeInitialCondition(event_id);
-  }
+  const int event_id = event->GetEventID();
+  const G4ParticleDefinition* particle = sampler_->particle_definition();
+  const PrimarySetting primary_info = sampler_->make_primary_setting();
 
-  m_ParticleGun->SetParticleTime(m_Time);
-  m_ParticleGun->SetParticlePosition(m_Position);
-  m_ParticleGun->SetParticleEnergy(m_Energy);
-  m_ParticleGun->SetParticleMomentumDirection(m_Direction);
-  if (m_Polarization.x()!=0.0 ||
-      m_Polarization.y()!=0.0 ||
-      m_Polarization.z()!=0.0) {
-    m_ParticleGun->SetParticlePolarization(m_Polarization);
-  }
-  m_ParticleGun->GeneratePrimaryVertex(anEvent);
+  SetDefinition(const_cast<G4ParticleDefinition*>(particle));
+  SetPrimarySetting(primary_info);
+  sampler_->confirm_primary_setting(event_id, primary_info);
+  particle_gun_->GeneratePrimaryVertex(event);
 }
 
 void BasicPrimaryGeneratorAction::SetDefinition(G4ParticleDefinition* definition)
 {
-  m_ParticleGun->SetParticleDefinition(definition);
+  particle_gun_->SetParticleDefinition(definition);
+}
+
+void BasicPrimaryGeneratorAction::SetPrimarySetting(const PrimarySetting& primary)
+{
+  particle_gun_->SetParticleTime(primary.time);
+  particle_gun_->SetParticlePosition(primary.position);
+  particle_gun_->SetParticleEnergy(primary.energy);
+  particle_gun_->SetParticleMomentumDirection(primary.direction);
+  particle_gun_->SetParticlePolarization(primary.polarization);
 }
 
 } /* namespace anlgeant4 */

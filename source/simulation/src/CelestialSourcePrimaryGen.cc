@@ -64,7 +64,7 @@ ANLStatus CelestialSourcePrimaryGen::mod_define()
   if (status != AS_OK) {
     return status;
   }
- 
+
   define_parameter("fits_filename_I", &mod_class::fitsFilenameI_);
   set_parameter_description("Polarization I image file.");
   define_parameter("fits_filename_Q", &mod_class::fitsFilenameQ_);
@@ -139,13 +139,13 @@ ANLStatus CelestialSourcePrimaryGen::mod_initialize()
   if (status != AS_OK) {
     return status;
   }
-  
+
   buildPixelIntegral();
 
   return AS_OK;
 }
 
-void CelestialSourcePrimaryGen::makePrimarySetting()
+anlgeant4::PrimarySetting CelestialSourcePrimaryGen::make_primary_setting() const
 {
   using std::cos;
   using std::sin;
@@ -173,9 +173,8 @@ void CelestialSourcePrimaryGen::makePrimarySetting()
   v2.rotate(chi, v);
   G4ThreeVector position = centerPosition + v + v2;
 
-  const double energy = sampleEnergy();
+  const double energy = sample_energy();
   G4ThreeVector direction = (-v).unit();
-
 
   G4ThreeVector uz(0.0, 0.0, 1.0);
   G4ThreeVector uy(0.0, 1.0, 0.0);
@@ -189,8 +188,7 @@ void CelestialSourcePrimaryGen::makePrimarySetting()
   direction.rotate(-detAngle, uz);
 
   if (!setPolarization_) {
-    setPrimary(position, energy, direction);
-    return;
+    return anlgeant4::PrimarySetting{energy, direction, 0.0, position, G4ThreeVector()};
   }
 
   const double polDegree = polarizationDegree_[ix][iy];
@@ -198,7 +196,7 @@ void CelestialSourcePrimaryGen::makePrimarySetting()
 
 #if 0
   std::cout << "position: (" << position.x() << ", " << position.y() << ", " << position.z() << ")" << std::endl;
-  std::cout << "direction: (" << direction.x() << ", " << direction.y() << ", " << direction.z() << ")" << std::endl; 
+  std::cout << "direction: (" << direction.x() << ", " << direction.y() << ", " << direction.z() << ")" << std::endl;
 #endif
 
   G4ThreeVector polarizationVector(sin(phi), -cos(phi), 0.0);
@@ -209,15 +207,14 @@ void CelestialSourcePrimaryGen::makePrimarySetting()
 #if 0
   std::cout << "polarization degree: " << polDegree << std::endl;
   std::cout << polAngle << std::endl;
-  std::cout << "polarization: (" << polarizationVector.x() << ", " << polarizationVector.y() << ", " << polarizationVector.z() << ")" << std::endl; 
+  std::cout << "polarization: (" << polarizationVector.x() << ", " << polarizationVector.y() << ", " << polarizationVector.z() << ")" << std::endl;
 #endif
 
   if (G4UniformRand() < polDegree) {
-    setPrimary(position, energy, direction, polarizationVector);
+    return anlgeant4::PrimarySetting{energy, direction, 0.0, position, polarizationVector};
   }
   else {
-    setPrimary(position, energy, direction);
-    setUnpolarized();
+    return anlgeant4::PrimarySetting{energy, direction, 0.0, position, unpolarized_vector(direction)};
   }
 }
 
@@ -225,17 +222,17 @@ ANLStatus CelestialSourcePrimaryGen::mod_end_run()
 {
   const double radius = Radius();
   const double area = CLHEP::pi*radius*radius;
-  const double realTime = TotalEnergy()/(sourceFlux_*area);
-  const double pflux = Number()/area/realTime;
+  const double realTime = total_energy()/(sourceFlux_*area);
+  const double pflux = number()/area/realTime;
 
-  setRealTime(realTime);
+  set_real_time(realTime);
 
   std::cout.setf(std::ios::scientific);
   std::cout << "CelestialSourcePrimaryGen::mod_end_run \n"
-            << "  Number: " << Number() << "\n"
+            << "  Number: " << number() << "\n"
             << "  Flux: " << sourceFlux_/(unit::erg/unit::cm2/unit::s) << " erg/cm2/s\n"
-            << "  Total Energy: " << TotalEnergy()/unit::keV << " keV = "
-            << TotalEnergy()/unit::erg << " erg\n"
+            << "  Total Energy: " << total_energy()/unit::keV << " keV = "
+            << total_energy()/unit::erg << " erg\n"
             << "  Area: " << area/unit::cm2 << " cm2\n"
             << "  Real time: " << realTime/unit::s << " s\n"
             << "  Photon flux: " << pflux/(1.0/unit::cm2/unit::s) << " photons/cm2/s\n"
@@ -372,7 +369,7 @@ void CelestialSourcePrimaryGen::setCoordinate(ANLStatus* status)
   const double rollAngle = inputImageRotationAngle_;
   degPixelX_ = dx;
   degPixelY_ = dy;
-  
+
   for (int ix=0; ix<pixelX_; ix++) {
     for (int iy=0; iy<pixelY_; iy++) {
       double ra = refRA + (ix-refX) * dx * cos(rollAngle) + (iy-refY) * dy * sin(rollAngle);
@@ -402,7 +399,7 @@ void CelestialSourcePrimaryGen::buildPixelIntegral()
   }
 }
 
-std::pair<int, int> CelestialSourcePrimaryGen::samplePixel()
+std::pair<int, int> CelestialSourcePrimaryGen::samplePixel() const
 {
   std::pair<int, int> p;
   const double r = G4UniformRand();

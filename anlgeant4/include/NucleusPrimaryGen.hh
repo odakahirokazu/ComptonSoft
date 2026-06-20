@@ -17,6 +17,7 @@
  *                                                                       *
  *************************************************************************/
 
+#include "PrimarySetting.hh"
 #ifndef ANLGEANT4_NucleusPrimaryGen_H
 #define ANLGEANT4_NucleusPrimaryGen_H 1
 
@@ -47,8 +48,8 @@ public:
   anlnext::ANLStatus mod_define() override;
   anlnext::ANLStatus mod_begin_run() override;
 
-  void makePrimarySetting() override;
-  
+  PrimarySetting make_primary_setting() const override;
+
 private:
   G4ThreeVector m_Position0;
   int m_RIZ = 0;

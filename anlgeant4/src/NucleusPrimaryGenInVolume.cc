@@ -18,6 +18,7 @@
  *************************************************************************/
 
 #include "NucleusPrimaryGenInVolume.hh"
+#include <G4ThreeVector.hh>
 
 using namespace anlnext;
 
@@ -36,7 +37,7 @@ ANLStatus NucleusPrimaryGenInVolume::mod_define()
 
   register_parameter(&m_VolumeHierarchy, "volume_hierarchy");
   set_parameter_description("Volume hierarchy that identifies the primary generating volume.");
-  
+
   return AS_OK;
 }
 
@@ -55,17 +56,18 @@ ANLStatus NucleusPrimaryGenInVolume::mod_begin_run()
 
   m_PositionSampler.setVolumeHierarchy(m_VolumeHierarchy);
   m_PositionSampler.defineVolumeSize();
-  
+
   return AS_OK;
 }
 
-void NucleusPrimaryGenInVolume::makePrimarySetting()
+PrimarySetting NucleusPrimaryGenInVolume::make_primary_setting() const
 {
   G4ThreeVector position(m_PositionSampler.samplePosition());
-  
+
   const double energy = 0.0;
-  const G4ThreeVector direction(0.0, 0.0, 0.0);
-  setPrimary(position, energy, direction);
+  const G4ThreeVector direction(0.0, 0.0, 1.0);
+
+  return PrimarySetting{energy, direction, 0.0, position, G4ThreeVector()};
 }
 
 } /* namespace anlgeant4 */

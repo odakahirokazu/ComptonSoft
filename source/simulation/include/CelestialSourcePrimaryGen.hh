@@ -45,20 +45,20 @@ class CelestialSourcePrimaryGen : public anlgeant4::IsotropicPrimaryGen
 public:
   CelestialSourcePrimaryGen();
   ~CelestialSourcePrimaryGen();
-  
+
   anlnext::ANLStatus mod_define() override;
   anlnext::ANLStatus mod_initialize() override;
   anlnext::ANLStatus mod_end_run() override;
 
-  void makePrimarySetting() override;
+  anlgeant4::PrimarySetting make_primary_setting() const override;
 
 protected:
   void inputImage(std::string filename, image_t& image, anlnext::ANLStatus* status);
   void makePolarizationMap(anlnext::ANLStatus* status);
   void setCoordinate(anlnext::ANLStatus* status);
   void buildPixelIntegral();
-  std::pair<int, int> samplePixel();
-  
+  std::pair<int, int> samplePixel() const;
+
 private:
   std::string fitsFilenameI_;
   std::string fitsFilenameQ_;

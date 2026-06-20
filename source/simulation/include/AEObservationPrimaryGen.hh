@@ -42,19 +42,19 @@ class AEObservationPrimaryGen : public anlgeant4::BasicPrimaryGen
   DEFINE_ANL_MODULE(AEObservationPrimaryGen, 1.0);
 public:
   AEObservationPrimaryGen();
-  
+
   anlnext::ANLStatus mod_define() override;
   anlnext::ANLStatus mod_pre_initialize() override;
   anlnext::ANLStatus mod_initialize() override;
   anlnext::ANLStatus mod_analyze() override;
 
-  void makePrimarySetting() override;
+  anlgeant4::PrimarySetting make_primary_setting() const override;
 
 protected:
-  G4ThreeVector samplePosition() override;
+  G4ThreeVector sample_position() const override;
   void buildPositionIntegral();
   double overlap(double v1, double v2, double w1, double w2);
-  
+
 private:
   static const int numColumns_ = 3;
   G4ThreeVector offset_;
@@ -74,7 +74,7 @@ private:
   int numEffectiveAreaPlot_ = 0;
   image_t PSF_;
   std::vector<double> PSFArray_;
-  double sumFlux_ = 0.0;
+  mutable double sumFlux_ = 0.0;
   std::vector<double> positionIntegral_;
   int percent_ = 0;
 };

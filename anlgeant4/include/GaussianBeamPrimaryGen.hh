@@ -41,8 +41,8 @@ public:
   anlnext::ANLStatus mod_define() override;
 
 protected:
-  G4ThreeVector samplePosition() override;
-  
+  G4ThreeVector sample_position() const override;
+
 private:
   double m_RSigma;
 };

@@ -35,7 +35,7 @@ namespace comptonsoft
 {
 
 AEObservationPrimaryGen::AEObservationPrimaryGen()
-  : arfFileName_("source.arf")    
+  : arfFileName_("source.arf")
 {
   add_alias("AEObservationPrimaryGen");
 }
@@ -45,10 +45,8 @@ ANLStatus AEObservationPrimaryGen::mod_define()
   anlnext::ANLStatus status = BasicPrimaryGen::mod_define();
   if (status!=AS_OK) {
     return status;
-  }  
+  }
 
-  setParticleName("gamma");
-  
   register_parameter(&offset_, "position_offset", unit::mm, "mm");
   register_parameter(&arfFileName_, "arf_filename");
   register_parameter(&pixelSize_, "pixel_size", unit::mm, "mm");
@@ -95,7 +93,7 @@ ANLStatus AEObservationPrimaryGen::mod_pre_initialize()
     cfitsio::fits_report_error(stderr, fitsStatus);
     return AS_QUIT_ERROR;
   }
- 
+
   cfitsio::fits_read_pix(fitsFile, TDOUBLE, StartPixel, NumPixels, &nulval, &array[0], &anynul, &fitsStatus);
   if (fitsStatus) {
     cfitsio::fits_report_error(stderr, fitsStatus);
@@ -116,15 +114,15 @@ ANLStatus AEObservationPrimaryGen::mod_pre_initialize()
       return AS_QUIT_ERROR;
     }
   }
-  
+
   cfitsio::fits_read_keys_lng(fitsFile, (char*)"NAXIS", 1, 2, naxes, &nfound, &fitsStatus);
   numEffectiveAreaPlot_ = static_cast<int>(naxes[1]);
-  
+
   if (fitsStatus) {
     cfitsio::fits_report_error(stderr, fitsStatus);
     return AS_QUIT_ERROR;
   }
- 
+
   for(int i=0; i<numColumns_; i++){
     effectiveArea_[i].resize(numEffectiveAreaPlot_);
     cfitsio::fits_read_col(fitsFile, TDOUBLE, colid[i], (long)1, (long)1,
@@ -135,7 +133,7 @@ ANLStatus AEObservationPrimaryGen::mod_pre_initialize()
       return AS_QUIT_ERROR;
     }
   }
-  
+
   cfitsio::fits_close_file(fitsFile, &fitsStatus);
   if (fitsStatus) {
     cfitsio::fits_report_error(stderr, fitsStatus);
@@ -162,8 +160,8 @@ ANLStatus AEObservationPrimaryGen::mod_pre_initialize()
     effectiveArea_[2][i] *= (unit::cm*unit::cm);
   }
 
-  const std::vector<double>& spectrumEnergy = SpectrumEnergy();
-  const std::vector<double>& spectrumPhotons = SpectrumPhotons();
+  const std::vector<double>& spectrumEnergy = spectrum_energy();
+  const std::vector<double>& spectrumPhotons = spectrum_photons();
 
   if (!useFlux_) {
     fluxEnergyMin_ = spectrumEnergy[0];
@@ -197,8 +195,8 @@ ANLStatus AEObservationPrimaryGen::mod_pre_initialize()
     newSpectrumPhotons[i] = v;
   }
 
-  setSpectrumPhotons(newSpectrumPhotons);
-  
+  set_spectrum_photons(newSpectrumPhotons);
+
   return AS_OK;
 }
 
@@ -223,17 +221,17 @@ ANLStatus AEObservationPrimaryGen::mod_analyze()
     std::cout << percent_ << "\% completed." << std::endl;
     percent_ += 1;
   }
-  
-  
+
+
   return BasicPrimaryGen::mod_analyze();
 }
 
-void AEObservationPrimaryGen::makePrimarySetting()
-{  
-  const double energy = sampleEnergy();
-  const G4ThreeVector position = samplePosition() + offset_;
+PrimarySetting AEObservationPrimaryGen::make_primary_setting() const
+{
+  const double energy = sample_energy();
+  const G4ThreeVector position = sample_position() + offset_;
   const G4ThreeVector direction(0.0, 0.0, -1.0);
-  
+
   double area = 1.0;
   if (energy>fluxEnergyMin_ && energy<fluxEnergyMax_) {
     for (int i=0; i<numEffectiveAreaPlot_; i++){
@@ -245,7 +243,7 @@ void AEObservationPrimaryGen::makePrimarySetting()
     sumFlux_ += energy/(exposure_*area);
   }
 
-  setPrimary(position, energy, direction.unit());
+  return PrimarySetting{energy, direction, 0.0, position, unpolarized_vector(direction)};
 }
 
 void AEObservationPrimaryGen::buildPositionIntegral()
@@ -266,7 +264,7 @@ void AEObservationPrimaryGen::buildPositionIntegral()
   }
 }
 
-G4ThreeVector AEObservationPrimaryGen::samplePosition()
+G4ThreeVector AEObservationPrimaryGen::sample_position() const
 {
   G4ThreeVector position (0.0, 0.0, 0.0);
   const int nx = pixelX_;

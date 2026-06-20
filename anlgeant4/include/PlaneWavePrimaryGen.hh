@@ -49,27 +49,27 @@ public:
   anlnext::ANLStatus mod_define() override;
   anlnext::ANLStatus mod_initialize() override;
   anlnext::ANLStatus mod_end_run() override;
-  
-  void makePrimarySetting() override;
+
+  PrimarySetting make_primary_setting() const override;
 
 protected:
   G4ThreeVector CenterPosition() const { return m_CenterPosition; }
   G4ThreeVector Direction() const { return m_Direction0; }
   G4ThreeVector DirectionOrthogonal() const { return m_DirectionOrthogonal; }
 
-  G4ThreeVector samplePosition() override;
+  G4ThreeVector sample_position() const override;
   virtual double GenerationArea();
-  
+
 private:
   G4ThreeVector m_CenterPosition;
-  
+
   G4ThreeVector m_Direction0;
   G4ThreeVector m_DirectionOrthogonal;
   double m_Radius;
 
   G4ThreeVector m_Polarization0;
   double m_PolarizationDegree;
-  
+
   double m_Flux;
 };
 

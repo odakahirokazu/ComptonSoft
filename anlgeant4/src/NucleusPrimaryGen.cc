@@ -23,6 +23,7 @@
 #include "G4IonTable.hh"
 #include "G4VIsotopeTable.hh"
 #include "AstroUnits.hh"
+#include <G4ThreeVector.hh>
 
 using namespace anlnext;
 
@@ -43,7 +44,6 @@ ANLStatus NucleusPrimaryGen::mod_define()
   BasicPrimaryGen::mod_define();
 
   unregister_parameter("particle");
-  setParticleName("");
   register_parameter(&m_Position0, "position", unit::cm, "cm");
   set_parameter_description("Position of the source.");
   register_parameter(&m_RIZ, "atomic_number");
@@ -54,14 +54,14 @@ ANLStatus NucleusPrimaryGen::mod_define()
   set_parameter_description("Excitation energy of the radioactive isotope. A value of 0 means the ground state of the nucleus.");
   register_parameter(&m_RIFloatingLevel, "floating_level");
   set_parameter_description("Index specifying a floating level. A value of 0 means a determined level.");
-  
+
   return AS_OK;
 }
 
 ANLStatus NucleusPrimaryGen::mod_begin_run()
 {
   BasicPrimaryGen::mod_begin_run();
-  
+
   G4IonTable* ionTable = static_cast<G4IonTable*>(G4ParticleTable::GetParticleTable()->GetIonTable());
   G4ParticleDefinition* particle_base =
     ionTable->GetIon(m_RIZ, m_RIA, m_RIEnergy, G4Ions::FloatLevelBase(m_RIFloatingLevel));
@@ -70,13 +70,9 @@ ANLStatus NucleusPrimaryGen::mod_begin_run()
     std::cout << "The particle can not be converted into G4Ions." << std::endl;
     return AS_QUIT_ERROR;
   }
-  
-  setDefinition(particle);
-  
-  G4double energy(0.0);
-  G4ThreeVector direction(0.0, 0.0, 0.0);
-  setPrimary(m_Position0, energy, direction);
-  
+
+  set_particle_definition(particle);
+
   std::cout << "------------------------------ \n"
             << "  RI Information \n"
             << "    Name:           " << particle->GetParticleName()        << '\n'
@@ -87,12 +83,13 @@ ANLStatus NucleusPrimaryGen::mod_begin_run()
             << "    life time:      " << particle->GetPDGLifeTime()/unit::s  << " second\n"
             << "------------------------------ \n"
             << std::endl;
-  
+
   return AS_OK;
 }
 
-void NucleusPrimaryGen::makePrimarySetting()
+PrimarySetting NucleusPrimaryGen::make_primary_setting() const
 {
+  return PrimarySetting{0.0, G4ThreeVector{0.0, 0.0, 0.0}, 0.0, m_Position0, G4ThreeVector()};
 }
 
 } /* namespace anlgeant4 */

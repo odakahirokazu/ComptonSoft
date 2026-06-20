@@ -50,11 +50,12 @@ ANLStatus PrimaryGenUniformSourceInVolume::mod_initialize()
   unregister_parameter("position");
   if (m_TargetMode) {
     hide_parameter("direction");
+    setCenterDirection(G4ThreeVector{0.0, 0.0, 1.0});
   }
   else {
     hide_parameter("target_position");
   }
-  
+
   return AS_OK;
 }
 
@@ -62,21 +63,24 @@ ANLStatus PrimaryGenUniformSourceInVolume::mod_begin_run()
 {
   m_PositionSampler.setVolumeHierarchy(m_VolumeHierarchy);
   m_PositionSampler.defineVolumeSize();
-  
+
   return AS_OK;
 }
 
-void PrimaryGenUniformSourceInVolume::makePrimarySetting()
+PrimarySetting PrimaryGenUniformSourceInVolume::make_primary_setting() const
 {
-  G4ThreeVector position(m_PositionSampler.samplePosition());
-  setSourcePosition(position);
+  const double energy = sample_energy();
 
+  const PositionSamplerInVolume& position_sampler = m_PositionSampler;
+  const G4ThreeVector position = position_sampler.samplePosition();
+
+  G4ThreeVector direction = sample_direction();
   if (m_TargetMode) {
-    const G4ThreeVector direction = (m_TargetPosition-position).unit();
-    setCenterDirection(direction);
+    const G4ThreeVector center_direction = (m_TargetPosition-position).unit();
+    direction.rotateUz(center_direction);
   }
 
-  PointSourcePrimaryGen::makePrimarySetting();
+  return PrimarySetting{energy, direction, 0.0, position, unpolarized_vector(direction)};
 }
 
 } /* namespace anlgeant4 */

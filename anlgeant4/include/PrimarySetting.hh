@@ -17,35 +17,22 @@
  *                                                                       *
  *************************************************************************/
 
-#ifndef ANLGEANT4_VANLPrimaryGen_H
-#define ANLGEANT4_VANLPrimaryGen_H 1
+#ifndef ANLGEANT4_PrimarySetting_H
+#define ANLGEANT4_PrimarySetting_H 1
 
-#include <anlnext/BasicModule.hh>
+#include "G4ThreeVector.hh"
 
-class G4VUserPrimaryGeneratorAction;
+namespace anlgeant4 {
 
-namespace anlgeant4
+struct PrimarySetting
 {
-
-/**
- * Virtual primary generator module
- * @author Shin Watanabe, Hirokazu Odaka
- * @date xxxx-xx-xx
- * @date 2011-xx-xx
- * @date 2026-04-15 | 5.0 | register this action to Geant4Body
- * @date 2026-06-20 | 6.0 | Geant4 MT
- */
-class VANLPrimaryGen : public anlnext::BasicModule
-{
-  DEFINE_ANL_MODULE(VANLPrimaryGen, 7.0);
-public:
-  VANLPrimaryGen();
-
-  virtual G4VUserPrimaryGeneratorAction* create() = 0;
-
-  anlnext::ANLStatus mod_initialize() override;
+  double energy = 0.0;
+  G4ThreeVector direction = {0.0, 0.0, 0.0};
+  double time = 0.0;
+  G4ThreeVector position = {0.0, 0.0, 0.0};
+  G4ThreeVector polarization = {0.0, 0.0, 0.0};
 };
 
 } /* namespace anlgeant4 */
 
-#endif /* ANLGEANT4_VANLPrimaryGen_H */
+#endif /* ANLGEANT4_PrimarySetting_H */

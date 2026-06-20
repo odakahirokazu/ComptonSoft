@@ -21,6 +21,7 @@
 #define COMPTONSOFT_AHRayTracingPrimaryGen_H 1
 
 #include <vector>
+#include <mutex>
 #include "BasicPrimaryGen.hh"
 
 namespace comptonsoft {
@@ -42,18 +43,19 @@ class AHRayTracingPrimaryGen : public anlgeant4::BasicPrimaryGen
   DEFINE_ANL_MODULE(AHRayTracingPrimaryGen, 4.1);
 public:
   AHRayTracingPrimaryGen();
-  
+
   anlnext::ANLStatus mod_define() override;
   anlnext::ANLStatus mod_initialize() override;
   anlnext::ANLStatus mod_analyze() override;
 
-  void makePrimarySetting() override;
-  
+  anlgeant4::PrimarySetting make_primary_setting() const override;
+
 private:
   std::string m_FileName;
-  
+
   int m_EventNum;
-  int m_ID;
+  mutable int m_ID;
+  mutable std::mutex mutex_;
 
   static const int NumColumns = 6;
   std::vector<double> m_Columns[6];

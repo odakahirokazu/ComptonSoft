@@ -20,7 +20,7 @@ ListPrimaryGen::ListPrimaryGen()
 ANLStatus ListPrimaryGen::mod_define()
 {
   BasicPrimaryGen::mod_define();
-  register_parameter(&filename_, "filename");
+  define_parameter("filename", &mod_class::filename_);
   return AS_OK;
 }
 
@@ -30,7 +30,7 @@ ANLStatus ListPrimaryGen::mod_initialize()
 
   file_ = std::make_unique<TFile>(filename_.c_str());
   tree_ = static_cast<TTree*>(file_->Get("primary_list"));
-  numEntries_ = tree_->GetEntries();
+  num_entries_ = tree_->GetEntries();
   tree_->SetBranchAddress("x", &x_);
   tree_->SetBranchAddress("y", &y_);
   tree_->SetBranchAddress("z", &z_);
@@ -44,21 +44,21 @@ ANLStatus ListPrimaryGen::mod_initialize()
 
 ANLStatus ListPrimaryGen::mod_analyze()
 {
-  if (index_ == numEntries_) {
+  if (index_ == num_entries_) {
     return AS_QUIT;
   }
   return AS_OK;
 }
 
-void ListPrimaryGen::makePrimarySetting()
+PrimarySetting ListPrimaryGen::make_primary_setting() const
 {
+  std::lock_guard<std::mutex> lock(mutex_);
   tree_->GetEntry(index_++);
 
   const G4double energy = energy_ * unit::keV;
   const G4ThreeVector direction(dirx_, diry_, dirz_);
   const G4ThreeVector position(x_*unit::cm, y_*unit::cm, z_*unit::cm);
-  setPrimary(position, energy, direction);
-  setUnpolarized();
+  return PrimarySetting{energy, direction, 0.0, position, unpolarized_vector(direction)};
 }
 
 } /* namespace comptonsoft */

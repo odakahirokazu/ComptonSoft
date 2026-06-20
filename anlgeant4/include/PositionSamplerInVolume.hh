@@ -32,7 +32,7 @@ namespace anlgeant4
 /**
  * Sample positions from a volume inside.
  *
- * @author Hirokazu Odaka 
+ * @author Hirokazu Odaka
  * @date 2008-09-19 | Hirokazu Odaka
  * @date 2011-06-22 | Hirokazu Odaka
  * @date 2012-08-01 | Yuto Ichinohe & Hirokazu Odaka | bug fixed
@@ -42,20 +42,20 @@ class PositionSamplerInVolume
 {
 public:
   enum class VolumeType_t { Box, Sphere, Tube, EllipticalTube, Ellipsoid, Any };
-  
+
 public:
   PositionSamplerInVolume();
   ~PositionSamplerInVolume() = default;
 
   void setVolumeHierarchy(const std::vector<std::string>& v) { volumeID_ = v; }
   void defineVolumeSize();
-  G4ThreeVector samplePosition();
+  G4ThreeVector samplePosition() const;
 
 private:
   std::vector<std::string> volumeID_;
   VolumeType_t volumeType_;
   const G4VPhysicalVolume* theVolume_;
-  
+
   double boxHSizeX_;
   double boxHSizeY_;
   double boxHSizeZ_;

@@ -51,12 +51,12 @@ class AllSkyPrimaryGen : public anlgeant4::IsotropicPrimaryGen
 public:
   AllSkyPrimaryGen();
   ~AllSkyPrimaryGen();
-  
+
   anlnext::ANLStatus mod_define() override;
   anlnext::ANLStatus mod_initialize() override;
   anlnext::ANLStatus mod_end_run() override;
 
-  void makePrimarySetting() override;
+  anlgeant4::PrimarySetting make_primary_setting() const override;
 
 protected:
   void loadMultiBandImages(fitshandle* fits, int num_maps, anlnext::ANLStatus& status);
@@ -64,8 +64,8 @@ protected:
   void constructMapsMultiBand(anlnext::ANLStatus& status);
   void calculateMapIntegrals(anlnext::ANLStatus& status);
   void setCoordinate(anlnext::ANLStatus& status);
-  int sampleBandIndex();
-  int samplePixel(int band_index);
+  int sampleBandIndex() const;
+  int samplePixel(int band_index) const;
 
 private:
   /* module parameters */
@@ -101,7 +101,7 @@ private:
   std::vector<double> image_phi_;
 
   /* internal class members */
-  
+
   struct band_intensity
   {
     double emin;

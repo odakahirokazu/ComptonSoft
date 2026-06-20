@@ -44,14 +44,12 @@ ANLStatus PlaneWavePrimaryGen::mod_define()
 {
   BasicPrimaryGen::mod_define();
 
-  enablePowerLawInput();
-  register_parameter(&m_CenterPosition, "position",
-                     LengthUnit(), LengthUnitName());
+  enable_powerlaw_input();
+  register_parameter(&m_CenterPosition, "position", unit::cm, "cm");
   set_parameter_description("Center of the circle where primary particles are generated.");
   register_parameter(&m_Direction0, "direction");
   set_parameter_description("Propagation direction of the plane wave.");
-  register_parameter(&m_Radius, "radius",
-                     LengthUnit(), LengthUnitName());
+  register_parameter(&m_Radius, "radius", unit::cm, "cm");
   set_parameter_description("Radius of the circle where parimary particles are generated.");
   register_parameter(&m_Flux, "flux", unit::erg/unit::s/unit::cm2, "erg/s/cm2");
   set_parameter_description("Energy flux of the plane wave. This parameter is used only for calculating real time correspoing to a simulation.");
@@ -59,7 +57,7 @@ ANLStatus PlaneWavePrimaryGen::mod_define()
   set_parameter_description("Polarization vector");
   register_parameter(&m_PolarizationDegree, "degree_of_polarization");
   set_parameter_description("Degree of polarization");
- 
+
   return AS_OK;
 }
 
@@ -77,31 +75,33 @@ ANLStatus PlaneWavePrimaryGen::mod_initialize()
   const double posz = m_CenterPosition.z();
   std::cout << "  Center position: "
             << posx/unit::cm << " " << posy/unit::cm << " " << posz/unit::cm << " cm" << std::endl;
-  printSpectralInfo();
+  print_spectral_info();
   const double dirx = m_Direction0.x();
   const double diry = m_Direction0.y();
   const double dirz = m_Direction0.z();
   std::cout << "  Direction: "
             << dirx << " " << diry << " " << dirz << std::endl;
-  
+
   return AS_OK;
 }
 
-void PlaneWavePrimaryGen::makePrimarySetting()
+PrimarySetting PlaneWavePrimaryGen::make_primary_setting() const
 {
-  const G4ThreeVector position = samplePosition();
-  const double energy = sampleEnergy();
-  
+  const G4ThreeVector position = sample_position();
+  const double energy = sample_energy();
+  const G4ThreeVector direction = m_Direction0;
+
+  G4ThreeVector polarization;
   if (G4UniformRand() < m_PolarizationDegree) {
-    setPrimary(position, energy, m_Direction0, m_Polarization0);
+    polarization = m_Polarization0;
   }
   else {
-    setPrimary(position, energy, m_Direction0);
-    setUnpolarized();
+    polarization = unpolarized_vector(direction);
   }
+  return PrimarySetting{energy, direction, 0.0, position, polarization};
 }
 
-G4ThreeVector PlaneWavePrimaryGen::samplePosition()
+G4ThreeVector PlaneWavePrimaryGen::sample_position() const
 {
   using std::sqrt;
 
@@ -116,23 +116,23 @@ G4ThreeVector PlaneWavePrimaryGen::samplePosition()
 ANLStatus PlaneWavePrimaryGen::mod_end_run()
 {
   const double area = GenerationArea();
-  const double realTime = TotalEnergy()/(m_Flux*area);
-  const double pflux = Number()/area/realTime;
+  const double realTime = total_energy()/(m_Flux*area);
+  const double pflux = number()/area/realTime;
 
-  setRealTime(realTime);
-  
+  set_real_time(realTime);
+
   std::cout.setf(std::ios::scientific);
   std::cout << "PWPrimaryGen::mod_end_run \n"
-            << "  Number: " << Number() << "\n"
+            << "  Number: " << number() << "\n"
             << "  Flux: " << m_Flux/(unit::erg/unit::cm2/unit::s) << " erg/cm2/s\n"
-            << "  Total Energy: " << TotalEnergy()/unit::keV << " keV = "
-            << TotalEnergy()/unit::erg << " erg\n"
+            << "  Total Energy: " << total_energy()/unit::keV << " keV = "
+            << total_energy()/unit::erg << " erg\n"
             << "  Area: " << area/unit::cm2 << " cm2\n"
             << "  Real time: " << realTime/unit::s << " s\n"
             << "  Photon flux: " << pflux/(1.0/unit::cm2/unit::s) << " photons/cm2/s\n"
             << std::endl;
   std::cout.unsetf(std::ios::scientific);
-  
+
   return AS_OK;
 }
 

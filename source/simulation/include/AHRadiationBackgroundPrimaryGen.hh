@@ -47,8 +47,8 @@ public:
 
   anlnext::ANLStatus mod_define() override;
   anlnext::ANLStatus mod_initialize() override;
-  
-  G4double sampleEnergy() override;
+
+  double sample_energy() const override;
 
 private:
   std::string m_Filename;

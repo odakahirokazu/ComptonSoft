@@ -43,9 +43,9 @@ public:
   anlnext::ANLStatus mod_define() override;
 
 protected:
-  G4ThreeVector samplePosition() override;
+  G4ThreeVector sample_position() const override;
   double GenerationArea() override;
-  
+
 private:
   double m_SizeX;
   double m_SizeY;

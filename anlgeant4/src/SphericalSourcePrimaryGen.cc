@@ -39,13 +39,13 @@ ANLStatus SphericalSourcePrimaryGen::mod_define()
 {
   PointSourcePrimaryGen::mod_define();
 
-  register_parameter(&source_inner_radius_, "source_inner_radius", LengthUnit(), LengthUnitName());
-  register_parameter(&source_outer_radius_, "source_outer_radius", LengthUnit(), LengthUnitName());
+  register_parameter(&source_inner_radius_, "source_inner_radius", unit::cm, "cm");
+  register_parameter(&source_outer_radius_, "source_outer_radius", unit::cm, "cm");
 
   return AS_OK;
 }
 
-G4ThreeVector SphericalSourcePrimaryGen::samplePosition()
+G4ThreeVector SphericalSourcePrimaryGen::sample_position() const
 {
   const double ri = source_inner_radius_;
   const double ro = source_outer_radius_;
