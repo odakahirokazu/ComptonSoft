@@ -66,8 +66,7 @@ module ComptonSoft
     attr_accessor :output
 
     ### Geant4 settings
-    attr_accessor :num_events_per_run, :num_threads, :print_beamon_time
-    attr_accessor :output_random_status, :random_seed, :verbose
+    attr_accessor :num_events_per_run, :num_threads, :print_beamon_time, :random_seed, :verbose
 
     ### ANL module setup.
     define_setup_module("geometry")
