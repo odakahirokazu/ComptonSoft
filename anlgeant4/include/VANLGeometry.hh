@@ -47,17 +47,17 @@ public:
 
   virtual G4VUserDetectorConstruction* create() = 0;
 
-  double GetLengthUnit() const { return m_LengthUnit; }
-  std::string GetLengthUnitName() const { return m_LengthUnitName; }
+  double get_length_unit() const { return length_unit_; }
+  std::string get_length_unit_name() const { return length_unit_name_; }
 
-  bool SurfaceCheck() const { return m_SurfaceCheck; }
+  bool surface_check() const { return surface_check_; }
 
   anlnext::ANLStatus mod_define() override;
 
 private:
-  const double m_LengthUnit;
-  const std::string m_LengthUnitName;
-  bool m_SurfaceCheck;
+  const double length_unit_;
+  const std::string length_unit_name_;
+  bool surface_check_;
 };
 
 } /* namespace anlgeant4 */

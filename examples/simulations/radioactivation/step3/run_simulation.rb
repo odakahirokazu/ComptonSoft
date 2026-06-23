@@ -18,11 +18,13 @@ def run_simulation(num, random, output, ri, volume_path)
                   hadron_hp: true,
                   radioactive_decay: true)
 
-  sim.set_primary_generator :NucleusPrimaryGenInVolume, {
-    atomic_number: ri.z,
-    mass_number: ri.a,
-    energy: ri.energy,
-    floating_level: ri.floating_level,
+  sim.set_primary_generator :UniformVolumePrimaryGenerator, {
+    particle: "nucleus",
+    nucleus_atomic_number: ri.z,
+    nucleus_mass_number: ri.a,
+    nucleus_excitation_energy: ri.energy,
+    nucleus_floating_level: ri.floating_level,
+    energy: 0.0,
     volume_hierarchy: volume_path.split('/').drop(1),
   }
 

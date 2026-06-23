@@ -9,7 +9,7 @@ def run_simulation(num, random, output)
   sim.output = output
   sim.random_seed = random
   sim.set_gdml "database/mass_model.gdml"
-  sim.set_primary_generator :GaussianBeamPrimaryGen, {
+  sim.set_primary_generator :GaussianBeamPrimaryGenerator, {
     particle: "proton",
     spectral_distribution: "gaussian",
     energy_mean: energy,

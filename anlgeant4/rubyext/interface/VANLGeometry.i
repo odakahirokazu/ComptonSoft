@@ -2,7 +2,7 @@
 class VANLGeometry : public anlnext::BasicModule
 {
 public:
-  double GetLengthUnit() const;
-  std::string GetLengthUnitName() const;
+  double get_length_unit() const;
+  std::string get_length_unit_name() const;
 };
 %makedefault;

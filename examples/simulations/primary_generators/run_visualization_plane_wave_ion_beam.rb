@@ -9,7 +9,7 @@ def run_simulation(num)
   sim.num_events_per_run = 50
   sim.random_seed = 0
   sim.set_gdml "database/mass_model.gdml"
-  sim.set_primary_generator :PlaneWavePrimaryGen, {
+  sim.set_primary_generator :PlaneWavePrimaryGenerator, {
     particle: "nucleus",
     nucleus_atomic_number: 6,
     nucleus_mass_number: 12,

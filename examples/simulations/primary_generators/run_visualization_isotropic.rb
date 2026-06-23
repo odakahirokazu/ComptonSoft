@@ -7,7 +7,7 @@ def run_simulation(num)
   sim.num_events_per_run = 100
   sim.random_seed = 0
   sim.set_gdml "database/mass_model.gdml"
-  sim.set_primary_generator :IsotropicPrimaryGen, {
+  sim.set_primary_generator :IsotropicPrimaryGenerator, {
     particle: "gamma",
     photon_index: 1.5,
     energy_min: 10.0,

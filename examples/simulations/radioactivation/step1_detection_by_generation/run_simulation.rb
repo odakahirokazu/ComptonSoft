@@ -17,7 +17,7 @@ def run_simulation(num, random, output)
   sim.set_gdml "../database/mass_model.gdml"
   sim.set_physics(physics_list: "QGSP_BIC_HP")
 
-  sim.set_primary_generator :PlaneWavePrimaryGen, {
+  sim.set_primary_generator :PlaneWavePrimaryGenerator, {
     particle: "proton",
     photon_index: 0.0,
     energy_min: energy,

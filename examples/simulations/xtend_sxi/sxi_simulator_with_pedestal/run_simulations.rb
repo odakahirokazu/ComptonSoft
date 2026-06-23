@@ -28,7 +28,7 @@ def get_energy_photons_array(filename)
     end
     return energy_array, photons_array
 end
-    
+
 def run_simulation(num, random, output)
     energy_array, photons_array = get_energy_photons_array("../tools/lif_yreg.txt")
     sim = ComptonSoft::Simulation.new
@@ -41,7 +41,7 @@ def run_simulation(num, random, output)
     sim.set_gdml "database/mass_model.gdml"
     sim.set_physics(hadron_hp: false, cut_value: 0.0001,
                   customized_em: true, electron_range_ratio: 0.01, electron_final_range: 1.0e-5)
-    sim.set_primary_generator :AEObservationPrimaryGen, {
+    sim.set_primary_generator :AEObservationPrimaryGenerator, {
         particle: "gamma",
         spectral_distribution: "histogram",
         energy_array: energy_array,

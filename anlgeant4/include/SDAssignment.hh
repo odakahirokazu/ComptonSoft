@@ -43,9 +43,10 @@ public:
   SDAssignment();
 
   void registerSD(const std::string& logical_volume_name, G4VSensitiveDetector* sd);
+  void setSDs(const SDVector& v) { SD_vector_ = v; }
 
 protected:
-  SDVector getSDs() const { return SD_vector_; }
+  const SDVector& getSDs() const { return SD_vector_; }
 
 private:
   SDVector SD_vector_;

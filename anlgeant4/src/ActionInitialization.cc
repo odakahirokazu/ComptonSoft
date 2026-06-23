@@ -39,12 +39,12 @@ ActionInitialization::ActionInitialization() = default;
 
 ActionInitialization::~ActionInitialization() = default;
 
-void ActionInitialization::registerUserAction(VANLPrimaryGen* primary_gen)
+void ActionInitialization::register_user_action(VANLPrimaryGenerator* primary_generator)
 {
-  primary_generation_module_ = primary_gen;
+  primary_generator_ = primary_generator;
 }
 
-void ActionInitialization::registerUserAction(VUserActionAssembly* uaa)
+void ActionInitialization::register_user_action(VUserActionAssembly* uaa)
 {
   user_action_assemblies_original_.push_back(uaa);
 }
@@ -74,8 +74,8 @@ void ActionInitialization::BuildForMaster() const
 
 void ActionInitialization::Build() const
 {
-  G4VUserPrimaryGeneratorAction* primary_generator = primary_generation_module_->create();
-  SetUserAction(primary_generator);
+  G4VUserPrimaryGeneratorAction* primary_generator_action = primary_generator_->create();
+  SetUserAction(primary_generator_action);
 
   std::vector<VUserActionAssembly*> user_action_assemblies = create_user_action_assemblies();
 

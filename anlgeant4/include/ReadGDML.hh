@@ -43,8 +43,8 @@ public:
   G4VUserDetectorConstruction* create() override;
 
 private:
-  std::string m_GeometryFileName;
-  bool m_Validate;
+  std::string filename_;
+  bool validate_;
 };
 
 } /* namespace anlgeant4 */

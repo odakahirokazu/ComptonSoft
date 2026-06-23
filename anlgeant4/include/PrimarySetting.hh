@@ -17,6 +17,7 @@
  *                                                                       *
  *************************************************************************/
 
+#include <G4RayTracer.hh>
 #ifndef ANLGEANT4_PrimarySetting_H
 #define ANLGEANT4_PrimarySetting_H 1
 
@@ -26,12 +27,22 @@ namespace anlgeant4 {
 
 struct PrimarySetting
 {
-  double energy = 0.0;
-  G4ThreeVector direction = {0.0, 0.0, 0.0};
   double time = 0.0;
   G4ThreeVector position = {0.0, 0.0, 0.0};
+  double energy = 0.0;
+  G4ThreeVector direction = {0.0, 0.0, 0.0};
   G4ThreeVector polarization = {0.0, 0.0, 0.0};
 };
+
+inline PrimarySetting make_primary(G4ThreeVector _position, double _energy, G4ThreeVector _direction)
+{
+  return PrimarySetting{0.0, _position, _energy, _direction, {0.0, 0.0, 0.0}};
+}
+
+inline PrimarySetting make_primary(G4ThreeVector _position, double _energy, G4ThreeVector _direction, G4ThreeVector _polarization)
+{
+  return PrimarySetting{0.0, _position, _energy, _direction, _polarization};
+}
 
 } /* namespace anlgeant4 */
 

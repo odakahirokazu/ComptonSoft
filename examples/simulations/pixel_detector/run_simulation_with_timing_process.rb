@@ -16,7 +16,7 @@ def run_simulation(num, random, output)
   sim.set_physics(hadron_hp: false, cut_value: 0.001)
   sim.enable_timing_process
 
-  sim.set_primary_generator :PlaneWavePrimaryGen, {
+  sim.set_primary_generator :PlaneWavePrimaryGenerator, {
     particle: "gamma",
     photon_index: 0.0,
     energy_min: 1.0,

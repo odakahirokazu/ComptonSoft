@@ -37,7 +37,7 @@ namespace anlgeant4
 {
 
 class ActionInitialization;
-class VANLPrimaryGen;
+class VANLPrimaryGenerator;
 class VUserActionAssembly;
 
 
@@ -61,11 +61,11 @@ public:
   anlnext::ANLStatus mod_end_run() override;
   anlnext::ANLStatus mod_finalize() override;
 
-  void register_user_action(VANLPrimaryGen* primary_gen);
+  void register_user_action(VANLPrimaryGenerator* primary_generator);
   void register_user_action(VUserActionAssembly* uaa);
 
 protected:
-  virtual void initialize_random_generator();
+  virtual bool initialize_random_generator();
   virtual void set_user_initializations();
   virtual void apply_commands();
 

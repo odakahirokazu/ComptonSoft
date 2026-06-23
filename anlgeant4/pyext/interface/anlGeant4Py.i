@@ -9,23 +9,21 @@
 #ifdef USE_GDML
 #include "WriteGDML.hh"
 #endif
-#include "VANLPrimaryGen.hh"
-#include "BasicPrimaryGen.hh"
-#include "PointSourcePrimaryGen.hh"
-#include "SphericalSourcePrimaryGen.hh"
-#include "PlaneWavePrimaryGen.hh"
-#include "PlaneWaveRectanglePrimaryGen.hh"
-#include "GaussianBeamPrimaryGen.hh"
-#include "IsotropicPrimaryGen.hh"
-#include "PrimaryGenUniformSourceInVolume.hh"
-#include "NucleusPrimaryGen.hh"
-#include "NucleusPrimaryGenInVolume.hh"
+#include "VANLPrimaryGenerator.hh"
+#include "BasicPrimaryGenerator.hh"
+#include "PointSourcePrimaryGenerator.hh"
+#include "SphericalSourcePrimaryGenerator.hh"
+#include "PlaneWavePrimaryGenerator.hh"
+#include "PlaneWaveRectanglePrimaryGenerator.hh"
+#include "GaussianBeamPrimaryGenerator.hh"
+#include "IsotropicPrimaryGenerator.hh"
+#include "UniformVolumePrimaryGenerator.hh"
 #include "VUserActionAssembly.hh"
 #include "StandardUserActionAssembly.hh"
-#ifdef USE_VIS
-#include "VisualizeG4Geom.hh"
-#endif
 #include "VEventStore.hh"
+#ifdef USE_VIS
+#include "VisualizeGeometry.hh"
+#endif
 
 
 %}
@@ -54,8 +52,8 @@ class VANLPhysicsList : public anlnext::BasicModule
 class VANLGeometry : public anlnext::BasicModule
 {
 public:
-  double GetLengthUnit() const;
-  std::string GetLengthUnitName() const;
+  double get_length_unit() const;
+  std::string get_length_unit_name() const;
 };
 %makedefault;
 
@@ -79,88 +77,72 @@ public:
 #endif
 
 %nodefault;
-class VANLPrimaryGen : public anlnext::BasicModule
+class VANLPrimaryGenerator : public anlnext::BasicModule
 {
 };
 %makedefault;
 
 
 %nodefault;
-class BasicPrimaryGen : public VANLPrimaryGen
+class BasicPrimaryGenerator : public VANLPrimaryGenerator
 {
 };
 %makedefault;
 
 
-class PointSourcePrimaryGen : public BasicPrimaryGen
+class PointSourcePrimaryGenerator : public BasicPrimaryGenerator
 {
 public:
-  PointSourcePrimaryGen();
-  ~PointSourcePrimaryGen();
+  PointSourcePrimaryGenerator();
+  ~PointSourcePrimaryGenerator();
 };
 
 
-class SphericalSourcePrimaryGen : public PointSourcePrimaryGen
+class SphericalSourcePrimaryGenerator : public PointSourcePrimaryGenerator
 {
 public:
-  SphericalSourcePrimaryGen();
-  ~SphericalSourcePrimaryGen();
+  SphericalSourcePrimaryGenerator();
+  ~SphericalSourcePrimaryGenerator();
 };
 
 
-class PlaneWavePrimaryGen : public anlgeant4::BasicPrimaryGen
+class PlaneWavePrimaryGenerator : public anlgeant4::BasicPrimaryGenerator
 {
 public:
-  PlaneWavePrimaryGen();
-  ~PlaneWavePrimaryGen();
+  PlaneWavePrimaryGenerator();
+  ~PlaneWavePrimaryGenerator();
 };
 
 
-class PlaneWaveRectanglePrimaryGen : public anlgeant4::PlaneWavePrimaryGen
+class PlaneWaveRectanglePrimaryGenerator : public anlgeant4::PlaneWavePrimaryGenerator
 {
 public:
-  PlaneWaveRectanglePrimaryGen();
-  ~PlaneWaveRectanglePrimaryGen();
+  PlaneWaveRectanglePrimaryGenerator();
+  ~PlaneWaveRectanglePrimaryGenerator();
 };
 
 
-class GaussianBeamPrimaryGen : public anlgeant4::PlaneWavePrimaryGen
+class GaussianBeamPrimaryGenerator : public anlgeant4::PlaneWavePrimaryGenerator
 {
 public:
-  GaussianBeamPrimaryGen();
-  ~GaussianBeamPrimaryGen();
+  GaussianBeamPrimaryGenerator();
+  ~GaussianBeamPrimaryGenerator();
 };
 
 
-class IsotropicPrimaryGen : public anlgeant4::BasicPrimaryGen
+class IsotropicPrimaryGenerator : public anlgeant4::BasicPrimaryGenerator
 {
 public:
-  IsotropicPrimaryGen();
-  ~IsotropicPrimaryGen();
+  IsotropicPrimaryGenerator();
+  ~IsotropicPrimaryGenerator();
 };
 
 
-class PrimaryGenUniformSourceInVolume : public PointSourcePrimaryGen
+class UniformVolumePrimaryGenerator : public PointSourcePrimaryGenerator
 {
 public:
-  PrimaryGenUniformSourceInVolume();
-  ~PrimaryGenUniformSourceInVolume() = default;
-};
-
-
-class NucleusPrimaryGen : public BasicPrimaryGen
-{
-public:
-  NucleusPrimaryGen();
-  ~NucleusPrimaryGen();
-};
-
-
-class NucleusPrimaryGenInVolume : public NucleusPrimaryGen
-{
-public:
-  NucleusPrimaryGenInVolume();
-  ~NucleusPrimaryGenInVolume();
+  UniformVolumePrimaryGenerator();
+  ~UniformVolumePrimaryGenerator() = default;
 };
 
 
@@ -179,16 +161,6 @@ public:
 };
 
 
-#ifdef USE_VIS
-class VisualizeG4Geom  : public anlnext::BasicModule
-{
-public:
-  VisualizeG4Geom();
-  ~VisualizeG4Geom();
-};
-
-#endif
-
 class VEventStore : public anlnext::BasicModule
 {
 public:
@@ -196,5 +168,15 @@ public:
   virtual ~VEventStore();
 };
 
+
+#ifdef USE_VIS
+class VisualizeGeometry  : public anlnext::BasicModule
+{
+public:
+  VisualizeGeometry();
+  ~VisualizeGeometry();
+};
+
+#endif
 
 }

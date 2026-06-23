@@ -34,12 +34,12 @@ class WriteGDML : public anlnext::BasicModule
   DEFINE_ANL_MODULE(WriteGDML, 1.0);
 public:
   WriteGDML();
-  
+
   anlnext::ANLStatus mod_define() override;
   anlnext::ANLStatus mod_initialize() override;
 
 private:
-  std::string m_GeometryFileName;
+  std::string filename_;
 };
 
 } /* namespace anlgeant4 */

@@ -22,7 +22,7 @@
 
 #include <mutex>
 #include "G4VUserActionInitialization.hh"
-#include "VANLPrimaryGen.hh"
+#include "VANLPrimaryGenerator.hh"
 #include "VUserActionAssembly.hh"
 
 namespace anlgeant4
@@ -39,8 +39,8 @@ public:
   ActionInitialization();
   virtual ~ActionInitialization();
 
-  void registerUserAction(VANLPrimaryGen* primary_gen);
-  void registerUserAction(VUserActionAssembly* uaa);
+  void register_user_action(VANLPrimaryGenerator* primary_generator);
+  void register_user_action(VUserActionAssembly* uaa);
 
   void BuildForMaster() const override;
   void Build() const override;
@@ -49,7 +49,7 @@ protected:
   std::vector<VUserActionAssembly*> create_user_action_assemblies() const;
 
 private:
-  VANLPrimaryGen* primary_generation_module_ = nullptr;
+  VANLPrimaryGenerator* primary_generator_ = nullptr;
   std::vector<VUserActionAssembly*> user_action_assemblies_original_;
   mutable std::mutex mutex_;
   mutable std::vector<std::vector<std::unique_ptr<VUserActionAssembly>>> user_action_assemblies_vector_;

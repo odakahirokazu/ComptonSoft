@@ -8,10 +8,13 @@ def run_simulation(num)
   sim.random_seed = 0
   sim.set_gdml "database/mass_model.gdml"
   sim.set_physics(radioactive_decay: true)
-  sim.set_primary_generator :NucleusPrimaryGen, {
-    atomic_number: 56,
-    mass_number: 133,
-    energy: 0.0,
+  sim.set_primary_generator :PointSourcePrimaryGenerator, {
+    particle: "nucleus",
+    nucleus_atomic_number: 56,
+    nucleus_mass_number: 133,
+    nucleus_excitation_energy: 0.0,
+    spectral_distribution: "mono",
+    energy_mean: 0.0,
     position: vec(0.0, 0.0, 5.0),
   }
 

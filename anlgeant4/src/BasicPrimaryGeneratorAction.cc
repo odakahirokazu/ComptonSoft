@@ -19,13 +19,13 @@
 
 #include "BasicPrimaryGeneratorAction.hh"
 
-#include "G4ParticleGun.hh"
-#include "G4Event.hh"
-#include "AstroUnits.hh"
-#include "BasicPrimaryGen.hh"
-
-#include <G4ParticleDefinition.hh>
 #include <mutex>
+#include <G4ParticleGun.hh>
+#include <G4Event.hh>
+#include <G4ParticleDefinition.hh>
+
+#include "AstroUnits.hh"
+#include "BasicPrimaryGenerator.hh"
 
 namespace anlgeant4
 {

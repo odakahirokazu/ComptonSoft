@@ -1,0 +1,451 @@
+/*************************************************************************
+ *                                                                       *
+ * Copyright (c) 2011 Hirokazu Odaka                                     *
+ *                                                                       *
+ * This program is free software: you can redistribute it and/or modify  *
+ * it under the terms of the GNU General Public License as published by  *
+ * the Free Software Foundation, either version 3 of the License, or     *
+ * (at your option) any later version.                                   *
+ *                                                                       *
+ * This program is distributed in the hope that it will be useful,       *
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of        *
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
+ * GNU General Public License for more details.                          *
+ *                                                                       *
+ * You should have received a copy of the GNU General Public License     *
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>. *
+ *                                                                       *
+ *************************************************************************/
+
+#include "BasicPrimaryGenerator.hh"
+
+#include <algorithm>
+#include <iterator>
+#include <boost/format.hpp>
+#include "Randomize.hh"
+#include "G4ParticleTable.hh"
+#include "G4Ions.hh"
+#include "G4IonTable.hh"
+#include "G4VIsotopeTable.hh"
+#include "AstroUnits.hh"
+#include "BasicPrimaryGeneratorAction.hh"
+#include "VANLGeometry.hh"
+
+using namespace anlnext;
+
+namespace anlgeant4
+{
+
+BasicPrimaryGenerator::BasicPrimaryGenerator()
+  : number_(0),
+    total_energy_(0.0),
+    real_time_(0.0),
+    particle_definition_(nullptr),
+    particle_name_("gamma"),
+    nucleus_atomic_number_(0),
+    nucleus_mass_number_(0),
+    nucleus_excitation_energy_(0.0),
+    nucleus_floating_level_(0),
+    energy_distribution_name_("powerlaw"),
+    energy_distribution_(SpectralShape::undefined),
+    energy_min_(0.1*unit::keV), energy_max_(1000.0*unit::keV),
+    photon_index_(0.0),
+    energy_mean_(511.0*unit::keV), energy_sigma_(0.0*unit::keV),
+    kT_(10.0*unit::keV)
+{
+  add_alias("BasicPrimaryGenerator");
+}
+
+BasicPrimaryGenerator::~BasicPrimaryGenerator() = default;
+
+ANLStatus BasicPrimaryGenerator::mod_define()
+{
+  VANLPrimaryGenerator::mod_define();
+
+  define_parameter("particle", &mod_class::particle_name_);
+  set_parameter_description("Particle name (gamma, e-, e+, proton, neutron, geantino...) Set this to \"nucleus\" for nucleus/isotope such as C-12, Cs-137.");
+
+  define_parameter("nucleus_atomic_number", &mod_class::nucleus_atomic_number_);
+  define_parameter("nucleus_mass_number", &mod_class::nucleus_mass_number_);
+  define_parameter("nucleus_excitation_energy", &mod_class::nucleus_excitation_energy_, unit::keV, "keV");
+  define_parameter("nucleus_floating_level", &mod_class::nucleus_floating_level_);
+
+  hide_parameter("nucleus_atomic_number");
+  hide_parameter("nucleus_mass_number");
+  hide_parameter("nucleus_excitation_energy");
+  hide_parameter("nucleus_floating_level");
+
+  define_parameter("spectral_distribution", &mod_class::energy_distribution_name_);
+
+  define_parameter("energy_min", &mod_class::energy_min_, unit::keV, "keV");
+  set_parameter_description("Minimum value of the energy distribution");
+  define_parameter("energy_max", &mod_class::energy_max_, unit::keV, "keV");
+  set_parameter_description("Maximum value of the energy distribution");
+  define_parameter("photon_index", &mod_class::photon_index_);
+  set_parameter_description("Power law index of the photon spectrum");
+  define_parameter("energy_mean", &mod_class::energy_mean_, unit::keV, "keV");
+  set_parameter_description("Mean energy of the Gaussian distribution");
+  define_parameter("energy_sigma", &mod_class::energy_sigma_, unit::keV, "keV");
+  set_parameter_description("Standard deviation of the Gaussian distribution");
+  define_parameter("radiation_temperature", &mod_class::kT_, unit::keV, "keV");
+  set_parameter_description("Radiation temperature in units of keV");
+  define_parameter("energy_array", &mod_class::spectrum_energy_, unit::keV, "keV");
+  set_parameter_description("Energy array of spectral histogram");
+  define_parameter("photons_array", &mod_class::spectrum_photons_);
+  set_parameter_description("Photons array of spectral histogram");
+
+  define_result("real_time", &mod_class::real_time_, unit::s, "s");
+
+  disable_default_energy_input();
+
+  return AS_OK;
+}
+
+ANLStatus BasicPrimaryGenerator::mod_pre_initialize()
+{
+  get_module("VANLGeometry", &geometry_);
+
+  if (particle_name_=="nucleus") {
+    expose_parameter("nucleus_atomic_number");
+    expose_parameter("nucleus_mass_number");
+    expose_parameter("nucleus_excitation_energy");
+    expose_parameter("nucleus_floating_level");
+  }
+
+  disable_default_energy_input();
+
+  if (energy_distribution_==SpectralShape::undefined) {
+    if (energy_distribution_name_=="user") {
+      energy_distribution_ = SpectralShape::user;
+    }
+    else if (energy_distribution_name_=="mono") {
+      energy_distribution_ = SpectralShape::mono;
+      enable_gaussian_input();
+    }
+    else if (energy_distribution_name_=="powerlaw") {
+      energy_distribution_ = SpectralShape::powerlaw;
+      enable_powerlaw_input();
+    }
+    else if (energy_distribution_name_=="gaussian") {
+      energy_distribution_ = SpectralShape::gaussian;
+      enable_gaussian_input();
+    }
+    else if (energy_distribution_name_=="blackbody") {
+      energy_distribution_ = SpectralShape::blackbody;
+      enable_blackbody_input();
+    }
+    else if (energy_distribution_name_=="histogram") {
+      energy_distribution_ = SpectralShape::histogram;
+      enable_histogram_input();
+    }
+    else if (energy_distribution_name_=="undefined") {
+      energy_distribution_ = SpectralShape::undefined;
+    }
+    else {
+      std::cout << "Invalid input to \"Energy distribution\": "
+                << energy_distribution_name_
+                << std::endl;
+      return AS_QUIT_ERROR;
+    }
+  }
+
+  return AS_OK;
+}
+
+ANLStatus BasicPrimaryGenerator::mod_initialize()
+{
+  if (energy_min_ == 0.0) {
+    energy_min_ = 1.0e-9 * unit::keV;
+    std::cout << "Energy min is reset to 1.0e-9 keV." << std::endl;
+  }
+
+  get_module_IFNC("InitialInformation", &initial_info_);
+
+  if (energy_distribution_ == SpectralShape::histogram) {
+    if (spectrum_energy_.size() != spectrum_photons_.size()+1) {
+      std::cout << "Spectral historam binning is invalid.\n"
+                << "Should be energy_array.size == photons_array.size+1."
+                << std::endl;
+      return AS_QUIT_ERROR;
+    }
+
+    build_spectrum_photon_integral();
+  }
+
+  return VANLPrimaryGenerator::mod_initialize();
+}
+
+ANLStatus BasicPrimaryGenerator::mod_begin_run()
+{
+  number_ = 0;
+  total_energy_ = 0.0;
+
+  if (particle_name_ == "") {
+    ;
+  }
+  if (particle_name_ == "nucleus") {
+    set_nucleus_definition(nucleus_atomic_number_,
+      nucleus_mass_number_,
+      nucleus_excitation_energy_,
+      nucleus_floating_level_);
+  }
+  else {
+    set_particle_definition_by_name(particle_name_);
+  }
+
+  return AS_OK;
+}
+
+const G4ParticleDefinition* BasicPrimaryGenerator::particle_definition() const
+{
+  return particle_definition_;
+}
+
+void BasicPrimaryGenerator::confirm_primary_setting(int event_id, const PrimarySetting& primary_info)
+{
+  store_initial_condition(event_id, primary_info);
+
+  std::lock_guard<std::mutex> lock(mutex_);
+  number_++;
+  total_energy_ += primary_info.energy;
+}
+
+void BasicPrimaryGenerator::store_initial_condition(int event_id, const PrimarySetting& primary_info)
+{
+  initial_info_->setInitialEnergy(event_id, primary_info.energy);
+  initial_info_->setInitialDirection(event_id, primary_info.direction);
+  initial_info_->setInitialTime(event_id, primary_info.time);
+  initial_info_->setInitialPosition(event_id, primary_info.position);
+  initial_info_->setInitialPolarization(event_id, primary_info.polarization);
+}
+
+void BasicPrimaryGenerator::set_particle_definition(G4ParticleDefinition* particle_definition)
+{
+  particle_definition_ = particle_definition;
+}
+
+void BasicPrimaryGenerator::set_particle_definition_by_name(const std::string& name)
+{
+  particle_definition_ = G4ParticleTable::GetParticleTable()->FindParticle(name);
+}
+
+void BasicPrimaryGenerator::set_nucleus_definition(int atomic_number,
+                                             int mass_number,
+                                             double excitation_energy,
+                                             int floating_level)
+{
+  G4IonTable* ionTable = static_cast<G4IonTable*>(G4ParticleTable::GetParticleTable()->GetIonTable());
+  G4ParticleDefinition* particle_base =
+    ionTable->GetIon(atomic_number,
+                     mass_number,
+                     excitation_energy,
+                     G4Ions::FloatLevelBase(floating_level));
+  G4Ions* particle = dynamic_cast<G4Ions*>(particle_base);
+  if (particle == nullptr) {
+    std::cout << "Error: the particle can not be converted into G4Ions." << std::endl;
+  }
+  set_particle_definition(particle);
+}
+
+void BasicPrimaryGenerator::enable_powerlaw_input()
+{
+  expose_parameter("photon_index");
+  expose_parameter("energy_min");
+  expose_parameter("energy_max");
+}
+
+void BasicPrimaryGenerator::enable_gaussian_input()
+{
+  expose_parameter("energy_mean");
+  expose_parameter("energy_sigma");
+}
+
+void BasicPrimaryGenerator::enable_blackbody_input()
+{
+  expose_parameter("radiation_temperature");
+  expose_parameter("energy_max");
+}
+
+void BasicPrimaryGenerator::enable_histogram_input()
+{
+  expose_parameter("energy_array");
+  expose_parameter("photons_array");
+}
+
+void BasicPrimaryGenerator::disable_default_energy_input()
+{
+  hide_parameter("energy_min");
+  hide_parameter("energy_max");
+  hide_parameter("photon_index");
+  hide_parameter("energy_mean");
+  hide_parameter("energy_sigma");
+  hide_parameter("radiation_temperature");
+  hide_parameter("energy_array");
+  hide_parameter("photons_array");
+}
+
+void BasicPrimaryGenerator::print_spectral_info() const
+{
+  switch (energy_distribution_) {
+  case SpectralShape::mono:
+    std::cout << "  Spectral shape: mono => "
+              << "Mean: " << energy_mean_/unit::keV  << " keV"
+              << std::endl;
+    break;
+  case SpectralShape::powerlaw:
+    std::cout << "  Spectral shape: powerlaw =>"
+              << " photon index = " << photon_index_
+              << " ( " << energy_min_/unit::keV  << " -- " << energy_max_/unit::keV  << " keV )"
+              << std::endl;
+    break;
+  case SpectralShape::gaussian:
+    std::cout << "  Spectral shape: gaussian =>"
+              << " mean: " << energy_mean_/unit::keV  << " keV ;"
+              << " sigma: " << energy_sigma_/unit::keV  << " keV"
+              << std::endl;
+    break;
+  case SpectralShape::blackbody:
+    std::cout << "  Spectral shape: blackbody => "
+              << " temperature: " << kT_/unit::keV  << " keV"
+              << " ( < " << energy_max_/unit::keV  << " keV )"
+              << std::endl;
+    break;
+  default:
+    break;
+  }
+}
+
+double BasicPrimaryGenerator::sample_energy() const
+{
+  switch (energy_distribution_) {
+    case SpectralShape::mono:
+      break;
+    case SpectralShape::powerlaw:
+      return sample_from_powerlaw();
+    case SpectralShape::gaussian:
+      return sample_from_gaussian();
+    case SpectralShape::blackbody:
+      return sample_from_blackbody();
+    case SpectralShape::histogram:
+      return sample_from_histogram();
+    default:
+      break;
+  }
+  return energy_mean_;
+}
+
+double BasicPrimaryGenerator::sample_from_powerlaw() const
+{
+  return sample_from_powerlaw(photon_index_, energy_min_, energy_max_);
+}
+
+double BasicPrimaryGenerator::sample_from_powerlaw(double gamma, double e0, double e1) const
+{
+  using std::pow;
+
+  double energy = 0.0;
+  if ( 0.999 < gamma && gamma < 1.001 ) {
+    // Photon index ~ 1
+    energy = e0 * pow(e1/e0, G4UniformRand());
+  }
+  else {
+    const double s = 1.0-gamma;
+    const double a0 = pow(e0, s);
+    const double a1 = pow(e1, s);
+    const double a = a0 + G4UniformRand()*(a1-a0);
+    energy = pow(a, 1./s);
+  }
+
+  return energy;
+}
+
+double BasicPrimaryGenerator::sample_from_gaussian() const
+{
+  return sample_from_gaussian(energy_mean_, energy_sigma_);
+}
+
+double BasicPrimaryGenerator::sample_from_gaussian(double mean, double sigma) const
+{
+  const double x = CLHEP::RandGauss::shoot(CLHEP::HepRandom::getTheEngine());
+  const double energy = mean + x * sigma;
+  return energy;
+}
+
+double BasicPrimaryGenerator::sample_from_blackbody() const
+{
+  return sample_from_blackbody(kT_, energy_max_/kT_);
+}
+
+double BasicPrimaryGenerator::sample_from_blackbody(double kT, double upper_limit_factor) const
+{
+  // sample from f(x) = x^2/(e^x-1)
+  using std::exp;
+
+  const double xmax = upper_limit_factor;
+  const double ymax = 0.65; // an upper bound of f(x)
+  double x=0.0, y=0.0, fx=0.0;
+  while (1) {
+    x = xmax * G4UniformRand();
+    y = ymax * G4UniformRand();
+    fx = x*x/(exp(x)-1.0);
+    if (y <= fx) break;
+  }
+  const double energy = kT * x;
+  return energy;
+}
+
+void BasicPrimaryGenerator::build_spectrum_photon_integral()
+{
+  const std::size_t num_bins = spectrum_photons_.size();
+  spectrum_photon_integral_.resize(spectrum_energy_.size());
+  spectrum_photon_integral_[0] = 0.0;
+  for (std::size_t i = 0; i < num_bins; i++) {
+    spectrum_photon_integral_[i+1]
+      = spectrum_photon_integral_[i] + spectrum_photons_[i];
+  }
+  const double norm = spectrum_photon_integral_.back();
+  for (auto& v: spectrum_photon_integral_) {
+    v /= norm;
+  }
+
+  std::cout << "Spectrum: (energy in keV, photon integral)\n";
+  for (std::size_t i=0; i < spectrum_energy_.size(); i++) {
+    std::cout << boost::format("%10.3E %8.3f")
+      % (spectrum_energy_[i]/unit::keV) % spectrum_photon_integral_[i] << '\n';
+  }
+  std::cout << std::endl;
+}
+
+double BasicPrimaryGenerator::sample_from_histogram() const
+{
+  const std::vector<double>& energies = spectrum_energy_;
+  const std::vector<double>& integrals = spectrum_photon_integral_;
+  const double r = G4UniformRand();
+  const std::vector<double>::const_iterator it
+    = std::upper_bound(std::begin(integrals), std::end(integrals), r);
+  const double r0 = *(it-1);
+  const double r1 = *it;
+  const std::vector<double>::const_iterator itEnergy
+    = std::begin(energies)+(it-std::begin(integrals));
+  const double energy0 = *(itEnergy-1);
+  const double energy1 = *itEnergy;
+  const double energy = energy0 + (energy1-energy0)*(r-r0)/(r1-r0);
+  return energy;
+}
+
+G4ThreeVector BasicPrimaryGenerator::unpolarized_vector(G4ThreeVector direction) const
+{
+  const double phi2 = CLHEP::twopi * G4UniformRand();
+  G4ThreeVector direction_orthogonal = direction.orthogonal().unit();
+  const G4ThreeVector polarization = direction_orthogonal.rotate(phi2, direction);
+  return polarization;
+}
+
+G4VUserPrimaryGeneratorAction* BasicPrimaryGenerator::create()
+{
+  BasicPrimaryGeneratorAction* primary_generator = new BasicPrimaryGeneratorAction;
+  primary_generator->RegisterSampler(this);
+  return primary_generator;
+}
+
+} /* namespace anlgeant4 */

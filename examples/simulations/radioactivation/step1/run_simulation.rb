@@ -18,7 +18,7 @@ def run_simulation(num, random, output)
   sim.set_gdml "../database/mass_model.gdml"
   sim.set_physics(physics_list: "QGSP_BIC_HP_RD")
 
-  sim.set_primary_generator :PlaneWavePrimaryGen, {
+  sim.set_primary_generator :PlaneWavePrimaryGenerator, {
     particle: "proton",
     photon_index: 0.0,
     energy_min: energy,
@@ -40,13 +40,6 @@ end
 ### Main
 
 num = 100000
-runs = (1..16).to_a
-
-a = ANL::ParallelRun.new
-a.num_processes = 4
-a.set_log "simulation_%06d.log"
-a.run(runs, testrun: true) do |run_id|
-  output = "simulation_%06d.root" % run_id
-  random = run_id
-  run_simulation(num, random, output)
-end
+output = "simulation.root"
+random = 12345
+run_simulation(num, random, output)

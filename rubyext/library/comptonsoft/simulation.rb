@@ -76,7 +76,7 @@ module ComptonSoft
     define_setup_module("pickup_data", array: true)
     define_setup_module("event_selection")
     define_setup_module("tree_output")
-    define_setup_module("visualization", :VisualizeG4Geom)
+    define_setup_module("visualization", :VisualizeGeometry)
     define_setup_module("fits_output")
 
     # Set database files
@@ -127,7 +127,7 @@ module ComptonSoft
     # @param [Bool] validate Validate the GDML file?
     def set_gdml(gdml_file, validate=false)
       set_geometry :ReadGDML
-      with(file: gdml_file, validate: validate)
+      with(filename: gdml_file, validate: validate)
     end
 
     def enable_timing_process(b=true)

@@ -130,21 +130,21 @@
 #endif
 #include "ExtractPhotoelectronTrajectory.hh"
 #ifdef USE_FITSIO
-#include "AHRayTracingPrimaryGen.hh"
+#include "AHRayTracingPrimaryGenerator.hh"
 #endif
-#include "ListPrimaryGen.hh"
+#include "ListPrimaryGenerator.hh"
 #ifdef USE_SIMX
-#include "SimXPrimaryGen.hh"
+#include "SimXPrimaryGenerator.hh"
 #endif
-#include "AHRadiationBackgroundPrimaryGen.hh"
+#include "AHRadiationBackgroundPrimaryGenerator.hh"
 #ifdef USE_FITSIO
-#include "AEObservationPrimaryGen.hh"
+#include "AEObservationPrimaryGenerator.hh"
 #endif
 #ifdef USE_FITSIO
-#include "CelestialSourcePrimaryGen.hh"
+#include "CelestialSourcePrimaryGenerator.hh"
 #endif
 #ifdef USE_HEALPIX
-#include "AllSkyPrimaryGen.hh"
+#include "AllSkyPrimaryGenerator.hh"
 #endif
 #include "RadioactiveDecayUserActionAssembly.hh"
 #include "ActivationUserActionAssembly.hh"
@@ -1035,64 +1035,64 @@ public:
 
 
 #ifdef USE_FITSIO
-class AHRayTracingPrimaryGen : public anlgeant4::BasicPrimaryGen
+class AHRayTracingPrimaryGenerator : public anlgeant4::BasicPrimaryGenerator
 {
 public:
-  AHRayTracingPrimaryGen();
+  AHRayTracingPrimaryGenerator();
 };
 
 #endif
 
-class ListPrimaryGen : public anlgeant4::BasicPrimaryGen
+class ListPrimaryGenerator : public anlgeant4::BasicPrimaryGenerator
 {
 public:
-  ListPrimaryGen();
+  ListPrimaryGenerator();
 };
 
 
 #ifdef USE_SIMX
-class SimXPrimaryGen : public anlgeant4::BasicPrimaryGen
+class SimXPrimaryGenerator : public anlgeant4::BasicPrimaryGenerator
 {
 public:
-  SimXPrimaryGen();
-  ~SimXPrimaryGen();
+  SimXPrimaryGenerator();
+  ~SimXPrimaryGenerator();
 };
 
 #endif
 
-class AHRadiationBackgroundPrimaryGen : public anlgeant4::IsotropicPrimaryGen
+class AHRadiationBackgroundPrimaryGenerator : public anlgeant4::IsotropicPrimaryGenerator
 {
 public:
-  AHRadiationBackgroundPrimaryGen();
-  ~AHRadiationBackgroundPrimaryGen();
+  AHRadiationBackgroundPrimaryGenerator();
+  ~AHRadiationBackgroundPrimaryGenerator();
 };
 
 
 #ifdef USE_FITSIO
-class AEObservationPrimaryGen : public anlgeant4::BasicPrimaryGen
+class AEObservationPrimaryGenerator : public anlgeant4::BasicPrimaryGenerator
 {
 public:
-  AEObservationPrimaryGen();
+  AEObservationPrimaryGenerator();
 };
 
 #endif
 
 #ifdef USE_FITSIO
-class CelestialSourcePrimaryGen : public anlgeant4::IsotropicPrimaryGen
+class CelestialSourcePrimaryGenerator : public anlgeant4::IsotropicPrimaryGenerator
 {
 public:
-  CelestialSourcePrimaryGen();
-  ~CelestialSourcePrimaryGen();
+  CelestialSourcePrimaryGenerator();
+  ~CelestialSourcePrimaryGenerator();
 };
 
 #endif
 
 #ifdef USE_HEALPIX
-class AllSkyPrimaryGen : public anlgeant4::IsotropicPrimaryGen
+class AllSkyPrimaryGenerator : public anlgeant4::IsotropicPrimaryGenerator
 {
 public:
-  AllSkyPrimaryGen();
-  ~AllSkyPrimaryGen();
+  AllSkyPrimaryGenerator();
+  ~AllSkyPrimaryGenerator();
 };
 
 #endif

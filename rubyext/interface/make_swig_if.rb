@@ -113,13 +113,13 @@ clMod = [
 
 clSim = [
   # primary generator
-  ANL::SWIGClass.new("AHRayTracingPrimaryGen", false, 'USE_FITSIO'),
-  ANL::SWIGClass.new("ListPrimaryGen"),
-  ANL::SWIGClass.new("SimXPrimaryGen", false, 'USE_SIMX'),
-  ANL::SWIGClass.new("AHRadiationBackgroundPrimaryGen"),
-  ANL::SWIGClass.new("AEObservationPrimaryGen", false, 'USE_FITSIO'),
-  ANL::SWIGClass.new("CelestialSourcePrimaryGen", false, 'USE_FITSIO'),
-  ANL::SWIGClass.new("AllSkyPrimaryGen", false, 'USE_HEALPIX'),
+  ANL::SWIGClass.new("AHRayTracingPrimaryGenerator", false, 'USE_FITSIO'),
+  ANL::SWIGClass.new("ListPrimaryGenerator"),
+  ANL::SWIGClass.new("SimXPrimaryGenerator", false, 'USE_SIMX'),
+  ANL::SWIGClass.new("AHRadiationBackgroundPrimaryGenerator"),
+  ANL::SWIGClass.new("AEObservationPrimaryGenerator", false, 'USE_FITSIO'),
+  ANL::SWIGClass.new("CelestialSourcePrimaryGenerator", false, 'USE_FITSIO'),
+  ANL::SWIGClass.new("AllSkyPrimaryGenerator", false, 'USE_HEALPIX'),
   # user action assembly
   ANL::SWIGClass.new("RadioactiveDecayUserActionAssembly"),
   ANL::SWIGClass.new("ActivationUserActionAssembly"),

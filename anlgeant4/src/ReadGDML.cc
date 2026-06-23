@@ -26,21 +26,21 @@ namespace anlgeant4
 {
 
 ReadGDML::ReadGDML()
-  : m_GeometryFileName("detector.gdml"), m_Validate(true)
+  : filename_("detector.gdml"), validate_(true)
 {
 }
 
 ANLStatus ReadGDML::mod_define()
 {
-  register_parameter(&m_GeometryFileName, "file");
-  register_parameter(&m_Validate, "validate");
+  define_parameter("filename", &mod_class::filename_);
+  define_parameter("validate", &mod_class::validate_);
 
   return AS_OK;
 }
 
 G4VUserDetectorConstruction* ReadGDML::create()
 {
-  VDetectorConstructionWithSDVector* udc = new GDMLDetectorConstruction(m_GeometryFileName, m_Validate);
+  VDetectorConstruction* udc = new GDMLDetectorConstruction(filename_, validate_);
   udc->setSDs(getSDs());
   return udc;
 }

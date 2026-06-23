@@ -10,7 +10,7 @@ def run_simulation(num)
   sim.num_threads = 1
   sim.random_seed = 0
   sim.set_gdml "database/mass_model.gdml"
-  sim.set_primary_generator :GaussianBeamPrimaryGen, {
+  sim.set_primary_generator :GaussianBeamPrimaryGenerator, {
     particle: "gamma",
     spectral_distribution: "mono",
     energy_mean: energy,

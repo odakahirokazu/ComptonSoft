@@ -32,8 +32,9 @@
 #include "ActionInitialization.hh"
 #include "VANLGeometry.hh"
 #include "VANLPhysicsList.hh"
-#include "VANLPrimaryGen.hh"
+#include "VANLPrimaryGenerator.hh"
 #include "VUserActionAssembly.hh"
+#include "anlnext/ANLStatus.hh"
 
 using namespace anlnext;
 
@@ -72,7 +73,9 @@ ANLStatus Geant4Body::mod_define()
 
 ANLStatus Geant4Body::mod_pre_initialize()
 {
-  initialize_random_generator();
+  const bool random_init_success = initialize_random_generator();
+  if (!random_init_success) { return AS_CRITICAL_ERROR_TO_FINALIZE; }
+
   run_manager_.reset(G4RunManagerFactory::CreateRunManager(G4RunManagerType::Default));
   action_initialization_ = new ActionInitialization;
 
@@ -96,7 +99,7 @@ ANLStatus Geant4Body::mod_initialize()
   return AS_OK;
 }
 
-void Geant4Body::initialize_random_generator()
+bool Geant4Body::initialize_random_generator()
 {
   if (random_engine_ == "MixMaxRng") {
     random_engine_ptr_.reset(new CLHEP::MixMaxRng);
@@ -109,6 +112,10 @@ void Geant4Body::initialize_random_generator()
   }
   else if (random_engine_ == "HepJamesRandom") {
     random_engine_ptr_.reset(new CLHEP::HepJamesRandom);
+  }
+  else {
+    std::cout << "Geant4Body Error: unknown random engine : " << random_engine_ << std::endl;
+    return false;
   }
 
   CLHEP::HepRandom::setTheEngine(random_engine_ptr_.get());
@@ -130,6 +137,8 @@ void Geant4Body::initialize_random_generator()
     std::cout << "  Random seed 0 was input ===> set the current time\n";
   }
   std::cout << std::endl;
+
+  return true;
 }
 
 void Geant4Body::set_user_initializations()
@@ -147,14 +156,14 @@ void Geant4Body::set_user_initializations()
   run_manager_->SetUserInitialization(action_initialization_);
 }
 
-void Geant4Body::register_user_action(VANLPrimaryGen* primary_gen)
+void Geant4Body::register_user_action(VANLPrimaryGenerator* primary_generator)
 {
-  action_initialization_->registerUserAction(primary_gen);
+  action_initialization_->register_user_action(primary_generator);
 }
 
 void Geant4Body::register_user_action(VUserActionAssembly* uaa)
 {
-  action_initialization_->registerUserAction(uaa);
+  action_initialization_->register_user_action(uaa);
 }
 
 void Geant4Body::apply_commands()

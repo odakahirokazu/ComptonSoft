@@ -32,7 +32,7 @@ class G4ParticleGun;
 
 namespace anlgeant4 {
 
-class BasicPrimaryGen;
+class BasicPrimaryGenerator;
 
 /**
  * Primary generator action
@@ -50,7 +50,7 @@ public:
 
   void GeneratePrimaries(G4Event* event) override;
 
-  void RegisterSampler(anlgeant4::BasicPrimaryGen* sampler) { sampler_ = sampler; }
+  void RegisterSampler(anlgeant4::BasicPrimaryGenerator* sampler) { sampler_ = sampler; }
 
 protected:
   void SetDefinition(G4ParticleDefinition* definition);
@@ -58,7 +58,7 @@ protected:
 
 private:
   std::unique_ptr<G4ParticleGun> particle_gun_;
-  anlgeant4::BasicPrimaryGen* sampler_ = nullptr;
+  anlgeant4::BasicPrimaryGenerator* sampler_ = nullptr;
 };
 
 } /* namespace anlgeant4 */
