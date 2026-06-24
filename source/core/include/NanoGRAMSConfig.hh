@@ -64,7 +64,8 @@ struct Config
   double timebin_ns_override = 0.0;
   double cross_fec_merge_drift_time_tolerance = -1.0 * anlgeant4::unit::us;
 
-  std::vector<int> light_channels = {4, 6, 5, 7};
+  std::vector<int> general_analysis_channels = {4, 6, 5, 7};
+  std::vector<int> pileup_analysis_channels  = {4};
   std::string light_waveform_analysis = "average";
   LightEventSelectionMode light_event_selection_mode = LightEventSelectionMode::GammaRequired;
   bool use_light_for_event_selection = true;

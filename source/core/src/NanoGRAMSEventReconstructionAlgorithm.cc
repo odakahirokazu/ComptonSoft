@@ -62,6 +62,12 @@ void printEnergyCorrectionFactors(const std::array<double, NUM_VATA>& factors)
   std::cout << " ]" << std::endl;
 }
 
+void printRequiredMinimumEnergyDepositInHigherHit(double threshold)
+{
+  std::cout << "required_minimum_energy_deposit_in_higher_hit: "
+            << threshold / unit::keV << " keV" << std::endl;
+}
+
 std::array<double, NUM_VATA>
 readEnergyCorrectionFactors(boost::property_tree::ptree& pt)
 {
@@ -136,6 +142,9 @@ bool NanoGRAMSEventReconstructionAlgorithm::loadParameters(boost::property_tree:
 {
     incident_energy_candidates_.clear();
     energy_correction_factors_ = readEnergyCorrectionFactors(pt);
+    required_minimum_energy_deposit_in_higher_hit_ =
+        pt.get<double>("required_minimum_energy_deposit_in_higher_hit", 0.0) *
+        unit::keV;
 
     for (const auto& item : pt.get_child("incident_energy_candidates")) {
         incident_energy_candidates_.push_back(item.second.get_value<double>() * unit::keV);
@@ -146,6 +155,8 @@ bool NanoGRAMSEventReconstructionAlgorithm::loadParameters(boost::property_tree:
         std::cout << e / unit::keV << " keV" << std::endl;
     }
     printEnergyCorrectionFactors(energy_correction_factors_);
+    printRequiredMinimumEnergyDepositInHigherHit(
+        required_minimum_energy_deposit_in_higher_hit_);
     std::cout << std::endl;;
 
     return true;
@@ -156,6 +167,12 @@ bool NanoGRAMSEventReconstructionAlgorithm::loadParametersYAML(YAML::Node& node)
 {
     incident_energy_candidates_.clear();
     energy_correction_factors_ = readEnergyCorrectionFactors(node);
+    required_minimum_energy_deposit_in_higher_hit_ = 0.0 * unit::keV;
+    if (node["required_minimum_energy_deposit_in_higher_hit"]) {
+      required_minimum_energy_deposit_in_higher_hit_ =
+          node["required_minimum_energy_deposit_in_higher_hit"].as<double>() *
+          unit::keV;
+    }
 
     std::vector<double> energy_values = node["incident_energy_candidates"].as<std::vector<double>>();
 
@@ -168,6 +185,8 @@ bool NanoGRAMSEventReconstructionAlgorithm::loadParametersYAML(YAML::Node& node)
         std::cout << e / unit::keV << " keV" << std::endl;
     }
     printEnergyCorrectionFactors(energy_correction_factors_);
+    printRequiredMinimumEnergyDepositInHigherHit(
+        required_minimum_energy_deposit_in_higher_hit_);
     std::cout << std::endl;;
 
     return true;
@@ -259,6 +278,10 @@ reconstructOrderedHits(const std::vector<DetectorHit_sptr>& ordered_hits,
                        BasicComptonEvent& eventReconstructed,
                        double incident_energy)
 {
+  if (!hasRequiredHigherHitEnergy(ordered_hits)) {
+    return false;
+  }
+
   bool result_kinematics = isSatisfyKinematics(ordered_hits, incident_energy);
   if(!result_kinematics){
       return false;
@@ -306,6 +329,21 @@ double NanoGRAMSEventReconstructionAlgorithm::energyCorrectionFactor(
     throw std::runtime_error("NanoGRAMS hit has an invalid readout FEC ID.");
   }
   return energy_correction_factors_[fec];
+}
+
+bool NanoGRAMSEventReconstructionAlgorithm::hasRequiredHigherHitEnergy(
+    const std::vector<DetectorHit_sptr>& ordered_hits) const
+{
+  if (required_minimum_energy_deposit_in_higher_hit_ <= 0.0) {
+    return true;
+  }
+  if (ordered_hits.size() < 2) {
+    return false;
+  }
+
+  const double higher_hit_energy =
+      std::max(ordered_hits[0]->Energy(), ordered_hits[1]->Energy());
+  return higher_hit_energy > required_minimum_energy_deposit_in_higher_hit_;
 }
 
 bool NanoGRAMSEventReconstructionAlgorithm::isSatisfyKinematics(const std::vector<DetectorHit_sptr>& ordered_hits, double incident_energy)

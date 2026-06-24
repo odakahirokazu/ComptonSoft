@@ -226,15 +226,11 @@ std::array<double, NUM_VATA> interpolateTestPulseGains(
         gains[fec] = (1.0 - weight_after) * before->fec_gain[fec] +
                      weight_after * after->fec_gain[fec];
       }
-    } else if (before) {
-      gains[fec] = before->fec_gain[fec];
-    } else if (after) {
-      gains[fec] = after->fec_gain[fec];
     }
 
-    if (!std::isfinite(gains[fec]) || gains[fec] <= 0.0) {
+    if (std::isfinite(gains[fec]) && gains[fec] <= 0.0) {
       throw std::runtime_error(
-          std::format("No valid test-pulse gain for FEC{}.", fec));
+          std::format("Test-pulse gain must be positive for FEC{}.", fec));
     }
   }
 

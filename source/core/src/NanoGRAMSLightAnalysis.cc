@@ -23,6 +23,7 @@
 #include <cstdint>
 #include <limits>
 #include <stdexcept>
+#include <string>
 #include <vector>
 
 namespace comptonsoft
@@ -40,7 +41,7 @@ struct LightPeaks
   double post_roi_peak = -std::numeric_limits<double>::infinity() * unit::volt;
 };
 
-std::vector<int> collectValidLightChannels(const Config& cfg,
+std::vector<int> collectValidLightChannels(const std::vector<int>& requested_channels,
                                            const TPCTreeBuffer& tpc_tree_buffer,
                                            bool light_ok)
 {
@@ -51,7 +52,7 @@ std::vector<int> collectValidLightChannels(const Config& cfg,
     return valid_channels;
   }
 
-  for (const int light_ch : cfg.light_channels) {
+  for (const int light_ch : requested_channels) {
     if (light_ch < 0 || light_ch >= tpc_tree_layout.num_dpp_registered_slots) {
       continue;
     }
@@ -63,11 +64,27 @@ std::vector<int> collectValidLightChannels(const Config& cfg,
   return valid_channels;
 }
 
-void requireSameWaveCompressForAverage(const TPCTreeBuffer& tpc_tree_buffer,
-                                       const std::vector<int>& valid_channels)
+bool containsChannel(const std::vector<int>& channels, int channel)
+{
+  return std::find(channels.begin(), channels.end(), channel) != channels.end();
+}
+
+bool hasSharedChannel(const std::vector<int>& lhs, const std::vector<int>& rhs)
+{
+  for (const int ch : lhs) {
+    if (containsChannel(rhs, ch)) {
+      return true;
+    }
+  }
+  return false;
+}
+
+uint16_t requireSameWaveCompressForAverage(const TPCTreeBuffer& tpc_tree_buffer,
+                                           const std::vector<int>& valid_channels,
+                                           const std::string& group_name)
 {
   if (valid_channels.empty()) {
-    return;
+    return 0;
   }
 
   const uint16_t reference_wave_compress =
@@ -76,8 +93,41 @@ void requireSameWaveCompressForAverage(const TPCTreeBuffer& tpc_tree_buffer,
     if (tpc_tree_buffer.wave_compress[light_ch] != reference_wave_compress) {
       throw std::runtime_error(
           "light.waveform_analysis=average requires the same wave_compress "
-          "for all enabled light_channels.");
+          "inside light." + group_name + ".");
     }
+  }
+  return reference_wave_compress;
+}
+
+void validateAverageAnalysisGroups(const TPCTreeBuffer& tpc_tree_buffer,
+                                   const std::vector<int>& general_channels,
+                                   const std::vector<int>& pileup_channels)
+{
+  const bool has_general_channels = !general_channels.empty();
+  const bool has_pileup_channels = !pileup_channels.empty();
+
+  uint16_t general_wave_compress = 0;
+  uint16_t pileup_wave_compress = 0;
+  if (has_general_channels) {
+    general_wave_compress =
+        requireSameWaveCompressForAverage(tpc_tree_buffer,
+                                          general_channels,
+                                          "general_analysis_channels");
+  }
+  if (has_pileup_channels) {
+    pileup_wave_compress =
+        requireSameWaveCompressForAverage(tpc_tree_buffer,
+                                          pileup_channels,
+                                          "pileup_analysis_channels");
+  }
+
+  if (has_general_channels && has_pileup_channels &&
+      hasSharedChannel(general_channels, pileup_channels) &&
+      general_wave_compress != pileup_wave_compress) {
+    throw std::runtime_error(
+        "light.general_analysis_channels and light.pileup_analysis_channels "
+        "share at least one channel, so their common wave_compress values "
+        "must match in average mode.");
   }
 }
 
@@ -111,16 +161,22 @@ void updateLightPeaksByIndex(LightPeaks& peaks,
   }
 }
 
-void updateLightStatusFromPeaks(LightStatus& status,
-                                const Config& cfg,
-                                const LightPeaks& peaks)
+void updateGeneralLightStatusFromPeaks(LightStatus& status,
+                                       const Config& cfg,
+                                       const LightPeaks& peaks)
 {
   status.cosmic = status.cosmic || (peaks.peak > cfg.light_cosmic_thr);
+  status.gamma = status.gamma || (peaks.peak > cfg.light_gamma_thr);
+}
+
+void updatePileupLightStatusFromPeaks(LightStatus& status,
+                                      const Config& cfg,
+                                      const LightPeaks& peaks)
+{
   status.pileup_pre_roi =
       status.pileup_pre_roi || (peaks.pre_roi_peak > cfg.out_roi_peak_thr);
   status.pileup_post_roi =
       status.pileup_post_roi || (peaks.post_roi_peak > cfg.out_roi_peak_thr);
-  status.gamma = status.gamma || (peaks.peak > cfg.light_gamma_thr);
 }
 
 LightPeaks analyzeSingleLightChannel(const Config& cfg,
@@ -148,8 +204,6 @@ LightPeaks analyzeAverageLightWaveform(const Config& cfg,
                                        const LightTimingState& light_timing,
                                        const std::vector<int>& valid_channels)
 {
-  requireSameWaveCompressForAverage(tpc_tree_buffer, valid_channels);
-
   LightPeaks peaks;
   if (valid_channels.empty()) {
     return peaks;
@@ -174,6 +228,52 @@ LightPeaks analyzeAverageLightWaveform(const Config& cfg,
   return peaks;
 }
 
+void mergeLightPeaks(LightPeaks& merged_peaks, const LightPeaks& peaks)
+{
+  merged_peaks.peak = std::max(merged_peaks.peak, peaks.peak);
+  merged_peaks.pre_roi_peak =
+      std::max(merged_peaks.pre_roi_peak, peaks.pre_roi_peak);
+  merged_peaks.post_roi_peak =
+      std::max(merged_peaks.post_roi_peak, peaks.post_roi_peak);
+}
+
+LightPeaks analyzeEachLightChannel(const Config& cfg,
+                                   const TPCTreeBuffer& tpc_tree_buffer,
+                                   const LightTimingState& light_timing,
+                                   const std::vector<int>& valid_channels)
+{
+  LightPeaks merged_peaks;
+  for (const int light_ch : valid_channels) {
+    mergeLightPeaks(
+        merged_peaks,
+        analyzeSingleLightChannel(cfg, tpc_tree_buffer, light_timing, light_ch));
+  }
+  return merged_peaks;
+}
+
+LightPeaks analyzeLightChannelGroup(const Config& cfg,
+                                    const TPCTreeBuffer& tpc_tree_buffer,
+                                    const LightTimingState& light_timing,
+                                    const std::vector<int>& valid_channels)
+{
+  if (cfg.light_waveform_analysis == "average") {
+    return analyzeAverageLightWaveform(cfg,
+                                       tpc_tree_buffer,
+                                       light_timing,
+                                       valid_channels);
+  }
+
+  if (cfg.light_waveform_analysis == "each_channel") {
+    return analyzeEachLightChannel(cfg,
+                                   tpc_tree_buffer,
+                                   light_timing,
+                                   valid_channels);
+  }
+
+  throw std::runtime_error("Unknown light waveform analysis mode: " +
+                           cfg.light_waveform_analysis);
+}
+
 } // namespace
 
 std::string normalizeLightWaveformAnalysis(const std::string& mode)
@@ -181,11 +281,11 @@ std::string normalizeLightWaveformAnalysis(const std::string& mode)
   if (mode == "average" || mode == "mean") {
     return "average";
   }
-  if (mode == "each_channel" || mode == "per_channel") {
+  if (mode == "channel" || mode == "each_channel" || mode == "per_channel") {
     return "each_channel";
   }
   throw std::runtime_error(
-      "light.waveform_analysis must be average, mean, each_channel, or per_channel.");
+      "light.waveform_analysis must be average, mean, channel, each_channel, or per_channel.");
 }
 
 LightStatus analyzeLightEvent(const Config& cfg,
@@ -194,33 +294,49 @@ LightStatus analyzeLightEvent(const Config& cfg,
                               bool light_ok)
 {
   LightStatus status;
-  const std::vector<int> valid_channels =
-      collectValidLightChannels(cfg, tpc_tree_buffer, light_ok);
-  if (valid_channels.empty()) {
+  const std::vector<int> valid_general_channels =
+      collectValidLightChannels(cfg.general_analysis_channels,
+                                tpc_tree_buffer,
+                                light_ok);
+  const std::vector<int> valid_pileup_channels =
+      collectValidLightChannels(cfg.pileup_analysis_channels,
+                                tpc_tree_buffer,
+                                light_ok);
+
+  status.general_valid = !valid_general_channels.empty();
+  status.pileup_valid = !valid_pileup_channels.empty();
+  status.valid_any = status.general_valid || status.pileup_valid;
+  if (!status.valid_any) {
     return status;
   }
-  status.valid_any = true;
 
   if (cfg.light_waveform_analysis == "average") {
-    updateLightStatusFromPeaks(
+    validateAverageAnalysisGroups(tpc_tree_buffer,
+                                  valid_general_channels,
+                                  valid_pileup_channels);
+  }
+
+  if (status.general_valid) {
+    updateGeneralLightStatusFromPeaks(
         status,
         cfg,
-        analyzeAverageLightWaveform(cfg, tpc_tree_buffer, light_timing, valid_channels));
-    return status;
+        analyzeLightChannelGroup(cfg,
+                                 tpc_tree_buffer,
+                                 light_timing,
+                                 valid_general_channels));
   }
 
-  if (cfg.light_waveform_analysis == "each_channel") {
-    for (const int light_ch : valid_channels) {
-      updateLightStatusFromPeaks(
-          status,
-          cfg,
-          analyzeSingleLightChannel(cfg, tpc_tree_buffer, light_timing, light_ch));
-    }
-    return status;
+  if (status.pileup_valid) {
+    updatePileupLightStatusFromPeaks(
+        status,
+        cfg,
+        analyzeLightChannelGroup(cfg,
+                                 tpc_tree_buffer,
+                                 light_timing,
+                                 valid_pileup_channels));
   }
 
-  throw std::runtime_error("Unknown light waveform analysis mode: " +
-                           cfg.light_waveform_analysis);
+  return status;
 }
 
 } /* namespace grams */

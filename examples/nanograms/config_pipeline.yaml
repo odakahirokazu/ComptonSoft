@@ -4,7 +4,8 @@ general:
 light: 
     event_selection_mode: veto_only
     waveform_analysis: average
-    light_channels: [4, 6, 5, 7]
+    general_analysis_channels: [4, 6, 5, 7]
+    pileup_analysis_channels: [4]
     light_gamma_thr_mV: 20.0
     light_cosmic_thr_mV: 250.0
     delay_counts: 60

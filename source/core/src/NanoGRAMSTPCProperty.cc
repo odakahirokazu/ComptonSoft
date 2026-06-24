@@ -26,6 +26,7 @@
 #include <cmath>
 #include <format>
 #include <hdf5.h>
+#include <limits>
 #include <stdexcept>
 #include <string>
 #include <vector>
@@ -172,8 +173,13 @@ void TPCProperty::applyTemperatureCorrection(
 {
   for (int fec = 0; fec < NUM_VATA; ++fec) {
     const double measured = tp_adc_values[fec];
+    if (!std::isfinite(measured)) {
+      temperature_correction_factors_[fec] =
+          std::numeric_limits<double>::quiet_NaN();
+      continue;
+    }
     if (measured <= 0.0) {
-      throw std::runtime_error("tp_adc_values must be positive for all FECs.");
+      throw std::runtime_error("Provided tp_adc_values must be positive.");
     }
 
     const GainParamArray& params = gain_matrices_ccal_to_adc_[fec][tp_channel];

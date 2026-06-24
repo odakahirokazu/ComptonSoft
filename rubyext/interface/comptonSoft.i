@@ -38,6 +38,7 @@
 #include "FilterByGoodTimeIntervals.hh"
 #include "WriteHitTree.hh"
 #include "ReadHitTree.hh"
+#include "MergeHitTree.hh"
 #include "ReadHitTreeAsRawHits.hh"
 #include "ReadHitTreeAsDetectorHits.hh"
 #include "WriteEventTree.hh"
@@ -503,6 +504,14 @@ class WriteHitTree : public VCSModule
 public:
   WriteHitTree();
   ~WriteHitTree() = default;
+};
+
+
+class MergeHitTree : public VCSModule
+{
+public:
+  MergeHitTree() = default;
+  ~MergeHitTree() = default;
 };
 
 

@@ -17,49 +17,37 @@
  *                                                                       *
  *************************************************************************/
 
-/**
- * @file NanoGRAMSLightAnalysis.hh
- * @brief Light waveform analysis helpers for NanoGRAMS data reduction.
- * @author Satoshi Takashima
- * @date 2026-06-11
- */
+#ifndef COMPTONSOFT_MergeHitTree_H
+#define COMPTONSOFT_MergeHitTree_H 1
 
-#ifndef COMPTONSOFT_NanoGRAMSLightAnalysis_H
-#define COMPTONSOFT_NanoGRAMSLightAnalysis_H 1
+#include "VCSModule.hh"
 
+#include <cstdint>
 #include <string>
+#include <vector>
 
-#include "NanoGRAMSTPCDataProcessor.hh"
+namespace comptonsoft {
 
-namespace comptonsoft
+class MergeHitTree : public VCSModule
 {
-namespace grams
-{
+  DEFINE_ANL_MODULE(MergeHitTree, 1.0);
+public:
+  MergeHitTree() = default;
+  ~MergeHitTree() = default;
 
-struct LightStatus
-{
-  bool valid_any = false;
-  bool general_valid = false;
-  bool pileup_valid = false;
-  bool gamma = false;
-  bool cosmic = false;
-  bool pileup_pre_roi = false;
-  bool pileup_post_roi = false;
+  anlnext::ANLStatus mod_define() override;
+  anlnext::ANLStatus mod_initialize() override;
+  anlnext::ANLStatus mod_analyze() override;
 
-  bool hasPileup() const
-  {
-    return pileup_pre_roi || pileup_post_roi;
-  }
+private:
+  void mergeHitTrees() const;
+
+private:
+  std::vector<std::string> hittree_files_;
+  std::string output_;
+  bool overwrite_ = true;
 };
 
-std::string normalizeLightWaveformAnalysis(const std::string& mode);
-
-LightStatus analyzeLightEvent(const Config& cfg,
-                              const TPCTreeBuffer& tpc_tree_buffer,
-                              const LightTimingState& light_timing,
-                              bool light_ok);
-
-} /* namespace grams */
 } /* namespace comptonsoft */
 
-#endif /* COMPTONSOFT_NanoGRAMSLightAnalysis_H */
+#endif /* COMPTONSOFT_MergeHitTree_H */

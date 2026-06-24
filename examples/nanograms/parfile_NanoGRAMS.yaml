@@ -1,2 +1,3 @@
 incident_energy_candidates: [1173.2, 1332.5]
 energy_correction_factor: [1.0, 1.0, 1.0, 1.0]
+required_minimum_energy_deposit_in_higher_hit: 0.0

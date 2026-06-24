@@ -77,6 +77,7 @@ protected:
 private:
   void setTotalEnergyDepositsAndNumHits(const std::vector<DetectorHit_sptr>& hits);
   bool isSatisfyKinematics(const std::vector<DetectorHit_sptr>& ordered_hits, double incident_energy);
+  bool hasRequiredHigherHitEnergy(const std::vector<DetectorHit_sptr>& ordered_hits) const;
   std::vector<DetectorHit_sptr> correctedHits(const std::vector<DetectorHit_sptr>& hits) const;
   double energyCorrectionFactor(const DetectorHit_sptr& hit) const;
 
@@ -85,6 +86,7 @@ private:
   double num_hits_;
   std::array<double, NUM_VATA> energy_correction_factors_{};
   std::vector<double> incident_energy_candidates_;
+  double required_minimum_energy_deposit_in_higher_hit_ = 0.0 * anlgeant4::unit::keV;
   bool is_escape_event_ = false;
 
   bool selecting_most_likely_order_ = true;

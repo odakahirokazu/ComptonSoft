@@ -37,6 +37,7 @@ class SelectTime;
 class FilterByGoodTimeIntervals;
 class WriteHitTree;
 class ReadHitTree;
+class MergeHitTree;
 class ReadHitTreeAsRawHits;
 class ReadHitTreeAsDetectorHits;
 class WriteEventTree;

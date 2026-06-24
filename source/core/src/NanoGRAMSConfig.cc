@@ -76,6 +76,34 @@ std::string lightEventSelectionModeName(LightEventSelectionMode mode)
   return "unknown";
 }
 
+std::vector<int> readDPPChannelList(const YAML::Node& node,
+                                    const std::string& key)
+{
+  const std::vector<int> channels = node.as<std::vector<int>>();
+  for (const int ch : channels) {
+    if (ch < 0 || ch >= NUM_CH_DPP_MAX) {
+      throw std::runtime_error(key + " contains a DPP channel outside 0-7.");
+    }
+  }
+  return channels;
+}
+
+void printDPPChannelList(const std::string& label,
+                         const std::vector<int>& channels)
+{
+  std::cout << label << ": [ ";
+  bool first_channel = true;
+  for (const int ch : channels) {
+    if (first_channel) {
+      std::cout << ch;
+      first_channel = false;
+    } else {
+      std::cout << ", " << ch;
+    }
+  }
+  std::cout << " ]" << std::endl;
+}
+
 void appendCoreExcludePixel(std::vector<int>& pixels, const YAML::Node& node)
 {
   const int pix = node.as<int>();
@@ -165,7 +193,12 @@ void readLightConfig(Config& cfg, const YAML::Node& node)
   cfg.pre_roi_window   = nodeLight["pre_roi_window_us"].as<double>() * unit::us;
   cfg.post_roi_window  = nodeLight["post_roi_window_us"].as<double>() * unit::us;
   cfg.out_roi_peak_thr = nodeLight["out_roi_peak_thr_mV"].as<double>() * (unit::volt/1000.0);
-  cfg.light_channels   = nodeLight["light_channels"].as<std::vector<int>>();
+  cfg.general_analysis_channels =
+      readDPPChannelList(nodeLight["general_analysis_channels"],
+                         "light.general_analysis_channels");
+  cfg.pileup_analysis_channels =
+      readDPPChannelList(nodeLight["pileup_analysis_channels"],
+                         "light.pileup_analysis_channels");
   if (nodeLight["waveform_analysis"]) {
     cfg.light_waveform_analysis = normalizeLightWaveformAnalysis(
         nodeLight["waveform_analysis"].as<std::string>());
@@ -201,18 +234,10 @@ void readLightConfig(Config& cfg, const YAML::Node& node)
             << lightEventSelectionModeName(cfg.light_event_selection_mode) << std::endl;
   std::cout << "use_for_event_selection: "
             << cfg.use_light_for_event_selection << std::endl;
-
-  std::cout << "light_channels: [ ";
-  bool first_light_channel = true;
-  for (const int light_ch : cfg.light_channels) {
-    if (first_light_channel) {
-      std::cout << light_ch;
-      first_light_channel = false;
-    } else {
-      std::cout << ", " << light_ch;
-    }
-  }
-  std::cout << " ]" << std::endl;
+  printDPPChannelList("general_analysis_channels",
+                      cfg.general_analysis_channels);
+  printDPPChannelList("pileup_analysis_channels",
+                      cfg.pileup_analysis_channels);
 }
 
 void readChargeConfig(Config& cfg, const YAML::Node& node)

@@ -103,6 +103,7 @@ set(CS_MODULES
   ### analysis ROOT trees & histograms
   src/WriteHitTree.cc
   src/ReadHitTree.cc
+  src/MergeHitTree.cc
   src/ReadHitTreeAsRawHits.cc
   src/ReadHitTreeAsDetectorHits.cc
   src/WriteEventTree.cc

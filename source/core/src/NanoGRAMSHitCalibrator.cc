@@ -21,6 +21,7 @@
 
 #include <algorithm>
 #include <array>
+#include <cmath>
 #include <limits>
 #include <memory>
 #include <stdexcept>
@@ -160,6 +161,7 @@ std::vector<DetectorHit_sptr> buildCalibratedHits(
     double posz           = 0.0 * unit::cm;
     std::size_t max_index = 0;
     double max_energy     = -std::numeric_limits<double>::infinity() * unit::keV;
+    bool skip_hit         = false;
 
     std::vector<double> energies(n, 0.0);
     std::vector<int> channel_fecs(n, raw_hit.fec);
@@ -176,9 +178,15 @@ std::vector<DetectorHit_sptr> buildCalibratedHits(
         throw std::runtime_error("Channel index out of range in NanoGRAMS calibration.");
       }
 
-      const double corrected_adu =
-          static_cast<double>(raw_hit.adus[i]) *
+      const double correction_factor =
           tpc_property.temperatureCorrectionFactor(fec);
+      if (!std::isfinite(correction_factor)) {
+        skip_hit = true;
+        break;
+      }
+
+      const double corrected_adu =
+          static_cast<double>(raw_hit.adus[i]) * correction_factor;
       const double energy =
           tpc_property.convertADC2keVWithSpline3D(fec, ch, corrected_adu);
       energies[i]   = energy;
@@ -189,6 +197,10 @@ std::vector<DetectorHit_sptr> buildCalibratedHits(
         max_energy = energy;
         max_index  = i;
       }
+    }
+
+    if (skip_hit) {
+      continue;
     }
 
     if (!(total_energy > 0.0)) {

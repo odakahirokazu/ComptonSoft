@@ -13,7 +13,8 @@ general:
 light:
   event_selection_mode: veto_only
   waveform_analysis: average
-  light_channels: [4, 6, 5, 7]
+  general_analysis_channels: [4, 6, 5, 7]
+  pileup_analysis_channels: [4]
   light_gamma_thr_mV: 20.0
   light_cosmic_thr_mV: 250.0
   delay_counts: 60
@@ -58,11 +59,12 @@ calibration:
 | Key | Type/range | Meaning |
 | --- | --- | --- |
 | `event_selection_mode` | `gamma_required`, `veto_only`, or `disabled` | Controls how light waveforms enter event selection. |
-| `waveform_analysis` | `average` or `channel` | `average` uses the average waveform from `light_channels`; `channel` checks each channel independently. |
-| `light_channels` | list of DPP channel IDs, normally 0-7 | Channels used for light waveform analysis. |
+| `waveform_analysis` | `average` or `channel` | `average` uses the average waveform within each analysis-channel group; `channel` checks each channel independently. |
+| `general_analysis_channels` | list of DPP channel IDs, normally 0-7 | Channels used for ROI light-peak analysis, including gamma and cosmic classification. |
+| `pileup_analysis_channels` | list of DPP channel IDs, normally 0-7 | Channels used for pre-ROI and post-ROI pileup analysis. Channels may overlap with `general_analysis_channels`. |
 | `light_gamma_thr_mV` | number, mV | ROI peak threshold for gamma selection when `event_selection_mode` is `gamma_required`. |
 | `light_cosmic_thr_mV` | number, mV | ROI peak threshold above which the event is classified as cosmic. |
-| `delay_counts` | non-negative integer | Trigger delay count. One count corresponds to 8 ns in the current TPC-tree convention. |
+| `delay_counts` | non-negative integer | Trigger delay count. One count corresponds to 8 waveform time bins, so the physical delay depends on each channel's `wave_compress`. |
 | `pre_roi_window_us` | non-negative number, us | Time window before the ROI. Peaks outside the ROI can be pileup. |
 | `post_roi_window_us` | non-negative number, us | Time window after the ROI. Peaks outside the ROI can be pileup. |
 | `out_roi_peak_thr_mV` | number, mV | Common threshold for pre-ROI and post-ROI pileup peaks. |
@@ -78,6 +80,13 @@ calibration:
 The legacy boolean `use_for_event_selection` is still accepted. `true` maps to
 `gamma_required`, and `false` maps to `disabled`. New configs should prefer
 `event_selection_mode`.
+
+When `waveform_analysis` is `average`, all enabled channels inside
+`general_analysis_channels` must have the same `wave_compress`, and all enabled
+channels inside `pileup_analysis_channels` must also have the same
+`wave_compress`. The two groups may have different `wave_compress` values if
+they do not share channels. If the two groups share any channel, the common
+`wave_compress` value of the two groups must match.
 
 ## charge
 
@@ -135,12 +144,14 @@ These parameters are read by `EventReconstruction` when
 ```yaml
 incident_energy_candidates: [1173.2, 1332.5]
 energy_correction_factor: [1.0, 1.0, 1.0, 1.0]
+required_minimum_energy_deposit_in_higher_hit: 530.0
 ```
 
 | Key | Type/range | Meaning |
 | --- | --- | --- |
 | `incident_energy_candidates` | list of positive numbers, keV | Candidate incident gamma-ray energies used in NanoGRAMS Compton reconstruction. |
 | `energy_correction_factor` | length-4 list of positive numbers | FEC0-FEC3 multiplicative factors applied to each hit energy during NanoGRAMS event reconstruction. The input hittree energy is not modified. |
+| `required_minimum_energy_deposit_in_higher_hit` | non-negative number, keV | For 2-hit NanoGRAMS reconstruction, reject the event when both corrected hit energies are at or below this value. Use `0.0` to disable this cut. |
 
 ## Legacy names
 

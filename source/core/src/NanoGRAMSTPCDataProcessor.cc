@@ -55,7 +55,6 @@ int lowerBoundTimeIndex(double time_window,
   return std::clamp(static_cast<int>(std::ceil(raw - 1e-12)), 0, waveform_len);
 }
 
-// Temporary wave_compress interpretation.
 double waveCompressToTimebin(uint16_t wave_compress)
 {
   return static_cast<double>(wave_compress) * unit::ns;
@@ -68,24 +67,20 @@ bool usesLightAnalysis(const Config& cfg)
 
 bool isTPCDataUsable(int error_flags)
 {
-  if (error_flags == 0) {
+  if ((error_flags==0)||(error_flags==4)) {
     return true;
+  } else {
+    return false;
   }
-  if (error_flags == 4) {
-    return true;
-  }
-  return false;
 }
 
 bool isLightDataUsable(int error_flags)
 {
-  if (error_flags == 0) {
+  if ((error_flags==0)||(error_flags==4)) {
     return true;
+  } else {
+    return false;
   }
-  if (error_flags == 4) {
-    return true;
-  }
-  return false;
 }
 
 bool requiresLightGamma(const Config& cfg)
