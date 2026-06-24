@@ -14,7 +14,7 @@ def run_simulation(num)
     nucleus_mass_number: 133,
     nucleus_excitation_energy: 0.0,
     spectral_distribution: "mono",
-    energy_mean: 0.0,
+    energy: 0.0,
     volume_hierarchy: ["CdTeDetector"]
   }
 

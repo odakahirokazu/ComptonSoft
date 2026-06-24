@@ -156,7 +156,8 @@ CSPhysicsList::CSPhysicsList(CSPhysicsOption option)
   
   // Radioactive decay
   if (option.isRadioactiveDecayEnabled()) {
-    G4HadronicParameters::Instance()->SetTimeThresholdForRadioactiveDecay(std::numeric_limits<double>::max());
+    const double lifetime_limit = std::numeric_limits<double>::max();
+    G4HadronicParameters::Instance()->SetTimeThresholdForRadioactiveDecay(lifetime_limit);
     this->RegisterPhysics( new G4RadioactiveDecayPhysics );
   }
 }

@@ -73,8 +73,8 @@ set(CS_CORE_CLASSES
   src/TangoAlgorithm.cc
   ### sensitive detector
   src/VCSSensitiveDetector.cc
-  ### raw hit store
-  src/CSRawHitStore.cc
+  ### event store
+  src/CSEventStore.cc
   ### manager
   src/DetectorSystem.cc
   ### tree IO

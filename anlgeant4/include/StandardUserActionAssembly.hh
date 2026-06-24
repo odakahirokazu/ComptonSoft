@@ -53,9 +53,11 @@ public:
 protected:
   double getInitialTime() const;
   void setInitialTime(size_t event_index, double v);
+  int getCurrentEventID() const { return current_event_id_; };
 
 private:
   VEventStore* event_store_ = nullptr;
+  int current_event_id_ = 0;
 };
 
 } /* namespace anlgeant4 */

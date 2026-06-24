@@ -17,8 +17,8 @@
  *                                                                       *
  *************************************************************************/
 
-#ifndef COMPTONSOFT_CSRawHitStore_H
-#define COMPTONSOFT_CSRawHitStore_H 1
+#ifndef COMPTONSOFT_CSEventStore_H
+#define COMPTONSOFT_CSEventStore_H 1
 
 #include "VEventStore.hh"
 
@@ -32,12 +32,12 @@ namespace comptonsoft
  * @author Hirokazu Odaka
  * @date 2026-06-16 | Hirokazu Odaka
  */
-class CSRawHitStore : public anlgeant4::VEventStore
+class CSEventStore : public anlgeant4::VEventStore
 {
-  DEFINE_ANL_MODULE(CSRawHitStore, 1.0);
+  DEFINE_ANL_MODULE(CSEventStore, 1.0);
 public:
-  CSRawHitStore();
-  virtual ~CSRawHitStore();
+  CSEventStore();
+  virtual ~CSEventStore();
 
   void initializeRun(int runID, int num_events) override;
   void initializeEvent(int eventID) override;
@@ -53,4 +53,4 @@ private:
 
 } /* namespace comptonsoft */
 
-#endif /* COMPTONSOFT_CSRawHitStore_H */
+#endif /* COMPTONSOFT_CSEventStore_H */

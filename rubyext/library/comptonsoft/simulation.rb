@@ -72,6 +72,7 @@ module ComptonSoft
     define_setup_module("geometry")
     define_setup_module("physics", :PhysicsListManager)
     define_setup_module("primary_generator")
+    define_setup_module("event_store")
     define_setup_module("user_action")
     define_setup_module("pickup_data", array: true)
     define_setup_module("event_selection")
@@ -158,6 +159,10 @@ module ComptonSoft
     def setup_normal()
       add_namespace ComptonSoft
 
+      unless module_of_event_store()
+        set_event_store :CSEventStore
+      end
+
       unless module_of_user_action()
         set_user_action :StandardUserActionAssembly
       end
@@ -173,7 +178,8 @@ module ComptonSoft
       chain :SaveData
       with_parameters(output: @output)
 
-      chain :CSRawHitStore
+      chain_with_parameters module_of_event_store
+
       chain :CSHitCollection
       chain :ConstructDetectorForSimulation
       with_parameters(detector_configuration: @detector_configuration,
@@ -233,7 +239,7 @@ module ComptonSoft
     def setup_minimal()
       add_namespace ComptonSoft
 
-      chain :CSRawHitStore
+      chain :CSEventStore
 
       chain_with_parameters module_of_geometry
 

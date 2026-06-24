@@ -111,7 +111,7 @@ void BatemanSolution::solve(const RIDecayChain& chain)
         d *= (Ap*Bp);
       }
       D_[i][j] = d;
-      
+
       if (verbose_level_ >= 8) {
         std::cout << boost::format("D[%d][%d] = %.9e") % i % j % D_[i][j] << std::endl;
       }
@@ -231,7 +231,7 @@ double BatemanSolution::getIntegralConvolution(std::size_t i,
       return s1+s2;
     }
   }
-  
+
   return 0.0l;
 }
 

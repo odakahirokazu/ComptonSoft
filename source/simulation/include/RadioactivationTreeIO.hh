@@ -17,48 +17,54 @@
  *                                                                       *
  *************************************************************************/
 
-#ifndef COMPTONSOFT_RadioactiveDecayUserActionAssembly_H
-#define COMPTONSOFT_RadioactiveDecayUserActionAssembly_H 1
+#ifndef COMPTONSOFT_RadioactivationTreeIO_H
+#define COMPTONSOFT_RadioactivationTreeIO_H 1
 
-#include "StandardUserActionAssembly.hh"
+#include <cstdint>
+#include <tuple>
+#include "G4ThreeVector.hh"
+#include "IsotopeInfo.hh"
+
+class TTree;
 
 namespace comptonsoft {
 
-
 /**
- * UserActionAssembly for radioactive decay.
  *
  * @author Hirokazu Odaka
- * @date 2008-08-27
- * @date 2011-04-08
- * @date 2016-06-29 | rename the module name.
- * @date 2017-06-29 | new design of UserActionAssembly
- * @date 2024-02-24 | process name as a member
+ * @date 2026-06-24
  */
-class RadioactiveDecayUserActionAssembly : public anlgeant4::StandardUserActionAssembly
+class RadioactivationTreeIO
 {
-  DEFINE_ANL_MODULE(RadioactiveDecayUserActionAssembly, 6.0);
-  ENABLE_PARALLEL_RUN();
 public:
-  RadioactiveDecayUserActionAssembly();
+  RadioactivationTreeIO();
+  virtual ~RadioactivationTreeIO();
 
-  anlnext::ANLStatus mod_define() override;
+  virtual void setTree(TTree* tree)
+  { tree_ = tree; }
 
-  void SteppingAction(const G4Step* aStep) override;
+  virtual void defineBranches();
+  virtual void setBranchAddresses();
 
-  void set_termination_time(double v) { termination_time_ = v; }
-  double termination_time() const { return termination_time_; }
-
-  double first_decay_time() const { return first_decay_time_; }
+  void fill(const IsotopeInfo& isotope, int volume, const G4ThreeVector& position);
+  std::tuple<IsotopeInfo, int, G4ThreeVector> retrieve() const;
 
 private:
-  double termination_time_;
-  std::string radioactive_decay_process_name_;
+  TTree* tree_ = nullptr;
 
-  double first_decay_time_;
-
+  /*
+   * tree contents
+   */
+  int32_t Z_ = 0;
+  int32_t A_ = 0;
+  double E_ = 0.0;
+  int32_t floating_level_ = 0;
+  int32_t volume_ = 0;
+  float posx_ = 0.0;
+  float posy_ = 0.0;
+  float posz_ = 0.0;
 };
 
 } /* namespace comptonsoft */
 
-#endif /* COMPTONSOFT_RadioactiveDecayUserActionAssembly_H */
+#endif /* COMPTONSOFT_RadioactivationTreeIO_H */

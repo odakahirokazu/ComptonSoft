@@ -1,6 +1,6 @@
 /*************************************************************************
  *                                                                       *
- * Copyright (c) 2011 Hirokazu Odaka, Makoto Asai                        *
+ * Copyright (c) 2011 Hirokazu Odaka                                     *
  *                                                                       *
  * This program is free software: you can redistribute it and/or modify  *
  * it under the terms of the GNU General Public License as published by  *
@@ -17,39 +17,50 @@
  *                                                                       *
  *************************************************************************/
 
-#include "ActivationStackingAction.hh"
+#include "CSEventStore.hh"
+#include "DetectorHit_sptr.hh"
+#include "DetectorSystem.hh"
 
-#include "G4Track.hh"
-#include "G4ParticleTypes.hh"
+using namespace anlnext;
 
-namespace comptonsoft
+namespace comptonsoft {
+
+CSEventStore::CSEventStore()
 {
-
-ActivationStackingAction::ActivationStackingAction() = default;
-
-ActivationStackingAction::~ActivationStackingAction() = default;
-
-G4ClassificationOfNewTrack 
-ActivationStackingAction::ClassifyNewTrack(const G4Track* aTrack)
-{
-  /* selection: fKill, fUrgent, fSuspend */
-  G4ClassificationOfNewTrack classification = fUrgent;
-  
-  /* kill if the particle is not relevant to radioactivation */
-  if (aTrack->GetParentID() != 0) {
-    G4ParticleDefinition* particleType = aTrack->GetDefinition();
-    if ((particleType == G4Gamma::GammaDefinition())
-        || (particleType == G4Electron::ElectronDefinition())
-        || (particleType == G4Positron::PositronDefinition())
-        || (particleType == G4NeutrinoE::NeutrinoEDefinition())
-        || (particleType == G4AntiNeutrinoE::AntiNeutrinoEDefinition())) {
-      
-      classification = fKill;
-      // G4cout << "ClassifyNewTrack() -- kill" << G4endl;
-    }
-  }
-  
-  return classification;
+  add_alias("CSEventStore");
 }
 
-} /* namespace comptonsoft */
+CSEventStore::~CSEventStore() = default;
+
+void CSEventStore::initializeRun(int runID, int num_events)
+{
+  VEventStore::initializeRun(runID, num_events);
+  hits_vector_.resize(num_events);
+  for (auto& hits: hits_vector_) {
+    hits.clear();
+  }
+}
+
+void CSEventStore::initializeEvent(int eventID)
+{
+  VEventStore::initializeEvent(eventID);
+}
+
+void CSEventStore::insertHit(const DetectorHit& hit)
+{
+  const size_t event_index = static_cast<size_t>(hit.EventID());
+  hits_vector_[event_index].push_back(hit);
+}
+
+void CSEventStore::insertHit(DetectorHit&& hit)
+{
+  const size_t event_index = static_cast<size_t>(hit.EventID());
+  hits_vector_[event_index].push_back(hit);
+}
+
+const std::vector<DetectorHit>& CSEventStore::getHits() const
+{
+  return hits_vector_[read_index()];
+}
+
+} // namespace comptonsoft

@@ -1,6 +1,6 @@
 /*************************************************************************
  *                                                                       *
- * Copyright (c) 2011 Hirokazu Odaka                                     *
+ * Copyright (c) 2011 Shin Watanabe, Hirokazu Odaka                      *
  *                                                                       *
  * This program is free software: you can redistribute it and/or modify  *
  * it under the terms of the GNU General Public License as published by  *
@@ -17,48 +17,35 @@
  *                                                                       *
  *************************************************************************/
 
-#ifndef COMPTONSOFT_RadioactiveDecayUserActionAssembly_H
-#define COMPTONSOFT_RadioactiveDecayUserActionAssembly_H 1
+#include "RadioactivationEventStore.hh"
+#include "DetectorHit_sptr.hh"
+#include "DetectorSystem.hh"
 
-#include "StandardUserActionAssembly.hh"
+using namespace anlnext;
 
 namespace comptonsoft {
 
+RadioactivationEventStore::RadioactivationEventStore() = default;
 
-/**
- * UserActionAssembly for radioactive decay.
- *
- * @author Hirokazu Odaka
- * @date 2008-08-27
- * @date 2011-04-08
- * @date 2016-06-29 | rename the module name.
- * @date 2017-06-29 | new design of UserActionAssembly
- * @date 2024-02-24 | process name as a member
- */
-class RadioactiveDecayUserActionAssembly : public anlgeant4::StandardUserActionAssembly
+RadioactivationEventStore::~RadioactivationEventStore() = default;
+
+void RadioactivationEventStore::initializeRun(int runID, int num_events)
 {
-  DEFINE_ANL_MODULE(RadioactiveDecayUserActionAssembly, 6.0);
-  ENABLE_PARALLEL_RUN();
-public:
-  RadioactiveDecayUserActionAssembly();
+  CSEventStore::initializeRun(runID, num_events);
+  radioactivations_vector_.resize(num_events);
+  for (auto& vec: radioactivations_vector_) {
+    vec.clear();
+  }
+}
 
-  anlnext::ANLStatus mod_define() override;
+void RadioactivationEventStore::insertRadioactivation(size_t event_index, const RadioactivationInfo& info)
+{
+  radioactivations_vector_[event_index].push_back(info);
+}
 
-  void SteppingAction(const G4Step* aStep) override;
+const std::vector<RadioactivationInfo>& RadioactivationEventStore::getRadioactivations() const
+{
+  return radioactivations_vector_[read_index()];
+}
 
-  void set_termination_time(double v) { termination_time_ = v; }
-  double termination_time() const { return termination_time_; }
-
-  double first_decay_time() const { return first_decay_time_; }
-
-private:
-  double termination_time_;
-  std::string radioactive_decay_process_name_;
-
-  double first_decay_time_;
-
-};
-
-} /* namespace comptonsoft */
-
-#endif /* COMPTONSOFT_RadioactiveDecayUserActionAssembly_H */
+} // namespace comptonsoft

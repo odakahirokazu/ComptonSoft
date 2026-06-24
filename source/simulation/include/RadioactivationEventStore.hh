@@ -1,6 +1,6 @@
 /*************************************************************************
  *                                                                       *
- * Copyright (c) 2012 Hirokazu Odaka, Makoto Asai                        *
+ * Copyright (c) 2011 Hirokazu Odaka                                     *
  *                                                                       *
  * This program is free software: you can redistribute it and/or modify  *
  * it under the terms of the GNU General Public License as published by  *
@@ -17,32 +17,40 @@
  *                                                                       *
  *************************************************************************/
 
-#ifndef COMPTONSOFT_ActivationStackingAction_H
-#define COMPTONSOFT_ActivationStackingAction_H 1
+#ifndef COMPTONSOFT_RadioactivationEventStore_H
+#define COMPTONSOFT_RadioactivationEventStore_H 1
 
-#include "G4UserStackingAction.hh"
+#include "CSEventStore.hh"
 
-class G4Track;
+#include <G4ThreeVector.hh>
+#include "IsotopeInfo.hh"
 
-namespace comptonsoft {
+namespace comptonsoft
+{
 
+using RadioactivationInfo = std::tuple<IsotopeInfo, int, G4ThreeVector>;
 
 /**
- * Geant4 user statiking action for radioactivation simulations.
- *
- * @author Hirokazu Odaka, Makoto Asai
- * @date 2012-03-07
+ * Raw hit store module for ComptonSoft
+ * @author Hirokazu Odaka
+ * @date 2026-06-16 | Hirokazu Odaka
  */
-class ActivationStackingAction : public G4UserStackingAction
+class RadioactivationEventStore : public CSEventStore
 {
+  DEFINE_ANL_MODULE(RadioactivationEventStore, 1.0);
 public:
-  ActivationStackingAction();
-  virtual ~ActivationStackingAction();
-  
-public:
-  G4ClassificationOfNewTrack ClassifyNewTrack(const G4Track* aTrack) override;
+  RadioactivationEventStore();
+  virtual ~RadioactivationEventStore();
+
+  void initializeRun(int runID, int num_events) override;
+
+  void insertRadioactivation(size_t event_index, const RadioactivationInfo& info);
+  const std::vector<RadioactivationInfo>& getRadioactivations() const;
+
+private:
+  std::vector<std::vector<RadioactivationInfo>> radioactivations_vector_;
 };
 
 } /* namespace comptonsoft */
 
-#endif /* COMPTONSOFT_ActivationStackingAction_H */
+#endif /* COMPTONSOFT_RadioactivationEventStore_H */

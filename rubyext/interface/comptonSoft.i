@@ -1,6 +1,6 @@
 %module comptonSoft
 %{
-#include "CSRawHitStore.hh"
+#include "CSEventStore.hh"
 #include "ConstructDetector.hh"
 #include "ConstructDetectorForSimulation.hh"
 #include "VCSModule.hh"
@@ -129,6 +129,8 @@
 #include "AEAssignWeightWithResponseMatrix.hh"
 #endif
 #include "ExtractPhotoelectronTrajectory.hh"
+#include "RadioactivationEventStore.hh"
+#include "RadioactivationUserActionAssembly.hh"
 #ifdef USE_FITSIO
 #include "AHRayTracingPrimaryGenerator.hh"
 #endif
@@ -147,7 +149,6 @@
 #include "AllSkyPrimaryGenerator.hh"
 #endif
 #include "RadioactiveDecayUserActionAssembly.hh"
-#include "ActivationUserActionAssembly.hh"
 #ifdef USE_SIMX
 #include "AHStandardUserActionAssembly.hh"
 #endif
@@ -202,11 +203,11 @@
 
 namespace comptonsoft {
 
-class CSRawHitStore : public anlgeant4::VEventStore
+class CSEventStore : public anlgeant4::VEventStore
 {
 public:
-  CSRawHitStore();
-  virtual ~CSRawHitStore();
+  CSEventStore();
+  virtual ~CSEventStore();
 };
 
 
@@ -1034,6 +1035,22 @@ public:
 };
 
 
+class RadioactivationEventStore : public CSEventStore
+{
+public:
+  RadioactivationEventStore();
+  virtual ~RadioactivationEventStore();
+};
+
+
+class RadioactivationUserActionAssembly : public anlgeant4::StandardUserActionAssembly
+{
+public:
+  RadioactivationUserActionAssembly();
+  virtual ~RadioactivationUserActionAssembly();
+};
+
+
 #ifdef USE_FITSIO
 class AHRayTracingPrimaryGenerator : public anlgeant4::BasicPrimaryGenerator
 {
@@ -1101,14 +1118,6 @@ class RadioactiveDecayUserActionAssembly : public anlgeant4::StandardUserActionA
 {
 public:
   RadioactiveDecayUserActionAssembly();
-};
-
-
-class ActivationUserActionAssembly : public anlgeant4::StandardUserActionAssembly
-{
-public:
-  ActivationUserActionAssembly();
-  virtual ~ActivationUserActionAssembly();
 };
 
 

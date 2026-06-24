@@ -25,13 +25,16 @@ link_directories(
   )
 
 set(CS_SIMULATION_CLASSES_BASIC
+  # radioactivation simulation
+  src/RadioactivationEventStore.cc
+  src/RadioactivationStackingAction.cc
+  src/RadioactivationUserActionAssembly.cc
+  src/RadioactivationTreeIO.cc
+  src/RadioactiveDecayUserActionAssembly.cc
   # primary geneator
   src/ListPrimaryGenerator.cc
   src/AHRadiationBackgroundPrimaryGenerator.cc
   # user actions
-  src/RadioactiveDecayUserActionAssembly.cc
-  src/ActivationStackingAction.cc
-  src/ActivationUserActionAssembly.cc
   src/ObservationPickUpData.cc
   src/SampleOpticalDepth.cc
   src/ScatteringPickUpData.cc

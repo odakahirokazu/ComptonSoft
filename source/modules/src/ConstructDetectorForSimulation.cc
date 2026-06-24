@@ -25,7 +25,7 @@
 #include "DeviceSimulation.hh"
 #include "DetectorSystem.hh"
 #include "VANLGeometry.hh"
-#include "CSRawHitStore.hh"
+#include "CSEventStore.hh"
 
 using namespace anlnext;
 
@@ -61,9 +61,9 @@ ANLStatus ConstructDetectorForSimulation::mod_initialize()
   get_module_NC("VANLGeometry", &geometry_module);
   detectorManager->registerGeant4SensitiveDetectors(geometry_module);
 
-  CSRawHitStore* hit_store = nullptr;
-  get_module_NC("CSRawHitStore", &hit_store);
-  detectorManager->setRawHitStore(hit_store);
+  CSEventStore* event_store = nullptr;
+  get_module_NC("CSEventStore", &event_store);
+  detectorManager->setEventStore(event_store);
 
   if (VerboseLevel() > 0) {
     std::cout << "\n\n";

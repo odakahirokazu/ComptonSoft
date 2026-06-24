@@ -1,5 +1,5 @@
 namespace comptonsoft {
-class CSRawHitStore;
+class CSEventStore;
 class ConstructDetector;
 class ConstructDetectorForSimulation;
 class VCSModule;
@@ -102,6 +102,8 @@ class AEAttitudeCorrection;
 class SelectEventsWithCelestialSpectrum;
 class AEAssignWeightWithResponseMatrix;
 class ExtractPhotoelectronTrajectory;
+class RadioactivationEventStore;
+class RadioactivationUserActionAssembly;
 class AHRayTracingPrimaryGenerator;
 class ListPrimaryGenerator;
 class SimXPrimaryGenerator;
@@ -110,7 +112,6 @@ class AEObservationPrimaryGenerator;
 class CelestialSourcePrimaryGenerator;
 class AllSkyPrimaryGenerator;
 class RadioactiveDecayUserActionAssembly;
-class ActivationUserActionAssembly;
 class AHStandardUserActionAssembly;
 class SampleOpticalDepth;
 class ScatteringPickUpData;

@@ -28,18 +28,20 @@ def run_simulation(num, random, output)
     radius: 2.0,
   }
 
-  sim.set_user_action :ActivationUserActionAssembly, {
+  sim.set_user_action :RadioactivationUserActionAssembly, {
     output_filename_base: output.sub(".root", ".act"),
     detection_by_generation: false,
     processes_to_detect: ["RadioactiveDecay"],
   }
+
+  sim.set_event_store :RadioactivationEventStore
 
   sim.run(num)
 end
 
 ### Main
 
-num = 100000
+num = 10000000
 output = "simulation.root"
 random = 12345
 run_simulation(num, random, output)

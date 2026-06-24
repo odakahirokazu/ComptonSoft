@@ -20,7 +20,7 @@ def main():
     parser.add_argument("--logy", action="store_true", default=True)
     args = parser.parse_args()
 
-    root_files = sorted(Path(args.directory).glob("sim_*.root"))
+    root_files = sorted(Path(args.directory).glob("simulation_*.root"))
     if not root_files:
         raise RuntimeError(f"No ROOT files found in {args.directory}")
 
@@ -72,4 +72,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-    

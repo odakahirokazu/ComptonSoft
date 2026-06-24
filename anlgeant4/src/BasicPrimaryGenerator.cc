@@ -48,9 +48,10 @@ BasicPrimaryGenerator::BasicPrimaryGenerator()
     nucleus_floating_level_(0),
     energy_distribution_name_("powerlaw"),
     energy_distribution_(SpectralShape::undefined),
-    energy_min_(0.1*unit::keV), energy_max_(1000.0*unit::keV),
+    energy_(0.0),
+    energy_min_(1.0*unit::keV), energy_max_(1000.0*unit::keV),
     photon_index_(0.0),
-    energy_mean_(511.0*unit::keV), energy_sigma_(0.0*unit::keV),
+    energy_mean_(1000.0*unit::keV), energy_sigma_(0.0*unit::keV),
     kT_(10.0*unit::keV)
 {
   add_alias("BasicPrimaryGenerator");
@@ -77,6 +78,8 @@ ANLStatus BasicPrimaryGenerator::mod_define()
 
   define_parameter("spectral_distribution", &mod_class::energy_distribution_name_);
 
+  define_parameter("energy", &mod_class::energy_, unit::keV, "keV");
+  set_parameter_description("Value of the monochromatic energy");
   define_parameter("energy_min", &mod_class::energy_min_, unit::keV, "keV");
   set_parameter_description("Minimum value of the energy distribution");
   define_parameter("energy_max", &mod_class::energy_max_, unit::keV, "keV");
@@ -120,7 +123,7 @@ ANLStatus BasicPrimaryGenerator::mod_pre_initialize()
     }
     else if (energy_distribution_name_=="mono") {
       energy_distribution_ = SpectralShape::mono;
-      enable_gaussian_input();
+      enable_mono_input();
     }
     else if (energy_distribution_name_=="powerlaw") {
       energy_distribution_ = SpectralShape::powerlaw;
@@ -247,6 +250,11 @@ void BasicPrimaryGenerator::set_nucleus_definition(int atomic_number,
   set_particle_definition(particle);
 }
 
+void BasicPrimaryGenerator::enable_mono_input()
+{
+  expose_parameter("energy");
+}
+
 void BasicPrimaryGenerator::enable_powerlaw_input()
 {
   expose_parameter("photon_index");
@@ -274,6 +282,7 @@ void BasicPrimaryGenerator::enable_histogram_input()
 
 void BasicPrimaryGenerator::disable_default_energy_input()
 {
+  hide_parameter("energy");
   hide_parameter("energy_min");
   hide_parameter("energy_max");
   hide_parameter("photon_index");
@@ -289,7 +298,7 @@ void BasicPrimaryGenerator::print_spectral_info() const
   switch (energy_distribution_) {
   case SpectralShape::mono:
     std::cout << "  Spectral shape: mono => "
-              << "Mean: " << energy_mean_/unit::keV  << " keV"
+              << " energy: " << energy_/unit::keV  << " keV"
               << std::endl;
     break;
   case SpectralShape::powerlaw:
@@ -319,7 +328,7 @@ double BasicPrimaryGenerator::sample_energy() const
 {
   switch (energy_distribution_) {
     case SpectralShape::mono:
-      break;
+      return get_energy();
     case SpectralShape::powerlaw:
       return sample_from_powerlaw();
     case SpectralShape::gaussian:
@@ -331,7 +340,7 @@ double BasicPrimaryGenerator::sample_energy() const
     default:
       break;
   }
-  return energy_mean_;
+  return energy_;
 }
 
 double BasicPrimaryGenerator::sample_from_powerlaw() const

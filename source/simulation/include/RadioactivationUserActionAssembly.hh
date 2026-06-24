@@ -17,14 +17,18 @@
  *                                                                       *
  *************************************************************************/
 
-#ifndef COMPTONSOFT_ActivationUserActionAssembly_H
-#define COMPTONSOFT_ActivationUserActionAssembly_H 1
+#ifndef COMPTONSOFT_RadioactivationUserActionAssembly_H
+#define COMPTONSOFT_RadioactivationUserActionAssembly_H 1
 
 #include "StandardUserActionAssembly.hh"
 
 #include <cstdint>
+#include <memory>
 #include <vector>
 #include <map>
+#include <mutex>
+
+#include <G4ThreeVector.hh>
 
 #include "IsotopeInfo.hh"
 
@@ -34,6 +38,9 @@ class G4Ions;
 class G4VAnalysisManager;
 
 namespace comptonsoft {
+
+class RadioactivationEventStore;
+
 
 /**
  * UserActionAssembly module for radioactivation
@@ -49,56 +56,54 @@ namespace comptonsoft {
  * @date 2017-07-29 | Hiro Odaka | use floating level of isotope.
  * @date 2022-05-20 | Hiro Odaka | Geant4-v11: The analysis manager is not owned by this class.
  * @date 2024-04-17 | Hiro Odaka | Geant4-v11.2: G4VTouchable -> G4TouchableHistory
+ * @date 2026-06-24 | Hiro Odaka | ComptonSoft version 6
  */
-class ActivationUserActionAssembly : public anlgeant4::StandardUserActionAssembly
+class RadioactivationUserActionAssembly : public anlgeant4::StandardUserActionAssembly
 {
-  DEFINE_ANL_MODULE(ActivationUserActionAssembly, 4.0);
+  DEFINE_ANL_MODULE(RadioactivationUserActionAssembly, 6.0);
   ENABLE_PARALLEL_RUN();
+
 private:
   typedef std::map<std::string, int> volume_map_t;
   typedef std::map<int64_t, IsotopeInfo> data_map_t;
+
 public:
-  ActivationUserActionAssembly();
-  virtual ~ActivationUserActionAssembly();
-  
+  RadioactivationUserActionAssembly();
+  virtual ~RadioactivationUserActionAssembly();
+
   anlnext::ANLStatus mod_define() override;
   anlnext::ANLStatus mod_initialize() override;
-  
-  void RunActionAtBeginning(const G4Run* run) override;
+  anlnext::ANLStatus mod_finalize() override;
+
   void RunActionAtEnd(const G4Run* run) override;
-  void TrackActionAtBeginning(const G4Track* track) override;
 
   bool isSteppingActionEffective() const override { return true; }
   void SteppingAction(const G4Step* step) override;
 
   bool isStackingActionEffective() const override { return true; }
   G4UserStackingAction* createStackingAction() const override;
-  
+
 protected:
-  void SetInitialEnergy(double var) { m_InitialEnergy = var; }
-  void Fill(const G4Ions* nucleus,
-            const G4TouchableHistory* touchable,
-            double posx, double posy, double posz);
-  void OutputVolumeInfo(const std::string& filename="");
-  void OutputSummary(const std::string& filename, int numberOfRun);
-  
-  int NumberOfVolumes();
-  std::string VolumeName(int index);
-  
+  void fill(const G4Ions* nucleus, const G4TouchableHistory* touchable, const G4ThreeVector& position);
+  int analyze_volume_info(const std::string& volume_name, const IsotopeInfo& isotope);
+  void output_volume_info(const std::string& filename="");
+  void output_summary(const std::string& filename);
+
 private:
-  G4VAnalysisManager* m_AnalysisManager = nullptr;
-  std::string m_FilenameBase;
-  bool m_DetectionByGeneration;
-  std::vector<std::string> m_ProcessesToDetect;
-  double m_LifetimeLimit;
-  
-  double m_InitialEnergy;
-      
-  volume_map_t m_VolumeMap;
-  std::vector<std::string> m_VolumeArray;
-  std::vector<data_map_t> m_RIMapVector;
+  std::string filename_base_;
+  bool detection_by_generation_;
+  std::vector<std::string> processes_to_detect_;
+  double lifetime_limit_;
+
+  RadioactivationEventStore* event_store_ = nullptr;
+
+  std::shared_ptr<std::mutex> mutex_;
+  std::shared_ptr<int> total_event_number_ptr_ = 0;
+  std::shared_ptr<volume_map_t> volume_map_;
+  std::shared_ptr<std::vector<std::string>> volume_vector_;
+  std::shared_ptr<std::vector<data_map_t>> data_map_vector_;
 };
-  
+
 } /* namespace comptonsoft */
 
-#endif /* COMPTONSOFT_ActivationUserActionAssembly_H */
+#endif /* COMPTONSOFT_RadioactivationUserActionAssembly_H */

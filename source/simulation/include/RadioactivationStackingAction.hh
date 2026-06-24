@@ -1,6 +1,6 @@
 /*************************************************************************
  *                                                                       *
- * Copyright (c) 2011 Shin Watanabe, Hirokazu Odaka                      *
+ * Copyright (c) 2012 Hirokazu Odaka, Makoto Asai                        *
  *                                                                       *
  * This program is free software: you can redistribute it and/or modify  *
  * it under the terms of the GNU General Public License as published by  *
@@ -17,47 +17,32 @@
  *                                                                       *
  *************************************************************************/
 
-#include "CSRawHitStore.hh"
-#include "DetectorHit_sptr.hh"
-#include "DetectorSystem.hh"
+#ifndef COMPTONSOFT_RadioactivationStackingAction_H
+#define COMPTONSOFT_RadioactivationStackingAction_H 1
 
-using namespace anlnext;
+#include "G4UserStackingAction.hh"
+
+class G4Track;
 
 namespace comptonsoft {
 
-CSRawHitStore::CSRawHitStore() = default;
 
-CSRawHitStore::~CSRawHitStore() = default;
-
-void CSRawHitStore::initializeRun(int runID, int num_events)
+/**
+ * Geant4 user statiking action for radioactivation simulations.
+ *
+ * @author Hirokazu Odaka, Makoto Asai
+ * @date 2012-03-07
+ */
+class RadioactivationStackingAction : public G4UserStackingAction
 {
-  VEventStore::initializeRun(runID, num_events);
-  hits_vector_.resize(num_events);
-  for (auto& hits: hits_vector_) {
-    hits.clear();
-  }
-}
+public:
+  RadioactivationStackingAction();
+  virtual ~RadioactivationStackingAction();
 
-void CSRawHitStore::initializeEvent(int eventID)
-{
-  VEventStore::initializeEvent(eventID);
-}
+public:
+  G4ClassificationOfNewTrack ClassifyNewTrack(const G4Track* track) override;
+};
 
-void CSRawHitStore::insertHit(const DetectorHit& hit)
-{
-  const size_t event_index = static_cast<size_t>(hit.EventID());
-  hits_vector_[event_index].push_back(hit);
-}
+} /* namespace comptonsoft */
 
-void CSRawHitStore::insertHit(DetectorHit&& hit)
-{
-  const size_t event_index = static_cast<size_t>(hit.EventID());
-  hits_vector_[event_index].push_back(hit);
-}
-
-const std::vector<DetectorHit>& CSRawHitStore::getHits() const
-{
-  return hits_vector_[read_index()];
-}
-
-} // namespace comptonsoft
+#endif /* COMPTONSOFT_RadioactivationStackingAction_H */

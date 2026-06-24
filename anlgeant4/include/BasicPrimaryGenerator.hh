@@ -80,6 +80,7 @@ protected:
     energy_distribution_name_ = name;
   }
 
+  void enable_mono_input();
   void enable_powerlaw_input();
   void enable_gaussian_input();
   void enable_blackbody_input();
@@ -99,6 +100,7 @@ protected:
    * @return sampled energy
    */
   virtual double sample_energy() const;
+  double get_energy() const { return energy_; }
   double sample_from_powerlaw(double gamma, double e0, double e1) const;
   double sample_from_powerlaw() const;
   double sample_from_gaussian(double mean, double sigma) const;
@@ -166,6 +168,7 @@ private:
    */
   std::string energy_distribution_name_;
   SpectralShape energy_distribution_;
+  double energy_;
   double energy_min_;
   double energy_max_;
   // power-law distribution

@@ -49,12 +49,12 @@ public:
   explicit IsotopeInfo(int64_t isotopeID);
   IsotopeInfo(int z, int a, double energy, int floating_level=0);
   ~IsotopeInfo();
-  
+
   IsotopeInfo(const IsotopeInfo&) = default;
   IsotopeInfo(IsotopeInfo&&) = default;
   IsotopeInfo& operator=(const IsotopeInfo&) = default;
   IsotopeInfo& operator=(IsotopeInfo&&) = default;
-  
+
   int Z() const { return Z_; }
   int A() const { return A_; }
   double Energy() const { return energy_; }
@@ -63,7 +63,7 @@ public:
   double Rate() const { return rate_; }
 
   void setFloatingLevel(int v) { floating_level_ = v; }
-  
+
   void setCounts(int v) { counts_ = v; }
   void add1() { counts_++; }
 
@@ -78,7 +78,7 @@ private:
   double energy_;
   int floating_level_;
   int counts_;
-  double rate_;
+  double rate_ = 0.0;
 };
 
 } /* namespace comptonsoft */

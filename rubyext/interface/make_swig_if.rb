@@ -6,7 +6,7 @@ name = 'comptonSoft'
 namespace = 'comptonsoft'
 
 clMod = [
-  ANL::SWIGClass.new("CSRawHitStore"),
+  ANL::SWIGClass.new("CSEventStore"),
   ANL::SWIGClass.new("ConstructDetector"),
   ANL::SWIGClass.new("ConstructDetectorForSimulation"),
   ANL::SWIGClass.new("VCSModule"),
@@ -112,6 +112,9 @@ clMod = [
 ]
 
 clSim = [
+  # radioactivation
+  ANL::SWIGClass.new("RadioactivationEventStore"),
+  ANL::SWIGClass.new("RadioactivationUserActionAssembly"),
   # primary generator
   ANL::SWIGClass.new("AHRayTracingPrimaryGenerator", false, 'USE_FITSIO'),
   ANL::SWIGClass.new("ListPrimaryGenerator"),
@@ -122,7 +125,6 @@ clSim = [
   ANL::SWIGClass.new("AllSkyPrimaryGenerator", false, 'USE_HEALPIX'),
   # user action assembly
   ANL::SWIGClass.new("RadioactiveDecayUserActionAssembly"),
-  ANL::SWIGClass.new("ActivationUserActionAssembly"),
   ANL::SWIGClass.new("AHStandardUserActionAssembly", false, 'USE_SIMX'),
   ANL::SWIGClass.new("SampleOpticalDepth"),
   ANL::SWIGClass.new("ScatteringPickUpData"),

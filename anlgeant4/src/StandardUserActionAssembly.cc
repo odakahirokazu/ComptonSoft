@@ -54,6 +54,7 @@ void StandardUserActionAssembly::RunActionAtEnd(const G4Run*)
 void StandardUserActionAssembly::EventActionAtBeginning(const G4Event* event)
 {
   const int eventID = event->GetEventID();
+  current_event_id_ = eventID;
   event_store_->initializeEvent(eventID);
 }
 

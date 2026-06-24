@@ -31,16 +31,16 @@ namespace comptonsoft
 {
 
 RadioactiveDecayUserActionAssembly::RadioactiveDecayUserActionAssembly()
-  : terminationTime_(1.0*unit::ms),
-    firstDecayTime_(0.0),
-    radioactiveDecayProcessName_("RadioactiveDecay")
+  : termination_time_(1.0*unit::ms),
+    radioactive_decay_process_name_("RadioactiveDecay"),
+    first_decay_time_(0.0)
 {
 }
 
 ANLStatus RadioactiveDecayUserActionAssembly::mod_define()
 {
-  define_parameter("termination_time", &mod_class::terminationTime_, unit::s, "s");
-  define_parameter("radioative_decay_process_name", &mod_class::radioactiveDecayProcessName_);
+  define_parameter("termination_time", &mod_class::termination_time_, unit::s, "s");
+  define_parameter("radioative_decay_process_name", &mod_class::radioactive_decay_process_name_);
 
   return AS_OK;
 }
@@ -48,25 +48,25 @@ ANLStatus RadioactiveDecayUserActionAssembly::mod_define()
 void RadioactiveDecayUserActionAssembly::SteppingAction(const G4Step* step)
 {
   G4Track* track = step->GetTrack();
-  const double globalTime = track->GetGlobalTime();
+  const double global_time = track->GetGlobalTime();
 
   if (track->GetTrackID()==1 && track->GetCurrentStepNumber()==1) {
     const G4Event* event = G4EventManager::GetEventManager()->GetConstCurrentEvent();
     const int event_id = event->GetEventID();
 
-    const G4String processName
+    const G4String process_name
       = step->GetPostStepPoint()->GetProcessDefinedStep()->GetProcessName();
-    if (processName == radioactiveDecayProcessName_) {
-      firstDecayTime_ = globalTime;
-      setInitialTime(event_id, firstDecayTime_);
+    if (process_name == radioactive_decay_process_name_) {
+      first_decay_time_ = global_time;
+      setInitialTime(event_id, first_decay_time_);
     }
     else {
       throw ANLException("RadioactiveDecayUserActionAssembly:Error---First step is not radioactive decay.");
     }
   }
 
-  const double timeFromFirstDecay = globalTime - firstDecayTime_;
-  if (timeFromFirstDecay > terminationTime_) {
+  const double time_from_first_decay = global_time - first_decay_time_;
+  if (time_from_first_decay > termination_time_) {
     track->SetTrackStatus(fKillTrackAndSecondaries);
     return;
   }

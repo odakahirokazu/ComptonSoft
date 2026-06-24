@@ -1,6 +1,6 @@
 /*************************************************************************
  *                                                                       *
- * Copyright (c) 2011 Hirokazu Odaka                                     *
+ * Copyright (c) 2011 Hirokazu Odaka, Makoto Asai                        *
  *                                                                       *
  * This program is free software: you can redistribute it and/or modify  *
  * it under the terms of the GNU General Public License as published by  *
@@ -17,48 +17,37 @@
  *                                                                       *
  *************************************************************************/
 
-#ifndef COMPTONSOFT_RadioactiveDecayUserActionAssembly_H
-#define COMPTONSOFT_RadioactiveDecayUserActionAssembly_H 1
+#include "RadioactivationStackingAction.hh"
 
-#include "StandardUserActionAssembly.hh"
+#include "G4Track.hh"
+#include "G4ParticleTypes.hh"
 
-namespace comptonsoft {
-
-
-/**
- * UserActionAssembly for radioactive decay.
- *
- * @author Hirokazu Odaka
- * @date 2008-08-27
- * @date 2011-04-08
- * @date 2016-06-29 | rename the module name.
- * @date 2017-06-29 | new design of UserActionAssembly
- * @date 2024-02-24 | process name as a member
- */
-class RadioactiveDecayUserActionAssembly : public anlgeant4::StandardUserActionAssembly
+namespace comptonsoft
 {
-  DEFINE_ANL_MODULE(RadioactiveDecayUserActionAssembly, 6.0);
-  ENABLE_PARALLEL_RUN();
-public:
-  RadioactiveDecayUserActionAssembly();
 
-  anlnext::ANLStatus mod_define() override;
+RadioactivationStackingAction::RadioactivationStackingAction() = default;
 
-  void SteppingAction(const G4Step* aStep) override;
+RadioactivationStackingAction::~RadioactivationStackingAction() = default;
 
-  void set_termination_time(double v) { termination_time_ = v; }
-  double termination_time() const { return termination_time_; }
+G4ClassificationOfNewTrack RadioactivationStackingAction::ClassifyNewTrack(const G4Track* track)
+{
+  /* selection: fKill, fUrgent, fSuspend */
+  G4ClassificationOfNewTrack classification = fUrgent;
 
-  double first_decay_time() const { return first_decay_time_; }
+  /* kill if the particle is not relevant to radioactivation */
+  if (track->GetParentID() != 0) {
+    G4ParticleDefinition* particleType = track->GetDefinition();
+    if ((particleType == G4Gamma::GammaDefinition())
+        || (particleType == G4Electron::ElectronDefinition())
+        || (particleType == G4Positron::PositronDefinition())
+        || (particleType == G4NeutrinoE::NeutrinoEDefinition())
+        || (particleType == G4AntiNeutrinoE::AntiNeutrinoEDefinition())) {
 
-private:
-  double termination_time_;
-  std::string radioactive_decay_process_name_;
+      classification = fKill;
+    }
+  }
 
-  double first_decay_time_;
-
-};
+  return classification;
+}
 
 } /* namespace comptonsoft */
-
-#endif /* COMPTONSOFT_RadioactiveDecayUserActionAssembly_H */

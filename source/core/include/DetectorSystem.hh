@@ -46,7 +46,7 @@ class MultiChannelData;
 class ChannelMap;
 class DeviceSimulation;
 class VCSSensitiveDetector;
-class CSRawHitStore;
+class CSEventStore;
 
 /**
  * A manager class of a whole detector system.
@@ -245,7 +245,7 @@ public:
   void registerGeant4SensitiveDetectors(anlgeant4::SDAssignment* geometry_module);
 
   // Simulation raw hit
-  void setRawHitStore(CSRawHitStore* hit_store);
+  void setEventStore(CSEventStore* event_store);
   void insertRawHit(DetectorHit&& hit);
   void distributeRawHitsToDetectors();
 
@@ -297,7 +297,7 @@ private:
   std::map<std::string, std::unique_ptr<DetectorGroup>> detectorGroupMap_;
   std::vector<HitPattern> hitPatterns_;
 
-  CSRawHitStore* hitStore_ = nullptr;
+  CSEventStore* event_store_ = nullptr;
 
 private:
   DetectorSystem(const DetectorSystem&) = delete;

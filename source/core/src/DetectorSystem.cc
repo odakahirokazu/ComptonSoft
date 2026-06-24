@@ -48,7 +48,7 @@
 #include "GainFunctionCubic.hh"
 #include "DeviceSimulation.hh"
 #include "CSSensitiveDetector.hh"
-#include "CSRawHitStore.hh"
+#include "CSEventStore.hh"
 
 namespace unit = anlgeant4::unit;
 
@@ -1415,19 +1415,19 @@ load(const boost::property_tree::ptree& node)
   }
 }
 
-void DetectorSystem::setRawHitStore(CSRawHitStore* hit_store)
+void DetectorSystem::setEventStore(CSEventStore* event_store)
 {
-  hitStore_ = hit_store;
+  event_store_ = event_store;
 }
 
 void DetectorSystem::insertRawHit(DetectorHit&& hit)
 {
-  hitStore_->insertHit(hit);
+  event_store_->insertHit(hit);
 }
 
 void DetectorSystem::distributeRawHitsToDetectors()
 {
-  const std::vector<DetectorHit>& hits = hitStore_->getHits();
+  const std::vector<DetectorHit>& hits = event_store_->getHits();
   for (const DetectorHit& hit: hits) {
     const int detectorID = hit.DetectorID();
     auto hit_copy = std::make_shared<DetectorHit>(hit);
