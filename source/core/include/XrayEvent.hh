@@ -35,9 +35,13 @@ namespace comptonsoft
  * @date 2019-05-22
  * @date 2019-10-08 | delete the assignment operators
  * @date 2020-04-02 | add propeties
+ * @date 2026-02-25 | enum EventAngleMethod 
  */
 class XrayEvent
 {
+public:
+  enum class EventAngleMethod_t { Average, Max2ndMoment };
+
 public:
   explicit XrayEvent(int size);
   virtual ~XrayEvent();

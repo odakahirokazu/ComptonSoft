@@ -59,6 +59,7 @@ private:
   int num_pixels_x_ = 1;
   int num_pixels_y_ = 1;
   std::vector<int> ids_;
+  bool polarization_ = false;
 };
 
 } /* namespace comptonsoft */

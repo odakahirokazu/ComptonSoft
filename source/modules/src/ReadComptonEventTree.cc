@@ -36,6 +36,8 @@ ReadComptonEventTree::ReadComptonEventTree()
   add_alias("InitialInformation");
 }
 
+ReadComptonEventTree::~ReadComptonEventTree() = default;
+
 ANLStatus ReadComptonEventTree::mod_define()
 {
   EventReconstruction::mod_define();
@@ -54,12 +56,12 @@ ANLStatus ReadComptonEventTree::mod_initialize()
   define_evs("EventReconstruction:NG");
   initializeHitPatternData();
   
-  cetree_ = new TChain("cetree");
+  cetree_ = std::make_unique<TChain>("cetree");
   for (const std::string& filename: fileList_) {
     cetree_->Add(filename.c_str());
   }
 
-  treeIO_->setTree(cetree_);
+  treeIO_->setTree(cetree_.get());
   if (cetree_->GetBranch("ini_energy")) {
     setInitialInformationStored();
     treeIO_->enableInitialInfoRecord();

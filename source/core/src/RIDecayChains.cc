@@ -53,6 +53,22 @@ bool areSameLevels(const comptonsoft::RIDecayProperties& a, const comptonsoft::R
   return false;
 }
 
+bool areSameLevels(int z1, int a1, double e1, int z2, int a2, double e2)
+{
+  if (z1==z2 && a1==a2) {
+    if (e1==0.0 && e2==0.0) {
+      return true;
+    }
+    else {
+      const double r = 1.0e-6;
+      if (e1!=0.0 && std::abs(e2/e1-1.0) < r) {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
 } /* anonymous namespace */
 
 namespace comptonsoft
@@ -144,7 +160,7 @@ void RIDecayChains::buildChain(const IsotopeInfo& parentIsotope, int depth)
               << boost::format("floating level = %d") % parentIsotope.FloatingLevel()
               << std::endl;
     return;
-  }
+ }
 #endif // STOP_DECAY_FOR_FLOATING_LEVEL
 
   G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
@@ -207,11 +223,10 @@ RIDecayChains::collectDecayProducts(const G4Ions* parent)
   if (decayConstant>=0.0 && decayConstant<DecayConstantThreshold()) {
     return std::list<RIDecayProperties>();
   }
-  
-  // decay_process_->SetVerboseLevel(2);
-  std::unique_ptr<const G4DecayTable> decayTable(decay_process_->LoadDecayTable(parent));
 
-  if (decayTable.get()==nullptr) {
+  // decay_process_->SetVerboseLevel(2); // for debug
+  const G4DecayTable* decayTable = decay_process_->GetDecayTable(parent);
+  if (decayTable==nullptr) {
     return std::list<RIDecayProperties>();
   }
 
@@ -250,8 +265,18 @@ RIDecayChains::collectDecayProducts(const G4Ions* parent)
         const int floatingLevel = daughter->GetFloatLevelBaseIndex();
         IsotopeInfo daughterIsotope(Z, A, Energy);
         daughterIsotope.setFloatingLevel(floatingLevel);
-        RIDecayProperties decayProperties(decayConstant, branchingRatio, daughterIsotope);
-        decayProducts.push_back(decayProperties);
+
+        if (areSameLevels(Z, A, Energy, parent->GetAtomicNumber(), parent->GetAtomicMass(), parent->GetExcitationEnergy())) {
+          // the daugheter and parent are the same level -> no daughter exisits -> force deexcitation to groud
+          IsotopeInfo groundLevelIsotope(Z, A, 0.0);
+          RIDecayProperties decayProperties(decayConstant, 1.0, groundLevelIsotope);
+          decayProducts.push_back(decayProperties);
+        }
+        else  {
+          // normal case
+          RIDecayProperties decayProperties(decayConstant, branchingRatio, daughterIsotope);
+          decayProducts.push_back(decayProperties);
+        }
       }
     }
   }

@@ -32,7 +32,7 @@ namespace comptonsoft
 RadioactiveDecayUserActionAssembly::RadioactiveDecayUserActionAssembly()
   : terminationTime_(1.0*unit::ms),
     firstDecayTime_(0.0),
-    radioactiveDecayProcessName_("Radioactivation")
+    radioactiveDecayProcessName_("RadioactiveDecay")
 {
 }
 

@@ -287,8 +287,10 @@ void ComptonEventFilter::add_condition(const std::string& type,
                           arg::_1, min_value, max_value);
   }
   else {
-    std::cout << "invalid condition type: " << type << std::endl;
-    return;
+    std::string message = "invalid condition type: ";
+    message += type;
+    std::cout << message << std::endl;
+    BOOST_THROW_EXCEPTION( CSException(message) );
   }
   
   m_ConditionsVector.back().add_condition(condition);

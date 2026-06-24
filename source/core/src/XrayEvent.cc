@@ -22,6 +22,8 @@
 #include <iostream>
 #include <cmath>
 
+#include "AstroUnits.hh"
+
 namespace comptonsoft
 {
 
@@ -36,9 +38,9 @@ XrayEvent::~XrayEvent() = default;
 void XrayEvent::copyFrom(const image_t& image, int ix, int iy)
 {
   const int size = EventSize();
-  const int halfSize = size/2;
-  const int ix0 = ix-halfSize;
-  const int iy0 = iy-halfSize;
+  const int center_index = size/2;
+  const int ix0 = ix - center_index;
+  const int iy0 = iy - center_index;
 
   ix_ = ix;
   iy_ = iy;
@@ -48,7 +50,7 @@ void XrayEvent::copyFrom(const image_t& image, int ix, int iy)
       data_[i][j] = image[ix0+i][iy0+j];
     }
   }
-  centerPH_ = data_[halfSize][halfSize];
+  centerPH_ = data_[center_index][center_index];
 }
 
 void XrayEvent::reduce()
@@ -87,12 +89,14 @@ void XrayEvent::reduce()
   rank_ = rank;
   weight_ = weight;
   sumPH_ = sumPH;
-
   angle_ = calculateEventAngle();
 }
 
 double XrayEvent::calculateEventAngle() const
 {
+  using std::atan2;
+  using anlgeant4::constant::twopi;
+
   const int size = EventSize();
   const int center = size/2;
   double x(0.0), y(0.0);
@@ -107,7 +111,10 @@ double XrayEvent::calculateEventAngle() const
       }
     }
   }
-  return std::atan2(y, x);
+
+  const double phi = atan2(y, x);
+  const double phi_positive = (phi>=0.0) ? phi : (phi+twopi);
+  return phi_positive;
 }
 
 } /* namespace comptonsoft */

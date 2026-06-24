@@ -88,6 +88,7 @@ set(CS_CORE_CLASSES
   src/FrameData.cc
   src/OutlierStore.cc
   src/XrayEvent.cc
+  src/PolarizedXrayEvent.cc
   src/XrayEventTreeIO.cc
   ### coded aperture
   src/VCodedAperture.cc
@@ -116,7 +117,6 @@ set(CS_CORE_CLASSES
   src/NanoGRAMSLightAnalysis.cc
   src/NanoGRAMSTPCDataProcessor.cc
   src/TPCTreeIO.cc
-  #src/NanoGRAMSEvent.cc
   )
 
 if(CS_USE_ORT)

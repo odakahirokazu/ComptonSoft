@@ -35,6 +35,8 @@ RecalculateSimulationNoise::RecalculateSimulationNoise()
 
 ANLStatus RecalculateSimulationNoise::mod_initialize()
 {
+  VCSModule::mod_initialize();
+  
   get_module_NC("CSHitCollection", &m_HitCollection);
 
   return AS_OK;

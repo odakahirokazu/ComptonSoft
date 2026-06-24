@@ -1,6 +1,6 @@
 /*************************************************************************
  *                                                                       *
- * Copyright (c) 2011 Hirokazu Odaka                                     *
+ * Copyright (c) 2019 Hirokazu Odaka                                     *
  *                                                                       *
  * This program is free software: you can redistribute it and/or modify  *
  * it under the terms of the GNU General Public License as published by  *
@@ -17,58 +17,33 @@
  *                                                                       *
  *************************************************************************/
 
-#ifndef COMPTONSOFT_ReadHitTree_H
-#define COMPTONSOFT_ReadHitTree_H 1
+#ifndef COMPTONSOFT_PolarizedXrayEvent_H
+#define COMPTONSOFT_PolarizedXrayEvent_H 1
 
-#include "VCSModule.hh"
-#include "InitialInformation.hh"
+#include "XrayEvent.hh"
 
-#include <vector>
-#include <string>
-#include <cstdint>
-#include <memory>
-
-#include "DetectorHit_sptr.hh"
-
-class TChain;
-
-namespace comptonsoft {
-
-class CSHitCollection;
-class HitTreeIOWithInitialInfo;
+namespace comptonsoft
+{
 
 /**
- * @author Hitokazu Odaka
- * @date 2014-11-30
- * @date 2019-04-22 | initialization in mod_begin_run()
+ * A class of an X-ray event measured with a pixel detector.
+ *
+ * @author Hirokazu Odaka
+ * @date 2026-02-25 | polarization
  */
-class ReadHitTree : public VCSModule, public anlgeant4::InitialInformation
+class PolarizedXrayEvent : public XrayEvent
 {
-  DEFINE_ANL_MODULE(ReadHitTree, 2.2);
 public:
-  ReadHitTree();
-  ~ReadHitTree();
-  
-  anlnext::ANLStatus mod_define() override;
-  anlnext::ANLStatus mod_initialize() override;
-  anlnext::ANLStatus mod_begin_run() override;
-  anlnext::ANLStatus mod_analyze() override;
+  explicit PolarizedXrayEvent(int size);
+  virtual ~PolarizedXrayEvent();
+
+  PolarizedXrayEvent(const PolarizedXrayEvent& r) = default;
+  PolarizedXrayEvent(PolarizedXrayEvent&& r) = default;
 
 protected:
-  virtual void insertHit(const DetectorHit_sptr& hit);
-  
-private:
-  std::vector<std::string> fileList_;
-  bool trustNumHits_;
-
-  std::unique_ptr<TChain> hittree_;
-  int64_t numEntries_ = 0;
-  int64_t entryIndex_ = 0;
-
-  CSHitCollection* hitCollection_;
-  std::unique_ptr<HitTreeIOWithInitialInfo> treeIO_;
+  double calculateEventAngle() const override;
 };
 
 } /* namespace comptonsoft */
 
-#endif /* COMPTONSOFT_ReadHitTree_H */
+#endif /* COMPTONSOFT_XrayEvent_H */

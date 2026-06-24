@@ -25,6 +25,7 @@
 
 #include <vector>
 #include <string>
+#include <memory>
 
 class TChain;
 
@@ -40,10 +41,10 @@ class ComptonEventTreeIOWithInitialInfo;
  */
 class ReadComptonEventTree : public EventReconstruction, public anlgeant4::InitialInformation
 {
-  DEFINE_ANL_MODULE(ReadComptonEventTree, 3.1);
+  DEFINE_ANL_MODULE(ReadComptonEventTree, 3.2);
 public:
   ReadComptonEventTree();
-  ~ReadComptonEventTree() = default;
+  ~ReadComptonEventTree();
 
   anlnext::ANLStatus mod_define() override;
   anlnext::ANLStatus mod_initialize() override;
@@ -51,7 +52,7 @@ public:
    
 private:
   std::vector<std::string> fileList_;
-  TChain* cetree_;
+  std::unique_ptr<TChain> cetree_;
   int64_t numEntries_ = 0;
   int64_t entryIndex_ = 0;
 

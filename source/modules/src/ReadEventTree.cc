@@ -50,12 +50,12 @@ ANLStatus ReadEventTree::mod_initialize()
   
   get_module_NC("CSHitCollection", &hitCollection_);
 
-  tree_ = new TChain("eventtree");
+  tree_ = std::make_unique<TChain>("eventtree");
   for (const std::string& filename: fileList_) {
     tree_->Add(filename.c_str());
   }
 
-  treeIO_->setTree(tree_);
+  treeIO_->setTree(tree_.get());
   if (tree_->GetBranch("ini_energy")) {
     setInitialInformationStored();
     treeIO_->enableInitialInfoRecord();

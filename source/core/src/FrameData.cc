@@ -27,6 +27,7 @@
 
 #include "VGainFunction.hh"
 #include "GainFunctionLinear.hh"
+#include "PolarizedXrayEvent.hh"
 
 namespace comptonsoft
 {
@@ -238,7 +239,18 @@ std::vector<XrayEvent_sptr> FrameData::extractEvents()
   for (const auto& pixel: hitPixels) {
     const int ix = pixel.first;
     const int iy = pixel.second;
-    XrayEvent_sptr event(new XrayEvent(size));
+
+    XrayEvent_sptr event;
+    if (EventAngleMethod()==XrayEvent::EventAngleMethod_t::Average) {
+      event = std::make_shared<XrayEvent>(size);
+    }
+    else if (EventAngleMethod()==XrayEvent::EventAngleMethod_t::Max2ndMoment) {
+      event = std::make_shared<PolarizedXrayEvent>(size);
+    }
+    else {
+      event = std::make_shared<XrayEvent>(size);
+    }
+    
     event->setSplitThreshold(SplitThreshold());
     event->copyFrom(frame_, ix, iy);
     event->reduce();

@@ -27,7 +27,8 @@ def run_simulation(num, random, output, ri, volume_path)
   }
 
   sim.set_user_action :RadioactiveDecayUserActionAssembly, {
-    termination_time: 1.0e-6
+    termination_time: 1.0e-6,
+    radioative_decay_process_name: "RadioactiveDecay"
   }
 
   sim.enable_timing_process()

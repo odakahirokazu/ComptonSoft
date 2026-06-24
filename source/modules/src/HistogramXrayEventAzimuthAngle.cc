@@ -19,6 +19,8 @@
 
 #include "HistogramXrayEventAzimuthAngle.hh"
 
+#include <cmath>
+
 #include "XrayEventCollection.hh"
 #include "AstroUnits.hh"
 #include "TH1.h"
@@ -30,7 +32,8 @@ namespace unit = anlgeant4::unit;
 namespace comptonsoft {
 
 HistogramXrayEventAzimuthAngle::HistogramXrayEventAzimuthAngle()
-  : numBins_(33), angleMin_(-180.0-0.5*11.25), angleMax_(180.0+0.5*11.25),
+  : numBins_(16), angleMin_(0.0), angleMax_(360.0),
+    angleOffset_(0.0), anglePeriod_(360.0),
     collectionModule_("XrayEventCollection"), outputName_("angle")
 {
 }
@@ -40,6 +43,8 @@ ANLStatus HistogramXrayEventAzimuthAngle::mod_define()
   define_parameter("num_bins", &mod_class::numBins_);
   define_parameter("angle_min", &mod_class::angleMin_, 1.0, "degree");
   define_parameter("angle_max", &mod_class::angleMax_, 1.0, "degree");
+  define_parameter("angle_offset", &mod_class::angleOffset_, 1.0, "degree");
+  define_parameter("angle_period", &mod_class::anglePeriod_, 1.0, "degree");
   define_parameter("collection_module", &mod_class::collectionModule_);
   define_parameter("output_name", &mod_class::outputName_);
   
@@ -67,8 +72,11 @@ ANLStatus HistogramXrayEventAzimuthAngle::mod_initialize()
 ANLStatus HistogramXrayEventAzimuthAngle::mod_analyze()
 {
   for (const auto& event: collection_->getEvents()) {
-    const double angle = event->Angle();
-    histogram_->Fill(angle/unit::degree);
+    const double phi = event->Angle();
+    const double angle_degree = phi/unit::degree + angleOffset_;
+    const double angle_cycle = std::floor(angle_degree/anglePeriod_);
+    const double angle_base = angle_degree - angle_cycle*anglePeriod_;
+    histogram_->Fill(angle_base);
   }
 
   return AS_OK;
