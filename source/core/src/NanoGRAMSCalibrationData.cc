@@ -42,13 +42,6 @@ namespace fs = std::filesystem;
 namespace
 {
 
-struct TestPulseGainRow
-{
-  std::string time_id;
-  double time = 0.0;
-  std::array<double, NUM_VATA> fec_gain{};
-};
-
 std::string trim(const std::string& text)
 {
   const auto first = std::find_if_not(text.begin(), text.end(),
@@ -101,19 +94,36 @@ bool isTimeIdClock(const std::string& text)
   return true;
 }
 
+bool isFlatTimeId(const std::string& text)
+{
+  if (text.size() != 17 || text[8] != '_' || text[13] != '_') {
+    return false;
+  }
+  return isTimeIdDate(text.substr(0, 8)) && isTimeIdClock(text.substr(9));
+}
+
+std::string normalizeTimeId(const std::string& time_id)
+{
+  if (time_id.size() == 16 && time_id[8] == '/' && time_id[13] == '_') {
+    return time_id;
+  }
+  if (isFlatTimeId(time_id)) {
+    return time_id.substr(0, 8) + "/" + time_id.substr(9);
+  }
+  throw std::runtime_error("Invalid NanoGRAMS time_id: " + time_id);
+}
+
 double parseTimestamp(const std::string& time_id)
 {
-  if (time_id.size() != 16 || time_id[8] != '/' || time_id[13] != '_') {
-    throw std::runtime_error("Invalid NanoGRAMS time_id: " + time_id);
-  }
+  const std::string normalized = normalizeTimeId(time_id);
 
   std::tm tm{};
-  tm.tm_year = std::stoi(time_id.substr(0, 4)) - 1900;
-  tm.tm_mon  = std::stoi(time_id.substr(4, 2)) - 1;
-  tm.tm_mday = std::stoi(time_id.substr(6, 2));
-  tm.tm_hour = std::stoi(time_id.substr(9, 2));
-  tm.tm_min  = std::stoi(time_id.substr(11, 2));
-  tm.tm_sec  = std::stoi(time_id.substr(14, 2));
+  tm.tm_year = std::stoi(normalized.substr(0, 4)) - 1900;
+  tm.tm_mon  = std::stoi(normalized.substr(4, 2)) - 1;
+  tm.tm_mday = std::stoi(normalized.substr(6, 2));
+  tm.tm_hour = std::stoi(normalized.substr(9, 2));
+  tm.tm_min  = std::stoi(normalized.substr(11, 2));
+  tm.tm_sec  = std::stoi(normalized.substr(14, 2));
   tm.tm_isdst = -1;
 
   const std::time_t t = std::mktime(&tm);
@@ -132,7 +142,9 @@ double parseGainValue(const std::string& text)
   return std::stod(value);
 }
 
-std::vector<TestPulseGainRow> readTestPulseGainTable(const fs::path& csv_path)
+} // namespace
+
+TestPulseGainTable readTestPulseGainTable(const fs::path& csv_path)
 {
   std::ifstream input(csv_path);
   if (!input) {
@@ -161,7 +173,7 @@ std::vector<TestPulseGainRow> readTestPulseGainTable(const fs::path& csv_path)
     }
   }
 
-  std::vector<TestPulseGainRow> rows;
+  TestPulseGainTable rows;
   while (std::getline(input, line)) {
     if (line.empty()) {
       continue;
@@ -194,8 +206,8 @@ std::vector<TestPulseGainRow> readTestPulseGainTable(const fs::path& csv_path)
   return rows;
 }
 
-std::array<double, NUM_VATA> interpolateTestPulseGains(
-    const std::vector<TestPulseGainRow>& rows,
+std::array<double, NUM_VATA> interpolatedTestPulseGains(
+    const TestPulseGainTable& rows,
     double target_time)
 {
   std::array<double, NUM_VATA> gains{};
@@ -236,8 +248,6 @@ std::array<double, NUM_VATA> interpolateTestPulseGains(
 
   return gains;
 }
-
-} // namespace
 
 CalibrationConfig readCalibrationConfig(const std::string& config_file)
 {
@@ -287,6 +297,9 @@ std::string timeIdFromTPCTreePath(const std::string& tpctree_file)
 {
   const fs::path path(tpctree_file);
   const std::string clock = path.parent_path().filename().string();
+  if (isFlatTimeId(clock)) {
+    return normalizeTimeId(clock);
+  }
   const std::string date  = path.parent_path().parent_path().filename().string();
   if (!isTimeIdDate(date) || !isTimeIdClock(clock)) {
     throw std::runtime_error("Cannot derive YYYYMMDD/HHMM_SS from TPC tree path: " +
@@ -299,7 +312,7 @@ std::array<double, NUM_VATA> interpolatedTestPulseGainsFromCsv(
     const fs::path& csv_path,
     const std::string& target_time_id)
 {
-  return interpolateTestPulseGains(readTestPulseGainTable(csv_path),
+  return interpolatedTestPulseGains(readTestPulseGainTable(csv_path),
                                    parseTimestamp(target_time_id));
 }
 

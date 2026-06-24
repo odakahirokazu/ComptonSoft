@@ -51,11 +51,12 @@ ANLStatus NanoGRAMSHitExtraction::mod_initialize()
     return status;
   }
 
-  grams::readConfig(cfg_, config_file_);
-
   if (tpctree_file_.empty()) {
     throw std::runtime_error("TPC tree input file path is empty.");
   }
+
+  grams::readConfig(cfg_, config_file_);
+  grams::readDPPConfig(cfg_, tpctree_file_);
 
   input_file_ = std::make_unique<TFile>(tpctree_file_.c_str(), "READ");
   if (input_file_->IsZombie()) {
@@ -114,6 +115,7 @@ ANLStatus NanoGRAMSHitExtraction::mod_analyze()
   }
 
   current_raw_event_id_ = raw_event_id;
+  current_unix_time_ = tpc_tree_reader_->currentUnixTime();
   ++processed_entries_;
   current_event_hits_.clear();
 

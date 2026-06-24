@@ -24,6 +24,7 @@
 #include <filesystem>
 #include <map>
 #include <string>
+#include <vector>
 
 #include "AstroUnits.hh"
 #include "NanoGRAMSEvent.hh"
@@ -40,6 +41,15 @@ struct EnergyCalibrationConfig
   int ccal = 8;
   std::array<double, NUM_VATA> tp_adc_values = {1.0, 1.0, 1.0, 1.0};
 };
+
+struct TestPulseGainRow
+{
+  std::string time_id;
+  double time = 0.0;
+  std::array<double, NUM_VATA> fec_gain{};
+};
+
+using TestPulseGainTable = std::vector<TestPulseGainRow>;
 
 struct PositionCalibrationConfig
 {
@@ -66,6 +76,12 @@ std::filesystem::path resolveCalibrationPath(const std::filesystem::path& base_d
                                              const std::string& value);
 
 std::string timeIdFromTPCTreePath(const std::string& tpctree_file);
+
+TestPulseGainTable readTestPulseGainTable(const std::filesystem::path& csv_path);
+
+std::array<double, NUM_VATA> interpolatedTestPulseGains(
+    const TestPulseGainTable& rows,
+    double target_time);
 
 std::array<double, NUM_VATA> interpolatedTestPulseGainsFromCsv(
     const std::filesystem::path& csv_path,

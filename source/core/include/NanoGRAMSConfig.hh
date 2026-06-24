@@ -20,11 +20,13 @@
 #ifndef COMPTONSOFT_NanoGRAMSConfig_H
 #define COMPTONSOFT_NanoGRAMSConfig_H 1
 
+#include <array>
 #include <map>
 #include <string>
 #include <vector>
 
 #include "AstroUnits.hh"
+#include "NanoGRAMSEvent.hh"
 
 namespace comptonsoft
 {
@@ -41,7 +43,6 @@ enum class LightEventSelectionMode
 struct Config
 {
   int daq_time      = 0;
-  int delay_counts  = 0;
   int pix_min       = 0;
   int pix_max       = 0;
   int circ_min_hits = 0;
@@ -66,6 +67,7 @@ struct Config
 
   std::vector<int> general_analysis_channels = {4, 6, 5, 7};
   std::vector<int> pileup_analysis_channels  = {4};
+  std::array<int, NUM_CH_DPP_MAX> light_delay_counts{};
   std::string light_waveform_analysis = "average";
   LightEventSelectionMode light_event_selection_mode = LightEventSelectionMode::GammaRequired;
   bool use_light_for_event_selection = true;
@@ -73,6 +75,7 @@ struct Config
 };
 
 void readConfig(Config& cfg, const std::string& config_path);
+void readDPPConfig(Config& cfg, const std::string& tpctree_file);
 
 } /* namespace grams */
 } /* namespace comptonsoft */

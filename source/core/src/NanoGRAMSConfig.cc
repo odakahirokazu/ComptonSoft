@@ -23,6 +23,7 @@
 #include "NanoGRAMSLightAnalysis.hh"
 
 #include <algorithm>
+#include <filesystem>
 #include <iostream>
 #include <stdexcept>
 #include <yaml-cpp/yaml.h>
@@ -35,6 +36,7 @@ namespace
 {
 
 namespace unit = anlgeant4::unit;
+namespace fs = std::filesystem;
 
 bool isPeripheralToken(const YAML::Node& node)
 {
@@ -187,7 +189,6 @@ YAML::Node coreExcludePixelNode(const YAML::Node& nodeCharge)
 void readLightConfig(Config& cfg, const YAML::Node& node)
 {
   const auto nodeLight = node["light"];
-  cfg.delay_counts     = nodeLight["delay_counts"].as<int>();
   cfg.light_gamma_thr  = nodeLight["light_gamma_thr_mV"].as<double>() * (unit::volt/1000.0);
   cfg.light_cosmic_thr = nodeLight["light_cosmic_thr_mV"].as<double>() * (unit::volt/1000.0);
   cfg.pre_roi_window   = nodeLight["pre_roi_window_us"].as<double>() * unit::us;
@@ -223,7 +224,6 @@ void readLightConfig(Config& cfg, const YAML::Node& node)
   }
 
   std::cout << "readLightConfig()" << std::endl;
-  std::cout << "delay_counts:       " << cfg.delay_counts << std::endl;
   std::cout << "light_gamma_thr_mV:  "  << cfg.light_gamma_thr / (unit::volt/1000.0) << std::endl;
   std::cout << "light_cosmic_thr_mV:  " << cfg.light_cosmic_thr / (unit::volt/1000.0) << std::endl;
   std::cout << "pre_roi_window_us:  "   << cfg.pre_roi_window / unit::us << std::endl;
@@ -309,6 +309,39 @@ void readConfig(Config& cfg, const std::string& config_path)
 
   readLightConfig(cfg, configNode);
   readChargeConfig(cfg, configNode);
+}
+
+void readDPPConfig(Config& cfg, const std::string& tpctree_file)
+{
+  const fs::path config_path = fs::path(tpctree_file).parent_path() / "config_dpp.yaml";
+  const auto configNode = YAML::LoadFile(config_path.string());
+  const auto delayNode = configNode["savefile"]["listwave_delay"]["value"];
+  const std::vector<int> delays = delayNode.as<std::vector<int>>();
+  if (delays.size() != NUM_CH_DPP_MAX) {
+    throw std::runtime_error(
+        "savefile.listwave_delay.value in " + config_path.string() +
+        " must contain 8 DPP channel values.");
+  }
+
+  for (int ch = 0; ch < NUM_CH_DPP_MAX; ++ch) {
+    if (delays[ch] < 0) {
+      throw std::runtime_error(
+          "savefile.listwave_delay.value contains a negative delay in " +
+          config_path.string());
+    }
+    cfg.light_delay_counts[ch] = delays[ch];
+  }
+
+  std::cout << "readDPPConfig()" << std::endl;
+  std::cout << "config_dpp: " << config_path << std::endl;
+  std::cout << "listwave_delay: [ ";
+  for (int ch = 0; ch < NUM_CH_DPP_MAX; ++ch) {
+    if (ch != 0) {
+      std::cout << ", ";
+    }
+    std::cout << cfg.light_delay_counts[ch];
+  }
+  std::cout << " ]" << std::endl;
 }
 
 } /* namespace grams */

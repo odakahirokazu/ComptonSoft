@@ -21,6 +21,7 @@
 #define COMPTONSOFT_NanoGRAMSCalibration_H 1
 
 #include <cstdint>
+#include <limits>
 #include <map>
 #include <memory>
 #include <string>
@@ -52,18 +53,24 @@ public:
   anlnext::ANLStatus mod_end_run() override;
 
 private:
+  void updateGainCorrectionForCurrentEvent();
+
   std::string hittree_file_;
   std::string gain_tp_file_;
   std::map<std::string, double> gain_tp_dict_;
   double gain_tp_value_ = 0.0;
+  double gain_cache_seconds_ = 60.0;
 
   const NanoGRAMSHitExtraction* data_reduction_ = nullptr;
   std::unique_ptr<TFile> output_file_;
   TTree* hit_tree_ = nullptr;
   std::unique_ptr<HitTreeIOWithInitialInfo> tree_io_;
   CalibrationConfig calibration_config_;
+  TestPulseGainTable gain_tp_table_;
   TPCProperty tpc_property_;
   int64_t written_events_ = 0;
+  bool use_event_time_gain_ = false;
+  int64_t cached_gain_time_bin_ = std::numeric_limits<int64_t>::min();
   //std::vector<double> gain_tp_array_;
 };
 

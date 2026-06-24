@@ -54,6 +54,7 @@ public:
     return -1;
   }
   int64_t currentRawEventId() const { return current_raw_event_id_; }
+  uint32_t currentUnixTime() const { return current_unix_time_; }
   const std::vector<grams::RawFECHit>& currentEventHits() const
   {
     return current_event_hits_;
@@ -76,6 +77,7 @@ private:
   int64_t processed_entries_    = 0;
   int64_t expected_tpc_entries_ = 0;
   int64_t current_raw_event_id_ = -1;
+  uint32_t current_unix_time_ = 0;
   std::vector<grams::RawFECHit> current_event_hits_;
 };
 

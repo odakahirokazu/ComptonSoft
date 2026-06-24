@@ -104,6 +104,7 @@ public:
   std::vector<uint16_t>   adc;
   std::vector<uint32_t>   drift_time;
   std::vector<uint32_t>   ti;
+  std::array<uint32_t, NUM_VATA> unixtime{};
   std::vector<int16_t>    waveform;
   uint16_t error_flags = 0;
 
@@ -177,6 +178,7 @@ public:
   bool processNext(int64_t& raw_event_id, std::vector<RawFECHit>& event_hits);
   const TPCTreeBuffer& currentBuffer() const { return tpc_tree_buffer_; }
   TPCEventType currentEventType() const { return current_event_type_; }
+  uint32_t currentUnixTime() const { return current_unix_time_; }
 
 private:
   Config cfg_;
@@ -186,6 +188,7 @@ private:
   FECTITracker        fec_ti_tracker_;
   int64_t current_entry_ = 0;
   TPCEventType current_event_type_ = TPCEventType::Error;
+  uint32_t current_unix_time_ = 0;
 };
 
 class RawHitTreeOutputWriter

@@ -278,7 +278,7 @@ void recordLightTimingFromCurrentEntry(LightTimingState& light_timing,
   std::cout << "[INFO] entries=" << tpc_tree_layout.n_entries
             << " waveform_len=" << tpc_tree_layout.waveform_len
             << " waveform_num_channels=" << tpc_tree_layout.waveform_num_channels
-            << " delay_counts=" << cfg.delay_counts << "\n";
+            << "\n";
 
   for (int light_ch = 0; light_ch < tpc_tree_layout.num_dpp_registered_slots; ++light_ch) {
     if (!tpc_tree_buffer.registered_channels[light_ch]) {
@@ -286,7 +286,8 @@ void recordLightTimingFromCurrentEntry(LightTimingState& light_timing,
     }
     const uint16_t wave_compress = tpc_tree_buffer.wave_compress[light_ch];
     const double dt = waveCompressToTimebin(wave_compress);
-    const double trigger_delay = static_cast<double>(cfg.delay_counts) * 8.0 * dt;
+    const int delay_counts = cfg.light_delay_counts[light_ch];
+    const double trigger_delay = static_cast<double>(delay_counts) * 8.0 * dt;
 
     light_timing.wave_compress[light_ch] = wave_compress;
     light_timing.timebin[light_ch] = dt;
@@ -302,6 +303,7 @@ void recordLightTimingFromCurrentEntry(LightTimingState& light_timing,
                             tpc_tree_layout.waveform_len);
 
     std::cout << "[INFO] light_ch=" << light_ch << "\n";
+    std::cout << " delay_counts="  << delay_counts << "\n";
     std::cout << " wave_compress="  << static_cast<int>(light_timing.wave_compress[light_ch]) << "\n";
     std::cout << " timebin_ns="     << light_timing.timebin[light_ch] / unit::ns << "\n";
     std::cout << " pre_roi_index="  << light_timing.pre_roi_index[light_ch]  << "\n";
@@ -644,10 +646,21 @@ void TPCTreeBuffer::bindBranches(TTree* tpc_tree)
   tpc_tree->SetBranchAddress("adc",           adc.data());
   tpc_tree->SetBranchAddress("drift_time",    drift_time.data());
   tpc_tree->SetBranchAddress("ti",            ti.data());
+  tpc_tree->SetBranchAddress("unixtime",      unixtime.data());
   tpc_tree->SetBranchAddress("waveform",      waveform.data());
   tpc_tree->SetBranchAddress("wave_compress", wave_compress.data());
   tpc_tree->SetBranchAddress("registered",    registered_channels.data());
   tpc_tree->SetBranchAddress("error_flags",   &error_flags);
+}
+
+uint32_t representativeUnixTime(const TPCTreeBuffer& tpc_tree_buffer)
+{
+  for (const uint32_t value : tpc_tree_buffer.unixtime) {
+    if (value > 0) {
+      return value;
+    }
+  }
+  return 0;
 }
 
 TPCTreeReader::TPCTreeReader(TTree* tpc_tree, const Config& cfg)
@@ -675,6 +688,7 @@ bool TPCTreeReader::processNext(int64_t& raw_event_id,
 
   raw_event_id = current_entry_;
   tpc_tree_buffer_.getEntry(current_entry_);
+  current_unix_time_ = representativeUnixTime(tpc_tree_buffer_);
 
   const int err = static_cast<int>(tpc_tree_buffer_.error_flags);
   const bool tpc_ok   = isTPCDataUsable(err);
