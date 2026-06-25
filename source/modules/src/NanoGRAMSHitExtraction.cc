@@ -22,6 +22,8 @@
 #include <TFile.h>
 #include <TTree.h>
 
+#include <cmath>
+#include <filesystem>
 #include <format>
 #include <iostream>
 #include <stdexcept>
@@ -30,6 +32,19 @@ using namespace anlnext;
 
 namespace comptonsoft
 {
+
+namespace
+{
+
+int64_t gainTimeBin(double unix_time, double cache_seconds)
+{
+  if (cache_seconds > 0.0) {
+    return static_cast<int64_t>(std::floor(unix_time / cache_seconds));
+  }
+  return static_cast<int64_t>(unix_time);
+}
+
+} // namespace
 
 NanoGRAMSHitExtraction::NanoGRAMSHitExtraction() = default;
 
@@ -41,6 +56,11 @@ ANLStatus NanoGRAMSHitExtraction::mod_define()
   define_parameter("tpctree_file",        &mod_class::tpctree_file_);
   define_parameter("rawhittree_file",     &mod_class::rawhittree_file_);
   define_parameter("quicklook_file",      &mod_class::quicklook_file_);
+  define_parameter("gain_tp_file",        &mod_class::gain_tp_file_);
+  define_parameter("gain_tp_hash",        &mod_class::gain_tp_dict_);
+  define_parameter("gain_cache_seconds",  &mod_class::gain_cache_seconds_);
+  define_map_key("fec", "0");
+  add_value_element("gain", &mod_class::gain_tp_value_);
   return AS_OK;
 }
 
@@ -57,6 +77,7 @@ ANLStatus NanoGRAMSHitExtraction::mod_initialize()
 
   grams::readConfig(cfg_, config_file_);
   grams::readDPPConfig(cfg_, tpctree_file_);
+  setupTPCPropertyForHitSelection();
 
   input_file_ = std::make_unique<TFile>(tpctree_file_.c_str(), "READ");
   if (input_file_->IsZombie()) {
@@ -74,7 +95,13 @@ ANLStatus NanoGRAMSHitExtraction::mod_initialize()
             << "[NanoGRAMSHitExtraction] tpctree entries: "
             << expected_tpc_entries_ << "\n";
 
-  tpc_tree_reader_ = std::make_unique<grams::TPCTreeReader>(tpc_tree, cfg_);
+  tpc_tree_reader_ = std::make_unique<grams::TPCTreeReader>(
+      tpc_tree,
+      cfg_,
+      tpc_property_,
+      [this](uint32_t unix_time) {
+        updateGainCorrectionForCurrentEvent(unix_time);
+      });
   const int64_t reader_entries = tpc_tree_reader_->currentBuffer().nEntries();
   std::cout << "[NanoGRAMSHitExtraction] TPCTreeReader entries: "
             << reader_entries << "\n";
@@ -85,7 +112,8 @@ ANLStatus NanoGRAMSHitExtraction::mod_initialize()
   if (!quicklook_file_.empty()) {
     quicklook_tree_writer_ = std::make_unique<grams::QuickLookTreeOutputWriter>(
         quicklook_file_,
-        tpc_tree_reader_->currentBuffer().layout());
+        tpc_tree_reader_->currentBuffer().layout(),
+        tpc_property_);
   } else {
     std::cout << "[INFO] tpcquicklook output is disabled.\n";
   }
@@ -101,6 +129,79 @@ ANLStatus NanoGRAMSHitExtraction::mod_initialize()
   current_event_hits_.clear();
 
   return AS_OK;
+}
+
+void NanoGRAMSHitExtraction::setupTPCPropertyForHitSelection()
+{
+  calibration_config_ = readCalibrationConfig(config_file_);
+
+  if (!gain_tp_file_.empty()) {
+    const std::filesystem::path gain_tp_path =
+        resolveCalibrationPath(calibration_config_.config_dir, gain_tp_file_);
+    gain_tp_table_ = readTestPulseGainTable(gain_tp_path);
+    use_event_time_gain_ = true;
+    std::cout << "[NanoGRAMSHitExtraction] gain_tp_file for hit selection: "
+              << gain_tp_path << std::endl;
+  } else if (!gain_tp_dict_.empty()) {
+    calibration_config_.energy.tp_adc_values =
+        fixedTestPulseGainsFromHash(gain_tp_dict_);
+    std::cout << "[NanoGRAMSHitExtraction] gain_tp_hash for hit selection."
+              << std::endl;
+  } else {
+    std::cout << "[NanoGRAMSHitExtraction] WARNING: no gain_tp_file/hash for "
+              << "keV hit selection. Temperature correction factors are 1."
+              << std::endl;
+  }
+
+  const std::filesystem::path gain_info_path =
+      resolveCalibrationPath(calibration_config_.config_dir,
+                             calibration_config_.energy.gain_info_file);
+  const std::filesystem::path spline_path =
+      resolveCalibrationPath(calibration_config_.config_dir,
+                             calibration_config_.energy.q_to_kev_spline_file);
+
+  tpc_property_.loadParamCoulomb2keVForSpline3D(spline_path,
+                                                calibration_config_.general.efield);
+  tpc_property_.loadParamGainMatrices(gain_info_path);
+  tpc_property_.setDriftVelocity(electronDriftVelocity(
+      calibration_config_.general.temperature,
+      calibration_config_.general.efield));
+  tpc_property_.setAnodePosZ(calibration_config_.position.anode_pos_z);
+
+  if (!use_event_time_gain_ && !gain_tp_dict_.empty()) {
+    tpc_property_.applyTemperatureCorrection(
+        calibration_config_.energy.tp_channel,
+        calibration_config_.energy.ccal,
+        calibration_config_.energy.tp_adc_values);
+  }
+}
+
+void NanoGRAMSHitExtraction::updateGainCorrectionForCurrentEvent(uint32_t unix_time)
+{
+  if (!use_event_time_gain_) {
+    return;
+  }
+
+  if (unix_time == 0) {
+    throw std::runtime_error(
+        "TPC tree unixtime is zero; cannot apply event-time gain correction "
+        "for keV hit selection.");
+  }
+
+  const int64_t time_bin = gainTimeBin(
+      static_cast<double>(unix_time),
+      gain_cache_seconds_);
+  if (time_bin == cached_gain_time_bin_) {
+    return;
+  }
+
+  calibration_config_.energy.tp_adc_values =
+      interpolatedTestPulseGains(gain_tp_table_, static_cast<double>(unix_time));
+  tpc_property_.applyTemperatureCorrection(
+      calibration_config_.energy.tp_channel,
+      calibration_config_.energy.ccal,
+      calibration_config_.energy.tp_adc_values);
+  cached_gain_time_bin_ = time_bin;
 }
 
 ANLStatus NanoGRAMSHitExtraction::mod_analyze()

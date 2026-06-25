@@ -48,19 +48,19 @@ struct Config
   int circ_min_hits = 0;
 
   double adc2mv           = (1.0 / 8192.0) * 1000.0;
-  double adu_min          = 0.0;
-  double adu_max          = 0.0;
+  double hit_energy_min   = 0.0 * anlgeant4::unit::keV;
+  double hit_energy_max   = 0.0 * anlgeant4::unit::keV;
   double light_gamma_thr  = 0.0;
   double light_cosmic_thr = 0.0;
-  double circ_thr         = 0.0;
-  double spread_thr       = 0.0;
+  double circ_thr_energy  = 0.0 * anlgeant4::unit::keV;
+  double spread_thr_energy = 0.0 * anlgeant4::unit::keV;
   double drift_time_max   = 0.0 * anlgeant4::unit::us;
   //double late_window      = 0.0;
   //double late_peak_thr    = 0.0;
   double pre_roi_window      = 0.0;
   double post_roi_window     = 0.0;
   double out_roi_peak_thr    = 0.0;
-  double noise_th            = 0.0;
+  double noise_energy_th     = 0.0 * anlgeant4::unit::keV;
   //double circ_min_ratio      = 0.0;
   double timebin_ns_override = 0.0;
   double cross_fec_merge_drift_time_tolerance = -1.0 * anlgeant4::unit::us;

@@ -13,7 +13,7 @@ selection:
 charge:
   vmin: 0.0
   vmax: null
-  # max uses the largest ADC-CMN value across all FEC0-3 pixels.
+  # max uses the largest keV value across all FEC0-3 pixels.
   # Use percentile only when you intentionally want to clip isolated hot pixels.
   scale: max
   percentile_vmax: 99.0

@@ -278,14 +278,14 @@ LightPeaks analyzeLightChannelGroup(const Config& cfg,
 
 std::string normalizeLightWaveformAnalysis(const std::string& mode)
 {
-  if (mode == "average" || mode == "mean") {
+  if (mode == "average") {
     return "average";
   }
-  if (mode == "channel" || mode == "each_channel" || mode == "per_channel") {
+  if (mode == "each_channel") {
     return "each_channel";
   }
   throw std::runtime_error(
-      "light.waveform_analysis must be average, mean, channel, each_channel, or per_channel.");
+      "light.waveform_analysis must be average or each_channel.");
 }
 
 LightStatus analyzeLightEvent(const Config& cfg,

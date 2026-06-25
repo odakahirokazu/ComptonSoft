@@ -23,12 +23,12 @@ light:
   out_roi_peak_thr_mV: 15.0
 
 charge:
-  adu_range: [18.0, 1000.0]
+  energy_range_kev: [18.0, 1000.0]
   clustering_pix_range: [1, 3]
-  circ_thr: 10.0
-  spread_thr: 7.0
+  circ_thr_kev: 10.0
+  spread_thr_kev: 7.0
   drift_time_max_us: 150.0
-  noise_th: 20.0
+  noise_th_kev: 20.0
   circ_min_hits: 4
   core_exclude_pix:
     0: [0, 63]
@@ -92,14 +92,14 @@ they do not share channels. If the two groups share any channel, the common
 
 | Key | Type/range | Meaning |
 | --- | --- | --- |
-| `adu_range` | `[min, max]`, numbers | Allowed ADU-CMN range for the core pixel. The current clustering mainly uses the lower bound as the seed threshold. |
+| `energy_range_kev` | `[min, max]`, numbers, keV | Allowed calibrated energy range for the core pixel after ADU-CMN is converted to keV. |
 | `clustering_pix_range` | `[min, max]`, integers | Allowed number of pixels in one clustered FEC hit. `max >= 3` enables diagonal neighbors. |
-| `circ_thr` | number, ADU | Threshold for counting high peripheral pixels in circle-noise rejection. |
-| `spread_thr` | number, ADU | Neighbor-pixel threshold for absorbing pixels into the cluster around a valid core pixel. |
+| `circ_thr_kev` | number, keV | Threshold for counting high peripheral pixels in circle-noise rejection. |
+| `spread_thr_kev` | number, keV | Neighbor-pixel threshold for absorbing pixels into the cluster around a valid core pixel. |
 | `drift_time_max_us` | positive number, us | FECs with drift time at or above this value are treated as time-up and are not accepted as gamma hits. |
-| `noise_th` | number, ADU | Additional circle-noise veto using channels 0 and 63. |
-| `circ_min_hits` | non-negative integer | Minimum number of peripheral pixels above `circ_thr` for circle-noise rejection. |
-| `core_exclude_pix` | map from FEC ID to pixel list or token | Pixels that cannot become the core seed of a cluster. They can still be absorbed as neighbors if adjacent to a valid core and above `spread_thr`. |
+| `noise_th_kev` | number, keV | Additional circle-noise veto using channels 0 and 63. |
+| `circ_min_hits` | non-negative integer | Minimum number of peripheral pixels above `circ_thr_kev` for circle-noise rejection. |
+| `core_exclude_pix` | map from FEC ID to pixel list or token | Pixels that cannot become the core seed of a cluster. They can still be absorbed as neighbors if adjacent to a valid core and above `spread_thr_kev`. |
 
 ### `core_exclude_pix`
 
@@ -128,7 +128,9 @@ ignored.
 
 Test-pulse gain values are supplied from Ruby parameters, not from this YAML:
 use either `gain_tp_file` for time interpolation from CSV or `gain_tp_hash` for
-fixed FEC gains.
+fixed FEC gains. The same Ruby parameter should also be passed to
+`NanoGRAMSHitExtraction` so the keV-based hit selection and final calibration
+use the same gain correction.
 
 ## calibration.position
 
@@ -159,7 +161,11 @@ These old names are still accepted for transition:
 
 | Old key | Preferred key |
 | --- | --- |
-| `charge.adu_min` and `charge.adu_max` | `charge.adu_range` |
+| `charge.adu_min` and `charge.adu_max` | `charge.energy_range_kev` |
+| `charge.adu_range` | `charge.energy_range_kev` |
+| `charge.circ_thr` | `charge.circ_thr_kev` |
+| `charge.spread_thr` | `charge.spread_thr_kev` |
+| `charge.noise_th` | `charge.noise_th_kev` |
 | `charge.pix_min` and `charge.pix_max` | `charge.clustering_pix_range` |
 | `charge.exclude_pix` | `charge.core_exclude_pix` |
 | `light.use_for_event_selection` | `light.event_selection_mode` |

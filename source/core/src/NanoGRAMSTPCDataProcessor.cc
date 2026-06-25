@@ -19,6 +19,7 @@
 
 #include "NanoGRAMSTPCDataProcessor.hh"
 #include "NanoGRAMSLightAnalysis.hh"
+#include "NanoGRAMSTPCProperty.hh"
 
 #include <TFile.h>
 #include <TLeaf.h>
@@ -120,16 +121,16 @@ double lowerMean(const PixelADU& values, int n_values)
   return sum / static_cast<double>(n_values);
 }
 
-std::pair<int, double> findCoreChannel(const PixelADU& adu_cmn_sub,
-                                       const PixelMask& mask)
+std::pair<int, double> findCoreSignalChannel(const PixelADU& values,
+                                             const PixelMask& mask)
 {
   int core_ch = 0;
   double core_value = -std::numeric_limits<double>::infinity();
 
   for (int ch = 0; ch < NUM_CH_EACH_VATA; ++ch) {
     double value = -std::numeric_limits<double>::infinity();
-    if (mask[ch]) {
-      value = adu_cmn_sub[ch];
+    if (mask[ch] && std::isfinite(values[ch])) {
+      value = values[ch];
     }
     if (value > core_value) {
       core_value = value;
@@ -332,8 +333,10 @@ uint64_t FECTITracker::absoluteTi(int fec, uint32_t ti_value)
   return ti_abs;
 }
 
-FECChargeSelector::FECChargeSelector(const Config& cfg)
+FECChargeSelector::FECChargeSelector(const Config& cfg,
+                                     const TPCProperty& tpc_property)
     : cfg_(cfg),
+      tpc_property_(tpc_property),
       anode_topology_(buildAnodeChannelTopology()),
       include_diag_(cfg_.pix_max >= 3) //discussion needed
 {
@@ -357,6 +360,7 @@ FECChargeSelector::selectHits(const TPCTreeBuffer& tpc_tree_buffer,
   event_hits.reserve(static_cast<std::size_t>(NUM_VATA));
 
   std::array<PixelADU, NUM_VATA> adu_cmn_sub_values{};
+  std::array<PixelADU, NUM_VATA> hit_selection_energy_values{};
   std::array<double, NUM_VATA> drift_times{};
   std::array<uint64_t, NUM_VATA> ti_values{};
   std::array<double, NUM_VATA> core_values{};
@@ -372,11 +376,14 @@ FECChargeSelector::selectHits(const TPCTreeBuffer& tpc_tree_buffer,
     const double cmn = median64(adu_values);
     for (int ch = 0; ch < NUM_CH_EACH_VATA; ++ch) {
       adu_cmn_sub_values[fec][ch] = adu_values[ch] - cmn;
+      hit_selection_energy_values[fec][ch] =
+          hitSelectionEnergy(fec, ch, adu_cmn_sub_values[fec][ch]);
     }
 
     drift_times[fec] = driftTimeFromClock(tpc_tree_buffer.drift_time[fec]);
     ti_values[fec]   = fec_ti_tracker.absoluteTi(fec, tpc_tree_buffer.ti[fec]);
-    core_values[fec] = findCoreChannel(adu_cmn_sub_values[fec], masks_[fec]).second;
+    core_values[fec] =
+        findCoreSignalChannel(hit_selection_energy_values[fec], masks_[fec]).second;
     fec_order[fec]   = fec;
   }
 
@@ -396,6 +403,7 @@ FECChargeSelector::selectHits(const TPCTreeBuffer& tpc_tree_buffer,
     hit.drift_time = drift_times[fec];
 
     FECSelectionInput selection_input{adu_cmn_sub_values,
+                                      hit_selection_energy_values,
                                       drift_times,
                                       claimed_pixels,
                                       fec,
@@ -425,23 +433,23 @@ bool FECChargeSelector::isRejectedByTiming(const FECSelectionInput& input) const
 bool FECChargeSelector::isCircleNoise(const FECSelectionInput& input) const
 {
   const int fec = input.fec;
-  const PixelADU& adu_cmn_sub = input.adu_cmn_sub_values[fec];
+  const PixelADU& hit_selection_energy = input.hit_selection_energy_values[fec];
 
   int count_periph = 0;
   for (int ch : anode_topology_.periphery[fec]) {
-    if (adu_cmn_sub[ch] > cfg_.circ_thr) {
+    if (hit_selection_energy[ch] > cfg_.circ_thr_energy) {
       ++count_periph;
     }
   }
 
   double edge_sum = 0.0;
-  if (std::isfinite(adu_cmn_sub[0])) {
-    edge_sum += adu_cmn_sub[0];
+  if (std::isfinite(hit_selection_energy[0])) {
+    edge_sum += hit_selection_energy[0];
   }
-  if (std::isfinite(adu_cmn_sub[63])) {
-    edge_sum += adu_cmn_sub[63];
+  if (std::isfinite(hit_selection_energy[63])) {
+    edge_sum += hit_selection_energy[63];
   }
-  return count_periph >= min_periph_hits_[fec] || edge_sum > cfg_.noise_th;
+  return count_periph >= min_periph_hits_[fec] || edge_sum > cfg_.noise_energy_th;
 }
 
 PixelMask FECChargeSelector::buildAllowedPixelMask(int fec, int core_ch) const
@@ -465,10 +473,11 @@ bool FECChargeSelector::hasExtraHighPixel(const FECSelectionInput& input,
 {
   const int fec = input.fec;
   const PixelMask& mask_in = masks_[fec];
-  const PixelADU& adu_cmn_sub = input.adu_cmn_sub_values[fec];
+  const PixelADU& hit_selection_energy = input.hit_selection_energy_values[fec];
 
   for (int ch = 0; ch < NUM_CH_EACH_VATA; ++ch) {
-    if (mask_in[ch] && !allowed_pixels[ch] && adu_cmn_sub[ch] > cfg_.adu_min) {
+    if (mask_in[ch] && !allowed_pixels[ch] &&
+        hit_selection_energy[ch] > cfg_.hit_energy_min) {
       return true;
     }
   }
@@ -486,7 +495,8 @@ FECChargeSelector::collectClusterPixels(const FECSelectionInput& input,
   auto addCandidatePixel = [&](int candidate_fec, int ch) {
     // Excluded pixels cannot seed a cluster, but can be absorbed by a real core.
     if (!input.claimed_pixels[candidate_fec][ch] &&
-        input.adu_cmn_sub_values[candidate_fec][ch] > cfg_.spread_thr) {
+        input.hit_selection_energy_values[candidate_fec][ch] >
+            cfg_.spread_thr_energy) {
       addPixelIfNew(selected_pixels, candidate_fec, ch);
     }
   };
@@ -555,9 +565,11 @@ bool FECChargeSelector::fillSelectedChannels(const FECSelectionInput& input,
 
   const int fec = input.fec;
   const PixelMask& mask_in = masks_[fec];
-  const PixelADU& adu_cmn_sub = input.adu_cmn_sub_values[fec];
-  const auto [core_ch, core_adu] = findCoreChannel(adu_cmn_sub, mask_in);
-  if (core_adu <= cfg_.adu_min || input.claimed_pixels[fec][core_ch]) {
+  const PixelADU& hit_selection_energy = input.hit_selection_energy_values[fec];
+  const auto [core_ch, core_energy] =
+      findCoreSignalChannel(hit_selection_energy, mask_in);
+  if (core_energy <= cfg_.hit_energy_min || core_energy > cfg_.hit_energy_max ||
+      input.claimed_pixels[fec][core_ch]) {
     return false;
   }
 
@@ -582,6 +594,27 @@ bool FECChargeSelector::fillSelectedChannels(const FECSelectionInput& input,
   }
 
   return event_mask && !hit.channels.empty();
+}
+
+double FECChargeSelector::hitSelectionEnergy(int fec,
+                                             int ch,
+                                             double adu_cmn_sub) const
+{
+  if (!std::isfinite(adu_cmn_sub) || adu_cmn_sub <= 0.0) {
+    return 0.0 * unit::keV;
+  }
+
+  const double correction_factor = tpc_property_.temperatureCorrectionFactor(fec);
+  if (!std::isfinite(correction_factor) || correction_factor <= 0.0) {
+    return std::numeric_limits<double>::quiet_NaN();
+  }
+
+  const double corrected_adu = adu_cmn_sub * correction_factor;
+  if (corrected_adu <= 0.0) {
+    return 0.0 * unit::keV;
+  }
+
+  return tpc_property_.convertADC2keVWithSpline3D(fec, ch, corrected_adu);
 }
 
 TPCTreeBuffer::TPCTreeBuffer(TTree* tpc_tree)
@@ -663,11 +696,15 @@ uint32_t representativeUnixTime(const TPCTreeBuffer& tpc_tree_buffer)
   return 0;
 }
 
-TPCTreeReader::TPCTreeReader(TTree* tpc_tree, const Config& cfg)
+TPCTreeReader::TPCTreeReader(TTree* tpc_tree,
+                             const Config& cfg,
+                             const TPCProperty& tpc_property,
+                             GainCorrectionUpdater gain_correction_updater)
     : cfg_(cfg),
       tpc_tree_buffer_(tpc_tree),
-      fec_selector_(cfg_),
-      fec_ti_tracker_()
+      fec_selector_(cfg_, tpc_property),
+      fec_ti_tracker_(),
+      gain_correction_updater_(std::move(gain_correction_updater))
 {
   if (tpc_tree_buffer_.nEntries() > 0) {
     tpc_tree_buffer_.getEntry(0);
@@ -689,6 +726,9 @@ bool TPCTreeReader::processNext(int64_t& raw_event_id,
   raw_event_id = current_entry_;
   tpc_tree_buffer_.getEntry(current_entry_);
   current_unix_time_ = representativeUnixTime(tpc_tree_buffer_);
+  if (gain_correction_updater_) {
+    gain_correction_updater_(current_unix_time_);
+  }
 
   const int err = static_cast<int>(tpc_tree_buffer_.error_flags);
   const bool tpc_ok   = isTPCDataUsable(err);
@@ -807,10 +847,12 @@ void RawHitTreeOutputWriter::bindBranches()
 
 QuickLookTreeOutputWriter::QuickLookTreeOutputWriter(
     const std::string& output_file_path,
-    const TPCTreeLayout& tpc_tree_layout)
+    const TPCTreeLayout& tpc_tree_layout,
+    const TPCProperty& tpc_property)
     : output_path_(prepareOutputPath(output_file_path)),
       file_(std::make_unique<TFile>(output_path_.string().c_str(), "RECREATE")),
       quicklook_tree_(std::make_unique<TTree>(kQuickLookTreeName, kQuickLookTreeName)),
+      tpc_property_(tpc_property),
       waveform_len_(tpc_tree_layout.waveform_len),
       waveform_num_channels_(tpc_tree_layout.waveform_num_channels),
       waveform_len_branch_(tpc_tree_layout.waveform_len),
@@ -822,6 +864,7 @@ QuickLookTreeOutputWriter::QuickLookTreeOutputWriter(
   }
 
   adu_cmn_sub_.assign(NUM_VATA * NUM_CH_EACH_VATA, 0.0f);
+  energy_cmn_sub_.assign(NUM_VATA * NUM_CH_EACH_VATA, 0.0f);
   waveform_.assign(waveform_num_channels_ * waveform_len_, 0);
   quicklook_tree_->SetDirectory(nullptr);
   bindBranches();
@@ -852,11 +895,12 @@ void QuickLookTreeOutputWriter::fillEvent(int64_t raw_event_id,
   }
   waveform_ = tpc_tree_buffer.waveform;
 
-  fillCmnSubtractedADU(event_type, tpc_tree_buffer);
+  fillChargeMaps(event_type, tpc_tree_buffer);
 
   hit_pixel_fec_.clear();
   hit_pixel_ch_.clear();
   hit_pixel_adu_.clear();
+  hit_pixel_energy_.clear();
   hit_pixel_cluster_id_.clear();
   for (std::size_t ihit = 0; ihit < hits.size(); ++ihit) {
     const RawFECHit& hit = hits[ihit];
@@ -869,8 +913,11 @@ void QuickLookTreeOutputWriter::fillEvent(int64_t raw_event_id,
       hit_pixel_ch_.push_back(hit.channels[j]);
       if (j < hit.adus.size()) {
         hit_pixel_adu_.push_back(hit.adus[j]);
+        hit_pixel_energy_.push_back(static_cast<float>(
+            quicklookEnergy(hit_pixel_fec_.back(), hit.channels[j], hit.adus[j]) / unit::keV));
       } else {
         hit_pixel_adu_.push_back(std::numeric_limits<float>::quiet_NaN());
+        hit_pixel_energy_.push_back(std::numeric_limits<float>::quiet_NaN());
       }
       hit_pixel_cluster_id_.push_back(static_cast<int16_t>(ihit));
     }
@@ -895,6 +942,7 @@ std::string QuickLookTreeOutputWriter::close()
 void QuickLookTreeOutputWriter::bindBranches()
 {
   adu_leaflist_           = std::format("adu_cmn_sub[{}][{}]/F", NUM_VATA, NUM_CH_EACH_VATA);
+  energy_leaflist_        = std::format("energy_cmn_sub[{}][{}]/F", NUM_VATA, NUM_CH_EACH_VATA);
   cmn_leaflist_           = std::format("cmn[{}]/F", NUM_VATA);
   ti_leaflist_            = std::format("ti[{}]/i", NUM_VATA);
   drift_leaflist_         = std::format("drift_time[{}]/i", NUM_VATA);
@@ -910,6 +958,9 @@ void QuickLookTreeOutputWriter::bindBranches()
                           &waveform_num_channels_branch_,
                           "waveform_num_channels/I");
   quicklook_tree_->Branch("adu_cmn_sub",  adu_cmn_sub_.data(),  adu_leaflist_.c_str());
+  quicklook_tree_->Branch("energy_cmn_sub",
+                          energy_cmn_sub_.data(),
+                          energy_leaflist_.c_str());
   quicklook_tree_->Branch("cmn",          cmn_.data(),          cmn_leaflist_.c_str());
   quicklook_tree_->Branch("ti",           ti_.data(),           ti_leaflist_.c_str());
   quicklook_tree_->Branch("drift_time",   drift_time_.data(),   drift_leaflist_.c_str());
@@ -920,10 +971,11 @@ void QuickLookTreeOutputWriter::bindBranches()
   quicklook_tree_->Branch("hit_pixel_fec",        &hit_pixel_fec_);
   quicklook_tree_->Branch("hit_pixel_ch",         &hit_pixel_ch_);
   quicklook_tree_->Branch("hit_pixel_adu",        &hit_pixel_adu_);
+  quicklook_tree_->Branch("hit_pixel_energy",     &hit_pixel_energy_);
   quicklook_tree_->Branch("hit_pixel_cluster_id", &hit_pixel_cluster_id_);
 }
 
-void QuickLookTreeOutputWriter::fillCmnSubtractedADU(
+void QuickLookTreeOutputWriter::fillChargeMaps(
     TPCEventType event_type,
     const TPCTreeBuffer& tpc_tree_buffer)
 {
@@ -941,10 +993,34 @@ void QuickLookTreeOutputWriter::fillCmnSubtractedADU(
     cmn_[fec] = static_cast<float>(cmn);
 
     for (int ch = 0; ch < NUM_CH_EACH_VATA; ++ch) {
-      adu_cmn_sub_[fec * NUM_CH_EACH_VATA + ch] =
-          static_cast<float>(adu_values[ch] - cmn);
+      const double adu_cmn_sub = adu_values[ch] - cmn;
+      const int index = fec * NUM_CH_EACH_VATA + ch;
+      adu_cmn_sub_[index] = static_cast<float>(adu_cmn_sub);
+      energy_cmn_sub_[index] =
+          static_cast<float>(quicklookEnergy(fec, ch, adu_cmn_sub) / unit::keV);
     }
   }
+}
+
+double QuickLookTreeOutputWriter::quicklookEnergy(int fec,
+                                                  int ch,
+                                                  double adu_cmn_sub) const
+{
+  if (!std::isfinite(adu_cmn_sub) || adu_cmn_sub <= 0.0) {
+    return 0.0 * unit::keV;
+  }
+
+  const double correction_factor = tpc_property_.temperatureCorrectionFactor(fec);
+  if (!std::isfinite(correction_factor) || correction_factor <= 0.0) {
+    return std::numeric_limits<double>::quiet_NaN();
+  }
+
+  const double corrected_adu = adu_cmn_sub * correction_factor;
+  if (corrected_adu <= 0.0) {
+    return 0.0 * unit::keV;
+  }
+
+  return tpc_property_.convertADC2keVWithSpline3D(fec, ch, corrected_adu);
 }
 
 } /* namespace grams */

@@ -30,6 +30,7 @@
 #include <array>
 #include <cstdint>
 #include <filesystem>
+#include <functional>
 #include <memory>
 #include <string>
 #include <vector>
@@ -44,6 +45,8 @@ class TTree;
 namespace comptonsoft
 {
 namespace unit = anlgeant4::unit;
+
+class TPCProperty;
 
 namespace grams
 {
@@ -61,6 +64,7 @@ struct RawFECHit
 struct FECSelectionInput
 {
   const std::array<PixelADU, NUM_VATA>& adu_cmn_sub_values;
+  const std::array<PixelADU, NUM_VATA>& hit_selection_energy_values;
   const std::array<double, NUM_VATA>& drift_times;
   std::array<PixelMask, NUM_VATA>& claimed_pixels;
   int fec           = 0;
@@ -140,7 +144,7 @@ private:
 class FECChargeSelector
 {
 public:
-  explicit FECChargeSelector(const Config& cfg);
+  FECChargeSelector(const Config& cfg, const TPCProperty& tpc_property);
 
   std::vector<RawFECHit> selectHits(const TPCTreeBuffer& tpc_tree_buffer,
                                     FECTITracker& fec_ti_tracker,
@@ -161,8 +165,10 @@ private:
   void fillHitChannels(const FECSelectionInput& input,
                        const std::vector<std::pair<int, int>>& selected_pixels,
                        RawFECHit& hit) const;
+  double hitSelectionEnergy(int fec, int ch, double adu_cmn_sub) const;
 
   const Config& cfg_;
+  const TPCProperty& tpc_property_;
   AnodeChannelTopology anode_topology_;
   bool include_diag_ = false;
   std::array<PixelMask, NUM_VATA> masks_{};
@@ -172,7 +178,12 @@ private:
 class TPCTreeReader
 {
 public:
-  TPCTreeReader(TTree* tpc_tree, const Config& cfg);
+  using GainCorrectionUpdater = std::function<void(uint32_t)>;
+
+  TPCTreeReader(TTree* tpc_tree,
+                const Config& cfg,
+                const TPCProperty& tpc_property,
+                GainCorrectionUpdater gain_correction_updater);
   ~TPCTreeReader();
 
   bool processNext(int64_t& raw_event_id, std::vector<RawFECHit>& event_hits);
@@ -186,6 +197,7 @@ private:
   FECChargeSelector   fec_selector_;
   LightTimingState    light_timing_;
   FECTITracker        fec_ti_tracker_;
+  GainCorrectionUpdater gain_correction_updater_;
   int64_t current_entry_ = 0;
   TPCEventType current_event_type_ = TPCEventType::Error;
   uint32_t current_unix_time_ = 0;
@@ -223,7 +235,8 @@ class QuickLookTreeOutputWriter
 {
 public:
   explicit QuickLookTreeOutputWriter(const std::string& output_file_path,
-                                     const TPCTreeLayout& tpc_tree_layout);
+                                     const TPCTreeLayout& tpc_tree_layout,
+                                     const TPCProperty& tpc_property);
   ~QuickLookTreeOutputWriter();
 
   void fillEvent(int64_t raw_event_id,
@@ -234,15 +247,18 @@ public:
 
 private:
   void bindBranches();
-  void fillCmnSubtractedADU(TPCEventType event_type,
-                            const TPCTreeBuffer& tpc_tree_buffer);
+  void fillChargeMaps(TPCEventType event_type,
+                      const TPCTreeBuffer& tpc_tree_buffer);
+  double quicklookEnergy(int fec, int ch, double adu_cmn_sub) const;
 
   std::filesystem::path  output_path_;
   std::unique_ptr<TFile> file_;
   std::unique_ptr<TTree> quicklook_tree_;
+  const TPCProperty& tpc_property_;
   int waveform_len_ = 0;
   int waveform_num_channels_ = 0;
   std::string adu_leaflist_;
+  std::string energy_leaflist_;
   std::string cmn_leaflist_;
   std::string ti_leaflist_;
   std::string drift_leaflist_;
@@ -256,6 +272,7 @@ private:
   int32_t waveform_len_branch_ = 0;
   int32_t waveform_num_channels_branch_ = 0;
   std::vector<float> adu_cmn_sub_;
+  std::vector<float> energy_cmn_sub_;
   std::array<float, NUM_VATA> cmn_{};
   std::array<uint32_t, NUM_VATA> ti_{};
   std::array<uint32_t, NUM_VATA> drift_time_{};
@@ -265,6 +282,7 @@ private:
   std::vector<int16_t> hit_pixel_fec_;
   std::vector<int16_t> hit_pixel_ch_;
   std::vector<float> hit_pixel_adu_;
+  std::vector<float> hit_pixel_energy_;
   std::vector<int16_t> hit_pixel_cluster_id_;
 };
 

@@ -96,7 +96,7 @@ bool isTimeIdClock(const std::string& text)
 
 bool isFlatTimeId(const std::string& text)
 {
-  if (text.size() != 17 || text[8] != '_' || text[13] != '_') {
+  if (text.size() != 16 || text[8] != '_' || text[13] != '_') {
     return false;
   }
   return isTimeIdDate(text.substr(0, 8)) && isTimeIdClock(text.substr(9));
