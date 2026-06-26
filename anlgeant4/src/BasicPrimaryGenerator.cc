@@ -26,7 +26,6 @@
 #include "G4ParticleTable.hh"
 #include "G4Ions.hh"
 #include "G4IonTable.hh"
-#include "G4VIsotopeTable.hh"
 #include "AstroUnits.hh"
 #include "BasicPrimaryGeneratorAction.hh"
 #include "VANLGeometry.hh"
@@ -215,11 +214,11 @@ void BasicPrimaryGenerator::confirm_primary_setting(int event_id, const PrimaryS
 
 void BasicPrimaryGenerator::store_initial_condition(int event_id, const PrimarySetting& primary_info)
 {
-  initial_info_->setInitialEnergy(event_id, primary_info.energy);
-  initial_info_->setInitialDirection(event_id, primary_info.direction);
-  initial_info_->setInitialTime(event_id, primary_info.time);
-  initial_info_->setInitialPosition(event_id, primary_info.position);
-  initial_info_->setInitialPolarization(event_id, primary_info.polarization);
+  initial_info_->set_initial_energy(event_id, primary_info.energy);
+  initial_info_->set_initial_direction(event_id, primary_info.direction);
+  initial_info_->set_initial_time(event_id, primary_info.time);
+  initial_info_->set_initial_position(event_id, primary_info.position);
+  initial_info_->set_initial_polarization(event_id, primary_info.polarization);
 }
 
 void BasicPrimaryGenerator::set_particle_definition(G4ParticleDefinition* particle_definition)
@@ -237,12 +236,12 @@ void BasicPrimaryGenerator::set_nucleus_definition(int atomic_number,
                                              double excitation_energy,
                                              int floating_level)
 {
-  G4IonTable* ionTable = static_cast<G4IonTable*>(G4ParticleTable::GetParticleTable()->GetIonTable());
+  G4IonTable* ion_table = static_cast<G4IonTable*>(G4ParticleTable::GetParticleTable()->GetIonTable());
   G4ParticleDefinition* particle_base =
-    ionTable->GetIon(atomic_number,
-                     mass_number,
-                     excitation_energy,
-                     G4Ions::FloatLevelBase(floating_level));
+    ion_table->GetIon(atomic_number,
+                      mass_number,
+                      excitation_energy,
+                    G4Ions::FloatLevelBase(floating_level));
   G4Ions* particle = dynamic_cast<G4Ions*>(particle_base);
   if (particle == nullptr) {
     std::cout << "Error: the particle can not be converted into G4Ions." << std::endl;
@@ -348,19 +347,19 @@ double BasicPrimaryGenerator::sample_from_powerlaw() const
   return sample_from_powerlaw(photon_index_, energy_min_, energy_max_);
 }
 
-double BasicPrimaryGenerator::sample_from_powerlaw(double gamma, double e0, double e1) const
+double BasicPrimaryGenerator::sample_from_powerlaw(double gamma, double emin, double emax) const
 {
   using std::pow;
 
   double energy = 0.0;
   if ( 0.999 < gamma && gamma < 1.001 ) {
     // Photon index ~ 1
-    energy = e0 * pow(e1/e0, G4UniformRand());
+    energy = emin * pow(emax/emin, G4UniformRand());
   }
   else {
     const double s = 1.0-gamma;
-    const double a0 = pow(e0, s);
-    const double a1 = pow(e1, s);
+    const double a0 = pow(emin, s);
+    const double a1 = pow(emax, s);
     const double a = a0 + G4UniformRand()*(a1-a0);
     energy = pow(a, 1./s);
   }
@@ -453,7 +452,7 @@ G4ThreeVector BasicPrimaryGenerator::unpolarized_vector(G4ThreeVector direction)
 G4VUserPrimaryGeneratorAction* BasicPrimaryGenerator::create()
 {
   BasicPrimaryGeneratorAction* primary_generator = new BasicPrimaryGeneratorAction;
-  primary_generator->RegisterSampler(this);
+  primary_generator->register_sampler(this);
   return primary_generator;
 }
 

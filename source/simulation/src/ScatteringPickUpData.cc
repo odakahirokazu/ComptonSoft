@@ -46,22 +46,22 @@ ANLStatus ScatteringPickUpData::mod_initialize()
     get_module_NC("SaveData", &saveModule);
     saveModule->GetDirectory()->cd();
   }
-  
+
   tree_ = new TTree("stree", "Scattering tree");
   tree_->Branch("dirx", &dirx_, "dirx/D");
   tree_->Branch("diry", &diry_, "diry/D");
   tree_->Branch("dirz", &dirz_, "dirz/D");
   tree_->Branch("energy", &energy_, "energy/D");
-  
+
   return AS_OK;
 }
 
-void ScatteringPickUpData::EventActionAtBeginning(const G4Event*)
+void ScatteringPickUpData::event_action_at_beginning(const G4Event*)
 {
   firstInteraction_ = true;
 }
 
-void ScatteringPickUpData::SteppingAction(const G4Step* aStep)
+void ScatteringPickUpData::stepping_action(const G4Step* aStep)
 {
   if (!firstInteraction_) return;
 

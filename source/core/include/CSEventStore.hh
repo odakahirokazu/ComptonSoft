@@ -39,8 +39,8 @@ public:
   CSEventStore();
   virtual ~CSEventStore();
 
-  void initializeRun(int runID, int num_events) override;
-  void initializeEvent(int eventID) override;
+  void initialize_run(int runID, int num_events) override;
+  void initialize_event(int eventID) override;
 
   void insertHit(const DetectorHit& hit);
   void insertHit(DetectorHit&& hit);

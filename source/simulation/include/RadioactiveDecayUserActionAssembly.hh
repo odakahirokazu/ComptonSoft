@@ -44,7 +44,7 @@ public:
 
   anlnext::ANLStatus mod_define() override;
 
-  void SteppingAction(const G4Step* aStep) override;
+  void stepping_action(const G4Step* aStep) override;
 
   void set_termination_time(double v) { termination_time_ = v; }
   double termination_time() const { return termination_time_; }

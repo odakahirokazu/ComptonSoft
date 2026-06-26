@@ -89,13 +89,13 @@ ANLStatus RadioactivationUserActionAssembly::mod_finalize()
   return StandardUserActionAssembly::mod_finalize();
 }
 
-void RadioactivationUserActionAssembly::RunActionAtEnd(const G4Run* run)
+void RadioactivationUserActionAssembly::run_action_at_end(const G4Run* run)
 {
   *total_event_number_ptr_ += run->GetNumberOfEvent();
-  StandardUserActionAssembly::RunActionAtEnd(run);
+  StandardUserActionAssembly::run_action_at_end(run);
 }
 
-void RadioactivationUserActionAssembly::SteppingAction(const G4Step* step)
+void RadioactivationUserActionAssembly::stepping_action(const G4Step* step)
 {
   G4Track* track = step->GetTrack();
   const G4VProcess* process = step->GetPostStepPoint()->GetProcessDefinedStep();
@@ -137,7 +137,7 @@ void RadioactivationUserActionAssembly::SteppingAction(const G4Step* step)
   }
 }
 
-G4UserStackingAction* RadioactivationUserActionAssembly::createStackingAction() const
+G4UserStackingAction* RadioactivationUserActionAssembly::create_stacking_action() const
 {
   return new RadioactivationStackingAction;
 }

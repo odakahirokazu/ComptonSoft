@@ -38,13 +38,13 @@ class VUserActionAssembly;
 class UserActionAssemblySteppingAction : public G4UserSteppingAction
 {
 public:
-  explicit UserActionAssemblySteppingAction(const std::vector<VUserActionAssembly*>& userActions);
+  explicit UserActionAssemblySteppingAction(const std::vector<VUserActionAssembly*>& user_actions);
   ~UserActionAssemblySteppingAction();
 
-  void UserSteppingAction(const G4Step*) override;
+  void UserSteppingAction(const G4Step* step) override;
 
 private:
-  std::vector<VUserActionAssembly*> userActions_;
+  std::vector<VUserActionAssembly*> user_actions_;
 };
 
 } /* namespace anlgeant4 */

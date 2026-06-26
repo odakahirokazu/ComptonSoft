@@ -35,7 +35,7 @@ namespace anlgeant4 {
  */
 class SphericalSourcePrimaryGenerator : public PointSourcePrimaryGenerator
 {
-  DEFINE_ANL_MODULE(SphericalSourcePrimaryGenerator, 2.0);
+  DEFINE_ANL_MODULE(SphericalSourcePrimaryGenerator, 7.0);
 public:
   SphericalSourcePrimaryGenerator();
   ~SphericalSourcePrimaryGenerator();

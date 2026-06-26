@@ -31,7 +31,7 @@ namespace anlgeant4 {
  */
 class WriteGDML : public anlnext::BasicModule
 {
-  DEFINE_ANL_MODULE(WriteGDML, 1.0);
+  DEFINE_ANL_MODULE(WriteGDML, 2.0);
 public:
   WriteGDML();
 

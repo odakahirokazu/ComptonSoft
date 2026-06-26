@@ -2,7 +2,7 @@ set(TARGET_LIBRARY ANLGeant4)
 
 set(ANLG4_CORE_CLASSES
   src/Geant4Body.cc
-  src/SDAssignment.cc
+  src/SensitiveDetectorAssignment.cc
   src/VDetectorConstruction.cc
   src/VANLGeometry.cc
   src/BasicPrimaryGeneratorAction.cc

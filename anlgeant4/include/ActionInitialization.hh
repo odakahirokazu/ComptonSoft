@@ -41,6 +41,7 @@ public:
 
   void register_user_action(VANLPrimaryGenerator* primary_generator);
   void register_user_action(VUserActionAssembly* uaa);
+  void set_store_trajectory(bool v=true) { store_trajectory_ = v; }
 
   void BuildForMaster() const override;
   void Build() const override;
@@ -49,6 +50,7 @@ protected:
   std::vector<VUserActionAssembly*> create_user_action_assemblies() const;
 
 private:
+  bool store_trajectory_ = false;
   VANLPrimaryGenerator* primary_generator_ = nullptr;
   std::vector<VUserActionAssembly*> user_action_assemblies_original_;
   mutable std::mutex mutex_;

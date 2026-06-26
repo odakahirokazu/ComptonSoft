@@ -25,27 +25,26 @@
 namespace anlgeant4
 {
 
-UserActionAssemblyTrackingAction::UserActionAssemblyTrackingAction(const std::vector<VUserActionAssembly*>& userActions)
-  : userActions_(userActions)
+UserActionAssemblyTrackingAction::UserActionAssemblyTrackingAction(const std::vector<VUserActionAssembly*>& user_actions)
+  : user_actions_(user_actions)
 {
 }
 
 UserActionAssemblyTrackingAction::~UserActionAssemblyTrackingAction() = default;
 
-void UserActionAssemblyTrackingAction::PreUserTrackingAction(const G4Track* aTrack)
+void UserActionAssemblyTrackingAction::PreUserTrackingAction(const G4Track* track)
 {
-  fpTrackingManager->SetStoreTrajectory(true);
-  fpTrackingManager->SetTrajectory(new G4Trajectory(aTrack));
-  
-  for (VUserActionAssembly* ua: userActions_) {
-    ua->TrackActionAtBeginning(aTrack);
+  fpTrackingManager->SetStoreTrajectory(store_trajectory_);
+
+  for (VUserActionAssembly* ua: user_actions_) {
+    ua->track_action_at_beginning(track);
   }
 }
 
-void UserActionAssemblyTrackingAction::PostUserTrackingAction(const G4Track* aTrack)
+void UserActionAssemblyTrackingAction::PostUserTrackingAction(const G4Track* track)
 {
-  for (VUserActionAssembly* ua: userActions_) {
-    ua->TrackActionAtEnd(aTrack);
+  for (VUserActionAssembly* ua: user_actions_) {
+    ua->track_action_at_end(track);
   }
 }
 

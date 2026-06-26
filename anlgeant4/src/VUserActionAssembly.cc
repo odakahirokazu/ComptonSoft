@@ -39,14 +39,14 @@ VUserActionAssembly::~VUserActionAssembly() = default;
 
 ANLStatus VUserActionAssembly::mod_initialize()
 {
-  Geant4Body* geant4body = nullptr;
-  get_module_NC("Geant4Body", &geant4body);
-  geant4body->register_user_action(this);
+  Geant4Body* geant4_body = nullptr;
+  get_module_NC("Geant4Body", &geant4_body);
+  geant4_body->register_user_action(this);
 
   return AS_OK;
 }
 
-std::unique_ptr<VUserActionAssembly> VUserActionAssembly::createUserActionAssembly() const
+std::unique_ptr<VUserActionAssembly> VUserActionAssembly::create_user_action_assembly() const
 {
   std::unique_ptr<anlnext::BasicModule> m = this->clone();
   return std::unique_ptr<VUserActionAssembly>(static_cast<VUserActionAssembly*>(m.release()));

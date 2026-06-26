@@ -41,13 +41,13 @@ class ObservationPickUpData : public anlgeant4::VUserActionAssembly
 public:
   ObservationPickUpData();
   ~ObservationPickUpData() = default;
-  
+
   anlnext::ANLStatus mod_define() override;
 
-  void EventActionAtBeginning(const G4Event*) override;
-  void TrackActionAtEnd(const G4Track* track) override;
+  void event_action_at_beginning(const G4Event*) override;
+  void track_action_at_end(const G4Track* track) override;
 
-  const std::vector<ObservedParticle_sptr>& getParticleVector() const 
+  const std::vector<ObservedParticle_sptr>& getParticleVector() const
   { return particleVector_; }
 
 private:

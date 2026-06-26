@@ -32,18 +32,18 @@ CSEventStore::CSEventStore()
 
 CSEventStore::~CSEventStore() = default;
 
-void CSEventStore::initializeRun(int runID, int num_events)
+void CSEventStore::initialize_run(int runID, int num_events)
 {
-  VEventStore::initializeRun(runID, num_events);
+  VEventStore::initialize_run(runID, num_events);
   hits_vector_.resize(num_events);
   for (auto& hits: hits_vector_) {
     hits.clear();
   }
 }
 
-void CSEventStore::initializeEvent(int eventID)
+void CSEventStore::initialize_event(int eventID)
 {
-  VEventStore::initializeEvent(eventID);
+  VEventStore::initialize_event(eventID);
 }
 
 void CSEventStore::insertHit(const DetectorHit& hit)

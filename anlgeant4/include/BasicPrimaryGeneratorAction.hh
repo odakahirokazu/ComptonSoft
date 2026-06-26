@@ -22,7 +22,6 @@
 
 #include "G4VUserPrimaryGeneratorAction.hh"
 
-#include <string>
 #include <memory>
 #include "PrimarySetting.hh"
 
@@ -50,11 +49,11 @@ public:
 
   void GeneratePrimaries(G4Event* event) override;
 
-  void RegisterSampler(anlgeant4::BasicPrimaryGenerator* sampler) { sampler_ = sampler; }
+  void register_sampler(anlgeant4::BasicPrimaryGenerator* sampler) { sampler_ = sampler; }
 
 protected:
-  void SetDefinition(G4ParticleDefinition* definition);
-  void SetPrimarySetting(const PrimarySetting& primary);
+  void set_particle_definition(G4ParticleDefinition* definition);
+  void set_primary_setting(const PrimarySetting& primary);
 
 private:
   std::unique_ptr<G4ParticleGun> particle_gun_;

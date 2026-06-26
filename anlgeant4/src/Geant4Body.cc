@@ -26,7 +26,6 @@
 #include "G4RunManagerFactory.hh"
 #include "G4VUserDetectorConstruction.hh"
 #include "G4VUserPhysicsList.hh"
-#include "G4VUserPrimaryGeneratorAction.hh"
 #include "G4UImanager.hh"
 
 #include "ActionInitialization.hh"
@@ -49,6 +48,7 @@ Geant4Body::Geant4Body()
     random_engine_("MixMaxRng"),
     random_seed_(0),
     verbose_level_(0),
+    store_trajectory_(false),
     random_seed_initial_(0)
 {
 }
@@ -64,6 +64,7 @@ ANLStatus Geant4Body::mod_define()
   define_parameter("random_engine", &mod_class::random_engine_);
   define_parameter("random_seed", &mod_class::random_seed_);
   define_parameter("verbose", &mod_class::verbose_level_);
+  define_parameter("store_trajectory", &mod_class::store_trajectory_);
   define_parameter("commands", &mod_class::user_commands_);
 
   define_result("random_seed_initial", &mod_class::random_seed_initial_);
@@ -78,6 +79,7 @@ ANLStatus Geant4Body::mod_pre_initialize()
 
   run_manager_.reset(G4RunManagerFactory::CreateRunManager(G4RunManagerType::Default));
   action_initialization_ = new ActionInitialization;
+  action_initialization_->set_store_trajectory(store_trajectory_);
 
   return AS_OK;
 }
@@ -173,13 +175,13 @@ void Geant4Body::apply_commands()
 
   G4UImanager* ui = G4UImanager::GetUIpointer();
 
-  std::vector<std::string> presetCommands;
-  presetCommands.push_back( str(format("/run/verbose %d") % verbose_level_) );
-  presetCommands.push_back( str(format("/event/verbose %d") % verbose_level_) );
-  presetCommands.push_back( str(format("/tracking/verbose %d") % verbose_level_) );
+  std::vector<std::string> preset_commands;
+  preset_commands.push_back( str(format("/run/verbose %d") % verbose_level_) );
+  preset_commands.push_back( str(format("/event/verbose %d") % verbose_level_) );
+  preset_commands.push_back( str(format("/tracking/verbose %d") % verbose_level_) );
 
   std::cout << "\nApplying preset commands:" << std::endl;
-  for (const std::string& com: presetCommands) {
+  for (const std::string& com: preset_commands) {
     std::cout << com << std::endl;
     ui->ApplyCommand(com);
   }
@@ -192,11 +194,6 @@ void Geant4Body::apply_commands()
   std::cout << std::endl;
 }
 
-ANLStatus Geant4Body::mod_begin_run()
-{
-  return AS_OK;
-}
-
 ANLStatus Geant4Body::mod_analyze()
 {
   if (!evs("Geant4Body:DataStored")) {
@@ -207,8 +204,7 @@ ANLStatus Geant4Body::mod_analyze()
     run_manager_->BeamOn(num_events_);
 
     const auto t1 = std::chrono::steady_clock::now();
-    const double duration =
-      std::chrono::duration<double>(t1 - t0).count();
+    const double duration = std::chrono::duration<double>(t1 - t0).count();
 
     if (print_beamon_time_) {
       std::cout << "BeamOn time: " << duration << " s"
@@ -218,11 +214,6 @@ ANLStatus Geant4Body::mod_analyze()
     }
   }
 
-  return AS_OK;
-}
-
-ANLStatus Geant4Body::mod_end_run()
-{
   return AS_OK;
 }
 

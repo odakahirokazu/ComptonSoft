@@ -41,20 +41,20 @@ class ScatteringPickUpData : public anlgeant4::VUserActionAssembly
   ENABLE_PARALLEL_RUN();
 public:
   ScatteringPickUpData();
-  
+
   anlnext::ANLStatus mod_define() override;
   anlnext::ANLStatus mod_initialize() override;
 
-  void EventActionAtBeginning(const G4Event*) override;
-  void SteppingAction(const G4Step* aStep) override;
+  void event_action_at_beginning(const G4Event*) override;
+  void stepping_action(const G4Step* aStep) override;
 
 private:
   std::string processName_;
 
   bool firstInteraction_ = false;
-  
+
   TTree* tree_ = nullptr;
-  
+
   double dirx_ = 0.0;
   double diry_ = 0.0;
   double dirz_ = 0.0;

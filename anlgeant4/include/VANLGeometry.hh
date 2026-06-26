@@ -21,7 +21,7 @@
 #define ANLGEANT4_VANLGeometry_H 1
 
 #include <anlnext/BasicModule.hh>
-#include "SDAssignment.hh"
+#include "SensitiveDetectorAssignment.hh"
 
 class G4VUserDetectorConstruction;
 
@@ -38,7 +38,7 @@ namespace anlgeant4
  * @date 2017-07-03 | 4.2 | H. Odaka | length unit is fixed to cm
  * @date 2026-04-17 | 5.0 | H. Odaka | SD map
  */
-class VANLGeometry : public anlnext::BasicModule, public SDAssignment
+class VANLGeometry : public anlnext::BasicModule, public SensitiveDetectorAssignment
 {
   DEFINE_ANL_MODULE(VANLGeometry, 5.0);
 
@@ -46,17 +46,10 @@ public:
   VANLGeometry();
 
   virtual G4VUserDetectorConstruction* create() = 0;
-
-  double get_length_unit() const { return length_unit_; }
-  std::string get_length_unit_name() const { return length_unit_name_; }
-
+  anlnext::ANLStatus mod_define() override;
   bool surface_check() const { return surface_check_; }
 
-  anlnext::ANLStatus mod_define() override;
-
 private:
-  const double length_unit_;
-  const std::string length_unit_name_;
   bool surface_check_;
 };
 

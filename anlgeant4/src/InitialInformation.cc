@@ -33,16 +33,16 @@ InitialInformation::InitialInformation(bool stored, anlnext::BasicModule* mod)
   primary_vector_.resize(1);
 }
 
-void InitialInformation::initializeRun(int runID, int num_events)
+void InitialInformation::initialize_run(int run_id, int num_events)
 {
-  setRunID(runID);
+  set_run_id(run_id);
   primary_vector_.assign(num_events, PrimaryData());
   index_ = 0;
 }
 
-void InitialInformation::initializeEvent(int eventID)
+void InitialInformation::initialize_event(int event_id)
 {
-  primary_vector_[eventID].event_id_ = eventID;
+  primary_vector_[event_id].event_id = event_id;
 }
 
 } /* namespace anlgeant4 */

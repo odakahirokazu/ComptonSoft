@@ -36,7 +36,7 @@
 class TFile;
 
 namespace anlgeant4 {
-class SDAssignment;
+class SensitiveDetectorAssignment;
 }
 
 namespace comptonsoft {
@@ -242,7 +242,7 @@ public:
   void readDetectorConfiguration(const std::string& filename);
   bool isConstructed() const { return detectorConstructed_; }
   void readDetectorParameters(const std::string& filename);
-  void registerGeant4SensitiveDetectors(anlgeant4::SDAssignment* geometry_module);
+  void registerGeant4SensitiveDetectors(anlgeant4::SensitiveDetectorAssignment* geometry_module);
 
   // Simulation raw hit
   void setEventStore(CSEventStore* event_store);

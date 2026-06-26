@@ -43,6 +43,7 @@ public:
   anlnext::ANLStatus mod_analyze() override;
 
 protected:
+  int runid;
   int eventid;
   double ini_energy;
   double ini_dirx;

@@ -39,38 +39,38 @@ ANLStatus StandardUserActionAssembly::mod_initialize()
   return VUserActionAssembly::mod_initialize();
 }
 
-void StandardUserActionAssembly::RunActionAtBeginning(const G4Run* run)
+void StandardUserActionAssembly::run_action_at_beginning(const G4Run* run)
 {
   const int runID = run->GetRunID();
   const int num_events = run->GetNumberOfEventToBeProcessed();
-  event_store_->initializeRun(runID, num_events);
+  event_store_->initialize_run(runID, num_events);
 }
 
-void StandardUserActionAssembly::RunActionAtEnd(const G4Run*)
+void StandardUserActionAssembly::run_action_at_end(const G4Run*)
 {
-  event_store_->finalizeRun();
+  event_store_->finalize_run();
 }
 
-void StandardUserActionAssembly::EventActionAtBeginning(const G4Event* event)
+void StandardUserActionAssembly::event_action_at_beginning(const G4Event* event)
 {
   const int eventID = event->GetEventID();
   current_event_id_ = eventID;
-  event_store_->initializeEvent(eventID);
+  event_store_->initialize_event(eventID);
 }
 
-void StandardUserActionAssembly::EventActionAtEnd(const G4Event*)
+void StandardUserActionAssembly::event_action_at_end(const G4Event*)
 {
-  event_store_->finalizeEvent();
+  event_store_->finalize_event();
 }
 
 void StandardUserActionAssembly::setInitialTime(size_t event_index, double v)
 {
-  event_store_->setInitialTime(event_index, v);
+  event_store_->set_initial_time(event_index, v);
 }
 
 double StandardUserActionAssembly::getInitialTime() const
 {
-  return event_store_->InitialTime();
+  return event_store_->initial_time();
 }
 
 } /* namespace anlgeant4 */

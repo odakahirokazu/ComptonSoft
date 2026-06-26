@@ -34,19 +34,19 @@ namespace anlgeant4
  * @author Hirokazu Odaka
  * @date 2026-06-17
  */
-class SDAssignment
+class SensitiveDetectorAssignment
 {
 public:
   using SDVector = std::vector<std::pair<std::string, G4VSensitiveDetector*>>;
 
 public:
-  SDAssignment();
+  SensitiveDetectorAssignment();
 
-  void registerSD(const std::string& logical_volume_name, G4VSensitiveDetector* sd);
-  void setSDs(const SDVector& v) { SD_vector_ = v; }
+  void register_sensitive_detector(const std::string& logical_volume_name, G4VSensitiveDetector* sd);
+  void set_sensitive_detectors(const SDVector& v) { SD_vector_ = v; }
 
 protected:
-  const SDVector& getSDs() const { return SD_vector_; }
+  const SDVector& get_sensitive_detectors() const { return SD_vector_; }
 
 private:
   SDVector SD_vector_;

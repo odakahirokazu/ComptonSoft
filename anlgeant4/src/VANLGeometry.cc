@@ -19,8 +19,6 @@
 
 #include "VANLGeometry.hh"
 
-#include "G4VUserDetectorConstruction.hh"
-
 #include "AstroUnits.hh"
 
 using namespace anlnext;
@@ -29,9 +27,7 @@ namespace anlgeant4
 {
 
 VANLGeometry::VANLGeometry()
-  : length_unit_(unit::cm),
-    length_unit_name_("cm"),
-    surface_check_(true)
+  : surface_check_(true)
 {
   add_alias("VANLGeometry");
 }

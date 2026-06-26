@@ -23,24 +23,24 @@
 namespace anlgeant4
 {
 
-UserActionAssemblyRunAction::UserActionAssemblyRunAction(const std::vector<VUserActionAssembly*>& userActions)
-  : userActions_(userActions)
+UserActionAssemblyRunAction::UserActionAssemblyRunAction(const std::vector<VUserActionAssembly*>& user_actions)
+  : user_actions_(user_actions)
 {
 }
 
 UserActionAssemblyRunAction::~UserActionAssemblyRunAction() = default;
 
-void UserActionAssemblyRunAction::BeginOfRunAction(const G4Run* aRun)
+void UserActionAssemblyRunAction::BeginOfRunAction(const G4Run* run)
 {
-  for (VUserActionAssembly* ua: userActions_) {
-    ua->RunActionAtBeginning(aRun);
+  for (VUserActionAssembly* ua: user_actions_) {
+    ua->run_action_at_beginning(run);
   }
 }
 
-void UserActionAssemblyRunAction::EndOfRunAction(const G4Run* aRun)
+void UserActionAssemblyRunAction::EndOfRunAction(const G4Run* run)
 {
-  for (VUserActionAssembly* ua: userActions_) {
-    ua->RunActionAtEnd(aRun);
+  for (VUserActionAssembly* ua: user_actions_) {
+    ua->run_action_at_end(run);
   }
 }
 

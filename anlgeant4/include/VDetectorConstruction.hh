@@ -21,10 +21,8 @@
 #define ANLGEANT4_VDetectorConstruction_H 1
 
 #include "G4VUserDetectorConstruction.hh"
-#include "SDAssignment.hh"
-#include <vector>
-#include <utility>
-#include <string>
+#include "SensitiveDetectorAssignment.hh"
+
 
 class G4VSensitiveDetector;
 
@@ -34,7 +32,7 @@ namespace anlgeant4 {
  * Virtual detector construction with sensitive detector vector
  * @author Hirokazu Odaka
  */
-class VDetectorConstruction : public G4VUserDetectorConstruction, public SDAssignment
+class VDetectorConstruction : public G4VUserDetectorConstruction, public SensitiveDetectorAssignment
 {
 public:
   VDetectorConstruction();

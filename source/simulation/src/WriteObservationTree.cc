@@ -62,20 +62,20 @@ ANLStatus WriteObservationTree::mod_initialize()
 ANLStatus WriteObservationTree::mod_analyze()
 {
   int64_t eventID = -1;
-  
+
   if (initialInfo_) {
-    eventID = initialInfo_->EventID();
-    treeIO_->setInitialInfo(initialInfo_->InitialEnergy(),
-                            initialInfo_->InitialDirection(),
-                            initialInfo_->InitialTime(),
-                            initialInfo_->InitialPosition(),
-                            initialInfo_->InitialPolarization());
-    treeIO_->setWeight(initialInfo_->Weight());
+    eventID = initialInfo_->event_id();
+    treeIO_->setInitialInfo(initialInfo_->initial_energy(),
+                            initialInfo_->initial_direction(),
+                            initialInfo_->initial_time(),
+                            initialInfo_->initial_position(),
+                            initialInfo_->initial_polarization());
+    treeIO_->setWeight(initialInfo_->weight());
   }
   else {
     eventID = get_loop_index();
   }
-  
+
   const std::vector<ObservedParticle_sptr>& particles
     = observationPUD_->getParticleVector();
   if (particles.size() > 0) {

@@ -19,9 +19,7 @@
 
 #include "VANLPrimaryGenerator.hh"
 
-#include "G4VUserPrimaryGeneratorAction.hh"
 #include "Geant4Body.hh"
-#include "AstroUnits.hh"
 
 using namespace anlnext;
 

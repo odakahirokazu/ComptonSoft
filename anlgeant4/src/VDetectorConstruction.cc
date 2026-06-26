@@ -33,7 +33,7 @@ void VDetectorConstruction::ConstructSDandField()
 {
   auto* sdManager = G4SDManager::GetSDMpointer();
 
-  const auto& SDs = getSDs();
+  const auto& SDs = get_sensitive_detectors();
   for (const auto& pair: SDs) {
     const std::string& logical_volume_name = pair.first;
     const G4VSensitiveDetector* sd = pair.second;

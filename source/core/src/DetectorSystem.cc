@@ -34,7 +34,7 @@
 #include "G4LogicalVolumeStore.hh"
 
 #include "AstroUnits.hh"
-#include "SDAssignment.hh"
+#include "SensitiveDetectorAssignment.hh"
 #include "RealDetectorUnitFactory.hh"
 #include "SimDetectorUnitFactory.hh"
 #include "RealDetectorUnit2DPixel.hh"
@@ -127,11 +127,11 @@ void DetectorSystem::printDetectorGroups() const
   std::cout << std::endl;
 }
 
-void DetectorSystem::registerGeant4SensitiveDetectors(anlgeant4::SDAssignment* sd_assignment)
+void DetectorSystem::registerGeant4SensitiveDetectors(anlgeant4::SensitiveDetectorAssignment* sd_assignment)
 {
   for (auto sd: sensitiveDetectorVector_) {
     const std::string logical_volume_name = sd->GetName();
-    sd_assignment->registerSD(logical_volume_name, sd);
+    sd_assignment->register_sensitive_detector(logical_volume_name, sd);
   }
 }
 

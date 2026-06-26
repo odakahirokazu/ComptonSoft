@@ -33,7 +33,7 @@ namespace anlgeant4 {
  */
 class ReadGDML : public VANLGeometry
 {
-  DEFINE_ANL_MODULE(ReadGDML, 1.0);
+  DEFINE_ANL_MODULE(ReadGDML, 2.0);
 
 public:
   ReadGDML();

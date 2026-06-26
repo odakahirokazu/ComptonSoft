@@ -128,7 +128,7 @@ ANLStatus ReadSGDEventFITS::mod_initialize()
   define_evs("ReadSGDEventFITS:ShieldSelection:NG");
   define_evs("ReadSGDEventFITS:StandardSelection:OK");
   define_evs("ReadSGDEventFITS:StandardSelection:NG");
-  
+
   return AS_OK;
 }
 
@@ -141,7 +141,7 @@ ANLStatus ReadSGDEventFITS::mod_analyze()
   astroh::sgd::Event event;
   const long int row = m_Index + 1;
   m_EventReader->restoreEvent(row, event);
-  setEventID(event.getOccurrenceID());
+  set_event_id(event.getOccurrenceID());
 
   const double eventTime = event.getTime() * unit::second;
   m_EventTime = eventTime;
@@ -206,7 +206,7 @@ ANLStatus ReadSGDEventFITS::mod_analyze()
   for (size_t i=0; i<NumHits; i++) {
     const uint16_t ASICID = event.getReadoutASICIDVector()[i];
     const ReadoutBasedChannelID ReadoutID = getReadoutID(ASICID);
-      
+
     const int ChannelID = event.getReadoutChannelIDVector()[i];
     const uint16_t ADCValue = event.getPHAVector()[i];
     const float EPI = event.getEPIVector()[i] * unit::keV;

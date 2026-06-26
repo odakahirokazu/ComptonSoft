@@ -101,7 +101,7 @@ protected:
    */
   virtual double sample_energy() const;
   double get_energy() const { return energy_; }
-  double sample_from_powerlaw(double gamma, double e0, double e1) const;
+  double sample_from_powerlaw(double gamma, double emin, double emax) const;
   double sample_from_powerlaw() const;
   double sample_from_gaussian(double mean, double sigma) const;
   double sample_from_gaussian() const;

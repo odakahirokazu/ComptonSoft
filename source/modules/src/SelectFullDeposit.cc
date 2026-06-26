@@ -32,7 +32,7 @@ ANLStatus SelectFullDeposit::mod_initialize()
 {
   get_module_NC("CSHitCollection", &m_HitCollection);
   get_module_IF("InitialInformation", &m_InitialInfo);
-  
+
   return AS_OK;
 }
 
@@ -47,7 +47,7 @@ ANLStatus SelectFullDeposit::mod_analyze()
   }
 
   const double FullDepositThreshold = 0.03;
-  const double initialEnergy = m_InitialInfo->InitialEnergy();
+  const double initialEnergy = m_InitialInfo->initial_energy();
 
   if (std::abs(energy/initialEnergy - 1.0) > FullDepositThreshold) {
     return AS_SKIP;

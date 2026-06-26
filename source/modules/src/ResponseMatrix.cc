@@ -49,7 +49,7 @@ ANLStatus ResponseMatrix::mod_define()
   register_parameter(&m_RangeEnergy1, "energy_min", 1.0, "keV");
   register_parameter(&m_RangeEnergy2, "energy_max", 1.0, "keV");
   register_parameter(&m_Selections, "event_selections");
-  
+
   return AS_OK;
 }
 
@@ -78,14 +78,14 @@ ANLStatus ResponseMatrix::mod_initialize()
 
 ANLStatus ResponseMatrix::mod_analyze()
 {
-  const double weight = m_InitialInfo->Weight();
-  const double initialEnergy = m_InitialInfo->InitialEnergy();
+  const double weight = m_InitialInfo->weight();
+  const double initialEnergy = m_InitialInfo->initial_energy();
 
   const std::vector<BasicComptonEvent_sptr> events = m_EventReconstruction->getReconstructedEvents();
   for (const auto& event: events) {
     const double energy = event->IncidentEnergy();
     const double eventWeight = event->ReconstructionFraction() * weight;
-  
+
     for (auto& pair: m_Responses) {
       const std::string& evsName = pair.first;
       TH2* hist = pair.second;

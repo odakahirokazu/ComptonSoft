@@ -56,7 +56,7 @@ ANLStatus DefineFrame::mod_initialize()
 ANLStatus DefineFrame::mod_begin_run()
 {
   m_EventIndexInThisFrame = 0;
-  m_CurrentEventID = m_InitialInfo->EventID();
+  m_CurrentEventID = m_InitialInfo->event_id();
 
   return AS_OK;
 }
@@ -69,7 +69,7 @@ ANLStatus DefineFrame::mod_analyze()
     return AS_QUIT_ERROR;
   }
 
-  const int32_t eventID = m_InitialInfo->EventID();
+  const int32_t eventID = m_InitialInfo->event_id();
 
   std::vector<DetectorHit_sptr>& hits = m_HitCollection->getHits(0);
   if (hits.size()==0) {
@@ -90,7 +90,7 @@ ANLStatus DefineFrame::mod_analyze()
     m_CurrentEventID = eventID;
   }
 
-  m_InitialInfo->setEventID(frameID);
+  m_InitialInfo->set_event_id(frameID);
   for (DetectorHit_sptr hit: hits) {
     hit->setEventID(frameID);
     hit->setTimeGroup(m_EventIndexInThisFrame);

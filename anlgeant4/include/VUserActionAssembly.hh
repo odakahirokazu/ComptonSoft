@@ -51,22 +51,22 @@ public:
 
   anlnext::ANLStatus mod_initialize() override;
 
-  virtual void RunActionAtBeginning(const G4Run*) {}
-  virtual void RunActionAtEnd(const G4Run*) {}
+  virtual void run_action_at_beginning(const G4Run*) {}
+  virtual void run_action_at_end(const G4Run*) {}
 
-  virtual void EventActionAtBeginning(const G4Event*) {}
-  virtual void EventActionAtEnd(const G4Event*) {}
+  virtual void event_action_at_beginning(const G4Event*) {}
+  virtual void event_action_at_end(const G4Event*) {}
 
-  virtual void TrackActionAtBeginning(const G4Track*) {}
-  virtual void TrackActionAtEnd(const G4Track*) {}
+  virtual void track_action_at_beginning(const G4Track*) {}
+  virtual void track_action_at_end(const G4Track*) {}
 
-  virtual bool isSteppingActionEffective() const { return false; }
-  virtual void SteppingAction(const G4Step*) {}
+  virtual bool is_stepping_action_effective() const { return false; }
+  virtual void stepping_action(const G4Step*) {}
 
-  virtual bool isStackingActionEffective() const { return false; }
-  virtual G4UserStackingAction* createStackingAction() const { return nullptr; }
+  virtual bool is_stacking_action_effective() const { return false; }
+  virtual G4UserStackingAction* create_stacking_action() const { return nullptr; }
 
-  virtual std::unique_ptr<VUserActionAssembly> createUserActionAssembly() const;
+  virtual std::unique_ptr<VUserActionAssembly> create_user_action_assembly() const;
 };
 
 } /* namespace anlgeant4 */

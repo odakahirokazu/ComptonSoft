@@ -33,24 +33,24 @@ VEventStore::VEventStore()
 
 VEventStore::~VEventStore() = default;
 
-void VEventStore::initializeRun(int runID, int num_events)
+void VEventStore::initialize_run(int run_id, int num_events)
 {
   eventid_vector_.resize(num_events, 0);
   read_index_ = 0;
   postprocess_ready_ = false;
 
-  InitialInformation::initializeRun(runID, num_events);
+  InitialInformation::initialize_run(run_id, num_events);
 }
 
-void VEventStore::finalizeRun()
+void VEventStore::finalize_run()
 {
   postprocess_ready_ = true;
 }
 
-void VEventStore::initializeEvent(int eventID)
+void VEventStore::initialize_event(int event_id)
 {
-  eventid_vector_[eventID] = eventID;
-  InitialInformation::initializeEvent(eventID);
+  eventid_vector_[event_id] = event_id;
+  InitialInformation::initialize_event(event_id);
 }
 
 ANLStatus VEventStore::mod_analyze()

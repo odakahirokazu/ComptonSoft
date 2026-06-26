@@ -63,7 +63,7 @@ ANLStatus ReadComptonEventTree::mod_initialize()
 
   treeIO_->setTree(cetree_.get());
   if (cetree_->GetBranch("ini_energy")) {
-    setInitialInformationStored();
+    set_initial_information_stored();
     treeIO_->enableInitialInfoRecord();
   }
   else {
@@ -89,16 +89,16 @@ ANLStatus ReadComptonEventTree::mod_analyze()
 
   const int32_t RunID = treeIO_->getRunID();
   const int32_t EventID = treeIO_->getEventID();
-  setRunID(RunID);
-  setEventID(EventID);
+  set_run_id(RunID);
+  set_event_id(EventID);
 
-  if (InitialInformationStored()) {
-    setInitialEnergy(treeIO_->getInitialEnergy());
-    setInitialDirection(treeIO_->getInitialDirection());
-    setInitialTime(treeIO_->getInitialTime());
-    setInitialPosition(treeIO_->getInitialPosition());
-    setInitialPolarization(treeIO_->getInitialPolarization());
-    setWeight(treeIO_->getWeight());
+  if (initial_information_stored()) {
+    set_initial_energy(treeIO_->getInitialEnergy());
+    set_initial_direction(treeIO_->getInitialDirection());
+    set_initial_time(treeIO_->getInitialTime());
+    set_initial_position(treeIO_->getInitialPosition());
+    set_initial_polarization(treeIO_->getInitialPolarization());
+    set_weight(treeIO_->getWeight());
   }
 
   do {

@@ -17,7 +17,7 @@
  *                                                                       *
  *************************************************************************/
 
-#include "SDAssignment.hh"
+#include "SensitiveDetectorAssignment.hh"
 
 #include "G4VSensitiveDetector.hh"
 #include "G4VUserDetectorConstruction.hh"
@@ -25,10 +25,9 @@
 namespace anlgeant4
 {
 
-SDAssignment::SDAssignment() = default;
+SensitiveDetectorAssignment::SensitiveDetectorAssignment() = default;
 
-void SDAssignment::registerSD(const std::string& logical_volume_name,
-                              G4VSensitiveDetector* sd)
+void SensitiveDetectorAssignment::register_sensitive_detector(const std::string& logical_volume_name, G4VSensitiveDetector* sd)
 {
   SD_vector_.push_back(std::make_pair(logical_volume_name, sd))  ;
 }

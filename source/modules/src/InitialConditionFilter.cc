@@ -50,8 +50,8 @@ ANLStatus InitialConditionFilter::mod_initialize()
 
 ANLStatus InitialConditionFilter::mod_analyze()
 {
-  const double initialEnergy = initialInfo_->InitialEnergy();
-  
+  const double initialEnergy = initialInfo_->initial_energy();
+
   if (initialEnergy < energy0_ || energy1_ < initialEnergy) {
     return AS_SKIP;
   }

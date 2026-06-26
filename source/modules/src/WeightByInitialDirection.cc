@@ -47,10 +47,10 @@ ANLStatus WeightByInitialDirection::mod_initialize()
 
 ANLStatus WeightByInitialDirection::mod_analyze()
 {
-  const G4ThreeVector dir0 = m_InitialInfo->InitialDirection();
-  const double weight0 = m_InitialInfo->Weight();
+  const G4ThreeVector dir0 = m_InitialInfo->initial_direction();
+  const double weight0 = m_InitialInfo->weight();
   const double weight1 = weight0 * (m_WeightFunction->Eval(dir0.z()));
-  m_InitialInfo->setWeight(weight1);
+  m_InitialInfo->set_weight(weight1);
   return AS_OK;
 }
 

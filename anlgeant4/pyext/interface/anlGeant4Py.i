@@ -28,7 +28,6 @@
 
 %}
 
-
 %import(module="anlnext.anlnextpy") "anlnext/python/anlnextpy.i"
 
 namespace anlgeant4 {
@@ -51,9 +50,6 @@ class VANLPhysicsList : public anlnext::BasicModule
 %nodefault;
 class VANLGeometry : public anlnext::BasicModule
 {
-public:
-  double get_length_unit() const;
-  std::string get_length_unit_name() const;
 };
 %makedefault;
 

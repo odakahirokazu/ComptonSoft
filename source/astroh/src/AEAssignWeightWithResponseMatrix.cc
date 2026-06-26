@@ -51,7 +51,7 @@ ANLStatus AEAssignWeightWithResponseMatrix::mod_define()
   define_parameter("root_filename", &mod_class::rootFilename_);
   define_parameter("fits_filename", &mod_class::fitsFilename_);
   define_parameter("histogram_name", &mod_class::histName_);
-  
+
   return AS_OK;
 }
 
@@ -61,10 +61,10 @@ ANLStatus AEAssignWeightWithResponseMatrix::mod_initialize()
   get_module_IFNC("InitialInformation", &initialInfo_);
 
   ANLStatus status = AS_OK;
-  
+
   readRootResponse();
   normalizeResponseHistogram(response_);
-  
+
   initializeHistogram();
   status = readFitsResponse();
   if (status!=AS_OK) {
@@ -82,18 +82,18 @@ ANLStatus AEAssignWeightWithResponseMatrix::mod_analyze()
 {
   const int timeGroup = 0;
   std::vector<DetectorHit_sptr>& hits = hitCollection_->getHits(timeGroup);
-  
-  const double ini_energy = initialInfo_->InitialEnergy();
+
+  const double ini_energy = initialInfo_->initial_energy();
   double energy = 0.0;
   if (hits.size()>0) {
     energy = hits[0]->Energy();
   }
-  
+
   const int ix = weightHist_->GetXaxis()->FindBin(ini_energy/unit::keV);
   const int iy = weightHist_->GetYaxis()->FindBin(energy/unit::keV);
   const double w = weightHist_->GetBinContent(ix, iy);
-  initialInfo_->setWeight(w);
-  
+  initialInfo_->set_weight(w);
+
   return AS_OK;
 }
 
@@ -133,7 +133,7 @@ ANLStatus AEAssignWeightWithResponseMatrix::readFitsResponse()
   long ebounds_naxes[2] = {1, 1};
   const std::vector<std::string> matrix_colname = {"ENERG_LO", "ENERG_HI", "F_CHAN", "MATRIX"};
   const std::vector<std::string> ebounds_colname = {"E_MIN", "E_MAX"};
-  
+
   cfitsio::fits_open_file(&fitsFile, fitsFilename_.c_str(), READONLY, &fitsStatus);
   if (fitsStatus) {
       cfitsio::fits_report_error(stderr, fitsStatus);
@@ -236,13 +236,13 @@ ANLStatus AEAssignWeightWithResponseMatrix::readFitsResponse()
       if (i==1) pulseRange_[j].second = buf[j];
     }
   }
-  
+
   cfitsio::fits_close_file(fitsFile, &fitsStatus);
   if (fitsStatus) {
     cfitsio::fits_report_error(stderr, fitsStatus);
     return AS_QUIT_ERROR;
   }
-  
+
   return AS_OK;
 }
 
@@ -263,7 +263,7 @@ void AEAssignWeightWithResponseMatrix::fillRefResponseHistogram()
 {
   const int n = refResponseArray_.size();
   const int num_div = 10;
-  
+
   for (int i=0; i<n; i++) {
     const int length = refResponseArray_[i].size();
     for (int j=0; j<length; j++) {

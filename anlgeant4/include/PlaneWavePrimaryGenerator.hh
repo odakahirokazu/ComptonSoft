@@ -41,7 +41,7 @@ namespace anlgeant4 {
  */
 class PlaneWavePrimaryGenerator : public anlgeant4::BasicPrimaryGenerator
 {
-  DEFINE_ANL_MODULE(PlaneWavePrimaryGenerator, 4.1);
+  DEFINE_ANL_MODULE(PlaneWavePrimaryGenerator, 7.0);
 public:
   PlaneWavePrimaryGenerator();
   ~PlaneWavePrimaryGenerator();

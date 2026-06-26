@@ -41,7 +41,7 @@ ANLStatus ReadGDML::mod_define()
 G4VUserDetectorConstruction* ReadGDML::create()
 {
   VDetectorConstruction* udc = new GDMLDetectorConstruction(filename_, validate_);
-  udc->setSDs(getSDs());
+  udc->set_sensitive_detectors(get_sensitive_detectors());
   return udc;
 }
 

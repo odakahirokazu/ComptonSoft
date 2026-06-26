@@ -40,12 +40,12 @@ ANLStatus ObservationPickUpData::mod_define()
   return AS_OK;
 }
 
-void ObservationPickUpData::EventActionAtBeginning(const G4Event*)
+void ObservationPickUpData::event_action_at_beginning(const G4Event*)
 {
   particleVector_.clear();
 }
 
-void ObservationPickUpData::TrackActionAtEnd(const G4Track* track)
+void ObservationPickUpData::track_action_at_end(const G4Track* track)
 {
   if (track->GetNextVolume() == 0) {
     const int PDGEncoding = track->GetDefinition()->GetPDGEncoding();

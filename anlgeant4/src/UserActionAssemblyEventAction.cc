@@ -23,24 +23,24 @@
 namespace anlgeant4
 {
 
-UserActionAssemblyEventAction::UserActionAssemblyEventAction(const std::vector<VUserActionAssembly*>& userActions)
-  : userActions_(userActions)
+UserActionAssemblyEventAction::UserActionAssemblyEventAction(const std::vector<VUserActionAssembly*>& user_actions)
+  : user_actions_(user_actions)
 {
 }
- 
+
 UserActionAssemblyEventAction::~UserActionAssemblyEventAction() = default;
 
-void UserActionAssemblyEventAction::BeginOfEventAction(const G4Event* anEvent)
+void UserActionAssemblyEventAction::BeginOfEventAction(const G4Event* event)
 {
-  for (VUserActionAssembly* ua: userActions_) {
-    ua->EventActionAtBeginning(anEvent);
+  for (VUserActionAssembly* ua: user_actions_) {
+    ua->event_action_at_beginning(event);
   }
 }
 
-void UserActionAssemblyEventAction::EndOfEventAction(const G4Event* anEvent)
+void UserActionAssemblyEventAction::EndOfEventAction(const G4Event* event)
 {
-  for (VUserActionAssembly* ua: userActions_) {
-    ua->EventActionAtEnd(anEvent);
+  for (VUserActionAssembly* ua: user_actions_) {
+    ua->event_action_at_end(event);
   }
 }
 

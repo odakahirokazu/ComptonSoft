@@ -44,11 +44,11 @@ public:
 
   anlnext::ANLStatus mod_initialize() override;
 
-  void RunActionAtBeginning(const G4Run* run) override;
-  void RunActionAtEnd(const G4Run*) override;
+  void run_action_at_beginning(const G4Run* run) override;
+  void run_action_at_end(const G4Run*) override;
 
-  void EventActionAtBeginning(const G4Event* event) override;
-  void EventActionAtEnd(const G4Event*) override;
+  void event_action_at_beginning(const G4Event* event) override;
+  void event_action_at_end(const G4Event*) override;
 
 protected:
   double getInitialTime() const;

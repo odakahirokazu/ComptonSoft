@@ -18,7 +18,6 @@
  *************************************************************************/
 
 #include "RadioactivationEventStore.hh"
-#include "DetectorHit_sptr.hh"
 #include "DetectorSystem.hh"
 
 using namespace anlnext;
@@ -29,9 +28,9 @@ RadioactivationEventStore::RadioactivationEventStore() = default;
 
 RadioactivationEventStore::~RadioactivationEventStore() = default;
 
-void RadioactivationEventStore::initializeRun(int runID, int num_events)
+void RadioactivationEventStore::initialize_run(int runID, int num_events)
 {
-  CSEventStore::initializeRun(runID, num_events);
+  CSEventStore::initialize_run(runID, num_events);
   radioactivations_vector_.resize(num_events);
   for (auto& vec: radioactivations_vector_) {
     vec.clear();

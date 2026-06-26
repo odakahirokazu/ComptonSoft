@@ -39,14 +39,17 @@ class VUserActionAssembly;
 class UserActionAssemblyTrackingAction : public G4UserTrackingAction
 {
 public:
-  explicit UserActionAssemblyTrackingAction(const std::vector<VUserActionAssembly*>& userActions);
+  explicit UserActionAssemblyTrackingAction(const std::vector<VUserActionAssembly*>& user_actions);
   virtual ~UserActionAssemblyTrackingAction();
 
-  void PreUserTrackingAction(const G4Track* aTrack) override;
-  void PostUserTrackingAction(const G4Track* aTrack) override;
+  void PreUserTrackingAction(const G4Track* track) override;
+  void PostUserTrackingAction(const G4Track* track) override;
+
+  void set_store_trajectory(bool v=true) { store_trajectory_ = v; }
 
 private:
-  std::vector<VUserActionAssembly*> userActions_;
+  std::vector<VUserActionAssembly*> user_actions_;
+  bool store_trajectory_ = false;
 };
 
 } /* namespace anlgeant4 */

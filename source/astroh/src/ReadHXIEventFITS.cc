@@ -87,7 +87,7 @@ ANLStatus ReadHXIEventFITS::mod_initialize()
   define_evs("ReadHXIEventFITS:PseudoTrigger");
   define_evs("ReadHXIEventFITS:PseudoEffective");
   define_evs("ReadHXIEventFITS:ShieldTrigger");
-  
+
   return AS_OK;
 }
 
@@ -100,7 +100,7 @@ ANLStatus ReadHXIEventFITS::mod_analyze()
   astroh::hxi::Event event;
   const long int row = m_Index + 1;
   m_EventReader->restoreEvent(row, event);
-  setEventID(event.getOccurrenceID());
+  set_event_id(event.getOccurrenceID());
 
   const double eventTime = event.getTime() * unit::second;
   m_EventTime = eventTime;
@@ -146,7 +146,7 @@ ANLStatus ReadHXIEventFITS::mod_analyze()
   for (size_t i=0; i<NumHits; i++) {
     const uint8_t ASICID = event.getReadoutASICIDVector()[i];
     const ReadoutBasedChannelID ReadoutID = getReadoutID(ASICID);
-      
+
     const int ChannelID = event.getReadoutChannelIDVector()[i];
     const uint16_t ADCValue = event.getPHAVector()[i];
     const float EPI = event.getEPIVector()[i] * unit::keV;

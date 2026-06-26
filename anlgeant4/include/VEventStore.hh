@@ -40,10 +40,10 @@ public:
   VEventStore();
   virtual ~VEventStore();
 
-  virtual void initializeRun(int runID, int num_events);
-  virtual void finalizeRun();
-  virtual void initializeEvent(int eventID);
-  virtual void finalizeEvent() {}
+  virtual void initialize_run(int run_id, int num_events);
+  virtual void finalize_run();
+  virtual void initialize_event(int event_id);
+  virtual void finalize_event() {}
 
   anlnext::ANLStatus mod_analyze() override;
 

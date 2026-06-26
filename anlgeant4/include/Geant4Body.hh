@@ -23,7 +23,6 @@
 #include <string>
 #include <memory>
 #include <anlnext/BasicModule.hh>
-#include "globals.hh"
 
 namespace CLHEP
 {
@@ -56,9 +55,7 @@ public:
   anlnext::ANLStatus mod_define() override;
   anlnext::ANLStatus mod_pre_initialize() override;
   anlnext::ANLStatus mod_initialize() override;
-  anlnext::ANLStatus mod_begin_run() override;
   anlnext::ANLStatus mod_analyze() override;
-  anlnext::ANLStatus mod_end_run() override;
   anlnext::ANLStatus mod_finalize() override;
 
   void register_user_action(VANLPrimaryGenerator* primary_generator);
@@ -80,6 +77,7 @@ private:
   std::string random_engine_;
   int random_seed_;
   int verbose_level_;
+  bool store_trajectory_ = false;
   std::vector<std::string> user_commands_;
 
   int random_seed_initial_;

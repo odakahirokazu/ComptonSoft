@@ -44,24 +44,24 @@ class SampleOpticalDepth : public anlgeant4::VUserActionAssembly
   ENABLE_PARALLEL_RUN();
 public:
   SampleOpticalDepth();
-  
+
   anlnext::ANLStatus mod_define() override;
   anlnext::ANLStatus mod_initialize() override;
 
-  void EventActionAtBeginning(const G4Event*) override;
-  void EventActionAtEnd(const G4Event*) override;
-  void SteppingAction(const G4Step* aStep) override;
-  
+  void event_action_at_beginning(const G4Event*) override;
+  void event_action_at_end(const G4Event*) override;
+  void stepping_action(const G4Step* aStep) override;
+
 private:
   double energy_;
   std::string processName_;
   std::string particleName_;
-  
+
   const anlgeant4::InitialInformation* initialInfo_ = nullptr;
   G4VEmProcess* process_ = nullptr;
 
   TTree* tree_ = nullptr;
-  
+
   double ini_posx_ = 0.0;
   double ini_posy_ = 0.0;
   double ini_posz_ = 0.0;

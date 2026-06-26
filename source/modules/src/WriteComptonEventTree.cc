@@ -69,16 +69,16 @@ ANLStatus WriteComptonEventTree::mod_analyze()
 {
   int32_t runID = -1;
   int32_t eventID = -1;
-  
+
   if (initialInfo_) {
-    runID = initialInfo_->RunID();
-    eventID = initialInfo_->EventID();
-    treeIO_->setInitialInfo(initialInfo_->InitialEnergy(),
-                            initialInfo_->InitialDirection(),
-                            initialInfo_->InitialTime(),
-                            initialInfo_->InitialPosition(),
-                            initialInfo_->InitialPolarization());
-    treeIO_->setWeight(initialInfo_->Weight());
+    runID = initialInfo_->run_id();
+    eventID = initialInfo_->event_id();
+    treeIO_->setInitialInfo(initialInfo_->initial_energy(),
+                            initialInfo_->initial_direction(),
+                            initialInfo_->initial_time(),
+                            initialInfo_->initial_position(),
+                            initialInfo_->initial_polarization());
+    treeIO_->setWeight(initialInfo_->weight());
   }
   else {
     runID = 0;
@@ -86,7 +86,7 @@ ANLStatus WriteComptonEventTree::mod_analyze()
   }
 
   treeIO_->fillEvents(runID, eventID, eventReconstruction_->getReconstructedEvents());
-  
+
   return AS_OK;
 }
 

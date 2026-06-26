@@ -119,7 +119,7 @@ ANLStatus WriteSGDEventFITS::mod_analyze()
 {
   int64_t eventID = -1;
   if (m_InitialInfo) {
-    eventID = m_InitialInfo->EventID();
+    eventID = m_InitialInfo->event_id();
   }
   else {
     eventID = get_loop_index();
@@ -135,7 +135,7 @@ ANLStatus WriteSGDEventFITS::mod_analyze()
       if (timeGroup>0) {
         occurrenceID = -1*timeGroup;
       }
-      
+
       fillHits(occurrenceID, hits, &event);
       m_EventWriter->fillEvent(event);
       set_evs("WriteSGDEventFITS:Fill");

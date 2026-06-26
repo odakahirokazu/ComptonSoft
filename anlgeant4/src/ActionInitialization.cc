@@ -54,7 +54,7 @@ std::vector<VUserActionAssembly*> ActionInitialization::create_user_action_assem
   std::vector<VUserActionAssembly*> uaa_vector;
   std::vector<std::unique_ptr<VUserActionAssembly>> uaa_vector_owner;
   for (const VUserActionAssembly* uaa: user_action_assemblies_original_) {
-    std::unique_ptr<VUserActionAssembly> uaa_created = uaa->createUserActionAssembly();
+    std::unique_ptr<VUserActionAssembly> uaa_created = uaa->create_user_action_assembly();
     uaa_vector.push_back(uaa_created.get());
     uaa_vector_owner.push_back(std::move(uaa_created));
   }
@@ -80,29 +80,31 @@ void ActionInitialization::Build() const
   std::vector<VUserActionAssembly*> user_action_assemblies = create_user_action_assemblies();
 
   if (!G4Threading::IsMultithreadedApplication()) {
-    UserActionAssemblyRunAction* runAction = new UserActionAssemblyRunAction(user_action_assemblies);
-    SetUserAction(runAction);
+    UserActionAssemblyRunAction* run_action = new UserActionAssemblyRunAction(user_action_assemblies);
+    SetUserAction(run_action);
   }
 
-  UserActionAssemblyEventAction* eventAction = new UserActionAssemblyEventAction(user_action_assemblies);
-  UserActionAssemblyTrackingAction* trackingAction = new UserActionAssemblyTrackingAction(user_action_assemblies);
-  SetUserAction(eventAction);
-  SetUserAction(trackingAction);
+  UserActionAssemblyEventAction* event_action = new UserActionAssemblyEventAction(user_action_assemblies);
+  SetUserAction(event_action);
+
+  UserActionAssemblyTrackingAction* tracking_action = new UserActionAssemblyTrackingAction(user_action_assemblies);
+  tracking_action->set_store_trajectory(store_trajectory_);
+  SetUserAction(tracking_action);
 
   const bool stepping_action_effective =
     std::accumulate(user_action_assemblies.begin(),
                     user_action_assemblies.end(),
                     false,
-                    [](bool acc, VUserActionAssembly* uaa){ return acc || uaa->isSteppingActionEffective(); });
+                    [](bool acc, VUserActionAssembly* uaa){ return acc || uaa->is_stepping_action_effective(); });
   if (stepping_action_effective) {
-    UserActionAssemblySteppingAction* steppingAction = new UserActionAssemblySteppingAction(user_action_assemblies);
-    SetUserAction(steppingAction);
+    UserActionAssemblySteppingAction* stepping_action = new UserActionAssemblySteppingAction(user_action_assemblies);
+    SetUserAction(stepping_action);
   }
 
   const int stacking_action_number =
     std::count_if(user_action_assemblies_original_.begin(),
                   user_action_assemblies_original_.end(),
-                  [](VUserActionAssembly* uaa){ return uaa->isStackingActionEffective(); });
+                  [](VUserActionAssembly* uaa){ return uaa->is_stacking_action_effective(); });
   if (stacking_action_number==0) {
     ; // do nothing
   }
@@ -110,8 +112,8 @@ void ActionInitialization::Build() const
     VUserActionAssembly* uaa_stacking_action  =
       *std::find_if(user_action_assemblies_original_.begin(),
                     user_action_assemblies_original_.end(),
-                    [](VUserActionAssembly* uaa){ return uaa->isStackingActionEffective(); });
-    SetUserAction(uaa_stacking_action->createStackingAction());
+                    [](VUserActionAssembly* uaa){ return uaa->is_stacking_action_effective(); });
+    SetUserAction(uaa_stacking_action->create_stacking_action());
   }
   else {
     const std::string msg = "There are multiple stacking actions to be registered. Only one stacking action can be set.";

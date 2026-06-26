@@ -23,17 +23,19 @@
 namespace anlgeant4
 {
 
-UserActionAssemblySteppingAction::UserActionAssemblySteppingAction(const std::vector<VUserActionAssembly*>& userActions)
-  : userActions_(userActions)
+UserActionAssemblySteppingAction::UserActionAssemblySteppingAction(const std::vector<VUserActionAssembly*>& user_actions)
+  : user_actions_(user_actions)
 {
 }
 
 UserActionAssemblySteppingAction::~UserActionAssemblySteppingAction() = default;
 
-void UserActionAssemblySteppingAction::UserSteppingAction(const G4Step* aStep)
+void UserActionAssemblySteppingAction::UserSteppingAction(const G4Step* step)
 {
-  for (VUserActionAssembly* ua: userActions_) {
-    ua->SteppingAction(aStep);
+  for (VUserActionAssembly* ua: user_actions_) {
+    if (ua->is_stepping_action_effective()) {
+      ua->stepping_action(step);
+    }
   }
 }
 

@@ -44,7 +44,7 @@ namespace anlgeant4 {
  */
 class VisualizeGeometry  : public anlnext::BasicModule
 {
-  DEFINE_ANL_MODULE(VisualizeGeometry, 1.5);
+  DEFINE_ANL_MODULE(VisualizeGeometry, 2.0);
 public:
   VisualizeGeometry();
   ~VisualizeGeometry();

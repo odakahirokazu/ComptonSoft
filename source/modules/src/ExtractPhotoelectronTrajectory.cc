@@ -74,7 +74,7 @@ ANLStatus ExtractPhotoelectronTrajectory::mod_initialize()
   tree_->Branch("image", image_->data(), (boost::format("image[%d][%d]/F")%pixelNumber_%pixelNumber_).str().c_str());
   tree_->Branch("angle", &angle_, "angle/F");
   tree_->Branch("weight", &weight_, "weight/I");
-  
+
   return AS_OK;
 }
 
@@ -84,7 +84,7 @@ ANLStatus ExtractPhotoelectronTrajectory::mod_analyze()
     return AS_SKIP;
   }
 
-  vector3_t center = initialInfo_->InitialPosition();
+  vector3_t center = initialInfo_->initial_position();
   if (randomCenter_) {
     std::uniform_real_distribution<> centerDistribution(-0.5*pixelSize_, +0.5*pixelSize_);
     const double shiftX = centerDistribution(*randomEngine_);

@@ -53,6 +53,7 @@ module ComptonSoft
       @print_beamon_time = false
       @random_seed = 0
       @verbose = 0
+      @store_trajectory = false
 
       ### Modules
       @make_detector_hits_module = :MakeDetectorHits
@@ -120,6 +121,7 @@ module ComptonSoft
       set_visualization()
       with(params)
       self.setup_mode = :minimal
+      @store_trajectory = true
     end
 
     # Set GDML file for geometry building.
@@ -217,7 +219,8 @@ module ComptonSoft
                       print_beamon_time: @print_beamon_time,
                       random_engine: "MixMaxRng",
                       random_seed: @random_seed,
-                      verbose: @verbose)
+                      verbose: @verbose,
+                      store_trajectory: @store_trajectory)
 
       chain @make_detector_hits_module
 
@@ -229,10 +232,6 @@ module ComptonSoft
 
       if fits_output = module_of_fits_output
         chain_with_parameters fits_output
-      end
-
-      if vis = module_of_visualization
-        chain_with_parameters vis
       end
     end
 
@@ -256,9 +255,10 @@ module ComptonSoft
       with_parameters(num_events: @num_events_per_run,
                       num_threads: 1,
                       print_beamon_time: @print_beamon_time,
-                      random_engine: "MTwistEngine",
+                      random_engine: "MixMaxRng",
                       random_seed: @random_seed,
-                      verbose: @verbose)
+                      verbose: @verbose,
+                      store_trajectory: @store_trajectory)
 
       if vis = module_of_visualization
         chain_with_parameters vis

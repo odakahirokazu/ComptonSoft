@@ -75,13 +75,13 @@ public:
   anlnext::ANLStatus mod_initialize() override;
   anlnext::ANLStatus mod_finalize() override;
 
-  void RunActionAtEnd(const G4Run* run) override;
+  void run_action_at_end(const G4Run* run) override;
 
-  bool isSteppingActionEffective() const override { return true; }
-  void SteppingAction(const G4Step* step) override;
+  bool is_stepping_action_effective() const override { return true; }
+  void stepping_action(const G4Step* step) override;
 
-  bool isStackingActionEffective() const override { return true; }
-  G4UserStackingAction* createStackingAction() const override;
+  bool is_stacking_action_effective() const override { return true; }
+  G4UserStackingAction* create_stacking_action() const override;
 
 protected:
   void fill(const G4Ions* nucleus, const G4TouchableHistory* touchable, const G4ThreeVector& position);

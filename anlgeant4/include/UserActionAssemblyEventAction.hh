@@ -38,15 +38,15 @@ class VUserActionAssembly;
 class UserActionAssemblyEventAction : public G4UserEventAction
 {
 public:
-  explicit UserActionAssemblyEventAction(const std::vector<VUserActionAssembly*>& userActions);
+  explicit UserActionAssemblyEventAction(const std::vector<VUserActionAssembly*>& user_actions);
   virtual ~UserActionAssemblyEventAction();
 
 public:
-  void BeginOfEventAction(const G4Event* anEvent) override;
-  void EndOfEventAction(const G4Event* anEvent) override;
+  void BeginOfEventAction(const G4Event* event) override;
+  void EndOfEventAction(const G4Event* event) override;
 
 private:
-  std::vector<VUserActionAssembly*> userActions_;
+  std::vector<VUserActionAssembly*> user_actions_;
 };
 
 } /* namespace anlgeant4 */

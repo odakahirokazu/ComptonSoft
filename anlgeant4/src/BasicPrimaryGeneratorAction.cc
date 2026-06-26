@@ -19,12 +19,10 @@
 
 #include "BasicPrimaryGeneratorAction.hh"
 
-#include <mutex>
 #include <G4ParticleGun.hh>
 #include <G4Event.hh>
 #include <G4ParticleDefinition.hh>
 
-#include "AstroUnits.hh"
 #include "BasicPrimaryGenerator.hh"
 
 namespace anlgeant4
@@ -43,18 +41,18 @@ void BasicPrimaryGeneratorAction::GeneratePrimaries(G4Event* event)
   const G4ParticleDefinition* particle = sampler_->particle_definition();
   const PrimarySetting primary_info = sampler_->make_primary_setting();
 
-  SetDefinition(const_cast<G4ParticleDefinition*>(particle));
-  SetPrimarySetting(primary_info);
+  set_particle_definition(const_cast<G4ParticleDefinition*>(particle));
+  set_primary_setting(primary_info);
   sampler_->confirm_primary_setting(event_id, primary_info);
   particle_gun_->GeneratePrimaryVertex(event);
 }
 
-void BasicPrimaryGeneratorAction::SetDefinition(G4ParticleDefinition* definition)
+void BasicPrimaryGeneratorAction::set_particle_definition(G4ParticleDefinition* definition)
 {
   particle_gun_->SetParticleDefinition(definition);
 }
 
-void BasicPrimaryGeneratorAction::SetPrimarySetting(const PrimarySetting& primary)
+void BasicPrimaryGeneratorAction::set_primary_setting(const PrimarySetting& primary)
 {
   particle_gun_->SetParticleTime(primary.time);
   particle_gun_->SetParticlePosition(primary.position);

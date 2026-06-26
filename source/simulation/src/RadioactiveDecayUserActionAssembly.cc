@@ -45,7 +45,7 @@ ANLStatus RadioactiveDecayUserActionAssembly::mod_define()
   return AS_OK;
 }
 
-void RadioactiveDecayUserActionAssembly::SteppingAction(const G4Step* step)
+void RadioactiveDecayUserActionAssembly::stepping_action(const G4Step* step)
 {
   G4Track* track = step->GetTrack();
   const double global_time = track->GetGlobalTime();
