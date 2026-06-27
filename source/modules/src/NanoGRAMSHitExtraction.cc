@@ -112,7 +112,7 @@ ANLStatus NanoGRAMSHitExtraction::mod_initialize()
   if (!quicklook_file_.empty()) {
     quicklook_tree_writer_ = std::make_unique<grams::QuickLookTreeOutputWriter>(
         quicklook_file_,
-        tpc_tree_reader_->currentBuffer().layout(),
+        tpc_tree_reader_->currentBuffer(),
         tpc_property_);
   } else {
     std::cout << "[INFO] tpcquicklook output is disabled.\n";

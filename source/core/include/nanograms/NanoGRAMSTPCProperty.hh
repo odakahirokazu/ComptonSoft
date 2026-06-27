@@ -42,12 +42,12 @@ public:
   TPCProperty();
   ~TPCProperty();
 
-  void setDriftVelocity(double value);
-  void setAnodePosZ(double value);
+  void setDriftVelocity(double value) { drift_velocity_ = value;}
+  void setAnodePosZ(double value) {anode_pos_z_ = value;}
 
-  double posXError() const;
-  double posYError() const;
-  double posZError() const;
+  double posXError() const {return pos_x_error_;};
+  double posYError() const {return pos_y_error_;};
+  double posZError() const {return pos_z_error_;};
 
   void loadParamCoulomb2keVForSpline3D(const std::filesystem::path& spline_path, double efield);
   void loadParamGainMatrices(const std::filesystem::path& gain_info_path);

@@ -23,13 +23,11 @@ light:
   out_roi_peak_thr_mV: 15.0
 
 charge:
-  energy_range_kev: [18.0, 1000.0]
+  noise_th_kev: 18.0
   clustering_pix_range: [1, 3]
-  circ_thr_kev: 10.0
   spread_thr_kev: 7.0
   drift_time_max_us: 150.0
-  noise_th_kev: 20.0
-  circ_min_hits: 4
+  noise_th_for_noisy_pixel_kev: 20.0
   core_exclude_pix:
     0: [0, 63]
     1: [0, 63]
@@ -92,14 +90,12 @@ they do not share channels. If the two groups share any channel, the common
 
 | Key | Type/range | Meaning |
 | --- | --- | --- |
-| `energy_range_kev` | `[min, max]`, numbers, keV | Allowed calibrated energy range for the core pixel after ADU-CMN is converted to keV. |
+| `noise_th_kev` | number, keV | Minimum calibrated energy required for the largest deposit pixel to become the core seed. FEC hits with core energy at or below this value are rejected. |
 | `clustering_pix_range` | `[min, max]`, integers | Allowed number of pixels in one clustered FEC hit. `max >= 3` enables diagonal neighbors. |
-| `circ_thr_kev` | number, keV | Threshold for counting high peripheral pixels in circle-noise rejection. |
 | `spread_thr_kev` | number, keV | Neighbor-pixel threshold for absorbing pixels into the cluster around a valid core pixel. |
 | `drift_time_max_us` | positive number, us | FECs with drift time at or above this value are treated as time-up and are not accepted as gamma hits. |
-| `noise_th_kev` | number, keV | Additional circle-noise veto using channels 0 and 63. |
-| `circ_min_hits` | non-negative integer | Minimum number of peripheral pixels above `circ_thr_kev` for circle-noise rejection. |
-| `core_exclude_pix` | map from FEC ID to pixel list or token | Pixels that cannot become the core seed of a cluster. They can still be absorbed as neighbors if adjacent to a valid core and above `spread_thr_kev`. |
+| `noise_th_for_noisy_pixel_kev` | number, keV | Veto threshold for known noisy pixels listed in `core_exclude_pix`. If one of those pixels exceeds this value, the FEC hit is rejected. |
+| `core_exclude_pix` | map from FEC ID to pixel list or token | Known noisy pixels. They cannot become the core seed, and they veto the FEC hit when above `noise_th_for_noisy_pixel_kev`. |
 
 ### `core_exclude_pix`
 
@@ -107,14 +103,12 @@ The keys are FEC IDs `0`, `1`, `2`, and `3`. Each value can be one of:
 
 | Form | Meaning |
 | --- | --- |
-| `[0, 63]` | Exclude only the listed channels from core-seed candidates. |
-| `peripheral` | Exclude all peripheral pixels in that FEC section from core-seed candidates. |
-| `periphery` | Alias of `peripheral`. |
-| `[peripheral, 12, 34]` | Exclude all peripheral pixels plus explicit channels. |
+| `[0, 63]` | Treat the listed channels as known noisy pixels. |
+| `peripheral` | Treat all peripheral pixels in that FEC section as known noisy pixels. |
+| `[peripheral, 12, 34]` | Treat all peripheral pixels plus explicit channels as known noisy pixels. |
 
-The old key name `exclude_pix` is still accepted as a fallback, but
-`core_exclude_pix` is the preferred name because the pixels are not completely
-ignored.
+These pixels cannot become core seeds. If any of them exceeds
+`noise_th_for_noisy_pixel_kev`, the FEC hit is rejected.
 
 ## calibration.energy
 
@@ -157,15 +151,13 @@ required_minimum_energy_deposit_in_higher_hit: 530.0
 
 ## Legacy names
 
-These old names are still accepted for transition:
+Old charge-threshold aliases are not accepted. Use one explicit key for each function:
 
-| Old key | Preferred key |
+| Function | Key |
 | --- | --- |
-| `charge.adu_min` and `charge.adu_max` | `charge.energy_range_kev` |
-| `charge.adu_range` | `charge.energy_range_kev` |
-| `charge.circ_thr` | `charge.circ_thr_kev` |
-| `charge.spread_thr` | `charge.spread_thr_kev` |
-| `charge.noise_th` | `charge.noise_th_kev` |
-| `charge.pix_min` and `charge.pix_max` | `charge.clustering_pix_range` |
-| `charge.exclude_pix` | `charge.core_exclude_pix` |
+| Core seed threshold | `charge.noise_th_kev` |
+| Spread-pixel threshold | `charge.spread_thr_kev` |
+| Known noisy-pixel veto threshold | `charge.noise_th_for_noisy_pixel_kev` |
+| Cluster pixel count range | `charge.clustering_pix_range` |
+| Known noisy pixel list | `charge.core_exclude_pix` |
 | `light.use_for_event_selection` | `light.event_selection_mode` |

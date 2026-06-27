@@ -19,6 +19,8 @@
 
 #include "NanoGRAMSLightAnalysis.hh"
 
+#include "AstroUnits.hh"
+
 #include <algorithm>
 #include <cstdint>
 #include <limits>
@@ -28,6 +30,8 @@
 
 namespace comptonsoft
 {
+namespace unit = anlgeant4::unit;
+
 namespace grams
 {
 

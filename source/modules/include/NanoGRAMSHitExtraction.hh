@@ -27,6 +27,7 @@
 #include <string>
 
 #include "NanoGRAMSCalibrationData.hh"
+#include "NanoGRAMSQuickLookTreeIO.hh"
 #include "NanoGRAMSTPCDataProcessor.hh"
 #include "NanoGRAMSTPCProperty.hh"
 #include "VCSModule.hh"

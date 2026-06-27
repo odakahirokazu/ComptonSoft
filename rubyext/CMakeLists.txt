@@ -6,6 +6,7 @@ set(ADDITIONAL_SWIG_IF_FILE interface/decayChains.i)
 set(CLASS_LIST_FILE interface/class_list_${TARGET_EXT_LIBRARY}.hh)
 set(RUBY_EXT_INCLUDE_DIRS
   ../source/core/include
+  ../source/core/include/nanograms
   ../source/modules/include
   ../source/simulation/include
   ../source/astroh/include

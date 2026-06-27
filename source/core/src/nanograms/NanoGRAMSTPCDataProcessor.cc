@@ -22,10 +22,8 @@
 #include "NanoGRAMSTPCProperty.hh"
 
 #include <TFile.h>
-#include <TLeaf.h>
 #include <TTree.h>
 
-#include <format>
 #include <algorithm>
 #include <array>
 #include <cmath>
@@ -189,80 +187,6 @@ bool hasTimeUp(const Config& cfg, const TPCTreeBuffer& tpc_tree_buffer)
   return true;
 }
 
-int waveformFlattenedLength(TTree* tpc_tree)
-{
-  const TLeaf* leaf = tpc_tree->GetLeaf("waveform");
-  if (!leaf) {
-    throw std::runtime_error("Missing waveform branch.");
-  }
-
-  const int flattened_len = leaf->GetLenStatic();
-  if (flattened_len <= 0) {
-    throw std::runtime_error("Unexpected waveform branch length.");
-  }
-  return flattened_len;
-}
-
-int readStaticArrayDimension(const std::string& leaf_title, std::size_t& pos)
-{
-  const std::size_t begin = leaf_title.find('[', pos);
-  const std::size_t end = leaf_title.find(']', begin);
-  if (begin == std::string::npos || end == std::string::npos || end <= begin + 1) {
-    throw std::runtime_error("Failed to parse waveform branch dimensions: " + leaf_title);
-  }
-
-  pos = end + 1;
-  return std::stoi(leaf_title.substr(begin + 1, end - begin - 1));
-}
-
-std::pair<int, int> waveformStaticArrayShape(TTree* tpc_tree)
-{
-  const TLeaf* leaf = tpc_tree->GetLeaf("waveform");
-  if (!leaf) {
-    throw std::runtime_error("Missing waveform branch.");
-  }
-
-  const std::string leaf_title = leaf->GetTitle();
-  std::size_t pos = 0;
-  const int num_channels = readStaticArrayDimension(leaf_title, pos);
-  const int waveform_len = readStaticArrayDimension(leaf_title, pos);
-  if (num_channels <= 0 || waveform_len <= 0) {
-    throw std::runtime_error("Unexpected waveform branch dimensions: " + leaf_title);
-  }
-
-  return {num_channels, waveform_len};
-}
-
-TPCTreeLayout inspectTPCTreeLayout(TTree* tpc_tree)
-{
-  TPCTreeLayout tpc_tree_layout;
-  tpc_tree_layout.n_entries =
-      static_cast<int64_t>(tpc_tree->GetEntries());
-  tpc_tree_layout.waveform_flattened_length =
-      waveformFlattenedLength(tpc_tree);
-  const auto [waveform_num_channels, waveform_len] =
-      waveformStaticArrayShape(tpc_tree);
-  tpc_tree_layout.waveform_num_channels = waveform_num_channels;
-  tpc_tree_layout.waveform_len = waveform_len;
-
-  if (tpc_tree_layout.waveform_flattened_length !=
-      tpc_tree_layout.waveform_num_channels * tpc_tree_layout.waveform_len) {
-    throw std::runtime_error("Inconsistent waveform branch dimensions.");
-  }
-
-  std::cout << "inspectTPCTreeLayout()" << std::endl;
-  std::cout << "n_entries:                   " << tpc_tree_layout.n_entries << std::endl;
-  std::cout << "num_dpp_registered_slots:    "
-            << tpc_tree_layout.num_dpp_registered_slots << std::endl;
-  std::cout << "waveform_num_channels:       "
-            << tpc_tree_layout.waveform_num_channels << std::endl;
-  std::cout << "waveform_len:                "
-            << tpc_tree_layout.waveform_len << std::endl;
-  std::cout << "waveform_flattened_length:   "
-            << tpc_tree_layout.waveform_flattened_length << std::endl;
-  return tpc_tree_layout;
-}
-
 LightTimingState makeLightTimingState(const TPCTreeLayout& tpc_tree_layout)
 {
   LightTimingState light_timing;
@@ -342,10 +266,6 @@ FECChargeSelector::FECChargeSelector(const Config& cfg,
 {
   for (int fec = 0; fec < NUM_VATA; ++fec) {
     masks_[fec] = buildFECMask(cfg_, fec);
-    min_periph_hits_[fec] =
-        cfg_.circ_min_hits;
-        //std::max(cfg_.circ_min_hits,
-        //         static_cast<int>(std::ceil(cfg_.circ_min_ratio * perimeter)));
   }
 }
 
@@ -373,11 +293,13 @@ FECChargeSelector::selectHits(const TPCTreeBuffer& tpc_tree_buffer,
           static_cast<double>(tpc_tree_buffer.adc[fec * NUM_CH_EACH_VATA + pix]);
     }
 
-    const double cmn = median64(adu_values);
+    const double output_cmn = median64(adu_values);
+    const double selection_cmn = lowerMean(adu_values, 10);
     for (int ch = 0; ch < NUM_CH_EACH_VATA; ++ch) {
-      adu_cmn_sub_values[fec][ch] = adu_values[ch] - cmn;
+      adu_cmn_sub_values[fec][ch] = adu_values[ch] - output_cmn;
+      const double selection_adu_cmn_sub = adu_values[ch] - selection_cmn;
       hit_selection_energy_values[fec][ch] =
-          hitSelectionEnergy(fec, ch, adu_cmn_sub_values[fec][ch]);
+          hitSelectionEnergy(fec, ch, selection_adu_cmn_sub);
     }
 
     drift_times[fec] = driftTimeFromClock(tpc_tree_buffer.drift_time[fec]);
@@ -430,26 +352,22 @@ bool FECChargeSelector::isRejectedByTiming(const FECSelectionInput& input) const
   return input.light_pileup || isTimeUp(input);
 }
 
-bool FECChargeSelector::isCircleNoise(const FECSelectionInput& input) const
+bool FECChargeSelector::hasNoisyPixel(const FECSelectionInput& input) const
 {
   const int fec = input.fec;
   const PixelADU& hit_selection_energy = input.hit_selection_energy_values[fec];
+  const auto it = cfg_.core_exclude_pix.find(fec);
+  if (it == cfg_.core_exclude_pix.end()) {
+    return false;
+  }
 
-  int count_periph = 0;
-  for (int ch : anode_topology_.periphery[fec]) {
-    if (hit_selection_energy[ch] > cfg_.circ_thr_energy) {
-      ++count_periph;
+  for (int ch : it->second) {
+    if (0 <= ch && ch < NUM_CH_EACH_VATA &&
+        hit_selection_energy[ch] > cfg_.noisy_pixel_energy_th) {
+      return true;
     }
   }
-
-  double edge_sum = 0.0;
-  if (std::isfinite(hit_selection_energy[0])) {
-    edge_sum += hit_selection_energy[0];
-  }
-  if (std::isfinite(hit_selection_energy[63])) {
-    edge_sum += hit_selection_energy[63];
-  }
-  return count_periph >= min_periph_hits_[fec] || edge_sum > cfg_.noise_energy_th;
+  return false;
 }
 
 PixelMask FECChargeSelector::buildAllowedPixelMask(int fec, int core_ch) const
@@ -477,7 +395,7 @@ bool FECChargeSelector::hasExtraHighPixel(const FECSelectionInput& input,
 
   for (int ch = 0; ch < NUM_CH_EACH_VATA; ++ch) {
     if (mask_in[ch] && !allowed_pixels[ch] &&
-        hit_selection_energy[ch] > cfg_.hit_energy_min) {
+        hit_selection_energy[ch] > cfg_.core_noise_energy_th) {
       return true;
     }
   }
@@ -568,7 +486,7 @@ bool FECChargeSelector::fillSelectedChannels(const FECSelectionInput& input,
   const PixelADU& hit_selection_energy = input.hit_selection_energy_values[fec];
   const auto [core_ch, core_energy] =
       findCoreSignalChannel(hit_selection_energy, mask_in);
-  if (core_energy <= cfg_.hit_energy_min || core_energy > cfg_.hit_energy_max ||
+  if (core_energy <= cfg_.core_noise_energy_th ||
       input.claimed_pixels[fec][core_ch]) {
     return false;
   }
@@ -584,7 +502,7 @@ bool FECChargeSelector::fillSelectedChannels(const FECSelectionInput& input,
   const bool event_mask =
       input.charge_selection_enabled &&
       !isRejectedByTiming(input) &&
-      !isCircleNoise(input) &&
+      !hasNoisyPixel(input) &&
       count_ok &&
       !cosmic &&
       !hasExtraHighPixel(input, allowed_pixels);
@@ -617,85 +535,6 @@ double FECChargeSelector::hitSelectionEnergy(int fec,
   return tpc_property_.convertADC2keVWithSpline3D(fec, ch, corrected_adu);
 }
 
-TPCTreeBuffer::TPCTreeBuffer(TTree* tpc_tree)
-    : tpc_tree_(tpc_tree)
-{
-  if (!tpc_tree_) {
-    throw std::runtime_error("TPCTreeBuffer received a null TTree pointer.");
-  }
-
-  layout_ = inspectTPCTreeLayout(tpc_tree_);
-
-  waveform_slot_of_dpp_channel_.fill(-1);
-  adc.assign(NUM_VATA * NUM_CH_EACH_VATA, 0);
-  drift_time.assign(NUM_VATA, 0);
-  ti.assign(NUM_VATA, 0);
-  waveform.assign(layout_.waveform_flattened_length, 0);
-
-  bindBranches(tpc_tree_);
-}
-
-void TPCTreeBuffer::getEntry(int64_t entry)
-{
-  tpc_tree_->GetEntry(entry);
-}
-
-void TPCTreeBuffer::updateWaveformLayoutFromRegisteredChannels()
-{
-  waveform_slot_of_dpp_channel_.fill(-1);
-
-  if (layout_.waveform_num_channels == NUM_CH_DPP_MAX) {
-    for (int dpp_ch = 0; dpp_ch < NUM_CH_DPP_MAX; ++dpp_ch) {
-      if (registered_channels[dpp_ch]) {
-        waveform_slot_of_dpp_channel_[dpp_ch] = dpp_ch;
-      }
-    }
-    return;
-  }
-
-  int registered_count = 0;
-  for (int dpp_ch = 0; dpp_ch < NUM_CH_DPP_MAX; ++dpp_ch) {
-    if (registered_channels[dpp_ch]) {
-      waveform_slot_of_dpp_channel_[dpp_ch] = registered_count;
-      ++registered_count;
-    }
-  }
-
-  if (registered_count <= 0 || layout_.waveform_num_channels != registered_count) {
-    throw std::runtime_error("Unexpected waveform/registered channel layout.");
-  }
-}
-
-int TPCTreeBuffer::waveformSlotForDPPChannel(int dpp_ch) const
-{
-  if (dpp_ch < 0 || dpp_ch >= NUM_CH_DPP_MAX) {
-    return -1;
-  }
-  return waveform_slot_of_dpp_channel_[dpp_ch];
-}
-
-void TPCTreeBuffer::bindBranches(TTree* tpc_tree)
-{
-  tpc_tree->SetBranchAddress("adc",           adc.data());
-  tpc_tree->SetBranchAddress("drift_time",    drift_time.data());
-  tpc_tree->SetBranchAddress("ti",            ti.data());
-  tpc_tree->SetBranchAddress("unixtime",      unixtime.data());
-  tpc_tree->SetBranchAddress("waveform",      waveform.data());
-  tpc_tree->SetBranchAddress("wave_compress", wave_compress.data());
-  tpc_tree->SetBranchAddress("registered",    registered_channels.data());
-  tpc_tree->SetBranchAddress("error_flags",   &error_flags);
-}
-
-uint32_t representativeUnixTime(const TPCTreeBuffer& tpc_tree_buffer)
-{
-  for (const uint32_t value : tpc_tree_buffer.unixtime) {
-    if (value > 0) {
-      return value;
-    }
-  }
-  return 0;
-}
-
 TPCTreeReader::TPCTreeReader(TTree* tpc_tree,
                              const Config& cfg,
                              const TPCProperty& tpc_property,
@@ -725,7 +564,7 @@ bool TPCTreeReader::processNext(int64_t& raw_event_id,
 
   raw_event_id = current_entry_;
   tpc_tree_buffer_.getEntry(current_entry_);
-  current_unix_time_ = representativeUnixTime(tpc_tree_buffer_);
+  current_unix_time_ = tpc_tree_buffer_.representativeUnixTime();
   if (gain_correction_updater_) {
     gain_correction_updater_(current_unix_time_);
   }
@@ -843,184 +682,6 @@ void RawHitTreeOutputWriter::bindBranches()
   rawhit_tree_->Branch("fecid",       &fecid_,      "fecid/S");
   rawhit_tree_->Branch("ch",          &ch_,         "ch/S");
   rawhit_tree_->Branch("drifttime",   &drifttime_,  "drifttime/F");
-}
-
-QuickLookTreeOutputWriter::QuickLookTreeOutputWriter(
-    const std::string& output_file_path,
-    const TPCTreeLayout& tpc_tree_layout,
-    const TPCProperty& tpc_property)
-    : output_path_(prepareOutputPath(output_file_path)),
-      file_(std::make_unique<TFile>(output_path_.string().c_str(), "RECREATE")),
-      quicklook_tree_(std::make_unique<TTree>(kQuickLookTreeName, kQuickLookTreeName)),
-      tpc_property_(tpc_property),
-      waveform_len_(tpc_tree_layout.waveform_len),
-      waveform_num_channels_(tpc_tree_layout.waveform_num_channels),
-      waveform_len_branch_(tpc_tree_layout.waveform_len),
-      waveform_num_channels_branch_(tpc_tree_layout.waveform_num_channels)
-{
-  if (file_->IsZombie()) {
-    throw std::runtime_error("Failed to create quicklook ROOT file: " +
-                             output_path_.string());
-  }
-
-  adu_cmn_sub_.assign(NUM_VATA * NUM_CH_EACH_VATA, 0.0f);
-  energy_cmn_sub_.assign(NUM_VATA * NUM_CH_EACH_VATA, 0.0f);
-  waveform_.assign(waveform_num_channels_ * waveform_len_, 0);
-  quicklook_tree_->SetDirectory(nullptr);
-  bindBranches();
-}
-
-QuickLookTreeOutputWriter::~QuickLookTreeOutputWriter() = default;
-
-void QuickLookTreeOutputWriter::fillEvent(int64_t raw_event_id,
-                                          TPCEventType event_type,
-                                          const TPCTreeBuffer& tpc_tree_buffer,
-                                          const std::vector<RawFECHit>& hits)
-{
-  raw_event_id_ = raw_event_id;
-  event_type_   = static_cast<int16_t>(event_type);
-  cmn_method_ = 0;
-  if (event_type == TPCEventType::Cosmic) {
-    cmn_method_ = 1;
-  }
-
-  for (int fec = 0; fec < NUM_VATA; ++fec) {
-    ti_[fec]         = tpc_tree_buffer.ti[fec];
-    drift_time_[fec] = tpc_tree_buffer.drift_time[fec];
-  }
-
-  for (int ch = 0; ch < NUM_CH_DPP_MAX; ++ch) {
-    wave_compress_[ch] = tpc_tree_buffer.wave_compress[ch];
-    registered_[ch]    = tpc_tree_buffer.registered_channels[ch];
-  }
-  waveform_ = tpc_tree_buffer.waveform;
-
-  fillChargeMaps(event_type, tpc_tree_buffer);
-
-  hit_pixel_fec_.clear();
-  hit_pixel_ch_.clear();
-  hit_pixel_adu_.clear();
-  hit_pixel_energy_.clear();
-  hit_pixel_cluster_id_.clear();
-  for (std::size_t ihit = 0; ihit < hits.size(); ++ihit) {
-    const RawFECHit& hit = hits[ihit];
-    for (std::size_t j = 0; j < hit.channels.size(); ++j) {
-      if (j < hit.channel_fecs.size()) {
-        hit_pixel_fec_.push_back(hit.channel_fecs[j]);
-      } else {
-        hit_pixel_fec_.push_back(static_cast<int16_t>(hit.fec));
-      }
-      hit_pixel_ch_.push_back(hit.channels[j]);
-      if (j < hit.adus.size()) {
-        hit_pixel_adu_.push_back(hit.adus[j]);
-        hit_pixel_energy_.push_back(static_cast<float>(
-            quicklookEnergy(hit_pixel_fec_.back(), hit.channels[j], hit.adus[j]) / unit::keV));
-      } else {
-        hit_pixel_adu_.push_back(std::numeric_limits<float>::quiet_NaN());
-        hit_pixel_energy_.push_back(std::numeric_limits<float>::quiet_NaN());
-      }
-      hit_pixel_cluster_id_.push_back(static_cast<int16_t>(ihit));
-    }
-  }
-
-  quicklook_tree_->Fill();
-}
-
-std::string QuickLookTreeOutputWriter::close()
-{
-  file_->cd();
-  quicklook_tree_->Write();
-  file_->Write();
-  const auto entries = quicklook_tree_->GetEntries();
-  file_->Close();
-
-  std::cout << "[ROOT] Saved quicklook file: " << output_path_.string()
-            << " (entries=" << entries << ")\n";
-  return output_path_.string();
-}
-
-void QuickLookTreeOutputWriter::bindBranches()
-{
-  adu_leaflist_           = std::format("adu_cmn_sub[{}][{}]/F", NUM_VATA, NUM_CH_EACH_VATA);
-  energy_leaflist_        = std::format("energy_cmn_sub[{}][{}]/F", NUM_VATA, NUM_CH_EACH_VATA);
-  cmn_leaflist_           = std::format("cmn[{}]/F", NUM_VATA);
-  ti_leaflist_            = std::format("ti[{}]/i", NUM_VATA);
-  drift_leaflist_         = std::format("drift_time[{}]/i", NUM_VATA);
-  wave_compress_leaflist_ = std::format("wave_compress[{}]/s", NUM_CH_DPP_MAX);
-  registered_leaflist_    = std::format("registered[{}]/O", NUM_CH_DPP_MAX);
-  waveform_leaflist_      = std::format("waveform[{}][{}]/S", waveform_num_channels_, waveform_len_);
-
-  quicklook_tree_->Branch("raw_event_id", &raw_event_id_, "raw_event_id/L");
-  quicklook_tree_->Branch("event_type",   &event_type_,   "event_type/S");
-  quicklook_tree_->Branch("cmn_method",   &cmn_method_,   "cmn_method/S");
-  quicklook_tree_->Branch("waveform_len", &waveform_len_branch_, "waveform_len/I");
-  quicklook_tree_->Branch("waveform_num_channels",
-                          &waveform_num_channels_branch_,
-                          "waveform_num_channels/I");
-  quicklook_tree_->Branch("adu_cmn_sub",  adu_cmn_sub_.data(),  adu_leaflist_.c_str());
-  quicklook_tree_->Branch("energy_cmn_sub",
-                          energy_cmn_sub_.data(),
-                          energy_leaflist_.c_str());
-  quicklook_tree_->Branch("cmn",          cmn_.data(),          cmn_leaflist_.c_str());
-  quicklook_tree_->Branch("ti",           ti_.data(),           ti_leaflist_.c_str());
-  quicklook_tree_->Branch("drift_time",   drift_time_.data(),   drift_leaflist_.c_str());
-  quicklook_tree_->Branch("wave_compress", wave_compress_.data(),
-                          wave_compress_leaflist_.c_str());
-  quicklook_tree_->Branch("registered",   registered_.data(),   registered_leaflist_.c_str());
-  quicklook_tree_->Branch("waveform",     waveform_.data(),     waveform_leaflist_.c_str());
-  quicklook_tree_->Branch("hit_pixel_fec",        &hit_pixel_fec_);
-  quicklook_tree_->Branch("hit_pixel_ch",         &hit_pixel_ch_);
-  quicklook_tree_->Branch("hit_pixel_adu",        &hit_pixel_adu_);
-  quicklook_tree_->Branch("hit_pixel_energy",     &hit_pixel_energy_);
-  quicklook_tree_->Branch("hit_pixel_cluster_id", &hit_pixel_cluster_id_);
-}
-
-void QuickLookTreeOutputWriter::fillChargeMaps(
-    TPCEventType event_type,
-    const TPCTreeBuffer& tpc_tree_buffer)
-{
-  for (int fec = 0; fec < NUM_VATA; ++fec) {
-    PixelADU adu_values{};
-    for (int ch = 0; ch < NUM_CH_EACH_VATA; ++ch) {
-      adu_values[ch] =
-          static_cast<double>(tpc_tree_buffer.adc[fec * NUM_CH_EACH_VATA + ch]);
-    }
-
-    double cmn = median64(adu_values);
-    if (event_type == TPCEventType::Cosmic) {
-      cmn = lowerMean(adu_values, 10);
-    }
-    cmn_[fec] = static_cast<float>(cmn);
-
-    for (int ch = 0; ch < NUM_CH_EACH_VATA; ++ch) {
-      const double adu_cmn_sub = adu_values[ch] - cmn;
-      const int index = fec * NUM_CH_EACH_VATA + ch;
-      adu_cmn_sub_[index] = static_cast<float>(adu_cmn_sub);
-      energy_cmn_sub_[index] =
-          static_cast<float>(quicklookEnergy(fec, ch, adu_cmn_sub) / unit::keV);
-    }
-  }
-}
-
-double QuickLookTreeOutputWriter::quicklookEnergy(int fec,
-                                                  int ch,
-                                                  double adu_cmn_sub) const
-{
-  if (!std::isfinite(adu_cmn_sub) || adu_cmn_sub <= 0.0) {
-    return 0.0 * unit::keV;
-  }
-
-  const double correction_factor = tpc_property_.temperatureCorrectionFactor(fec);
-  if (!std::isfinite(correction_factor) || correction_factor <= 0.0) {
-    return std::numeric_limits<double>::quiet_NaN();
-  }
-
-  const double corrected_adu = adu_cmn_sub * correction_factor;
-  if (corrected_adu <= 0.0) {
-    return 0.0 * unit::keV;
-  }
-
-  return tpc_property_.convertADC2keVWithSpline3D(fec, ch, corrected_adu);
 }
 
 } /* namespace grams */

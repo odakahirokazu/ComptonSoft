@@ -1,6 +1,7 @@
 find_package(HDF5 REQUIRED COMPONENTS C)
 
 include_directories(include
+  include/nanograms
   ${ANLG4_INC_DIR}
   ${ROOT_INC_DIR}
   ${G4_INC_DIR}
@@ -71,7 +72,7 @@ set(CS_CORE_CLASSES
   src/HY2020EventReconstructionAlgorithm.cc
   src/OberlackAlgorithm.cc
   src/TangoAlgorithm.cc
-  src/NanoGRAMSEventReconstructionAlgorithm.cc
+  src/nanograms/NanoGRAMSEventReconstructionAlgorithm.cc
   ### sensitive detector
   src/VCSSensitiveDetector.cc
   ### manager
@@ -109,14 +110,15 @@ set(CS_CORE_CLASSES
   src/RIDecayProperties.cc
   src/RIDecayChains.cc
   src/RIDecayCalculation.cc
-  src/NanoGRAMSTPCProperty.cc
-  src/NanoGRAMSFECGeometry.cc
-  src/NanoGRAMSConfig.cc
-  src/NanoGRAMSCalibrationData.cc
-  src/NanoGRAMSHitCalibrator.cc
-  src/NanoGRAMSLightAnalysis.cc
-  src/NanoGRAMSTPCDataProcessor.cc
-  src/TPCTreeIO.cc
+  src/nanograms/NanoGRAMSTPCProperty.cc
+  src/nanograms/NanoGRAMSFECGeometry.cc
+  src/nanograms/NanoGRAMSConfig.cc
+  src/nanograms/NanoGRAMSCalibrationData.cc
+  src/nanograms/NanoGRAMSHitCalibrator.cc
+  src/nanograms/NanoGRAMSLightAnalysis.cc
+  src/nanograms/NanoGRAMSQuickLookTreeIO.cc
+  src/nanograms/NanoGRAMSTPCTreeIO.cc
+  src/nanograms/NanoGRAMSTPCDataProcessor.cc
   )
 
 if(CS_USE_ORT)
@@ -138,9 +140,10 @@ add_library(CSCore SHARED
   )
 
 set_source_files_properties(
-  src/NanoGRAMSCalibrationData.cc
-  src/NanoGRAMSTPCDataProcessor.cc
-  src/NanoGRAMSTPCProperty.cc
+  src/nanograms/NanoGRAMSCalibrationData.cc
+  src/nanograms/NanoGRAMSQuickLookTreeIO.cc
+  src/nanograms/NanoGRAMSTPCDataProcessor.cc
+  src/nanograms/NanoGRAMSTPCProperty.cc
   PROPERTIES
   COMPILE_OPTIONS "-std=c++20"
 )

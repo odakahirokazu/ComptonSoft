@@ -1,6 +1,7 @@
 include_directories(
   include
   ../core/include
+  ../core/include/nanograms
   ${ANLG4_INC_DIR}
   ${ANLNEXT_INC_DIR}
   ${ROOT_INC_DIR}

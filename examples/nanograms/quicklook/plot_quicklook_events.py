@@ -304,16 +304,25 @@ def strongest_light_channel(waveforms: np.ndarray, cfg: PlotConfig) -> int:
 
 def expand_waveforms_by_dpp_channel(waveforms: np.ndarray,
                                     registered: np.ndarray,
+                                    waveform_dpp_ch: np.ndarray,
                                     waveform_len: int) -> np.ndarray:
     expanded = np.full((registered.size, waveform_len), np.nan, dtype=float)
+    if waveform_dpp_ch.size == waveforms.shape[0]:
+        for waveform_slot, dpp_ch in enumerate(waveform_dpp_ch):
+            if 0 <= dpp_ch < registered.size:
+                expanded[int(dpp_ch)] = waveforms[waveform_slot]
+        return expanded
+
+    if waveforms.shape[0] == registered.size:
+        return waveforms.astype(float, copy=False)
+
     waveform_slot = 0
     for dpp_ch, is_registered in enumerate(registered):
-        if not is_registered:
-            continue
-        if waveform_slot >= waveforms.shape[0]:
-            break
-        expanded[dpp_ch] = waveforms[waveform_slot]
-        waveform_slot += 1
+        if is_registered:
+            if waveform_slot >= waveforms.shape[0]:
+                break
+            expanded[dpp_ch] = waveforms[waveform_slot]
+            waveform_slot += 1
     return expanded
 
 
@@ -337,9 +346,15 @@ def plot_entry(entry: int, arrays: dict[str, np.ndarray], cfg: PlotConfig, outdi
         charge_label = "ADU - CMN"
     drift_counts = np.asarray(arrays["drift_time"][entry], dtype=float).reshape(4)
     registered = np.asarray(arrays["registered"][entry], dtype=bool).reshape(8)
+    waveform_dpp_ch = np.asarray(arrays.get("waveform_dpp_ch", []), dtype=np.int16)
+    if waveform_dpp_ch.size > 0:
+        waveform_dpp_ch = np.asarray(arrays["waveform_dpp_ch"][entry], dtype=np.int16)
     waveforms_flat = np.asarray(arrays["waveform"][entry]).reshape(waveform_num_channels,
                                                                    waveform_len)
-    waveforms = expand_waveforms_by_dpp_channel(waveforms_flat, registered, waveform_len)
+    waveforms = expand_waveforms_by_dpp_channel(waveforms_flat,
+                                                registered,
+                                                waveform_dpp_ch,
+                                                waveform_len)
     wave_compress = np.asarray(arrays["wave_compress"][entry]).reshape(8)
 
     vmin, vmax = charge_color_limits(charge_values, cfg)
@@ -513,6 +528,8 @@ def main() -> None:
     ]
     if "waveform_num_channels" in tree_branches:
         branches.append("waveform_num_channels")
+    if "waveform_dpp_ch" in tree_branches:
+        branches.append("waveform_dpp_ch")
     arrays = tree.arrays(branches, library="np")
     if "waveform_num_channels" not in arrays:
         arrays["waveform_num_channels"] = np.full(tree.num_entries, 8, dtype=np.int32)

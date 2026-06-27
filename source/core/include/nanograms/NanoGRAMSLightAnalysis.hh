@@ -27,14 +27,26 @@
 #ifndef COMPTONSOFT_NanoGRAMSLightAnalysis_H
 #define COMPTONSOFT_NanoGRAMSLightAnalysis_H 1
 
+#include <array>
+#include <cstdint>
 #include <string>
 
-#include "NanoGRAMSTPCDataProcessor.hh"
+#include "NanoGRAMSConfig.hh"
+#include "NanoGRAMSTPCTreeIO.hh"
 
 namespace comptonsoft
 {
 namespace grams
 {
+
+struct LightTimingState
+{
+  bool ready = false;
+  std::array<uint16_t, NUM_CH_DPP_MAX> wave_compress{};
+  std::array<double,   NUM_CH_DPP_MAX> timebin{};
+  std::array<int,      NUM_CH_DPP_MAX> pre_roi_index{};
+  std::array<int,      NUM_CH_DPP_MAX> post_roi_index{};
+};
 
 struct LightStatus
 {

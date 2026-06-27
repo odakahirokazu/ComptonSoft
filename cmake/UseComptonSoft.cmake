@@ -7,7 +7,10 @@ if(NOT DEFINED CS_INSTALL)
     set(CS_INSTALL $ENV{HOME})
   endif()
 endif(NOT DEFINED CS_INSTALL)
-set(CS_INC_DIR ${CS_INSTALL}/include/comptonsoft)
+set(CS_INC_DIR
+  ${CS_INSTALL}/include/comptonsoft
+  ${CS_INSTALL}/include/comptonsoft/nanograms
+)
 set(CS_LIB_DIR ${CS_INSTALL}/lib)
 set(CS_LIB CSCore CSModules CSSimulation)
 message("-- CS_INSTALL = ${CS_INSTALL}")

@@ -45,14 +45,11 @@ struct Config
   int daq_time      = 0;
   int pix_min       = 0;
   int pix_max       = 0;
-  int circ_min_hits = 0;
 
   double adc2mv           = (1.0 / 8192.0) * 1000.0;
-  double hit_energy_min   = 0.0 * anlgeant4::unit::keV;
-  double hit_energy_max   = 0.0 * anlgeant4::unit::keV;
+  double core_noise_energy_th = 0.0 * anlgeant4::unit::keV;
   double light_gamma_thr  = 0.0;
   double light_cosmic_thr = 0.0;
-  double circ_thr_energy  = 0.0 * anlgeant4::unit::keV;
   double spread_thr_energy = 0.0 * anlgeant4::unit::keV;
   double drift_time_max   = 0.0 * anlgeant4::unit::us;
   //double late_window      = 0.0;
@@ -60,8 +57,7 @@ struct Config
   double pre_roi_window      = 0.0;
   double post_roi_window     = 0.0;
   double out_roi_peak_thr    = 0.0;
-  double noise_energy_th     = 0.0 * anlgeant4::unit::keV;
-  //double circ_min_ratio      = 0.0;
+  double noisy_pixel_energy_th = 0.0 * anlgeant4::unit::keV;
   double timebin_ns_override = 0.0;
   double cross_fec_merge_drift_time_tolerance = -1.0 * anlgeant4::unit::us;
 

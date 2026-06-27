@@ -38,6 +38,8 @@
 #include "AstroUnits.hh"
 #include "NanoGRAMSConfig.hh"
 #include "NanoGRAMSFECGeometry.hh"
+#include "NanoGRAMSLightAnalysis.hh"
+#include "NanoGRAMSTPCTreeIO.hh"
 
 class TFile;
 class TTree;
@@ -83,52 +85,6 @@ enum class TPCEventType : int16_t
   TimeUp = 4,
 };
 
-struct TPCTreeLayout
-{
-  int64_t n_entries             = 0;
-  int num_dpp_registered_slots  = NUM_CH_DPP_MAX;
-  int waveform_num_channels     = 0;
-  int waveform_flattened_length = 0;
-  int waveform_len              = 0;
-};
-
-class TPCTreeBuffer
-{
-public:
-  explicit TPCTreeBuffer(TTree* tpc_tree);
-
-  const TPCTreeLayout& layout() const { return layout_; }
-  int64_t nEntries() const { return layout_.n_entries; }
-  void getEntry(int64_t entry);
-  void updateWaveformLayoutFromRegisteredChannels();
-  int waveformSlotForDPPChannel(int dpp_ch) const;
-
-  std::array<uint16_t, NUM_CH_DPP_MAX> wave_compress{};
-  std::array<bool,     NUM_CH_DPP_MAX> registered_channels{};
-  std::vector<uint16_t>   adc;
-  std::vector<uint32_t>   drift_time;
-  std::vector<uint32_t>   ti;
-  std::array<uint32_t, NUM_VATA> unixtime{};
-  std::vector<int16_t>    waveform;
-  uint16_t error_flags = 0;
-
-private:
-  void bindBranches(TTree* tpc_tree);
-
-  TTree* tpc_tree_ = nullptr;
-  TPCTreeLayout layout_;
-  std::array<int, NUM_CH_DPP_MAX> waveform_slot_of_dpp_channel_{};
-};
-
-struct LightTimingState
-{
-  bool ready = false;
-  std::array<uint16_t, NUM_CH_DPP_MAX> wave_compress{};
-  std::array<double,   NUM_CH_DPP_MAX> timebin{};
-  std::array<int,      NUM_CH_DPP_MAX> pre_roi_index{};
-  std::array<int,      NUM_CH_DPP_MAX> post_roi_index{};
-};
-
 class FECTITracker
 {
 public:
@@ -156,7 +112,7 @@ private:
   bool fillSelectedChannels(const FECSelectionInput& input, RawFECHit& hit) const;
   bool isTimeUp(const FECSelectionInput& input) const;
   bool isRejectedByTiming(const FECSelectionInput& input) const;
-  bool isCircleNoise(const FECSelectionInput& input) const;
+  bool hasNoisyPixel(const FECSelectionInput& input) const;
   PixelMask buildAllowedPixelMask(int fec, int core_ch) const;
   bool hasExtraHighPixel(const FECSelectionInput& input,
                          const PixelMask& allowed_pixels) const;
@@ -172,7 +128,6 @@ private:
   AnodeChannelTopology anode_topology_;
   bool include_diag_ = false;
   std::array<PixelMask, NUM_VATA> masks_{};
-  std::array<int, NUM_VATA> min_periph_hits_{};
 };
 
 class TPCTreeReader
@@ -229,61 +184,6 @@ private:
   int16_t fecid_      = 0;
   int16_t ch_         = 0;
   float drifttime_    = 0.0 * unit::us;
-};
-
-class QuickLookTreeOutputWriter
-{
-public:
-  explicit QuickLookTreeOutputWriter(const std::string& output_file_path,
-                                     const TPCTreeLayout& tpc_tree_layout,
-                                     const TPCProperty& tpc_property);
-  ~QuickLookTreeOutputWriter();
-
-  void fillEvent(int64_t raw_event_id,
-                 TPCEventType event_type,
-                 const TPCTreeBuffer& tpc_tree_buffer,
-                 const std::vector<RawFECHit>& hits);
-  std::string close();
-
-private:
-  void bindBranches();
-  void fillChargeMaps(TPCEventType event_type,
-                      const TPCTreeBuffer& tpc_tree_buffer);
-  double quicklookEnergy(int fec, int ch, double adu_cmn_sub) const;
-
-  std::filesystem::path  output_path_;
-  std::unique_ptr<TFile> file_;
-  std::unique_ptr<TTree> quicklook_tree_;
-  const TPCProperty& tpc_property_;
-  int waveform_len_ = 0;
-  int waveform_num_channels_ = 0;
-  std::string adu_leaflist_;
-  std::string energy_leaflist_;
-  std::string cmn_leaflist_;
-  std::string ti_leaflist_;
-  std::string drift_leaflist_;
-  std::string wave_compress_leaflist_;
-  std::string registered_leaflist_;
-  std::string waveform_leaflist_;
-
-  int64_t raw_event_id_ = 0;
-  int16_t event_type_   = 0;
-  int16_t cmn_method_   = 0;
-  int32_t waveform_len_branch_ = 0;
-  int32_t waveform_num_channels_branch_ = 0;
-  std::vector<float> adu_cmn_sub_;
-  std::vector<float> energy_cmn_sub_;
-  std::array<float, NUM_VATA> cmn_{};
-  std::array<uint32_t, NUM_VATA> ti_{};
-  std::array<uint32_t, NUM_VATA> drift_time_{};
-  std::array<uint16_t, NUM_CH_DPP_MAX> wave_compress_{};
-  std::array<bool, NUM_CH_DPP_MAX> registered_{};
-  std::vector<int16_t> waveform_;
-  std::vector<int16_t> hit_pixel_fec_;
-  std::vector<int16_t> hit_pixel_ch_;
-  std::vector<float> hit_pixel_adu_;
-  std::vector<float> hit_pixel_energy_;
-  std::vector<int16_t> hit_pixel_cluster_id_;
 };
 
 } /* namespace grams */

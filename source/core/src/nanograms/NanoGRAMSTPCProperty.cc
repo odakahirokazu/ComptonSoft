@@ -94,43 +94,18 @@ GainMatrix loadCalibrationMatrix(const fs::path& gain_info_path, const std::stri
 } // namespace
 
 TPCProperty::TPCProperty()
-    : drift_velocity_(1.0e5 * unit::cm / unit::s),
-      anode_pos_z_(5.0 * unit::cm),
-      pixel_size_(kPixelSize),
-      z_height_lartpc_(10.0 * unit::cm),
-      pos_x_error_(pixel_size_ / std::sqrt(12.0)),
-      pos_y_error_(pixel_size_ / std::sqrt(12.0)),
-      pos_z_error_(0.1 * unit::cm)
 {
+  drift_velocity_  = 1.0 * unit::mm / unit::us;
+  anode_pos_z_     = 5.0 * unit::cm;
+  pixel_size_      = kPixelSize;
+  z_height_lartpc_ = 10.0 * unit::cm;
+  pos_x_error_     = pixel_size_ / std::sqrt(12.0);
+  pos_y_error_     = pixel_size_ / std::sqrt(12.0);
+  pos_z_error_     = 1.0 * unit::mm;
   temperature_correction_factors_.fill(1.0);
 }
 
 TPCProperty::~TPCProperty() = default;
-
-void TPCProperty::setDriftVelocity(double value)
-{
-  drift_velocity_ = value;
-}
-
-void TPCProperty::setAnodePosZ(double value)
-{
-  anode_pos_z_ = value;
-}
-
-double TPCProperty::posXError() const
-{
-  return pos_x_error_;
-}
-
-double TPCProperty::posYError() const
-{
-  return pos_y_error_;
-}
-
-double TPCProperty::posZError() const
-{
-  return pos_z_error_;
-}
 
 void TPCProperty::loadParamCoulomb2keVForSpline3D(const fs::path& spline_path, double efield)
 {
@@ -196,7 +171,10 @@ double TPCProperty::temperatureCorrectionFactor(int fec) const
 double TPCProperty::convertADC2keVWithSpline3D(int fec, int ch, double adc) const
 {
   const GainParamArray& params = gain_matrices_adc_to_c_[fec][ch];
-  double charge_coulomb = cubic(adc, params);
+  double charge_coulomb = cubic(adc, params) - cubic(0.0, params);
+  if (charge_coulomb <= 0.0) {
+    return 0.0 * unit::keV;
+  }
   charge_coulomb = std::clamp(charge_coulomb, xmin_spline3d_, xmax_spline3d_);
 
   return spline_->Eval(charge_coulomb) * unit::keV;

@@ -145,66 +145,27 @@ std::vector<int> readCoreExcludePixelList(const YAML::Node& node,
 
 void readClusteringPixelRange(Config& cfg, const YAML::Node& nodeCharge)
 {
-  if (nodeCharge["clustering_pix_range"]) {
-    const auto range = nodeCharge["clustering_pix_range"].as<std::vector<int>>();
-    if (range.size() != 2) {
-      throw std::runtime_error("charge.clustering_pix_range must contain [min, max].");
-    }
-    cfg.pix_min = range[0];
-    cfg.pix_max = range[1];
-    return;
+  const auto range = nodeCharge["clustering_pix_range"].as<std::vector<int>>();
+  if (range.size() != 2) {
+    throw std::runtime_error("charge.clustering_pix_range must contain [min, max].");
   }
-
-  cfg.pix_min = nodeCharge["pix_min"].as<int>();
-  cfg.pix_max = nodeCharge["pix_max"].as<int>();
+  cfg.pix_min = range[0];
+  cfg.pix_max = range[1];
 }
 
 double readChargeThresholdKeV(const YAML::Node& nodeCharge,
-                              const std::string& key,
-                              const std::string& legacy_key)
+                              const std::string& key)
 {
   if (nodeCharge[key]) {
     return nodeCharge[key].as<double>() * unit::keV;
   }
-  if (nodeCharge[legacy_key]) {
-    return nodeCharge[legacy_key].as<double>() * unit::keV;
-  }
   throw std::runtime_error("charge." + key + " is missing.");
-}
-
-void readHitEnergyRange(Config& cfg, const YAML::Node& nodeCharge)
-{
-  if (nodeCharge["energy_range_kev"]) {
-    const auto range = nodeCharge["energy_range_kev"].as<std::vector<double>>();
-    if (range.size() != 2) {
-      throw std::runtime_error("charge.energy_range_kev must contain [min, max].");
-    }
-    cfg.hit_energy_min = range[0] * unit::keV;
-    cfg.hit_energy_max = range[1] * unit::keV;
-  } else if (nodeCharge["adu_range"]) {
-    const auto range = nodeCharge["adu_range"].as<std::vector<double>>();
-    if (range.size() != 2) {
-      throw std::runtime_error("charge.adu_range must contain [min, max].");
-    }
-    cfg.hit_energy_min = range[0] * unit::keV;
-    cfg.hit_energy_max = range[1] * unit::keV;
-  } else {
-    cfg.hit_energy_min = nodeCharge["adu_min"].as<double>() * unit::keV;
-    cfg.hit_energy_max = nodeCharge["adu_max"].as<double>() * unit::keV;
-  }
-
-  if (cfg.hit_energy_max <= cfg.hit_energy_min) {
-    throw std::runtime_error("charge.energy_range_kev must satisfy max > min.");
-  }
 }
 
 YAML::Node coreExcludePixelNode(const YAML::Node& nodeCharge)
 {
   if (nodeCharge["core_exclude_pix"]) {
     return nodeCharge["core_exclude_pix"];
-  }
-  if (nodeCharge["exclude_pix"]) {
-    return nodeCharge["exclude_pix"];
   }
 
   throw std::runtime_error("charge.core_exclude_pix is missing.");
@@ -268,16 +229,13 @@ void readChargeConfig(Config& cfg, const YAML::Node& node)
 {
   const auto nodeCharge = node["charge"];
   readClusteringPixelRange(cfg, nodeCharge);
-  cfg.circ_min_hits     = nodeCharge["circ_min_hits"].as<int>();
-  readHitEnergyRange(cfg, nodeCharge);
-  cfg.circ_thr_energy =
-      readChargeThresholdKeV(nodeCharge, "circ_thr_kev", "circ_thr");
+  cfg.core_noise_energy_th =
+      readChargeThresholdKeV(nodeCharge, "noise_th_kev");
   cfg.spread_thr_energy =
-      readChargeThresholdKeV(nodeCharge, "spread_thr_kev", "spread_thr");
+      readChargeThresholdKeV(nodeCharge, "spread_thr_kev");
   cfg.drift_time_max    = nodeCharge["drift_time_max_us"].as<double>() * unit::us;
-  cfg.noise_energy_th =
-      readChargeThresholdKeV(nodeCharge, "noise_th_kev", "noise_th");
-  //cfg.circ_min_ratio    = nodeCharge["circ_min_ratio"].as<double>();
+  cfg.noisy_pixel_energy_th =
+      readChargeThresholdKeV(nodeCharge, "noise_th_for_noisy_pixel_kev");
   if (nodeCharge["cross_fec_merge_drift_time_tolerance_us"]) {
     cfg.cross_fec_merge_drift_time_tolerance =
         nodeCharge["cross_fec_merge_drift_time_tolerance_us"].as<double>() * unit::us;
@@ -296,14 +254,11 @@ void readChargeConfig(Config& cfg, const YAML::Node& node)
 
   std::cout << "pix_min: "           << cfg.pix_min           << std::endl;
   std::cout << "pix_max: "           << cfg.pix_max           << std::endl;
-  std::cout << "circ_min_hits: "     << cfg.circ_min_hits     << std::endl;
-  std::cout << "hit_energy_min_keV: " << cfg.hit_energy_min / unit::keV << std::endl;
-  std::cout << "hit_energy_max_keV: " << cfg.hit_energy_max / unit::keV << std::endl;
-  std::cout << "circ_thr_kev: "      << cfg.circ_thr_energy / unit::keV << std::endl;
+  std::cout << "noise_th_kev: " << cfg.core_noise_energy_th / unit::keV << std::endl;
   std::cout << "spread_thr_kev: "    << cfg.spread_thr_energy / unit::keV << std::endl;
   std::cout << "drift_time_max_us: " << cfg.drift_time_max / unit::us << std::endl;
-  std::cout << "noise_th_kev: "      << cfg.noise_energy_th / unit::keV << std::endl;
-  //std::cout << "circ_min_ratio: "    << cfg.circ_min_ratio    << std::endl;
+  std::cout << "noise_th_for_noisy_pixel_kev: "
+            << cfg.noisy_pixel_energy_th / unit::keV << std::endl;
   if (cfg.cross_fec_merge_drift_time_tolerance >= 0.0) {
     std::cout << "cross_fec_merge_drift_time_tolerance_us: "
               << cfg.cross_fec_merge_drift_time_tolerance / unit::us << std::endl;
