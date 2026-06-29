@@ -176,8 +176,13 @@ void ComptonEventFilter::add_condition(const std::string& type,
   std::function<bool (const BasicComptonEvent&)> condition;
 
   namespace arg = std::placeholders;
-  if (type == "event ID") {
-    condition = std::bind(filter_compton<int64_t>,
+  if (type == "run ID") {
+    condition = std::bind(filter_compton<int32_t>,
+                          &BasicComptonEvent::RunID,
+                          arg::_1, min_value, max_value);
+  }
+  else if (type == "event ID") {
+    condition = std::bind(filter_compton<int32_t>,
                           &BasicComptonEvent::EventID,
                           arg::_1, min_value, max_value);
   }

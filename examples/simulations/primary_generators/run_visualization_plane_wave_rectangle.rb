@@ -4,9 +4,10 @@ require 'comptonsoft'
 
 def run_simulation(num)
   sim = ComptonSoft::Simulation.new
+  sim.num_events_per_run = 50
   sim.random_seed = 0
   sim.set_gdml "database/mass_model.gdml"
-  sim.set_primary_generator :PlaneWaveRectanglePrimaryGen, {
+  sim.set_primary_generator :PlaneWaveRectanglePrimaryGenerator, {
     particle: "gamma",
     photon_index: 1.5,
     energy_min: 10.0,
@@ -23,5 +24,4 @@ def run_simulation(num)
 end
 
 ### main ###
-num = 100
-run_simulation(num)
+run_simulation(1)

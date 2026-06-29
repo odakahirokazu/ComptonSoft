@@ -6,9 +6,10 @@ def run_simulation(num)
   energy = 511.0 # keV
 
   sim = ComptonSoft::Simulation.new
+  sim.num_events_per_run = 50
   sim.random_seed = 0
   sim.set_gdml "database/mass_model.gdml"
-  sim.set_primary_generator :PlaneWavePrimaryGen, {
+  sim.set_primary_generator :PlaneWavePrimaryGenerator, {
     particle: "gamma",
     photon_index: 0.0,
     energy_min: energy,
@@ -23,5 +24,4 @@ def run_simulation(num)
 end
 
 ### main ###
-num = 4
-run_simulation(num)
+run_simulation(1)

@@ -18,9 +18,9 @@
  *************************************************************************/
 
 #include "MultiChannelData.hh"
-#include "TRandom3.h"
 #include "AstroUnits.hh"
 #include "GainFunctionLinear.hh"
+#include "TRandom3.h"
 
 namespace unit = anlgeant4::unit;
 
@@ -51,7 +51,7 @@ MultiChannelData::~MultiChannelData() = default;
 void MultiChannelData::randomizePHAValues()
 {
   const std::size_t N = NumChannels_;
-  for (std::size_t i=0; i<N; i++) {
+  for (std::size_t i = 0; i < N; i++) {
     if (getDataValid(i) && getChannelEnabled(i)) {
       PHAVector_[i] += gRandom->Uniform(-0.5, 0.5);
     }
@@ -61,7 +61,7 @@ void MultiChannelData::randomizePHAValues()
 void MultiChannelData::correctPedestalLevel()
 {
   const std::size_t N = NumChannels_;
-  for (std::size_t i=0; i<N; i++) {
+  for (std::size_t i = 0; i < N; i++) {
     if (getDataValid(i) && getChannelEnabled(i)) {
       PHAVector_[i] -= pedestalVector_[i];
     }
@@ -72,16 +72,18 @@ double MultiChannelData::calculateCommonModeNoiseByMedian()
 {
   const std::size_t N = NumChannels_;
   std::vector<double> sortedPHA;
-  for (std::size_t i=0; i<N; i++) {
+  for (std::size_t i = 0; i < N; i++) {
     if (getDataValid(i) && getChannelEnabled(i)) {
       sortedPHA.push_back(getPHA(i));
     }
   }
   std::size_t numGoodChannel = sortedPHA.size();
-  if (numGoodChannel < 1) { return 0.0; }
+  if (numGoodChannel < 1) {
+    return 0.0;
+  }
 
   std::sort(sortedPHA.begin(), sortedPHA.end());
-  double median = sortedPHA[numGoodChannel/2];
+  double median = sortedPHA[numGoodChannel / 2];
   commonModeNoise_ = median;
   return median;
 }
@@ -95,29 +97,37 @@ double MultiChannelData::calculateCommonModeNoiseByMean()
 
   double sum = 0.0;
   int numGoodChannel = 0;
-  
-  for (std::size_t i=0; i<N; i++) {
+
+  for (std::size_t i = 0; i < N; i++) {
     if (getDataValid(i) && getChannelEnabled(i)) {
       double pha = getPHA(i);
       sum += pha;
       numGoodChannel++;
-      
+
       if (max3 < pha) {
         max3 = pha;
         if (max2 < max3) {
-          double t1 = max2; max2 = max3; max3 = t1; // swap
+          double t1 = max2;
+          max2 = max3;
+          max3 = t1; // swap
           if (max1 < max2) {
-            double t2 = max1; max1 = max2; max2 = t2; // swap
+            double t2 = max1;
+            max1 = max2;
+            max2 = t2; // swap
           }
         }
       }
-      
+
       if (min3 > pha) {
         min3 = pha;
         if (min2 > min3) {
-          double t1 = min2; min2 = min3; min3 = t1; // swap
+          double t1 = min2;
+          min2 = min3;
+          min3 = t1; // swap
           if (min1 > min2) {
-            double t2 = min1; min1 = min2; min2 = t2; // swap
+            double t2 = min1;
+            min1 = min2;
+            min2 = t2; // swap
           }
         }
       }
@@ -126,7 +136,7 @@ double MultiChannelData::calculateCommonModeNoiseByMean()
 
   double mean = 0.0;
   if (numGoodChannel > 6) {
-    mean = (sum-max1-max2-max3-min1-min2-min3)/(numGoodChannel-6);
+    mean = (sum - max1 - max2 - max3 - min1 - min2 - min3) / (numGoodChannel - 6);
   }
   commonModeNoise_ = mean;
   return mean;
@@ -136,7 +146,7 @@ void MultiChannelData::subtractCommonModeNoise()
 {
   const std::size_t N = NumChannels_;
   const double CMN = commonModeNoise_;
-  for (std::size_t i=0; i<N; i++) {
+  for (std::size_t i = 0; i < N; i++) {
     if (getDataValid(i) && getChannelEnabled(i)) {
       PHAVector_[i] -= CMN;
     }
@@ -158,13 +168,13 @@ double MultiChannelData::PHA2EPI(std::size_t i, double pha) const
   else {
     vpi = gainFunction->eval(pha);
   }
-  return vpi*unit::keV;
+  return vpi * unit::keV;
 }
 
 bool MultiChannelData::convertPHA2EPI()
 {
   const std::size_t N = NumChannels_;
-  for (std::size_t i=0; i<N; i++) {
+  for (std::size_t i = 0; i < N; i++) {
     if (getDataValid(i) && getChannelEnabled(i)) {
       setEPI(i, PHA2EPI(i, getPHA(i)));
     }
@@ -189,7 +199,7 @@ bool MultiChannelData::discriminate(std::size_t i, double energy) const
 void MultiChannelData::selectHits()
 {
   const std::size_t N = NumChannels_;
-  for (std::size_t i=0; i<N; i++) {
+  for (std::size_t i = 0; i < N; i++) {
     if (getDataValid(i) && getChannelEnabled(i) && discriminate(i, getEPI(i))) {
       setChannelHit(i, 1);
     }

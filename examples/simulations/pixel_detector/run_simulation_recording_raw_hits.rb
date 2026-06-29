@@ -17,7 +17,7 @@ def run_simulation(num, random, output)
   sim.set_gdml "database/mass_model.gdml"
   sim.set_physics(hadron_hp: false, cut_value: 0.001)
 
-  sim.set_primary_generator :PlaneWavePrimaryGen, {
+  sim.set_primary_generator :PlaneWavePrimaryGenerator, {
     particle: "gamma",
     photon_index: 0.0,
     energy_min: energy,
@@ -34,5 +34,5 @@ end
 ### main ###
 num = 100000
 output = "simulation_raw_hits.root"
-random = 0
+random = 10
 run_simulation(num, random, output)

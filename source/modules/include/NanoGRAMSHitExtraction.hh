@@ -60,6 +60,7 @@ public:
     return -1;
   }
   int64_t currentRawEventId() const { return current_raw_event_id_; }
+  int32_t runId() const { return run_id_; }
   uint32_t currentUnixTime() const { return current_unix_time_; }
   const std::vector<grams::RawFECHit>& currentEventHits() const
   {
@@ -82,6 +83,7 @@ private:
   std::map<std::string, double> gain_tp_dict_;
   double gain_tp_value_ = 0.0;
   double gain_cache_seconds_ = 60.0;
+  int32_t run_id_ = 0;
   std::vector<std::string> quicklook_event_types_;
   int quicklook_num_hits_ = -1;
   bool quicklook_save_waveforms_ = true;

@@ -228,7 +228,9 @@ ANLStatus NanoGRAMSCalibration::mod_analyze()
     return AS_OK;
   }
 
-  tree_io_->fillHits(data_reduction_->currentEventId(), hits);
+  const int32_t run_id = data_reduction_->runId();
+  const int32_t event_id = static_cast<int32_t>(data_reduction_->currentEventId());
+  tree_io_->fillHits(run_id, event_id, hits);
   ++written_events_;
   set_evs("NanoGRAMSHitTree:Fill");
   return AS_OK;

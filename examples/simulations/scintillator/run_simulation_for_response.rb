@@ -15,7 +15,7 @@ def run_simulation(num, random, output)
   sim.set_gdml "database/mass_model.gdml"
   sim.set_physics(hadron_hp: false, cut_value: 0.001)
 
-  sim.set_primary_generator :PlaneWaveRectanglePrimaryGen, {
+  sim.set_primary_generator :PlaneWaveRectanglePrimaryGenerator, {
     particle: "gamma",
     photon_index: 0.0,
     energy_min: energy_min,

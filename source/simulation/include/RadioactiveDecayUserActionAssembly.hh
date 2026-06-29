@@ -37,23 +37,26 @@ namespace comptonsoft {
  */
 class RadioactiveDecayUserActionAssembly : public anlgeant4::StandardUserActionAssembly
 {
-  DEFINE_ANL_MODULE(RadioactiveDecayUserActionAssembly, 3.1);
+  DEFINE_ANL_MODULE(RadioactiveDecayUserActionAssembly, 6.0);
+  ENABLE_PARALLEL_RUN();
 public:
   RadioactiveDecayUserActionAssembly();
-  
+
   anlnext::ANLStatus mod_define() override;
 
-  void SteppingAction(const G4Step* aStep) override;
+  void stepping_action(const G4Step* aStep) override;
 
-  void SetTerminationTime(double v) { terminationTime_ = v; }
-  double TerminationTime() const { return terminationTime_; }
+  void set_termination_time(double v) { termination_time_ = v; }
+  double termination_time() const { return termination_time_; }
 
-  double FirstDecayTime() const { return firstDecayTime_; }
+  double first_decay_time() const { return first_decay_time_; }
 
 private:
-  double terminationTime_;
-  double firstDecayTime_;
-  std::string radioactiveDecayProcessName_;
+  double termination_time_;
+  std::string radioactive_decay_process_name_;
+
+  double first_decay_time_;
+
 };
 
 } /* namespace comptonsoft */

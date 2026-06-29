@@ -4,7 +4,7 @@ require 'comptonsoft'
 
 def run_simulation(num, random, output)
   energy = 1332.5 # keV
-  
+
   sim = ComptonSoft::Simulation.new
   sim.output = output
   sim.random_seed = random
@@ -15,7 +15,7 @@ def run_simulation(num, random, output)
   sim.set_gdml "database/mass_model.gdml"
   sim.set_physics(hadron_hp: false, cut_value: 0.001)
 
-  sim.set_primary_generator :PlaneWavePrimaryGen, {
+  sim.set_primary_generator :PlaneWavePrimaryGenerator, {
     particle: "gamma",
     photon_index: 0.0,
     energy_min: energy,
@@ -29,7 +29,7 @@ def run_simulation(num, random, output)
 end
 
 ### main ###
-num = 100000
+num = 1000000
 output = "simulation.root"
-random = 0
+random = 100
 run_simulation(num, random, output)

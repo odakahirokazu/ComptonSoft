@@ -55,7 +55,7 @@ ANLStatus ReadComptonEventTree::mod_initialize()
   define_evs("EventReconstruction:OK");
   define_evs("EventReconstruction:NG");
   initializeHitPatternData();
-  
+
   cetree_ = std::make_unique<TChain>("cetree");
   for (const std::string& filename: fileList_) {
     cetree_->Add(filename.c_str());
@@ -63,7 +63,7 @@ ANLStatus ReadComptonEventTree::mod_initialize()
 
   treeIO_->setTree(cetree_.get());
   if (cetree_->GetBranch("ini_energy")) {
-    setInitialInformationStored();
+    set_initial_information_stored();
     treeIO_->enableInitialInfoRecord();
   }
   else {
@@ -83,23 +83,22 @@ ANLStatus ReadComptonEventTree::mod_analyze()
     return AS_QUIT;
   }
 
-  initializeEvent();
+  EventReconstruction::initializeEvent();
 
   cetree_->GetEntry(entryIndex_);
-    
-  const int64_t EventID = treeIO_->getEventID();
-  setEventID(EventID);
 
-  if (InitialInformationStored()) {
-    setInitialEnergy(treeIO_->getInitialEnergy());
-    setInitialDirection(treeIO_->getInitialDirection());
-    setInitialTime(treeIO_->getInitialTime());
-    setInitialPosition(treeIO_->getInitialPosition());
-    setInitialPolarization(treeIO_->getInitialPolarization());
-  }
-  
-  if (WeightStored()) {
-    setWeight(treeIO_->getWeight());
+  const int32_t RunID = treeIO_->getRunID();
+  const int32_t EventID = treeIO_->getEventID();
+  set_run_id(RunID);
+  set_event_id(EventID);
+
+  if (initial_information_stored()) {
+    set_initial_energy(treeIO_->getInitialEnergy());
+    set_initial_direction(treeIO_->getInitialDirection());
+    set_initial_time(treeIO_->getInitialTime());
+    set_initial_position(treeIO_->getInitialPosition());
+    set_initial_polarization(treeIO_->getInitialPolarization());
+    set_weight(treeIO_->getWeight());
   }
 
   do {
@@ -115,7 +114,7 @@ ANLStatus ReadComptonEventTree::mod_analyze()
       return AS_QUIT;
     }
     cetree_->GetEntry(entryIndex_);
-  } while (treeIO_->getEventID() == EventID);
+  } while (treeIO_->getEventID() == EventID && treeIO_->getRunID() == RunID);
 
   return AS_OK;
 }

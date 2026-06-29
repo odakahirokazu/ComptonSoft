@@ -35,7 +35,7 @@ class ComptonEventTreeIOWithInitialInfo;
 
 class WriteComptonEventTree : public VCSModule
 {
-  DEFINE_ANL_MODULE(WriteComptonEventTree, 2.0);
+  DEFINE_ANL_MODULE(WriteComptonEventTree, 3.0);
 public:
   WriteComptonEventTree();
   ~WriteComptonEventTree();

@@ -49,7 +49,7 @@ ANLStatus ReadHitTree::mod_define()
 ANLStatus ReadHitTree::mod_initialize()
 {
   VCSModule::mod_initialize();
-  
+
   get_module_NC("CSHitCollection", &hitCollection_);
 
   hittree_ = std::make_unique<TChain>("hittree");
@@ -59,8 +59,7 @@ ANLStatus ReadHitTree::mod_initialize()
 
   treeIO_->setTree(hittree_.get());
   if (hittree_->GetBranch("ini_energy")) {
-    setInitialInformationStored();
-    setWeightStored();
+    set_initial_information_stored();
     treeIO_->enableInitialInfoRecord();
   }
   else {
@@ -77,10 +76,12 @@ ANLStatus ReadHitTree::mod_initialize()
 ANLStatus ReadHitTree::mod_begin_run()
 {
   if (numEntries_ == 0) { return AS_OK; }
-  
+
   hittree_->GetEntry(0);
-  const int64_t EventID = treeIO_->getEventID();
-  setEventID(EventID);
+  const int32_t RunID = treeIO_->getRunID();
+  const int32_t EventID = treeIO_->getEventID();
+  set_run_id(RunID);
+  set_event_id(EventID);
 
   return AS_OK;
 }
@@ -93,19 +94,18 @@ ANLStatus ReadHitTree::mod_analyze()
 
   hittree_->GetEntry(entryIndex_);
 
-  const int64_t EventID = treeIO_->getEventID();
-  setEventID(EventID);
+  const int32_t RunID = treeIO_->getRunID();
+  const int32_t EventID = treeIO_->getEventID();
+  set_run_id(RunID);
+  set_event_id(EventID);
 
-  if (InitialInformationStored()) {
-    setInitialEnergy(treeIO_->getInitialEnergy());
-    setInitialDirection(treeIO_->getInitialDirection());
-    setInitialTime(treeIO_->getInitialTime());
-    setInitialPosition(treeIO_->getInitialPosition());
-    setInitialPolarization(treeIO_->getInitialPolarization());
-  }
-  
-  if (WeightStored()) {
-    setWeight(treeIO_->getWeight());
+  if (initial_information_stored()) {
+    set_initial_energy(treeIO_->getInitialEnergy());
+    set_initial_direction(treeIO_->getInitialDirection());
+    set_initial_time(treeIO_->getInitialTime());
+    set_initial_position(treeIO_->getInitialPosition());
+    set_initial_polarization(treeIO_->getInitialPolarization());
+    set_weight(treeIO_->getWeight());
   }
 
   if (trustNumHits_) {
@@ -123,9 +123,9 @@ ANLStatus ReadHitTree::mod_analyze()
         return AS_OK;
       }
       hittree_->GetEntry(entryIndex_);
-    } while (treeIO_->getEventID() == EventID);
+    } while (treeIO_->getEventID() == EventID && treeIO_->getRunID() == RunID);
   }
-  
+
   return AS_OK;
 }
 

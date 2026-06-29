@@ -18,6 +18,7 @@
  *************************************************************************/
 
 #include "VANLGeometry.hh"
+
 #include "AstroUnits.hh"
 
 using namespace anlnext;
@@ -26,16 +27,14 @@ namespace anlgeant4
 {
 
 VANLGeometry::VANLGeometry()
-  : m_LengthUnit(unit::cm),
-    m_LengthUnitName("cm"),
-    m_SurfaceCheck(true)
+  : surface_check_(true)
 {
   add_alias("VANLGeometry");
 }
 
 ANLStatus VANLGeometry::mod_define()
 {
-  register_parameter(&m_SurfaceCheck, "surface_check");
+  define_parameter("surface_check", &mod_class::surface_check_);
   return AS_OK;
 }
 

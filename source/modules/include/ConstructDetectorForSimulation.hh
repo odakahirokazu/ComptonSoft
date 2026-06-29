@@ -36,7 +36,6 @@ public:
 
   anlnext::ANLStatus mod_define() override;
   anlnext::ANLStatus mod_initialize() override;
-  anlnext::ANLStatus mod_begin_run() override;
 };
 
 } /* namespace comptonsoft */

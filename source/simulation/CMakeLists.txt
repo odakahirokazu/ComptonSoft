@@ -25,13 +25,16 @@ link_directories(
   )
 
 set(CS_SIMULATION_CLASSES_BASIC
-  # primary geneator
-  src/ListPrimaryGen.cc
-  src/AHRadiationBackgroundPrimaryGen.cc
-  # user actions
+  # radioactivation simulation
+  src/RadioactivationEventStore.cc
+  src/RadioactivationStackingAction.cc
+  src/RadioactivationUserActionAssembly.cc
+  src/RadioactivationTreeIO.cc
   src/RadioactiveDecayUserActionAssembly.cc
-  src/ActivationStackingAction.cc
-  src/ActivationUserActionAssembly.cc
+  # primary geneator
+  src/ListPrimaryGenerator.cc
+  src/AHRadiationBackgroundPrimaryGenerator.cc
+  # user actions
   src/ObservationPickUpData.cc
   src/SampleOpticalDepth.cc
   src/ScatteringPickUpData.cc
@@ -51,15 +54,15 @@ set(CS_SIMULATION_CLASSES_BASIC
 
 if(CS_USE_FITSIO)
   set(CS_SIMULATION_CLASSES_FITSIO
-    src/AHRayTracingPrimaryGen.cc
-    src/AEObservationPrimaryGen.cc
-    src/CelestialSourcePrimaryGen.cc
+    src/AHRayTracingPrimaryGenerator.cc
+    src/AEObservationPrimaryGenerator.cc
+    src/CelestialSourcePrimaryGenerator.cc
     )
 endif()
 
 if(CS_USE_HEALPIX)
   set(CS_SIMULATION_CLASSES_HEALPIX
-    src/AllSkyPrimaryGen.cc
+    src/AllSkyPrimaryGenerator.cc
     )
 endif()
 
@@ -68,7 +71,7 @@ if(CS_USE_SIMX)
     # basic interface
     src/SimXIF.cc
     # primary generator
-    src/SimXPrimaryGen.cc  
+    src/SimXPrimaryGenerator.cc
     # pick up data
     src/AHStandardUserActionAssembly.cc
     # other

@@ -17,6 +17,7 @@
  *                                                                       *
  *************************************************************************/
 
+#include <G4VSensitiveDetector.hh>
 #ifndef COMPTONSOFT_CSSensitiveDetector_H
 #define COMPTONSOFT_CSSensitiveDetector_H 1
 
@@ -42,7 +43,16 @@ public:
     : VCSSensitiveDetector(name)
   {
   }
-  
+
+protected:
+  CSSensitiveDetector(const CSSensitiveDetector& r) = default;
+
+public:
+  G4VSensitiveDetector* Clone() const override
+  {
+    return new CSSensitiveDetector(*this);
+  }
+
   /**
    * asociate a detector ID with a string identifier of volume hierarchy.
    * @param detid detector ID
@@ -59,7 +69,7 @@ public:
     DetectorKeyType key = MakeKey(touchable);
     return GetDetectorIDByKey(key);
   }
-  
+
   /**
    * @return a detector ID associated with the given key.
    */
@@ -77,7 +87,7 @@ protected:
   {
     return HierarchyString(touchable);
   }
-  
+
 private:
   std::map<DetectorKeyType, int> detectorMap_;
 };

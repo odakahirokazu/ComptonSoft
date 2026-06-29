@@ -82,7 +82,7 @@ ANLStatus EventReconstruction::mod_define()
 ANLStatus EventReconstruction::mod_initialize()
 {
   VCSModule::mod_initialize();
-  
+
   define_evs("EventReconstruction:OK");
   define_evs("EventReconstruction:NG");
 
@@ -93,7 +93,7 @@ ANLStatus EventReconstruction::mod_initialize()
       return AS_QUIT_ERROR;
     }
   }
-  
+
   assignSourceInformation();
   get_module_NC("CSHitCollection", &m_HitCollection);
   initializeHitPatternData();
@@ -171,7 +171,7 @@ ANLStatus EventReconstruction::mod_analyze()
     set_evs("EventReconstruction:NG");
     return AS_SKIP;
   }
-  
+
   return AS_OK;
 }
 
@@ -190,7 +190,7 @@ void EventReconstruction::assignSourceInformation()
 void EventReconstruction::assignSourceInformation(BasicComptonEvent& event) const
 {
   if (m_UseInitialInfo) {
-    const vector3_t source_direction = -(m_InitialInfo->InitialDirection());
+    const vector3_t source_direction = -(m_InitialInfo->initial_direction());
     event.setSourceDirection(source_direction);
   }
   else {

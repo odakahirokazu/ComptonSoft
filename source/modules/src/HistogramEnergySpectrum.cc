@@ -47,7 +47,7 @@ ANLStatus HistogramEnergySpectrum::mod_define()
   register_parameter(&m_RangeEnergy1, "energy_min", 1, "keV");
   register_parameter(&m_RangeEnergy2, "energy_max", 1, "keV");
   register_parameter(&m_Selections, "event_selections");
-  
+
   return AS_OK;
 }
 
@@ -92,15 +92,15 @@ ANLStatus HistogramEnergySpectrum::mod_analyze()
 {
   typedef std::vector<DetectorHit_sptr> HitVector;
 
-  const double weight = m_InitialInfo->Weight();
-  
+  const double weight = m_InitialInfo->weight();
+
   HitVector& hitVec = m_HitCollection->getHits();
-  
+
   double energy = 0.0;
   for (HitVector::iterator it=hitVec.begin(); it!=hitVec.end(); ++it) {
     energy += (*it)->Energy();
   }
-  
+
   for (std::map<std::string, TH1*>::iterator it=m_Histograms.begin(); it!=m_Histograms.end(); ++it) {
     const std::string& evsName = (*it).first;
     TH1* hist = (*it).second;

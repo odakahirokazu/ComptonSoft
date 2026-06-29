@@ -23,60 +23,64 @@
 #include <string>
 #include <memory>
 #include <anlnext/BasicModule.hh>
-#include "globals.hh"
 
 namespace CLHEP
 {
 class HepRandomEngine;
 }
 
+class G4RunManager;
+
+
 namespace anlgeant4
 {
 
-class ANLG4RunManager;
+class ActionInitialization;
+class VANLPrimaryGenerator;
+class VUserActionAssembly;
+
 
 /**
  * @author Hirokazu Odaka
  * @date 2017-07-28 | 3.0, re-designed.
+ * @date 2026-04-15 | 4.0
  */
 class Geant4Body : public anlnext::BasicModule
 {
-  DEFINE_ANL_MODULE(Geant4Body, 3.0);
-public: 
+  DEFINE_ANL_MODULE(Geant4Body, 4.0);
+public:
   Geant4Body();
   ~Geant4Body();
 
   anlnext::ANLStatus mod_define() override;
+  anlnext::ANLStatus mod_pre_initialize() override;
   anlnext::ANLStatus mod_initialize() override;
-  anlnext::ANLStatus mod_begin_run() override;
   anlnext::ANLStatus mod_analyze() override;
-  anlnext::ANLStatus mod_end_run() override;
   anlnext::ANLStatus mod_finalize() override;
 
-  void set_verbose_level(G4int v) { m_VerboseLevel = v; }
-  G4int get_verbose_level() { return m_VerboseLevel; }
-  
+  void register_user_action(VANLPrimaryGenerator* primary_generator);
+  void register_user_action(VUserActionAssembly* uaa);
+
 protected:
-  virtual void initialize_random_generator();
+  virtual bool initialize_random_generator();
   virtual void set_user_initializations();
-  virtual void set_user_primary_generator_action();
-  virtual void set_user_defined_actions();
   virtual void apply_commands();
 
 private:
-  std::unique_ptr<ANLG4RunManager> m_G4RunManager;
-  std::unique_ptr<CLHEP::HepRandomEngine> m_RandomEnginePtr;
-  int m_EventIndex = 0;
-  
-  std::string m_RandomEngine;
-  int m_RandomInitMode;
-  int m_RandomSeed1;
-  bool m_OutputRandomStatus;
-  std::string m_RandomInitialStatusFileName;
-  std::string m_RandomFinalStatusFileName;
+  std::unique_ptr<G4RunManager> run_manager_;
+  ActionInitialization* action_initialization_;
+  std::unique_ptr<CLHEP::HepRandomEngine> random_engine_ptr_;
 
-  int m_VerboseLevel;
-  std::vector<std::string> m_UserCommands;
+  int num_events_ = 1;
+  int num_threads_ = 0;
+  bool print_beamon_time_ = false;
+  std::string random_engine_;
+  int random_seed_;
+  int verbose_level_;
+  bool store_trajectory_ = false;
+  std::vector<std::string> user_commands_;
+
+  int random_seed_initial_;
 };
 
 } /* namespace anlgeant4 */

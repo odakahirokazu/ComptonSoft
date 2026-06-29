@@ -49,7 +49,7 @@ ANLStatus Histogram2DDeltaEnergyWithARM::mod_define()
   register_parameter(&numARMBins_, "number_of_arm_bins");
   register_parameter(&arm0_, "arm_min", 1, "degree");
   register_parameter(&arm1_, "arm_max", 1, "degree");
-  
+
   return AS_OK;
 }
 
@@ -57,10 +57,10 @@ ANLStatus Histogram2DDeltaEnergyWithARM::mod_initialize()
 {
   get_module("EventReconstruction", &eventReconstruction_);
   get_module_IF("InitialInformation", &initialInfo_);
-  
+
   VCSModule::mod_initialize();
   mkdir();
-  
+
   hist_all_ = new TH2D("de_arm_all","ARM:DeltaEnergy (All)",
                        numEnergyBins_, energy0_, energy1_,
                        numARMBins_, arm0_, arm1_);
@@ -100,7 +100,7 @@ ANLStatus Histogram2DDeltaEnergyWithARM::mod_analyze()
   if (!evs("EventReconstruction:OK")) {
     return AS_OK;
   }
-  
+
   const std::vector<BasicComptonEvent_sptr> events = eventReconstruction_->getReconstructedEvents();
   for (const auto& event: events) {
     const double fraction = event->ReconstructionFraction();
@@ -111,7 +111,7 @@ ANLStatus Histogram2DDeltaEnergyWithARM::mod_analyze()
     }
 
     const double energy = event->IncidentEnergy() / unit::keV;
-    const double ini_energy = initialInfo_->InitialEnergy() / unit::keV;
+    const double ini_energy = initialInfo_->initial_energy() / unit::keV;
     const double de = energy - ini_energy;
     const double arm = event->DeltaTheta() / unit::degree;
     const unsigned int hit1Process = event->Hit1Process();

@@ -20,7 +20,7 @@
 #ifndef ANLGEANT4_GDMLDetectorConstruction_H
 #define ANLGEANT4_GDMLDetectorConstruction_H 1
 
-#include "G4VUserDetectorConstruction.hh"
+#include "VDetectorConstruction.hh"
 
 namespace anlgeant4 {
 
@@ -28,16 +28,16 @@ namespace anlgeant4 {
  * Detector construction using a GDML input.
  * @author Hirokazu Odaka
  */
-class GDMLDetectorConstruction : public G4VUserDetectorConstruction
+class GDMLDetectorConstruction : public VDetectorConstruction
 {
 public:
-  GDMLDetectorConstruction(const std::string& geom_file_name, bool validate);
+  explicit GDMLDetectorConstruction(const std::string& filename, bool validate);
 
-  G4VPhysicalVolume* Construct();
+  G4VPhysicalVolume* Construct() override;
 
 private:
-  std::string m_GeometryFileName;
-  bool m_Validate;
+  std::string filename_;
+  bool validate_;
 };
 
 } /* namespace anlgeant4 */

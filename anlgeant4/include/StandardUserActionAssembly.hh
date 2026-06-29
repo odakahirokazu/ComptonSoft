@@ -20,35 +20,44 @@
 #ifndef ANLGEANT4_StandardUserActionAssembly_H
 #define ANLGEANT4_StandardUserActionAssembly_H 1
 
-#include "VMasterUserActionAssembly.hh"
-#include <list>
+#include "VUserActionAssembly.hh"
+
 
 namespace anlgeant4 {
 
-class InitialInformation;
+class VEventStore;
 
 /**
  * @author Hirokazu Odaka
  * @date 2011-04-11
  * @date 2016-07-08 | setInitialTime()
  * @date 2017-06-28 | Hirokazu Odaka | redesign, rename class and methods
+ * @date 2026-04-15
+ * @date 2026-05-26
  */
-class StandardUserActionAssembly : public VMasterUserActionAssembly
+class StandardUserActionAssembly : public VUserActionAssembly
 {
-  DEFINE_ANL_MODULE(StandardUserActionAssembly, 5.0);
+  DEFINE_ANL_MODULE(StandardUserActionAssembly, 6.0);
+  ENABLE_PARALLEL_RUN();
 public:
   StandardUserActionAssembly();
 
   anlnext::ANLStatus mod_initialize() override;
 
-  void EventActionAtBeginning(const G4Event* anEvent) override;
+  void run_action_at_beginning(const G4Run* run) override;
+  void run_action_at_end(const G4Run*) override;
+
+  void event_action_at_beginning(const G4Event* event) override;
+  void event_action_at_end(const G4Event*) override;
 
 protected:
   double getInitialTime() const;
-  void setInitialTime(double v);
+  void setInitialTime(size_t event_index, double v);
+  int getCurrentEventID() const { return current_event_id_; };
 
 private:
-  InitialInformation* m_InitialInfo;
+  VEventStore* event_store_ = nullptr;
+  int current_event_id_ = 0;
 };
 
 } /* namespace anlgeant4 */

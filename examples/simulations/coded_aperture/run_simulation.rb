@@ -15,7 +15,7 @@ def run_simulation(num, random, output)
   sim.set_physics(hadron_hp: false, cut_value: 0.001,
                   customized_em: true, electron_range_ratio: 0.01, electron_final_range: 1.0e-5, polarization: true)
 
-  sim.set_primary_generator :PlaneWavePrimaryGen, {
+  sim.set_primary_generator :PlaneWavePrimaryGenerator, {
     particle: "gamma",
     photon_index: 0.0,
     energy_min: energy,

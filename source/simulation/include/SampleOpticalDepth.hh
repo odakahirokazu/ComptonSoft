@@ -20,7 +20,7 @@
 #ifndef COMPTONSOFT_SampleOpticalDepth_H
 #define COMPTONSOFT_SampleOpticalDepth_H 1
 
-#include "VAppendableUserActionAssembly.hh"
+#include "VUserActionAssembly.hh"
 
 class TTree;
 class G4VEmProcess;
@@ -36,30 +36,32 @@ namespace comptonsoft {
 /**
  * @author Hirokazu Odaka, Tamotsu Sato
  * @date 2017-07-29 | Hirokazu Odaka | new design of VAppendableUserActionAssembly, code cleanup.
+ * @date 2026-04-15 | use VUserActionAssembly
  */
-class SampleOpticalDepth : public anlgeant4::VAppendableUserActionAssembly
+class SampleOpticalDepth : public anlgeant4::VUserActionAssembly
 {
-  DEFINE_ANL_MODULE(SampleOpticalDepth, 2.0);
+  DEFINE_ANL_MODULE(SampleOpticalDepth, 3.0);
+  ENABLE_PARALLEL_RUN();
 public:
   SampleOpticalDepth();
-  
+
   anlnext::ANLStatus mod_define() override;
   anlnext::ANLStatus mod_initialize() override;
 
-  void EventActionAtBeginning(const G4Event*) override;
-  void EventActionAtEnd(const G4Event*) override;
-  void SteppingAction(const G4Step* aStep) override;
-  
+  void event_action_at_beginning(const G4Event*) override;
+  void event_action_at_end(const G4Event*) override;
+  void stepping_action(const G4Step* aStep) override;
+
 private:
   double energy_;
   std::string processName_;
   std::string particleName_;
-  
+
   const anlgeant4::InitialInformation* initialInfo_ = nullptr;
   G4VEmProcess* process_ = nullptr;
 
   TTree* tree_ = nullptr;
-  
+
   double ini_posx_ = 0.0;
   double ini_posy_ = 0.0;
   double ini_posz_ = 0.0;

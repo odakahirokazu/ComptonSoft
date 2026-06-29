@@ -36,54 +36,62 @@ namespace anlgeant4 {
 class InitialInformation
 {
 public:
+  struct PrimaryData
+  {
+    int32_t event_id = -1;
+    double weight = 1.0;
+    double time = 0.0;
+    G4ThreeVector position = {0.0, 0.0, 0.0};
+    double energy = 0.0;
+    G4ThreeVector direction = {0.0, 0.0, 0.0};
+    G4ThreeVector polarization = {0.0, 0.0, 0.0};
+  };
+
+public:
   explicit InitialInformation(bool stored, anlnext::BasicModule* mod=nullptr);
 
-  bool InitialInformationStored() const { return stored_; }
-  void setInitialInformationStored(bool v=true) { stored_ = v; }
-  bool WeightStored() const { return weight_stored_; }
-  void setWeightStored(bool v=true) { weight_stored_ = v; }
+  bool initial_information_stored() const { return stored_; }
+  void set_initial_information_stored(bool v=true) { stored_ = v; }
 
-  double InitialEnergy() const              { return energy_; }
-  G4ThreeVector InitialDirection() const    { return direction_; }
-  double InitialTime() const                { return time_; }
-  G4ThreeVector InitialPosition() const     { return position_; }
-  G4ThreeVector InitialPolarization() const { return polarization_; }
-  
-  int64_t EventID() const { return event_id_; }
-  double Weight() const { return weight_; }
+  int32_t run_id() const { return run_id_; }
 
-  void setEventID(int64_t i) { event_id_ = i; }
+  int32_t event_id() const { return primary_vector_[index_].event_id; }
+  double weight() const { return primary_vector_[index_].weight; }
+  double initial_time() const { return primary_vector_[index_].time; }
+  G4ThreeVector initial_position() const { return primary_vector_[index_].position; }
+  double initial_energy() const { return primary_vector_[index_].energy; }
+  G4ThreeVector initial_direction() const { return primary_vector_[index_].direction; }
+  G4ThreeVector initial_polarization() const { return primary_vector_[index_].polarization; }
 
-  void setInitialEnergy(double v)
-  { energy_ = v; }
-  void setInitialDirection(G4ThreeVector v)
-  { direction_ = v;    }
-  void setInitialDirection(double x, double y, double z)
-  { direction_.set(x, y, z); }
-  void setInitialTime(double v)
-  { time_ = v; }
-  void setInitialPosition(G4ThreeVector v)
-  { position_ = v; }
-  void setInitialPosition(double x, double y, double z)
-  { position_.set(x, y, z); }
-  void setInitialPolarization(G4ThreeVector v)
-  { polarization_ = v; }
-  void setInitialPolarization(double x, double y, double z)
-  { polarization_.set(x, y, z); }
-  
-  void setWeight(double v) { weight_ = v; }
+  void set_run_id(int32_t i) { run_id_ = i; }
+
+  void set_event_id(size_t i, int32_t v) { primary_vector_[i].event_id = v; }
+  void set_weight(size_t i, double v) { primary_vector_[i].weight = v; }
+  void set_initial_time(size_t i, double v) { primary_vector_[i].time = v; }
+  void set_initial_position(size_t i, G4ThreeVector v) { primary_vector_[i].position = v; }
+  void set_initial_energy(size_t i, double v) { primary_vector_[i].energy = v; }
+  void set_initial_direction(size_t i, G4ThreeVector v){ primary_vector_[i].direction = v; }
+  void set_initial_polarization(size_t i, G4ThreeVector v) { primary_vector_[i].polarization = v; }
+
+  // setters for a single event mode
+  void set_event_id(int32_t v) { primary_vector_[0].event_id = v; }
+  void set_weight(double v) { primary_vector_[0].weight = v; }
+  void set_initial_time(double v) { primary_vector_[0].time = v; }
+  void set_initial_position(G4ThreeVector v) { primary_vector_[0].position = v; }
+  void set_initial_energy(double v) { primary_vector_[0].energy = v; }
+  void set_initial_direction(G4ThreeVector v){ primary_vector_[0].direction = v;    }
+  void set_initial_polarization(G4ThreeVector v) { primary_vector_[0].polarization = v; }
+
+protected:
+  void initialize_run(int runID, int num_events);
+  void initialize_event(int eventID);
+  void set_read_index(size_t i) { index_ = i; }
 
 private:
   bool stored_;
-  bool weight_stored_;
-
-  double energy_;
-  G4ThreeVector direction_;
-  double time_;
-  G4ThreeVector position_;
-  G4ThreeVector polarization_;
-  int64_t event_id_;
-  double weight_;
+  int32_t run_id_;
+  std::vector<PrimaryData> primary_vector_;
+  size_t index_ = 0;
 };
 
 } /* namespace anlgeant4 */

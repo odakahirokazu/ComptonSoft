@@ -1,7 +1,6 @@
 %module anlGeant4Py
 %{
 #include "Geant4Body.hh"
-#include "Geant4Simple.hh"
 #include "VANLPhysicsList.hh"
 #include "VANLGeometry.hh"
 #ifdef USE_GDML
@@ -10,27 +9,24 @@
 #ifdef USE_GDML
 #include "WriteGDML.hh"
 #endif
-#include "VANLPrimaryGen.hh"
-#include "BasicPrimaryGen.hh"
-#include "PointSourcePrimaryGen.hh"
-#include "PlaneWavePrimaryGen.hh"
-#include "PlaneWaveRectanglePrimaryGen.hh"
-#include "GaussianBeamPrimaryGen.hh"
-#include "IsotropicPrimaryGen.hh"
-#include "PrimaryGenUniformSourceInVolume.hh"
-#include "NucleusPrimaryGen.hh"
-#include "NucleusPrimaryGenInVolume.hh"
+#include "VANLPrimaryGenerator.hh"
+#include "BasicPrimaryGenerator.hh"
+#include "PointSourcePrimaryGenerator.hh"
+#include "SphericalSourcePrimaryGenerator.hh"
+#include "PlaneWavePrimaryGenerator.hh"
+#include "PlaneWaveRectanglePrimaryGenerator.hh"
+#include "GaussianBeamPrimaryGenerator.hh"
+#include "IsotropicPrimaryGenerator.hh"
+#include "UniformVolumePrimaryGenerator.hh"
 #include "VUserActionAssembly.hh"
-#include "VMasterUserActionAssembly.hh"
-#include "VAppendableUserActionAssembly.hh"
 #include "StandardUserActionAssembly.hh"
+#include "VEventStore.hh"
 #ifdef USE_VIS
-#include "VisualizeG4Geom.hh"
+#include "VisualizeGeometry.hh"
 #endif
 
 
 %}
-
 
 %import(module="anlnext.anlnextpy") "anlnext/python/anlnextpy.i"
 
@@ -44,14 +40,6 @@ public:
 };
 
 
-class Geant4Simple : public anlnext::BasicModule
-{
-public:
-  Geant4Simple();
-  ~Geant4Simple();
-};
-
-
 %nodefault;
 class VANLPhysicsList : public anlnext::BasicModule
 {
@@ -62,9 +50,6 @@ class VANLPhysicsList : public anlnext::BasicModule
 %nodefault;
 class VANLGeometry : public anlnext::BasicModule
 {
-public:
-  double GetLengthUnit() const;
-  std::string GetLengthUnitName() const;
 };
 %makedefault;
 
@@ -88,80 +73,72 @@ public:
 #endif
 
 %nodefault;
-class VANLPrimaryGen : public anlnext::BasicModule
+class VANLPrimaryGenerator : public anlnext::BasicModule
 {
 };
 %makedefault;
 
 
 %nodefault;
-class BasicPrimaryGen : public VANLPrimaryGen
+class BasicPrimaryGenerator : public VANLPrimaryGenerator
 {
 };
 %makedefault;
 
 
-class PointSourcePrimaryGen : public BasicPrimaryGen
+class PointSourcePrimaryGenerator : public BasicPrimaryGenerator
 {
 public:
-  PointSourcePrimaryGen();
-  ~PointSourcePrimaryGen();
+  PointSourcePrimaryGenerator();
+  ~PointSourcePrimaryGenerator();
 };
 
 
-class PlaneWavePrimaryGen : public anlgeant4::BasicPrimaryGen
+class SphericalSourcePrimaryGenerator : public PointSourcePrimaryGenerator
 {
 public:
-  PlaneWavePrimaryGen();
-  ~PlaneWavePrimaryGen();
+  SphericalSourcePrimaryGenerator();
+  ~SphericalSourcePrimaryGenerator();
 };
 
 
-class PlaneWaveRectanglePrimaryGen : public anlgeant4::PlaneWavePrimaryGen
+class PlaneWavePrimaryGenerator : public anlgeant4::BasicPrimaryGenerator
 {
 public:
-  PlaneWaveRectanglePrimaryGen();
-  ~PlaneWaveRectanglePrimaryGen();
+  PlaneWavePrimaryGenerator();
+  ~PlaneWavePrimaryGenerator();
 };
 
 
-class GaussianBeamPrimaryGen : public anlgeant4::PlaneWavePrimaryGen
+class PlaneWaveRectanglePrimaryGenerator : public anlgeant4::PlaneWavePrimaryGenerator
 {
 public:
-  GaussianBeamPrimaryGen();
-  ~GaussianBeamPrimaryGen();
+  PlaneWaveRectanglePrimaryGenerator();
+  ~PlaneWaveRectanglePrimaryGenerator();
 };
 
 
-class IsotropicPrimaryGen : public anlgeant4::BasicPrimaryGen
+class GaussianBeamPrimaryGenerator : public anlgeant4::PlaneWavePrimaryGenerator
 {
 public:
-  IsotropicPrimaryGen();
-  ~IsotropicPrimaryGen();
+  GaussianBeamPrimaryGenerator();
+  ~GaussianBeamPrimaryGenerator();
 };
 
 
-class PrimaryGenUniformSourceInVolume : public PointSourcePrimaryGen
+class IsotropicPrimaryGenerator : public anlgeant4::BasicPrimaryGenerator
 {
 public:
-  PrimaryGenUniformSourceInVolume();
-  ~PrimaryGenUniformSourceInVolume() = default;
+  IsotropicPrimaryGenerator();
+  ~IsotropicPrimaryGenerator();
 };
 
 
-class NucleusPrimaryGen : public BasicPrimaryGen
+class UniformVolumePrimaryGenerator : public PointSourcePrimaryGenerator
 {
 public:
-  NucleusPrimaryGen();
-  ~NucleusPrimaryGen();
-};
-
-
-class NucleusPrimaryGenInVolume : public NucleusPrimaryGen
-{
-public:
-  NucleusPrimaryGenInVolume();
-  ~NucleusPrimaryGenInVolume();
+  UniformVolumePrimaryGenerator();
+  ~UniformVolumePrimaryGenerator() = default;
 };
 
 
@@ -173,35 +150,27 @@ public:
 };
 
 
-class VMasterUserActionAssembly : public VUserActionAssembly
-{
-public:
-  VMasterUserActionAssembly();
-  virtual ~VMasterUserActionAssembly();
-};
-
-
-class VAppendableUserActionAssembly : public VUserActionAssembly
-{
-public:
-  VAppendableUserActionAssembly();
-  virtual ~VAppendableUserActionAssembly();
-};
-
-
-class StandardUserActionAssembly : public VMasterUserActionAssembly
+class StandardUserActionAssembly : public VUserActionAssembly
 {
 public:
   StandardUserActionAssembly();
 };
 
 
-#ifdef USE_VIS
-class VisualizeG4Geom  : public anlnext::BasicModule
+class VEventStore : public anlnext::BasicModule
 {
 public:
-  VisualizeG4Geom();
-  ~VisualizeG4Geom();
+  VEventStore();
+  virtual ~VEventStore();
+};
+
+
+#ifdef USE_VIS
+class VisualizeGeometry  : public anlnext::BasicModule
+{
+public:
+  VisualizeGeometry();
+  ~VisualizeGeometry();
 };
 
 #endif

@@ -1,9 +1,39 @@
 set(TARGET_LIBRARY ANLGeant4)
 
+set(ANLG4_CORE_CLASSES
+  src/Geant4Body.cc
+  src/SensitiveDetectorAssignment.cc
+  src/VDetectorConstruction.cc
+  src/VANLGeometry.cc
+  src/BasicPrimaryGeneratorAction.cc
+  src/VANLPrimaryGenerator.cc
+  src/BasicPrimaryGenerator.cc
+  src/ActionInitialization.cc
+  src/UserActionAssemblyRunAction.cc
+  src/UserActionAssemblyEventAction.cc
+  src/UserActionAssemblyTrackingAction.cc
+  src/UserActionAssemblySteppingAction.cc
+  src/VUserActionAssembly.cc
+  src/StandardUserActionAssembly.cc
+  src/InitialInformation.cc
+  src/VEventStore.cc
+)
+
+set(ANLG4_PRIMARYGEN_CLASSES
+  src/PointSourcePrimaryGenerator.cc
+  src/SphericalSourcePrimaryGenerator.cc
+  src/PlaneWavePrimaryGenerator.cc
+  src/PlaneWaveRectanglePrimaryGenerator.cc
+  src/GaussianBeamPrimaryGenerator.cc
+  src/IsotropicPrimaryGenerator.cc
+  src/UniformVolumePrimaryGenerator.cc
+  src/PositionSamplerInVolume.cc
+)
+
 if(ANLG4_USE_GDML)
-  set(GDML_CLASSES
-    src/ReadGDML.cc
+  set(ANLG4_GDML_CLASSES
     src/GDMLDetectorConstruction.cc
+    src/ReadGDML.cc
     src/WriteGDML.cc
     )
   set(GDML_INC_DIR ${XercesC_INC_DIRS})
@@ -11,8 +41,8 @@ if(ANLG4_USE_GDML)
 endif(ANLG4_USE_GDML)
 
 if(ANLG4_USE_VIS OR ANLG4_USE_VIS_QT)
-  set(VIS_CLASSES
-    src/VisualizeG4Geom.cc 
+  set(ANLG4_VIS_CLASSES
+    src/VisualizeGeometry.cc
     )
   if(ANLG4_USE_VIS)
     add_definitions(-DANLG4_USE_VIS)
@@ -29,7 +59,7 @@ if(ANLG4_USE_VIS OR ANLG4_USE_VIS_QT)
 endif()
 
 add_definitions(-DANLNEXT_USE_HEPVECTOR)
- 
+
 include_directories(include
   ${CLHEP_INC_DIR}
   ${G4_INC_DIR}
@@ -47,33 +77,10 @@ link_directories(
   )
 
 add_library(${TARGET_LIBRARY} SHARED
-  src/InitialInformation.cc
-  src/ANLG4RunManager.cc
-  src/Geant4Body.cc
-  src/Geant4Simple.cc
-  src/BasicPrimaryGeneratorAction.cc
-  src/BasicPrimaryGen.cc
-  src/PointSourcePrimaryGen.cc
-  src/SphericalSourcePrimaryGen.cc
-  src/PlaneWavePrimaryGen.cc
-  src/PlaneWaveRectanglePrimaryGen.cc
-  src/GaussianBeamPrimaryGen.cc
-  src/IsotropicPrimaryGen.cc
-  src/PrimaryGenUniformSourceInVolume.cc
-  src/PositionSamplerInVolume.cc
-  src/NucleusPrimaryGen.cc
-  src/NucleusPrimaryGenInVolume.cc
-  src/UserActionAssemblyRunAction.cc
-  src/UserActionAssemblyEventAction.cc
-  src/UserActionAssemblyTrackingAction.cc
-  src/UserActionAssemblySteppingAction.cc
-  src/VUserActionAssembly.cc
-  src/VMasterUserActionAssembly.cc
-  src/VAppendableUserActionAssembly.cc
-  src/StandardUserActionAssembly.cc
-  src/VANLGeometry.cc
-  ${GDML_CLASSES}
-  ${VIS_CLASSES}
+  ${ANLG4_CORE_CLASSES}
+  ${ANLG4_PRIMARYGEN_CLASSES}
+  ${ANLG4_GDML_CLASSES}
+  ${ANLG4_VIS_CLASSES}
   )
 
 target_link_libraries(${TARGET_LIBRARY}

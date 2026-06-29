@@ -23,17 +23,15 @@
 #include "G4VUserPrimaryGeneratorAction.hh"
 
 #include <memory>
-#include "globals.hh"
-#include "G4ThreeVector.hh"
+#include "PrimarySetting.hh"
 
-class G4ParticleGun;
 class G4Event;
 class G4ParticleDefinition;
+class G4ParticleGun;
 
 namespace anlgeant4 {
 
-class BasicPrimaryGen;
-
+class BasicPrimaryGenerator;
 
 /**
  * Primary generator action
@@ -41,80 +39,25 @@ class BasicPrimaryGen;
  * @author Hirokazu Odaka
  * @date 2010-xx-xx
  * @date 2017-06-27 | tweaks
+ * @date 2026-06-20 | Geant4-MT
  */
 class BasicPrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction
 {
 public:
   BasicPrimaryGeneratorAction();
-  explicit BasicPrimaryGeneratorAction(G4ParticleDefinition* definition);
-  explicit BasicPrimaryGeneratorAction(G4String particle_name);  
   virtual ~BasicPrimaryGeneratorAction();
-  
-  virtual void GeneratePrimaries(G4Event* anEvent);
 
-  void SetDefinition(G4ParticleDefinition* definition);
-  
-  void Set(double time0,
-           const G4ThreeVector& position,
-           double energy,
-           const G4ThreeVector& direction)
-  {
-    m_Time = time0;
-    m_Position = position;
-    m_Energy = energy;
-    m_Direction = direction;
-    m_Polarization.set(0., 0., 0.);
-  }
+  void GeneratePrimaries(G4Event* event) override;
 
-  void Set(double time0,
-           const G4ThreeVector& position,
-           double energy,
-           const G4ThreeVector& direction,
-           const G4ThreeVector& polarization)
-  {
-    m_Time = time0;
-    m_Position = position;
-    m_Energy = energy;
-    m_Direction = direction;
-    m_Polarization = polarization;
-  }
+  void register_sampler(anlgeant4::BasicPrimaryGenerator* sampler) { sampler_ = sampler; }
 
-  void Set(const G4ThreeVector& position,
-           double energy,
-           const G4ThreeVector& direction)
-  {
-    m_Time = 0.0;
-    m_Position = position;
-    m_Energy = energy;
-    m_Direction = direction;
-    m_Polarization.set(0., 0., 0.);
-  }
-
-  void Set(const G4ThreeVector& position,
-           double energy,
-           const G4ThreeVector& direction,
-           const G4ThreeVector& polarization)
-  {
-    m_Time = 0.0;
-    m_Position = position;
-    m_Energy = energy;
-    m_Direction = direction;
-    m_Polarization = polarization;
-  }
-
-  void RegisterGeneratorSetting(BasicPrimaryGen* setting)
-  {
-    m_GeneratorSetting = setting;
-  }
+protected:
+  void set_particle_definition(G4ParticleDefinition* definition);
+  void set_primary_setting(const PrimarySetting& primary);
 
 private:
-  std::unique_ptr<G4ParticleGun> m_ParticleGun;
-  BasicPrimaryGen* m_GeneratorSetting = nullptr;
-  double m_Time;
-  G4ThreeVector m_Position;
-  double m_Energy;
-  G4ThreeVector m_Direction;
-  G4ThreeVector m_Polarization;
+  std::unique_ptr<G4ParticleGun> particle_gun_;
+  anlgeant4::BasicPrimaryGenerator* sampler_ = nullptr;
 };
 
 } /* namespace anlgeant4 */

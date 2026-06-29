@@ -6,6 +6,7 @@ name = 'comptonSoft'
 namespace = 'comptonsoft'
 
 clMod = [
+  ANL::SWIGClass.new("CSEventStore"),
   ANL::SWIGClass.new("ConstructDetector"),
   ANL::SWIGClass.new("ConstructDetectorForSimulation"),
   ANL::SWIGClass.new("VCSModule"),
@@ -111,17 +112,19 @@ clMod = [
 ]
 
 clSim = [
+  # radioactivation
+  ANL::SWIGClass.new("RadioactivationEventStore"),
+  ANL::SWIGClass.new("RadioactivationUserActionAssembly"),
   # primary generator
-  ANL::SWIGClass.new("AHRayTracingPrimaryGen", false, 'USE_FITSIO'),
-  ANL::SWIGClass.new("ListPrimaryGen"),
-  ANL::SWIGClass.new("SimXPrimaryGen", false, 'USE_SIMX'),
-  ANL::SWIGClass.new("AHRadiationBackgroundPrimaryGen"),
-  ANL::SWIGClass.new("AEObservationPrimaryGen", false, 'USE_FITSIO'),
-  ANL::SWIGClass.new("CelestialSourcePrimaryGen", false, 'USE_FITSIO'),
-  ANL::SWIGClass.new("AllSkyPrimaryGen", false, 'USE_HEALPIX'),
+  ANL::SWIGClass.new("AHRayTracingPrimaryGenerator", false, 'USE_FITSIO'),
+  ANL::SWIGClass.new("ListPrimaryGenerator"),
+  ANL::SWIGClass.new("SimXPrimaryGenerator", false, 'USE_SIMX'),
+  ANL::SWIGClass.new("AHRadiationBackgroundPrimaryGenerator"),
+  ANL::SWIGClass.new("AEObservationPrimaryGenerator", false, 'USE_FITSIO'),
+  ANL::SWIGClass.new("CelestialSourcePrimaryGenerator", false, 'USE_FITSIO'),
+  ANL::SWIGClass.new("AllSkyPrimaryGenerator", false, 'USE_HEALPIX'),
   # user action assembly
   ANL::SWIGClass.new("RadioactiveDecayUserActionAssembly"),
-  ANL::SWIGClass.new("ActivationUserActionAssembly"),
   ANL::SWIGClass.new("AHStandardUserActionAssembly", false, 'USE_SIMX'),
   ANL::SWIGClass.new("SampleOpticalDepth"),
   ANL::SWIGClass.new("ScatteringPickUpData"),
@@ -157,6 +160,7 @@ clAH = [
 classList = clMod + clSim + clAH
 classList.each{|s|
   s.include_path = ["../../source/modules/include",
+    "../../source/core/include",
     "../../source/simulation/include",
     "../../source/astroh/include",
   ]

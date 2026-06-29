@@ -70,7 +70,7 @@ ANLStatus ReadSGDEventTree::mod_initialize()
     std::cout << "Event file to be read is not specified." << std::endl;
     return AS_QUIT;
   }
-  
+
   if (m_TreeNames.size()==0) {
     m_TreeNames.resize(m_FileNames.size(), "event_tree");
   }
@@ -81,12 +81,12 @@ ANLStatus ReadSGDEventTree::mod_initialize()
                   TChain::kBigNumber,
                   m_TreeNames[i].c_str());
   }
-  
+
   m_NumEvents = tree->GetEntries();
   std::cout << "Total events: " << m_NumEvents << std::endl;
 
   m_EventReader.reset(new astroh::sgd::EventTreeReader(tree));
-  
+
   return AS_OK;
 }
 
@@ -98,7 +98,7 @@ ANLStatus ReadSGDEventTree::mod_analyze()
 
   astroh::sgd::Event event;
   m_EventReader->restoreEvent(m_Index, event);
-  setEventID(event.getOccurrenceID());
+  set_event_id(event.getOccurrenceID());
 
   // const double time0 = event.getTime();
   // const uint32_t localTime = event.getLocalTime();
@@ -121,7 +121,7 @@ ANLStatus ReadSGDEventTree::mod_analyze()
   for (size_t i=0; i<NumHits; i++) {
     const int ASICID = event.getReadoutASICIDVector()[i];
     const ReadoutBasedChannelID ReadoutID = getReadoutID(ASICID);
-      
+
     const int ChannelID = event.getReadoutChannelIDVector()[i];
     const uint16_t ADCValue = event.getPHAVector()[i];
     const uint16_t EPI = event.getEPIVector()[i];

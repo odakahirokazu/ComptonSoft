@@ -27,7 +27,7 @@ namespace comptonsoft
 {
 
 InitialParticleTree::InitialParticleTree()
-  : eventid(0),
+  : runid(0), eventid(0),
     ini_energy(0.0), ini_dirx(0.0), ini_diry(0.0), ini_dirz(0.0),
     ini_time(0.0), ini_posx(0.0), ini_posy(0.0), ini_posz(0.0),
     ini_polarx(0.0), ini_polary(0.0), ini_polarz(0.0),
@@ -44,6 +44,7 @@ ANLStatus InitialParticleTree::mod_initialize()
 
   tree = new TTree("ini_tree", "ini_tree");
 
+  tree->Branch("runid",  &runid,   "runid/I");
   tree->Branch("eventid",  &eventid,   "eventid/I");
   tree->Branch("ini_energy", &ini_energy,  "ini_energy/D");
   tree->Branch("ini_dirx", &ini_dirx,  "ini_dirx/D");
@@ -61,35 +62,36 @@ ANLStatus InitialParticleTree::mod_initialize()
     tree->Branch("ini_polary", &ini_polary,  "ini_polary/D");
     tree->Branch("ini_polarz", &ini_polarz,  "ini_polarz/D");
   }
-  
+
   return AS_OK;
 }
 
 ANLStatus InitialParticleTree::mod_analyze()
 {
-  ini_energy = initial_info->InitialEnergy();
-  G4ThreeVector iniDir = initial_info->InitialDirection();
+  ini_energy = initial_info->initial_energy();
+  G4ThreeVector iniDir = initial_info->initial_direction();
   ini_dirx = iniDir.x();
   ini_diry = iniDir.y();
   ini_dirz = iniDir.z();
-  ini_time = initial_info->InitialTime();
-  G4ThreeVector iniPos = initial_info->InitialPosition();
+  ini_time = initial_info->initial_time();
+  G4ThreeVector iniPos = initial_info->initial_position();
   ini_posx = iniPos.x();
   ini_posy = iniPos.y();
   ini_posz = iniPos.z();
-  
+
   if (polarization_enable) {
-    G4ThreeVector iniPolar = initial_info->InitialPolarization();
+    G4ThreeVector iniPolar = initial_info->initial_polarization();
     ini_polarx = iniPolar.x();
     ini_polary = iniPolar.y();
     ini_polarz = iniPolar.z();
   }
 
-  weight = initial_info->Weight();
-  eventid = initial_info->EventID();
-  
+  runid = initial_info->run_id();
+  eventid = initial_info->event_id();
+  weight = initial_info->weight();
+
   tree->Fill();
-  
+
   return AS_OK;
 }
 

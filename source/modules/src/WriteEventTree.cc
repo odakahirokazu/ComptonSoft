@@ -55,7 +55,7 @@ ANLStatus WriteEventTree::mod_initialize()
   else {
     treeIO_->disableInitialInfoRecord();
   }
-  
+
   tree_ = new TTree("eventtree", "eventtree");
   treeIO_->setTree(tree_);
   treeIO_->defineBranches();
@@ -65,18 +65,21 @@ ANLStatus WriteEventTree::mod_initialize()
 
 ANLStatus WriteEventTree::mod_analyze()
 {
-  int64_t eventID = -1;
-  
+  int32_t runID = -1;
+  int32_t eventID = -1;
+
   if (initialInfo_) {
-    eventID = initialInfo_->EventID();
-    treeIO_->setInitialInfo(initialInfo_->InitialEnergy(),
-                            initialInfo_->InitialDirection(),
-                            initialInfo_->InitialTime(),
-                            initialInfo_->InitialPosition(),
-                            initialInfo_->InitialPolarization());
-    treeIO_->setWeight(initialInfo_->Weight());
+    runID = initialInfo_->run_id();
+    eventID = initialInfo_->event_id();
+    treeIO_->setInitialInfo(initialInfo_->initial_energy(),
+                            initialInfo_->initial_direction(),
+                            initialInfo_->initial_time(),
+                            initialInfo_->initial_position(),
+                            initialInfo_->initial_polarization());
+    treeIO_->setWeight(initialInfo_->weight());
   }
   else {
+    runID = 0;
     eventID = get_loop_index();
   }
 
@@ -86,7 +89,7 @@ ANLStatus WriteEventTree::mod_analyze()
     const std::vector<DetectorHit_sptr>& hits
       = hitCollection_->getHits(timeGroup);
     if (hits.size() > 0) {
-      treeIO_->fillHits(eventID, hits);
+      treeIO_->fillHits(runID, eventID, hits);
       filled = true;
     }
   }
@@ -95,7 +98,7 @@ ANLStatus WriteEventTree::mod_analyze()
     set_evs("WriteEventTree:Fill");
   }
   else if (notice_undetected_) {
-    treeIO_->fillUndetectedEvent(eventID);
+    treeIO_->fillUndetectedEvent(runID, eventID);
     set_evs("WriteEventTree:FillUndetected");
   }
 

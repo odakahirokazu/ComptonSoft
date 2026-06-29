@@ -53,6 +53,7 @@ namespace comptonsoft {
  * @date 2020-12-25 | add track ID
  * @date 2022-04-25 | introduce a voxel
  * @date 2025-06-24 | pre-/post-step point positions
+ * @date 2026-04-18 | introduce run ID, and make event ID int32_t
  */
 class DetectorHit
 {
@@ -72,12 +73,15 @@ public:
 
   std::shared_ptr<DetectorHit> clone() const
   { return std::shared_ptr<DetectorHit>(new DetectorHit(*this)); }
-  
-  void setEventID(int64_t v) { eventID_ = v; }
-  int64_t EventID() const { return eventID_; }
 
-  void setTrackID(int v) { trackID_ = v; }
-  int TrackID() const { return trackID_; }
+  void setRunID(int32_t v) { runID_ = v; }
+  int32_t RunID() const { return runID_; }
+
+  void setEventID(int32_t v) { eventID_ = v; }
+  int32_t EventID() const { return eventID_; }
+
+  void setTrackID(int32_t v) { trackID_ = v; }
+  int32_t TrackID() const { return trackID_; }
 
   void setTimeIndicator(int64_t v) { ti_ = v; }
   int64_t TimeIndicator() const { return ti_; }
@@ -239,7 +243,7 @@ public:
 
   void setDepthSensingMode(int v) { depthSensingMode_ = v; }
   int DepthSensingMode() const { return depthSensingMode_; }
-  
+
   /**
    * check if the given hit occurred in the same detector.
    */
@@ -259,7 +263,7 @@ public:
    * @return result
    */
   bool isAdjacent(const DetectorHit& r, bool contact=true) const;
-  
+
   double distance(const DetectorHit& r) const
   { return distance(r.Position()); }
   double distance(const vector3_t& v) const
@@ -300,8 +304,9 @@ public:
 
 private:
   // Event/track ID
-  int64_t eventID_ = 0l;
-  int trackID_ = 0;
+  int32_t runID_ = 0;
+  int32_t eventID_ = 0;
+  int32_t trackID_ = 0;
   // measured data
   int64_t ti_ = 0l;
   int instrumentID_ = 0;

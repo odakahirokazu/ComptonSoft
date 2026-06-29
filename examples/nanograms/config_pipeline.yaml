@@ -25,7 +25,6 @@ calibration:
     energy: 
         gain_info_file: subproducts/gainFuncParam3d.hdf5
         q_to_kev_spline_file: subproducts/QvsEkeV_spline.root
-        max_time_us: 67.0
         tp_channel: 17
         ccal: 8
     position:

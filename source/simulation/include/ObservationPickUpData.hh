@@ -20,7 +20,7 @@
 #ifndef COMPTONSOFT_ObservationPickUpData_H
 #define COMPTONSOFT_ObservationPickUpData_H 1
 
-#include "VAppendableUserActionAssembly.hh"
+#include "VUserActionAssembly.hh"
 #include "ObservedParticle.hh"
 
 namespace comptonsoft {
@@ -32,20 +32,22 @@ namespace comptonsoft {
  * @author Hirokazu Odaka
  * @date 2017-06-20
  * @date 2017-06-29 | new design of VAppendableUserActionAssembly
+ * @date 2026-04-15 | use VUserActionAssembly
  */
-class ObservationPickUpData : public anlgeant4::VAppendableUserActionAssembly
+class ObservationPickUpData : public anlgeant4::VUserActionAssembly
 {
-  DEFINE_ANL_MODULE(ObservationPickUpData, 2.0);
+  DEFINE_ANL_MODULE(ObservationPickUpData, 3.0);
+  ENABLE_PARALLEL_RUN();
 public:
   ObservationPickUpData();
   ~ObservationPickUpData() = default;
-  
+
   anlnext::ANLStatus mod_define() override;
 
-  void EventActionAtBeginning(const G4Event*) override;
-  void TrackActionAtEnd(const G4Track* track) override;
+  void event_action_at_beginning(const G4Event*) override;
+  void track_action_at_end(const G4Track* track) override;
 
-  const std::vector<ObservedParticle_sptr>& getParticleVector() const 
+  const std::vector<ObservedParticle_sptr>& getParticleVector() const
   { return particleVector_; }
 
 private:

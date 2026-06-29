@@ -38,10 +38,11 @@ HitTreeIO::~HitTreeIO() = default;
 
 void HitTreeIO::defineBranches()
 {
-  hittree_->Branch("eventid",          &eventid_,          "eventid/L");
+  hittree_->Branch("runid",            &runid_,            "runid/I");
+  hittree_->Branch("eventid",          &eventid_,          "eventid/I");
   hittree_->Branch("ihit",             &ihit_,             "ihit/S");
   hittree_->Branch("num_hits",         &num_hits_,         "num_hits/I");
-  
+
   // measured data
   hittree_->Branch("ti",               &ti_,               "ti/L");
   hittree_->Branch("instrument",       &instrument_,       "instrument/S");
@@ -59,7 +60,7 @@ void HitTreeIO::defineBranches()
   hittree_->Branch("epi_error",        &epi_error_,        "epi_error/F");
   hittree_->Branch("flag_data",        &flag_data_,        "flag_data/l");
   hittree_->Branch("flags",            &flags_,            "flags/l");
-  
+
   // simulation
   hittree_->Branch("trackid",          &trackid_,          "trackid/I");
   hittree_->Branch("particle",         &particle_,         "particle/I");
@@ -95,6 +96,7 @@ void HitTreeIO::defineBranches()
 
 void HitTreeIO::setBranchAddresses()
 {
+  hittree_->SetBranchAddress("runid",            &runid_);
   hittree_->SetBranchAddress("eventid",          &eventid_);
   hittree_->SetBranchAddress("ihit",             &ihit_);
   hittree_->SetBranchAddress("num_hits",         &num_hits_);
@@ -150,7 +152,8 @@ void HitTreeIO::setBranchAddresses()
   hittree_->SetBranchAddress("grade",            &grade_);
 }
 
-void HitTreeIO::fillHits(const int64_t eventID,
+void HitTreeIO::fillHits(const int32_t runID,
+                         const int32_t eventID,
                          const std::vector<DetectorHit_sptr>& hits)
 {
   const int NumHits = hits.size();
@@ -158,6 +161,7 @@ void HitTreeIO::fillHits(const int64_t eventID,
 
   for (int i=0; i<NumHits; i++) {
     const DetectorHit_sptr& hit = hits[i];
+    runid_ = (runID >= 0) ? runID : hit->RunID();
     eventid_ = (eventID >= 0) ? eventID : hit->EventID();
     ihit_ = i;
 
@@ -205,7 +209,7 @@ void HitTreeIO::fillHits(const int64_t eventID,
     time_ = hit->Time() / unit::second;
     time_error_ = hit->TimeError() / unit::second;
     grade_ = hit->Grade();
-    
+
     hittree_->Fill();
   }
 }
@@ -213,6 +217,7 @@ void HitTreeIO::fillHits(const int64_t eventID,
 DetectorHit_sptr HitTreeIO::retrieveHit() const
 {
   DetectorHit_sptr hit(new DetectorHit);
+  hit->setRunID(runid_);
   hit->setEventID(eventid_);
   hit->setTI(ti_);
   hit->setInstrumentID(instrument_);
@@ -256,20 +261,21 @@ std::vector<DetectorHit_sptr> HitTreeIO::retrieveHits(int64_t& entry,
     hittree_->GetEntry(entry);
   }
 
-  const int64_t ThisEventID = eventid_;
+  const int32_t ThisRunID = runid_;
+  const int32_t ThisEventID = eventid_;
   const int numHits = getNumberOfHits();
   for (int i=0; i<numHits; i++) {
     if (i != 0) {
       hittree_->GetEntry(entry+i);
 
-      if (eventid_ != ThisEventID) {
+      if (eventid_ != ThisEventID || runid_ != ThisRunID) {
         std::ostringstream message;
         message << "Error: inconsistent Event ID at "
                 << ThisEventID << '\n';
         BOOST_THROW_EXCEPTION( CSException(message.str()) );
       }
     }
-    
+
     DetectorHit_sptr hit = retrieveHit();
     hits.push_back(std::move(hit));
   }

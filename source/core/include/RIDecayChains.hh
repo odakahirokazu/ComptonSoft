@@ -95,14 +95,14 @@ public:
 
   void printChains() const;
   void printTotalCounts() const;
-  
+
 private:
   void buildChain(const IsotopeInfo& parentIsotope, int depth);
-  std::list<RIDecayProperties> collectDecayProducts(const G4Ions* parent);
-  std::list<RIDecayProperties> collectInternalTransitionProducts(const G4Ions* parent);
+  std::list<RIDecayProperties> collectDecayProducts(const G4Ions* parent) const;
+  std::list<RIDecayProperties> collectInternalTransitionProducts(const G4Ions* parent) const;
 
-  void forceInstantaneousDecay(std::list<RIDecayProperties>& decayProducts);
-  void compressDecayProducts(std::list<RIDecayProperties>& decayProducts);
+  void forceInstantaneousDecay(std::list<RIDecayProperties>& decayProducts) const;
+  void compressDecayProducts(std::list<RIDecayProperties>& decayProducts) const;
 
   void solveChain(const BatemanSolution& solution,
                   double t,

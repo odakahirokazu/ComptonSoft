@@ -34,115 +34,115 @@ namespace anlgeant4
 {
 
 PositionSamplerInVolume::PositionSamplerInVolume()
-  : volumeType_(VolumeType_t::Box), theVolume_(nullptr),
-    boxHSizeX_(0.0), boxHSizeY_(0.0), boxHSizeZ_(0.0),
-    innerRadius_(0.0), outerRadius_(0.0),
-    startPhi_(0.0), deltaPhi_(0.0),
-    startTheta_(0.0), deltaTheta_(0.0)
+  : volume_type_(VolumeType_t::Box), theVolume_(nullptr),
+    box_half_size_x_(0.0), box_half_size_y_(0.0), box_half_size_z_(0.0),
+    inner_radius_(0.0), outer_radius_(0.0),
+    start_phi_(0.0), delta_phi_(0.0),
+    start_theta_(0.0), delta_theta_(0.0)
 {
 }
 
-void PositionSamplerInVolume::defineVolumeSize()
+void PositionSamplerInVolume::define_volume_size()
 {
   G4PhysicalVolumeStore* PVStore = G4PhysicalVolumeStore::GetInstance();
-  theVolume_ = PVStore->GetVolume(volumeID_[volumeID_.size()-1]);
+  theVolume_ = PVStore->GetVolume(volume_ID_[volume_ID_.size()-1]);
   G4VSolid* solid = theVolume_->GetLogicalVolume()->GetSolid();
 
   if (solid->GetEntityType() == "G4Box") {
-    volumeType_ = VolumeType_t::Box;
+    volume_type_ = VolumeType_t::Box;
     G4Box* box = static_cast<G4Box*>(solid);
-    boxHSizeX_ = box->GetXHalfLength();
-    boxHSizeY_ = box->GetYHalfLength();
-    boxHSizeZ_ = box->GetZHalfLength();
+    box_half_size_x_ = box->GetXHalfLength();
+    box_half_size_y_ = box->GetYHalfLength();
+    box_half_size_z_ = box->GetZHalfLength();
   }
   else if (solid->GetEntityType() == "G4Sphere") {
-    volumeType_ = VolumeType_t::Sphere;
+    volume_type_ = VolumeType_t::Sphere;
     G4Sphere* sphere = static_cast<G4Sphere*>(solid);
-    innerRadius_ = sphere->GetInnerRadius();
-    outerRadius_ = sphere->GetOuterRadius();
-    startPhi_ = sphere->GetStartPhiAngle();
-    deltaPhi_ = sphere->GetDeltaPhiAngle();
-    startTheta_ = sphere->GetStartThetaAngle();
-    deltaTheta_ = sphere->GetDeltaThetaAngle();
+    inner_radius_ = sphere->GetInnerRadius();
+    outer_radius_ = sphere->GetOuterRadius();
+    start_phi_ = sphere->GetStartPhiAngle();
+    delta_phi_ = sphere->GetDeltaPhiAngle();
+    start_theta_ = sphere->GetStartThetaAngle();
+    delta_theta_ = sphere->GetDeltaThetaAngle();
 
-    boxHSizeX_ = outerRadius_;
-    boxHSizeY_ = outerRadius_;
-    boxHSizeZ_ = outerRadius_;
+    box_half_size_x_ = outer_radius_;
+    box_half_size_y_ = outer_radius_;
+    box_half_size_z_ = outer_radius_;
   }
   else if (solid->GetEntityType() == "G4Tubs") {
-    volumeType_ = VolumeType_t::Tube;
+    volume_type_ = VolumeType_t::Tube;
     G4Tubs* tube = static_cast<G4Tubs*>(solid);
-    innerRadius_ = tube->GetInnerRadius();
-    outerRadius_ = tube->GetOuterRadius();
-    startPhi_ = tube->GetStartPhiAngle();
-    deltaPhi_ = tube->GetDeltaPhiAngle();
-    boxHSizeZ_ = tube->GetZHalfLength();
+    inner_radius_ = tube->GetInnerRadius();
+    outer_radius_ = tube->GetOuterRadius();
+    start_phi_ = tube->GetStartPhiAngle();
+    delta_phi_ = tube->GetDeltaPhiAngle();
+    box_half_size_z_ = tube->GetZHalfLength();
 
-    boxHSizeX_ = outerRadius_;
-    boxHSizeY_ = outerRadius_;
+    box_half_size_x_ = outer_radius_;
+    box_half_size_y_ = outer_radius_;
   }
   else if (solid->GetEntityType() == "G4EllipticalTube") {
-    volumeType_ = VolumeType_t::EllipticalTube;
+    volume_type_ = VolumeType_t::EllipticalTube;
     G4EllipticalTube* tube = static_cast<G4EllipticalTube*>(solid);
-    boxHSizeX_ = tube->GetDx();
-    boxHSizeY_ = tube->GetDy();
-    boxHSizeZ_ = tube->GetDz();
+    box_half_size_x_ = tube->GetDx();
+    box_half_size_y_ = tube->GetDy();
+    box_half_size_z_ = tube->GetDz();
   }
   else if (solid->GetEntityType() == "G4Ellipsoid") {
-    volumeType_ = VolumeType_t::Ellipsoid;
+    volume_type_ = VolumeType_t::Ellipsoid;
     G4Ellipsoid* ellipsoid = static_cast<G4Ellipsoid*>(solid);
-    boxHSizeX_ = ellipsoid->GetSemiAxisMax(0);
-    boxHSizeY_ = ellipsoid->GetSemiAxisMax(1);
-    boxHSizeZ_ = ellipsoid->GetSemiAxisMax(2);
+    box_half_size_x_ = ellipsoid->GetSemiAxisMax(0);
+    box_half_size_y_ = ellipsoid->GetSemiAxisMax(1);
+    box_half_size_z_ = ellipsoid->GetSemiAxisMax(2);
     const double zTop = ellipsoid->GetZTopCut();
     const double zBottom = ellipsoid->GetZBottomCut();
     if (std::abs(zBottom) > std::abs(zTop)) {
-      boxHSizeZ_ = std::abs(zBottom);
+      box_half_size_z_ = std::abs(zBottom);
     }
     else {
-      boxHSizeZ_ = std::abs(zTop);
+      box_half_size_z_ = std::abs(zTop);
     }
   }
   else {
-    volumeType_ = VolumeType_t::Any;
+    volume_type_ = VolumeType_t::Any;
     double radius = 0.;
-    const G4int numSampleSurface = 10000;
-    for (G4int i=0; i<numSampleSurface; i++) {
-      G4double tmpRadius = solid->GetPointOnSurface().mag();
-      if (tmpRadius > radius) {
-        radius = tmpRadius;
+    const int num_samples = 10000;
+    for (int i=0; i<num_samples; i++) {
+      const double radius_trial = solid->GetPointOnSurface().mag();
+      if (radius_trial > radius) {
+        radius = radius_trial;
       }
     }
-    boxHSizeX_ = radius;
-    boxHSizeY_ = radius;
-    boxHSizeZ_ = radius;
+    box_half_size_x_ = radius;
+    box_half_size_y_ = radius;
+    box_half_size_z_ = radius;
   }
 }
 
-G4ThreeVector PositionSamplerInVolume::samplePosition()
+G4ThreeVector PositionSamplerInVolume::sample_position() const
 {
   double posx(0.0), posy(0.0), posz(0.0);
-  
+
   const G4LogicalVolume* logvol = theVolume_->GetLogicalVolume();
   const G4VSolid* solid = logvol->GetSolid();
 
  position_sampling_start:
-  if (false && volumeType_==VolumeType_t::Tube) {
-    const double r2min = innerRadius_*innerRadius_;
-    const double r2max = outerRadius_*outerRadius_;
+  if (false && volume_type_==VolumeType_t::Tube) {
+    const double r2min = inner_radius_*inner_radius_;
+    const double r2max = outer_radius_*outer_radius_;
     const double r = std::sqrt(r2min+G4UniformRand()*(r2max-r2min));
-    const double phi = startPhi_ + G4UniformRand()*deltaPhi_;
+    const double phi = start_phi_ + G4UniformRand()*delta_phi_;
     posx = r * std::cos(phi);
     posy = r * std::sin(phi);
-    posz = -boxHSizeZ_ + 2.0 * boxHSizeZ_ * G4UniformRand();
+    posz = -box_half_size_z_ + 2.0 * box_half_size_z_ * G4UniformRand();
   }
-  else if (false && volumeType_==VolumeType_t::Sphere) {
-    const double r3min = innerRadius_*innerRadius_*innerRadius_;
-    const double r3max = outerRadius_*outerRadius_*outerRadius_;
+  else if (false && volume_type_==VolumeType_t::Sphere) {
+    const double r3min = inner_radius_*inner_radius_*inner_radius_;
+    const double r3max = outer_radius_*outer_radius_*outer_radius_;
     const double r = std::cbrt(r3min+G4UniformRand()*(r3max-r3min));
-    const double phi = startPhi_ + G4UniformRand()*deltaPhi_;
-    const double cosTheta0 = std::cos(startTheta_);
-    const double cosTheta1 = std::cos(startTheta_+deltaTheta_);
+    const double phi = start_phi_ + G4UniformRand()*delta_phi_;
+    const double cosTheta0 = std::cos(start_theta_);
+    const double cosTheta1 = std::cos(start_theta_+delta_theta_);
     const double cosTheta = cosTheta0 + G4UniformRand()*(cosTheta1-cosTheta0);
     const double sinTheta = std::sqrt(1.0-cosTheta*cosTheta);
     posx = r * sinTheta * std::cos(phi);
@@ -150,16 +150,16 @@ G4ThreeVector PositionSamplerInVolume::samplePosition()
     posz = r * cosTheta;
   }
   else { // Box and others
-    posx = -boxHSizeX_ + 2.0 * boxHSizeX_ * G4UniformRand();
-    posy = -boxHSizeY_ + 2.0 * boxHSizeY_ * G4UniformRand();
-    posz = -boxHSizeZ_ + 2.0 * boxHSizeZ_ * G4UniformRand();
+    posx = -box_half_size_x_ + 2.0 * box_half_size_x_ * G4UniformRand();
+    posy = -box_half_size_y_ + 2.0 * box_half_size_y_ * G4UniformRand();
+    posz = -box_half_size_z_ + 2.0 * box_half_size_z_ * G4UniformRand();
   }
   G4ThreeVector position(posx, posy, posz);
 
   if (solid->Inside(position) != kInside) {
     goto position_sampling_start;
   }
-  
+
   for (std::size_t i=0; i<logvol->GetNoDaughters(); i++) {
     G4VPhysicalVolume* daughter = logvol->GetDaughter(i);
     G4ThreeVector posInDaughter = position;
@@ -177,14 +177,14 @@ G4ThreeVector PositionSamplerInVolume::samplePosition()
 
   G4PhysicalVolumeStore* PVStore = G4PhysicalVolumeStore::GetInstance();
 
-  for (int i=volumeID_.size()-1; i>=0; i--) {
-    G4VPhysicalVolume* physivol = PVStore->GetVolume(volumeID_[i]);
+  for (int i=volume_ID_.size()-1; i>=0; i--) {
+    G4VPhysicalVolume* physivol = PVStore->GetVolume(volume_ID_[i]);
     if (physivol->GetFrameRotation() != 0) {
       position = (*physivol->GetObjectRotation()) * position;
     }
     position += physivol->GetObjectTranslation();
   }
-  
+
   return position;
 }
 

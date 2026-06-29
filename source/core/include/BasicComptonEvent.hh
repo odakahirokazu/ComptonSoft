@@ -38,6 +38,7 @@ namespace comptonsoft {
  * @date 2020-07-08 | rename TotalEnergy() -> IncidentEnergy()
  * @date 2020-09-02 | add errors of energy/position
  * @date 2022-05-19 | pixel -> voxel
+ * @date 2026-04-18 | run ID
  */
 class BasicComptonEvent
 {
@@ -49,8 +50,11 @@ public:
   BasicComptonEvent& operator=(const BasicComptonEvent&) = default;
   BasicComptonEvent& operator=(BasicComptonEvent&&) = default;
 
-  int64_t EventID() const { return eventID_; }
-  void setEventID(int64_t v) { eventID_ = v; }
+  int32_t RunID() const { return runID_; }
+  void setRunID(int32_t v) { runID_ = v; }
+
+  int32_t EventID() const { return eventID_; }
+  void setEventID(int32_t v) { eventID_ = v; }
   
   int NumberOfHits() const { return numHits_; }
   void setNumberOfHits(int v) { numHits_ = v; }
@@ -201,7 +205,8 @@ private:
   void calc() const;
 
 private:
-  int64_t eventID_ = 0;
+  int32_t runID_ = 0;
+  int32_t eventID_ = 0;
   int numHits_ = 0;
   
   int hit1ID_ = 0;

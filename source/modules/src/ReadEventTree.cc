@@ -47,7 +47,7 @@ ANLStatus ReadEventTree::mod_define()
 ANLStatus ReadEventTree::mod_initialize()
 {
   VCSModule::mod_initialize();
-  
+
   get_module_NC("CSHitCollection", &hitCollection_);
 
   tree_ = std::make_unique<TChain>("eventtree");
@@ -57,7 +57,7 @@ ANLStatus ReadEventTree::mod_initialize()
 
   treeIO_->setTree(tree_.get());
   if (tree_->GetBranch("ini_energy")) {
-    setInitialInformationStored();
+    set_initial_information_stored();
     treeIO_->enableInitialInfoRecord();
   }
   else {
@@ -74,10 +74,12 @@ ANLStatus ReadEventTree::mod_initialize()
 ANLStatus ReadEventTree::mod_begin_run()
 {
   if (numEntries_ == 0) { return AS_OK; }
-  
+
   tree_->GetEntry(0);
-  const int64_t EventID = treeIO_->getEventID();
-  setEventID(EventID);
+  const int32_t RunID = treeIO_->getRunID();
+  const int32_t EventID = treeIO_->getEventID();
+  set_run_id(RunID);
+  set_event_id(EventID);
 
   return AS_OK;
 }
@@ -90,26 +92,25 @@ ANLStatus ReadEventTree::mod_analyze()
 
   tree_->GetEntry(entryIndex_);
 
-  const int64_t EventID = treeIO_->getEventID();
-  setEventID(EventID);
+  const int32_t RunID = treeIO_->getRunID();
+  const int32_t EventID = treeIO_->getEventID();
+  set_run_id(RunID);
+  set_event_id(EventID);
 
-  if (InitialInformationStored()) {
-    setInitialEnergy(treeIO_->getInitialEnergy());
-    setInitialDirection(treeIO_->getInitialDirection());
-    setInitialTime(treeIO_->getInitialTime());
-    setInitialPosition(treeIO_->getInitialPosition());
-    setInitialPolarization(treeIO_->getInitialPolarization());
-  }
-  
-  if (WeightStored()) {
-    setWeight(treeIO_->getWeight());
+  if (initial_information_stored()) {
+    set_initial_energy(treeIO_->getInitialEnergy());
+    set_initial_direction(treeIO_->getInitialDirection());
+    set_initial_time(treeIO_->getInitialTime());
+    set_initial_position(treeIO_->getInitialPosition());
+    set_initial_polarization(treeIO_->getInitialPolarization());
+    set_weight(treeIO_->getWeight());
   }
 
   std::vector<DetectorHit_sptr> hits = treeIO_->retrieveHits(entryIndex_, false);
   for (auto& hit: hits) {
     insertHit(hit);
   }
-  
+
   return AS_OK;
 }
 

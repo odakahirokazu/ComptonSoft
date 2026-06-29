@@ -33,7 +33,7 @@ namespace anlgeant4 {
  */
 class ReadGDML : public VANLGeometry
 {
-  DEFINE_ANL_MODULE(ReadGDML, 1.0);
+  DEFINE_ANL_MODULE(ReadGDML, 2.0);
 
 public:
   ReadGDML();
@@ -43,8 +43,8 @@ public:
   G4VUserDetectorConstruction* create() override;
 
 private:
-  std::string m_GeometryFileName;
-  bool m_Validate;
+  std::string filename_;
+  bool validate_;
 };
 
 } /* namespace anlgeant4 */

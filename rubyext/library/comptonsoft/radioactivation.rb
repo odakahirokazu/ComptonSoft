@@ -28,6 +28,23 @@ module ComptonSoft
       id_cosima = @id/100000000000
       "RP %5d %15.9e %15d" % [id_cosima, @energy, @value]
     end
+
+    def self.from_isotope_id(isotope_id)
+      # Isotope ID :xxyyyzzzzzzzzzww
+      #  Z = xx
+      #  A = yyy
+      #  E = zzz zzz zzz [eV]
+      #  floating level = ww
+      i = isotope_id
+      floating_level = i % 100
+      i /= 100
+      energy = (i % 1000000000) * 0.001 # eV to keV
+      i /= 1000000000
+      a = i % 1000
+      i /= 1000
+      z = i
+      RIData.new(isotope_id, z, a, energy, floating_level, 0.0)
+    end
   end
 
   class ActivationSummary

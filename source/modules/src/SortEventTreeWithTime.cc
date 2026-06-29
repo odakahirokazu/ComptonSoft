@@ -49,7 +49,7 @@ ANLStatus SortEventTreeWithTime::mod_define()
 ANLStatus SortEventTreeWithTime::mod_initialize()
 {
   VCSModule::mod_initialize();
-  
+
   get_module_NC("CSHitCollection", &hitCollection_);
 
   tree_ = new TChain("eventtree");
@@ -59,7 +59,7 @@ ANLStatus SortEventTreeWithTime::mod_initialize()
 
   treeIO_->setTree(tree_);
   if (tree_->GetBranch("ini_energy")) {
-    setInitialInformationStored();
+    set_initial_information_stored();
     treeIO_->enableInitialInfoRecord();
   }
   else {

@@ -81,11 +81,11 @@ ANLStatus SampleOpticalDepth::mod_initialize()
     std::cout << "Process " << processName_ << " is not an EM process." << std::endl;
     return AS_QUIT_ERROR;
   }
-  
+
   return AS_OK;
 }
 
-void SampleOpticalDepth::EventActionAtBeginning(const G4Event*)
+void SampleOpticalDepth::event_action_at_beginning(const G4Event*)
 {
   ini_posx_ = 0.0;
   ini_posy_ = 0.0;
@@ -97,13 +97,13 @@ void SampleOpticalDepth::EventActionAtBeginning(const G4Event*)
   tau_ = 0.0;
 }
 
-void SampleOpticalDepth::EventActionAtEnd(const G4Event*)
+void SampleOpticalDepth::event_action_at_end(const G4Event*)
 {
-  const G4ThreeVector iniPos = initialInfo_->InitialPosition();
+  const G4ThreeVector iniPos = initialInfo_->initial_position();
   ini_posx_ = iniPos.x()/unit::cm;
   ini_posy_ = iniPos.y()/unit::cm;
   ini_posz_ = iniPos.z()/unit::cm;
-  const G4ThreeVector iniDir = initialInfo_->InitialDirection();
+  const G4ThreeVector iniDir = initialInfo_->initial_direction();
   ini_dirx_ = iniDir.x();
   ini_diry_ = iniDir.y();
   ini_dirz_ = iniDir.z();
@@ -111,7 +111,7 @@ void SampleOpticalDepth::EventActionAtEnd(const G4Event*)
   tree_->Fill();
 }
 
-void SampleOpticalDepth::SteppingAction(const G4Step* aStep)
+void SampleOpticalDepth::stepping_action(const G4Step* aStep)
 {
   const G4Track* aTrack = aStep->GetTrack();
   const G4MaterialCutsCouple* mcc = aTrack->GetMaterialCutsCouple();

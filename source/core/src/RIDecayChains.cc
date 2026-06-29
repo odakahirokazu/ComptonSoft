@@ -115,7 +115,7 @@ void RIDecayChains::build()
     newChain.push_back(startingIsotope);
     chains_.push_back(newChain);
   }
-  
+
   buildChain(isotope_, 0);
 
   if (verbose_level_ >= 3) {
@@ -209,13 +209,13 @@ void RIDecayChains::buildChain(const IsotopeInfo& parentIsotope, int depth)
       newChain.push_back(decayProperties);
       chains_.push_back(newChain);
     }
-    
+
     buildChain(decayProperties.Isotope(), depth+1);
   }
 }
 
 std::list<RIDecayProperties>
-RIDecayChains::collectDecayProducts(const G4Ions* parent)
+RIDecayChains::collectDecayProducts(const G4Ions* parent) const
 {
   const double lifetime = parent->GetPDGLifeTime();
   const double decayConstant = invert_lifetime(lifetime);
@@ -285,7 +285,7 @@ RIDecayChains::collectDecayProducts(const G4Ions* parent)
 }
 
 std::list<RIDecayProperties>
-RIDecayChains::collectInternalTransitionProducts(const G4Ions* parent)
+RIDecayChains::collectInternalTransitionProducts(const G4Ions* parent) const
 {
   const int parentZ = parent->GetAtomicNumber();
   const int parentA = parent->GetAtomicMass();
@@ -395,7 +395,7 @@ RIDecayChains::collectInternalTransitionProducts(const G4Ions* parent)
 }
 
 void RIDecayChains::
-forceInstantaneousDecay(std::list<RIDecayProperties>& decayProducts)
+forceInstantaneousDecay(std::list<RIDecayProperties>& decayProducts) const
 {
   G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
 
@@ -413,7 +413,7 @@ forceInstantaneousDecay(std::list<RIDecayProperties>& decayProducts)
       ++it;
       continue;
     }
-    
+
     const G4ParticleDefinition* nucleus_base
       = particleTable->GetIonTable()->GetIon(Z, A, Energy, G4Ions::FloatLevelBase(FloatingLevel));
     const G4Ions* nucleus = dynamic_cast<const G4Ions*>(nucleus_base);
@@ -444,7 +444,7 @@ forceInstantaneousDecay(std::list<RIDecayProperties>& decayProducts)
 }
 
 void RIDecayChains::
-compressDecayProducts(std::list<RIDecayProperties>& decayProducts)
+compressDecayProducts(std::list<RIDecayProperties>& decayProducts) const
 {
   using Iter = std::list<RIDecayProperties>::iterator;
 
@@ -475,7 +475,6 @@ compressDecayProducts(std::list<RIDecayProperties>& decayProducts)
 
 void RIDecayChains::prepareSolutions()
 {
-  solutions_.clear();
   for (RIDecayChain& chain: chains_) {
     BatemanSolution solution;
     solution.setVerboseLevel(verbose_level_);
@@ -615,7 +614,6 @@ void RIDecayChains::takeAverage(double totalTime)
 
 void RIDecayChains::makeTotal()
 {
-  total_counts_.clear();
   double sumWeight = 0.0;
 
   for (const RIDecayChain& chain: chains_) {

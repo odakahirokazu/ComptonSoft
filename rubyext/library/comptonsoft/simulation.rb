@@ -48,8 +48,12 @@ module ComptonSoft
       @detector_info_verbose_level = 0
 
       ### Geant4 settings
+      @num_events_per_run = 1000
+      @num_threads = 0
+      @print_beamon_time = false
       @random_seed = 0
       @verbose = 0
+      @store_trajectory = false
 
       ### Modules
       @make_detector_hits_module = :MakeDetectorHits
@@ -63,17 +67,18 @@ module ComptonSoft
     attr_accessor :output
 
     ### Geant4 settings
-    attr_accessor :random_seed, :verbose
+    attr_accessor :num_events_per_run, :num_threads, :print_beamon_time, :random_seed, :verbose
 
     ### ANL module setup.
     define_setup_module("geometry")
     define_setup_module("physics", :PhysicsListManager)
     define_setup_module("primary_generator")
+    define_setup_module("event_store")
     define_setup_module("user_action")
     define_setup_module("pickup_data", array: true)
     define_setup_module("event_selection")
     define_setup_module("tree_output")
-    define_setup_module("visualization", :VisualizeG4Geom)
+    define_setup_module("visualization", :VisualizeGeometry)
     define_setup_module("fits_output")
 
     # Set database files
@@ -116,6 +121,7 @@ module ComptonSoft
       set_visualization()
       with(params)
       self.setup_mode = :minimal
+      @store_trajectory = true
     end
 
     # Set GDML file for geometry building.
@@ -124,7 +130,7 @@ module ComptonSoft
     # @param [Bool] validate Validate the GDML file?
     def set_gdml(gdml_file, validate=false)
       set_geometry :ReadGDML
-      with(file: gdml_file, validate: validate)
+      with(filename: gdml_file, validate: validate)
     end
 
     def enable_timing_process(b=true)
@@ -155,6 +161,10 @@ module ComptonSoft
     def setup_normal()
       add_namespace ComptonSoft
 
+      unless module_of_event_store()
+        set_event_store :CSEventStore
+      end
+
       unless module_of_user_action()
         set_user_action :StandardUserActionAssembly
       end
@@ -169,6 +179,8 @@ module ComptonSoft
 
       chain :SaveData
       with_parameters(output: @output)
+
+      chain_with_parameters module_of_event_store
 
       chain :CSHitCollection
       chain :ConstructDetectorForSimulation
@@ -194,14 +206,21 @@ module ComptonSoft
       chain_with_parameters module_of_physics
 
       chain_with_parameters module_of_primary_generator
+
+      chain_with_parameters module_of_user_action
+
+      if pickup_list = module_list_of_pickup_data
+        pickup_list.each{|m| chain_with_parameters(m) }
+      end
+
       chain :Geant4Body
-      with_parameters(random_engine: "MTwistEngine",
-                      random_initialization_mode: 1,
+      with_parameters(num_events: @num_events_per_run,
+                      num_threads: @num_threads,
+                      print_beamon_time: @print_beamon_time,
+                      random_engine: "MixMaxRng",
                       random_seed: @random_seed,
-                      output_random_status: true,
-                      random_initial_status_file: @output.sub(/.root/, "")+"_seed_i.dat",
-                      random_final_status_file: @output.sub(/.root/, "")+"_seed_f.dat",
-                      verbose: @verbose)
+                      verbose: @verbose,
+                      store_trajectory: @store_trajectory)
 
       chain @make_detector_hits_module
 
@@ -211,27 +230,15 @@ module ComptonSoft
 
       chain_with_parameters module_of_tree_output
 
-      chain_with_parameters module_of_user_action
-
-      if pickup_list = module_list_of_pickup_data
-        pickup_list.each{|m| chain_with_parameters(m) }
-      end
-
       if fits_output = module_of_fits_output
         chain_with_parameters fits_output
-      end
-
-      if vis = module_of_visualization
-        chain_with_parameters vis
       end
     end
 
     def setup_minimal()
       add_namespace ComptonSoft
 
-      unless module_of_user_action()
-        set_user_action :StandardUserActionAssembly
-      end
+      chain :CSEventStore
 
       chain_with_parameters module_of_geometry
 
@@ -242,18 +249,16 @@ module ComptonSoft
 
       chain_with_parameters module_of_primary_generator
 
+      chain :StandardUserActionAssembly
+
       chain :Geant4Body
-      with_parameters(random_engine: "MTwistEngine",
-                      random_initialization_mode: 1,
+      with_parameters(num_events: @num_events_per_run,
+                      num_threads: 1,
+                      print_beamon_time: @print_beamon_time,
+                      random_engine: "MixMaxRng",
                       random_seed: @random_seed,
-                      output_random_status: false,
-                      verbose: @verbose)
-
-      chain_with_parameters module_of_user_action
-
-      if pickup_list = module_list_of_pickup_data
-        pickup_list.each{|m| chain_with_parameters(m) }
-      end
+                      verbose: @verbose,
+                      store_trajectory: @store_trajectory)
 
       if vis = module_of_visualization
         chain_with_parameters vis

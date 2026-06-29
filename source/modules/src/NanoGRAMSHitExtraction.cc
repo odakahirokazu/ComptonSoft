@@ -84,6 +84,7 @@ ANLStatus NanoGRAMSHitExtraction::mod_define()
   define_parameter("gain_tp_file",        &mod_class::gain_tp_file_);
   define_parameter("gain_tp_hash",        &mod_class::gain_tp_dict_);
   define_parameter("gain_cache_seconds",  &mod_class::gain_cache_seconds_);
+  define_parameter("run_id",              &mod_class::run_id_);
   define_parameter("quicklook_event_types", &mod_class::quicklook_event_types_);
   define_parameter("quicklook_num_hits",    &mod_class::quicklook_num_hits_);
   define_parameter("quicklook_save_waveforms", &mod_class::quicklook_save_waveforms_);

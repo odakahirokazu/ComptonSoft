@@ -47,13 +47,13 @@ ANLStatus EfficiencyMapSky::mod_define()
 ANLStatus EfficiencyMapSky::mod_initialize()
 {
   get_module_IF("InitialInformation", &m_InitialInfo);
-  
+
   return BackProjection::mod_initialize();
 }
 
 ANLStatus EfficiencyMapSky::mod_analyze()
 {
-  G4ThreeVector dir = -(m_InitialInfo->InitialDirection());
+  G4ThreeVector dir = -(m_InitialInfo->initial_direction());
   G4ThreeVector yaxis(0.0, 1.0, 0.0);
   G4ThreeVector zaxis(0.0, 0.0, 1.0);
   double y = 90.0 - dir.angle(yaxis)/unit::degree;
@@ -64,7 +64,7 @@ ANLStatus EfficiencyMapSky::mod_analyze()
   }
   fillImage(x, y, m_Scale);
   // std::cout << x << "  " << y << std::endl;
-  
+
   return AS_OK;
 }
 

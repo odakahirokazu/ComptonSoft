@@ -21,30 +21,31 @@
 #include "G4GDMLParser.hh"
 
 using namespace anlnext;
-using namespace anlgeant4;
+
+namespace anlgeant4 {
 
 WriteGDML::WriteGDML()
-  : m_GeometryFileName("detector.gdml")
+  : filename_("detector.gdml")
 {
 }
-
 
 ANLStatus WriteGDML::mod_define()
 {
-  register_parameter(&m_GeometryFileName, "file");
-    
+  define_parameter("file", &mod_class::filename_);
+
   return AS_OK;
 }
 
-
 ANLStatus WriteGDML::mod_initialize()
-{ 
-  G4VPhysicalVolume* world = 
+{
+  G4VPhysicalVolume* world =
     G4TransportationManager::GetTransportationManager()
     ->GetNavigatorForTracking()->GetWorldVolume();
   G4GDMLParser parser;
   // parser.Write("output.gdml", world, true, "path_to_GDML_schema");
-  parser.Write(m_GeometryFileName, world, false);
-  
+  parser.Write(filename_, world, false);
+
   return AS_OK;
 }
+
+} /* namespace anlgeant4 */

@@ -23,7 +23,6 @@ include_directories(
   )
 
 link_directories(
-  /usr/local/lib
   ${ANLNEXT_LIB_DIR}
   ${ROOT_LIB_DIR}
   ${G4_LIB_DIR}
@@ -104,7 +103,6 @@ set(CS_MODULES
   ### analysis ROOT trees & histograms
   src/WriteHitTree.cc
   src/ReadHitTree.cc
-  src/MergeHitTree.cc
   src/ReadHitTreeAsRawHits.cc
   src/ReadHitTreeAsDetectorHits.cc
   src/WriteEventTree.cc

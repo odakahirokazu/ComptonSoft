@@ -1,24 +1,20 @@
 namespace anlgeant4 {
 class Geant4Body;
-class Geant4Simple;
 class VANLPhysicsList;
 class VANLGeometry;
 class ReadGDML;
 class WriteGDML;
-class VANLPrimaryGen;
-class BasicPrimaryGen;
-class PointSourcePrimaryGen;
-class SphericalSourcePrimaryGen;
-class PlaneWavePrimaryGen;
-class PlaneWaveRectanglePrimaryGen;
-class GaussianBeamPrimaryGen;
-class IsotropicPrimaryGen;
-class PrimaryGenUniformSourceInVolume;
-class NucleusPrimaryGen;
-class NucleusPrimaryGenInVolume;
+class VANLPrimaryGenerator;
+class BasicPrimaryGenerator;
+class PointSourcePrimaryGenerator;
+class SphericalSourcePrimaryGenerator;
+class PlaneWavePrimaryGenerator;
+class PlaneWaveRectanglePrimaryGenerator;
+class GaussianBeamPrimaryGenerator;
+class IsotropicPrimaryGenerator;
+class UniformVolumePrimaryGenerator;
 class VUserActionAssembly;
-class VMasterUserActionAssembly;
-class VAppendableUserActionAssembly;
 class StandardUserActionAssembly;
-class VisualizeG4Geom;
+class VEventStore;
+class VisualizeGeometry;
 }

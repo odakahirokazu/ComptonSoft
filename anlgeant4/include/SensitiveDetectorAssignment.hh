@@ -1,0 +1,57 @@
+/*************************************************************************
+ *                                                                       *
+ * Copyright (c) 2011 Hirokazu Odaka                                     *
+ *                                                                       *
+ * This program is free software: you can redistribute it and/or modify  *
+ * it under the terms of the GNU General Public License as published by  *
+ * the Free Software Foundation, either version 3 of the License, or     *
+ * (at your option) any later version.                                   *
+ *                                                                       *
+ * This program is distributed in the hope that it will be useful,       *
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of        *
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
+ * GNU General Public License for more details.                          *
+ *                                                                       *
+ * You should have received a copy of the GNU General Public License     *
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>. *
+ *                                                                       *
+ *************************************************************************/
+
+#ifndef ANLGEANT4_SDAssignment_H
+#define ANLGEANT4_SDAssignment_H 1
+
+#include <vector>
+#include <utility>
+#include <string>
+
+class G4VSensitiveDetector;
+
+namespace anlgeant4
+{
+
+/**
+ * SD assignment
+ * @author Hirokazu Odaka
+ * @date 2026-06-17
+ */
+class SensitiveDetectorAssignment
+{
+public:
+  using SDVector = std::vector<std::pair<std::string, G4VSensitiveDetector*>>;
+
+public:
+  SensitiveDetectorAssignment();
+
+  void register_sensitive_detector(const std::string& logical_volume_name, G4VSensitiveDetector* sd);
+  void set_sensitive_detectors(const SDVector& v) { SD_vector_ = v; }
+
+protected:
+  const SDVector& get_sensitive_detectors() const { return SD_vector_; }
+
+private:
+  SDVector SD_vector_;
+};
+
+} /* namespace anlgeant4 */
+
+#endif /* ANLGEANT4_SDAssignment_H */

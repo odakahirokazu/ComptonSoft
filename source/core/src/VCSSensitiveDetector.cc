@@ -19,6 +19,8 @@
 
 #include "VCSSensitiveDetector.hh"
 
+#include "G4EventManager.hh"
+#include "G4Event.hh"
 #include "G4VProcess.hh"
 
 #include "DetectorHit.hh"
@@ -28,22 +30,30 @@
 #include "MultiChannelData.hh"
 #include "VRealDetectorUnit.hh"
 #include "DeviceSimulation.hh"
+#include <G4Threading.hh>
 
 namespace comptonsoft {
 
 VCSSensitiveDetector::VCSSensitiveDetector(G4String name)
   : G4VSensitiveDetector(name),
     positionCalculation_(false), SDCheck_(false), layerOffset_(0),
-    detectorSystem_(nullptr)
-{ 
+    detectorSystem_(nullptr),
+    currentEventID_(0)
+{
 }
 
 VCSSensitiveDetector::~VCSSensitiveDetector() = default;
 
-G4bool
-VCSSensitiveDetector::ProcessHits(G4Step* aStep, G4TouchableHistory* )
+void VCSSensitiveDetector::Initialize(G4HCofThisEvent*)
 {
-  const G4VTouchable* touchable = aStep->GetPreStepPoint()->GetTouchable();
+  const G4Event* event = G4EventManager::GetEventManager()->GetConstCurrentEvent();
+  currentEventID_ = event->GetEventID();
+}
+
+G4bool
+VCSSensitiveDetector::ProcessHits(G4Step* step, G4TouchableHistory* )
+{
+  const G4VTouchable* touchable = step->GetPreStepPoint()->GetTouchable();
   const G4int DetectorID = GetDetectorID(touchable);
   if (DetectorID == -1) {
     if (SDCheck_) {
@@ -52,11 +62,11 @@ VCSSensitiveDetector::ProcessHits(G4Step* aStep, G4TouchableHistory* )
     return true;
   }
 
-  G4Track* aTrack = aStep->GetTrack();
-  G4double edep = aStep->GetTotalEnergyDeposit();
+  G4Track* track = step->GetTrack();
+  G4double edep = step->GetTotalEnergyDeposit();
 
   uint32_t processFlag = 0;
-  const G4VProcess* process = aStep->GetPostStepPoint()->GetProcessDefinedStep();
+  const G4VProcess* process = step->GetPostStepPoint()->GetProcessDefinedStep();
   if (process) {
     G4String processName = process->GetProcessName();
     if(processName.find("phot") != std::string::npos) {
@@ -73,61 +83,50 @@ VCSSensitiveDetector::ProcessHits(G4Step* aStep, G4TouchableHistory* )
     }
   }
 
-  const G4ParticleDefinition* particleDefinition = aTrack->GetDefinition();
+  const G4ParticleDefinition* particleDefinition = track->GetDefinition();
   if (particleDefinition->GetParticleType() == "nucleus") {
     processFlag |= process::NucleusHit;
   }
-    
+
   if (edep==0.0 && processFlag==0) { return true; }
-  
-  comptonsoft::DetectorHit_sptr hit(new comptonsoft::DetectorHit);
-  hit->setTrackID(aTrack->GetTrackID());
-  hit->setDetectorID(DetectorID);
-  hit->setEnergyDeposit(edep);
-  hit->setProcess(processFlag);
-  hit->setParticle(particleDefinition->GetPDGEncoding());
 
-  G4ThreeVector position;
-  switch (aStep->GetPostStepPoint()->GetStepStatus()) 
-  {
-    case fPostStepDoItProc:
-      position = aStep->GetPostStepPoint()->GetPosition();
-      break;
-    case fAlongStepDoItProc:
-      position = 0.5*(aStep->GetPreStepPoint()->GetPosition() + 
-                      aStep->GetPostStepPoint()->GetPosition());
-      break;
-    default:
-      position = aStep->GetPreStepPoint()->GetPosition();
-      break;
-  }
-  hit->setRealPosition(position);
-  hit->setRealTime(aTrack->GetGlobalTime());
+  comptonsoft::DetectorHit hit;
+  hit.setEventID(currentEventID_);
+  hit.setTrackID(track->GetTrackID());
+  hit.setDetectorID(DetectorID);
+  hit.setEnergyDeposit(edep);
+  hit.setProcess(processFlag);
+  hit.setParticle(particleDefinition->GetPDGEncoding());
 
-  hit->setPreStepPointPosition(aStep->GetPreStepPoint()->GetPosition());
-  hit->setPostStepPointPosition(aStep->GetPostStepPoint()->GetPosition());
+  const G4ThreeVector pre_step_position = step->GetPreStepPoint()->GetPosition();
+  const G4ThreeVector post_step_position = step->GetPostStepPoint()->GetPosition();
+  const G4ThreeVector position = 0.5 * (pre_step_position + post_step_position);
+  hit.setPreStepPointPosition(pre_step_position);
+  hit.setPostStepPointPosition(post_step_position);
+  hit.setRealPosition(position);
+  hit.setRealTime(track->GetGlobalTime());
 
+  G4ThreeVector local_position = position;
   for (G4int i = touchable->GetHistoryDepth()-1; i >= 0; i--) {
    G4VPhysicalVolume* physicalVolume = touchable->GetVolume(i);
-    position += physicalVolume->GetFrameTranslation();
+    local_position += physicalVolume->GetFrameTranslation();
     if (physicalVolume->GetFrameRotation() != 0) {
-      position = (*physicalVolume->GetFrameRotation()) * position;
+      local_position = (*physicalVolume->GetFrameRotation()) * position;
     }
   }
-  
-  hit->setLocalPosition(position);
+  hit.setLocalPosition(local_position);
 
-  detectorSystem_->getDeviceSimulationByID(DetectorID)->insertRawHit(hit);
+  detectorSystem_->insertRawHit(std::move(hit));
 
   if (positionCalculation_) {
     std::set<int>::iterator it = positionCalculationSet_.find(DetectorID);
-    
+
     if (it!=positionCalculationSet_.end()) {
       G4ThreeVector center(0, 0, 0);
       G4ThreeVector xdir(1, 0, 0);
       G4ThreeVector ydir(0, 1, 0);
       G4ThreeVector zdir(0, 0, 1);
-      
+
       for (G4int i = 0; i < touchable->GetHistoryDepth(); i++) {
         G4VPhysicalVolume* physicalVolume = touchable->GetVolume(i);
         if (physicalVolume->GetFrameRotation() != 0) {
@@ -138,7 +137,7 @@ VCSSensitiveDetector::ProcessHits(G4Step* aStep, G4TouchableHistory* )
         }
         center += physicalVolume->GetObjectTranslation();
       }
-      
+
       VRealDetectorUnit* detector = detectorSystem_->getDetectorByID(DetectorID);
       detector->setCenterPosition(center);
       detector->setXAxisDirection(xdir);

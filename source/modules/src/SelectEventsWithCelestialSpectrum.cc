@@ -73,7 +73,6 @@ ANLStatus SelectEventsWithCelestialSpectrum::mod_initialize()
 {
   get_module_NC("CSHitCollection", &hitCollection_);
   get_module_IFNC("InitialInformation", &initialInfo_);
-  initialInfo_->setWeightStored(true);
 
   ANLStatus status = AS_OK;
   if (assignPosition_) {
@@ -122,16 +121,16 @@ ANLStatus SelectEventsWithCelestialSpectrum::mod_initialize()
 }
 
 ANLStatus SelectEventsWithCelestialSpectrum::mod_analyze()
-{  
+{
   if (numRemainedBin_==0) {
     return AS_QUIT;
   }
- 
-  double initialEnergy = initialInfo_->InitialEnergy();
+
+  double initialEnergy = initialInfo_->initial_energy();
 
   const std::vector<double>::const_iterator it = std::upper_bound(energyArray_.begin(), energyArray_.end(), initialEnergy);
   const int bin = it - energyArray_.begin() - 1;
-  const double weight = initialInfo_->Weight();
+  const double weight = initialInfo_->weight();
   const double r = G4UniformRand();
   const double th = defaultSampleProb_ * weight;
 
@@ -139,7 +138,7 @@ ANLStatus SelectEventsWithCelestialSpectrum::mod_analyze()
     hitCollection_->initializeEvent();
     return AS_OK;
   }
-  
+
   if (it==energyArray_.begin() || it==energyArray_.end()) {
     hitCollection_->initializeEvent();
   }

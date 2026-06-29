@@ -42,7 +42,7 @@ class CSHitCollection;
  */
 class WriteHitTree : public VCSModule
 {
-  DEFINE_ANL_MODULE(WriteHitTree, 2.1);
+  DEFINE_ANL_MODULE(WriteHitTree, 3.0);
 public:
   WriteHitTree();
   ~WriteHitTree() = default;

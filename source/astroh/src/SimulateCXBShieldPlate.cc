@@ -52,7 +52,7 @@ ANLStatus SimulateCXBShieldPlate::mod_define()
   register_parameter(&m_ShieldFillingFraction, "filling_fraction");
   register_parameter(&m_CSFilename, "cross_section_file");
   register_parameter(&m_PositionFilename, "position_file");
-  
+
   return AS_OK;
 }
 
@@ -72,7 +72,7 @@ ANLStatus SimulateCXBShieldPlate::mod_initialize()
         xs.push_back(energy);
         ys.push_back(alpha);
       }
-      
+
       m_CS.reset(new TGraph(xs.size(), &xs[0], &ys[0]));
     }
     else {
@@ -83,14 +83,14 @@ ANLStatus SimulateCXBShieldPlate::mod_initialize()
 
   m_PositionFile.reset(new TFile(m_PositionFilename.c_str()));
   m_ShieldDistribution = (TH2*)m_PositionFile->Get("shield");
-  
+
   return AS_OK;
 }
 
 ANLStatus SimulateCXBShieldPlate::mod_analyze()
 {
-  const G4ThreeVector dir0 = m_InitialInfo->InitialDirection();
-  const G4ThreeVector pos0 = m_InitialInfo->InitialPosition();
+  const G4ThreeVector dir0 = m_InitialInfo->initial_direction();
+  const G4ThreeVector pos0 = m_InitialInfo->initial_position();
 
   if (dir0.z() >= 0.0) { // check if the photon goes down
     return AS_OK;
@@ -113,19 +113,19 @@ ANLStatus SimulateCXBShieldPlate::mod_analyze()
     if (m_RandomGen->Uniform(1.0) > m_ShieldFillingFraction) {
       return AS_OK;
     }
-    
-    const double weight0 = m_InitialInfo->Weight();
-    const double energy0 = m_InitialInfo->InitialEnergy();
+
+    const double weight0 = m_InitialInfo->weight();
+    const double energy0 = m_InitialInfo->initial_energy();
     const double alpha = m_CS->Eval(energy0);
     if (alpha<=0.0) {
       return AS_OK;
     }
-    
+
     const double cosTheta = -dir0.z();
     const double shieldLength = m_ShieldThickness/cosTheta;
     const double attenuation = std::exp(-alpha*shieldLength);
     const double weight1 = weight0 * attenuation;
-    m_InitialInfo->setWeight(weight1);
+    m_InitialInfo->set_weight(weight1);
   }
 
   return AS_OK;

@@ -1,8 +1,10 @@
 find_package(HDF5 REQUIRED COMPONENTS C)
 
-include_directories(include
+include_directories(
+  include
   include/nanograms
   ${ANLG4_INC_DIR}
+  ${ANLNEXT_INC_DIR}
   ${ROOT_INC_DIR}
   ${G4_INC_DIR}
   ${CLHEP_INC_DIR}
@@ -13,6 +15,7 @@ include_directories(include
 )
 
 link_directories(
+  ${ANLNEXT_LIB_DIR}
   ${ROOT_LIB_DIR}
   ${G4_LIB_DIR}
   ${CLHEP_LIB_DIR}
@@ -75,6 +78,8 @@ set(CS_CORE_CLASSES
   src/nanograms/NanoGRAMSEventReconstructionAlgorithm.cc
   ### sensitive detector
   src/VCSSensitiveDetector.cc
+  ### event store
+  src/CSEventStore.cc
   ### manager
   src/DetectorSystem.cc
   ### tree IO
@@ -149,8 +154,17 @@ set_source_files_properties(
 )
 
 target_link_libraries(CSCore
-  ${ROOT_LIB} ${G4_LIB} ${CLHEP_LIB} ${ORT_LIB} ${ADD_LIB} ${BOOST_LIB}
-  ${HDF5_LIBRARIES} ${YAMLCPP_LIB})
+  ${ANLG4_LIB}
+  ${ANLNEXT_LIB}
+  ${ROOT_LIB} 
+  ${G4_LIB} 
+  ${CLHEP_LIB} 
+  ${ORT_LIB} 
+  ${ADD_LIB} 
+  ${BOOST_LIB}
+  ${HDF5_LIBRARIES} 
+  ${YAMLCPP_LIB}
+)
 
 install(TARGETS CSCore LIBRARY DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
 

@@ -17,7 +17,7 @@ def run_simulation(num, random, output)
   sim.set_gdml "../database/mass_model.gdml"
   sim.set_physics(physics_list: "QGSP_BIC_HP")
 
-  sim.set_primary_generator :PlaneWavePrimaryGen, {
+  sim.set_primary_generator :PlaneWavePrimaryGenerator, {
     particle: "proton",
     photon_index: 0.0,
     energy_min: energy,
@@ -27,25 +27,21 @@ def run_simulation(num, random, output)
     radius: 2.0,
   }
 
-  sim.set_user_action :ActivationUserActionAssembly, {
+  sim.set_user_action :RadioactivationUserActionAssembly, {
     output_filename_base: output.sub(".root", ".act"),
     detection_by_generation: true,
     processes_to_detect: ["protonInelastic"],
   }
+
+  sim.set_event_store :RadioactivationEventStore
 
   sim.run(num)
 end
 
 ### Main
 
-num = 1000000
-runs = (1..16).to_a
+num = 10000000
+output = "simulation.root"
+random = 0
 
-a = ANL::ParallelRun.new
-a.num_processes = 4
-a.set_log "simulation_%06d.log"
-a.run(runs, testrun: false) do |run_id|
-  output = "simulation_%06d.root" % run_id
-  random = run_id
-  run_simulation(num, random, output)
-end
+run_simulation(num, random, output)
