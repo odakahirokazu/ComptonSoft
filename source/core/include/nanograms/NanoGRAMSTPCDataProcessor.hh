@@ -106,13 +106,14 @@ public:
                                     FECTITracker& fec_ti_tracker,
                                     bool charge_selection_enabled,
                                     bool light_cosmic,
-                                    bool light_pileup) const;
+                                    bool light_pileup,
+                                    bool& rejected_by_excluded_core) const;
 
 private:
   bool fillSelectedChannels(const FECSelectionInput& input, RawFECHit& hit) const;
   bool isTimeUp(const FECSelectionInput& input) const;
   bool isRejectedByTiming(const FECSelectionInput& input) const;
-  bool hasNoisyPixel(const FECSelectionInput& input) const;
+  bool hasExcludedCorePixel(int fec, const PixelADU& hit_selection_energy) const;
   PixelMask buildAllowedPixelMask(int fec, int core_ch) const;
   bool hasExtraHighPixel(const FECSelectionInput& input,
                          const PixelMask& allowed_pixels) const;

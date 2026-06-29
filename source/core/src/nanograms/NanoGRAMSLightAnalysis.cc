@@ -152,15 +152,20 @@ double lightVoltageAtSample(const Config& cfg,
 
 void updateLightPeaksByIndex(LightPeaks& peaks,
                              int raw_idx,
-                             int pre_roi_index,
-                             int post_roi_index,
+                             int pre_pileup_start_index,
+                             int pre_pileup_stop_index,
+                             int post_pileup_start_index,
+                             int post_pileup_stop_index,
                              double voltage)
 {
-  if (raw_idx < pre_roi_index) {
+  if (pre_pileup_start_index <= raw_idx &&
+      raw_idx < pre_pileup_stop_index) {
     peaks.pre_roi_peak = std::max(peaks.pre_roi_peak, voltage);
-  } else if (raw_idx > post_roi_index) {
+  } else if (post_pileup_start_index <= raw_idx &&
+             raw_idx < post_pileup_stop_index) {
     peaks.post_roi_peak = std::max(peaks.post_roi_peak, voltage);
-  } else {
+  } else if (pre_pileup_stop_index <= raw_idx &&
+             raw_idx < post_pileup_start_index) {
     peaks.peak = std::max(peaks.peak, voltage);
   }
 }
@@ -190,14 +195,22 @@ LightPeaks analyzeSingleLightChannel(const Config& cfg,
 {
   LightPeaks peaks;
   const int waveform_len = tpc_tree_buffer.layout().waveform_len;
-  const int pre_roi_index = light_timing.pre_roi_index[light_ch];
-  const int post_roi_index = light_timing.post_roi_index[light_ch];
+  const int pre_pileup_start_index =
+      light_timing.pre_pileup_start_index[light_ch];
+  const int pre_pileup_stop_index =
+      light_timing.pre_pileup_stop_index[light_ch];
+  const int post_pileup_start_index =
+      light_timing.post_pileup_start_index[light_ch];
+  const int post_pileup_stop_index =
+      light_timing.post_pileup_stop_index[light_ch];
 
   for (int raw_idx = 0; raw_idx < waveform_len; ++raw_idx) {
     updateLightPeaksByIndex(peaks,
                             raw_idx,
-                            pre_roi_index,
-                            post_roi_index,
+                            pre_pileup_start_index,
+                            pre_pileup_stop_index,
+                            post_pileup_start_index,
+                            post_pileup_stop_index,
                             lightVoltageAtSample(cfg, tpc_tree_buffer, light_ch, raw_idx));
   }
   return peaks;
@@ -215,8 +228,14 @@ LightPeaks analyzeAverageLightWaveform(const Config& cfg,
 
   const int waveform_len = tpc_tree_buffer.layout().waveform_len;
   const int reference_ch = valid_channels.front();
-  const int pre_roi_index = light_timing.pre_roi_index[reference_ch];
-  const int post_roi_index = light_timing.post_roi_index[reference_ch];
+  const int pre_pileup_start_index =
+      light_timing.pre_pileup_start_index[reference_ch];
+  const int pre_pileup_stop_index =
+      light_timing.pre_pileup_stop_index[reference_ch];
+  const int post_pileup_start_index =
+      light_timing.post_pileup_start_index[reference_ch];
+  const int post_pileup_stop_index =
+      light_timing.post_pileup_stop_index[reference_ch];
 
   for (int raw_idx = 0; raw_idx < waveform_len; ++raw_idx) {
     double voltage_sum = 0.0;
@@ -225,8 +244,10 @@ LightPeaks analyzeAverageLightWaveform(const Config& cfg,
     }
     updateLightPeaksByIndex(peaks,
                             raw_idx,
-                            pre_roi_index,
-                            post_roi_index,
+                            pre_pileup_start_index,
+                            pre_pileup_stop_index,
+                            post_pileup_start_index,
+                            post_pileup_stop_index,
                             voltage_sum / static_cast<double>(valid_channels.size()));
   }
   return peaks;

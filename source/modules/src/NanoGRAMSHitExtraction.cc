@@ -44,6 +44,31 @@ int64_t gainTimeBin(double unix_time, double cache_seconds)
   return static_cast<int64_t>(unix_time);
 }
 
+grams::TPCEventType parseQuickLookEventType(const std::string& name)
+{
+  if (name == "error") {
+    return grams::TPCEventType::Error;
+  }
+  if (name == "other") {
+    return grams::TPCEventType::Other;
+  }
+  if (name == "gamma") {
+    return grams::TPCEventType::Gamma;
+  }
+  if (name == "cosmic") {
+    return grams::TPCEventType::Cosmic;
+  }
+  if (name == "pileup") {
+    return grams::TPCEventType::PileUp;
+  }
+  if (name == "timeup") {
+    return grams::TPCEventType::TimeUp;
+  }
+
+  throw std::runtime_error(
+      "quicklook_event_types accepts only error, other, gamma, cosmic, pileup, or timeup.");
+}
+
 } // namespace
 
 NanoGRAMSHitExtraction::NanoGRAMSHitExtraction() = default;
@@ -59,6 +84,9 @@ ANLStatus NanoGRAMSHitExtraction::mod_define()
   define_parameter("gain_tp_file",        &mod_class::gain_tp_file_);
   define_parameter("gain_tp_hash",        &mod_class::gain_tp_dict_);
   define_parameter("gain_cache_seconds",  &mod_class::gain_cache_seconds_);
+  define_parameter("quicklook_event_types", &mod_class::quicklook_event_types_);
+  define_parameter("quicklook_num_hits",    &mod_class::quicklook_num_hits_);
+  define_parameter("quicklook_save_waveforms", &mod_class::quicklook_save_waveforms_);
   define_map_key("fec", "0");
   add_value_element("gain", &mod_class::gain_tp_value_);
   return AS_OK;
@@ -113,7 +141,8 @@ ANLStatus NanoGRAMSHitExtraction::mod_initialize()
     quicklook_tree_writer_ = std::make_unique<grams::QuickLookTreeOutputWriter>(
         quicklook_file_,
         tpc_tree_reader_->currentBuffer(),
-        tpc_property_);
+        tpc_property_,
+        quicklook_save_waveforms_);
   } else {
     std::cout << "[INFO] tpcquicklook output is disabled.\n";
   }
@@ -204,6 +233,31 @@ void NanoGRAMSHitExtraction::updateGainCorrectionForCurrentEvent(uint32_t unix_t
   cached_gain_time_bin_ = time_bin;
 }
 
+bool NanoGRAMSHitExtraction::shouldWriteQuickLook(
+    grams::TPCEventType event_type,
+    const std::vector<grams::RawFECHit>& event_hits) const
+{
+  if (!quicklook_event_types_.empty()) {
+    bool event_type_ok = false;
+    for (const std::string& name : quicklook_event_types_) {
+      if (event_type == parseQuickLookEventType(name)) {
+        event_type_ok = true;
+        break;
+      }
+    }
+    if (!event_type_ok) {
+      return false;
+    }
+  }
+
+  if (quicklook_num_hits_ >= 0 &&
+      static_cast<int>(event_hits.size()) != quicklook_num_hits_) {
+    return false;
+  }
+
+  return true;
+}
+
 ANLStatus NanoGRAMSHitExtraction::mod_analyze()
 {
   int64_t raw_event_id = 0;
@@ -220,9 +274,11 @@ ANLStatus NanoGRAMSHitExtraction::mod_analyze()
   ++processed_entries_;
   current_event_hits_.clear();
 
-  if (quicklook_tree_writer_) {
+  const grams::TPCEventType event_type = tpc_tree_reader_->currentEventType();
+  if (quicklook_tree_writer_ &&
+      shouldWriteQuickLook(event_type, event_hits)) {
     quicklook_tree_writer_->fillEvent(raw_event_id,
-                                      tpc_tree_reader_->currentEventType(),
+                                      event_type,
                                       tpc_tree_reader_->currentBuffer(),
                                       event_hits);
   }

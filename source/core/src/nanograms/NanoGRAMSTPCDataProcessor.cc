@@ -190,8 +190,10 @@ bool hasTimeUp(const Config& cfg, const TPCTreeBuffer& tpc_tree_buffer)
 LightTimingState makeLightTimingState(const TPCTreeLayout& tpc_tree_layout)
 {
   LightTimingState light_timing;
-  light_timing.pre_roi_index.fill(0);
-  light_timing.post_roi_index.fill(tpc_tree_layout.waveform_len-1);
+  light_timing.pre_pileup_start_index.fill(0);
+  light_timing.pre_pileup_stop_index.fill(0);
+  light_timing.post_pileup_start_index.fill(tpc_tree_layout.waveform_len);
+  light_timing.post_pileup_stop_index.fill(tpc_tree_layout.waveform_len);
   return light_timing;
 }
 
@@ -216,13 +218,23 @@ void recordLightTimingFromCurrentEntry(LightTimingState& light_timing,
 
     light_timing.wave_compress[light_ch] = wave_compress;
     light_timing.timebin[light_ch] = dt;
-    light_timing.pre_roi_index[light_ch] =
+    light_timing.pre_pileup_start_index[light_ch] =
+        lowerBoundTimeIndex(-cfg.drift_time_max,
+                            trigger_delay,
+                            dt,
+                            tpc_tree_layout.waveform_len);
+    light_timing.pre_pileup_stop_index[light_ch] =
         lowerBoundTimeIndex(-cfg.pre_roi_window,
                             trigger_delay,
                             dt,
                             tpc_tree_layout.waveform_len);
-    light_timing.post_roi_index[light_ch] =
+    light_timing.post_pileup_start_index[light_ch] =
         lowerBoundTimeIndex(cfg.post_roi_window,
+                            trigger_delay,
+                            dt,
+                            tpc_tree_layout.waveform_len);
+    light_timing.post_pileup_stop_index[light_ch] =
+        lowerBoundTimeIndex(cfg.drift_time_max,
                             trigger_delay,
                             dt,
                             tpc_tree_layout.waveform_len);
@@ -231,8 +243,14 @@ void recordLightTimingFromCurrentEntry(LightTimingState& light_timing,
     std::cout << " delay_counts="  << delay_counts << "\n";
     std::cout << " wave_compress="  << static_cast<int>(light_timing.wave_compress[light_ch]) << "\n";
     std::cout << " timebin_ns="     << light_timing.timebin[light_ch] / unit::ns << "\n";
-    std::cout << " pre_roi_index="  << light_timing.pre_roi_index[light_ch]  << "\n";
-    std::cout << " post_roi_index=" << light_timing.post_roi_index[light_ch] << "\n";
+    std::cout << " pre_pileup_start_index="
+              << light_timing.pre_pileup_start_index[light_ch] << "\n";
+    std::cout << " pre_pileup_stop_index="
+              << light_timing.pre_pileup_stop_index[light_ch] << "\n";
+    std::cout << " post_pileup_start_index="
+              << light_timing.post_pileup_start_index[light_ch] << "\n";
+    std::cout << " post_pileup_stop_index="
+              << light_timing.post_pileup_stop_index[light_ch] << "\n";
   }
 
   light_timing.ready = true;
@@ -274,10 +292,12 @@ FECChargeSelector::selectHits(const TPCTreeBuffer& tpc_tree_buffer,
                               FECTITracker& fec_ti_tracker,
                               bool charge_selection_enabled,
                               bool light_cosmic,
-                              bool light_pileup) const
+                              bool light_pileup,
+                              bool& rejected_by_excluded_core) const
 {
   std::vector<RawFECHit> event_hits;
   event_hits.reserve(static_cast<std::size_t>(NUM_VATA));
+  rejected_by_excluded_core = false;
 
   std::array<PixelADU, NUM_VATA> adu_cmn_sub_values{};
   std::array<PixelADU, NUM_VATA> hit_selection_energy_values{};
@@ -307,6 +327,13 @@ FECChargeSelector::selectHits(const TPCTreeBuffer& tpc_tree_buffer,
     core_values[fec] =
         findCoreSignalChannel(hit_selection_energy_values[fec], masks_[fec]).second;
     fec_order[fec]   = fec;
+  }
+
+  for (int fec = 0; fec < NUM_VATA; ++fec) {
+    if (hasExcludedCorePixel(fec, hit_selection_energy_values[fec])) {
+      rejected_by_excluded_core = true;
+      return event_hits;
+    }
   }
 
   std::sort(fec_order.begin(), fec_order.end(), [&](int lhs, int rhs) {
@@ -352,18 +379,25 @@ bool FECChargeSelector::isRejectedByTiming(const FECSelectionInput& input) const
   return input.light_pileup || isTimeUp(input);
 }
 
-bool FECChargeSelector::hasNoisyPixel(const FECSelectionInput& input) const
+bool FECChargeSelector::hasExcludedCorePixel(
+    int fec,
+    const PixelADU& hit_selection_energy) const
 {
-  const int fec = input.fec;
-  const PixelADU& hit_selection_energy = input.hit_selection_energy_values[fec];
   const auto it = cfg_.core_exclude_pix.find(fec);
   if (it == cfg_.core_exclude_pix.end()) {
     return false;
   }
 
+  PixelMask all_pixels{};
+  all_pixels.fill(1);
+  const auto [max_ch, max_energy] =
+      findCoreSignalChannel(hit_selection_energy, all_pixels);
+  if (!std::isfinite(max_energy) || max_energy <= cfg_.core_noise_energy_th) {
+    return false;
+  }
+
   for (int ch : it->second) {
-    if (0 <= ch && ch < NUM_CH_EACH_VATA &&
-        hit_selection_energy[ch] > cfg_.noisy_pixel_energy_th) {
+    if (ch == max_ch) {
       return true;
     }
   }
@@ -502,7 +536,6 @@ bool FECChargeSelector::fillSelectedChannels(const FECSelectionInput& input,
   const bool event_mask =
       input.charge_selection_enabled &&
       !isRejectedByTiming(input) &&
-      !hasNoisyPixel(input) &&
       count_ok &&
       !cosmic &&
       !hasExtraHighPixel(input, allowed_pixels);
@@ -589,19 +622,23 @@ bool TPCTreeReader::processNext(int64_t& raw_event_id,
   }
   const bool time_up      = hasTimeUp(cfg_, tpc_tree_buffer_);
 
+  bool rejected_by_excluded_core = false;
   event_hits = fec_selector_.selectHits(tpc_tree_buffer_,
                                         fec_ti_tracker_,
                                         charge_selection_enabled,
                                         light_cosmic,
-                                        light_pileup);
+                                        light_pileup,
+                                        rejected_by_excluded_core);
   if (!tpc_ok) {
     current_event_type_ = TPCEventType::Error;
+  } else if (rejected_by_excluded_core) {
+    current_event_type_ = TPCEventType::Other;
   } else if (!event_hits.empty()) {
     current_event_type_ = TPCEventType::Gamma;
-  } else if (light_pileup) {
-    current_event_type_ = TPCEventType::PileUp;
   } else if (light_cosmic) {
     current_event_type_ = TPCEventType::Cosmic;
+  } else if (light_pileup) {
+    current_event_type_ = TPCEventType::PileUp;
   } else if (time_up) {
     current_event_type_ = TPCEventType::TimeUp;
   } else {

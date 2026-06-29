@@ -50,7 +50,8 @@ class QuickLookTreeOutputWriter
 public:
   explicit QuickLookTreeOutputWriter(const std::string& output_file_path,
                                      const TPCTreeBuffer& first_tpc_tree_buffer,
-                                     const TPCProperty& tpc_property);
+                                     const TPCProperty& tpc_property,
+                                     bool save_waveforms = true);
   ~QuickLookTreeOutputWriter();
 
   void fillEvent(int64_t raw_event_id,
@@ -70,6 +71,7 @@ private:
   std::unique_ptr<TFile> file_;
   std::unique_ptr<TTree> quicklook_tree_;
   const TPCProperty& tpc_property_;
+  bool save_waveforms_ = true;
   int waveform_len_ = 0;
   int waveform_num_channels_ = 0;
   std::string adu_leaflist_;
@@ -101,6 +103,7 @@ private:
   std::vector<float> hit_pixel_adu_;
   std::vector<float> hit_pixel_energy_;
   std::vector<int16_t> hit_pixel_cluster_id_;
+  std::vector<int16_t> hit_num_pixels_;
 };
 
 } /* namespace grams */

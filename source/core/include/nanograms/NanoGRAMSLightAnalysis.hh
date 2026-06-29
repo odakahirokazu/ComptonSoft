@@ -44,8 +44,10 @@ struct LightTimingState
   bool ready = false;
   std::array<uint16_t, NUM_CH_DPP_MAX> wave_compress{};
   std::array<double,   NUM_CH_DPP_MAX> timebin{};
-  std::array<int,      NUM_CH_DPP_MAX> pre_roi_index{};
-  std::array<int,      NUM_CH_DPP_MAX> post_roi_index{};
+  std::array<int,      NUM_CH_DPP_MAX> pre_pileup_start_index{};
+  std::array<int,      NUM_CH_DPP_MAX> pre_pileup_stop_index{};
+  std::array<int,      NUM_CH_DPP_MAX> post_pileup_start_index{};
+  std::array<int,      NUM_CH_DPP_MAX> post_pileup_stop_index{};
 };
 
 struct LightStatus

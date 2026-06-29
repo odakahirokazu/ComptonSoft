@@ -57,7 +57,6 @@ struct Config
   double pre_roi_window      = 0.0;
   double post_roi_window     = 0.0;
   double out_roi_peak_thr    = 0.0;
-  double noisy_pixel_energy_th = 0.0 * anlgeant4::unit::keV;
   double timebin_ns_override = 0.0;
   double cross_fec_merge_drift_time_tolerance = -1.0 * anlgeant4::unit::us;
 

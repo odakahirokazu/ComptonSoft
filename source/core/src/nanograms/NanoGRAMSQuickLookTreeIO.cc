@@ -84,13 +84,16 @@ std::vector<int16_t> registeredDPPChannels(const TPCTreeBuffer& tpc_tree_buffer)
 QuickLookTreeOutputWriter::QuickLookTreeOutputWriter(
     const std::string& output_file_path,
     const TPCTreeBuffer& first_tpc_tree_buffer,
-    const TPCProperty& tpc_property)
+    const TPCProperty& tpc_property,
+    bool save_waveforms)
     : output_path_(prepareOutputPath(output_file_path)),
       file_(std::make_unique<TFile>(output_path_.string().c_str(), "RECREATE")),
       quicklook_tree_(std::make_unique<TTree>(kQuickLookTreeName, kQuickLookTreeName)),
       tpc_property_(tpc_property),
+      save_waveforms_(save_waveforms),
       waveform_len_(first_tpc_tree_buffer.layout().waveform_len),
-      waveform_dpp_ch_(registeredDPPChannels(first_tpc_tree_buffer))
+      waveform_dpp_ch_(save_waveforms ? registeredDPPChannels(first_tpc_tree_buffer)
+                                       : std::vector<int16_t>{})
 {
   if (file_->IsZombie()) {
     throw std::runtime_error("Failed to create quicklook ROOT file: " +
@@ -102,7 +105,9 @@ QuickLookTreeOutputWriter::QuickLookTreeOutputWriter(
   waveform_num_channels_branch_ = waveform_num_channels_;
   adu_cmn_sub_.assign(NUM_VATA * NUM_CH_EACH_VATA, 0.0f);
   energy_cmn_sub_.assign(NUM_VATA * NUM_CH_EACH_VATA, 0.0f);
-  waveform_.assign(waveform_num_channels_ * waveform_len_, 0);
+  if (save_waveforms_) {
+    waveform_.assign(waveform_num_channels_ * waveform_len_, 0);
+  }
   quicklook_tree_->SetDirectory(nullptr);
   bindBranches();
 }
@@ -130,7 +135,9 @@ void QuickLookTreeOutputWriter::fillEvent(int64_t raw_event_id,
     wave_compress_[ch] = tpc_tree_buffer.wave_compress[ch];
     registered_[ch]    = tpc_tree_buffer.registered_channels[ch];
   }
-  fillRegisteredWaveforms(tpc_tree_buffer);
+  if (save_waveforms_) {
+    fillRegisteredWaveforms(tpc_tree_buffer);
+  }
   fillChargeMaps(event_type, tpc_tree_buffer);
 
   hit_pixel_fec_.clear();
@@ -138,8 +145,10 @@ void QuickLookTreeOutputWriter::fillEvent(int64_t raw_event_id,
   hit_pixel_adu_.clear();
   hit_pixel_energy_.clear();
   hit_pixel_cluster_id_.clear();
+  hit_num_pixels_.clear();
   for (std::size_t ihit = 0; ihit < hits.size(); ++ihit) {
     const RawFECHit& hit = hits[ihit];
+    hit_num_pixels_.push_back(static_cast<int16_t>(hit.channels.size()));
     for (std::size_t j = 0; j < hit.channels.size(); ++j) {
       if (j < hit.channel_fecs.size()) {
         hit_pixel_fec_.push_back(hit.channel_fecs[j]);
@@ -184,16 +193,9 @@ void QuickLookTreeOutputWriter::bindBranches()
   drift_leaflist_           = std::format("drift_time[{}]/i", NUM_VATA);
   wave_compress_leaflist_   = std::format("wave_compress[{}]/s", NUM_CH_DPP_MAX);
   registered_leaflist_      = std::format("registered[{}]/O", NUM_CH_DPP_MAX);
-  waveform_dpp_ch_leaflist_ = std::format("waveform_dpp_ch[{}]/S", waveform_num_channels_);
-  waveform_leaflist_        = std::format("waveform[{}][{}]/S", waveform_num_channels_, waveform_len_);
-
   quicklook_tree_->Branch("raw_event_id", &raw_event_id_, "raw_event_id/L");
   quicklook_tree_->Branch("event_type",   &event_type_,   "event_type/S");
   quicklook_tree_->Branch("cmn_method",   &cmn_method_,   "cmn_method/S");
-  quicklook_tree_->Branch("waveform_len", &waveform_len_branch_, "waveform_len/I");
-  quicklook_tree_->Branch("waveform_num_channels",
-                          &waveform_num_channels_branch_,
-                          "waveform_num_channels/I");
   quicklook_tree_->Branch("adu_cmn_sub",  adu_cmn_sub_.data(),  adu_leaflist_.c_str());
   quicklook_tree_->Branch("energy_cmn_sub",
                           energy_cmn_sub_.data(),
@@ -204,15 +206,24 @@ void QuickLookTreeOutputWriter::bindBranches()
   quicklook_tree_->Branch("wave_compress", wave_compress_.data(),
                           wave_compress_leaflist_.c_str());
   quicklook_tree_->Branch("registered",   registered_.data(),   registered_leaflist_.c_str());
-  quicklook_tree_->Branch("waveform_dpp_ch",
-                          waveform_dpp_ch_.data(),
-                          waveform_dpp_ch_leaflist_.c_str());
-  quicklook_tree_->Branch("waveform",     waveform_.data(),     waveform_leaflist_.c_str());
+  if (save_waveforms_) {
+    waveform_dpp_ch_leaflist_ = std::format("waveform_dpp_ch[{}]/S", waveform_num_channels_);
+    waveform_leaflist_        = std::format("waveform[{}][{}]/S", waveform_num_channels_, waveform_len_);
+    quicklook_tree_->Branch("waveform_len", &waveform_len_branch_, "waveform_len/I");
+    quicklook_tree_->Branch("waveform_num_channels",
+                            &waveform_num_channels_branch_,
+                            "waveform_num_channels/I");
+    quicklook_tree_->Branch("waveform_dpp_ch",
+                            waveform_dpp_ch_.data(),
+                            waveform_dpp_ch_leaflist_.c_str());
+    quicklook_tree_->Branch("waveform",     waveform_.data(),     waveform_leaflist_.c_str());
+  }
   quicklook_tree_->Branch("hit_pixel_fec",        &hit_pixel_fec_);
   quicklook_tree_->Branch("hit_pixel_ch",         &hit_pixel_ch_);
   quicklook_tree_->Branch("hit_pixel_adu",        &hit_pixel_adu_);
   quicklook_tree_->Branch("hit_pixel_energy",     &hit_pixel_energy_);
   quicklook_tree_->Branch("hit_pixel_cluster_id", &hit_pixel_cluster_id_);
+  quicklook_tree_->Branch("hit_num_pixels",       &hit_num_pixels_);
 }
 
 void QuickLookTreeOutputWriter::fillChargeMaps(

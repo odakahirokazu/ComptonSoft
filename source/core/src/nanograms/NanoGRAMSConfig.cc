@@ -171,6 +171,15 @@ YAML::Node coreExcludePixelNode(const YAML::Node& nodeCharge)
   throw std::runtime_error("charge.core_exclude_pix is missing.");
 }
 
+void readGeneralConfig(Config& cfg, const YAML::Node& node)
+{
+  const auto nodeGeneral = node["general"];
+  cfg.drift_time_max = nodeGeneral["drift_time_max_us"].as<double>() * unit::us;
+
+  std::cout << "readGeneralConfig()" << std::endl;
+  std::cout << "drift_time_max_us: " << cfg.drift_time_max / unit::us << std::endl;
+}
+
 void readLightConfig(Config& cfg, const YAML::Node& node)
 {
   const auto nodeLight = node["light"];
@@ -233,9 +242,6 @@ void readChargeConfig(Config& cfg, const YAML::Node& node)
       readChargeThresholdKeV(nodeCharge, "noise_th_kev");
   cfg.spread_thr_energy =
       readChargeThresholdKeV(nodeCharge, "spread_thr_kev");
-  cfg.drift_time_max    = nodeCharge["drift_time_max_us"].as<double>() * unit::us;
-  cfg.noisy_pixel_energy_th =
-      readChargeThresholdKeV(nodeCharge, "noise_th_for_noisy_pixel_kev");
   if (nodeCharge["cross_fec_merge_drift_time_tolerance_us"]) {
     cfg.cross_fec_merge_drift_time_tolerance =
         nodeCharge["cross_fec_merge_drift_time_tolerance_us"].as<double>() * unit::us;
@@ -256,9 +262,6 @@ void readChargeConfig(Config& cfg, const YAML::Node& node)
   std::cout << "pix_max: "           << cfg.pix_max           << std::endl;
   std::cout << "noise_th_kev: " << cfg.core_noise_energy_th / unit::keV << std::endl;
   std::cout << "spread_thr_kev: "    << cfg.spread_thr_energy / unit::keV << std::endl;
-  std::cout << "drift_time_max_us: " << cfg.drift_time_max / unit::us << std::endl;
-  std::cout << "noise_th_for_noisy_pixel_kev: "
-            << cfg.noisy_pixel_energy_th / unit::keV << std::endl;
   if (cfg.cross_fec_merge_drift_time_tolerance >= 0.0) {
     std::cout << "cross_fec_merge_drift_time_tolerance_us: "
               << cfg.cross_fec_merge_drift_time_tolerance / unit::us << std::endl;
@@ -289,6 +292,7 @@ void readConfig(Config& cfg, const std::string& config_path)
 {
   const auto configNode = YAML::LoadFile(config_path);
 
+  readGeneralConfig(cfg, configNode);
   readLightConfig(cfg, configNode);
   readChargeConfig(cfg, configNode);
 }

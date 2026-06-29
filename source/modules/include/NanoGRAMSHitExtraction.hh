@@ -25,6 +25,7 @@
 #include <map>
 #include <memory>
 #include <string>
+#include <vector>
 
 #include "NanoGRAMSCalibrationData.hh"
 #include "NanoGRAMSQuickLookTreeIO.hh"
@@ -70,6 +71,8 @@ public:
 private:
   void setupTPCPropertyForHitSelection();
   void updateGainCorrectionForCurrentEvent(uint32_t unix_time);
+  bool shouldWriteQuickLook(grams::TPCEventType event_type,
+                            const std::vector<grams::RawFECHit>& event_hits) const;
 
   std::string config_file_     = "";
   std::string tpctree_file_    = "";
@@ -79,6 +82,9 @@ private:
   std::map<std::string, double> gain_tp_dict_;
   double gain_tp_value_ = 0.0;
   double gain_cache_seconds_ = 60.0;
+  std::vector<std::string> quicklook_event_types_;
+  int quicklook_num_hits_ = -1;
+  bool quicklook_save_waveforms_ = true;
 
   grams::Config cfg_;
   CalibrationConfig calibration_config_;
