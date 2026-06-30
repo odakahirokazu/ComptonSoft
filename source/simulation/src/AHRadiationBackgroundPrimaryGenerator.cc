@@ -31,9 +31,8 @@ namespace comptonsoft
 {
 
 AHRadiationBackgroundPrimaryGenerator::AHRadiationBackgroundPrimaryGenerator()
-  : m_Filename("trapped_proton_spectrum.root"),
-    m_File(nullptr),
-    m_Hist(nullptr)
+  : filename_("trapped_proton_spectrum.root"),
+    hist_(nullptr)
 {
   add_alias("AHRadiationBackgroundPrimaryGenerator");
 }
@@ -44,7 +43,7 @@ ANLStatus AHRadiationBackgroundPrimaryGenerator::mod_define()
 {
   anlgeant4::IsotropicPrimaryGenerator::mod_define();
   disable_default_energy_input();
-  register_parameter(&m_Filename, "filename");
+  register_parameter(&filename_, "filename");
   set_parameter_description("ROOT file of background radiation spectrum.");
   return AS_OK;
 }
@@ -53,13 +52,13 @@ ANLStatus AHRadiationBackgroundPrimaryGenerator::mod_initialize()
 {
   anlgeant4::IsotropicPrimaryGenerator::mod_initialize();
 
-  m_File.reset(new TFile(m_Filename.c_str()));
-  if ( m_File->IsZombie() ) {
-    std::cout << "Cannot open " << m_Filename << " ! " << std::endl;
+  file_.reset(new TFile(filename_.c_str()));
+  if ( file_->IsZombie() ) {
+    std::cout << "Cannot open " << filename_ << " ! " << std::endl;
     return AS_QUIT_ERROR;
   }
 
-  TGraph* graph = (TGraph*) m_File->Get("Graph");
+  TGraph* graph = (TGraph*) file_->Get("Graph");
   const int N = graph->GetN();
 
   double* x_array = graph->GetX(); // GeV
@@ -68,18 +67,18 @@ ANLStatus AHRadiationBackgroundPrimaryGenerator::mod_initialize()
     energies[i] = x_array[i] * unit::GeV;
   }
 
-  m_Hist = new TH1D("spectrum", "spectrum", N-1, &energies[0]);
+  hist_ = new TH1D("spectrum", "spectrum", N-1, &energies[0]);
   double integralParticleIntensity(0.0);
   double integralEnergyIntensity(0.0);
   std::cout << "** output spectral information of particles **" << std::endl;
 
   for (int bin=1; bin<=N; bin++) {
-    const double energy = m_Hist->GetBinCenter(bin);
+    const double energy = hist_->GetBinCenter(bin);
     const double differentialIntensity = graph->Eval(energy/unit::GeV) * (1.0/unit::s/unit::m2/unit::sr/unit::GeV);
-    const double deltaE = m_Hist->GetBinWidth(bin);
+    const double deltaE = hist_->GetBinWidth(bin);
     const double particleIntensity = differentialIntensity * deltaE;
     const double energyIntensity = differentialIntensity * deltaE * energy;
-    m_Hist->SetBinContent(bin, particleIntensity);
+    hist_->SetBinContent(bin, particleIntensity);
     integralParticleIntensity += particleIntensity;
     integralEnergyIntensity += energyIntensity;
     std::cout << energy/unit::MeV << " [MeV] : " << differentialIntensity/(1.0/unit::s/unit::cm2/unit::sr/unit::MeV) << " [#/s/cm2/sr/MeV] " << std::endl;
@@ -97,7 +96,8 @@ ANLStatus AHRadiationBackgroundPrimaryGenerator::mod_initialize()
 
 G4double AHRadiationBackgroundPrimaryGenerator::sample_energy() const
 {
-  return m_Hist->GetRandom();
+  std::lock_guard<std::mutex> lock(mutex_);
+  return hist_->GetRandom();
 }
 
 } /* namespace comptonsoft */

@@ -22,6 +22,7 @@
 
 #include "IsotropicPrimaryGenerator.hh"
 #include <memory>
+#include <mutex>
 
 class TFile;
 class TH1D;
@@ -40,7 +41,7 @@ namespace comptonsoft {
  */
 class AHRadiationBackgroundPrimaryGenerator : public anlgeant4::IsotropicPrimaryGenerator
 {
-  DEFINE_ANL_MODULE(AHRadiationBackgroundPrimaryGenerator, 4.1);
+  DEFINE_ANL_MODULE(AHRadiationBackgroundPrimaryGenerator, 7.0);
 public:
   AHRadiationBackgroundPrimaryGenerator();
   ~AHRadiationBackgroundPrimaryGenerator();
@@ -51,9 +52,10 @@ public:
   double sample_energy() const override;
 
 private:
-  std::string m_Filename;
-  std::unique_ptr<TFile> m_File;
-  TH1D* m_Hist;
+  std::string filename_;
+  std::unique_ptr<TFile> file_;
+  TH1D* hist_ = nullptr;
+  mutable std::mutex mutex_;
 };
 
 } /* namespace comptonsoft */
