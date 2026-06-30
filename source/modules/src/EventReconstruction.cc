@@ -22,6 +22,7 @@
 #include <cstddef>
 #include <fstream>
 #include <algorithm>
+#include <string>
 #include "AstroUnits.hh"
 #include "DetectorHit.hh"
 #include "BasicComptonEvent.hh"
@@ -47,6 +48,21 @@ namespace unit = anlgeant4::unit;
 
 namespace comptonsoft
 {
+
+namespace
+{
+
+bool hasYAMLExtension(const std::string& path)
+{
+  const std::string yaml = ".yaml";
+  const std::string yml = ".yml";
+  return (path.size() >= yaml.size() &&
+          path.compare(path.size() - yaml.size(), yaml.size(), yaml) == 0)
+      || (path.size() >= yml.size() &&
+          path.compare(path.size() - yml.size(), yml.size(), yml) == 0);
+}
+
+} // namespace
 
 EventReconstruction::EventReconstruction()
   : m_MinHits(1),
@@ -141,11 +157,16 @@ ANLStatus EventReconstruction::mod_initialize()
 
   if (m_ParameterFile != "") {
     m_Reconstruction->setParameterFile(m_ParameterFile);
-    bool paramLoaded = m_Reconstruction->readParameterFile();
+    bool paramLoaded = false;
 #if CS_USE_YAMLCPP
-    if (!paramLoaded) {
+    if (ReconstructionMethodName()=="NanoGRAMS" && hasYAMLExtension(m_ParameterFile)) {
       paramLoaded = m_Reconstruction->readParameterYAMLFile();
     }
+    else {
+      paramLoaded = m_Reconstruction->readParameterFile();
+    }
+#else
+    paramLoaded = m_Reconstruction->readParameterFile();
 #endif /* CS_USE_YAMLCPP */
     if (!paramLoaded) {
       return AS_QUIT_ERROR;

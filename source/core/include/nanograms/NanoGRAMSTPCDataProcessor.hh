@@ -29,9 +29,7 @@
 
 #include <array>
 #include <cstdint>
-#include <filesystem>
 #include <functional>
-#include <memory>
 #include <string>
 #include <vector>
 
@@ -41,7 +39,6 @@
 #include "NanoGRAMSLightAnalysis.hh"
 #include "NanoGRAMSTPCTreeIO.hh"
 
-class TFile;
 class TTree;
 
 namespace comptonsoft
@@ -157,34 +154,6 @@ private:
   int64_t current_entry_ = 0;
   TPCEventType current_event_type_ = TPCEventType::Error;
   uint32_t current_unix_time_ = 0;
-};
-
-class RawHitTreeOutputWriter
-{
-public:
-  explicit RawHitTreeOutputWriter(const std::string& output_file_path);
-  ~RawHitTreeOutputWriter();
-
-  void fillEvent(int64_t event_id,
-                 int64_t raw_event_id,
-                 const   std::vector<RawFECHit>& hits);
-  std::string close();
-
-private:
-  void bindBranches();
-
-  std::filesystem::path  output_path_;
-  std::unique_ptr<TFile> file_;
-  std::unique_ptr<TTree> rawhit_tree_;
-  int64_t eventid_    = 0;
-  int64_t raweventid_ = 0;
-  int16_t ihit_       = 0;
-  int64_t ti_         = 0;
-  int32_t num_hits_   = 0;
-  float adu_          = 0.0;
-  int16_t fecid_      = 0;
-  int16_t ch_         = 0;
-  float drifttime_    = 0.0 * unit::us;
 };
 
 } /* namespace grams */

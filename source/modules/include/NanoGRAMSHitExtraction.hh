@@ -77,7 +77,6 @@ private:
 
   std::string config_file_     = "";
   std::string tpctree_file_    = "";
-  std::string rawhittree_file_ = "";
   std::string quicklook_file_  = "";
   std::string gain_tp_file_    = "";
   std::map<std::string, double> gain_tp_dict_;
@@ -94,7 +93,6 @@ private:
   TPCProperty tpc_property_;
   std::unique_ptr<TFile> input_file_;
   std::unique_ptr<grams::TPCTreeReader> tpc_tree_reader_;
-  std::unique_ptr<grams::RawHitTreeOutputWriter> rawhit_tree_writer_;
   std::unique_ptr<grams::QuickLookTreeOutputWriter> quicklook_tree_writer_;
   int64_t gamma_events_         = 0;
   int64_t processed_entries_    = 0;

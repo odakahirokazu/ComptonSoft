@@ -79,7 +79,6 @@ ANLStatus NanoGRAMSHitExtraction::mod_define()
 {
   define_parameter("config_file",         &mod_class::config_file_);
   define_parameter("tpctree_file",        &mod_class::tpctree_file_);
-  define_parameter("rawhittree_file",     &mod_class::rawhittree_file_);
   define_parameter("quicklook_file",      &mod_class::quicklook_file_);
   define_parameter("gain_tp_file",        &mod_class::gain_tp_file_);
   define_parameter("gain_tp_hash",        &mod_class::gain_tp_dict_);
@@ -148,11 +147,6 @@ ANLStatus NanoGRAMSHitExtraction::mod_initialize()
     std::cout << "[INFO] tpcquicklook output is disabled.\n";
   }
 
-  if (!rawhittree_file_.empty()) {
-    rawhit_tree_writer_ = std::make_unique<grams::RawHitTreeOutputWriter>(rawhittree_file_);
-  } else {
-    std::cout << "[INFO] rawhittree output is disabled.\n";
-  }
   gamma_events_         = 0;
   processed_entries_    = 0;
   current_raw_event_id_ = -1;
@@ -286,9 +280,6 @@ ANLStatus NanoGRAMSHitExtraction::mod_analyze()
 
   if (!event_hits.empty()) {
     current_event_hits_ = event_hits;
-    if (rawhit_tree_writer_) {
-      rawhit_tree_writer_->fillEvent(gamma_events_, raw_event_id, current_event_hits_);
-    }
     ++gamma_events_;
   }
 
@@ -302,10 +293,6 @@ ANLStatus NanoGRAMSHitExtraction::mod_end_run()
   std::cout << "Total processed tpctree entries: " << processed_entries_
             << " / " << expected_tpc_entries_ << "\n";
 
-  if (rawhit_tree_writer_) {
-    rawhit_tree_writer_->close();
-    rawhit_tree_writer_.reset();
-  }
   if (quicklook_tree_writer_) {
     quicklook_tree_writer_->close();
     quicklook_tree_writer_.reset();

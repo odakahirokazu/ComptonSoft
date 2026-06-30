@@ -21,17 +21,12 @@
 #include "NanoGRAMSLightAnalysis.hh"
 #include "NanoGRAMSTPCProperty.hh"
 
-#include <TFile.h>
-#include <TTree.h>
-
 #include <algorithm>
 #include <array>
 #include <cmath>
 #include <cstdint>
-#include <filesystem>
 #include <iostream>
 #include <limits>
-#include <memory>
 #include <numeric>
 #include <stdexcept>
 #include <string>
@@ -85,20 +80,6 @@ bool isLightDataUsable(int error_flags)
 bool requiresLightGamma(const Config& cfg)
 {
   return cfg.light_event_selection_mode == LightEventSelectionMode::GammaRequired;
-}
-
-std::filesystem::path prepareOutputPath(const std::string& output_file_path)
-{
-  if (output_file_path.empty()) {
-    throw std::runtime_error("Output file path is empty.");
-  }
-
-  std::filesystem::path output_path(output_file_path);
-  const auto output_parent = output_path.parent_path();
-  if (!output_parent.empty()) {
-    std::filesystem::create_directories(output_parent);
-  }
-  return output_path;
 }
 
 double median64(const PixelADU& values)
@@ -646,79 +627,6 @@ bool TPCTreeReader::processNext(int64_t& raw_event_id,
   }
   ++current_entry_;
   return true;
-}
-
-RawHitTreeOutputWriter::RawHitTreeOutputWriter(const std::string& output_file_path)
-    : output_path_(prepareOutputPath(output_file_path)),
-      file_(std::make_unique<TFile>(output_path_.string().c_str(), "RECREATE")),
-      rawhit_tree_(std::make_unique<TTree>(kRawHitTreeName, kRawHitTreeName))
-{
-  if (file_->IsZombie()) {
-    throw std::runtime_error("Failed to create output ROOT file: " + output_path_.string());
-  }
-
-  // Keep ownership in rawhit_tree_; otherwise ROOT may delete it again with the TFile.
-  rawhit_tree_->SetDirectory(nullptr);
-  bindBranches();
-}
-
-RawHitTreeOutputWriter::~RawHitTreeOutputWriter() = default;
-
-void RawHitTreeOutputWriter::fillEvent(int64_t event_id,
-                                       int64_t raw_event_id,
-                                       const std::vector<RawFECHit>& hits)
-{
-  eventid_    = event_id;
-  raweventid_ = raw_event_id;
-  num_hits_   = static_cast<int32_t>(hits.size());
-
-  for (std::size_t ih=0;ih<hits.size();++ih) {
-    const auto& hit = hits[ih];
-    ihit_      = static_cast<int16_t>(ih);
-    ti_        = static_cast<int64_t>(hit.ti);
-    drifttime_ = static_cast<float>(hit.drift_time);
-
-    for (std::size_t j = 0; j < hit.channels.size(); ++j) {
-      if (j < hit.channel_fecs.size()) {
-        fecid_ = hit.channel_fecs[j];
-      } else {
-        fecid_ = static_cast<int16_t>(hit.fec);
-      }
-      ch_  = hit.channels[j];
-      if (j < hit.adus.size()) {
-        adu_ = hit.adus[j];
-      } else {
-        adu_ = std::numeric_limits<float>::quiet_NaN();
-      }
-      rawhit_tree_->Fill();
-    }
-  }
-}
-
-std::string RawHitTreeOutputWriter::close()
-{
-  file_->cd();
-  rawhit_tree_->Write();
-  file_->Write();
-  const auto entries = rawhit_tree_->GetEntries();
-  file_->Close();
-
-  std::cout << "[ROOT] Saved file: " << output_path_.string()
-            << " (entries=" << entries << ")\n";
-  return output_path_.string();
-}
-
-void RawHitTreeOutputWriter::bindBranches()
-{
-  rawhit_tree_->Branch("eventid",     &eventid_,    "eventid/L");
-  rawhit_tree_->Branch("raweventid",  &raweventid_, "raweventid/L");
-  rawhit_tree_->Branch("ihit",        &ihit_,       "ihit/S");
-  rawhit_tree_->Branch("ti",          &ti_,         "ti/L");
-  rawhit_tree_->Branch("num_hits",    &num_hits_,   "num_hits/I");
-  rawhit_tree_->Branch("adu",         &adu_,        "adu/F");
-  rawhit_tree_->Branch("fecid",       &fecid_,      "fecid/S");
-  rawhit_tree_->Branch("ch",          &ch_,         "ch/S");
-  rawhit_tree_->Branch("drifttime",   &drifttime_,  "drifttime/F");
 }
 
 } /* namespace grams */

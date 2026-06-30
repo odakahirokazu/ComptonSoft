@@ -31,7 +31,6 @@ namespace grams
 {
 
 constexpr const char* kTpcTreeName       = "tpctree";
-constexpr const char* kRawHitTreeName    = "rawhittree";
 constexpr const char* kHitTreeName       = "hittree";
 constexpr const char* kQuickLookTreeName = "tpcquicklook";
 
