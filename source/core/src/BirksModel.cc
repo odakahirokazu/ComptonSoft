@@ -35,7 +35,7 @@ BirksModel::BirksModel(const std::map<std::string, double> &params) : VLArRecomb
   }
   kOverRho_ = k_ / Rho();
 }
-double BirksModel::electronDeDx(double dedx, double electricField) const {
+double BirksModel::electronDeDx(double dedx, double electricField) {
   const double kOverRhoE = kOverRho_ / electricField;
   const double new_dedx = Ab_ * (dedx / (1 + kOverRhoE * dedx));
   if (RandomizeMode() == 0) {
@@ -55,29 +55,13 @@ double BirksModel::electronDeDx(double dedx, double electricField) const {
     else if (p > 1.0) {
       return nQuantaWithFluctuations * Wion();
     }
-    const double var = nQuantaWithFluctuations * p * (1.0 - p);
-    const double ex = nQuantaWithFluctuations * p;
-    //std::cout << "var: " << var << ", ex: " << ex << std::endl;
-    double nElectron;
-    if (var > 10.0 && ex > 10.0) {
-      nElectron = gRandom->Gaus(nQuantaWithFluctuations * p, TMath::Sqrt(nQuantaWithFluctuations * p * (1.0 - p)));
-      //std::cout << "Gaus: " << nElectron << std::endl;
-    }
-    else {
-      nElectron = gRandom->Binomial(static_cast<int>(nQuantaWithFluctuations), p);
-      //std::cout << "Binomial: " << nElectron << std::endl;
-    }
-    int nElectronInt;
-    if (nElectron < 0.0) {
+    int nElectronInt = Binomial(static_cast<int>(nQuantaWithFluctuations), p);
+    if (nElectronInt < 0.0) {
       nElectronInt = 0;
     }
-    else if (nElectron > nQuantaWithFluctuations) {
+    else if (nElectronInt > nQuantaWithFluctuations) {
       nElectronInt = nQuantaWithFluctuations;
     }
-    else {
-      nElectronInt = TMath::Nint(nElectron);
-    }
-    //std::cout << "nElectron: " << nElectronInt << std::endl;
     return nElectronInt * Wion();
   }
   else {

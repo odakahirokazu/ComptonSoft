@@ -1,4 +1,4 @@
-#include "VLArRecombinationModelFactory.hh"
+#include "LArRecombinationModelFactory.hh"
 #include "BirksModel.hh"
 #include "CSException.hh"
 #include "ModifiedBoxModel.hh"
@@ -8,7 +8,7 @@
 #include <boost/property_tree/xml_parser.hpp>
 #include <map>
 namespace comptonsoft {
-std::unique_ptr<VLArRecombinationModel> VLArRecombinationModelFactory::load(std::string const &filename) {
+std::unique_ptr<VLArRecombinationModel> LArRecombinationModelFactory::load(std::string const &filename) {
   boost::property_tree::ptree pt;
   try {
     read_xml(filename, pt);
@@ -82,7 +82,7 @@ std::unique_ptr<VLArRecombinationModel> VLArRecombinationModelFactory::load(std:
   }
   return create(type, params);
 }
-std::unique_ptr<VLArRecombinationModel> VLArRecombinationModelFactory::create(RecombinationModelType type, const std::map<std::string, double> &params) {
+std::unique_ptr<VLArRecombinationModel> LArRecombinationModelFactory::create(RecombinationModelType type, const std::map<std::string, double> &params) {
   switch (type) {
   case RecombinationModelType::Birks:
     return std::make_unique<BirksModel>(params);

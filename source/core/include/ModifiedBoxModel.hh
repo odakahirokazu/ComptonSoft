@@ -16,7 +16,7 @@ public:
   ModifiedBoxModel(const std::map<std::string, double> &params);
   virtual ~ModifiedBoxModel() = default;
 
-  virtual double electronDeDx(double let, double electricField) const override;
+  virtual double electronDeDx(double let, double electricField) override;
   void printInfo(std::ostream &os) const override;
 
 private:

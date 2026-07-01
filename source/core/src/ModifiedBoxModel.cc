@@ -34,7 +34,7 @@ ModifiedBoxModel::ModifiedBoxModel(const std::map<std::string, double> &params) 
   }
   betaOverRho_ = beta / Rho();
 }
-double ModifiedBoxModel::electronDeDx(double dedx, double electricField) const {
+double ModifiedBoxModel::electronDeDx(double dedx, double electricField) {
   const double betaOverRhoE = betaOverRho_ / electricField;
   const double new_dedx = TMath::Log(betaOverRhoE * dedx + alpha) / betaOverRhoE;
   //std::cout << "ModifiedBoxModel::electronDeDx: dedx=" << dedx / (CLHEP::MeV / CLHEP::cm) << "MeV/cm, electricField=" << electricField / (CLHEP::kilovolt / CLHEP::cm) << " kV/cm, new_dedx=" << new_dedx / (CLHEP::MeV / CLHEP::cm) << "MeV/cm" << std::endl;
@@ -49,25 +49,23 @@ double ModifiedBoxModel::electronDeDx(double dedx, double electricField) const {
     if (nQuantaWithFluctuations < 0) {
       nQuantaWithFluctuations = 0;
     }
-    //std::cout << "nQuantaWithFluctuations: " << nQuantaWithFluctuations << std::endl;
     const double p = new_dedx / dedx;
+    //std::cout << "nQuantaWithFluctuations: " << nQuantaWithFluctuations << " p: " << p << " center: " << p * nQuantaWithFluctuations << " sigma: " << TMath::Sqrt(nQuantaWithFluctuations * p * (1 - p)) << std::endl;
     if (p < 0.0) {
       return 0.0;
     }
     else if (p > 1.0) {
       return nQuantaWithFluctuations * Wion();
     }
-    int nElectron = Binomial(nQuantaWithFluctuations, p);
-    if (nElectron < 0.0) {
-      nElectron = 0;
+    int nElectronInt = Binomial(nQuantaWithFluctuations, p);
+    if (nElectronInt < 0.0) {
+      nElectronInt = 0;
     }
-    else if (nElectron > nQuantaWithFluctuations) {
-      nElectron = nQuantaWithFluctuations;
+    else if (nElectronInt > nQuantaWithFluctuations) {
+      nElectronInt = nQuantaWithFluctuations;
     }
-    else {
-      nElectron = TMath::Nint(nElectron);
-    }
-    return nElectron * Wion();
+    //std::cout << "new electron number: " << nElectronInt << std::endl;
+    return nElectronInt * Wion();
   }
   else {
     // No randomization

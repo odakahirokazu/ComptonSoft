@@ -112,7 +112,7 @@ set(CS_CORE_CLASSES
   src/RIDecayCalculation.cc
   ### recombination models
   src/VLArRecombinationModel.cc
-  src/VLArRecombinationModelFactory.cc
+  src/LArRecombinationModelFactory.cc
   src/ModifiedBoxModel.cc
   src/BirksModel.cc
   )

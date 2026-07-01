@@ -7,7 +7,7 @@
 #include "TFile.h"
 #include "TSpline.h"
 #include "VLArRecombinationModel.hh"
-#include "VLArRecombinationModelFactory.hh"
+#include "LArRecombinationModelFactory.hh"
 #include <memory>
 namespace comptonsoft {
 class DetectorHit;

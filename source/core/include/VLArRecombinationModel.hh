@@ -42,14 +42,14 @@ public:
   virtual ~VLArRecombinationModel();
 
   // Pure virtual function to calculate recombination energy
-  virtual double electronDeDx(double dedx, double electricField) const = 0;
-  double lightYieldPerLength(double dedx, double electricField) const {
+  virtual double electronDeDx(double dedx, double electricField) = 0;
+  double lightYieldPerLength(double dedx, double electricField) {
     return dedx/Wexc() - electronYieldPerLength(dedx, electricField);
   }
-  double electronYieldPerLength(double dedx, double electricField) const {
+  double electronYieldPerLength(double dedx, double electricField) {
     return electronDeDx(dedx, electricField) / Wion();
   }
-  double getRecombinationFactor(double dedx, double electricField) const {
+  double getRecombinationFactor(double dedx, double electricField) {
     const double recombination_dedx = electronDeDx(dedx, electricField);
     if (dedx <= 0.0) {
       return 1.0;
@@ -82,10 +82,12 @@ private:
   double Wexc_ = 19.6 * CLHEP::eV; // in eV
   double rho_ = 1.39 * (CLHEP::g / CLHEP::cm3); // in g/cm^3
   int randomizeMode_ = 0; // 0: no randomization, 1: Binomial
-  double fanoFactor_ = 0.107; // Fano factor for LAr // Reference: Bonivento, W. M. and Terranova, F., "The science and technology of liquid argon detectors", 2024,
+  double fanoFactor_ = 0.107; // Fano factor for LAr // Referece: Bonivento, W. M. and Terranova, F., "The science and technology of liquid argon detectors", 2024,
+  std::mt19937 rng_;
+  uint32_t seed_ = 0;
 
 protected:
-  double Binomial(int n, double p) const;
+  int Binomial(int n, double p);
 };
 } // namespace comptonsoft
 #endif //COMPTONSOFT_VLArRecombinationModel_H

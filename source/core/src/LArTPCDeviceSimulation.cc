@@ -63,7 +63,7 @@ double LArTPCDeviceSimulation::DiffusionSigmaCathode(double) {
 }
 
 void LArTPCDeviceSimulation::instantiateRecombinationModel(const std::string &config_filename) {
-  recombinationModel_ = VLArRecombinationModelFactory::load(config_filename);
+  recombinationModel_ = LArRecombinationModelFactory::load(config_filename);
 }
 
 void LArTPCDeviceSimulation::applyRecombination(DetectorHit_sptr &hit) {
