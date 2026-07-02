@@ -37,7 +37,7 @@ anlnext_add_swig_ruby_binding(${target_binding}
   INSTALL_DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/ruby/comptonsoft
 )
 
-install(FILES ${SWIG_IF_FILE} ${ADDITIONAL_SWIG_IF_FILE} ${CLASS_LIST_FILE}
+install(FILES ${swig_if_file} ${additional_swig_if_file} ${class_list_file}
   DESTINATION ${CMAKE_INSTALL_PREFIX}/include/comptonsoft/ruby)
 
 ########################################################
