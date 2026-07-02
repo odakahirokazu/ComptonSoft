@@ -1,141 +1,186 @@
-include_directories(
-  include
-  ${ANLG4_INC_DIR}
-  ${ANLNEXT_INC_DIR}
-  ${ROOT_INC_DIR}
-  ${G4_INC_DIR}
-  ${CLHEP_INC_DIR}
-  ${ORT_INC_DIR}
-  ${ADD_INC_DIR}
-  ${BOOST_INC_DIR}
+add_library(ComptonSoftCore)
+
+set(ComptonSoftCore_Base_Classes
+  ### basic types and classes
+  base/src/CSException.cc
+  base/src/ChannelID.cc
+  base/src/VoxelID.cc
+  base/src/DetectorGroup.cc
+  base/src/HitPattern.cc
+  base/src/PhaseSpaceVector.cc
+  base/src/IsotopeInfo.cc
+  base/src/DetectorHit.cc
+  base/src/BasicComptonEvent.cc
 )
 
-link_directories(
-  ${ANLNEXT_LIB_DIR}
-  ${ROOT_LIB_DIR}
-  ${G4_LIB_DIR}
-  ${CLHEP_LIB_DIR}
-  ${BOOST_LIB_DIR}
-  )
-
-set(CS_CORE_CLASSES
-  ### basic types and classes
-  src/CSException.cc
-  src/ChannelID.cc
-  src/VoxelID.cc
-  src/DetectorGroup.cc
-  src/HitPattern.cc
-  src/PhaseSpaceVector.cc
-  src/IsotopeInfo.cc
+set(ComptonSoftCore_Framework_Classes
   ### processing/readout
-  src/VGainFunction.cc
-  src/GainFunctionLinear.cc
-  src/GainFunctionCubic.cc
-  src/GainFunctionSpline.cc
-  src/MultiChannelData.cc
-  src/VChannelMap.cc
-  src/ChannelMap.cc
-  src/ChannelMapDSD.cc
-  src/ReadoutModule.cc
-  src/DetectorHit.cc
+  framework/src/VGainFunction.cc
+  framework/src/GainFunctionLinear.cc
+  framework/src/GainFunctionCubic.cc
+  framework/src/GainFunctionSpline.cc
+  framework/src/MultiChannelData.cc
+  framework/src/VChannelMap.cc
+  framework/src/ChannelMap.cc
+  framework/src/ChannelMapDSD.cc
+  framework/src/ReadoutModule.cc
   ### detector units
-  src/VDetectorUnit.cc
-  src/VRealDetectorUnit.cc
-  src/RealDetectorUnit2DPixel.cc
-  src/RealDetectorUnit2DStrip.cc
-  src/RealDetectorUnitScintillator.cc
-  src/RealDetectorUnit3DVoxel.cc
-  ### device simulation
-  src/EFieldModel.cc
-  src/VDeviceSimulation.cc
-  src/DeviceSimulation.cc
-  src/SimDetectorUnit2DPixel.cc
-  src/SimDetectorUnit2DStrip.cc
-  src/SimDetectorUnitScintillator.cc
-  src/SimDetectorUnit3DVoxel.cc
-  src/WeightingPotentialPixel.cc
-  src/WeightingPotentialStrip.cc
-  ### detector unit factory
-  src/VDetectorUnitFactory.cc
-  src/RealDetectorUnitFactory.cc
-  src/SimDetectorUnitFactory.cc
-  ### Compton reconstruction
-  src/BasicComptonEvent.cc
-  src/VEventReconstructionAlgorithm.cc
-  src/StandardEventReconstructionAlgorithm.cc
-  src/PhotoAbsorptionEventReconstructionAlgorithm.cc
-  src/FocalPlaneEventReconstructionAlgorithm.cc
-  src/SGDEventReconstructionAlgorithm.cc
-  src/ComptonConstraints.cc
-  src/HY2017EventReconstructionAlgorithm.cc
-  src/HY2020EventReconstructionAlgorithm.cc
-  src/OberlackAlgorithm.cc
-  src/TangoAlgorithm.cc
-  ### sensitive detector
-  src/VCSSensitiveDetector.cc
-  ### event store
-  src/CSEventStore.cc
-  ### manager
-  src/DetectorSystem.cc
-  ### tree IO
-  src/HitTreeIO.cc
-  src/ComptonEventTreeIO.cc
-  src/EventTreeIO.cc
-  src/InitialInfoTreeIO.cc
-  src/HitTreeIOWithInitialInfo.cc
-  src/ComptonEventTreeIOWithInitialInfo.cc
-  src/EventTreeIOWithInitialInfo.cc
+  framework/src/VDetectorUnit.cc
+  framework/src/VRealDetectorUnit.cc
+  framework/src/RealDetectorUnit2DPixel.cc
+  framework/src/RealDetectorUnit2DStrip.cc
+  framework/src/RealDetectorUnitScintillator.cc
+  framework/src/RealDetectorUnit3DVoxel.cc
   ### frame readout
-  src/FrameData.cc
-  src/OutlierStore.cc
-  src/XrayEvent.cc
-  src/PolarizedXrayEvent.cc
-  src/XrayEventTreeIO.cc
-  ### coded aperture
-  src/VCodedAperture.cc
-  src/CodedAperture.cc
-  ### charge transport
-  src/VGoalRegion.cc
-  src/RectangularGoalRegion.cc
-  src/SemiconductorModel.cc
-  src/PointCharge.cc
-  src/CCECalculation.cc
-  src/NumericalField.cc
-  ### radioactivation step 2 (RDChains)
-  src/DummyDetectorConstruction.cc
-  src/IsotopeDatabaseAccess.cc
-  src/RateData.cc
-  src/TimeProfile.cc
-  src/BatemanSolution.cc
-  src/RIDecayProperties.cc
-  src/RIDecayChains.cc
-  src/RIDecayCalculation.cc
-  )
+  framework/src/FrameData.cc
+  framework/src/OutlierStore.cc
+  framework/src/XrayEvent.cc
+  framework/src/PolarizedXrayEvent.cc
+  ### device simulation
+  framework/src/EFieldModel.cc
+  framework/src/VDeviceSimulation.cc
+  framework/src/DeviceSimulation.cc
+  framework/src/SimDetectorUnit2DPixel.cc
+  framework/src/SimDetectorUnit2DStrip.cc
+  framework/src/SimDetectorUnitScintillator.cc
+  framework/src/SimDetectorUnit3DVoxel.cc
+  framework/src/WeightingPotentialPixel.cc
+  framework/src/WeightingPotentialStrip.cc
+  ### detector unit factory
+  framework/src/VDetectorUnitFactory.cc
+  framework/src/RealDetectorUnitFactory.cc
+  framework/src/SimDetectorUnitFactory.cc
+  ### sensitive detector
+  framework/src/VCSSensitiveDetector.cc
+  ### manager
+  framework/src/DetectorSystem.cc
+)
 
-if(CS_USE_ORT)
-  set(CS_ORT_CLASSES
-    src/OnnxInference.cc
-    src/NeuralNetST2022EventReconstructionAlgorithm.cc
-    )
+set(ComptonSoftCore_Framework_Modules
+  ### event store
+  framework/src/CSEventStore.cc
+  ### base and IO
+  framework/src/VCSModule.cc
+  framework/src/CSHitCollection.cc
+  framework/src/CreateRootFile.cc
+  framework/src/SaveData.cc
+  ### detector construction
+  framework/src/ConstructDetector.cc
+  framework/src/ConstructDetectorForSimulation.cc
+  ### detector processing
+  framework/src/ConstructChannelMap.cc
+  framework/src/SetNoiseLevels.cc
+  framework/src/SetBadChannels.cc
+  framework/src/SetChannelProperties.cc
+  framework/src/SelectHits.cc
+  framework/src/AnalyzeHits.cc
+  framework/src/MakeDetectorHits.cc
+  framework/src/MakeRawHits.cc
+  framework/src/MakeDetectorHitsWithTimingProcess.cc
+  framework/src/ApplyEPICompensation.cc
+  framework/src/EventSelection.cc
+)
+
+set(ComptonSoftCore_Simulation_Classes
+  ### physics list
+  simulation/src/CustomizedEmLivermorePhysics.cc
+  simulation/src/CustomizedEmLivermorePolarizedPhysics.cc
+  simulation/src/CSPhysicsList.cc
+  ### observation simulation
+  simulation/src/ObservationPickUpData.cc
+  simulation/src/ObservationTreeIO.cc
+  simulation/src/ObservationTreeIOWithInitialInfo.cc
+)
+
+set(ComptonSoftCore_Simulation_Modules
+  ### physics
+  simulation/src/PhysicsListManager.cc
+  ### primary generator
+  simulation/src/ListPrimaryGenerator.cc
+  ### observation simulation
+  simulation/src/WriteObservationTree.cc
+  ### utility
+  simulation/src/InitialParticleTree.cc
+)
+
+if(CS_USE_HEALPIX)
+  set(ComptonSoftCore_Simulation_Modules
+    ${ComptonSoftCore_Simulation_Modules}
+    simulation/src/AllSkyPrimaryGenerator.cc
+  )
 endif()
 
-add_library(CSCore SHARED
-  ${CS_CORE_CLASSES}
-  ${CS_ORT_CLASSES}
-  )
-
-target_link_libraries(CSCore
-  ${ANLG4_LIB}
-  ${ANLNEXT_LIB}
-  ${ROOT_LIB}
-  ${G4_LIB}
-  ${CLHEP_LIB}
-  ${ORT_LIB}
-  ${ADD_LIB}
-  ${BOOST_LIB}
+set(ComptonSoftCore_IO_Classes
+  ### tree IO
+  io/src/HitTreeIO.cc
+  io/src/EventTreeIO.cc
+  io/src/InitialInfoTreeIO.cc
+  io/src/HitTreeIOWithInitialInfo.cc
+  io/src/EventTreeIOWithInitialInfo.cc
 )
 
-install(TARGETS CSCore LIBRARY DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
+set(ComptonSoftCore_IO_Modules
+  io/src/WriteHitTree.cc
+  io/src/ReadHitTree.cc
+  io/src/ReadHitTreeAsRawHits.cc
+  io/src/ReadHitTreeAsDetectorHits.cc
+  io/src/WriteEventTree.cc
+  io/src/ReadEventTree.cc
+  io/src/ReadEventTreeAsRawHits.cc
+  io/src/ReadEventTreeAsDetectorHits.cc
+)
+
+target_sources(ComptonSoftCore
+  PRIVATE
+  ${ComptonSoftCore_Base_Classes}
+  ${ComptonSoftCore_Framework_Classes}
+  ${ComptonSoftCore_Framework_Modules}
+  ${ComptonSoftCore_Simulation_Classes}
+  ${ComptonSoftCore_Simulation_Modules}
+  ${ComptonSoftCore_IO_Classes}
+  ${ComptonSoftCore_IO_Modules}
+)
+
+target_include_directories(ComptonSoftCore
+  PUBLIC
+  ${BOOST_INC_DIR}
+  ${CLHEP_INC_DIR}
+  ${G4_INC_DIR}
+  ${ROOT_INC_DIR}
+  ${HEALPIX_INC_DIR}
+  ${ANLNEXT_INC_DIR}
+  ${ANLG4_INC_DIR}
+  base/include
+  framework/include
+  simulation/include
+  io/include
+)
+
+target_compile_definitions(ComptonSoftCore
+  PUBLIC
+  ANLNEXT_USE_TVECTOR
+  ANLNEXT_USE_HEPVECTOR
+)
+
+target_link_directories(ComptonSoftCore
+  PUBLIC
+  ${ANLNEXT_LIB_DIR}
+)
+
+target_link_libraries(ComptonSoftCore
+  PUBLIC
+  ${BOOST_LIB}
+  ${CLHEP_LIB}
+  ${G4_LIB}
+  ${ROOT_LIB}
+  ${HEALPIX_LIB}
+  ${ANLNEXT_LIB}
+  ${ANLG4_LIB}
+)
+
+install(TARGETS ComptonSoftCore
+  LIBRARY
+  DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
 
 if(INSTALL_HEADERS)
   install(DIRECTORY include/

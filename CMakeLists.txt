@@ -22,6 +22,7 @@ message("-- Install destination prefix: ${CMAKE_INSTALL_PREFIX}")
 list(APPEND CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
 
 ### options
+option(BUILD_SHARED_LIBS "Build shared libraries" ON)
 #### interface options
 option(CS_USE_RUBY "enable Ruby binding" ON)
 option(CS_USE_PYTHON "enable Python binding (anlgeant4)" ON)
@@ -97,7 +98,7 @@ if(USE_EXE)
 endif(USE_EXE)
 
 if(USE_RUBY)
-  add_subdirectory(rubyext)
+  add_subdirectory(bindings/ruby)
 endif(USE_RUBY)
 
 add_subdirectory(cmake)

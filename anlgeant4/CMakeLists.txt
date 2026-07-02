@@ -1,4 +1,4 @@
-set(TARGET_LIBRARY ANLGeant4)
+add_library(ANLGeant4)
 
 set(ANLG4_CORE_CLASSES
   src/Geant4Body.cc
@@ -19,7 +19,7 @@ set(ANLG4_CORE_CLASSES
   src/VEventStore.cc
 )
 
-set(ANLG4_PRIMARYGEN_CLASSES
+set(ANLG4_PRIMARYGENERATOR_CLASSES
   src/PointSourcePrimaryGenerator.cc
   src/SphericalSourcePrimaryGenerator.cc
   src/PlaneWavePrimaryGenerator.cc
@@ -45,7 +45,10 @@ if(ANLG4_USE_VIS OR ANLG4_USE_VIS_QT)
     src/VisualizeGeometry.cc
     )
   if(ANLG4_USE_VIS)
-    add_definitions(-DANLG4_USE_VIS)
+    target_compile_definitions(ANLGeant4
+      PRIVATE
+      ANLG4_USE_VIS=TRUE
+    )
   endif()
   if(ANLG4_USE_VIS_QT)
     set(QT_INC_DIR
@@ -53,40 +56,52 @@ if(ANLG4_USE_VIS OR ANLG4_USE_VIS_QT)
       /usr/local/include/QtDeclarative
       /usr/local/include/QtOpenGL
       /usr/local/include/QtGui
-      )
-    add_definitions(-DANLG4_USE_VIS_QT)
+    )
+    target_compile_definitions(ANLGeant4
+      PRIVATE
+      ANLG4_USE_VIS_QT=TRUE
+    )
   endif()
 endif()
 
-add_definitions(-DANLNEXT_USE_HEPVECTOR)
+target_compile_definitions(ANLGeant4
+  PRIVATE
+  ANLNEXT_USE_HEPVECTOR=TRUE
+)
 
-include_directories(include
-  ${CLHEP_INC_DIR}
-  ${G4_INC_DIR}
-  ${ANLNEXT_INC_DIR}
-  ${QT_INC_DIR}
-  ${BOOST_INC_DIR}
-  ${GDML_INC_DIR}
-  )
-
-link_directories(
-  /usr/local/lib
-  ${CLHEP_LIB_DIR}
-  ${G4_LIB_DIR}
-  ${ANLNEXT_LIB_DIR}
-  )
-
-add_library(${TARGET_LIBRARY} SHARED
+target_sources(ANLGeant4
+  PRIVATE
   ${ANLG4_CORE_CLASSES}
-  ${ANLG4_PRIMARYGEN_CLASSES}
+  ${ANLG4_PRIMARYGENERATOR_CLASSES}
   ${ANLG4_GDML_CLASSES}
   ${ANLG4_VIS_CLASSES}
-  )
+)
 
-target_link_libraries(${TARGET_LIBRARY}
-  ${ANLNEXT_LIB} ${G4_LIB} ${CLHEP_LIB} ${GDML_LIB})
+target_include_directories(ANLGeant4
+  PUBLIC
+  ${BOOST_INC_DIR}
+  ${CLHEP_INC_DIR}
+  ${G4_INC_DIR}
+  ${GDML_INC_DIR}
+  ${QT_INC_DIR}
+  ${ANLNEXT_INC_DIR}
+  include
+)
 
-install(TARGETS ${TARGET_LIBRARY}
+target_link_directories(ANLGeant4
+  PUBLIC
+  ${ANLNEXT_LIB_DIR}
+)
+
+target_link_libraries(ANLGeant4
+  PUBLIC
+  ${CLHEP_LIB}
+  ${GDML_LIB}
+  ${G4_LIB}
+  ${ANLNEXT_LIB}
+)
+
+install(TARGETS ANLGeant4
   LIBRARY
   DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
 
@@ -97,9 +112,9 @@ if(INSTALL_HEADERS)
 endif(INSTALL_HEADERS)
 
 if(USE_RUBY)
-  add_subdirectory(rubyext)
+  add_subdirectory(bindings/ruby)
 endif(USE_RUBY)
 
 if(USE_PYTHON)
-  add_subdirectory(pyext)
+  add_subdirectory(bindings/python)
 endif(USE_PYTHON)
