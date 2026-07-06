@@ -57,8 +57,8 @@ ANLStatus WriteEventTree::mod_initialize()
   }
 
   tree_ = new TTree("eventtree", "eventtree");
-  treeIO_->setTree(tree_);
-  treeIO_->defineBranches();
+  treeIO_->set_tree(tree_);
+  treeIO_->define_branches();
 
   return AS_OK;
 }

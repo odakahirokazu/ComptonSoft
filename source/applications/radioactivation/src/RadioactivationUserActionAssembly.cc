@@ -160,7 +160,7 @@ void RadioactivationUserActionAssembly::fill(const G4Ions* nucleus,
   }
 
   const int volume_index = analyze_volume_info(volume_name, isotope);
-  event_store_->insertRadioactivation(getCurrentEventID(), std::make_tuple(isotope, volume_index, position));
+  event_store_->insert_radioactivation(getCurrentEventID(), std::make_tuple(isotope, volume_index, position));
 }
 
 int RadioactivationUserActionAssembly::analyze_volume_info(const std::string& volume_name, const IsotopeInfo& isotope)

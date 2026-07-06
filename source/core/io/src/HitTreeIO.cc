@@ -36,7 +36,7 @@ HitTreeIO::HitTreeIO()
 
 HitTreeIO::~HitTreeIO() = default;
 
-void HitTreeIO::defineBranches()
+void HitTreeIO::define_branches()
 {
   hittree_->Branch("runid",            &runid_,            "runid/I");
   hittree_->Branch("eventid",          &eventid_,          "eventid/I");
@@ -94,7 +94,7 @@ void HitTreeIO::defineBranches()
   hittree_->Branch("grade",            &grade_,            "grade/I");
 }
 
-void HitTreeIO::setBranchAddresses()
+void HitTreeIO::set_branch_addresses()
 {
   hittree_->SetBranchAddress("runid",            &runid_);
   hittree_->SetBranchAddress("eventid",          &eventid_);

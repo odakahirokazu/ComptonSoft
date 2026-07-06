@@ -26,7 +26,7 @@
 namespace comptonsoft {
 
 /**
- * 
+ *
  * @author Hirokazu Odaka
  * @date 2014-12-02
  */
@@ -36,9 +36,9 @@ public:
   HitTreeIOWithInitialInfo() = default;
   ~HitTreeIOWithInitialInfo();
 
-  void setTree(TTree* tree);
-  void defineBranches();
-  void setBranchAddresses();
+  void set_tree(TTree* tree);
+  void define_branches();
+  void set_branch_addresses();
 };
 
 } /* namespace comptonsoft */

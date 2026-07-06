@@ -1,6 +1,6 @@
 /*************************************************************************
  *                                                                       *
- * Copyright (c) 2011 Shin Watanabe, Hirokazu Odaka                      *
+ * Copyright (c) 2011 Hirokazu Odaka                                     *
  *                                                                       *
  * This program is free software: you can redistribute it and/or modify  *
  * it under the terms of the GNU General Public License as published by  *
@@ -28,21 +28,21 @@ RadioactivationEventStore::RadioactivationEventStore() = default;
 
 RadioactivationEventStore::~RadioactivationEventStore() = default;
 
-void RadioactivationEventStore::initialize_run(int runID, int num_events)
+void RadioactivationEventStore::initialize_run(int run_id, int num_events)
 {
-  CSEventStore::initialize_run(runID, num_events);
+  CSEventStore::initialize_run(run_id, num_events);
   radioactivations_vector_.resize(num_events);
   for (auto& vec: radioactivations_vector_) {
     vec.clear();
   }
 }
 
-void RadioactivationEventStore::insertRadioactivation(size_t event_index, const RadioactivationInfo& info)
+void RadioactivationEventStore::insert_radioactivation(size_t event_index, const RadioactivationInfo& info)
 {
   radioactivations_vector_[event_index].push_back(info);
 }
 
-const std::vector<RadioactivationInfo>& RadioactivationEventStore::getRadioactivations() const
+const std::vector<RadioactivationInfo>& RadioactivationEventStore::get_radioactivations() const
 {
   return radioactivations_vector_[read_index()];
 }

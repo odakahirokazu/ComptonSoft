@@ -34,7 +34,7 @@ InitialInfoTreeIO::InitialInfoTreeIO()
 
 InitialInfoTreeIO::~InitialInfoTreeIO() = default;
 
-void InitialInfoTreeIO::defineBranches()
+void InitialInfoTreeIO::define_branches()
 {
   if (enabled_) {
     tree_->Branch("ini_energy", &ini_energy_, "ini_energy/F");
@@ -52,7 +52,7 @@ void InitialInfoTreeIO::defineBranches()
   }
 }
 
-void InitialInfoTreeIO::setBranchAddresses()
+void InitialInfoTreeIO::set_branch_addresses()
 {
   if (enabled_) {
     tree_->SetBranchAddress("ini_energy", &ini_energy_);
@@ -89,7 +89,7 @@ vector3_t InitialInfoTreeIO::getInitialPosition() const
 {
   return vector3_t(ini_posx_ * unit::cm, ini_posy_ * unit::cm, ini_posz_ * unit::cm);
 }
-  
+
 vector3_t InitialInfoTreeIO::getInitialPolarization() const
 {
   return vector3_t(ini_polarx_, ini_polary_, ini_polarz_);
@@ -123,7 +123,7 @@ void InitialInfoTreeIO::setInitialPosition(double x, double y, double z)
   ini_posy_ = y / unit::cm;
   ini_posz_ = z / unit::cm;
 }
-  
+
 void InitialInfoTreeIO::setInitialPolarization(double x, double y, double z)
 {
   ini_polarx_ = x;

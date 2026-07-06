@@ -22,7 +22,7 @@
 #include "InitialInformation.hh"
 #include "ObservedParticle.hh"
 #include "ObservationTreeIOWithInitialInfo.hh"
-#include "ObservationPickUpData.hh"
+#include "ObservationEventStore.hh"
 
 using namespace anlnext;
 
@@ -30,10 +30,7 @@ namespace comptonsoft
 {
 
 WriteObservationTree::WriteObservationTree()
-  : observationPUD_(nullptr),
-    initialInfo_(nullptr),
-    tree_(nullptr),
-    treeIO_(new ObservationTreeIOWithInitialInfo)
+  : tree_io_(std::make_unique<ObservationTreeIOWithInitialInfo>())
 {
 }
 
@@ -41,45 +38,46 @@ ANLStatus WriteObservationTree::mod_initialize()
 {
   VCSModule::mod_initialize();
 
-  get_module("ObservationPickUpData", &observationPUD_);
+  get_module("ObservationEventStore", &event_store_);
   define_evs("WriteObservationTree:Fill");
 
   if (exist_module("InitialInformation")) {
-    get_module_IF("InitialInformation", &initialInfo_);
-    treeIO_->enableInitialInfoRecord();
+    get_module_IF("InitialInformation", &initial_info_);
+    tree_io_->enableInitialInfoRecord();
   }
   else {
-    treeIO_->disableInitialInfoRecord();
+    tree_io_->disableInitialInfoRecord();
   }
 
   tree_ = new TTree("otree", "Observation tree");
-  treeIO_->setTree(tree_);
-  treeIO_->defineBranches();
+  tree_io_->set_tree(tree_);
+  tree_io_->define_branches();
 
   return AS_OK;
 }
 
 ANLStatus WriteObservationTree::mod_analyze()
 {
-  int64_t eventID = -1;
+  int run_id = -1;
+  int event_id = -1;
 
-  if (initialInfo_) {
-    eventID = initialInfo_->event_id();
-    treeIO_->setInitialInfo(initialInfo_->initial_energy(),
-                            initialInfo_->initial_direction(),
-                            initialInfo_->initial_time(),
-                            initialInfo_->initial_position(),
-                            initialInfo_->initial_polarization());
-    treeIO_->setWeight(initialInfo_->weight());
+  if (initial_info_) {
+    run_id = initial_info_->run_id();
+    event_id = initial_info_->event_id();
+    tree_io_->setInitialInfo(initial_info_->initial_energy(),
+                             initial_info_->initial_direction(),
+                             initial_info_->initial_time(),
+                             initial_info_->initial_position(),
+                             initial_info_->initial_polarization());
+    tree_io_->setWeight(initial_info_->weight());
   }
   else {
-    eventID = get_loop_index();
+    event_id = get_loop_index();
   }
 
-  const std::vector<ObservedParticle_sptr>& particles
-    = observationPUD_->getParticleVector();
+  const std::vector<ObservedParticle>& particles = event_store_->get_observed_particles();
   if (particles.size() > 0) {
-    treeIO_->fillParticles(eventID, particles);
+    tree_io_->fill_particles(run_id, event_id, particles);
     set_evs("WriteObservationTree:Fill");
   }
 

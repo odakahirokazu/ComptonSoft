@@ -21,10 +21,10 @@
 #define COMPTONSOFT_ObservationPickUpData_H 1
 
 #include "VUserActionAssembly.hh"
-#include "ObservedParticle.hh"
 
 namespace comptonsoft {
 
+class ObservationEventStore;
 
 /**
  * PickUpData for observation from outside of the world.
@@ -36,24 +36,24 @@ namespace comptonsoft {
  */
 class ObservationPickUpData : public anlgeant4::VUserActionAssembly
 {
-  DEFINE_ANL_MODULE(ObservationPickUpData, 3.0);
+  DEFINE_ANL_MODULE(ObservationPickUpData, 6.0);
   ENABLE_PARALLEL_RUN();
 public:
   ObservationPickUpData();
   ~ObservationPickUpData() = default;
 
   anlnext::ANLStatus mod_define() override;
+  anlnext::ANLStatus mod_initialize() override;
 
-  void event_action_at_beginning(const G4Event*) override;
+  void event_action_at_beginning(const G4Event* event) override;
   void track_action_at_end(const G4Track* track) override;
 
-  const std::vector<ObservedParticle_sptr>& getParticleVector() const
-  { return particleVector_; }
-
 private:
-  bool recordPrimaries_;
-  std::vector<int> particleSelection_;
-  std::vector<ObservedParticle_sptr> particleVector_;
+  bool record_primaries_ = true;
+  std::vector<int> particle_selection_;
+
+  int current_event_id_ = 0;
+  ObservationEventStore* event_store_ = nullptr;
 };
 
 } /* namespace comptonsoft */

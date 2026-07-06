@@ -17,29 +17,38 @@
  *                                                                       *
  *************************************************************************/
 
-#include "EventTreeIOWithInitialInfo.hh"
+#ifndef COMPTONSOFT_ObservationEventStore_H
+#define COMPTONSOFT_ObservationEventStore_H 1
+
+#include "CSEventStore.hh"
+
+#include <G4ThreeVector.hh>
+#include "ObservedParticle.hh"
 
 namespace comptonsoft
 {
 
-EventTreeIOWithInitialInfo::~EventTreeIOWithInitialInfo() = default;
-
-void EventTreeIOWithInitialInfo::set_tree(TTree* tree)
+/**
+ * Raw hit store module for ComptonSoft
+ * @author Hirokazu Odaka
+ * @date 2026-07-06 | Hirokazu Odaka
+ */
+class ObservationEventStore : public CSEventStore
 {
-  EventTreeIO::set_tree(tree);
-  InitialInfoTreeIO::set_tree(tree);
-}
+  DEFINE_ANL_MODULE(ObservationEventStore, 1.0);
+public:
+  ObservationEventStore();
+  virtual ~ObservationEventStore();
 
-void EventTreeIOWithInitialInfo::define_branches()
-{
-  EventTreeIO::define_branches();
-  InitialInfoTreeIO::define_branches();
-}
+  void initialize_run(int run_id, int num_events) override;
 
-void EventTreeIOWithInitialInfo::set_branch_addresses()
-{
-  EventTreeIO::set_branch_addresses();
-  InitialInfoTreeIO::set_branch_addresses();
-}
+  void insert_observed_particle(size_t event_index, const ObservedParticle& observed_particle);
+  const std::vector<ObservedParticle>& get_observed_particles() const;
+
+private:
+  std::vector<std::vector<ObservedParticle>> observations_vector_;
+};
 
 } /* namespace comptonsoft */
+
+#endif /* COMPTONSOFT_ObservationEventStore_H */

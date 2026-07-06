@@ -21,7 +21,6 @@
 #define COMPTONSOFT_ComptonEventTreeIO_H 1
 
 #include <cstdint>
-#include "DetectorHit_sptr.hh"
 #include "BasicComptonEvent.hh"
 
 class TTree;
@@ -46,11 +45,11 @@ public:
   ComptonEventTreeIO();
   virtual ~ComptonEventTreeIO();
 
-  virtual void setTree(TTree* tree)
+  virtual void set_tree(TTree* tree)
   { cetree_ = tree; }
 
-  virtual void defineBranches();
-  virtual void setBranchAddresses();
+  virtual void define_branches();
+  virtual void set_branch_addresses();
 
   void fillEvent(int32_t runID,
                  int32_t eventID,

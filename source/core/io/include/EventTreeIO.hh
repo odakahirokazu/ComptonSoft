@@ -30,7 +30,7 @@ class TTree;
 namespace comptonsoft {
 
 /**
- * 
+ *
  * @author Hirokazu Odaka
  * @date 2015-10-11
  * @date 2016-09-07
@@ -42,16 +42,16 @@ class EventTreeIO
 {
 public:
   static const std::size_t MaxHits = 65536;
-  
+
 public:
   EventTreeIO();
   virtual ~EventTreeIO();
 
-  virtual void setTree(TTree* tree)
+  virtual void set_tree(TTree* tree)
   { tree_ = tree; }
 
-  virtual void defineBranches();
-  virtual void setBranchAddresses();
+  virtual void define_branches();
+  virtual void set_branch_addresses();
 
   void fillHits(int32_t runID, int32_t eventID, const std::vector<DetectorHit_sptr>& hits);
   void fillHits(const std::vector<DetectorHit_sptr>& hits)
@@ -64,7 +64,7 @@ public:
   int32_t getNumberOfHits() const { return num_hits_; }
   DetectorHit_sptr retrieveHit(std::size_t i) const;
   std::vector<DetectorHit_sptr> retrieveHits(int64_t& entry, bool get_entry=true);
-  
+
 private:
   TTree* tree_;
 

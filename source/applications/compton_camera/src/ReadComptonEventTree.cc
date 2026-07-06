@@ -20,8 +20,9 @@
 #include "ReadComptonEventTree.hh"
 #include "TChain.h"
 #include "BasicComptonEvent.hh"
-#include "VEventReconstructionAlgorithm.hh"
 #include "ComptonEventTreeIOWithInitialInfo.hh"
+#include "VEventReconstructionAlgorithm.hh"
+
 
 using namespace anlnext;
 
@@ -61,7 +62,7 @@ ANLStatus ReadComptonEventTree::mod_initialize()
     cetree_->Add(filename.c_str());
   }
 
-  treeIO_->setTree(cetree_.get());
+  treeIO_->set_tree(cetree_.get());
   if (cetree_->GetBranch("ini_energy")) {
     set_initial_information_stored();
     treeIO_->enableInitialInfoRecord();
@@ -69,7 +70,7 @@ ANLStatus ReadComptonEventTree::mod_initialize()
   else {
     treeIO_->disableInitialInfoRecord();
   }
-  treeIO_->setBranchAddresses();
+  treeIO_->set_branch_addresses();
 
   numEntries_ = cetree_->GetEntries();
   std::cout << "Number of entries: " << numEntries_ << std::endl;

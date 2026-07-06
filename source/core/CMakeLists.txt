@@ -87,6 +87,7 @@ set(ComptonSoftCore_Simulation_Classes
   simulation/src/CustomizedEmLivermorePolarizedPhysics.cc
   simulation/src/CSPhysicsList.cc
   ### observation simulation
+  simulation/src/ObservationEventStore.cc
   simulation/src/ObservationPickUpData.cc
   simulation/src/ObservationTreeIO.cc
   simulation/src/ObservationTreeIOWithInitialInfo.cc

@@ -128,13 +128,14 @@ classList = [
   # physics list
   ANL::SWIGClass.new("PhysicsListManager"),
   # others
+  ANL::SWIGClass.new("ObservationEventStore"),
+  ANL::SWIGClass.new("WriteObservationTree"),
   ANL::SWIGClass.new("SimXIF", false, 'USE_SIMX'),
   ANL::SWIGClass.new("GenerateSimXEvent", false, 'USE_SIMX'),
   ANL::SWIGClass.new("OutputSimXPrimaries", false, 'USE_SIMX'),
   ANL::SWIGClass.new("AssignG4CopyNumber"),
   ANL::SWIGClass.new("InitialParticleTree"),
   ANL::SWIGClass.new("DumpMass"),
-  ANL::SWIGClass.new("WriteObservationTree"),
   # simulation
   ANL::SWIGClass.new("SimulateCXBShieldPlate"),
   ANL::SWIGClass.new("RescaleSimulationNoiseOfSGDSiUntriggered"),

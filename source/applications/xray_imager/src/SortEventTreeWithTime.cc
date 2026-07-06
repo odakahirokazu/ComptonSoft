@@ -57,7 +57,7 @@ ANLStatus SortEventTreeWithTime::mod_initialize()
     tree_->Add(filename.c_str());
   }
 
-  treeIO_->setTree(tree_);
+  treeIO_->set_tree(tree_);
   if (tree_->GetBranch("ini_energy")) {
     set_initial_information_stored();
     treeIO_->enableInitialInfoRecord();
@@ -65,7 +65,7 @@ ANLStatus SortEventTreeWithTime::mod_initialize()
   else {
     treeIO_->disableInitialInfoRecord();
   }
-  treeIO_->setBranchAddresses();
+  treeIO_->set_branch_addresses();
 
   numEntries_ = tree_->GetEntries();
   std::cout << "Number of entries: " << numEntries_ << std::endl;

@@ -155,6 +155,8 @@
 #include "SampleOpticalDepth.hh"
 #include "ObservationPickUpData.hh"
 #include "PhysicsListManager.hh"
+#include "ObservationEventStore.hh"
+#include "WriteObservationTree.hh"
 #ifdef USE_SIMX
 #include "SimXIF.hh"
 #endif
@@ -167,7 +169,6 @@
 #include "AssignG4CopyNumber.hh"
 #include "InitialParticleTree.hh"
 #include "DumpMass.hh"
-#include "WriteObservationTree.hh"
 #include "SimulateCXBShieldPlate.hh"
 #include "RescaleSimulationNoiseOfSGDSiUntriggered.hh"
 #include "UniformlyRandomizeEPI.hh"
@@ -1153,6 +1154,22 @@ public:
 };
 
 
+class ObservationEventStore : public CSEventStore
+{
+public:
+  ObservationEventStore();
+  virtual ~ObservationEventStore();
+};
+
+
+class WriteObservationTree : public VCSModule
+{
+public:
+  WriteObservationTree();
+  ~WriteObservationTree() = default;
+};
+
+
 #ifdef USE_SIMX
 class SimXIF : public anlnext::BasicModule
 {
@@ -1204,14 +1221,6 @@ class DumpMass : public anlnext::BasicModule
 public:
   DumpMass();
   ~DumpMass();
-};
-
-
-class WriteObservationTree : public VCSModule
-{
-public:
-  WriteObservationTree();
-  ~WriteObservationTree() = default;
 };
 
 

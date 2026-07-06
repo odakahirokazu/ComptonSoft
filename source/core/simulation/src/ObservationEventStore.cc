@@ -17,29 +17,33 @@
  *                                                                       *
  *************************************************************************/
 
-#include "EventTreeIOWithInitialInfo.hh"
+#include "ObservationEventStore.hh"
 
-namespace comptonsoft
+using namespace anlnext;
+
+namespace comptonsoft {
+
+ObservationEventStore::ObservationEventStore() = default;
+
+ObservationEventStore::~ObservationEventStore() = default;
+
+void ObservationEventStore::initialize_run(int run_id, int num_events)
 {
-
-EventTreeIOWithInitialInfo::~EventTreeIOWithInitialInfo() = default;
-
-void EventTreeIOWithInitialInfo::set_tree(TTree* tree)
-{
-  EventTreeIO::set_tree(tree);
-  InitialInfoTreeIO::set_tree(tree);
+  CSEventStore::initialize_run(run_id, num_events);
+  observations_vector_.resize(num_events);
+  for (auto& vec: observations_vector_) {
+    vec.clear();
+  }
 }
 
-void EventTreeIOWithInitialInfo::define_branches()
+void ObservationEventStore::insert_observed_particle(size_t event_index, const ObservedParticle& observed_particle)
 {
-  EventTreeIO::define_branches();
-  InitialInfoTreeIO::define_branches();
+  observations_vector_[event_index].push_back(observed_particle);
 }
 
-void EventTreeIOWithInitialInfo::set_branch_addresses()
+const std::vector<ObservedParticle>& ObservationEventStore::get_observed_particles() const
 {
-  EventTreeIO::set_branch_addresses();
-  InitialInfoTreeIO::set_branch_addresses();
+  return observations_vector_[read_index()];
 }
 
-} /* namespace comptonsoft */
+} // namespace comptonsoft

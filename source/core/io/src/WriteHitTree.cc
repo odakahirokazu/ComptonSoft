@@ -53,8 +53,8 @@ ANLStatus WriteHitTree::mod_initialize()
   }
 
   hittree_ = new TTree("hittree", "hittree");
-  treeIO_->setTree(hittree_);
-  treeIO_->defineBranches();
+  treeIO_->set_tree(hittree_);
+  treeIO_->define_branches();
 
   return AS_OK;
 }

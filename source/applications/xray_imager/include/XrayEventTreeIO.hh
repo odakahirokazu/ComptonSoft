@@ -30,7 +30,7 @@ namespace comptonsoft {
 
 
 /**
- * 
+ *
  * @author Hirokazu Odaka
  * @date 2019-06-05
  * @date 2020-04-02 | add detector_id
@@ -44,17 +44,17 @@ public:
   void setEventSize(int v);
   int EventSize() const { return eventSize_; }
 
-  virtual void setTree(TTree* tree)
+  virtual void set_tree(TTree* tree)
   { tree_ = tree; }
 
-  virtual void defineBranches();
-  virtual void setBranchAddresses();
+  virtual void define_branches();
+  virtual void set_branch_addresses();
 
   int fillEvents(const XrayEventContainer& events);
   int fillEvents(XrayEventCIter events_begin, XrayEventCIter events_end);
   XrayEvent_sptr retrieveEvent() const;
   std::list<XrayEvent_sptr> retrieveEvents(int64_t& entry);
-  
+
 private:
   static constexpr int MaxEventSize_ = 9;
 

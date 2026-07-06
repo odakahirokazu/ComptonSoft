@@ -26,7 +26,7 @@
 namespace comptonsoft {
 
 /**
- * 
+ *
  * @author Hirokazu Odaka
  * @date 2017-06-21 | based on HitTreeIOWithInitialInfo
  */
@@ -36,9 +36,9 @@ public:
   ObservationTreeIOWithInitialInfo() = default;
   ~ObservationTreeIOWithInitialInfo();
 
-  void setTree(TTree* tree) override;
-  void defineBranches() override;
-  void setBranchAddresses() override;
+  void set_tree(TTree* tree) override;
+  void define_branches() override;
+  void set_branch_addresses() override;
 };
 
 } /* namespace comptonsoft */

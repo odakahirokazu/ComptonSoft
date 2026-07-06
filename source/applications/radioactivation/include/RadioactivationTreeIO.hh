@@ -40,11 +40,11 @@ public:
   RadioactivationTreeIO();
   virtual ~RadioactivationTreeIO();
 
-  virtual void setTree(TTree* tree)
+  virtual void set_tree(TTree* tree)
   { tree_ = tree; }
 
-  virtual void defineBranches();
-  virtual void setBranchAddresses();
+  virtual void define_branches();
+  virtual void set_branch_addresses();
 
   void fill(const IsotopeInfo& isotope, int volume, const G4ThreeVector& position);
   std::tuple<IsotopeInfo, int, G4ThreeVector> retrieve() const;

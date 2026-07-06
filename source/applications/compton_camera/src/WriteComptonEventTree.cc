@@ -59,8 +59,8 @@ ANLStatus WriteComptonEventTree::mod_initialize()
   }
 
   cetree_ = new TTree("cetree", "cetree");
-  treeIO_->setTree(cetree_);
-  treeIO_->defineBranches();
+  treeIO_->set_tree(cetree_);
+  treeIO_->define_branches();
 
   return AS_OK;
 }

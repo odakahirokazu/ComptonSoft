@@ -42,10 +42,10 @@ public:
   RadioactivationEventStore();
   virtual ~RadioactivationEventStore();
 
-  void initialize_run(int runID, int num_events) override;
+  void initialize_run(int run_id, int num_events) override;
 
-  void insertRadioactivation(size_t event_index, const RadioactivationInfo& info);
-  const std::vector<RadioactivationInfo>& getRadioactivations() const;
+  void insert_radioactivation(size_t event_index, const RadioactivationInfo& info);
+  const std::vector<RadioactivationInfo>& get_radioactivations() const;
 
 private:
   std::vector<std::vector<RadioactivationInfo>> radioactivations_vector_;

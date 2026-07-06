@@ -24,22 +24,22 @@ namespace comptonsoft
 
 ComptonEventTreeIOWithInitialInfo::~ComptonEventTreeIOWithInitialInfo() = default;
 
-void ComptonEventTreeIOWithInitialInfo::setTree(TTree* tree)
+void ComptonEventTreeIOWithInitialInfo::set_tree(TTree* tree)
 {
-  ComptonEventTreeIO::setTree(tree);
-  InitialInfoTreeIO::setTree(tree);
+  ComptonEventTreeIO::set_tree(tree);
+  InitialInfoTreeIO::set_tree(tree);
 }
 
-void ComptonEventTreeIOWithInitialInfo::defineBranches()
+void ComptonEventTreeIOWithInitialInfo::define_branches()
 {
-  ComptonEventTreeIO::defineBranches();
-  InitialInfoTreeIO::defineBranches();
+  ComptonEventTreeIO::define_branches();
+  InitialInfoTreeIO::define_branches();
 }
 
-void ComptonEventTreeIOWithInitialInfo::setBranchAddresses()
+void ComptonEventTreeIOWithInitialInfo::set_branch_addresses()
 {
-  ComptonEventTreeIO::setBranchAddresses();
-  InitialInfoTreeIO::setBranchAddresses();
+  ComptonEventTreeIO::set_branch_addresses();
+  InitialInfoTreeIO::set_branch_addresses();
 }
 
 } /* namespace comptonsoft */

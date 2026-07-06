@@ -238,7 +238,15 @@ module ComptonSoft
     def setup_minimal()
       add_namespace ComptonSoft
 
-      chain :CSEventStore
+      unless module_of_event_store()
+        set_event_store :CSEventStore
+      end
+
+      unless module_of_user_action()
+        set_user_action :StandardUserActionAssembly
+      end
+
+      chain_with_parameters module_of_event_store
 
       chain_with_parameters module_of_geometry
 
@@ -249,7 +257,11 @@ module ComptonSoft
 
       chain_with_parameters module_of_primary_generator
 
-      chain :StandardUserActionAssembly
+      chain_with_parameters module_of_user_action
+
+      if pickup_list = module_list_of_pickup_data
+        pickup_list.each{|m| chain_with_parameters(m) }
+      end
 
       chain :Geant4Body
       with_parameters(num_events: @num_events_per_run,
@@ -284,6 +296,8 @@ module ComptonSoft
     end
 
     def setup()
+      set_event_store :ObservationEventStore
+
       add_pickup_data :ObservationPickUpData, {
         record_primaries: @record_primaries,
         particle_selection: @particle_selection

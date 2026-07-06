@@ -48,7 +48,7 @@ class ReadHitTree : public VCSModule, public anlgeant4::InitialInformation
 public:
   ReadHitTree();
   ~ReadHitTree();
-  
+
   anlnext::ANLStatus mod_define() override;
   anlnext::ANLStatus mod_initialize() override;
   anlnext::ANLStatus mod_begin_run() override;
@@ -56,7 +56,7 @@ public:
 
 protected:
   virtual void insertHit(const DetectorHit_sptr& hit);
-  
+
 private:
   std::vector<std::string> fileList_;
   bool trustNumHits_;

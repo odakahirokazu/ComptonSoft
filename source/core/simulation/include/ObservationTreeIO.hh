@@ -30,7 +30,7 @@ class TTree;
 namespace comptonsoft {
 
 /**
- * 
+ *
  * @author Hirokazu Odaka
  * @date 2017-06-20
  */
@@ -40,30 +40,30 @@ public:
   ObservationTreeIO();
   virtual ~ObservationTreeIO();
 
-  virtual void setTree(TTree* tree)
+  virtual void set_tree(TTree* tree)
   { tree_ = tree; }
 
-  virtual void defineBranches();
-  virtual void setBranchAddresses();
+  virtual void define_branches();
+  virtual void set_branch_addresses();
 
-  void fillParticles(int64_t eventID, const std::vector<ObservedParticle_sptr>& particles);
+  void fill_particles(int32_t run_id, int32_t event_id, const std::vector<ObservedParticle>& particles);
 
-  int64_t getEventID() const { return eventid_; }
-  int32_t getNumberOfParticles() const { return num_; }
+  int32_t get_run_id() const { return runid_; }
+  int32_t get_event_id() const { return eventid_; }
+  int32_t get_number_of_particles() const { return num_; }
 
-  ObservedParticle_sptr retrieveParticle() const;
+  ObservedParticle retrieve_particle() const;
 
-  std::pair<int64_t, std::vector<ObservedParticle_sptr>>
-  retrieveParticles(int64_t& entry,
-                    bool get_first_entry=true);
-  
+  std::pair<int, std::vector<ObservedParticle>> retrieve_particles(int64_t& entry, bool get_first_entry=true);
+
 private:
-  TTree* tree_;
+  TTree* tree_ = nullptr;
 
   /*
    * tree contents
    */
-  int64_t eventid_ = 0;
+  int32_t runid_ = 0;
+  int32_t eventid_ = 0;
   int32_t num_ = 0;
   int32_t trackid_ = 0;
   int32_t particle_ = 0;

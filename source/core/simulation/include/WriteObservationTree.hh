@@ -32,28 +32,28 @@ class InitialInformation;
 namespace comptonsoft {
 
 class ObservationTreeIOWithInitialInfo;
-class ObservationPickUpData;
+class ObservationEventStore;
 
 /**
- * 
+ *
  * @author Hirokazu Odaka
  * @date 2017-06-20
  */
 class WriteObservationTree : public VCSModule
 {
-  DEFINE_ANL_MODULE(WriteObservationTree, 1.0);
+  DEFINE_ANL_MODULE(WriteObservationTree, 2.0);
 public:
   WriteObservationTree();
   ~WriteObservationTree() = default;
-  
+
   anlnext::ANLStatus mod_initialize() override;
   anlnext::ANLStatus mod_analyze() override;
 
 private:
-  const ObservationPickUpData* observationPUD_;
-  const anlgeant4::InitialInformation* initialInfo_;
-  TTree* tree_;
-  std::unique_ptr<ObservationTreeIOWithInitialInfo> treeIO_;
+  const ObservationEventStore* event_store_ = nullptr;
+  const anlgeant4::InitialInformation* initial_info_ = nullptr;
+  TTree* tree_ = nullptr;
+  std::unique_ptr<ObservationTreeIOWithInitialInfo> tree_io_;
 };
 
 } /* namespace comptonsoft */

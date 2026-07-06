@@ -34,7 +34,7 @@ ComptonEventTreeIO::ComptonEventTreeIO()
 
 ComptonEventTreeIO::~ComptonEventTreeIO() = default;
 
-void ComptonEventTreeIO::defineBranches()
+void ComptonEventTreeIO::define_branches()
 {
   cetree_->Branch("runid", &runid_, "runid/I");
   cetree_->Branch("eventid", &eventid_, "eventid/I");
@@ -61,7 +61,7 @@ void ComptonEventTreeIO::defineBranches()
   cetree_->Branch("hit1_posy_error", &hit1_posy_error_, "hit1_posy_error/F");
   cetree_->Branch("hit1_posz_error", &hit1_posz_error_, "hit1_posz_error/F");
   cetree_->Branch("hit1_energy_error", &hit1_energy_error_, "hit1_energy_error/F");
-  
+
   cetree_->Branch("hit2_id", &hit2_id_, "hit2_id/S");
   cetree_->Branch("hit2_process", &hit2_process_, "hit2_process/i");
   cetree_->Branch("hit2_detector", &hit2_detector_, "hit2_detector/S");
@@ -100,7 +100,7 @@ void ComptonEventTreeIO::defineBranches()
   cetree_->Branch("reconstruction_fraction", &reconstruction_fraction_, "reconstruction_fraction/D");
 }
 
-void ComptonEventTreeIO::setBranchAddresses()
+void ComptonEventTreeIO::set_branch_addresses()
 {
   cetree_->SetBranchAddress("runid", &runid_);
   cetree_->SetBranchAddress("eventid", &eventid_);
@@ -127,7 +127,7 @@ void ComptonEventTreeIO::setBranchAddresses()
   cetree_->SetBranchAddress("hit1_posy_error", &hit1_posy_error_);
   cetree_->SetBranchAddress("hit1_posz_error", &hit1_posz_error_);
   cetree_->SetBranchAddress("hit1_energy_error", &hit1_energy_error_);
-  
+
   cetree_->SetBranchAddress("hit2_id", &hit2_id_);
   cetree_->SetBranchAddress("hit2_process", &hit2_process_);
   cetree_->SetBranchAddress("hit2_detector", &hit2_detector_);
@@ -242,7 +242,7 @@ void ComptonEventTreeIO::fillEvent(const int32_t runID,
   total_energy_deposit_ = event.TotalEnergyDeposit() / unit::keV;
   reconstructed_order_ = event.ReconstructedOrder();
   reconstruction_fraction_ = event.ReconstructionFraction();
-  
+
   cetree_->Fill();
 }
 
@@ -268,7 +268,7 @@ void ComptonEventTreeIO::retrieveEvent(BasicComptonEvent& event) const
   event.setRunID(runid_);
   event.setEventID(eventid_);
   event.setNumberOfHits(num_hits_);
-  
+
   event.setHit1ID(hit1_id_);
   event.setHit1Process(hit1_process_);
   event.setHit1DetectorChannelID(DetectorBasedChannelID(hit1_detector_));
@@ -299,7 +299,7 @@ void ComptonEventTreeIO::retrieveEvent(BasicComptonEvent& event) const
 
   // Currently, BasicComptonEvent does not have a correspoing property
   // event.setEnergyReconstructed(energy_reconstructed_ * unit::keV);
-  
+
   event.setFlags(flags_);
   event.setHitPattern(hitpattern_);
   event.setGrade(grade_);

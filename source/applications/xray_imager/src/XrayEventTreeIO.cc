@@ -44,7 +44,7 @@ void XrayEventTreeIO::setEventSize(int v)
   eventSize_ = v;
 }
 
-void XrayEventTreeIO::defineBranches()
+void XrayEventTreeIO::define_branches()
 {
   tree_->Branch("frameID",    &frameID_,    "frameID/I");
   tree_->Branch("time",       &time_,       "time/D");
@@ -64,7 +64,7 @@ void XrayEventTreeIO::defineBranches()
   tree_->Branch("posz",       &posz_,       "posz/D");
 }
 
-void XrayEventTreeIO::setBranchAddresses()
+void XrayEventTreeIO::set_branch_addresses()
 {
   tree_->SetBranchAddress("frameID",    &frameID_);
   tree_->SetBranchAddress("time",       &time_);
@@ -123,7 +123,7 @@ int XrayEventTreeIO::fillEvents(const XrayEventCIter events_begin, const XrayEve
         data_[ix][iy] = data[ix][iy];
       }
     }
-    
+
     tree_->Fill();
     num++;
   }
@@ -165,7 +165,7 @@ std::list<XrayEvent_sptr> XrayEventTreeIO::retrieveEvents(int64_t& entry)
   if (frameID_ == -1) {
     tree_->GetEntry(entry);
   }
-  
+
   const int32_t ThisFrameID = frameID_;
 
   std::list<XrayEvent_sptr> events;

@@ -31,7 +31,7 @@ RadioactivationTreeIO::RadioactivationTreeIO() = default;
 
 RadioactivationTreeIO::~RadioactivationTreeIO() = default;
 
-void RadioactivationTreeIO::defineBranches()
+void RadioactivationTreeIO::define_branches()
 {
   tree_->Branch("Z", &Z_, "Z/I");
   tree_->Branch("A", &A_, "A/I");
@@ -43,7 +43,7 @@ void RadioactivationTreeIO::defineBranches()
   tree_->Branch("posz", &posz_, "posz/F");
 }
 
-void RadioactivationTreeIO::setBranchAddresses()
+void RadioactivationTreeIO::set_branch_addresses()
 {
   tree_->SetBranchAddress("Z", &Z_);
   tree_->SetBranchAddress("A", &A_);

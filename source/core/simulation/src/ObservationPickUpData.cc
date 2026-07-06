@@ -18,9 +18,11 @@
  *************************************************************************/
 
 #include "ObservationPickUpData.hh"
+
 #include <algorithm>
 #include "G4Event.hh"
 #include "G4Track.hh"
+#include "ObservationEventStore.hh"
 
 using namespace anlnext;
 
@@ -28,40 +30,48 @@ namespace comptonsoft
 {
 
 ObservationPickUpData::ObservationPickUpData()
-  : recordPrimaries_(true)
 {
 }
 
 ANLStatus ObservationPickUpData::mod_define()
 {
-  register_parameter(&recordPrimaries_, "record_primaries");
-  register_parameter(&particleSelection_, "particle_selection");
+  define_parameter("record_primaries", &mod_class::record_primaries_);
+  define_parameter("particle_selection", &mod_class::particle_selection_);
 
   return AS_OK;
 }
 
-void ObservationPickUpData::event_action_at_beginning(const G4Event*)
+ANLStatus ObservationPickUpData::mod_initialize()
 {
-  particleVector_.clear();
+  VUserActionAssembly::mod_initialize();
+
+  get_module_NC("ObservationEventStore", &event_store_);
+
+  return AS_OK;
+}
+
+void ObservationPickUpData::event_action_at_beginning(const G4Event* event)
+{
+  current_event_id_ = event->GetEventID();
 }
 
 void ObservationPickUpData::track_action_at_end(const G4Track* track)
 {
   if (track->GetNextVolume() == 0) {
     const int PDGEncoding = track->GetDefinition()->GetPDGEncoding();
-    if (particleSelection_.empty() ||
-        std::find(particleSelection_.begin(), particleSelection_.end(), PDGEncoding)!=particleSelection_.end()) {
-      const int trackID = track->GetTrackID();
-      if (recordPrimaries_ || trackID > 1) {
-        ObservedParticle_sptr data(new ObservedParticle);
-        data->trackid = trackID;
-        data->particle = PDGEncoding;
-        data->time = track->GetGlobalTime();
-        data->position = track->GetPosition();
-        data->energy = track->GetKineticEnergy();
-        data->direction = track->GetMomentumDirection();
-        data->polarization = track->GetPolarization();
-        particleVector_.push_back(data);
+    if (particle_selection_.empty() ||
+        std::find(particle_selection_.begin(), particle_selection_.end(), PDGEncoding)!=particle_selection_.end()) {
+      const int track_id = track->GetTrackID();
+      if (record_primaries_ || track_id > 1) {
+        ObservedParticle data;
+        data.trackid = track_id;
+        data.particle = PDGEncoding;
+        data.time = track->GetGlobalTime();
+        data.position = track->GetPosition();
+        data.energy = track->GetKineticEnergy();
+        data.direction = track->GetMomentumDirection();
+        data.polarization = track->GetPolarization();
+        event_store_->insert_observed_particle(current_event_id_, data);
       }
     }
   }

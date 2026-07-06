@@ -24,22 +24,22 @@ namespace comptonsoft
 
 ObservationTreeIOWithInitialInfo::~ObservationTreeIOWithInitialInfo() = default;
 
-void ObservationTreeIOWithInitialInfo::setTree(TTree* tree)
+void ObservationTreeIOWithInitialInfo::set_tree(TTree* tree)
 {
-  ObservationTreeIO::setTree(tree);
-  InitialInfoTreeIO::setTree(tree);
+  ObservationTreeIO::set_tree(tree);
+  InitialInfoTreeIO::set_tree(tree);
 }
 
-void ObservationTreeIOWithInitialInfo::defineBranches()
+void ObservationTreeIOWithInitialInfo::define_branches()
 {
-  ObservationTreeIO::defineBranches();
-  InitialInfoTreeIO::defineBranches();
+  ObservationTreeIO::define_branches();
+  InitialInfoTreeIO::define_branches();
 }
 
-void ObservationTreeIOWithInitialInfo::setBranchAddresses()
+void ObservationTreeIOWithInitialInfo::set_branch_addresses()
 {
-  ObservationTreeIO::setBranchAddresses();
-  InitialInfoTreeIO::setBranchAddresses();
+  ObservationTreeIO::set_branch_addresses();
+  InitialInfoTreeIO::set_branch_addresses();
 }
 
 } /* namespace comptonsoft */

@@ -57,7 +57,7 @@ ANLStatus ReadHitTree::mod_initialize()
     hittree_->Add(filename.c_str());
   }
 
-  treeIO_->setTree(hittree_.get());
+  treeIO_->set_tree(hittree_.get());
   if (hittree_->GetBranch("ini_energy")) {
     set_initial_information_stored();
     treeIO_->enableInitialInfoRecord();
@@ -65,7 +65,7 @@ ANLStatus ReadHitTree::mod_initialize()
   else {
     treeIO_->disableInitialInfoRecord();
   }
-  treeIO_->setBranchAddresses();
+  treeIO_->set_branch_addresses();
 
   numEntries_ = hittree_->GetEntries();
   std::cout << "Number of entries: " << numEntries_ << std::endl;

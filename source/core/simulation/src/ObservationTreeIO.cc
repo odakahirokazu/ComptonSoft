@@ -35,9 +35,10 @@ ObservationTreeIO::ObservationTreeIO()
 
 ObservationTreeIO::~ObservationTreeIO() = default;
 
-void ObservationTreeIO::defineBranches()
+void ObservationTreeIO::define_branches()
 {
-  tree_->Branch("eventid",  &eventid_,  "eventid/L");
+  tree_->Branch("runid",    &runid_,    "runid/I");
+  tree_->Branch("eventid",  &eventid_,  "eventid/I");
   tree_->Branch("num",      &num_,      "num/I");
   tree_->Branch("trackid",  &trackid_,  "trackid/I");
   tree_->Branch("particle", &particle_, "particle/I");
@@ -54,8 +55,9 @@ void ObservationTreeIO::defineBranches()
   tree_->Branch("polarz",   &polarz_,   "polarz/F");
 }
 
-void ObservationTreeIO::setBranchAddresses()
+void ObservationTreeIO::set_branch_addresses()
 {
+  tree_->SetBranchAddress("runid",    &runid_);
   tree_->SetBranchAddress("eventid",  &eventid_);
   tree_->SetBranchAddress("num",      &num_);
   tree_->SetBranchAddress("trackid",  &trackid_);
@@ -74,79 +76,80 @@ void ObservationTreeIO::setBranchAddresses()
 }
 
 void ObservationTreeIO::
-fillParticles(const int64_t eventID,
-              const std::vector<ObservedParticle_sptr>& particles)
+fill_particles(const int32_t run_id,
+               const int32_t event_id,
+               const std::vector<ObservedParticle>& particles)
 {
-  eventid_ = eventID;
+  runid_ = run_id;
+  eventid_ = event_id;
 
   const std::size_t NumParticles = particles.size();
   num_ = static_cast<int32_t>(NumParticles);
 
   for (std::size_t i=0; i<NumParticles; i++) {
-    const ObservedParticle_sptr& particle = particles[i];
-    trackid_ = particle->trackid;
-    particle_ = particle->particle;
-    time_ = particle->time / unit::second;
-    posx_ = static_cast<float>(particle->position.x()/unit::cm);
-    posy_ = static_cast<float>(particle->position.y()/unit::cm);
-    posz_ = static_cast<float>(particle->position.z()/unit::cm);
-    energy_ = static_cast<float>(particle->energy/unit::keV);
-    dirx_ = static_cast<float>(particle->direction.x());
-    diry_ = static_cast<float>(particle->direction.y());
-    dirz_ = static_cast<float>(particle->direction.z());
-    polarx_ = static_cast<float>(particle->polarization.x());
-    polary_ = static_cast<float>(particle->polarization.y());
-    polarz_ = static_cast<float>(particle->polarization.z());
-    
+    const ObservedParticle& particle = particles[i];
+    trackid_ = particle.trackid;
+    particle_ = particle.particle;
+    time_ = particle.time / unit::second;
+    posx_ = static_cast<float>(particle.position.x()/unit::cm);
+    posy_ = static_cast<float>(particle.position.y()/unit::cm);
+    posz_ = static_cast<float>(particle.position.z()/unit::cm);
+    energy_ = static_cast<float>(particle.energy/unit::keV);
+    dirx_ = static_cast<float>(particle.direction.x());
+    diry_ = static_cast<float>(particle.direction.y());
+    dirz_ = static_cast<float>(particle.direction.z());
+    polarx_ = static_cast<float>(particle.polarization.x());
+    polary_ = static_cast<float>(particle.polarization.y());
+    polarz_ = static_cast<float>(particle.polarization.z());
+
     tree_->Fill();
   }
 }
 
-ObservedParticle_sptr
-ObservationTreeIO::retrieveParticle() const
+ObservedParticle ObservationTreeIO::retrieve_particle() const
 {
-  ObservedParticle_sptr particle(new ObservedParticle);
-  particle->trackid = trackid_;
-  particle->particle = particle_;
-  particle->time = time_ * unit::second;
-  particle->position.set(posx_*unit::cm, posy_*unit::cm, posz_*unit::cm);
-  particle->energy = energy_ * unit::keV;
-  particle->direction.set(dirx_, diry_, dirz_);
-  particle->polarization.set(polarx_, polary_, polarz_);
+  ObservedParticle particle;
+  particle.trackid = trackid_;
+  particle.particle = particle_;
+  particle.time = time_ * unit::second;
+  particle.position.set(posx_*unit::cm, posy_*unit::cm, posz_*unit::cm);
+  particle.energy = energy_ * unit::keV;
+  particle.direction.set(dirx_, diry_, dirz_);
+  particle.polarization.set(polarx_, polary_, polarz_);
 
   return particle;
 }
 
-std::pair<int64_t, std::vector<ObservedParticle_sptr>>
-ObservationTreeIO::retrieveParticles(int64_t& entry,
-                                     bool get_first_entry)
+std::pair<int, std::vector<ObservedParticle>>
+ObservationTreeIO::retrieve_particles(int64_t& entry, bool get_first_entry)
 {
-  std::vector<ObservedParticle_sptr> particles;
+  std::vector<ObservedParticle> particles;
 
   if (get_first_entry) {
     tree_->GetEntry(entry);
   }
 
-  const int64_t ThisEventID = eventid_;
-  const std::size_t Num = getNumberOfParticles();
-  for (std::size_t i=0; i<Num; i++) {
+  const int this_run_id = runid_;
+  const int this_event_id = eventid_;
+  const std::size_t num = get_number_of_particles();
+  for (std::size_t i=0; i<num; i++) {
     if (i != 0) {
       tree_->GetEntry(entry+i);
 
-      if (eventid_ != ThisEventID) {
+      if (eventid_ != this_event_id || runid_ != this_run_id) {
         std::ostringstream message;
         message << "Error: inconsistent Event ID at "
-                << ThisEventID << '\n';
+                << this_event_id << '\n';
         BOOST_THROW_EXCEPTION( CSException(message.str()) );
       }
     }
-    
-    ObservedParticle_sptr particle = retrieveParticle();
+
+    ObservedParticle particle = retrieve_particle();
     particles.push_back(std::move(particle));
   }
 
-  entry += Num;
-  return std::make_pair(ThisEventID, particles);
+  entry += num;
+  return std::make_pair(this_event_id, particles);
 }
 
 } /* namespace comptonsoft */

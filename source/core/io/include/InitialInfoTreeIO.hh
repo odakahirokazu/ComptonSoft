@@ -27,7 +27,7 @@ class TTree;
 namespace comptonsoft {
 
 /**
- * 
+ *
  * @author Hirokazu Odaka
  * @date 2014-12-02
  * @date 2016-09-07 | time_ is double.
@@ -38,13 +38,13 @@ public:
   InitialInfoTreeIO();
   virtual ~InitialInfoTreeIO();
 
-  virtual void setTree(TTree* tree) { tree_ = tree; }
+  virtual void set_tree(TTree* tree) { tree_ = tree; }
 
   void enableInitialInfoRecord() { enabled_ = true; }
   void disableInitialInfoRecord() { enabled_ = false; }
 
-  virtual void defineBranches();
-  virtual void setBranchAddresses();
+  virtual void define_branches();
+  virtual void set_branch_addresses();
 
   double getInitialEnergy() const;
   vector3_t getInitialDirection() const;
@@ -62,10 +62,10 @@ public:
 
   void setInitialDirection(const vector3_t& v)
   { setInitialDirection(v.x(), v.y(), v.z()); }
-  
+
   void setInitialPosition(const vector3_t& v)
   { setInitialPosition(v.x(), v.y(), v.z()); }
-  
+
   void setInitialPolarization(const vector3_t& v)
   { setInitialPolarization(v.x(), v.y(), v.z()); }
 
@@ -93,7 +93,7 @@ public:
     setInitialPosition(position);
     setInitialPolarization(vector3_t(0.0, 0.0, 0.0));
   }
-  
+
 private:
   TTree* tree_;
   bool enabled_;

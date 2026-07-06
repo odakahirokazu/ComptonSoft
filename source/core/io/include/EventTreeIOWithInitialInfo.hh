@@ -26,7 +26,7 @@
 namespace comptonsoft {
 
 /**
- * 
+ *
  * @author Hirokazu Odaka
  * @date 2015-10-11
  */
@@ -36,9 +36,9 @@ public:
   EventTreeIOWithInitialInfo() = default;
   virtual ~EventTreeIOWithInitialInfo();
 
-  void setTree(TTree* tree) override;
-  void defineBranches() override;
-  void setBranchAddresses() override;
+  void set_tree(TTree* tree) override;
+  void define_branches() override;
+  void set_branch_addresses() override;
 };
 
 } /* namespace comptonsoft */

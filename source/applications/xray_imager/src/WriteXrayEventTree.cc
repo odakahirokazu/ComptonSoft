@@ -38,7 +38,7 @@ WriteXrayEventTree::WriteXrayEventTree()
 ANLStatus WriteXrayEventTree::mod_define()
 {
   define_parameter("collection_module", &mod_class::collectionModule_);
-  
+
   return AS_OK;
 }
 
@@ -50,9 +50,9 @@ ANLStatus WriteXrayEventTree::mod_initialize()
   define_evs("WriteXrayEventTree:Fill");
 
   tree_ = new TTree("xetree", "xetree");
-  treeIO_->setTree(tree_);
-  treeIO_->defineBranches();
-  
+  treeIO_->set_tree(tree_);
+  treeIO_->define_branches();
+
   return AS_OK;
 }
 
@@ -62,7 +62,7 @@ ANLStatus WriteXrayEventTree::mod_analyze()
   if (n>0) {
     set_evs("WriteXrayEventTree:Fill");
   }
-  
+
   return AS_OK;
 }
 

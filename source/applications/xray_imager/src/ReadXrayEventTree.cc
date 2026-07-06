@@ -40,22 +40,22 @@ ANLStatus ReadXrayEventTree::mod_define()
 {
   define_parameter("file_list", &mod_class::fileList_);
   define_parameter("event_size", &mod_class::eventSize_);
-  
+
   return AS_OK;
 }
 
 ANLStatus ReadXrayEventTree::mod_initialize()
 {
   get_module_NC("XrayEventCollection", &collection_);
-  
+
   tree_ = std::make_unique<TChain>("xetree");
   for (const std::string& filename: fileList_) {
     tree_->Add(filename.c_str());
   }
 
   treeIO_->setEventSize(eventSize_);
-  treeIO_->setTree(tree_.get());
-  treeIO_->setBranchAddresses();
+  treeIO_->set_tree(tree_.get());
+  treeIO_->set_branch_addresses();
 
   numEntries_ = tree_->GetEntries();
   std::cout << "Number of entries: " << numEntries_ << std::endl;

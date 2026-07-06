@@ -28,7 +28,7 @@ class TTree;
 namespace comptonsoft {
 
 /**
- * 
+ *
  * @author Hirokazu Odaka
  * @date 2014-12-02
  * @date 2016-09-07
@@ -44,11 +44,11 @@ public:
   HitTreeIO();
   virtual ~HitTreeIO();
 
-  virtual void setTree(TTree* tree)
+  virtual void set_tree(TTree* tree)
   { hittree_ = tree; }
 
-  virtual void defineBranches();
-  virtual void setBranchAddresses();
+  virtual void define_branches();
+  virtual void set_branch_addresses();
 
   void fillHits(int32_t runID, int32_t eventID, const std::vector<DetectorHit_sptr>& hits);
   void fillHits(const std::vector<DetectorHit_sptr>& hits)
@@ -60,7 +60,7 @@ public:
   DetectorHit_sptr retrieveHit() const;
   std::vector<DetectorHit_sptr> retrieveHits(int64_t& entry,
                                              bool get_first_entry=true);
-  
+
 private:
   TTree* hittree_;
 

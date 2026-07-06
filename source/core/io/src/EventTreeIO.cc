@@ -34,12 +34,12 @@ EventTreeIO::EventTreeIO()
 
 EventTreeIO::~EventTreeIO() = default;
 
-void EventTreeIO::defineBranches()
+void EventTreeIO::define_branches()
 {
   tree_->Branch("runid",          &runid_,                "runid/I");
   tree_->Branch("eventid",        &eventid_,              "eventid/I");
   tree_->Branch("num_hits",       &num_hits_,             "num_hits/I");
-  
+
   // measured data
   tree_->Branch("ti",             &ti_,                   "ti/L");
   tree_->Branch("instrument",     &instrument_,           "instrument/S");
@@ -56,7 +56,7 @@ void EventTreeIO::defineBranches()
   tree_->Branch("epi",            epi_.data(),            "epi[num_hits]/F");
   tree_->Branch("flag_data",      &flag_data_,            "flag_data/l");
   tree_->Branch("flags",          &flags_,                "flags/l");
-  
+
   // simulation
   tree_->Branch("trackid",        trackid_.data(),        "trackid[num_hits]/I");
   tree_->Branch("particle",       particle_.data(),       "particle[num_hits]/I");
@@ -82,7 +82,7 @@ void EventTreeIO::defineBranches()
   tree_->Branch("grade",          &grade_,                "grade/I");
 }
 
-void EventTreeIO::setBranchAddresses()
+void EventTreeIO::set_branch_addresses()
 {
   tree_->SetBranchAddress("runid",          &runid_);
   tree_->SetBranchAddress("eventid",        &eventid_);
@@ -239,7 +239,7 @@ std::vector<DetectorHit_sptr> EventTreeIO::retrieveHits(int64_t& entry, bool get
   if (get_entry) {
     tree_->GetEntry(entry);
   }
-  
+
   const int numHits = getNumberOfHits();
   for (int i=0; i<numHits; i++) {
     DetectorHit_sptr hit = retrieveHit(i);
