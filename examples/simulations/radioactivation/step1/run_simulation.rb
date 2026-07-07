@@ -1,14 +1,12 @@
 #! /usr/bin/env ruby
 
 require 'anlnext'
-# require 'comptonsoft'
+require 'comptonsoft'
 
 def run_simulation(num, random, output)
-  require 'comptonsoft'
-
   energy = 150000.0 # keV
 
-  sim = ComptonSoft::Simulation.new
+  sim = ComptonSoft::RadioactivationSimulationStep1.new
   sim.output = output
   sim.random_seed = random
   sim.verbose = 0
@@ -27,14 +25,6 @@ def run_simulation(num, random, output)
     direction: vec(0.0, 0.0, -1.0),
     radius: 2.0,
   }
-
-  sim.set_user_action :RadioactivationUserActionAssembly, {
-    output_filename_base: output.sub(".root", ".act"),
-    detection_by_generation: false,
-    processes_to_detect: ["RadioactiveDecay"],
-  }
-
-  sim.set_event_store :RadioactivationEventStore
 
   sim.run(num)
 end

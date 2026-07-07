@@ -35,7 +35,7 @@ module ComptonSoft
       super
 
       ### Basic settings
-      @setup_mode = :normal
+      @minimal_mode = false
 
       ### Input files
       @detector_configuration = nil # "detector_configuration.xml"
@@ -54,14 +54,10 @@ module ComptonSoft
       @random_seed = 0
       @verbose = 0
       @store_trajectory = false
-
-      ### Modules
-      @make_detector_hits_module = :MakeDetectorHits
-      @write_tree_module = :WriteHitTree
     end
 
     ### Basic settings
-    attr_accessor :setup_mode
+    attr_accessor :minimal_mode
 
     ### Output files
     attr_accessor :output
@@ -70,12 +66,13 @@ module ComptonSoft
     attr_accessor :num_events_per_run, :num_threads, :print_beamon_time, :random_seed, :verbose
 
     ### ANL module setup.
+    define_setup_module("event_store")
     define_setup_module("geometry")
     define_setup_module("physics", :PhysicsListManager)
     define_setup_module("primary_generator")
-    define_setup_module("event_store")
     define_setup_module("user_action")
     define_setup_module("pickup_data", array: true)
+    define_setup_module("make_detector_hits")
     define_setup_module("event_selection")
     define_setup_module("tree_output")
     define_setup_module("visualization", :VisualizeGeometry)
@@ -120,7 +117,7 @@ module ComptonSoft
       self.console = false
       set_visualization()
       with(params)
-      self.setup_mode = :minimal
+      self.minimal_mode = true
       @store_trajectory = true
     end
 
@@ -133,56 +130,32 @@ module ComptonSoft
       with(filename: gdml_file, validate: validate)
     end
 
-    def enable_timing_process(b=true)
-      if b
-        @make_detector_hits_module = :MakeDetectorHitsWithTimingProcess
-      else
-        @make_detector_hits_module = :MakeDetectorHits
-      end
+    def enable_timing_process()
+      set_make_detector_hits :MakeDetectorHitsWithTimingProcess
     end
 
-    def record_raw_hits(b=true)
-      if b
-        @make_detector_hits_module = :MakeRawHits
-      else
-        @make_detector_hits_module = :MakeDetectorHits
-      end
+    def record_raw_hits()
+      set_make_detector_hits :MakeRawHits
     end
 
     def setup()
-      case @setup_mode
-      when :minimal
-        setup_minimal()
-      when :normal
-        setup_normal()
-      end
+      add_namespace ComptonSoft
+      prepare_default_modules()
+      setup_detector_construction() unless minimal_mode()
+      setup_geant4()
+      setup_postprocesses() unless minimal_mode()
     end
 
-    def setup_normal()
-      add_namespace ComptonSoft
+    def prepare_default_modules()
+      set_event_store :CSEventStore unless module_of_event_store()
+      set_physics unless module_of_physics()
+      set_user_action :StandardUserActionAssembly unless module_of_user_action()
+      set_make_detector_hits :MakeDetectorHits unless module_of_make_detector_hits()
+      set_event_selection :EventSelection unless module_of_event_selection()
+      set_tree_output(:WriteHitTree) unless module_of_tree_output()
+    end
 
-      unless module_of_event_store()
-        set_event_store :CSEventStore
-      end
-
-      unless module_of_user_action()
-        set_user_action :StandardUserActionAssembly
-      end
-
-      unless module_of_event_selection()
-        set_event_selection :EventSelection
-      end
-
-      unless module_of_tree_output()
-        set_tree_output(:WriteHitTree)
-      end
-
-      chain :SaveData
-      with_parameters(output: @output)
-
-      chain_with_parameters module_of_event_store
-
-      chain :CSHitCollection
+    def setup_detector_construction()
       chain :ConstructDetectorForSimulation
       with_parameters(detector_configuration: @detector_configuration,
                       detector_parameters: @detector_parameters,
@@ -197,16 +170,13 @@ module ComptonSoft
         chain :SetChannelProperties, "SetChannelProperties_#{i}"
         with_parameters(filename: channel_properties)
       end
+    end
 
+    def setup_geant4()
+      chain_with_parameters module_of_event_store
       chain_with_parameters module_of_geometry
-
-      unless module_of_physics()
-        set_physics()
-      end
       chain_with_parameters module_of_physics
-
       chain_with_parameters module_of_primary_generator
-
       chain_with_parameters module_of_user_action
 
       if pickup_list = module_list_of_pickup_data
@@ -222,9 +192,20 @@ module ComptonSoft
                       verbose: @verbose,
                       store_trajectory: @store_trajectory)
 
-      chain @make_detector_hits_module
+      if vis = module_of_visualization
+        chain_with_parameters vis
+      end
+    end
 
-      unless @make_detector_hits_module==:MakeRawHits
+    def setup_postprocesses()
+      chain :SaveData
+      with_parameters(output: @output)
+
+      chain :CSHitCollection
+
+      chain_with_parameters module_of_make_detector_hits
+
+      unless module_of_make_detector_hits.module_class == :MakeRawHits
         chain_with_parameters module_of_event_selection
       end
 
@@ -234,48 +215,6 @@ module ComptonSoft
         chain_with_parameters fits_output
       end
     end
-
-    def setup_minimal()
-      add_namespace ComptonSoft
-
-      unless module_of_event_store()
-        set_event_store :CSEventStore
-      end
-
-      unless module_of_user_action()
-        set_user_action :StandardUserActionAssembly
-      end
-
-      chain_with_parameters module_of_event_store
-
-      chain_with_parameters module_of_geometry
-
-      unless module_of_physics()
-        set_physics()
-      end
-      chain_with_parameters module_of_physics
-
-      chain_with_parameters module_of_primary_generator
-
-      chain_with_parameters module_of_user_action
-
-      if pickup_list = module_list_of_pickup_data
-        pickup_list.each{|m| chain_with_parameters(m) }
-      end
-
-      chain :Geant4Body
-      with_parameters(num_events: @num_events_per_run,
-                      num_threads: 1,
-                      print_beamon_time: @print_beamon_time,
-                      random_engine: "MixMaxRng",
-                      random_seed: @random_seed,
-                      verbose: @verbose,
-                      store_trajectory: @store_trajectory)
-
-      if vis = module_of_visualization
-        chain_with_parameters vis
-      end
-    end
   end
 
   # Simulation class for observation
@@ -283,7 +222,7 @@ module ComptonSoft
   class SimulationOfObservedSystem < Simulation
     def initialize()
       super
-      self.setup_mode = :minimal
+      self.minimal_mode = true
       @record_primaries = true
       @particle_selection = []
     end
@@ -304,9 +243,28 @@ module ComptonSoft
       }
 
       super
-      chain(:WriteObservationTree)
+
       chain(:SaveData)
       with_parameters(output: self.output)
+
+      chain(:WriteObservationTree)
     end
   end
+
+  # Simulation class for radioactivation step 1
+  #
+  class RadioactivationSimulationStep1 < Simulation
+    def setup()
+      set_event_store :RadioactivationEventStore
+
+      set_user_action :RadioactivationUserActionAssembly, {
+        output_filename_base: output.sub(".root", ".act"),
+        detection_by_generation: false,
+        processes_to_detect: ["RadioactiveDecay"],
+      }
+
+      super
+    end
+  end
+
 end # module ComptonSoft
