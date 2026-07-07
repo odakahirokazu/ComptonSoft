@@ -36,20 +36,9 @@ set(ComptonSoftCore_Framework_Classes
   framework/src/OutlierStore.cc
   framework/src/XrayEvent.cc
   framework/src/PolarizedXrayEvent.cc
-  ### device simulation
-  framework/src/EFieldModel.cc
-  framework/src/VDeviceSimulation.cc
-  framework/src/DeviceSimulation.cc
-  framework/src/SimDetectorUnit2DPixel.cc
-  framework/src/SimDetectorUnit2DStrip.cc
-  framework/src/SimDetectorUnitScintillator.cc
-  framework/src/SimDetectorUnit3DVoxel.cc
-  framework/src/WeightingPotentialPixel.cc
-  framework/src/WeightingPotentialStrip.cc
   ### detector unit factory
   framework/src/VDetectorUnitFactory.cc
   framework/src/RealDetectorUnitFactory.cc
-  framework/src/SimDetectorUnitFactory.cc
   ### sensitive detector
   framework/src/VCSSensitiveDetector.cc
   ### manager
@@ -79,6 +68,21 @@ set(ComptonSoftCore_Framework_Modules
   framework/src/MakeDetectorHitsWithTimingProcess.cc
   framework/src/ApplyEPICompensation.cc
   framework/src/EventSelection.cc
+)
+
+set(ComptonSoftCore_DetectorModels_Classes
+  ### device simulation
+  detector_models/src/EFieldModel.cc
+  detector_models/src/VDeviceSimulation.cc
+  detector_models/src/DeviceSimulation.cc
+  detector_models/src/SimDetectorUnit2DPixel.cc
+  detector_models/src/SimDetectorUnit2DStrip.cc
+  detector_models/src/SimDetectorUnitScintillator.cc
+  detector_models/src/SimDetectorUnit3DVoxel.cc
+  detector_models/src/WeightingPotentialPixel.cc
+  detector_models/src/WeightingPotentialStrip.cc
+  ### detector unit factory
+  detector_models/src/SimDetectorUnitFactory.cc
 )
 
 set(ComptonSoftCore_Simulation_Classes
@@ -136,6 +140,7 @@ target_sources(ComptonSoftCore
   ${ComptonSoftCore_Base_Classes}
   ${ComptonSoftCore_Framework_Classes}
   ${ComptonSoftCore_Framework_Modules}
+  ${ComptonSoftCore_DetectorModels_Classes}
   ${ComptonSoftCore_Simulation_Classes}
   ${ComptonSoftCore_Simulation_Modules}
   ${ComptonSoftCore_IO_Classes}
@@ -153,6 +158,7 @@ target_include_directories(ComptonSoftCore
   ${ANLG4_INC_DIR}
   base/include
   framework/include
+  detector_models/include
   simulation/include
   io/include
 )

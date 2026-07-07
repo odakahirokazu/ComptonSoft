@@ -27,13 +27,13 @@ def run_simulation(num, random, output)
     radius: 2.0,
   }
 
+  sim.set_event_store :RadioactivationEventStore
+
   sim.set_user_action :RadioactivationUserActionAssembly, {
     output_filename_base: output.sub(".root", ".act"),
     detection_by_generation: true,
     processes_to_detect: ["protonInelastic"],
   }
-
-  sim.set_event_store :RadioactivationEventStore
 
   sim.run(num)
 end
