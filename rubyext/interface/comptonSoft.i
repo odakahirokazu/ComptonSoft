@@ -28,6 +28,7 @@
 #include "RecalculateEPI.hh"
 #include "CorrectRecombination.hh"
 #include "SetEnergy.hh"
+#include "EliminateLowEnergyHits.hh"
 #include "CalculatePedestalLevels.hh"
 #include "InitialConditionFilter.hh"
 #include "WeightByInitialDirection.hh"
@@ -417,6 +418,14 @@ class SetEnergy : public anlnext::BasicModule
 public:
   SetEnergy();
   ~SetEnergy();
+};
+
+
+class EliminateLowEnergyHits: public anlnext::BasicModule
+{
+public:
+  EliminateLowEnergyHits();
+  ~EliminateLowEnergyHits();
 };
 
 
