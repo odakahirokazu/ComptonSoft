@@ -64,6 +64,7 @@
 #include "EfficiencyMapSky.hh"
 #include "QuickAnalysisForDSD.hh"
 #include "AssignTime.hh"
+#include "AssignTimeWithExpDistribution.hh"
 #include "DefineFrame.hh"
 #ifdef USE_FITSIO
 #include "MakeFrameFITS.hh"
@@ -713,6 +714,13 @@ class AssignTime : public VCSModule
 public:
   AssignTime();
   ~AssignTime();
+};
+
+class AssignTimeWithExpDistribution: public VCSModule
+{
+public:
+  AssignTimeWithExpDistribution();
+  ~AssignTimeWithExpDistribution();
 };
 
 

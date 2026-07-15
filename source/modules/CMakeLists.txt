@@ -46,6 +46,7 @@ set(CS_MODULES
   src/HXIEventSelection.cc
   ### Frame data processes
   src/AssignTime.cc
+  src/AssignTimeWithExpDistribution.cc
   src/DefineFrame.cc
   src/ConstructFrame.cc
   src/FillFrame.cc
