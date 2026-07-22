@@ -25,7 +25,7 @@ if(CS_USE_HSQUICKLOOK)
 endif()
 
 ########################################################
-include(ANLNextSWIGRuby)
+include(ANLNextSwigRuby)
 
 ########################################################
 anlnext_add_swig_ruby_binding(${target_binding}
