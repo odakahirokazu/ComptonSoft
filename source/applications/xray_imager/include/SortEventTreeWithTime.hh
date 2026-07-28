@@ -48,7 +48,7 @@ class SortEventTreeWithTime : public VCSModule, public anlgeant4::InitialInforma
 public:
   SortEventTreeWithTime();
   ~SortEventTreeWithTime();
-  
+
   anlnext::ANLStatus mod_define() override;
   anlnext::ANLStatus mod_initialize() override;
   anlnext::ANLStatus mod_begin_run() override;
@@ -56,18 +56,18 @@ public:
 
 protected:
   virtual void insertHit(const DetectorHit_sptr& hit);
-  
+
 private:
-  std::vector<std::string> fileList_;
+  std::vector<std::string> file_list_;
 
   TChain* tree_;
-  int64_t numEntries_ = 0;
-  int64_t entryIndex_ = 0;
+  int64_t num_entries_ = 0;
+  int64_t entry_index_ = 0;
 
-  CSHitCollection* hitCollection_;
-  std::unique_ptr<EventTreeIOWithInitialInfo> treeIO_;
-  std::list<std::vector<DetectorHit_sptr>> eventList_;
-  std::list<std::vector<DetectorHit_sptr>>::iterator eventIter_;
+  CSHitCollection* hit_collection_;
+  std::unique_ptr<EventTreeIOWithInitialInfo> tree_io_;
+  std::list<std::vector<DetectorHit_sptr>> event_list_;
+  std::list<std::vector<DetectorHit_sptr>>::iterator event_iter_;
 };
 
 } /* namespace comptonsoft */

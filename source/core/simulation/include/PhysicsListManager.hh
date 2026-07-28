@@ -43,7 +43,7 @@ class PhysicsListManager : public anlgeant4::VANLPhysicsList
 public:
   PhysicsListManager();
   ~PhysicsListManager() = default;
-  
+
   anlnext::ANLStatus mod_define() override;
   anlnext::ANLStatus mod_pre_initialize() override;
   anlnext::ANLStatus mod_initialize() override;
@@ -51,21 +51,21 @@ public:
   G4VUserPhysicsList* create() override;
 
 private:
-  std::string m_PhysicsListName;
-  bool m_EMPolarization;
-  bool m_EMCustomized;
-  bool m_EMOptionFluo;
-  bool m_EMOptionAuger;
-  bool m_EMOptionPIXE;
-  double m_ElectronRangeRatio;
-  double m_ElectronFinalRange;
-  bool m_HadronHP;
-  std::string m_HadronModel;
-  double m_NuclearLifeTimeThreshold;
-  bool m_RDEnabled;
-  bool m_ParallelWorldEnabled;
-  double m_DefaultCut;
-  CSPhysicsOption m_PhysicsOption;
+  std::string physics_list_name_;
+  bool em_polarization_;
+  bool em_customized_;
+  bool em_option_fluo_;
+  bool em_option_auger_;
+  bool em_option_pipx_;
+  double electron_range_ratio_;
+  double electron_final_range_;
+  bool hadron_hp_;
+  std::string hadron_model_;
+  double nuclear_lifetime_threshold_;
+  bool radioactive_decay_enabled_;
+  bool parallel_world_enabled_;
+  double default_cut_;
+  CSPhysicsOption physics_option_;
 };
 
 } /* namespace comptonsoft */

@@ -31,25 +31,25 @@ class CalculatePedestalLevels : public VCSModule
 public:
   CalculatePedestalLevels();
   ~CalculatePedestalLevels() = default;
-  
+
   anlnext::ANLStatus mod_define() override;
   anlnext::ANLStatus mod_initialize() override;
   anlnext::ANLStatus mod_analyze() override;
   anlnext::ANLStatus mod_end_run() override;
 
 private:
-  std::vector<TH1*> m_hisSpec;
-  std::vector<TH1*> m_hisPed;
-  std::vector<TH1*> m_hisNoise;
+  std::vector<TH1*> spectrum_histograms_;
+  std::vector<TH1*> pedestral_histograms_;
+  std::vector<TH1*> noise_histograms_;
 
-  int m_NBins = 1024;
-  double m_ADCMin;
-  double m_ADCMax;
-  bool m_NegativeADC = false;
+  int num_bins_ = 1024;
+  double ADC_min_;
+  double ADC_max_;
+  bool negative_ADC_ = false;
 
-  int m_ADCZeroLevelBin = 250;
-  int m_PeakSearchHalfWidth = 245;
-  int m_AverageRangeHalfWidth = 8;
+  int ADC_zero_level_bin_ = 250;
+  int peak_search_half_width_ = 245;
+  int average_range_half_width_ = 8;
 };
 
 } /* namespace comptonsoft */

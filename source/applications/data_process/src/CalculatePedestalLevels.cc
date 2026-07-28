@@ -28,19 +28,19 @@ namespace comptonsoft
 {
 
 CalculatePedestalLevels::CalculatePedestalLevels()
-  : m_NBins(1024), m_ADCMin(-0.5), m_ADCMax(1023.5), m_NegativeADC(false),
-    m_ADCZeroLevelBin(250), m_PeakSearchHalfWidth(245),
-    m_AverageRangeHalfWidth(8)
+  : num_bins_(1024), ADC_min_(-0.5), ADC_max_(1023.5), negative_ADC_(false),
+    ADC_zero_level_bin_(250), peak_search_half_width_(245),
+    average_range_half_width_(8)
 {
 }
 
 ANLStatus CalculatePedestalLevels::mod_define()
 {
-  register_parameter(&m_NBins, "num_bins");
-  register_parameter(&m_NegativeADC, "adc_nagative");
-  register_parameter(&m_ADCZeroLevelBin, "adc_zero_level_bin");
-  register_parameter(&m_PeakSearchHalfWidth, "peak_search_half_width");
-  register_parameter(&m_AverageRangeHalfWidth, "average_range_half_width");
+  define_parameter("num_bins", &mod_class::num_bins_);
+  define_parameter("adc_nagative", &mod_class::negative_ADC_);
+  define_parameter("adc_zero_level_bin", &mod_class::ADC_zero_level_bin_);
+  define_parameter("peak_search_half_width", &mod_class::peak_search_half_width_);
+  define_parameter("average_range_half_width", &mod_class::average_range_half_width_);
   return AS_OK;
 }
 
@@ -49,15 +49,15 @@ ANLStatus CalculatePedestalLevels::mod_initialize()
   VCSModule::mod_initialize();
   mkdir("pedestal");
 
-  if (m_NegativeADC) {
-    m_ADCMin = -0.5*m_NBins - 0.5;
-    m_ADCMax = +0.5*m_NBins - 0.5;
+  if (negative_ADC_) {
+    ADC_min_ = -0.5*num_bins_ - 0.5;
+    ADC_max_ = +0.5*num_bins_ - 0.5;
   }
   else {
-    m_ADCMin = -0.5;
-    m_ADCMax = m_NBins - 0.5;
+    ADC_min_ = -0.5;
+    ADC_max_ = num_bins_ - 0.5;
   }
-  
+
   DetectorSystem* detectorManager = getDetectorManager();
   const int NumROM = detectorManager->NumberOfReadoutModules();
   for (int i=0; i<NumROM; i++) {
@@ -72,18 +72,18 @@ ANLStatus CalculatePedestalLevels::mod_initialize()
       name = (boost::format("pedestal_r%04d_%04d") % ROMID % j).str();
       TH1* hisPed = new TH1D(name.c_str(), name.c_str(),
                              NumChannels, -0.5, NumChannels-0.5);
-      m_hisPed.push_back(hisPed);
+      pedestral_histograms_.push_back(hisPed);
 
       name = (boost::format("noiselevel_r%04d_%04d") % ROMID % j).str();
       TH1* hisNoise = new TH1D(name.c_str(), name.c_str(),
                                NumChannels, -0.5, NumChannels-0.5);
-      m_hisNoise.push_back(hisNoise);
+      noise_histograms_.push_back(hisNoise);
 
       for (int k=0; k<NumChannels; k++) {
         name = (boost::format("spectrum_r%04d_%04d_%04d") % ROMID % j % k).str();
         TH1* hisSpec = new TH1I(name.c_str(), name.c_str(),
-                                m_NBins, m_ADCMin, m_ADCMax);
-        m_hisSpec.push_back(hisSpec);
+                                num_bins_, ADC_min_, ADC_max_);
+        spectrum_histograms_.push_back(hisSpec);
       }
     }
   }
@@ -93,7 +93,7 @@ ANLStatus CalculatePedestalLevels::mod_initialize()
 
 ANLStatus CalculatePedestalLevels::mod_analyze()
 {
-  std::vector<TH1*>::iterator itHist = m_hisSpec.begin();
+  std::vector<TH1*>::iterator itHist = spectrum_histograms_.begin();
 
   DetectorSystem* detectorManager = getDetectorManager();
   const int NumROM = detectorManager->NumberOfReadoutModules();
@@ -118,15 +118,15 @@ ANLStatus CalculatePedestalLevels::mod_analyze()
 
 ANLStatus CalculatePedestalLevels::mod_end_run()
 {
-  const int ADCZeroLevelBin = m_ADCZeroLevelBin;
-  const int SearchHalfWidth = m_PeakSearchHalfWidth;
+  const int ADCZeroLevelBin = ADC_zero_level_bin_;
+  const int SearchHalfWidth = peak_search_half_width_;
   const int SearchMin = ADCZeroLevelBin - SearchHalfWidth;
   const int SearchMax = ADCZeroLevelBin + SearchHalfWidth;
-  const int RangeHalfWidth = m_AverageRangeHalfWidth;
+  const int RangeHalfWidth = average_range_half_width_;
 
-  std::vector<TH1*>::iterator itHisSpec = m_hisSpec.begin();
-  std::vector<TH1*>::iterator itHisPed = m_hisPed.begin();
-  std::vector<TH1*>::iterator itHisNoise = m_hisNoise.begin();
+  std::vector<TH1*>::iterator itHisSpec = spectrum_histograms_.begin();
+  std::vector<TH1*>::iterator itHisPed = pedestral_histograms_.begin();
+  std::vector<TH1*>::iterator itHisNoise = noise_histograms_.begin();
 
   DetectorSystem* detectorManager = getDetectorManager();
   const int NumROM = detectorManager->NumberOfReadoutModules();
@@ -155,7 +155,7 @@ ANLStatus CalculatePedestalLevels::mod_end_run()
       itHisNoise++;
     }
   }
- 
+
   return AS_OK;
 }
 

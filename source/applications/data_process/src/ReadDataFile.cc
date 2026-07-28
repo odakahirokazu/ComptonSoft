@@ -32,7 +32,7 @@ ReadDataFile::ReadDataFile()
 
 ANLStatus ReadDataFile::mod_define()
 {
-  register_parameter(&m_FileList, "file_list");
+  define_parameter("file_list", &mod_class::m_FileList);
   return AS_OK;
 }
 

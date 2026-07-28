@@ -21,8 +21,6 @@
 #define COMPTONSOFT_SetBadChannels_H 1
 
 #include "VCSModule.hh"
-#include <map>
-#include <tuple>
 
 namespace comptonsoft {
 
@@ -40,7 +38,7 @@ private:
   bool set_by_file();
 
 private:
-  std::string m_FileName;
+  std::string filename_;
 };
 
 } /* namespace comptonsoft */

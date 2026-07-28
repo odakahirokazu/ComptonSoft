@@ -60,7 +60,7 @@ ANLStatus BackProjection::mod_define()
   define_parameter("y_max", &mod_class::range_y2_, 1, pixel_unit_name_);
   define_parameter("num_points", &mod_class::num_points_);
   define_parameter("arm", &mod_class::arm_spread_, unit::degree, "degree");
-  
+
   return AS_OK;
 }
 
@@ -69,9 +69,9 @@ ANLStatus BackProjection::mod_initialize()
   VCSModule::mod_initialize();
 
   get_module_NC("EventReconstruction", &event_reconstruction_module_);
-  
+
   mkdir();
-  
+
   hist_bp_all_ = new TH2D("h_bp_all","Back Projection (All)",
                           num_pixel_x_, range_x1_, range_x2_,
                           num_pixel_y_, range_y1_, range_y2_);
@@ -127,7 +127,7 @@ ANLStatus BackProjection::mod_analyze()
       }
     }
   }
-  
+
   return AS_OK;
 }
 

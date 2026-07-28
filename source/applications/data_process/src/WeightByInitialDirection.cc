@@ -33,24 +33,24 @@ WeightByInitialDirection::WeightByInitialDirection()
 
 ANLStatus WeightByInitialDirection::mod_define()
 {
-  register_parameter(&m_DirZVector, "dirz_vector");
-  register_parameter(&m_WeightVector, "weight_vector");
+  define_parameter("dirz_vector", &mod_class::dirz_vector_);
+  define_parameter("weight_vector", &mod_class::weight_vector_);
   return AS_OK;
 }
 
 ANLStatus WeightByInitialDirection::mod_initialize()
 {
-  get_module_IFNC("InitialInformation", &m_InitialInfo);
-  m_WeightFunction.reset(new TGraph(m_DirZVector.size(), &m_DirZVector[0], &m_WeightVector[0]));
+  get_module_IFNC("InitialInformation", &initial_info_);
+  weight_function_.reset(new TGraph(dirz_vector_.size(), &dirz_vector_[0], &weight_vector_[0]));
   return AS_OK;
 }
 
 ANLStatus WeightByInitialDirection::mod_analyze()
 {
-  const G4ThreeVector dir0 = m_InitialInfo->initial_direction();
-  const double weight0 = m_InitialInfo->weight();
-  const double weight1 = weight0 * (m_WeightFunction->Eval(dir0.z()));
-  m_InitialInfo->set_weight(weight1);
+  const G4ThreeVector dir0 = initial_info_->initial_direction();
+  const double weight0 = initial_info_->weight();
+  const double weight1 = weight0 * (weight_function_->Eval(dir0.z()));
+  initial_info_->set_weight(weight1);
   return AS_OK;
 }
 

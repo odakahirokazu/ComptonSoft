@@ -27,8 +27,8 @@ namespace comptonsoft {
 
 /**
  *
- * @author Hirokazu Odaka 
- * @date 2007-12-xx 
+ * @author Hirokazu Odaka
+ * @date 2007-12-xx
  * @date 2009-06-22
  * @date 2014-09-09
  * @date 2016-05-02 | PHA randomization
@@ -51,15 +51,15 @@ public:
   anlnext::ANLStatus mod_finalize() override;
 
 private:
-  bool m_PHARandomization;
-  bool m_PedestalCorrection;
-  CMNSubtractionMode m_CMNSubtraction;
-  bool m_GainCorrection;
+  bool PHA_randomization_;
+  bool pedestal_correction_;
+  CMNSubtractionMode CMN_subtraction_;
+  bool gain_correction_;
 
-  std::string m_PedestalFileName;
-  int m_CMNSubtractionInteger;
-  std::string m_GainFileName;
-  std::unique_ptr<TFile> m_GainFile;
+  std::string pedestal_filename_;
+  int CMN_subtraction_integer_;
+  std::string gain_filename_;
+  std::unique_ptr<TFile> gain_file_;
 };
 
 } /* namespace comptonsoft */

@@ -47,26 +47,26 @@ class ReadEventTree : public VCSModule, public anlgeant4::InitialInformation
 public:
   ReadEventTree();
   ~ReadEventTree();
-  
+
   anlnext::ANLStatus mod_define() override;
   anlnext::ANLStatus mod_initialize() override;
   anlnext::ANLStatus mod_begin_run() override;
   anlnext::ANLStatus mod_analyze() override;
 
-  int64_t NumEntries() const { return numEntries_; }
+  int64_t NumEntries() const { return num_entries_; }
 
 protected:
   virtual void insertHit(const DetectorHit_sptr& hit);
-  
+
 private:
-  std::vector<std::string> fileList_;
+  std::vector<std::string> file_list_;
 
   std::unique_ptr<TChain> tree_;
-  int64_t numEntries_ = 0;
-  int64_t entryIndex_ = 0;
+  int64_t num_entries_ = 0;
+  int64_t entry_index_ = 0;
 
-  CSHitCollection* hitCollection_;
-  std::unique_ptr<EventTreeIOWithInitialInfo> treeIO_;
+  CSHitCollection* hit_collection_;
+  std::unique_ptr<EventTreeIOWithInitialInfo> tree_io_;
 };
 
 } /* namespace comptonsoft */

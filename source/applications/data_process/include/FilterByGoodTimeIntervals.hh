@@ -46,10 +46,10 @@ protected:
   std::vector<std::tuple<double, double>> m_GTIs;
 
 private:
-  const CSHitCollection* m_HitCollection = nullptr;
+  const CSHitCollection* hit_collection_ = nullptr;
 
-  double m_TimeStart = 0.0;
-  double m_TimeEnd = 0.0;
+  double time_start_ = 0.0;
+  double time_end_ = 0.0;
 };
 
 } /* namespace comptonsoft */

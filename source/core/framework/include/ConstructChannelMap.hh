@@ -49,7 +49,7 @@ private:
   void loadChannelMap(const boost::property_tree::ptree& pt);
 
 private:
-  std::map<std::string, std::shared_ptr<const VChannelMap>> channelMaps_;
+  std::map<std::string, std::shared_ptr<const VChannelMap>> channel_maps_;
   std::string filename_;
 };
 

@@ -28,20 +28,20 @@ namespace comptonsoft
 {
 
 HistogramPHA::HistogramPHA()
-  : m_ReadoutOrder(true), m_GroupingInSection(true),
-    m_HistogramType("PHA"),
-    m_NumBins(1280), m_RangeMin(-256.5), m_RangeMax(1023.5)
+  : readout_order_(true), grouping_in_section_(true),
+    histogram_type_("PHA"),
+    num_bins_(1280), range_min_(-256.5), range_max_(1023.5)
 {
 }
 
 ANLStatus HistogramPHA::mod_define()
 {
-  register_parameter(&m_ReadoutOrder, "readout_order");
-  register_parameter(&m_GroupingInSection, "group");
-  register_parameter(&m_HistogramType, "category");
-  register_parameter(&m_NumBins, "num_bins");
-  register_parameter(&m_RangeMin, "range_min");
-  register_parameter(&m_RangeMax, "range_max");
+  define_parameter("readout_order", &mod_class::readout_order_);
+  define_parameter("group", &mod_class::grouping_in_section_);
+  define_parameter("category", &mod_class::histogram_type_);
+  define_parameter("num_bins", &mod_class::num_bins_);
+  define_parameter("range_min", &mod_class::range_min_);
+  define_parameter("range_max", &mod_class::range_max_);
   return AS_OK;
 }
 
@@ -50,15 +50,15 @@ ANLStatus HistogramPHA::mod_initialize()
   VCSModule::mod_initialize();
   mkdir();
 
-  if (m_ReadoutOrder) {
+  if (readout_order_) {
     DetectorSystem* detectorManager = getDetectorManager();
     detectorManager->doForEachMultiChannelDataInReadoutOrder(
       [&](MultiChannelData* mcd, const ReadoutBasedChannelID& channel) {
-        if (m_GroupingInSection) {
+        if (grouping_in_section_) {
           std::string name = "spectrum_"+channel.toString();
           TH1* h = new TH1I(name.c_str(), name.c_str(),
-                            m_NumBins, m_RangeMin, m_RangeMax);
-          m_Histograms.push_back(h);
+                            num_bins_, range_min_, range_max_);
+          histograms_.push_back(h);
         }
         else {
           const int NumChannels = mcd->NumberOfChannels();
@@ -68,8 +68,8 @@ ANLStatus HistogramPHA::mod_initialize()
                                       k);
             std::string name = "spectrum_"+channel2.toString();
             TH1* h = new TH1I(name.c_str(), name.c_str(),
-                              m_NumBins, m_RangeMin, m_RangeMax);
-            m_Histograms.push_back(h);
+                              num_bins_, range_min_, range_max_);
+            histograms_.push_back(h);
           }
         }
       });
@@ -78,11 +78,11 @@ ANLStatus HistogramPHA::mod_initialize()
     DetectorSystem* detectorManager = getDetectorManager();
     detectorManager->doForEachMultiChannelDataInDetectorOrder(
       [&](MultiChannelData* mcd, const DetectorBasedChannelID& channel) {
-        if (m_GroupingInSection) {
+        if (grouping_in_section_) {
           std::string name = "spectrum_"+channel.toString();
           TH1* h = new TH1I(name.c_str(), name.c_str(),
-                            m_NumBins, m_RangeMin, m_RangeMax);
-          m_Histograms.push_back(h);
+                            num_bins_, range_min_, range_max_);
+          histograms_.push_back(h);
         }
         else {
           const int NumChannels = mcd->NumberOfChannels();
@@ -92,45 +92,45 @@ ANLStatus HistogramPHA::mod_initialize()
                                            k);
             std::string name = "spectrum_"+channel2.toString();
             TH1* h = new TH1I(name.c_str(), name.c_str(),
-                              m_NumBins, m_RangeMin, m_RangeMax);
-            m_Histograms.push_back(h);
+                              num_bins_, range_min_, range_max_);
+            histograms_.push_back(h);
           }
         }
       });
   }
 
-  if (m_HistogramType=="RawADC") {
-    m_GetterFunc = [](MultiChannelData* mcd, int k) -> double {
+  if (histogram_type_=="RawADC") {
+    getter_func_ = [](MultiChannelData* mcd, int k) -> double {
       return mcd->getRawADC(k);
     };
   }
-  else if (m_HistogramType=="PHA") {
-    m_GetterFunc = std::mem_fn(&MultiChannelData::getPHA);
+  else if (histogram_type_=="PHA") {
+    getter_func_ = std::mem_fn(&MultiChannelData::getPHA);
   }
-  else if (m_HistogramType=="EPI") {
-    m_GetterFunc = std::mem_fn(&MultiChannelData::getEPI);
+  else if (histogram_type_=="EPI") {
+    getter_func_ = std::mem_fn(&MultiChannelData::getEPI);
   }
   else {
-    std::cout << "Histogram type \"" << m_HistogramType << "\" is invalid." << std::endl;
+    std::cout << "Histogram type \"" << histogram_type_ << "\" is invalid." << std::endl;
     return AS_QUIT_ERROR;
   }
-  
+
   return AS_OK;
 }
 
 ANLStatus HistogramPHA::mod_analyze()
 {
-  std::vector<TH1*>::iterator itHist = std::begin(m_Histograms);
+  std::vector<TH1*>::iterator itHist = std::begin(histograms_);
 
   DetectorSystem* detectorManager = getDetectorManager();
-  if (m_ReadoutOrder) {
+  if (readout_order_) {
     detectorManager->doForEachMultiChannelDataInReadoutOrder(
       [&](MultiChannelData* mcd, const ReadoutBasedChannelID&) {
-        if (m_GroupingInSection) {
+        if (grouping_in_section_) {
           TH1* h = *itHist;
           const int NumChannels = mcd->NumberOfChannels();
           for (int k=0; k<NumChannels; k++) {
-            double v = m_GetterFunc(mcd, k);
+            double v = getter_func_(mcd, k);
             h->Fill(v);
           }
           ++itHist;
@@ -139,7 +139,7 @@ ANLStatus HistogramPHA::mod_analyze()
           const int NumChannels = mcd->NumberOfChannels();
           for (int k=0; k<NumChannels; k++) {
             TH1* h = *itHist;
-            double v = m_GetterFunc(mcd, k);
+            double v = getter_func_(mcd, k);
             h->Fill(v);
             ++itHist;
           }
@@ -149,11 +149,11 @@ ANLStatus HistogramPHA::mod_analyze()
   else {
     detectorManager->doForEachMultiChannelDataInDetectorOrder(
       [&](MultiChannelData* mcd, const DetectorBasedChannelID&) {
-        if (m_GroupingInSection) {
+        if (grouping_in_section_) {
           TH1* h = *itHist;
           const int NumChannels = mcd->NumberOfChannels();
           for (int k=0; k<NumChannels; k++) {
-            double v = m_GetterFunc(mcd, k);
+            double v = getter_func_(mcd, k);
             h->Fill(v);
           }
           ++itHist;
@@ -162,7 +162,7 @@ ANLStatus HistogramPHA::mod_analyze()
           const int NumChannels = mcd->NumberOfChannels();
           for (int k=0; k<NumChannels; k++) {
             TH1* h = *itHist;
-            double v = m_GetterFunc(mcd, k);
+            double v = getter_func_(mcd, k);
             h->Fill(v);
             ++itHist;
           }

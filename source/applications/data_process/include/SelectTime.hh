@@ -41,9 +41,9 @@ public:
   anlnext::ANLStatus mod_analyze() override;
 
 private:
-  const ReadDataFile* m_ReadDataModule;
-  int m_Time0;
-  int m_Time1;
+  const ReadDataFile* read_data_module_;
+  int time_start_;
+  int time_end_;
 };
 
 } /* namespace comptonsoft */

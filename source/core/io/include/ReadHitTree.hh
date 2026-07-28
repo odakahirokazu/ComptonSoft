@@ -58,15 +58,15 @@ protected:
   virtual void insertHit(const DetectorHit_sptr& hit);
 
 private:
-  std::vector<std::string> fileList_;
-  bool trustNumHits_;
+  std::vector<std::string> file_list_;
+  bool trust_num_hits_;
 
   std::unique_ptr<TChain> hittree_;
-  int64_t numEntries_ = 0;
-  int64_t entryIndex_ = 0;
+  int64_t num_entries_ = 0;
+  int64_t entry_index_ = 0;
 
-  CSHitCollection* hitCollection_;
-  std::unique_ptr<HitTreeIOWithInitialInfo> treeIO_;
+  CSHitCollection* hit_collection_;
+  std::unique_ptr<HitTreeIOWithInitialInfo> tree_io_;
 };
 
 } /* namespace comptonsoft */

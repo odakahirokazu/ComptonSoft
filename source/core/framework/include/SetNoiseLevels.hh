@@ -40,23 +40,23 @@ private:
   bool set_by_map();
   bool set_by_file();
 
-  bool m_ByFile;
-  std::string m_FileName;
-  
+  bool setting_by_file_;
+  std::string filename_;
+
   std::map<std::string, std::tuple<int,
                                    double, double, double,
                                    double, double, double,
-                                   double, double, double>> m_NoiseLevelMap;
-  int m_DetectorType;
-  double m_Noise0;
-  double m_Noise1;
-  double m_Noise2;
-  double m_CathodeNoise0;
-  double m_CathodeNoise1;
-  double m_CathodeNoise2;
-  double m_AnodeNoise0;
-  double m_AnodeNoise1;
-  double m_AnodeNoise2;
+                                   double, double, double>> noise_level_map_;
+  int detector_type_;
+  double noise0_;
+  double noise1_;
+  double noise2_;
+  double cathode_noise0_;
+  double cathode_noise1_;
+  double cathode_noise2_;
+  double anode_noise0_;
+  double anode_noise1_;
+  double anode_noise2_;
 };
 
 } /* namespace comptonsoft */

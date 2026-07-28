@@ -43,12 +43,12 @@ QuickAnalysisForDSD::~QuickAnalysisForDSD() = default;
 
 ANLStatus QuickAnalysisForDSD::mod_define()
 {
-  register_parameter(&m_DetectorID, "detector_id");
-  register_parameter(&m_NBins, "num_bins");
-  register_parameter(&m_Energy0, "energy_min", 1, "keV");
-  register_parameter(&m_Energy1, "energy_max", 1, "keV");
-  register_parameter(&m_CutEnergy0, "cut_energy_min", unit::keV, "keV");
-  register_parameter(&m_CutEnergy1, "cut_energy_max", unit::keV, "keV");
+  define_parameter("detector_id", &mod_class::m_DetectorID);
+  define_parameter("num_bins", &mod_class::m_NBins);
+  define_parameter("energy_min", &mod_class::m_Energy0, 1, "keV");
+  define_parameter("energy_max", &mod_class::m_Energy1, 1, "keV");
+  define_parameter("cut_energy_min", &mod_class::m_CutEnergy0, unit::keV, "keV");
+  define_parameter("cut_energy_max", &mod_class::m_CutEnergy1, unit::keV, "keV");
   return AS_OK;
 }
 
@@ -109,7 +109,7 @@ ANLStatus QuickAnalysisForDSD::mod_analyze()
   else if (numCathode==2) {
     DetectorHit_sptr hit0 = m_DSD->getCathodeSideHit(0);
     DetectorHit_sptr hit1 = m_DSD->getCathodeSideHit(1);
-    
+
     bool adjacent = false;
     int strip0 = -1, strip1 = -1;
     if (hit0->isXStrip()) {
@@ -143,7 +143,7 @@ ANLStatus QuickAnalysisForDSD::mod_analyze()
   else if (numAnode==2) {
     DetectorHit_sptr hit0 = m_DSD->getAnodeSideHit(0);
     DetectorHit_sptr hit1 = m_DSD->getAnodeSideHit(1);
-    
+
     bool adjacent = false;
     int strip0 = -1, strip1 = -1;
     if (hit0->isXStrip()) {
@@ -180,7 +180,7 @@ ANLStatus QuickAnalysisForDSD::mod_analyze()
   if (numCathode==1 && numAnode==1) {
     DetectorHit_sptr hit0 = m_DSD->getAnodeSideHit(0);
     DetectorHit_sptr hit1 = m_DSD->getCathodeSideHit(0);
-    
+
     int stripX=-1, stripY=-1;
     if (hit0->PixelX() >= 0) {
       stripX = hit0->PixelX();
@@ -190,7 +190,7 @@ ANLStatus QuickAnalysisForDSD::mod_analyze()
       stripX = hit1->PixelX();
       stripY = hit0->PixelY();
     }
-    
+
     double energy = 0.0;
     if (m_DSD->PriorityToAnodeSide()) {
       energy = hit0->EPI();
@@ -205,7 +205,7 @@ ANLStatus QuickAnalysisForDSD::mod_analyze()
       m_Image1DY->Fill(stripY);
     }
   }
-  
+
   return AS_OK;
 }
 

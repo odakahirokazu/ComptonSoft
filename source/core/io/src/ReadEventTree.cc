@@ -30,8 +30,8 @@ namespace comptonsoft
 
 ReadEventTree::ReadEventTree()
   : anlgeant4::InitialInformation(false),
-    hitCollection_(nullptr),
-    treeIO_(new EventTreeIOWithInitialInfo)
+    hit_collection_(nullptr),
+    tree_io_(new EventTreeIOWithInitialInfo)
 {
   add_alias("InitialInformation");
 }
@@ -40,7 +40,7 @@ ReadEventTree::~ReadEventTree() = default;
 
 ANLStatus ReadEventTree::mod_define()
 {
-  register_parameter(&fileList_, "file_list");
+  define_parameter("file_list", &mod_class::file_list_);
   return AS_OK;
 }
 
@@ -48,36 +48,36 @@ ANLStatus ReadEventTree::mod_initialize()
 {
   VCSModule::mod_initialize();
 
-  get_module_NC("CSHitCollection", &hitCollection_);
+  get_module_NC("CSHitCollection", &hit_collection_);
 
   tree_ = std::make_unique<TChain>("eventtree");
-  for (const std::string& filename: fileList_) {
+  for (const std::string& filename: file_list_) {
     tree_->Add(filename.c_str());
   }
 
-  treeIO_->set_tree(tree_.get());
+  tree_io_->set_tree(tree_.get());
   if (tree_->GetBranch("ini_energy")) {
     set_initial_information_stored();
-    treeIO_->enableInitialInfoRecord();
+    tree_io_->enableInitialInfoRecord();
   }
   else {
-    treeIO_->disableInitialInfoRecord();
+    tree_io_->disableInitialInfoRecord();
   }
-  treeIO_->set_branch_addresses();
+  tree_io_->set_branch_addresses();
 
-  numEntries_ = tree_->GetEntries();
-  std::cout << "Number of entries: " << numEntries_ << std::endl;
+  num_entries_ = tree_->GetEntries();
+  std::cout << "Number of entries: " << num_entries_ << std::endl;
 
   return AS_OK;
 }
 
 ANLStatus ReadEventTree::mod_begin_run()
 {
-  if (numEntries_ == 0) { return AS_OK; }
+  if (num_entries_ == 0) { return AS_OK; }
 
   tree_->GetEntry(0);
-  const int32_t RunID = treeIO_->getRunID();
-  const int32_t EventID = treeIO_->getEventID();
+  const int32_t RunID = tree_io_->getRunID();
+  const int32_t EventID = tree_io_->getEventID();
   set_run_id(RunID);
   set_event_id(EventID);
 
@@ -86,27 +86,27 @@ ANLStatus ReadEventTree::mod_begin_run()
 
 ANLStatus ReadEventTree::mod_analyze()
 {
-  if (entryIndex_ == numEntries_) {
+  if (entry_index_ == num_entries_) {
     return AS_QUIT;
   }
 
-  tree_->GetEntry(entryIndex_);
+  tree_->GetEntry(entry_index_);
 
-  const int32_t RunID = treeIO_->getRunID();
-  const int32_t EventID = treeIO_->getEventID();
+  const int32_t RunID = tree_io_->getRunID();
+  const int32_t EventID = tree_io_->getEventID();
   set_run_id(RunID);
   set_event_id(EventID);
 
   if (initial_information_stored()) {
-    set_initial_energy(treeIO_->getInitialEnergy());
-    set_initial_direction(treeIO_->getInitialDirection());
-    set_initial_time(treeIO_->getInitialTime());
-    set_initial_position(treeIO_->getInitialPosition());
-    set_initial_polarization(treeIO_->getInitialPolarization());
-    set_weight(treeIO_->getWeight());
+    set_initial_energy(tree_io_->getInitialEnergy());
+    set_initial_direction(tree_io_->getInitialDirection());
+    set_initial_time(tree_io_->getInitialTime());
+    set_initial_position(tree_io_->getInitialPosition());
+    set_initial_polarization(tree_io_->getInitialPolarization());
+    set_weight(tree_io_->getWeight());
   }
 
-  std::vector<DetectorHit_sptr> hits = treeIO_->retrieveHits(entryIndex_, false);
+  std::vector<DetectorHit_sptr> hits = tree_io_->retrieveHits(entry_index_, false);
   for (auto& hit: hits) {
     insertHit(hit);
   }
@@ -116,7 +116,7 @@ ANLStatus ReadEventTree::mod_analyze()
 
 void ReadEventTree::insertHit(const DetectorHit_sptr& hit)
 {
-  hitCollection_->insertHit(hit);
+  hit_collection_->insertHit(hit);
 }
 
 } /* namespace comptonsoft */

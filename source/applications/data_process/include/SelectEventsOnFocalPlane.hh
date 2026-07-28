@@ -47,15 +47,15 @@ public:
   anlnext::ANLStatus mod_analyze() override;
 
 private:
-  const EventReconstruction* m_EventReconstruction = nullptr;
-  int m_DetectorID;
-  std::string m_RegionTypeString;
-  Region_t m_RegionType;
-  G4TwoVector m_Center;
-  double m_SizeX;
-  double m_SizeY;
-  double m_Radius;
-  double m_Radius2;
+  const EventReconstruction* event_reconstruction_ = nullptr;
+  int detector_id_;
+  std::string region_type_keyword_;
+  Region_t region_type_;
+  G4TwoVector center_;
+  double size_x_;
+  double size_y_;
+  double radius_;
+  double radius_squared_;
 };
 
 } /* namespace comptonsoft */

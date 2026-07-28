@@ -40,7 +40,7 @@ class CreateRootFile : public anlnext::BasicModule
 public:
   CreateRootFile();
   ~CreateRootFile();
-  
+
 protected:
   CreateRootFile(const CreateRootFile& r);
 
@@ -52,15 +52,15 @@ public:
   TDirectory* GetDirectory();
   bool cd();
 
-  std::string FilenameBase() const { return m_FilenameBase; }
+  std::string FilenameBase() const { return filename_base_; }
   std::string Filename() const;
 
 private:
-  std::string m_FilenameBase;
-  std::unique_ptr<TFile> m_RootFile;
-  bool m_MasterFile = true;
-  bool m_SeparateClones = false;
-  bool m_SaveClones = false;
+  std::string filename_base_;
+  std::unique_ptr<TFile> root_file_;
+  bool master_file_ = true;
+  bool separate_clones_ = false;
+  bool save_clones_ = false;
 };
 
 } /* namespace comptonsoft */

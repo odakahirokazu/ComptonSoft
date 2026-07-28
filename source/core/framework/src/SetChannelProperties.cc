@@ -43,7 +43,7 @@ namespace comptonsoft
 {
 
 SetChannelProperties::SetChannelProperties()
-  : m_Filename("channel_properties.xml")
+  : filename_("channel_properties.xml")
 {
 }
 
@@ -51,7 +51,7 @@ SetChannelProperties::~SetChannelProperties() = default;
 
 ANLStatus SetChannelProperties::mod_define()
 {
-  register_parameter(&m_Filename, "filename");
+  define_parameter("filename", &mod_class::filename_);
   return AS_OK;
 }
 
@@ -69,11 +69,11 @@ void SetChannelProperties::readFile()
 
   ptree pt;
   try {
-    read_xml(m_Filename, pt);
+    read_xml(filename_, pt);
   }
   catch (boost::property_tree::xml_parser_error&) {
     const std::string message
-      = (boost::format("cannot parse: %s") % m_Filename).str();
+      = (boost::format("cannot parse: %s") % filename_).str();
     BOOST_THROW_EXCEPTION(ANLException(message));
   }
 
@@ -83,7 +83,7 @@ void SetChannelProperties::readFile()
 void SetChannelProperties::loadRootNode(const boost::property_tree::ptree& rootNode)
 {
   using boost::property_tree::ptree;
-  
+
   for (const ptree::value_type& v: rootNode.get_child("channel_properties.data")) {
     if (v.first == "detector") {
       const ptree& detectorNode = v.second;
@@ -117,7 +117,7 @@ void SetChannelProperties::loadRootNode(const boost::property_tree::ptree& rootN
       }
     }
   }
-}  
+}
 
 void SetChannelProperties::
 loadSectionNode(const boost::property_tree::ptree& sectionNode,
@@ -125,14 +125,14 @@ loadSectionNode(const boost::property_tree::ptree& sectionNode,
 {
   using boost::property_tree::ptree;
   using boost::optional;
-  
+
   const int detectorID = detectorChannelID.Detector();
   const int section = detectorChannelID.Section();
   const optional<int> all = sectionNode.get_optional<int>("<xmlattr>.all");
 
   VRealDetectorUnit* detector = getDetectorManager()->getDetectorByID(detectorID);
   DeviceSimulation* ds = nullptr;
-  
+
   if (isMCSimulation()) {
     ds = dynamic_cast<DeviceSimulation*>(detector);
     if (ds == nullptr) {
@@ -191,7 +191,7 @@ loadFrameNode(const boost::property_tree::ptree& frameNode,
 {
   using boost::property_tree::ptree;
   using boost::optional;
-  
+
   const int detectorID = detectorChannelID.Detector();
   const optional<int> all = frameNode.get_optional<int>("<xmlattr>.all");
 
@@ -203,7 +203,7 @@ loadFrameNode(const boost::property_tree::ptree& frameNode,
       = (boost::format("frame node must be contained in a pixel detector. Detector ID: %d") % detectorID).str();
     BOOST_THROW_EXCEPTION(ANLException(message));
   }
-  
+
   if (isMCSimulation()) {
     ds = dynamic_cast<DeviceSimulation*>(detector);
     if (ds == nullptr) {
@@ -273,7 +273,7 @@ void SetChannelProperties::setupChannelProperties(PixelID pixelID,
                                                   DeviceSimulation* ds)
 {
   using boost::optional;
-  
+
   if (optional<int> o = properties.disable_status) {
     ds->setChannelDisabled(pixelID, *o);
   }

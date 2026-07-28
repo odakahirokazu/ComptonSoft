@@ -34,12 +34,12 @@ namespace comptonsoft
 {
 
 SetNoiseLevels::SetNoiseLevels()
-  : m_ByFile(true),
-    m_FileName(""),
-    m_DetectorType(1),
-    m_Noise0(0.0), m_Noise1(0.0), m_Noise2(0.0),
-    m_CathodeNoise0(0.0), m_CathodeNoise1(0.0), m_CathodeNoise2(0.0),
-    m_AnodeNoise0(0.0), m_AnodeNoise1(0.0), m_AnodeNoise2(0.0)
+  : setting_by_file_(true),
+    filename_(""),
+    detector_type_(1),
+    noise0_(0.0), noise1_(0.0), noise2_(0.0),
+    cathode_noise0_(0.0), cathode_noise1_(0.0), cathode_noise2_(0.0),
+    anode_noise0_(0.0), anode_noise1_(0.0), anode_noise2_(0.0)
 {
 }
 
@@ -47,25 +47,25 @@ SetNoiseLevels::~SetNoiseLevels() = default;
 
 ANLStatus SetNoiseLevels::mod_define()
 {
-  register_parameter(&m_FileName, "filename");
-  register_parameter(&m_NoiseLevelMap, "noise_level_map");
+  define_parameter("filename", &mod_class::filename_);
+  define_parameter("noise_level_map", &mod_class::noise_level_map_);
   define_map_key("detector_name_prefix", "Si");
-  add_value_element(&m_DetectorType, "detector_type");
+  add_value_element("detector_type", &mod_class::detector_type_);
   set_value_element_description("Detector type (1: single, 2: double)");
-  add_value_element(&m_Noise0, "noise_coefficient0");
-  add_value_element(&m_Noise1, "noise_coefficient1");
-  add_value_element(&m_Noise2, "noise_coefficient2");
-  add_value_element(&m_CathodeNoise0, "cathode_noise_coefficient0");
-  add_value_element(&m_CathodeNoise1, "cathode_noise_coefficient1");
-  add_value_element(&m_CathodeNoise2, "cathode_noise_coefficient2");
-  add_value_element(&m_AnodeNoise0, "anode_noise_coefficient0");
-  add_value_element(&m_AnodeNoise1, "anode_noise_coefficient1");
-  add_value_element(&m_AnodeNoise2, "anode_noise_coefficient2");
+  add_value_element("noise_coefficient0", &mod_class::noise0_);
+  add_value_element("noise_coefficient1", &mod_class::noise1_);
+  add_value_element("noise_coefficient2", &mod_class::noise2_);
+  add_value_element("cathode_noise_coefficient0", &mod_class::cathode_noise0_);
+  add_value_element("cathode_noise_coefficient1", &mod_class::cathode_noise1_);
+  add_value_element("cathode_noise_coefficient2", &mod_class::cathode_noise2_);
+  add_value_element("anode_noise_coefficient0", &mod_class::anode_noise0_);
+  add_value_element("anode_noise_coefficient1", &mod_class::anode_noise1_);
+  add_value_element("anode_noise_coefficient2",  &mod_class::anode_noise2_);
 
   enable_value_elements(1, {1, 2, 3});
   enable_value_elements(2, {4, 5, 6, 7, 8, 9});
   enable_value_elements(3, {1, 2, 3});
-  
+
   return AS_OK;
 }
 
@@ -73,10 +73,10 @@ ANLStatus SetNoiseLevels::mod_initialize()
 {
   VCSModule::mod_initialize();
 
-  if (m_FileName == "") { m_ByFile = false; }
+  if (filename_ == "") { setting_by_file_ = false; }
 
   bool rval = false;
-  if (m_ByFile) {
+  if (setting_by_file_) {
     rval = set_by_file();
   }
   else {
@@ -95,13 +95,13 @@ bool SetNoiseLevels::set_by_map()
   DetectorSystem* detectorManager = getDetectorManager();
   for (auto& detector: detectorManager->getDetectors()) {
     const std::string prefix = detector->getNamePrefix();
-    if (m_NoiseLevelMap.count(prefix) == 0) {
+    if (noise_level_map_.count(prefix) == 0) {
       std::cout << "No detector name prefix is found in Noise level map. "
                 << detector->getName() << std::endl;
       continue;
     }
 
-    const auto parameters = m_NoiseLevelMap[prefix];
+    const auto parameters = noise_level_map_[prefix];
     const int type = std::get<0>(parameters);
     if (!detector->checkType(type)) {
       std::cout << "Detector type given in the analysis parameters is inconsistent.\n"
@@ -110,7 +110,7 @@ bool SetNoiseLevels::set_by_map()
                 << std::endl;
       return false;
     }
-    
+
     const int detid = detector->getID();
     if (detector->checkType(DetectorType::DoubleSidedStripDetector)) {
       const double cathode_noise0 = std::get<4>(parameters);
@@ -119,7 +119,7 @@ bool SetNoiseLevels::set_by_map()
       const double anode_noise0 = std::get<7>(parameters);
       const double anode_noise1 = std::get<8>(parameters);
       const double anode_noise2 = std::get<9>(parameters);
-      
+
       SimDetectorUnit2DStrip* ds
         = dynamic_cast<SimDetectorUnit2DStrip*>(detector.get());
       if (ds == nullptr) {
@@ -165,7 +165,7 @@ bool SetNoiseLevels::set_by_map()
       ds->resetNoiseParam2Vector(noise2);
     }
   }
-  
+
   return true;
 }
 
@@ -176,10 +176,10 @@ bool SetNoiseLevels::set_by_file()
 
   ptree pt;
   try {
-    read_xml(m_FileName, pt);
+    read_xml(filename_, pt);
   }
   catch (boost::property_tree::xml_parser_error&) {
-    std::cout << "cannot parse: " << m_FileName << std::endl;
+    std::cout << "cannot parse: " << filename_ << std::endl;
     return false;
   }
 
@@ -221,10 +221,10 @@ bool SetNoiseLevels::set_by_file()
             = readoutModule->getSection(mod_section);
           const int detectorID = channelID.Detector();
           const int det_section = channelID.Section();
-          
+
           VDeviceSimulation* const ds
             = getDetectorManager()->getDeviceSimulationByID(detectorID);
-          
+
           for (const ptree::value_type& vvv: sectionNode.get_child("")) {
             if (vvv.first == "channel") {
               const ptree channelNode = vvv.second;
@@ -241,7 +241,7 @@ bool SetNoiseLevels::set_by_file()
       }
     }
   }
-  
+
   return true;
 }
 

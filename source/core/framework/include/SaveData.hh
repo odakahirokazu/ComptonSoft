@@ -40,7 +40,7 @@ class SaveData : public anlnext::BasicModule
 public:
   SaveData();
   ~SaveData();
-  
+
   anlnext::ANLStatus mod_define() override;
   anlnext::ANLStatus mod_pre_initialize() override;
   anlnext::ANLStatus mod_analyze() override;
@@ -49,12 +49,12 @@ public:
   TDirectory* GetDirectory();
   bool cd();
 
-  std::string Filename() const { return m_Filename; }
+  std::string Filename() const { return filename_; }
 
 private:
-  std::string m_Filename;
-  std::unique_ptr<TFile> m_RootFile;
-  int m_Period = 0;
+  std::string filename_;
+  std::unique_ptr<TFile> root_file_;
+  int period_ = 0;
 };
 
 } /* namespace comptonsoft */

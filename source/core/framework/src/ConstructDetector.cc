@@ -27,10 +27,10 @@ using namespace anlnext;
 namespace comptonsoft {
 
 ConstructDetector::ConstructDetector()
-  : detectorManager_(new DetectorSystem),
-    configurationFile_("detector_config.xml"),
-    parametersFile_(""),
-    verboseLevel_(0)
+  : detector_manager_(new DetectorSystem),
+    configuration_file_("detector_config.xml"),
+    parameters_file_(""),
+    verbose_level_(0)
 {
   add_alias("ConstructDetector");
 }
@@ -39,15 +39,15 @@ ConstructDetector::~ConstructDetector() = default;
 
 ANLStatus ConstructDetector::mod_define()
 {
-  detectorManager_->setMCSimulation(false);
+  detector_manager_->setMCSimulation(false);
 
-  register_parameter(&configurationFile_, "detector_configuration");
+  define_parameter("detector_configuration", &mod_class::configuration_file_);
   set_parameter_description("XML data file describing a detector configuration.");
 
-  register_parameter(&parametersFile_, "detector_parameters");
+  define_parameter("detector_parameters", &mod_class::parameters_file_);
   set_parameter_description("XML data file of information on detectors.");
 
-  register_parameter(&verboseLevel_, "verbose_level");
+  define_parameter("verbose_level", &mod_class::verbose_level_);
 
   return AS_OK;
 }
@@ -55,15 +55,15 @@ ANLStatus ConstructDetector::mod_define()
 ANLStatus ConstructDetector::mod_initialize()
 {
   try {
-    if (!detectorManager_->isConstructed()) {
-      detectorManager_->readDetectorConfiguration(configurationFile_);
+    if (!detector_manager_->isConstructed()) {
+      detector_manager_->readDetectorConfiguration(configuration_file_);
     }
 
-    if (parametersFile_ != "") {
-      detectorManager_->readDetectorParameters(parametersFile_);
+    if (parameters_file_ != "") {
+      detector_manager_->readDetectorParameters(parameters_file_);
     }
     else {
-      if (detectorManager_->isMCSimulation()) {
+      if (detector_manager_->isMCSimulation()) {
         std::cout << "Error: detector parameters file should be given." << std::endl;
         return AS_QUIT;
       }
@@ -78,11 +78,11 @@ ANLStatus ConstructDetector::mod_initialize()
               << std::endl;
     return AS_QUIT;
   }
-  
+
   if (VerboseLevel() > 0) {
     std::cout << "\n\n";
     std::cout << "######  Detector parameters  ######\n\n";
-    for (const auto& detector: detectorManager_->getDetectors()) {
+    for (const auto& detector: detector_manager_->getDetectors()) {
       std::cout << "****************************************\n\n";
       std::cout << "Detector ID: " << detector->getID() << '\n';
       std::cout << "Name: " << detector->getName() << "\n\n";
@@ -91,16 +91,16 @@ ANLStatus ConstructDetector::mod_initialize()
       std::cout << "****************************************\n\n"
                 << std::endl;
     }
-    detectorManager_->printDetectorGroups();
+    detector_manager_->printDetectorGroups();
     std::cout << "\n\n";
   }
-  
+
   return AS_OK;
 }
 
 ANLStatus ConstructDetector::mod_analyze()
 {
-  detectorManager_->initializeEvent();
+  detector_manager_->initializeEvent();
   return AS_OK;
 }
 

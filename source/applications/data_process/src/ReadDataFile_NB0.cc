@@ -38,7 +38,7 @@ ReadDataFile_NB0::ReadDataFile_NB0()
 
 ANLStatus ReadDataFile_NB0::mod_define()
 {
-  register_parameter(&m_EventLength, "event_length");
+  define_parameter("event_length", &mod_class::m_EventLength);
 
   return ReadDataFile::mod_define();
 }
@@ -62,7 +62,7 @@ ANLStatus ReadDataFile_NB0::mod_begin_run()
     std::cout << "The file list seems empty." << std::endl;
     return AS_QUIT;
   }
-  
+
   std::string filename = nextFile();
   m_fin.open(filename.c_str());
   if (!m_fin) {
@@ -106,7 +106,7 @@ ANLStatus ReadDataFile_NB0::mod_analyze()
       m_NewFrame = true;
       return AS_SKIP;
     }
-    
+
     if ((tmp&0xFF000000) == 0x03000000) {
       if (readHK()) {
         m_NewFrame = true;
@@ -169,13 +169,13 @@ uint32_t* ReadDataFile_NB0::readEvent(uint32_t* pEvent)
 {
   const size_t EventLength = m_EventLength;
   uint32_t* p = pEvent;
-  
+
   size_t j = 0;
   while ((*p & 0xFFFF0000)!=0x3c3c0000 && j<FRAME_LENGTH) {
     ++p;
     ++j;
   }
-  
+
   size_t i=0;
   unsigned int* pBit = m_DataBitBuf;
   while ((*p & 0x0000FFFF)!=0x00007777 && i<EventLength && j<FRAME_LENGTH) {
@@ -200,7 +200,7 @@ uint32_t* ReadDataFile_NB0::readEvent(uint32_t* pEvent)
         *(pBit++) = (*p >> (31-ib)) & 0x00000001;
       }
     }
-    
+
     ++p;
     ++j;
     ++i;
@@ -212,21 +212,21 @@ uint32_t* ReadDataFile_NB0::readEvent(uint32_t* pEvent)
     p = m_FrameBuf;
     m_NewFrame = true;
   }
-  
+
   return p;
 }
 
 void ReadDataFile_NB0::decodeASICData()
 {
   const uint32_t* p = m_DataBitBuf;
-  
+
   DetectorSystem* detectorManager = getDetectorManager();
   for (auto& readoutModule: detectorManager->getReadoutModules()) {
     for (auto& section: readoutModule->Sections()) {
       MultiChannelData* mcd = detectorManager->getMultiChannelData(section);
       const int nCh = mcd->NumberOfChannels();
       mcd->resetRawADCVector();
-      
+
       std::vector<unsigned int> indexVec;
       p += 5;
       for (int l=0; l<nCh; l++) {
@@ -236,14 +236,14 @@ void ReadDataFile_NB0::decodeASICData()
         }
       }
       ++p;
-      
+
       const int ADCRes = 10;
       uint16_t ref = 0;
       for (int b=0; b<ADCRes; b++) {
         ref += *(p++) << b;
       }
       mcd->setReferenceLevel(ref);
-      
+
       const int hitnum = indexVec.size();
       for (int i=0; i<hitnum; i++) {
         uint16_t adc = 0;
@@ -252,13 +252,13 @@ void ReadDataFile_NB0::decodeASICData()
         }
         mcd->setRawADC(indexVec[i], adc);
       }
-      
+
       uint16_t cmn = 0;
       for (int b=0; b<ADCRes; b++) {
         cmn += *(p++) << b;
       }
       mcd->setCommonModeNoise(cmn);
-      
+
       ++p;
     }
   }

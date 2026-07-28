@@ -33,22 +33,22 @@ class HistogramEnergySpectrum : public VCSModule
 {
   DEFINE_ANL_MODULE(HistogramEnergySpectrum, 1.1);
 public:
-  HistogramEnergySpectrum();  
+  HistogramEnergySpectrum();
   ~HistogramEnergySpectrum() = default;
 
   anlnext::ANLStatus mod_define() override;
   anlnext::ANLStatus mod_initialize() override;
   anlnext::ANLStatus mod_analyze() override;
-  
+
 private:
-  CSHitCollection* m_HitCollection;
-  const anlgeant4::InitialInformation* m_InitialInfo;
-  std::string m_EnergyBinType;
-  int m_NumBinEnergy;
-  double m_RangeEnergy1;
-  double m_RangeEnergy2;
-  std::map<std::string, TH1*> m_Histograms;
-  std::vector<std::string> m_Selections;
+  CSHitCollection* hit_collection_;
+  const anlgeant4::InitialInformation* initial_info_;
+  std::string energy_bin_type_;
+  int num_bins_;
+  double energy_min_;
+  double energy_max_;
+  std::map<std::string, TH1*> histograms_;
+  std::vector<std::string> event_selections_;
 };
 
 } /* namespace comptonsoft */

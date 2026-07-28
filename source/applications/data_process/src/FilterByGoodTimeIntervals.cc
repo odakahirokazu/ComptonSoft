@@ -35,16 +35,16 @@ FilterByGoodTimeIntervals::~FilterByGoodTimeIntervals() = default;
 
 ANLStatus FilterByGoodTimeIntervals::mod_define()
 {
-  register_parameter(&m_GTIs, "time_intervals");
-  add_value_element(&m_TimeStart, "start", CLHEP::second, "s");
-  add_value_element(&m_TimeEnd, "end", CLHEP::second, "s");
+  define_parameter("time_intervals", &mod_class::m_GTIs);
+  add_value_element("start", &mod_class::time_start_, CLHEP::second, "s");
+  add_value_element("end", &mod_class::time_end_, CLHEP::second, "s");
 
   return AS_OK;
 }
 
 ANLStatus FilterByGoodTimeIntervals::mod_initialize()
 {
-  get_module("CSHitCollection", &m_HitCollection);
+  get_module("CSHitCollection", &hit_collection_);
   define_evs("FilterByGoodTimeIntervals:OK");
 
   return AS_OK;
@@ -53,10 +53,10 @@ ANLStatus FilterByGoodTimeIntervals::mod_initialize()
 ANLStatus FilterByGoodTimeIntervals::mod_analyze()
 {
   bool passed = false;
-  const int NumTimeGroups = m_HitCollection->NumberOfTimeGroups();
+  const int NumTimeGroups = hit_collection_->NumberOfTimeGroups();
   for (int timeGroup=0; timeGroup<NumTimeGroups; timeGroup++) {
     const std::vector<DetectorHit_sptr>& hits
-      = m_HitCollection->getHits(timeGroup);
+      = hit_collection_->getHits(timeGroup);
     for (const DetectorHit_sptr& hit: hits) {
       const double t = hit->Time();
       for (const std::tuple<double, double>& interval: m_GTIs) {

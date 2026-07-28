@@ -43,13 +43,13 @@ public:
   anlnext::ANLStatus mod_define() override;
   anlnext::ANLStatus mod_initialize() override;
   anlnext::ANLStatus mod_analyze() override;
-  
-private:
-  std::vector<double> m_DirZVector;
-  std::vector<double> m_WeightVector;
 
-  anlgeant4::InitialInformation* m_InitialInfo = nullptr;
-  std::unique_ptr<TGraph> m_WeightFunction;
+private:
+  std::vector<double> dirz_vector_;
+  std::vector<double> weight_vector_;
+
+  anlgeant4::InitialInformation* initial_info_ = nullptr;
+  std::unique_ptr<TGraph> weight_function_;
 };
 
 } /* namespace comptonsoft */

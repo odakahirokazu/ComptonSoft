@@ -64,9 +64,9 @@ private:
   void setupFramePixelProperties(PixelID pixelID,
                                  const DetectorSystem::ChannelNodeContents& properties,
                                  VRealDetectorUnit* detector);
-  
+
 private:
-  std::string m_Filename;
+  std::string filename_;
 };
 
 } /* namespace comptonsoft */

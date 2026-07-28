@@ -32,8 +32,8 @@ namespace comptonsoft
 
 SortEventTreeWithTime::SortEventTreeWithTime()
   : anlgeant4::InitialInformation(true),
-    hitCollection_(nullptr),
-    treeIO_(new EventTreeIOWithInitialInfo)
+    hit_collection_(nullptr),
+    tree_io_(new EventTreeIOWithInitialInfo)
 {
   add_alias("InitialInformation");
 }
@@ -42,7 +42,7 @@ SortEventTreeWithTime::~SortEventTreeWithTime() = default;
 
 ANLStatus SortEventTreeWithTime::mod_define()
 {
-  register_parameter(&fileList_, "file_list");
+  define_parameter("file_list", &mod_class::file_list_);
   return AS_OK;
 }
 
@@ -50,65 +50,65 @@ ANLStatus SortEventTreeWithTime::mod_initialize()
 {
   VCSModule::mod_initialize();
 
-  get_module_NC("CSHitCollection", &hitCollection_);
+  get_module_NC("CSHitCollection", &hit_collection_);
 
   tree_ = new TChain("eventtree");
-  for (const std::string& filename: fileList_) {
+  for (const std::string& filename: file_list_) {
     tree_->Add(filename.c_str());
   }
 
-  treeIO_->set_tree(tree_);
+  tree_io_->set_tree(tree_);
   if (tree_->GetBranch("ini_energy")) {
     set_initial_information_stored();
-    treeIO_->enableInitialInfoRecord();
+    tree_io_->enableInitialInfoRecord();
   }
   else {
-    treeIO_->disableInitialInfoRecord();
+    tree_io_->disableInitialInfoRecord();
   }
-  treeIO_->set_branch_addresses();
+  tree_io_->set_branch_addresses();
 
-  numEntries_ = tree_->GetEntries();
-  std::cout << "Number of entries: " << numEntries_ << std::endl;
+  num_entries_ = tree_->GetEntries();
+  std::cout << "Number of entries: " << num_entries_ << std::endl;
 
   return AS_OK;
 }
 
 ANLStatus SortEventTreeWithTime::mod_begin_run()
 {
-  if (numEntries_ == 0) { return AS_OK; }
+  if (num_entries_ == 0) { return AS_OK; }
 
-  while (entryIndex_ < numEntries_) {
-    tree_->GetEntry(entryIndex_);
-    eventList_.push_back( treeIO_->retrieveHits(entryIndex_, false) );
+  while (entry_index_ < num_entries_) {
+    tree_->GetEntry(entry_index_);
+    event_list_.push_back( tree_io_->retrieveHits(entry_index_, false) );
   }
 
-  eventList_.sort([](std::vector<DetectorHit_sptr>& a, std::vector<DetectorHit_sptr>& b) {
+  event_list_.sort([](std::vector<DetectorHit_sptr>& a, std::vector<DetectorHit_sptr>& b) {
                     return a[0]->RealTime() < b[0]->RealTime();
                   });
-  eventIter_ = eventList_.begin();
+  event_iter_ = event_list_.begin();
 
   return AS_OK;
 }
 
 ANLStatus SortEventTreeWithTime::mod_analyze()
 {
-  if (eventIter_ == eventList_.end()) {
+  if (event_iter_ == event_list_.end()) {
     return AS_QUIT;
   }
 
-  std::vector<DetectorHit_sptr>& hits = *eventIter_;
+  std::vector<DetectorHit_sptr>& hits = *event_iter_;
   for (auto& hit: hits){
     insertHit(hit);
   }
 
-  ++eventIter_;
+  ++event_iter_;
 
   return AS_OK;
 }
 
 void SortEventTreeWithTime::insertHit(const DetectorHit_sptr& hit)
 {
-  hitCollection_->insertHit(hit);
+  hit_collection_->insertHit(hit);
 }
 
 } /* namespace comptonsoft */

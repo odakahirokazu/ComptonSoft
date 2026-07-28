@@ -26,21 +26,21 @@ namespace comptonsoft
 {
 
 SelectTime::SelectTime()
-  : m_ReadDataModule(0), m_Time0(0), m_Time1(0)
+  : read_data_module_(0), time_start_(0), time_end_(0)
 {
 }
 
 ANLStatus SelectTime::mod_define()
 {
-  register_parameter(&m_Time0, "time_start");
-  register_parameter(&m_Time1, "time_end");
-  
+  define_parameter("time_start", &mod_class::time_start_);
+  define_parameter("time_end", &mod_class::time_end_);
+
   return AS_OK;
 }
 
 ANLStatus SelectTime::mod_initialize()
 {
-  get_module_NC("ReadDataFile", &m_ReadDataModule);
+  get_module_NC("ReadDataFile", &read_data_module_);
   define_evs("SelectTime:OK");
 
   return AS_OK;
@@ -48,8 +48,8 @@ ANLStatus SelectTime::mod_initialize()
 
 ANLStatus SelectTime::mod_analyze()
 {
-  const int t = m_ReadDataModule->Time();
-  if (t < m_Time0 || m_Time1 < t) {
+  const int t = read_data_module_->Time();
+  if (t < time_start_ || time_end_ < t) {
     return AS_SKIP;
   }
 

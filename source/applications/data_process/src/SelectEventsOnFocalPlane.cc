@@ -30,85 +30,86 @@ namespace comptonsoft
 {
 
 SelectEventsOnFocalPlane::SelectEventsOnFocalPlane()
-  : m_DetectorID(0),
-    m_RegionTypeString("rectangle"),
-    m_RegionType(Region_t::Rectangle),
-    m_Center(0.0, 0.0),
-    m_SizeX(0.0),
-    m_SizeY(0.0),
-    m_Radius(0.0),
-    m_Radius2(0.0)
+  : detector_id_(0),
+    region_type_keyword_("rectangle"),
+    region_type_(Region_t::Rectangle),
+    center_(0.0, 0.0),
+    size_x_(0.0),
+    size_y_(0.0),
+    radius_(0.0),
+    radius_squared_(0.0)
 {
 }
 
 ANLStatus SelectEventsOnFocalPlane::mod_define()
 {
-  register_parameter(&m_DetectorID, "detector_id");
-  register_parameter(&m_RegionTypeString, "region_type");
-  register_parameter(&m_Center, "center", unit::cm, "cm");
-  register_parameter(&m_SizeX, "size_x", unit::cm, "cm");
-  register_parameter(&m_SizeY, "size_y", unit::cm, "cm");
-  register_parameter(&m_Radius, "radius", unit::cm, "cm");
+  define_parameter("detector_id", &mod_class::detector_id_);
+  define_parameter("region_type", &mod_class::region_type_keyword_);
+  define_parameter("center", &mod_class::center_, unit::cm, "cm");
+  define_parameter("size_x", &mod_class::size_x_, unit::cm, "cm");
+  define_parameter("size_y", &mod_class::size_y_, unit::cm, "cm");
+  define_parameter("radius", &mod_class::radius_, unit::cm, "cm");
+
   return AS_OK;
 }
 
 ANLStatus SelectEventsOnFocalPlane::mod_initialize()
 {
   VCSModule::mod_initialize();
- 
-  get_module("EventReconstruction", &m_EventReconstruction);
+
+  get_module("EventReconstruction", &event_reconstruction_);
 
   define_evs("SelectEventsOnFocalPlane:Exception");
 
-  if (m_RegionTypeString=="rectangle") {
-    m_RegionType = Region_t::Rectangle;
+  if (region_type_keyword_=="rectangle") {
+    region_type_ = Region_t::Rectangle;
   }
-  else if (m_RegionTypeString=="circle") {
-    m_RegionType = Region_t::Circle;
+  else if (region_type_keyword_=="circle") {
+    region_type_ = Region_t::Circle;
   }
   else {
-    std::cout << "Unknown region type: " << m_RegionTypeString << std::endl;
+    std::cout << "Unknown region type: " << region_type_keyword_ << std::endl;
     return AS_QUIT_ERROR;
   }
-  
-  m_Radius2 = m_Radius * m_Radius;
-  
+
+  radius_squared_ = radius_ * radius_;
+
   return AS_OK;
 }
 
 ANLStatus SelectEventsOnFocalPlane::mod_analyze()
 {
-  if (m_EventReconstruction->NumberOfReconstructedEvents()!=1) {
+  if (event_reconstruction_->NumberOfReconstructedEvents()!=1) {
     set_evs("SelectEventsOnFocalPlane:Exception");
     return AS_SKIP;
   }
 
-  const_BasicComptonEvent_sptr comptonEvent = m_EventReconstruction->getReconstructedEvents()[0];
+  const_BasicComptonEvent_sptr comptonEvent = event_reconstruction_->getReconstructedEvents()[0];
 
-  if (comptonEvent->Hit1DetectorID() != m_DetectorID) {
+  if (comptonEvent->Hit1DetectorID() != detector_id_) {
     return AS_OK;
   }
-  
+
   const double x = comptonEvent->Hit1PositionX();
   const double y = comptonEvent->Hit1PositionY();
 
-  if (m_RegionType==Region_t::Rectangle) {
-    const double x0 = m_Center.x() - 0.5*m_SizeX;
-    const double x1 = m_Center.x() + 0.5*m_SizeX;
+  if (region_type_==Region_t::Rectangle) {
+    const double x0 = center_.x() - 0.5*size_x_;
+    const double x1 = center_.x() + 0.5*size_x_;
     if (x < x0 || x1 < x) {
       return AS_SKIP;
     }
 
-    const double y0 = m_Center.y() - 0.5*m_SizeY;
-    const double y1 = m_Center.y() + 0.5*m_SizeY;
+    const double y0 = center_.y() - 0.5*size_y_;
+    const double y1 = center_.y() + 0.5*size_y_;
     if (y < y0 || y1 < y) {
       return AS_SKIP;
     }
   }
-  else if (m_RegionType==Region_t::Circle) {
-    const double dx = x-m_Center.x();
-    const double dy = y-m_Center.y();
-    if (dx*dx+dy*dy > m_Radius2) {
+  else if (region_type_==Region_t::Circle) {
+    const double dx = x-center_.x();
+    const double dy = y-center_.y();
+    if (dx*dx+dy*dy > radius_squared_) {
       return AS_SKIP;
     }
   }

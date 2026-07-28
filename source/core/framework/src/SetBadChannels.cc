@@ -34,7 +34,7 @@ namespace comptonsoft
 {
 
 SetBadChannels::SetBadChannels()
-  : m_FileName("")
+  : filename_("")
 {
 }
 
@@ -42,8 +42,8 @@ SetBadChannels::~SetBadChannels() = default;
 
 ANLStatus SetBadChannels::mod_define()
 {
-  register_parameter(&m_FileName, "filename");
-  
+  define_parameter("filename", &mod_class::filename_);
+
   return AS_OK;
 }
 
@@ -66,16 +66,16 @@ bool SetBadChannels::set_by_file()
 
   ptree pt;
   try {
-    read_xml(m_FileName, pt);
+    read_xml(filename_, pt);
   }
   catch (boost::property_tree::xml_parser_error&) {
-    std::cout << "cannot parse: " << m_FileName << std::endl;
+    std::cout << "cannot parse: " << filename_ << std::endl;
     return false;
   }
 
   DetectorSystem* detectorManager = getDetectorManager();
   const bool isSimulation = detectorManager->isMCSimulation();
-  
+
   for (ptree::value_type& v: pt.get_child("badchannels.data")) {
     if (v.first == "detector") {
       const ptree detectorNode = v.second;
@@ -117,7 +117,7 @@ bool SetBadChannels::set_by_file()
             = readoutModule->getSection(mod_section);
           const int detectorID = channelID.Detector();
           const int det_section = channelID.Section();
-          
+
           for (const ptree::value_type& vvv: sectionNode.get_child("")) {
             if (vvv.first == "channel") {
               const ptree channelNode = vvv.second;
@@ -138,7 +138,7 @@ bool SetBadChannels::set_by_file()
       }
     }
   }
-  
+
   return true;
 }
 

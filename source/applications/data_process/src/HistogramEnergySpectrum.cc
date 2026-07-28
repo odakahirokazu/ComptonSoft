@@ -35,54 +35,54 @@ namespace comptonsoft
 {
 
 HistogramEnergySpectrum::HistogramEnergySpectrum()
-  : m_HitCollection(0), m_InitialInfo(0), m_EnergyBinType("lin"),
-    m_NumBinEnergy(720), m_RangeEnergy1(0.0), m_RangeEnergy2(720.0)
+  : hit_collection_(0), initial_info_(0), energy_bin_type_("lin"),
+    num_bins_(720), energy_min_(0.0), energy_max_(720.0)
 {
 }
 
 ANLStatus HistogramEnergySpectrum::mod_define()
 {
-  register_parameter(&m_EnergyBinType, "bin_type");
-  register_parameter(&m_NumBinEnergy, "number_of_bins");
-  register_parameter(&m_RangeEnergy1, "energy_min", 1, "keV");
-  register_parameter(&m_RangeEnergy2, "energy_max", 1, "keV");
-  register_parameter(&m_Selections, "event_selections");
+  define_parameter("bin_type", &mod_class::energy_bin_type_);
+  define_parameter("number_of_bins", &mod_class::num_bins_);
+  define_parameter("energy_min", &mod_class::energy_min_, 1, "keV");
+  define_parameter("energy_max", &mod_class::energy_max_, 1, "keV");
+  define_parameter("event_selections", &mod_class::event_selections_);
 
   return AS_OK;
 }
 
 ANLStatus HistogramEnergySpectrum::mod_initialize()
 {
-  get_module_NC("CSHitCollection", &m_HitCollection);
-  get_module_IFNC("InitialInformation", &m_InitialInfo);
+  get_module_NC("CSHitCollection", &hit_collection_);
+  get_module_IFNC("InitialInformation", &initial_info_);
 
   VCSModule::mod_initialize();
   mkdir();
 
-  std::vector<double> xs(m_NumBinEnergy+1);
-  if (m_EnergyBinType=="log") {
-    const double width = std::log(m_RangeEnergy2-m_RangeEnergy1)/m_NumBinEnergy;
+  std::vector<double> xs(num_bins_+1);
+  if (energy_bin_type_=="log") {
+    const double width = std::log(energy_max_-energy_min_)/num_bins_;
     for (size_t k=0; k<xs.size(); k++) {
-      xs[k] = m_RangeEnergy1 * std::exp( k*width );
+      xs[k] = energy_min_ * std::exp( k*width );
     }
   }
 
-  const size_t n = m_Selections.size();
+  const size_t n = event_selections_.size();
   for (size_t i=0; i<n; i++) {
     const std::string name = (boost::format("spectrum_%03d") % i).str();
-    const std::string selection = m_Selections[i];
+    const std::string selection = event_selections_[i];
     const std::string title = (boost::format("Spectrum [%s]") % selection).str();
     TH1F* hist = nullptr;
-    if (m_EnergyBinType=="log") {
+    if (energy_bin_type_=="log") {
       hist = new TH1F(name.c_str(), title.c_str(),
-                      m_NumBinEnergy, &xs[0]);
+                      num_bins_, &xs[0]);
     }
     else {
       hist = new TH1F(name.c_str(), title.c_str(),
-                      m_NumBinEnergy, m_RangeEnergy1, m_RangeEnergy2);
+                      num_bins_, energy_min_, energy_max_);
     }
     hist->Sumw2();
-    m_Histograms[m_Selections[i]] = hist;
+    histograms_[event_selections_[i]] = hist;
   }
 
   return AS_OK;
@@ -92,16 +92,16 @@ ANLStatus HistogramEnergySpectrum::mod_analyze()
 {
   typedef std::vector<DetectorHit_sptr> HitVector;
 
-  const double weight = m_InitialInfo->weight();
+  const double weight = initial_info_->weight();
 
-  HitVector& hitVec = m_HitCollection->getHits();
+  HitVector& hitVec = hit_collection_->getHits();
 
   double energy = 0.0;
   for (HitVector::iterator it=hitVec.begin(); it!=hitVec.end(); ++it) {
     energy += (*it)->Energy();
   }
 
-  for (std::map<std::string, TH1*>::iterator it=m_Histograms.begin(); it!=m_Histograms.end(); ++it) {
+  for (std::map<std::string, TH1*>::iterator it=histograms_.begin(); it!=histograms_.end(); ++it) {
     const std::string& evsName = (*it).first;
     TH1* hist = (*it).second;
     if (evs(evsName)) {

@@ -41,8 +41,8 @@ public:
 
 protected:
   void insertHitIntoTheCollection(const DetectorHit_sptr& hit)
-  { m_HitCollection->insertHit(hit); }
-  
+  { hit_collection_->insertHit(hit); }
+
 private:
   virtual bool setAnalysisParameters();
   virtual void doProcessing();
@@ -60,21 +60,21 @@ private:
                                           double upperC1);
 
 private:
-  CSHitCollection* m_HitCollection = nullptr;
+  CSHitCollection* hit_collection_ = nullptr;
 
-  int m_DetectorType;
-  int m_ReconstructionMode;
-  double m_Threshold;
-  double m_ThresholdCathode;
-  double m_ThresholdAnode;
-  double m_LowerECheckFuncC0;
-  double m_LowerECheckFuncC1;
-  double m_UpperECheckFuncC0;
-  double m_UpperECheckFuncC1;
+  int detector_type_;
+  int reconstruction_mode_;
+  double threshold_;
+  double threshold_cathode_;
+  double threshold_anode_;
+  double lower_energy_check_func_C0_;
+  double lower_energy_check_func_C1_;
+  double upper_energy_check_func_C0_;
+  double upper_energy_check_func_C1_;
   std::map<std::string,
            std::tuple<int, int,
                       double, double, double,
-                      double, double, double, double>> m_AnalysisMap;
+                      double, double, double, double>> analysis_map_;
 };
 
 } /* namespace comptonsoft */

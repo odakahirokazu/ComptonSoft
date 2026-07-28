@@ -48,9 +48,9 @@ ANLStatus BackProjectionSky::mod_define()
 {
   BackProjection::mod_define();
 
-  unregister_parameter("plane_normal");
-  unregister_parameter("plane_point");
-  
+  undefine_parameter("plane_normal");
+  undefine_parameter("plane_point");
+
   define_parameter("image_center_theta", &mod_class::image_center_theta_, unit::degree, "degree");
   define_parameter("image_center_phi",   &mod_class::image_center_phi_,   unit::degree, "degree");
   define_parameter("image_yaxis_theta",  &mod_class::image_yaxis_theta_,  unit::degree, "degree");
@@ -71,7 +71,7 @@ ANLStatus BackProjectionSky::mod_initialize()
   const vector3_t yaxis_proposed(sin(image_yaxis_theta_)*cos(image_yaxis_phi_),
                                  sin(image_yaxis_theta_)*sin(image_yaxis_phi_),
                                  cos(image_yaxis_theta_));
-  
+
   const vector3_t yaxis = (yaxis_proposed - (yaxis_proposed.dot(zaxis))*zaxis).unit();
   const vector3_t xaxis = yaxis.cross(zaxis);
 
@@ -123,7 +123,7 @@ ANLStatus BackProjectionSky::mod_analyze()
       fillImage(x/PixelUnit(), y/PixelUnit(), weight);
     }
   }
-  
+
   return AS_OK;
 }
 

@@ -40,20 +40,20 @@ class HistogramPHA : public VCSModule
 public:
   HistogramPHA();
   ~HistogramPHA() = default;
- 
+
   anlnext::ANLStatus mod_define() override;
   anlnext::ANLStatus mod_initialize() override;
   anlnext::ANLStatus mod_analyze() override;
 
 private:
-  bool m_ReadoutOrder;
-  bool m_GroupingInSection;
-  std::string m_HistogramType;
-  std::vector<TH1*> m_Histograms;
-  int m_NumBins;
-  double m_RangeMin;
-  double m_RangeMax;
-  std::function<double (MultiChannelData*, int)> m_GetterFunc;
+  bool readout_order_;
+  bool grouping_in_section_;
+  std::string histogram_type_;
+  std::vector<TH1*> histograms_;
+  int num_bins_;
+  double range_min_;
+  double range_max_;
+  std::function<double (MultiChannelData*, int)> getter_func_;
 };
 
 } /* namespace comptonsoft */

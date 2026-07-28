@@ -31,22 +31,22 @@ namespace comptonsoft
 {
 
 EventSelection::EventSelection()
-  : m_DiscardTimeGroupZero(false),
-    m_DiscardTimeGroupNonZero(false),
-    m_OffEnabled(true),
-    m_VetoEnabled(true),
-    m_TriggerEnabled(false),
-    m_HitCollection(nullptr)
+  : discard_time_group_zero_(false),
+    discard_time_group_non_zero_(false),
+    off_enabled_(true),
+    veto_enabled_(true),
+    trigger_enabled_(false),
+    hit_collection_(nullptr)
 {
 }
 
 ANLStatus EventSelection::mod_define()
 {
-  register_parameter(&m_DiscardTimeGroupZero, "discard_time_group_zero");
-  register_parameter(&m_DiscardTimeGroupNonZero, "discard_time_group_nonzero");
-  register_parameter(&m_OffEnabled, "enable_off");
-  register_parameter(&m_VetoEnabled, "enable_veto");
-  register_parameter(&m_TriggerEnabled, "enable_trigger");
+  define_parameter("discard_time_group_zero", &mod_class::discard_time_group_zero_);
+  define_parameter("discard_time_group_nonzero", &mod_class::discard_time_group_non_zero_);
+  define_parameter("enable_off", &mod_class::off_enabled_);
+  define_parameter("enable_veto", &mod_class::veto_enabled_);
+  define_parameter("enable_trigger", &mod_class::trigger_enabled_);
 
   return AS_OK;
 }
@@ -54,7 +54,7 @@ ANLStatus EventSelection::mod_define()
 ANLStatus EventSelection::mod_initialize()
 {
   VCSModule::mod_initialize();
-  get_module_NC("CSHitCollection", &m_HitCollection);
+  get_module_NC("CSHitCollection", &hit_collection_);
   define_evs("EventSelection:Veto");
   define_evs("EventSelection:Trigger");
   return AS_OK;
@@ -74,24 +74,24 @@ ANLStatus EventSelection::mod_analyze()
   const DetectorGroup& HighZDetectorGroup
     = detectorManager->getDetectorGroup("HighZ");
 
-  const int NumTimeGroups = m_HitCollection->NumberOfTimeGroups();
+  const int NumTimeGroups = hit_collection_->NumberOfTimeGroups();
   for (int timeGroup=0; timeGroup<NumTimeGroups; timeGroup++) {
-    std::vector<DetectorHit_sptr>& hits = m_HitCollection->getHits(timeGroup);
+    std::vector<DetectorHit_sptr>& hits = hit_collection_->getHits(timeGroup);
 
     if (timeGroup==0) {
-      if (m_DiscardTimeGroupZero) {
+      if (discard_time_group_zero_) {
         hits.clear();
         continue;
       }
     }
     else {
-      if (m_DiscardTimeGroupNonZero) {
+      if (discard_time_group_non_zero_) {
         hits.clear();
         continue;
       }
     }
 
-    if (m_OffEnabled) {
+    if (off_enabled_) {
       std::vector<DetectorHit_sptr>::iterator it = hits.begin();
       while (it != hits.end()) {
         const int detectorID = (*it)->DetectorID();
@@ -103,7 +103,7 @@ ANLStatus EventSelection::mod_analyze()
         }
       }
     }
-    
+
     bool veto = false;
     bool trigger = false;
     for (DetectorHit_sptr& hit: hits) {
@@ -137,7 +137,7 @@ ANLStatus EventSelection::mod_analyze()
       hit->clearFlags(flag::FluorescenceHit);
       const double energy = hit->Energy();
       bool fluorescence = false;
-      for (auto& range: m_FluoresenceRanges) {
+      for (auto& range: fluoresence_ranges_) {
         const double e0 = std::get<0>(range);
         const double e1 = std::get<1>(range);
         if (e0<=energy && energy<=e1) {
@@ -150,11 +150,11 @@ ANLStatus EventSelection::mod_analyze()
       }
     }
 
-    if (m_VetoEnabled && veto) {
+    if (veto_enabled_ && veto) {
       hits.clear();
     }
 
-    if (m_TriggerEnabled && !trigger) {
+    if (trigger_enabled_ && !trigger) {
       hits.clear();
     }
   }

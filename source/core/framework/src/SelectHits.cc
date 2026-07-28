@@ -33,10 +33,10 @@ namespace comptonsoft
 {
 
 SelectHits::SelectHits()
-  : m_DetectorType(1), m_ReconstructionMode(0),
-    m_Threshold(1.0*unit::keV), m_ThresholdCathode(1.0*unit::keV), m_ThresholdAnode(1.0*unit::keV),
-    m_LowerECheckFuncC0(0.0), m_LowerECheckFuncC1(0.9),
-    m_UpperECheckFuncC0(0.0), m_UpperECheckFuncC1(1.1)
+  : detector_type_(1), reconstruction_mode_(0),
+    threshold_(1.0*unit::keV), threshold_cathode_(1.0*unit::keV), threshold_anode_(1.0*unit::keV),
+    lower_energy_check_func_C0_(0.0), lower_energy_check_func_C1_(0.9),
+    upper_energy_check_func_C0_(0.0), upper_energy_check_func_C1_(1.1)
 {
 }
 
@@ -44,29 +44,29 @@ SelectHits::~SelectHits() = default;
 
 ANLStatus SelectHits::mod_define()
 {
-  register_parameter(&m_AnalysisMap, "analysis_map");
+  define_parameter("analysis_map", &mod_class::analysis_map_);
   define_map_key("detector_name_prefix", "Si");
-  add_value_element(&m_DetectorType, "detector_type");
+  add_value_element("detector_type", &mod_class::detector_type_);
   set_value_element_description("Detector type (1: pad, 2: DSD, 3: scintillator)");
-  add_value_element(&m_ReconstructionMode, "reconstruction_mode");
-  add_value_element(&m_Threshold, "threshold", unit::keV, "keV");
-  add_value_element(&m_ThresholdCathode, "threshold_cathode", unit::keV, "keV");
-  add_value_element(&m_ThresholdAnode, "threshold_anode", unit::keV, "keV");
-  add_value_element(&m_LowerECheckFuncC0, "lower_energy_consistency_check_function_c0", unit::keV, "keV");
-  add_value_element(&m_LowerECheckFuncC1, "lower_energy_consistency_check_function_c1");
-  add_value_element(&m_UpperECheckFuncC0, "upper_energy_consistency_check_function_c0", unit::keV, "keV");
-  add_value_element(&m_UpperECheckFuncC1, "upper_energy_consistency_check_function_c1");
+  add_value_element("reconstruction_mode", &mod_class::reconstruction_mode_);
+  add_value_element("threshold", &mod_class::threshold_, unit::keV, "keV");
+  add_value_element("threshold_cathode", &mod_class::threshold_cathode_, unit::keV, "keV");
+  add_value_element("threshold_anode", &mod_class::threshold_anode_, unit::keV, "keV");
+  add_value_element("lower_energy_consistency_check_function_c0", &mod_class::lower_energy_check_func_C0_, unit::keV, "keV");
+  add_value_element("lower_energy_consistency_check_function_c1", &mod_class::lower_energy_check_func_C1_);
+  add_value_element("upper_energy_consistency_check_function_c0", &mod_class::upper_energy_check_func_C0_, unit::keV, "keV");
+  add_value_element("upper_energy_consistency_check_function_c1", &mod_class::upper_energy_check_func_C1_);
   enable_value_elements(1, {1, 2});
   enable_value_elements(2, {1, 3, 4, 5, 6, 7, 8});
   enable_value_elements(3, {1, 2});
-  
+
   return AS_OK;
 }
 
 ANLStatus SelectHits::mod_initialize()
 {
   VCSModule::mod_initialize();
-  get_module_NC("CSHitCollection", &m_HitCollection);
+  get_module_NC("CSHitCollection", &hit_collection_);
   return AS_OK;
 }
 
@@ -82,13 +82,13 @@ bool SelectHits::setAnalysisParameters()
   DetectorSystem* detectorManager = getDetectorManager();
   for (auto& detector: detectorManager->getDetectors()) {
     const std::string prefix = detector->getNamePrefix();
-    if (m_AnalysisMap.count(prefix) == 0) {
+    if (analysis_map_.count(prefix) == 0) {
       std::cout << "No detector name prefix is found in Threshold Map. "
                 << detector->getName() << std::endl;
       return false;
     }
 
-    auto analysisParameters = m_AnalysisMap[prefix];
+    auto analysisParameters = analysis_map_[prefix];
     const int type = std::get<0>(analysisParameters);
     if (!detector->checkType(type)) {
       std::cout << "Detector type given in the analysis parameters is inconsistent.\n"
@@ -97,10 +97,10 @@ bool SelectHits::setAnalysisParameters()
                 << std::endl;
       return false;
     }
-    
+
     const int mode = std::get<1>(analysisParameters);
     detector->setReconstructionMode(mode);
-    
+
     const double threshold = std::get<2>(analysisParameters);
     const double thresholdCathode = std::get<3>(analysisParameters);
     const double thresholdAnode = std::get<4>(analysisParameters);

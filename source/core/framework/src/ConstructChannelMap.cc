@@ -41,7 +41,7 @@ ConstructChannelMap::~ConstructChannelMap() = default;
 
 ANLStatus ConstructChannelMap::mod_define()
 {
-  register_parameter(&filename_, "filename");
+  define_parameter("filename", &mod_class::filename_);
   set_parameter_description("XML data file describing a channel map.");
   return AS_OK;
 }
@@ -73,7 +73,7 @@ ANLStatus ConstructChannelMap::mod_initialize()
 void ConstructChannelMap::loadChannelMap(const boost::property_tree::ptree& pt)
 {
   using boost::property_tree::ptree;
-  
+
   for (const ptree::value_type& v: pt.get_child("channel_map")) {
     if (v.first == "detector") {
       const ptree& detectorNode = v.second;
@@ -104,19 +104,19 @@ void ConstructChannelMap::loadChannelMap(const boost::property_tree::ptree& pt)
         }
       }
 
-      channelMaps_[prefix] = channelMap;
+      channel_maps_[prefix] = channelMap;
     }
   }
-  
+
   DetectorSystem* detectorManager = getDetectorManager();
   for (auto& detector: detectorManager->getDetectors()) {
     const std::string prefix = detector->getNamePrefix();
-    if (channelMaps_.count(prefix) == 0) {
+    if (channel_maps_.count(prefix) == 0) {
       std::ostringstream message;
       message << "Channel map is not found for Detector prefix: " << prefix << std::endl;
       BOOST_THROW_EXCEPTION(ANLException(this, message.str()));
     }
-    detector->setChannelMap(channelMaps_[prefix]);
+    detector->setChannelMap(channel_maps_[prefix]);
   }
 }
 

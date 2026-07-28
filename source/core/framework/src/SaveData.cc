@@ -28,8 +28,8 @@ namespace comptonsoft
 {
 
 SaveData::SaveData()
-  : m_Filename("output.root"),
-    m_RootFile(nullptr)
+  : filename_("output.root"),
+    root_file_(nullptr)
 {
 }
 
@@ -37,30 +37,30 @@ SaveData::~SaveData() = default;
 
 ANLStatus SaveData::mod_define()
 {
-  register_parameter(&m_Filename, "output");
-  register_parameter(&m_Period, "period");
+  define_parameter("output", &mod_class::filename_);
+  define_parameter("period", &mod_class::period_);
   return AS_OK;
 }
 
 ANLStatus SaveData::mod_pre_initialize()
 {
-  m_RootFile.reset(new TFile(m_Filename.c_str(), "recreate"));
-  if ( !m_RootFile ) {
+  root_file_.reset(new TFile(filename_.c_str(), "recreate"));
+  if ( !root_file_ ) {
     std::cout << "SaveData: cannot create ROOT file" << std::endl;
     return AS_QUIT;
   }
-  
+
   return AS_OK;
 }
 
 ANLStatus SaveData::mod_analyze()
 {
-  const int period = m_Period;
+  const int period = period_;
   if (period==0) { return AS_OK; }
 
   const int loop_count = get_loop_index()+1;
   if (loop_count%period == 0) {
-    m_RootFile->Write();
+    root_file_->Write();
   }
   return AS_OK;
 }
@@ -68,22 +68,22 @@ ANLStatus SaveData::mod_analyze()
 ANLStatus SaveData::mod_finalize()
 {
   std::cout << "SaveData: saving data to ROOT file" << std::endl;
-  m_RootFile->Write();
+  root_file_->Write();
   std::cout << "SaveData: closing ROOT file" << std::endl;
-  m_RootFile->Close();
+  root_file_->Close();
   std::cout << "SaveData: ROOT file closed " << std::endl;
-  
+
   return AS_OK;
 }
 
 TDirectory* SaveData::GetDirectory()
 {
-  return m_RootFile->GetDirectory(0);
+  return root_file_->GetDirectory(0);
 }
 
 bool SaveData::cd()
 {
-  return m_RootFile->cd();
+  return root_file_->cd();
 }
 
 } /* namespace comptonsoft */

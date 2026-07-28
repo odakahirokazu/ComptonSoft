@@ -51,13 +51,13 @@ public:
   anlnext::ANLStatus mod_analyze() override;
 
 private:
-  bool m_DiscardTimeGroupZero;
-  bool m_DiscardTimeGroupNonZero;
-  bool m_OffEnabled;
-  bool m_VetoEnabled;
-  bool m_TriggerEnabled;
-  std::vector<std::pair<double, double>> m_FluoresenceRanges;
-  CSHitCollection* m_HitCollection;
+  bool discard_time_group_zero_;
+  bool discard_time_group_non_zero_;
+  bool off_enabled_;
+  bool veto_enabled_;
+  bool trigger_enabled_;
+  std::vector<std::pair<double, double>> fluoresence_ranges_;
+  CSHitCollection* hit_collection_;
 };
 
 } /* namespace comptonsoft */

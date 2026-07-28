@@ -45,17 +45,17 @@ public:
   anlnext::ANLStatus mod_initialize() override;
   anlnext::ANLStatus mod_analyze() override;
 
-  const DetectorSystem* getDetectorManager() const { return detectorManager_.get(); }
-  DetectorSystem* getDetectorManager() { return detectorManager_.get(); }
+  const DetectorSystem* getDetectorManager() const { return detector_manager_.get(); }
+  DetectorSystem* getDetectorManager() { return detector_manager_.get(); }
 
 protected:
-  int VerboseLevel() const { return verboseLevel_; }
+  int VerboseLevel() const { return verbose_level_; }
 
 private:
-  std::unique_ptr<DetectorSystem> detectorManager_;
-  std::string configurationFile_;
-  std::string parametersFile_;
-  int verboseLevel_;
+  std::unique_ptr<DetectorSystem> detector_manager_;
+  std::string configuration_file_;
+  std::string parameters_file_;
+  int verbose_level_;
 };
 
 } /* namespace comptonsoft */
