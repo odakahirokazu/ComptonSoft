@@ -34,7 +34,7 @@ namespace comptonsoft
 
 HistogramAzimuthAngle::HistogramAzimuthAngle()
   : eventReconstruction_(nullptr),
-    numBins_(64),
+    num_bins_(64),
     theta_min_(-1.0*unit::degree), theta_max_(181.0*unit::degree),
     phi_origin_(0.0), sky_(false)
 {
@@ -42,30 +42,30 @@ HistogramAzimuthAngle::HistogramAzimuthAngle()
 
 ANLStatus HistogramAzimuthAngle::mod_define()
 {
-  register_parameter(&numBins_, "number_of_bins");
-  register_parameter(&theta_min_, "theta_min", unit::degree, "degree");
-  register_parameter(&theta_max_, "theta_max", unit::degree, "degree");
-  register_parameter(&phi_origin_, "phi_origin", 1.0, "degree");
-  register_parameter(&sky_, "sky");
-  
+  define_parameter("number_of_bins", &mod_class::num_bins_);
+  define_parameter("theta_min", &mod_class::theta_min_, unit::degree, "degree");
+  define_parameter("theta_max", &mod_class::theta_max_, unit::degree, "degree");
+  define_parameter("phi_origin", &mod_class::phi_origin_, 1.0, "degree");
+  define_parameter("sky", &mod_class::sky_);
+
   return AS_OK;
 }
 
 ANLStatus HistogramAzimuthAngle::mod_initialize()
 {
   get_module("EventReconstruction", &eventReconstruction_);
-  
+
   VCSModule::mod_initialize();
   mkdir();
 
   const double phi_min = -180.0;
   const double phi_max = +180.0;
   hist_all_ = new TH1D("phi_all", "Azimuth angle (All)",
-                       numBins_, phi_min, phi_max);
+                       num_bins_, phi_min, phi_max);
   hist_delta_all_ = new TH1D("delta_all", "Difference of azimuth angle (All)",
-                             numBins_, phi_min, phi_max);
+                             num_bins_, phi_min, phi_max);
   hist_delta_all_->Sumw2();
-  
+
   const std::vector<HitPattern>& hitPatterns
     = getDetectorManager()->getHitPatterns();
   const std::size_t numHitPatterns = hitPatterns.size();
@@ -79,7 +79,7 @@ ANLStatus HistogramAzimuthAngle::mod_initialize()
     histTitle += hitPatterns[i].Name();
     histTitle += ")";
     hist_vec_[i] = new TH1D(histName.c_str(), histTitle.c_str(),
-                            numBins_, phi_min, phi_max);
+                            num_bins_, phi_min, phi_max);
 
     histName = "delta_";
     histTitle = "Difference of azimuth angle value (";
@@ -87,7 +87,7 @@ ANLStatus HistogramAzimuthAngle::mod_initialize()
     histTitle += hitPatterns[i].Name();
     histTitle += ")";
     hist_delta_vec_[i] = new TH1D(histName.c_str(), histTitle.c_str(),
-                                  numBins_, phi_min, phi_max);
+                                  num_bins_, phi_min, phi_max);
     hist_delta_vec_[i]->Sumw2();
   }
 
@@ -99,7 +99,7 @@ ANLStatus HistogramAzimuthAngle::mod_analyze()
   if (!evs("EventReconstruction:OK")) {
     return AS_OK;
   }
-  
+
   const std::vector<BasicComptonEvent_sptr> events = eventReconstruction_->getReconstructedEvents();
   for (const auto& event: events) {
     const double fraction = event->ReconstructionFraction();
@@ -146,7 +146,7 @@ ANLStatus HistogramAzimuthAngle::mod_end_run()
   for (std::size_t i=0; i<hist_vec_.size(); i++) {
     hist_delta_vec_[i]->Divide(hist_vec_[i]);
   }
-  
+
   return AS_OK;
 }
 

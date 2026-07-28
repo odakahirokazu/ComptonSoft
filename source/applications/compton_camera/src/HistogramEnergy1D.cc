@@ -39,23 +39,23 @@ HistogramEnergy1D::HistogramEnergy1D()
 
 ANLStatus HistogramEnergy1D::mod_define()
 {
-  register_parameter(&numBins_, "number_of_bins");
-  register_parameter(&energy0_, "energy_min", 1, "keV");
-  register_parameter(&energy1_, "energy_max", 1, "keV");
-  
+  define_parameter("number_of_bins", &mod_class::numBins_);
+  define_parameter("energy_min", &mod_class::energy0_, 1, "keV");
+  define_parameter("energy_max", &mod_class::energy1_, 1, "keV");
+
   return AS_OK;
 }
 
 ANLStatus HistogramEnergy1D::mod_initialize()
 {
   get_module("EventReconstruction", &eventReconstruction_);
-  
+
   VCSModule::mod_initialize();
   mkdir();
-  
+
   hist_all_ = new TH1D("energy1d_all","Energy1+Energy2 (All)",
                        numBins_, energy0_, energy1_);
-  
+
   const std::vector<HitPattern>& hitPatterns
     = getDetectorManager()->getHitPatterns();
   const std::size_t numHitPatterns = hitPatterns.size();
@@ -83,7 +83,7 @@ ANLStatus HistogramEnergy1D::mod_analyze()
   for (const auto& event: events) {
     const double fraction = event->ReconstructionFraction();
     const double energy = event->IncidentEnergy() / unit::keV;
-    
+
     hist_all_->Fill(energy, fraction);
     for (std::size_t i=0; i<hist_vec_.size(); i++) {
       if (eventReconstruction_->HitPatternFlag(i)) {

@@ -38,8 +38,8 @@ public:
   anlnext::ANLStatus mod_analyze() override;
 
 private:
-  int m_NumSamples;
-  std::unique_ptr<TRandom> m_RandomGenerator;
+  int num_samples_;
+  std::unique_ptr<TRandom> random_generator_;
 };
 
 } /* namespace comptonsoft */

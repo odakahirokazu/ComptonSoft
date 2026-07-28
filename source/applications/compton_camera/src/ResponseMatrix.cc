@@ -36,8 +36,8 @@ namespace comptonsoft
 {
 
 ResponseMatrix::ResponseMatrix()
-  : m_EventReconstruction(nullptr), m_InitialInfo(nullptr),
-    m_NumBinEnergy(720), m_RangeEnergy1(0.0), m_RangeEnergy2(720.0)
+  : event_reconstruction_(nullptr), initial_info_(nullptr),
+    num_bins_(720), energy_min_(0.0), energy_max_(720.0)
 {
 }
 
@@ -45,32 +45,32 @@ ResponseMatrix::~ResponseMatrix() = default;
 
 ANLStatus ResponseMatrix::mod_define()
 {
-  register_parameter(&m_NumBinEnergy, "number_of_bins");
-  register_parameter(&m_RangeEnergy1, "energy_min", 1.0, "keV");
-  register_parameter(&m_RangeEnergy2, "energy_max", 1.0, "keV");
-  register_parameter(&m_Selections, "event_selections");
+  define_parameter("number_of_bins", &mod_class::num_bins_);
+  define_parameter("energy_min", &mod_class::energy_min_, 1.0, "keV");
+  define_parameter("energy_max", &mod_class::energy_max_, 1.0, "keV");
+  define_parameter("event_selections", &mod_class::event_selections_);
 
   return AS_OK;
 }
 
 ANLStatus ResponseMatrix::mod_initialize()
 {
-  get_module("EventReconstruction", &m_EventReconstruction);
-  get_module_IFNC("InitialInformation", &m_InitialInfo);
+  get_module("EventReconstruction", &event_reconstruction_);
+  get_module_IFNC("InitialInformation", &initial_info_);
 
   VCSModule::mod_initialize();
   mkdir();
 
-  const size_t n = m_Selections.size();
+  const size_t n = event_selections_.size();
   for (size_t i=0; i<n; i++) {
     const std::string name = (boost::format("response_%03d") % i).str();
-    const std::string selection = m_Selections[i];
+    const std::string selection = event_selections_[i];
     const std::string title = (boost::format("input energy : output energy (%s)") % selection).str();
     TH2F* hist = new TH2F(name.c_str(), title.c_str(),
-                          m_NumBinEnergy, m_RangeEnergy1, m_RangeEnergy2,
-                          m_NumBinEnergy, m_RangeEnergy1, m_RangeEnergy2);
+                          num_bins_, energy_min_, energy_max_,
+                          num_bins_, energy_min_, energy_max_);
     hist->Sumw2();
-    m_Responses[m_Selections[i]] = hist;
+    responses_[event_selections_[i]] = hist;
   }
 
   return AS_OK;
@@ -78,15 +78,15 @@ ANLStatus ResponseMatrix::mod_initialize()
 
 ANLStatus ResponseMatrix::mod_analyze()
 {
-  const double weight = m_InitialInfo->weight();
-  const double initialEnergy = m_InitialInfo->initial_energy();
+  const double weight = initial_info_->weight();
+  const double initialEnergy = initial_info_->initial_energy();
 
-  const std::vector<BasicComptonEvent_sptr> events = m_EventReconstruction->getReconstructedEvents();
+  const std::vector<BasicComptonEvent_sptr> events = event_reconstruction_->getReconstructedEvents();
   for (const auto& event: events) {
     const double energy = event->IncidentEnergy();
     const double eventWeight = event->ReconstructionFraction() * weight;
 
-    for (auto& pair: m_Responses) {
+    for (auto& pair: responses_) {
       const std::string& evsName = pair.first;
       TH2* hist = pair.second;
       if (evs(evsName)) {

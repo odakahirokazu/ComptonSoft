@@ -42,7 +42,7 @@ public:
   anlnext::ANLStatus mod_define() override;
   anlnext::ANLStatus mod_initialize() override;
   anlnext::ANLStatus mod_analyze() override;
-  
+
 private:
   const EventReconstruction* eventReconstruction_;
   const anlgeant4::InitialInformation* initialInfo_;
@@ -52,10 +52,10 @@ private:
   TH2* hist_compton_all_;
   std::vector<TH2*> hist_compton_vec_;
 
-  int numEnergyBins_;
+  int num_energy_bins_;
   double energy0_;
   double energy1_;
-  int numARMBins_;
+  int num_arm_bins_;
   double arm0_;
   double arm1_;
 };

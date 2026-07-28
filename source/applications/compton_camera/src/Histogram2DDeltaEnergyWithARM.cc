@@ -36,19 +36,19 @@ Histogram2DDeltaEnergyWithARM::Histogram2DDeltaEnergyWithARM()
   : eventReconstruction_(nullptr),
     initialInfo_(nullptr),
     hist_all_(nullptr), hist_compton_all_(nullptr),
-    numEnergyBins_(128), energy0_(-64.0), energy1_(+64.0),
-    numARMBins_(72), arm0_(-180.0), arm1_(+180.0)
+    num_energy_bins_(128), energy0_(-64.0), energy1_(+64.0),
+    num_arm_bins_(72), arm0_(-180.0), arm1_(+180.0)
 {
 }
 
 ANLStatus Histogram2DDeltaEnergyWithARM::mod_define()
 {
-  register_parameter(&numEnergyBins_, "number_of_energy_bins");
-  register_parameter(&energy0_, "energy_min", 1, "keV");
-  register_parameter(&energy1_, "energy_max", 1, "keV");
-  register_parameter(&numARMBins_, "number_of_arm_bins");
-  register_parameter(&arm0_, "arm_min", 1, "degree");
-  register_parameter(&arm1_, "arm_max", 1, "degree");
+  define_parameter("number_of_energy_bins", &mod_class::num_energy_bins_);
+  define_parameter("energy_min", &mod_class::energy0_, 1, "keV");
+  define_parameter("energy_max", &mod_class::energy1_,1, "keV");
+  define_parameter("number_of_arm_bins", &mod_class::num_arm_bins_);
+  define_parameter("arm_min", &mod_class::arm0_, 1, "degree");
+  define_parameter("arm_max", &mod_class::arm1_, 1, "degree");
 
   return AS_OK;
 }
@@ -62,11 +62,11 @@ ANLStatus Histogram2DDeltaEnergyWithARM::mod_initialize()
   mkdir();
 
   hist_all_ = new TH2D("de_arm_all","ARM:DeltaEnergy (All)",
-                       numEnergyBins_, energy0_, energy1_,
-                       numARMBins_, arm0_, arm1_);
+                       num_energy_bins_, energy0_, energy1_,
+                       num_arm_bins_, arm0_, arm1_);
   hist_compton_all_ = new TH2D("de_arm_compton_all","ARM:DeltaEnergy (All, Compton)",
-                               numEnergyBins_, energy0_, energy1_,
-                               numARMBins_, arm0_, arm1_);
+                               num_energy_bins_, energy0_, energy1_,
+                               num_arm_bins_, arm0_, arm1_);
 
   const std::vector<HitPattern>& hitPatterns
     = getDetectorManager()->getHitPatterns();
@@ -80,16 +80,16 @@ ANLStatus Histogram2DDeltaEnergyWithARM::mod_initialize()
     histTitle += hitPatterns[i].Name();
     histTitle += ")";
     hist_vec_[i] = new TH2D(histName.c_str(), histTitle.c_str(),
-                            numEnergyBins_, energy0_, energy1_,
-                            numARMBins_, arm0_, arm1_);
+                            num_energy_bins_, energy0_, energy1_,
+                            num_arm_bins_, arm0_, arm1_);
     histName = "de_arm_compton_";
     histTitle = "ARM:DeltaEnergy (";
     histName += hitPatterns[i].ShortName();
     histTitle += hitPatterns[i].Name();
     histTitle += ", Compton)";
     hist_compton_vec_[i] = new TH2D(histName.c_str(), histTitle.c_str(),
-                                    numEnergyBins_, energy0_, energy1_,
-                                    numARMBins_, arm0_, arm1_);
+                                    num_energy_bins_, energy0_, energy1_,
+                                    num_arm_bins_, arm0_, arm1_);
   }
 
   return AS_OK;

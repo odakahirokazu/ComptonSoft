@@ -43,15 +43,15 @@ public:
   anlnext::ANLStatus mod_define() override;
   anlnext::ANLStatus mod_initialize() override;
   anlnext::ANLStatus mod_analyze() override;
-  
+
 private:
-  const EventReconstruction* m_EventReconstruction;
-  const anlgeant4::InitialInformation* m_InitialInfo;
-  int m_NumBinEnergy;
-  double m_RangeEnergy1;
-  double m_RangeEnergy2;
-  std::map<std::string, TH2*> m_Responses;
-  std::vector<std::string> m_Selections;
+  const EventReconstruction* event_reconstruction_;
+  const anlgeant4::InitialInformation* initial_info_;
+  int num_bins_;
+  double energy_min_;
+  double energy_max_;
+  std::map<std::string, TH2*> responses_;
+  std::vector<std::string> event_selections_;
 };
 
 } /* namespace comptonsoft */

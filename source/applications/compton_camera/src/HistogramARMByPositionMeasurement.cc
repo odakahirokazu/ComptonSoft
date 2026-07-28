@@ -36,7 +36,7 @@ namespace comptonsoft
 {
 
 HistogramARMByPositionMeasurement::HistogramARMByPositionMeasurement()
-  : m_NumSamples(1000), m_RandomGenerator(new TRandom3)
+  : num_samples_(1000), random_generator_(new TRandom3)
 {
 }
 
@@ -45,7 +45,7 @@ HistogramARMByPositionMeasurement::~HistogramARMByPositionMeasurement() = defaul
 ANLStatus HistogramARMByPositionMeasurement::mod_define()
 {
   HistogramARM::mod_define();
-  register_parameter(&m_NumSamples, "num_samples");
+  define_parameter("num_samples", &mod_class::num_samples_);
   return AS_OK;
 }
 
@@ -88,9 +88,9 @@ ANLStatus HistogramARMByPositionMeasurement::mod_analyze()
     const vector3_t coneAxis = event->ConeAxis();
     const double thetaG = sourceDirection.angle(coneAxis);
 
-    const int NumSamples = m_NumSamples;
+    const int NumSamples = num_samples_;
     const double FillWeight = fraction/static_cast<double>(NumSamples);
-    TRandom* randgen = m_RandomGenerator.get();
+    TRandom* randgen = random_generator_.get();
 
     for (int t=0; t<NumSamples; t++) {
       const double hit1DeltaLocalX = randgen->Uniform(-hit1HalfWidthX, +hit1HalfWidthX);
@@ -99,7 +99,7 @@ ANLStatus HistogramARMByPositionMeasurement::mod_analyze()
       const double hit2DeltaLocalX = randgen->Uniform(-hit2HalfWidthX, +hit2HalfWidthX);
       const double hit2DeltaLocalY = randgen->Uniform(-hit2HalfWidthY, +hit2HalfWidthY);
       const double hit2DeltaLocalZ = randgen->Uniform(-hit2HalfWidthZ, +hit2HalfWidthZ);
-      
+
       const vector3_t hit1Position1 = hit1Position
         + hit1DeltaLocalX * hit1DetectorDirX
         + hit1DeltaLocalY * hit1DetectorDirY
@@ -120,7 +120,7 @@ ANLStatus HistogramARMByPositionMeasurement::mod_analyze()
       }
     }
   }
-  
+
   return AS_OK;
 }
 

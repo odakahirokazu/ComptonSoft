@@ -38,14 +38,14 @@ public:
   anlnext::ANLStatus mod_define() override;
   anlnext::ANLStatus mod_initialize() override;
   anlnext::ANLStatus mod_analyze() override;
-  
+
 private:
   const EventReconstruction* eventReconstruction_;
 
   TH2* hist_all_;
   std::vector<TH2*> hist_vec_;
 
-  int numBins_;
+  int num_bins_;
   double energy0_;
   double energy1_;
 };

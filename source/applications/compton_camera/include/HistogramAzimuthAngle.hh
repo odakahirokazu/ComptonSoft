@@ -35,12 +35,12 @@ class HistogramAzimuthAngle : public VCSModule
 public:
   HistogramAzimuthAngle();
   ~HistogramAzimuthAngle() = default;
-  
+
   anlnext::ANLStatus mod_define() override;
   anlnext::ANLStatus mod_initialize() override;
   anlnext::ANLStatus mod_analyze() override;
   anlnext::ANLStatus mod_end_run() override;
-  
+
 private:
   const EventReconstruction* eventReconstruction_;
 
@@ -49,7 +49,7 @@ private:
   TH1* hist_delta_all_;
   std::vector<TH1*> hist_delta_vec_;
 
-  int numBins_;
+  int num_bins_;
   double theta_min_;
   double theta_max_;
   double phi_origin_;

@@ -46,10 +46,10 @@ public:
   anlnext::ANLStatus mod_define() override;
   anlnext::ANLStatus mod_initialize() override;
   anlnext::ANLStatus mod_analyze() override;
-  
+
 private:
-  const anlgeant4::InitialInformation* m_InitialInfo;
-  double m_Scale;
+  const anlgeant4::InitialInformation* initial_info_;
+  double scale_;
 };
 
 } /* namespace comptonsoft */

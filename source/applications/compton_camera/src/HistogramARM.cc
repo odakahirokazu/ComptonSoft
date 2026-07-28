@@ -33,27 +33,27 @@ namespace comptonsoft
 
 HistogramARM::HistogramARM()
   : eventReconstruction_(nullptr),
-    numBins_(500), range0_(-25.0), range1_(+25.0)
+    num_bins_(500), range0_(-25.0), range1_(+25.0)
 {
 }
 
 ANLStatus HistogramARM::mod_define()
 {
-  register_parameter(&numBins_, "number_of_bins");
-  register_parameter(&range0_, "range_min", 1.0, "degree");
-  register_parameter(&range1_, "range_max", 1.0, "degree");
+  define_parameter("number_of_bins", &mod_class::num_bins_);
+  define_parameter("range_min", &mod_class::range0_, 1.0, "degree");
+  define_parameter("range_max", &mod_class::range1_, 1.0, "degree");
   return AS_OK;
 }
 
 ANLStatus HistogramARM::mod_initialize()
 {
   get_module("EventReconstruction", &eventReconstruction_);
-  
+
   VCSModule::mod_initialize();
   mkdir();
-  
+
   hist_all_ = new TH1D("arm_all", "ARM (All)",
-                       numBins_, range0_, range1_);
+                       num_bins_, range0_, range1_);
 
   const std::vector<HitPattern>& hitPatterns
     = getDetectorManager()->getHitPatterns();
@@ -66,7 +66,7 @@ ANLStatus HistogramARM::mod_initialize()
     histTitle += hitPatterns[i].Name();
     histTitle += ")";
     hist_vec_[i] = new TH1D(histName.c_str(), histTitle.c_str(),
-                            numBins_, range0_, range1_);
+                            num_bins_, range0_, range1_);
   }
 
   return AS_OK;
@@ -77,7 +77,7 @@ ANLStatus HistogramARM::mod_analyze()
   if (!evs("EventReconstruction:OK")) {
     return AS_OK;
   }
-  
+
   const std::vector<BasicComptonEvent_sptr> events = eventReconstruction_->getReconstructedEvents();
   for (const auto& event: events) {
     const double fraction = event->ReconstructionFraction();

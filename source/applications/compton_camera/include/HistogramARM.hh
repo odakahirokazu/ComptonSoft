@@ -39,7 +39,7 @@ public:
   anlnext::ANLStatus mod_define() override;
   anlnext::ANLStatus mod_initialize() override;
   anlnext::ANLStatus mod_analyze() override;
-  
+
 protected:
   const EventReconstruction* eventReconstruction_;
 
@@ -47,7 +47,7 @@ protected:
   std::vector<TH1*> hist_vec_;
 
 private:
-  int numBins_;
+  int num_bins_;
   double range0_;
   double range1_;
 };

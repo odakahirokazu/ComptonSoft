@@ -33,29 +33,29 @@ namespace comptonsoft
 HistogramEnergy2D::HistogramEnergy2D()
   : eventReconstruction_(nullptr),
     hist_all_(nullptr),
-    numBins_(720), energy0_(0.0), energy1_(720.0)
+    num_bins_(720), energy0_(0.0), energy1_(720.0)
 {
 }
 
 ANLStatus HistogramEnergy2D::mod_define()
 {
-  register_parameter(&numBins_, "number_of_bins");
-  register_parameter(&energy0_, "energy_min", 1, "keV");
-  register_parameter(&energy1_, "energy_max", 1, "keV");
-  
+  define_parameter("number_of_bins", &mod_class::num_bins_);
+  define_parameter("energy_min", &mod_class::energy0_, 1, "keV");
+  define_parameter("energy_max", &mod_class::energy1_, 1, "keV");
+
   return AS_OK;
 }
 
 ANLStatus HistogramEnergy2D::mod_initialize()
 {
   get_module("EventReconstruction", &eventReconstruction_);
-  
+
   VCSModule::mod_initialize();
   mkdir();
-  
+
   hist_all_ = new TH2D("energy2d_all","Energy1:Energy2 (All)",
-                       numBins_, energy0_, energy1_,
-                       numBins_, energy0_, energy1_);
+                       num_bins_, energy0_, energy1_,
+                       num_bins_, energy0_, energy1_);
 
   const std::vector<HitPattern>& hitPatterns
     = getDetectorManager()->getHitPatterns();
@@ -68,8 +68,8 @@ ANLStatus HistogramEnergy2D::mod_initialize()
     histTitle += hitPatterns[i].Name();
     histTitle += ")";
     hist_vec_[i] = new TH2D(histName.c_str(), histTitle.c_str(),
-                            numBins_, energy0_, energy1_,
-                            numBins_, energy0_, energy1_);
+                            num_bins_, energy0_, energy1_,
+                            num_bins_, energy0_, energy1_);
   }
 
   return AS_OK;
@@ -80,13 +80,13 @@ ANLStatus HistogramEnergy2D::mod_analyze()
   if (!evs("EventReconstruction:OK")) {
     return AS_OK;
   }
-  
+
   const std::vector<BasicComptonEvent_sptr> events = eventReconstruction_->getReconstructedEvents();
   for (const auto& event: events) {
     const double fraction = event->ReconstructionFraction();
     const double energy1 = event->Hit1Energy() / unit::keV;
     const double energy2 = event->Hit2Energy() / unit::keV;
-    
+
     hist_all_->Fill(energy2, energy1, fraction);
     for (std::size_t i=0; i<hist_vec_.size(); i++) {
       if (eventReconstruction_->HitPatternFlag(i)) {
@@ -94,7 +94,7 @@ ANLStatus HistogramEnergy2D::mod_analyze()
       }
     }
   }
-  
+
   return AS_OK;
 }
 

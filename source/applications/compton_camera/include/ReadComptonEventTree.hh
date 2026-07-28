@@ -49,14 +49,14 @@ public:
   anlnext::ANLStatus mod_define() override;
   anlnext::ANLStatus mod_initialize() override;
   anlnext::ANLStatus mod_analyze() override;
-   
-private:
-  std::vector<std::string> fileList_;
-  std::unique_ptr<TChain> cetree_;
-  int64_t numEntries_ = 0;
-  int64_t entryIndex_ = 0;
 
-  std::unique_ptr<ComptonEventTreeIOWithInitialInfo> treeIO_;
+private:
+  std::vector<std::string> file_list_;
+  std::unique_ptr<TChain> cetree_;
+  int64_t num_entries_ = 0;
+  int64_t entry_index_ = 0;
+
+  std::unique_ptr<ComptonEventTreeIOWithInitialInfo> tree_io_;
 };
 
 } /* namespace comptonsoft */
