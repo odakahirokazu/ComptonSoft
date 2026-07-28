@@ -70,7 +70,7 @@ ReadHXIEventFITS::~ReadHXIEventFITS() = default;
 
 ANLStatus ReadHXIEventFITS::mod_define()
 {
-  register_parameter(&m_Filename, "filename");
+  define_parameter("filename", &mod_class::m_Filename);
 
   return AS_OK;
 }

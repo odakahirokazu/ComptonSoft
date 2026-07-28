@@ -49,22 +49,22 @@ ANLStatus SimXPrimaryGenerator::mod_define()
 {
   BasicPrimaryGenerator::mod_define();
 
-  register_parameter(&m_CenterPosition, "center_position", unit::cm, "cm");
+  define_parameter("center_position", &mod_class::m_CenterPosition, unit::cm, "cm");
   set_parameter_description("Position of the sphere.");
-  register_parameter(&m_Radius, "radius", unit::cm, "cm");
+  define_parameter("radius", &mod_class::m_Radius, unit::cm, "cm");
   set_parameter_description("Radius of the sphere.");
 
-  register_parameter(&m_Polarization0, "polarization_vector");
+  define_parameter("polarization_vector", &mod_class::m_Polarization0);
   set_parameter_description("Polarization vector (if polarization is enable).");
-  register_parameter(&m_PolarizationDegree, "degree_of_polarization");
+  define_parameter("degree_of_polarization", &mod_class::m_PolarizationDegree);
   set_parameter_description("Degree of polarization (if polarization is enable).");
 
-  register_parameter(&m_Flux, "flux", (unit::erg/unit::cm2/unit::s/unit::sr), "erg/cm2/s/sr");
+  define_parameter("flux", &mod_class::m_Flux, (unit::erg/unit::cm2/unit::s/unit::sr), "erg/cm2/s/sr");
   set_parameter_description("Energy flux of the primaries. This parameter is used only for calculating real time correspoing to a simulation.");
 
-  unregister_parameter("photon_index");
-  unregister_parameter("energy_min");
-  unregister_parameter("energy_max");
+  undefine_parameter("photon_index");
+  undefine_parameter("energy_min");
+  undefine_parameter("energy_max");
 
   return AS_OK;
 }

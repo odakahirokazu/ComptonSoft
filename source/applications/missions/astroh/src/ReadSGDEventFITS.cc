@@ -104,11 +104,11 @@ ReadSGDEventFITS::~ReadSGDEventFITS() = default;
 
 ANLStatus ReadSGDEventFITS::mod_define()
 {
-  register_parameter(&m_Filename, "filename");
-  register_parameter(&m_CCID, "cc_id");
-  register_parameter(&m_PseudoPass, "pseudo_pass");
-  register_parameter(&m_VetoEnabled, "veto");
-  register_parameter(&m_StandardSelectionEnabled, "standard_selection");
+  define_parameter("filename", &mod_class::m_Filename);
+  define_parameter("cc_id", &mod_class::m_CCID);
+  define_parameter("pseudo_pass", &mod_class::m_PseudoPass);
+  define_parameter("veto", &mod_class::m_VetoEnabled);
+  define_parameter("standard_selection", &mod_class::m_StandardSelectionEnabled);
 
   return AS_OK;
 }

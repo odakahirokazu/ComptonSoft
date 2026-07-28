@@ -43,7 +43,7 @@ ANLStatus AHRadiationBackgroundPrimaryGenerator::mod_define()
 {
   anlgeant4::IsotropicPrimaryGenerator::mod_define();
   disable_default_energy_input();
-  register_parameter(&filename_, "filename");
+  define_parameter("filename", &mod_class::filename_);
   set_parameter_description("ROOT file of background radiation spectrum.");
   return AS_OK;
 }

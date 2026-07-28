@@ -44,9 +44,9 @@ SampleOpticalDepth::SampleOpticalDepth()
 
 ANLStatus SampleOpticalDepth::mod_define()
 {
-  register_parameter(&energy_, "energy", unit::keV, "keV");
-  register_parameter(&processName_, "process");
-  register_parameter(&particleName_, "particle");
+  define_parameter("energy", &mod_class::energy_, unit::keV, "keV");
+  define_parameter("process", &mod_class::processName_);
+  define_parameter("particle", &mod_class::particleName_);
   return AS_OK;
 }
 

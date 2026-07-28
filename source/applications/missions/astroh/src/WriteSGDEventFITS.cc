@@ -89,9 +89,9 @@ WriteSGDEventFITS::~WriteSGDEventFITS() = default;
 
 ANLStatus WriteSGDEventFITS::mod_define()
 {
-  register_parameter(&m_Filename, "filename");
-  register_parameter(&m_SGDID, "sgd");
-  register_parameter(&m_CCID, "cc");
+  define_parameter("filename", &mod_class::m_Filename);
+  define_parameter("sgd", &mod_class::m_SGDID);
+  define_parameter("cc", &mod_class::m_CCID);
 
   return AS_OK;
 }

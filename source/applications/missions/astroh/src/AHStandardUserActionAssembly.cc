@@ -52,18 +52,18 @@ AHStandardUserActionAssembly::AHStandardUserActionAssembly()
     m_PolarizationEnable(false)
 {
   add_alias("AHStandardUserActionAssembly");
-  
+
   m_AnalysisManager = G4RootAnalysisManager::Instance();
 }
 
 AHStandardUserActionAssembly::~AHStandardUserActionAssembly()
 {
-  if (m_AnalysisManager) delete m_AnalysisManager;
+  if (m_AnalysisManager) { delete m_AnalysisManager; }
 }
 
 ANLStatus AHStandardUserActionAssembly::mod_define()
 {
-  register_parameter(&m_FileName, "output");
+  define_parameter("output", &mod_class::m_FileName);
   return AS_OK;
 }
 
@@ -78,7 +78,7 @@ ANLStatus AHStandardUserActionAssembly::mod_initialize()
   if (exist_module("EventReconstruction")) {
     get_module_NC("EventReconstruction", &m_EventReconstruction);
   }
-  
+
   define_evs("HitTree:Fill");
   define_evs("CompMode:DeltaTheta:GOOD");
   define_evs("CompMode:DeltaTheta:NG");
@@ -96,7 +96,7 @@ ANLStatus AHStandardUserActionAssembly::mod_analyze()
 
   int num = hitVec.size();
   if (num>0) { set_evs("HitTree:Fill"); }
-  
+
   for (int i=0; i<num; i++) {
     Fill(i, num, hitVec[i]);
   }
@@ -109,7 +109,7 @@ ANLStatus AHStandardUserActionAssembly::mod_analyze()
 ANLStatus AHStandardUserActionAssembly::mod_finalize()
 {
   if (m_SimXIF) m_SimXIF->outputEvents();
-  
+
   return AS_OK;
 }
 
@@ -120,7 +120,7 @@ void AHStandardUserActionAssembly::RunActionAtBeginning(const G4Run*)
     off();
     return;
   }
-  
+
   m_AnalysisManager->OpenFile(m_FileName);
   m_AnalysisManager->SetNtupleDirectoryName("hit_list");
   m_AnalysisManager->CreateNtuple("hittree", "hittree");
@@ -141,7 +141,7 @@ void AHStandardUserActionAssembly::RunActionAtBeginning(const G4Run*)
   m_AnalysisManager->CreateNtupleDColumn("e_pi");       // 11
 
   m_AnalysisManager->CreateNtupleDColumn("time");       // 12
- 
+
   m_AnalysisManager->CreateNtupleIColumn("detid");      // 13
   m_AnalysisManager->CreateNtupleIColumn("stripx");     // 14
   m_AnalysisManager->CreateNtupleIColumn("stripy");     // 15
@@ -154,7 +154,7 @@ void AHStandardUserActionAssembly::RunActionAtBeginning(const G4Run*)
   m_AnalysisManager->CreateNtupleDColumn("ini_posx");   // 21
   m_AnalysisManager->CreateNtupleDColumn("ini_posy");   // 22
   m_AnalysisManager->CreateNtupleDColumn("ini_posz");   // 23
-  
+
   if (m_PolarizationEnable) {
     m_AnalysisManager->CreateNtupleDColumn("ini_polarx"); // 24
     m_AnalysisManager->CreateNtupleDColumn("ini_polary"); // 25
@@ -178,7 +178,7 @@ void AHStandardUserActionAssembly::Fill(int seqnum,
                                         const_DetectorHit_sptr hit)
 {
   const int eventID = m_InitialInfo->EventID();
-  
+
   const G4double iniEnergy = m_InitialInfo->InitialEnergy();
   const G4ThreeVector iniDir = m_InitialInfo->InitialDirection();
   const G4double  iniTime = m_InitialInfo->InitialTime();
@@ -191,13 +191,13 @@ void AHStandardUserActionAssembly::Fill(int seqnum,
   G4double posx = hit->PositionX();
   G4double posy = hit->PositionY();
   G4double posz = hit->PositionZ();
-  
+
   G4double edep  = hit->EnergyDeposit();
   G4double e_pha = hit->PHA();
   G4double e_pi  = hit->EPI();
-  
+
   G4double time1 = hit->Time();
-  
+
   G4double detid = hit->DetectorID();
   G4double stripx = hit->PixelX();
   G4double stripy = hit->PixelY();
@@ -238,7 +238,7 @@ void AHStandardUserActionAssembly::Fill(int seqnum,
     m_AnalysisManager->FillNtupleDColumn(25, iniPolar.y());
     m_AnalysisManager->FillNtupleDColumn(26, iniPolar.z());
   }
-  
+
   m_AnalysisManager->AddNtupleRow();
 }
 

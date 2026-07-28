@@ -56,8 +56,8 @@ ReadSGDEventTree::~ReadSGDEventTree() = default;
 
 ANLStatus ReadSGDEventTree::mod_define()
 {
-  register_parameter(&m_FileNames, "file_list");
-  register_parameter(&m_TreeNames, "tree_list");
+  define_parameter("file_list", &mod_class::m_FileNames);
+  define_parameter("tree_list", &mod_class::m_TreeNames);
 
   return AS_OK;
 }

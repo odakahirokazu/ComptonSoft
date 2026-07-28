@@ -29,11 +29,11 @@ namespace comptonsoft
 RescaleSimulationNoiseOfSGDSiUntriggered::RescaleSimulationNoiseOfSGDSiUntriggered()
   : m_Scale(1.0), m_HitCollection(nullptr)
 {
-}  
+}
 
 ANLStatus RescaleSimulationNoiseOfSGDSiUntriggered::mod_define()
 {
-  register_parameter(&m_Scale, "factor");
+  define_parameter("factor", &mod_class::m_Scale);
 
   return AS_OK;
 }
@@ -60,7 +60,7 @@ ANLStatus RescaleSimulationNoiseOfSGDSiUntriggered::mod_analyze()
       }
     }
   }
-  
+
   return AS_OK;
 }
 

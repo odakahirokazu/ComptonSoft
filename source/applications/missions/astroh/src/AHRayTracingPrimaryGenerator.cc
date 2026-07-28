@@ -42,9 +42,9 @@ ANLStatus AHRayTracingPrimaryGenerator::mod_define()
     return status;
   }
 
-  register_parameter(&m_FileName, "filename");
-  register_parameter(&m_offset, "position_offset", unit::mm, "mm");
-  register_parameter(&m_EnergyResample, "energy_resample");
+  define_parameter("filename", &mod_class::m_FileName);
+  define_parameter("position_offset", &mod_class::m_offset, unit::mm, "mm");
+  define_parameter("energy_resample", &mod_class::m_EnergyResample);
 
   return AS_OK;
 }

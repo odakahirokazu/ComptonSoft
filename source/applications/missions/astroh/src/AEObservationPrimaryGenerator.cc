@@ -47,16 +47,16 @@ ANLStatus AEObservationPrimaryGenerator::mod_define()
     return status;
   }
 
-  register_parameter(&offset_, "position_offset", unit::mm, "mm");
-  register_parameter(&arfFileName_, "arf_filename");
-  register_parameter(&pixelSize_, "pixel_size", unit::mm, "mm");
-  register_parameter(&pixelX_, "num_pixel_x");
-  register_parameter(&pixelY_, "num_pixel_y");
-  register_parameter(&exposure_, "exposure", unit::s, "s");
-  register_parameter(&useFlux_, "use_flux");
-  register_parameter(&flux_, "flux", unit::erg/(unit::cm*unit::cm*unit::s), "erg s^-1 cm^-2");
-  register_parameter(&fluxEnergyMin_, "flux_energy_min", unit::keV, "keV");
-  register_parameter(&fluxEnergyMax_, "flux_energy_max", unit::keV, "keV");
+  define_parameter("position_offset", &mod_class::offset_, unit::mm, "mm");
+  define_parameter("arf_filename", &mod_class::arfFileName_);
+  define_parameter("pixel_size", &mod_class::pixelSize_, unit::mm, "mm");
+  define_parameter("num_pixel_x", &mod_class::pixelX_);
+  define_parameter("num_pixel_y", &mod_class::pixelY_);
+  define_parameter("exposure", &mod_class::exposure_, unit::s, "s");
+  define_parameter("use_flux", &mod_class::useFlux_);
+  define_parameter("flux", &mod_class::flux_, unit::erg/(unit::cm*unit::cm*unit::s), "erg s^-1 cm^-2");
+  define_parameter("flux_energy_min", &mod_class::fluxEnergyMin_, unit::keV, "keV");
+  define_parameter("flux_energy_max", &mod_class::fluxEnergyMax_, unit::keV, "keV");
 
   return AS_OK;
 }

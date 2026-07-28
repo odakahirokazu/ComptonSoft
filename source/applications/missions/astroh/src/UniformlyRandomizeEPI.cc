@@ -33,16 +33,16 @@ namespace comptonsoft
 UniformlyRandomizeEPI::UniformlyRandomizeEPI()
   : m_Random(new TRandom3)
 {
-}  
+}
 
 UniformlyRandomizeEPI::~UniformlyRandomizeEPI() = default;
 
 ANLStatus UniformlyRandomizeEPI::mod_define()
 {
-  register_parameter(&m_LZDeltaE0, "si_delta0", unit::keV, "keV");
-  register_parameter(&m_LZDeltaE1, "si_delta1", unit::keV, "keV");
-  register_parameter(&m_HZDeltaE0, "cdte_delta0", unit::keV, "keV");
-  register_parameter(&m_HZDeltaE1, "cdte_delta1", unit::keV, "keV");
+  define_parameter("si_delta0", &mod_class::m_LZDeltaE0, unit::keV, "keV");
+  define_parameter("si_delta1", &mod_class::m_LZDeltaE1, unit::keV, "keV");
+  define_parameter("cdte_delta0", &mod_class::m_HZDeltaE0, unit::keV, "keV");
+  define_parameter("cdte_delta1", &mod_class::m_HZDeltaE1, unit::keV, "keV");
 
   return AS_OK;
 }
@@ -72,7 +72,7 @@ ANLStatus UniformlyRandomizeEPI::mod_analyze()
       }
     }
   }
-  
+
   return AS_OK;
 }
 

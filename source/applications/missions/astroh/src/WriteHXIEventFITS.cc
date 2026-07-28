@@ -71,7 +71,7 @@ WriteHXIEventFITS::~WriteHXIEventFITS() = default;
 
 ANLStatus WriteHXIEventFITS::mod_define()
 {
-  register_parameter(&m_Filename, "filename");
+  define_parameter("filename", &mod_class::m_Filename);
 
   return AS_OK;
 }

@@ -46,12 +46,12 @@ SimulateCXBShieldPlate::SimulateCXBShieldPlate()
 
 ANLStatus SimulateCXBShieldPlate::mod_define()
 {
-  register_parameter(&m_ShieldDensity, "density", unit::g/unit::cm3, "g/cm3");
-  register_parameter(&m_ShieldHeight, "height", unit::cm, "cm");
-  register_parameter(&m_ShieldThickness, "thickness", unit::cm, "cm");
-  register_parameter(&m_ShieldFillingFraction, "filling_fraction");
-  register_parameter(&m_CSFilename, "cross_section_file");
-  register_parameter(&m_PositionFilename, "position_file");
+  define_parameter("density", &mod_class::m_ShieldDensity, unit::g/unit::cm3, "g/cm3");
+  define_parameter("height", &mod_class::m_ShieldHeight, unit::cm, "cm");
+  define_parameter("thickness", &mod_class::m_ShieldThickness, unit::cm, "cm");
+  define_parameter("filling_fraction", &mod_class::m_ShieldFillingFraction);
+  define_parameter("cross_section_file", &mod_class::m_CSFilename);
+  define_parameter("position_file", &mod_class::m_PositionFilename);
 
   return AS_OK;
 }

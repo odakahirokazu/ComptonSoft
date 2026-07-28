@@ -37,8 +37,8 @@ ReadHXIEventTree::ReadHXIEventTree()
 
 ANLStatus ReadHXIEventTree::mod_define()
 {
-  register_parameter(&file_names, "file_list", "seq", "hxi_event.root");
-  register_parameter(&tree_names, "trees", "seq", "event_tree");
+  define_parameter("file_list", &mod_class::file_names, "seq", "hxi_event.root");
+  define_parameter("trees", &mod_class::tree_names, "seq", "event_tree");
 
   return AS_OK;
 }
@@ -49,7 +49,7 @@ ANLStatus ReadHXIEventTree::mod_initialize()
     std::cout << "Event file to be read is not specified." << std::endl;
     return AS_QUIT;
   }
-  
+
   if (tree_names.size()==0) {
     tree_names.resize(file_names.size(), "event_tree");
   }
@@ -60,7 +60,7 @@ ANLStatus ReadHXIEventTree::mod_initialize()
                         TChain::kBigNumber,
                         tree_names[i].c_str());
   }
-  
+
   num_events = event_tree->GetEntries();
   std::cout << "Total events: " << num_events << std::endl;
 

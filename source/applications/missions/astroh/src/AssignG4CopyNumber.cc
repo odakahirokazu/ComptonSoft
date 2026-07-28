@@ -40,7 +40,7 @@ AssignG4CopyNumber::~AssignG4CopyNumber()
 
 ANLStatus AssignG4CopyNumber::mod_define()
 {
-  register_parameter(&m_FileName, "filename");
+  define_parameter("filename", &mod_class::m_FileName);
 
   return AS_OK;
 }
@@ -66,7 +66,7 @@ ANLStatus AssignG4CopyNumber::mod_begin_run()
     fin.getline(buf, BufSize);
     if (fin.eof()) { break; }
     if (buf[0] == '#') { continue; }
-    
+
     std::istringstream iss(buf);
     iss >> name;
     iss >> copyNo;
@@ -75,7 +75,7 @@ ANLStatus AssignG4CopyNumber::mod_begin_run()
     }
   }
   fin.close();
-  
+
   G4PhysicalVolumeStore* store = G4PhysicalVolumeStore::GetInstance();
   for (volume_map_iter it=volumeMap.begin(); it != volumeMap.end(); ++it) {
     G4VPhysicalVolume* volume = store->GetVolume((*it).first);
