@@ -51,7 +51,7 @@ BackProjection::~BackProjection() = default;
 ANLStatus BackProjection::mod_define()
 {
   define_parameter("plane_normal", &mod_class::plane_normal_);
-  define_parameter("plane_point", &mod_class::plane_point_, 1, pixel_unit_name_);
+  define_parameter("plane_point", &mod_class::plane_point_, unit::cm, "cm");
   define_parameter("num_pixel_x", &mod_class::num_pixel_x_);
   define_parameter("num_pixel_y", &mod_class::num_pixel_y_);
   define_parameter("x_min", &mod_class::range_x1_, 1, pixel_unit_name_);
