@@ -47,9 +47,6 @@ protected:
 
 private:
   const CSHitCollection* hit_collection_ = nullptr;
-
-  double time_start_ = 0.0;
-  double time_end_ = 0.0;
 };
 
 } /* namespace comptonsoft */

@@ -35,11 +35,7 @@ namespace comptonsoft
 
 SetNoiseLevels::SetNoiseLevels()
   : setting_by_file_(true),
-    filename_(""),
-    detector_type_(1),
-    noise0_(0.0), noise1_(0.0), noise2_(0.0),
-    cathode_noise0_(0.0), cathode_noise1_(0.0), cathode_noise2_(0.0),
-    anode_noise0_(0.0), anode_noise1_(0.0), anode_noise2_(0.0)
+    filename_("")
 {
 }
 
@@ -50,17 +46,17 @@ ANLStatus SetNoiseLevels::mod_define()
   define_parameter("filename", &mod_class::filename_);
   define_parameter("noise_level_map", &mod_class::noise_level_map_);
   define_map_key("detector_name_prefix", "Si");
-  add_value_element("detector_type", &mod_class::detector_type_);
+  add_value_element("detector_type", 1);
   set_value_element_description("Detector type (1: single, 2: double)");
-  add_value_element("noise_coefficient0", &mod_class::noise0_);
-  add_value_element("noise_coefficient1", &mod_class::noise1_);
-  add_value_element("noise_coefficient2", &mod_class::noise2_);
-  add_value_element("cathode_noise_coefficient0", &mod_class::cathode_noise0_);
-  add_value_element("cathode_noise_coefficient1", &mod_class::cathode_noise1_);
-  add_value_element("cathode_noise_coefficient2", &mod_class::cathode_noise2_);
-  add_value_element("anode_noise_coefficient0", &mod_class::anode_noise0_);
-  add_value_element("anode_noise_coefficient1", &mod_class::anode_noise1_);
-  add_value_element("anode_noise_coefficient2",  &mod_class::anode_noise2_);
+  add_value_element("noise_coefficient0", 0.0);
+  add_value_element("noise_coefficient1", 0.0);
+  add_value_element("noise_coefficient2", 0.0);
+  add_value_element("cathode_noise_coefficient0", 0.0);
+  add_value_element("cathode_noise_coefficient1", 0.0);
+  add_value_element("cathode_noise_coefficient2", 0.0);
+  add_value_element("anode_noise_coefficient0", 0.0);
+  add_value_element("anode_noise_coefficient1", 0.0);
+  add_value_element("anode_noise_coefficient2",  0.0);
 
   enable_value_elements(1, {1, 2, 3});
   enable_value_elements(2, {4, 5, 6, 7, 8, 9});

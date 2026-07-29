@@ -62,15 +62,6 @@ private:
 private:
   CSHitCollection* hit_collection_ = nullptr;
 
-  int detector_type_;
-  int reconstruction_mode_;
-  double threshold_;
-  double threshold_cathode_;
-  double threshold_anode_;
-  double lower_energy_check_func_C0_;
-  double lower_energy_check_func_C1_;
-  double upper_energy_check_func_C0_;
-  double upper_energy_check_func_C1_;
   std::map<std::string,
            std::tuple<int, int,
                       double, double, double,

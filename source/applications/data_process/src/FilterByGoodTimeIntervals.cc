@@ -36,8 +36,8 @@ FilterByGoodTimeIntervals::~FilterByGoodTimeIntervals() = default;
 ANLStatus FilterByGoodTimeIntervals::mod_define()
 {
   define_parameter("time_intervals", &mod_class::m_GTIs);
-  add_value_element("start", &mod_class::time_start_, CLHEP::second, "s");
-  add_value_element("end", &mod_class::time_end_, CLHEP::second, "s");
+  add_value_element("start", 0.0, CLHEP::second, "s");
+  add_value_element("end", 0.0, CLHEP::second, "s");
 
   return AS_OK;
 }

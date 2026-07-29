@@ -32,13 +32,7 @@ namespace unit = anlgeant4::unit;
 namespace comptonsoft
 {
 
-SelectHits::SelectHits()
-  : detector_type_(1), reconstruction_mode_(0),
-    threshold_(1.0*unit::keV), threshold_cathode_(1.0*unit::keV), threshold_anode_(1.0*unit::keV),
-    lower_energy_check_func_C0_(0.0), lower_energy_check_func_C1_(0.9),
-    upper_energy_check_func_C0_(0.0), upper_energy_check_func_C1_(1.1)
-{
-}
+SelectHits::SelectHits() = default;
 
 SelectHits::~SelectHits() = default;
 
@@ -46,16 +40,16 @@ ANLStatus SelectHits::mod_define()
 {
   define_parameter("analysis_map", &mod_class::analysis_map_);
   define_map_key("detector_name_prefix", "Si");
-  add_value_element("detector_type", &mod_class::detector_type_);
+  add_value_element("detector_type", 1);
   set_value_element_description("Detector type (1: pad, 2: DSD, 3: scintillator)");
-  add_value_element("reconstruction_mode", &mod_class::reconstruction_mode_);
-  add_value_element("threshold", &mod_class::threshold_, unit::keV, "keV");
-  add_value_element("threshold_cathode", &mod_class::threshold_cathode_, unit::keV, "keV");
-  add_value_element("threshold_anode", &mod_class::threshold_anode_, unit::keV, "keV");
-  add_value_element("lower_energy_consistency_check_function_c0", &mod_class::lower_energy_check_func_C0_, unit::keV, "keV");
-  add_value_element("lower_energy_consistency_check_function_c1", &mod_class::lower_energy_check_func_C1_);
-  add_value_element("upper_energy_consistency_check_function_c0", &mod_class::upper_energy_check_func_C0_, unit::keV, "keV");
-  add_value_element("upper_energy_consistency_check_function_c1", &mod_class::upper_energy_check_func_C1_);
+  add_value_element("reconstruction_mode", 0);
+  add_value_element("threshold", 1.0*unit::keV, unit::keV, "keV");
+  add_value_element("threshold_cathode", 1.0*unit::keV, unit::keV, "keV");
+  add_value_element("threshold_anode", 1.0*unit::keV, unit::keV, "keV");
+  add_value_element("lower_energy_consistency_check_function_c0", 0.0, unit::keV, "keV");
+  add_value_element("lower_energy_consistency_check_function_c1", 0.9);
+  add_value_element("upper_energy_consistency_check_function_c0", 0.0, unit::keV, "keV");
+  add_value_element("upper_energy_consistency_check_function_c1", 1.1);
   enable_value_elements(1, {1, 2});
   enable_value_elements(2, {1, 3, 4, 5, 6, 7, 8});
   enable_value_elements(3, {1, 2});

@@ -47,16 +47,6 @@ private:
                                    double, double, double,
                                    double, double, double,
                                    double, double, double>> noise_level_map_;
-  int detector_type_;
-  double noise0_;
-  double noise1_;
-  double noise2_;
-  double cathode_noise0_;
-  double cathode_noise1_;
-  double cathode_noise2_;
-  double anode_noise0_;
-  double anode_noise1_;
-  double anode_noise2_;
 };
 
 } /* namespace comptonsoft */
