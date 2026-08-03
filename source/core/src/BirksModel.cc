@@ -35,39 +35,16 @@ BirksModel::BirksModel(const std::map<std::string, double> &params) : VLArRecomb
   }
   kOverRho_ = k_ / Rho();
 }
-double BirksModel::electronDeDx(double dedx, double electricField) {
+double BirksModel::recombinationRate(double dedx, double electricField) const {
   const double kOverRhoE = kOverRho_ / electricField;
-  const double new_dedx = Ab_ * (dedx / (1 + kOverRhoE * dedx));
-  if (RandomizeMode() == 0) {
-    return (new_dedx > 0.0 && dedx > new_dedx) ? new_dedx : 0.0;
+  double p = Ab_ * (dedx / (1 + kOverRhoE * dedx)) / dedx;
+  if (p > 1.0) {
+    p = 1.0;
   }
-  else if (RandomizeMode() == 1) {
-    // Binomial randomization
-    const double nQuanta = dedx / Wion(); // number of quanta
-    int nQuantaWithFluctuations = TMath::Nint(gRandom->Gaus(nQuanta, TMath::Sqrt(TMath::Max(0.0, nQuanta * FanoFactor()))));
-    if (nQuantaWithFluctuations < 0) {
-      nQuantaWithFluctuations = 0;
-    }
-    double p = new_dedx / dedx;
-    if (p < 0.0) {
-      return 0.0;
-    }
-    else if (p > 1.0) {
-      return nQuantaWithFluctuations * Wion();
-    }
-    int nElectronInt = Binomial(static_cast<int>(nQuantaWithFluctuations), p);
-    if (nElectronInt < 0.0) {
-      nElectronInt = 0;
-    }
-    else if (nElectronInt > nQuantaWithFluctuations) {
-      nElectronInt = nQuantaWithFluctuations;
-    }
-    return nElectronInt * Wion();
+  else if (p < 0.0) {
+    p = 0.0;
   }
-  else {
-    std::cerr << "BirksModel::electronDeDx: Unknown randomization mode: " << RandomizeMode() << std::endl;
-    return (new_dedx > 0.0 && dedx > new_dedx) ? new_dedx : 0.0;
-  }
+  return p;
 }
 void BirksModel::printInfo(std::ostream &os) const {
   VLArRecombinationModel::printInfo(os);

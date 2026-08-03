@@ -1,0 +1,57 @@
+# ComptonSoft Coding Style
+# Based on LLVM, customized for ComptonSoft.
+
+BasedOnStyle: LLVM
+
+# Indentation
+IndentWidth: 2
+TabWidth: 2
+UseTab: Never
+
+# Line length
+ColumnLimit: 120
+
+# Do not indent namespace contents
+NamespaceIndentation: None
+
+# Brace style
+BreakBeforeBraces: Custom
+BraceWrapping:
+  AfterClass: true
+  AfterStruct: true
+  AfterEnum: true
+  AfterFunction: true
+  AfterNamespace: false
+
+  # if (...) {
+  # }
+  # else {
+  BeforeElse: true
+  BeforeCatch: true
+
+  # Keep K&R style for control statements
+  AfterControlStatement: Never
+
+# Allow short guard clauses
+AllowShortIfStatementsOnASingleLine: WithoutElse
+
+# Short loops may remain on a single line
+AllowShortLoopsOnASingleLine: true
+
+# Allow inline accessors inside class definitions
+AllowShortFunctionsOnASingleLine: Inline
+
+# Do not compress arbitrary blocks
+AllowShortBlocksOnASingleLine: Never
+
+# Short enums may stay on one line
+AllowShortEnumsOnASingleLine: true
+
+# Pointer/reference style
+PointerAlignment: Left
+ReferenceAlignment: Left
+
+# Constructor initializer lists
+BreakConstructorInitializers: BeforeColon
+PackConstructorInitializers: Never
+ConstructorInitializerIndentWidth: 2

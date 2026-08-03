@@ -32,7 +32,7 @@ public:
   BirksModel();
   BirksModel(const std::map<std::string, double> &params);
   virtual ~BirksModel() = default;
-  virtual double electronDeDx(double let, double electricField) override;
+  double recombinationRate(double dedx, double electricField) const override;
   void printInfo(std::ostream &os) const override;
 
 private:

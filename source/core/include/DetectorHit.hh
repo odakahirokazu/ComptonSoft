@@ -37,6 +37,8 @@
 #include "PixelID.hh"
 #include "FlagDefinition.hh"
 
+class G4MaterialCutsCouple;
+
 namespace comptonsoft {
 
 /**
@@ -193,8 +195,14 @@ public:
   void setEnergyError(double v) { energyError_ = v; }
   double EnergyError() const { return energyError_; }
   
+  /** The kinetic energy at the middle of the step, i.e. the average of the
+   *  pre-step and post-step point values. dE/dx varies over a step, so this is
+   *  the appropriate evaluation point rather than the pre-step value. */
   void setKineticEnergy(double v) { kineticEnergy_ = v; }
   double KineticEnergy() const { return kineticEnergy_; }
+
+  void setMaterialCutsCouple(const G4MaterialCutsCouple* couple) { materialCutsCouple_ = couple; }
+  const G4MaterialCutsCouple* MaterialCutsCouple() const { return materialCutsCouple_; }
 
   void setPosition(double x, double y, double z) { position_.set(x, y, z); }
   void setPosition(const vector3_t& v) { position_ = v; }
@@ -317,6 +325,7 @@ private:
   int timeGroup_ = 0;
   vector3_t realPosition_{0.0, 0.0, 0.0};
   double stepLength_ = 0.0;
+  const G4MaterialCutsCouple* materialCutsCouple_ = nullptr;
   double energyDeposit_ = 0.0;
   double energyCharge_ = 0.0;
   double kineticEnergy_ = 0.0;

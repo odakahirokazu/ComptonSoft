@@ -27,13 +27,23 @@
 #include <string>
 
 namespace comptonsoft {
+struct RecombinationResult {
+  int photonYield;
+  int electronYield;
+  double electronEnergy;
+  double recombinationSurvivingRate;
+  int totalQuanta;
+  };
 /**
  * A base class for LAr recombination model.
  * @author Shota Arai
  * @date 2025-08-09
  * @date 2025-10-10 | added parameterized constructor
- * @date 2026-02-21 | Change random generator to TRandom3 instead of std::mt19937
+ * @date 2026-02-21 | Change random generator to TRandom3 instead of
+ * std::mt19937
  */
+
+
 class VLArRecombinationModel {
 public:
   VLArRecombinationModel();
@@ -42,20 +52,13 @@ public:
   virtual ~VLArRecombinationModel();
 
   // Pure virtual function to calculate recombination energy
-  virtual double electronDeDx(double dedx, double electricField) = 0;
-  double lightYieldPerLength(double dedx, double electricField) {
-    return dedx/Wexc() - electronYieldPerLength(dedx, electricField);
-  }
-  double electronYieldPerLength(double dedx, double electricField) {
-    return electronDeDx(dedx, electricField) / Wion();
-  }
-  double getRecombinationFactor(double dedx, double electricField) {
-    const double recombination_dedx = electronDeDx(dedx, electricField);
-    if (dedx <= 0.0) {
-      return 1.0;
-    }
-    return recombination_dedx / dedx;
-  }
+  /**
+    * @brief Calculation of Recombination
+    */
+  virtual RecombinationResult calculateRecombination(double energy, double dx, double electricField, double dedx = -1);
+  
+  virtual double recombinationRate(double dedx, double electricField) const = 0;
+
   double lightYield(double edep, double recombination_factor) const {
     if (edep <= 0.0) {
       return 0.0;
@@ -74,12 +77,17 @@ public:
 
   double Wion() const { return Wion_; } /// Ionization energy of LAr
   double Wexc() const { return Wexc_; } /// Excitation energy of LAr
-  double Rho() const { return rho_; } /// Density of LAr
+  double Rho() const { return rho_; }   /// Density of LAr
+  double IonExitonRatio() const { return ionExitonRatio_; }
 
 private:
+  void calAlpha() {
+     ionExitonRatio_ = Wion_ / Wexc_ - 1.0;
+  }
   std::string name_ = "VLArRecombinationModel";
   double Wion_ = 23.6 * CLHEP::eV; // in eV
   double Wexc_ = 19.6 * CLHEP::eV; // in eV
+  double ionExitonRatio_ = Wion_ / Wexc_ - 1.0;
   double rho_ = 1.39 * (CLHEP::g / CLHEP::cm3); // in g/cm^3
   int randomizeMode_ = 0; // 0: no randomization, 1: Binomial
   double fanoFactor_ = 0.107; // Fano factor for LAr // Referece: Bonivento, W. M. and Terranova, F., "The science and technology of liquid argon detectors", 2024,

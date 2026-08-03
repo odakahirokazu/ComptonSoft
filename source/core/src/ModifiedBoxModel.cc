@@ -19,7 +19,7 @@
 
 #include "ModifiedBoxModel.hh"
 #include "TMath.h"
-#include "TRandom3.h"
+
 namespace comptonsoft {
 ModifiedBoxModel::ModifiedBoxModel() : VLArRecombinationModel("Modified Box Model") {
 }
@@ -34,43 +34,17 @@ ModifiedBoxModel::ModifiedBoxModel(const std::map<std::string, double> &params) 
   }
   betaOverRho_ = beta / Rho();
 }
-double ModifiedBoxModel::electronDeDx(double dedx, double electricField) {
+double ModifiedBoxModel::recombinationRate(double dedx, double electricField) const {
   const double betaOverRhoE = betaOverRho_ / electricField;
   const double new_dedx = TMath::Log(betaOverRhoE * dedx + alpha) / betaOverRhoE;
-  //std::cout << "ModifiedBoxModel::electronDeDx: dedx=" << dedx / (CLHEP::MeV / CLHEP::cm) << "MeV/cm, electricField=" << electricField / (CLHEP::kilovolt / CLHEP::cm) << " kV/cm, new_dedx=" << new_dedx / (CLHEP::MeV / CLHEP::cm) << "MeV/cm" << std::endl;
-  if (RandomizeMode() == 0) {
-    return (new_dedx > 0.0 && dedx > new_dedx) ? new_dedx : 0.0;
+  double p = new_dedx / dedx;
+  if (p < 0.0) {
+    p = 0;
   }
-  else if (RandomizeMode() == 1) {
-    // Binomial randomization
-    const double nQuanta = dedx / Wexc(); // number of quanta
-    //std::cout << "nQuanta: " << nQuanta << std::endl;
-    int nQuantaWithFluctuations = TMath::Nint(gRandom->Gaus(nQuanta, TMath::Sqrt(TMath::Max(0.0, nQuanta * FanoFactor()))));
-    if (nQuantaWithFluctuations < 0) {
-      nQuantaWithFluctuations = 0;
-    }
-    const double p = new_dedx / dedx;
-    //std::cout << "nQuantaWithFluctuations: " << nQuantaWithFluctuations << " p: " << p << " center: " << p * nQuantaWithFluctuations << " sigma: " << TMath::Sqrt(nQuantaWithFluctuations * p * (1 - p)) << std::endl;
-    if (p < 0.0) {
-      return 0.0;
-    }
-    else if (p > 1.0) {
-      return nQuantaWithFluctuations * Wion();
-    }
-    int nElectronInt = Binomial(nQuantaWithFluctuations, p);
-    if (nElectronInt < 0.0) {
-      nElectronInt = 0;
-    }
-    else if (nElectronInt > nQuantaWithFluctuations) {
-      nElectronInt = nQuantaWithFluctuations;
-    }
-    //std::cout << "new electron number: " << nElectronInt << std::endl;
-    return nElectronInt * Wion();
+  else if (p > 1.0) {
+    p = 1.0;
   }
-  else {
-    // No randomization
-    return (new_dedx > 0.0 && dedx > new_dedx) ? new_dedx : 0.0;
-  }
+  return p;
 }
 void ModifiedBoxModel::printInfo(std::ostream &os) const {
   VLArRecombinationModel::printInfo(os);

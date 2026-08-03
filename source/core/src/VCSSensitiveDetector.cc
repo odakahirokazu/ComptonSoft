@@ -90,6 +90,7 @@ VCSSensitiveDetector::ProcessHits(G4Step* aStep, G4TouchableHistory* )
   hit->setEnergyDeposit(edep);
   hit->setProcess(processFlag);
   hit->setParticle(particleDefinition->GetPDGEncoding());
+  hit->setMaterialCutsCouple(aStep->GetPreStepPoint()->GetMaterialCutsCouple());
 
   G4ThreeVector position;
   switch (aStep->GetPostStepPoint()->GetStepStatus()) 
