@@ -551,13 +551,11 @@ double FECChargeSelector::hitSelectionEnergy(int fec,
 
 TPCTreeReader::TPCTreeReader(TTree* tpc_tree,
                              const Config& cfg,
-                             const TPCProperty& tpc_property,
-                             GainCorrectionUpdater gain_correction_updater)
+                             const TPCProperty& tpc_property)
     : cfg_(cfg),
       tpc_tree_buffer_(tpc_tree),
       fec_selector_(cfg_, tpc_property),
-      fec_ti_tracker_(),
-      gain_correction_updater_(std::move(gain_correction_updater))
+      fec_ti_tracker_()
 {
   if (tpc_tree_buffer_.nEntries() > 0) {
     tpc_tree_buffer_.getEntry(0);
@@ -569,8 +567,7 @@ TPCTreeReader::TPCTreeReader(TTree* tpc_tree,
 
 TPCTreeReader::~TPCTreeReader() = default;
 
-bool TPCTreeReader::processNext(int64_t& raw_event_id,
-                                std::vector<RawFECHit>& event_hits)
+bool TPCTreeReader::readNextEntry(int64_t& raw_event_id)
 {
   if (current_entry_ >= tpc_tree_buffer_.nEntries()) {
     return false;
@@ -579,17 +576,17 @@ bool TPCTreeReader::processNext(int64_t& raw_event_id,
   raw_event_id = current_entry_;
   tpc_tree_buffer_.getEntry(current_entry_);
   current_unix_time_ = tpc_tree_buffer_.representativeUnixTime();
-  if (gain_correction_updater_) {
-    gain_correction_updater_(current_unix_time_);
-  }
+  ++current_entry_;
+  return true;
+}
 
+void TPCTreeReader::extractCurrentEventHits(std::vector<RawFECHit>& event_hits)
+{
   const int err = static_cast<int>(tpc_tree_buffer_.error_flags);
   const bool tpc_ok   = isTPCDataUsable(err);
   const bool light_ok = isLightDataUsable(err);
   LightStatus light_status;
-  if (usesLightAnalysis(cfg_)) {
-    light_status = analyzeLightEvent(cfg_, tpc_tree_buffer_, light_timing_, light_ok);
-  }
+  light_status = analyzeLightEvent(cfg_, tpc_tree_buffer_, light_timing_, light_ok);
 
   bool light_pileup = false;
   bool light_cosmic = false;
@@ -610,6 +607,7 @@ bool TPCTreeReader::processNext(int64_t& raw_event_id,
                                         light_cosmic,
                                         light_pileup,
                                         rejected_by_excluded_core);
+
   if (!tpc_ok) {
     current_event_type_ = TPCEventType::Error;
   } else if (rejected_by_excluded_core) {
@@ -625,8 +623,14 @@ bool TPCTreeReader::processNext(int64_t& raw_event_id,
   } else {
     current_event_type_ = TPCEventType::Other;
   }
-  ++current_entry_;
-  return true;
+
+  if (current_event_type_ == TPCEventType::Gamma) {
+    const double roi_integral_charge =
+        lightRoiIntegralCharge(cfg_, tpc_tree_buffer_, light_timing_, light_ok);
+    for (auto& hit : event_hits) {
+      hit.light_roi_charge = roi_integral_charge;
+    }
+  }
 }
 
 } /* namespace grams */

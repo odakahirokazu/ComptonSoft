@@ -126,10 +126,7 @@ ANLStatus NanoGRAMSHitExtraction::mod_initialize()
   tpc_tree_reader_ = std::make_unique<grams::TPCTreeReader>(
       tpc_tree,
       cfg_,
-      tpc_property_,
-      [this](uint32_t unix_time) {
-        updateGainCorrectionForCurrentEvent(unix_time);
-      });
+      tpc_property_);
   const int64_t reader_entries = tpc_tree_reader_->currentBuffer().nEntries();
   std::cout << "[NanoGRAMSHitExtraction] TPCTreeReader entries: "
             << reader_entries << "\n";
@@ -257,7 +254,7 @@ ANLStatus NanoGRAMSHitExtraction::mod_analyze()
 {
   int64_t raw_event_id = 0;
   std::vector<grams::RawFECHit> event_hits;
-  if (!tpc_tree_reader_ || !tpc_tree_reader_->processNext(raw_event_id, event_hits)) {
+  if (!tpc_tree_reader_ || !tpc_tree_reader_->readNextEntry(raw_event_id)) {
     std::cout << "[NanoGRAMSHitExtraction] AS_QUIT after processing "
               << processed_entries_ << " / "
               << expected_tpc_entries_ << " tpctree entries.\n";
@@ -266,6 +263,8 @@ ANLStatus NanoGRAMSHitExtraction::mod_analyze()
 
   current_raw_event_id_ = raw_event_id;
   current_unix_time_ = tpc_tree_reader_->currentUnixTime();
+  updateGainCorrectionForCurrentEvent(current_unix_time_);
+  tpc_tree_reader_->extractCurrentEventHits(event_hits);
   ++processed_entries_;
   current_event_hits_.clear();
 

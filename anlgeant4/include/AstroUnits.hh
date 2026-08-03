@@ -108,6 +108,7 @@ using CLHEP::eplus;
 using CLHEP::coulomb;
 
 using CLHEP::volt;
+using CLHEP::ohm;
 
 using CLHEP::tesla;
 using CLHEP::gauss;

@@ -81,6 +81,10 @@ if(CS_HARD_ALL)
   set(CS_USE_YAMLCPP ON)
 endif(CS_HARD_ALL)
 
+# NanoGRAMS configuration and calibration files are YAML based.
+# Keep yaml-cpp enabled even when the old optional cache value is OFF.
+set(CS_USE_YAMLCPP ON)
+
 set(USE_RUBY ${CS_USE_RUBY})
 set(USE_PYTHON ${CS_USE_PYTHON})
 set(USE_EXE ${CS_USE_EXE})

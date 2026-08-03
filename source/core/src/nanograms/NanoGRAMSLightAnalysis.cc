@@ -27,6 +27,7 @@
 #include <stdexcept>
 #include <string>
 #include <vector>
+#include <iostream>
 
 namespace comptonsoft
 {
@@ -37,6 +38,8 @@ namespace grams
 
 namespace
 {
+
+constexpr double kDigitizerInputImpedanceOhm = 50.0 * unit::ohm;
 
 struct LightPeaks
 {
@@ -186,6 +189,89 @@ void updatePileupLightStatusFromPeaks(LightStatus& status,
       status.pileup_pre_roi || (peaks.pre_roi_peak > cfg.out_roi_peak_thr);
   status.pileup_post_roi =
       status.pileup_post_roi || (peaks.post_roi_peak > cfg.out_roi_peak_thr);
+}
+
+double baselineVoltage(const Config& cfg,
+                       const TPCTreeBuffer& tpc_tree_buffer,
+                       const LightTimingState& light_timing,
+                       int light_ch)
+{
+  const int start_index = light_timing.pre_pileup_start_index[light_ch];
+  const int stop_index  = light_timing.pre_pileup_stop_index[light_ch];
+
+  double voltage_sum = 0.0 * unit::volt;
+  int num_samples = 0;
+  for (int raw_idx = start_index; raw_idx < stop_index; ++raw_idx) {
+    const double voltage =
+        lightVoltageAtSample(cfg, tpc_tree_buffer, light_ch, raw_idx);
+    if (std::isfinite(voltage)) {
+      voltage_sum += voltage;
+      ++num_samples;
+    }
+  }
+
+  if (num_samples == 0) {
+    return std::numeric_limits<double>::quiet_NaN() * unit::volt;
+  }
+
+  return voltage_sum / static_cast<double>(num_samples);
+}
+
+double integratedDigitizerVoltSecond(const Config& cfg,
+                                     const TPCTreeBuffer& tpc_tree_buffer,
+                                     const LightTimingState& light_timing,
+                                     int light_ch)
+{
+  const double baseline =
+      baselineVoltage(cfg, tpc_tree_buffer, light_timing, light_ch);
+  if (!std::isfinite(baseline)) {
+    return std::numeric_limits<double>::quiet_NaN();
+  }
+
+  const double timebin  = light_timing.timebin[light_ch];
+  const int start_index = light_timing.pre_pileup_stop_index[light_ch];
+  const int stop_index  = light_timing.post_pileup_start_index[light_ch];
+
+  double integral = 0.0;
+  for (int raw_idx = start_index; raw_idx < stop_index; ++raw_idx) {
+    const double voltage =
+        lightVoltageAtSample(cfg, tpc_tree_buffer, light_ch, raw_idx);
+    if (std::isfinite(voltage)) {
+      integral += (voltage - baseline) / unit::volt *
+                  timebin / unit::second;
+    }
+  }
+
+  return integral;
+}
+
+double lightRoiIntegralChargeForChannels(const Config& cfg,
+                                         const TPCTreeBuffer& tpc_tree_buffer,
+                                         const LightTimingState& light_timing,
+                                         const std::vector<int>& valid_channels)
+{
+  double digitizer_integral_volt_second = 0.0;
+  for (const int light_ch : valid_channels) {
+    const double channel_integral =
+        integratedDigitizerVoltSecond(cfg,
+                                      tpc_tree_buffer,
+                                      light_timing,
+                                      light_ch);
+    if (std::isfinite(channel_integral)) {
+      digitizer_integral_volt_second += channel_integral;
+    }
+  }
+
+  const double output_voltage_scale =
+      (cfg.light_output_impedance_ohm + kDigitizerInputImpedanceOhm) /
+      kDigitizerInputImpedanceOhm;
+  const double tia_output_integral_volt_second =
+      digitizer_integral_volt_second * output_voltage_scale;
+  const double charge_coulomb =
+      tia_output_integral_volt_second /
+      (cfg.light_transimpedance_feedback_resistance_ohm / unit::ohm);
+
+  return charge_coulomb * unit::coulomb;
 }
 
 LightPeaks analyzeSingleLightChannel(const Config& cfg,
@@ -362,6 +448,25 @@ LightStatus analyzeLightEvent(const Config& cfg,
   }
 
   return status;
+}
+
+double lightRoiIntegralCharge(const Config& cfg,
+                              const TPCTreeBuffer& tpc_tree_buffer,
+                              const LightTimingState& light_timing,
+                              bool light_ok)
+{
+  const std::vector<int> valid_general_channels =
+      collectValidLightChannels(cfg.general_analysis_channels,
+                                tpc_tree_buffer,
+                                light_ok);
+  if (valid_general_channels.empty()) {
+    return 0.0 * unit::coulomb;
+  }
+
+  return lightRoiIntegralChargeForChannels(cfg,
+                                           tpc_tree_buffer,
+                                           light_timing,
+                                           valid_general_channels);
 }
 
 } /* namespace grams */

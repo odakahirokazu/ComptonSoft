@@ -188,6 +188,18 @@ void readLightConfig(Config& cfg, const YAML::Node& node)
   cfg.pre_roi_window   = nodeLight["pre_roi_window_us"].as<double>() * unit::us;
   cfg.post_roi_window  = nodeLight["post_roi_window_us"].as<double>() * unit::us;
   cfg.out_roi_peak_thr = nodeLight["out_roi_peak_thr_mV"].as<double>() * (unit::volt/1000.0);
+  cfg.light_transimpedance_feedback_resistance_ohm =
+      nodeLight["transimpedance_feedback_resistance_ohm"].as<double>() * unit::ohm;
+  cfg.light_output_impedance_ohm =
+      nodeLight["output_impedance_ohm"].as<double>() * unit::ohm;
+  std::cout << "konnichiwa: " << nodeLight["output_impedance_ohm"].as<double>() << std::endl;
+  if (cfg.light_transimpedance_feedback_resistance_ohm <= 0.0*unit::ohm) {
+    throw std::runtime_error(
+        "light.transimpedance_feedback_resistance_ohm must be positive.");
+  }
+  if (cfg.light_output_impedance_ohm < 0.0*unit::ohm) {
+    throw std::runtime_error("light.output_impedance_ohm must be non-negative.");
+  }
   cfg.general_analysis_channels =
       readDPPChannelList(nodeLight["general_analysis_channels"],
                          "light.general_analysis_channels");
@@ -223,6 +235,10 @@ void readLightConfig(Config& cfg, const YAML::Node& node)
   std::cout << "pre_roi_window_us:  "   << cfg.pre_roi_window / unit::us << std::endl;
   std::cout << "post_roi_window_us: "   << cfg.post_roi_window / unit::us << std::endl;
   std::cout << "out_roi_peak_thr_mV: "  << cfg.out_roi_peak_thr  / (unit::volt/1000.0) << std::endl;
+  std::cout << "transimpedance_feedback_resistance_ohm: "
+            << cfg.light_transimpedance_feedback_resistance_ohm / unit::ohm<< std::endl;
+  std::cout << "output_impedance_ohm: "
+            << cfg.light_output_impedance_ohm / unit::ohm<< std::endl;
   std::cout << "waveform_analysis:   " << cfg.light_waveform_analysis << std::endl;
   std::cout << "event_selection_mode: "
             << lightEventSelectionModeName(cfg.light_event_selection_mode) << std::endl;

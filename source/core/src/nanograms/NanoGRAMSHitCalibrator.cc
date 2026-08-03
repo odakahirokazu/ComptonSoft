@@ -245,6 +245,11 @@ std::vector<DetectorHit_sptr> buildCalibratedHits(
     hit->setReadoutChannelID(channel_fec, channel_fec, channel);
     hit->setVoxel(kPixelX[channel], kPixelY[channel], VoxelID::Undefined);
     hit->setEnergy(total_energy);
+    // NanoGRAMS stores the light ROI charge in the hittree epi branch.
+    // HitTreeIO writes EPI divided by keV, so encode the Coulomb value as
+    // a numeric value carried by the EPI field.
+    hit->setEPI(raw_hit.light_roi_charge / unit::coulomb * unit::keV);
+    hit->setEPIError(0.0 * unit::keV);
     hit->setPosition(posx, posy, posz);
     hit->setPositionError(tpc_property.posXError(),
                           tpc_property.posYError(),

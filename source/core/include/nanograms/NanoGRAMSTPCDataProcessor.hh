@@ -29,7 +29,6 @@
 
 #include <array>
 #include <cstdint>
-#include <functional>
 #include <string>
 #include <vector>
 
@@ -55,6 +54,7 @@ struct RawFECHit
   int fec           = 0;
   uint64_t ti       = 0;
   double drift_time = 0.0 * unit::us;
+  double light_roi_charge = 0.0 * unit::coulomb;
   std::vector<int16_t> channel_fecs;
   std::vector<int16_t> channels;
   std::vector<float>   adus;
@@ -131,15 +131,13 @@ private:
 class TPCTreeReader
 {
 public:
-  using GainCorrectionUpdater = std::function<void(uint32_t)>;
-
   TPCTreeReader(TTree* tpc_tree,
                 const Config& cfg,
-                const TPCProperty& tpc_property,
-                GainCorrectionUpdater gain_correction_updater);
+                const TPCProperty& tpc_property);
   ~TPCTreeReader();
 
-  bool processNext(int64_t& raw_event_id, std::vector<RawFECHit>& event_hits);
+  bool readNextEntry(int64_t& raw_event_id);
+  void extractCurrentEventHits(std::vector<RawFECHit>& event_hits);
   const TPCTreeBuffer& currentBuffer() const { return tpc_tree_buffer_; }
   TPCEventType currentEventType() const { return current_event_type_; }
   uint32_t currentUnixTime() const { return current_unix_time_; }
@@ -150,7 +148,6 @@ private:
   FECChargeSelector   fec_selector_;
   LightTimingState    light_timing_;
   FECTITracker        fec_ti_tracker_;
-  GainCorrectionUpdater gain_correction_updater_;
   int64_t current_entry_ = 0;
   TPCEventType current_event_type_ = TPCEventType::Error;
   uint32_t current_unix_time_ = 0;

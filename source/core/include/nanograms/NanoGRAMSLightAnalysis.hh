@@ -31,6 +31,7 @@
 #include <cstdint>
 #include <string>
 
+#include "AstroUnits.hh"
 #include "NanoGRAMSConfig.hh"
 #include "NanoGRAMSTPCTreeIO.hh"
 
@@ -59,6 +60,7 @@ struct LightStatus
   bool cosmic = false;
   bool pileup_pre_roi = false;
   bool pileup_post_roi = false;
+  double roi_integral_charge = 0.0 * anlgeant4::unit::coulomb;
 
   bool hasPileup() const
   {
@@ -69,6 +71,11 @@ struct LightStatus
 std::string normalizeLightWaveformAnalysis(const std::string& mode);
 
 LightStatus analyzeLightEvent(const Config& cfg,
+                              const TPCTreeBuffer& tpc_tree_buffer,
+                              const LightTimingState& light_timing,
+                              bool light_ok);
+
+double lightRoiIntegralCharge(const Config& cfg,
                               const TPCTreeBuffer& tpc_tree_buffer,
                               const LightTimingState& light_timing,
                               bool light_ok);

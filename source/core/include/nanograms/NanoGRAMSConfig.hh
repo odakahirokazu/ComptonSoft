@@ -33,6 +33,8 @@ namespace comptonsoft
 namespace grams
 {
 
+namespace unit = anlgeant4::unit;
+
 enum class LightEventSelectionMode
 {
   Disabled,
@@ -57,6 +59,8 @@ struct Config
   double pre_roi_window      = 0.0;
   double post_roi_window     = 0.0;
   double out_roi_peak_thr    = 0.0;
+  double light_transimpedance_feedback_resistance_ohm = 3200.0 * unit::ohm;
+  double light_output_impedance_ohm = 50.0 * unit::ohm;
   double timebin_ns_override = 0.0;
   double cross_fec_merge_drift_time_tolerance = -1.0 * anlgeant4::unit::us;
 
