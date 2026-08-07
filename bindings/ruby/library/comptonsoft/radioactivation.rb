@@ -51,6 +51,7 @@ module ComptonSoft
     def initialize()
       @data = {}
       @num_events = 0
+      @volume_id_conversion = nil
     end
     attr_accessor :num_events
 
@@ -80,6 +81,14 @@ module ComptonSoft
       @current_volume.values
     end
 
+    def define_volume_id_conversion(&func)
+      @volume_id_conversion = func
+    end
+
+    def undefine_volume_id_conversion(&func)
+      @volume_id_conversion = nil
+    end
+
     def read(filename, as_rate: false)
       File::open(filename) do |fin|
         fin.each_line do |line|
@@ -87,6 +96,9 @@ module ComptonSoft
             @num_events += $1.to_i
           elsif line =~ /^Volume\S+\s+(\S+)/
             volume_id = $1
+            if @volume_id_conversion
+              volume_id = @volume_id_conversion.(volume_id)
+            end
             cd(volume_id)
           elsif line =~ /^Isotope/
             row_data = line.strip.split(/\s+/)
@@ -127,6 +139,9 @@ module ComptonSoft
         fin.each_line do |line|
           if line =~ /^VN\s+(\S+)/
             volume_id = $1
+            if @volume_id_conversion
+              volume_id = @volume_id_conversion.(volume_id)
+            end
             cd(volume_id)
           elsif line =~ /^RP/
             row_data = line.strip.split(/\s+/)
