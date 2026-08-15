@@ -25,7 +25,7 @@ list(APPEND CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
 ### options
 #### interface options
 option(CS_USE_RUBY "enable Ruby binding" ON)
-option(CS_USE_PYTHON "enable Python binding (anlgeant4)" ON)
+option(CS_USE_PYTHON "enable Python bindings" ON)
 option(CS_USE_EXE "enable standalone executables" OFF)
 #### library options
 option(CS_USE_GDML "enable GDML" ON)
@@ -108,6 +108,10 @@ endif(USE_EXE)
 if(USE_RUBY)
   add_subdirectory(rubyext)
 endif(USE_RUBY)
+
+if(USE_PYTHON)
+  add_subdirectory(pyext)
+endif(USE_PYTHON)
 
 add_subdirectory(cmake)
 
