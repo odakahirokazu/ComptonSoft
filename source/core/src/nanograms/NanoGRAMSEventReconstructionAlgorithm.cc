@@ -19,6 +19,7 @@
 
 #include "NanoGRAMSEventReconstructionAlgorithm.hh"
 #include <algorithm>
+#include <cmath>
 #include <stdexcept>
 #include <utility>
 #include "AstroUnits.hh"
@@ -99,7 +100,6 @@ readEnergyCorrectionFactors(boost::property_tree::ptree& pt)
   return factors;
 }
 
-#if CS_USE_YAMLCPP
 std::array<double, NUM_VATA>
 readEnergyCorrectionFactors(YAML::Node& node)
 {
@@ -126,7 +126,6 @@ readEnergyCorrectionFactors(YAML::Node& node)
   validateEnergyCorrectionFactors(factors);
   return factors;
 }
-#endif /* CS_USE_YAMLCPP */
 
 } // namespace
 
@@ -162,7 +161,6 @@ bool NanoGRAMSEventReconstructionAlgorithm::loadParameters(boost::property_tree:
     return true;
 }
 
-#if CS_USE_YAMLCPP
 bool NanoGRAMSEventReconstructionAlgorithm::loadParametersYAML(YAML::Node& node)
 {
     incident_energy_candidates_.clear();
@@ -191,7 +189,6 @@ bool NanoGRAMSEventReconstructionAlgorithm::loadParametersYAML(YAML::Node& node)
 
     return true;
 }
-#endif /* CS_USE_YAMLCPP */
 
 void NanoGRAMSEventReconstructionAlgorithm::initializeEvent()
 {
@@ -348,8 +345,9 @@ bool NanoGRAMSEventReconstructionAlgorithm::hasRequiredHigherHitEnergy(
 
 bool NanoGRAMSEventReconstructionAlgorithm::isSatisfyKinematics(const std::vector<DetectorHit_sptr>& ordered_hits, double incident_energy)
 {
-    double cosThetaK = 1.0 - CLHEP::electron_mass_c2 * (1.0/(incident_energy-ordered_hits[0]->Energy()) - 1.0/incident_energy);
-    return (-1.0 < cosThetaK) && (cosThetaK < 1.0);
+    const double energy_margin = std::abs(ordered_hits[0]->EnergyError());
+    return checkEdepIsPhysicallyAcceptable(
+        incident_energy, ordered_hits[0]->Energy(), energy_margin);
 }
 
 

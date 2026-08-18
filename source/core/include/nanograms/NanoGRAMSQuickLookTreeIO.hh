@@ -51,7 +51,8 @@ public:
   explicit QuickLookTreeOutputWriter(const std::string& output_file_path,
                                      const TPCTreeBuffer& first_tpc_tree_buffer,
                                      const TPCProperty& tpc_property,
-                                     bool save_waveforms = true);
+                                     bool save_waveforms = true,
+                                     int flush_entries = 1000);
   ~QuickLookTreeOutputWriter();
 
   void fillEvent(int64_t raw_event_id,
@@ -62,6 +63,7 @@ public:
 
 private:
   void bindBranches();
+  void flush();
   void fillChargeMaps(TPCEventType event_type,
                       const TPCTreeBuffer& tpc_tree_buffer);
   void fillRegisteredWaveforms(const TPCTreeBuffer& tpc_tree_buffer);
@@ -72,6 +74,7 @@ private:
   std::unique_ptr<TTree> quicklook_tree_;
   const TPCProperty& tpc_property_;
   bool save_waveforms_ = true;
+  int flush_entries_ = 1000;
   int waveform_len_ = 0;
   int waveform_num_channels_ = 0;
   std::string adu_leaflist_;

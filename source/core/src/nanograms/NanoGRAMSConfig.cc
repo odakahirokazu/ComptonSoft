@@ -313,15 +313,14 @@ void readConfig(Config& cfg, const std::string& config_path)
   readChargeConfig(cfg, configNode);
 }
 
-void readDPPConfig(Config& cfg, const std::string& tpctree_file)
+void readDPPConfigFile(Config& cfg, const std::string& config_path)
 {
-  const fs::path config_path = fs::path(tpctree_file).parent_path() / "config_dpp.yaml";
-  const auto configNode = YAML::LoadFile(config_path.string());
+  const auto configNode = YAML::LoadFile(config_path);
   const auto delayNode = configNode["savefile"]["listwave_delay"]["value"];
   const std::vector<int> delays = delayNode.as<std::vector<int>>();
   if (delays.size() != NUM_CH_DPP_MAX) {
     throw std::runtime_error(
-        "savefile.listwave_delay.value in " + config_path.string() +
+        "savefile.listwave_delay.value in " + config_path +
         " must contain 8 DPP channel values.");
   }
 
@@ -329,7 +328,7 @@ void readDPPConfig(Config& cfg, const std::string& tpctree_file)
     if (delays[ch] < 0) {
       throw std::runtime_error(
           "savefile.listwave_delay.value contains a negative delay in " +
-          config_path.string());
+          config_path);
     }
     cfg.light_delay_counts[ch] = delays[ch];
   }
@@ -344,6 +343,13 @@ void readDPPConfig(Config& cfg, const std::string& tpctree_file)
     std::cout << cfg.light_delay_counts[ch];
   }
   std::cout << " ]" << std::endl;
+}
+
+void readDPPConfig(Config& cfg, const std::string& tpctree_file)
+{
+  const std::string config_path =
+      (fs::path(tpctree_file).parent_path() / "config_dpp.yaml").string();
+  readDPPConfigFile(cfg, config_path);
 }
 
 } /* namespace grams */

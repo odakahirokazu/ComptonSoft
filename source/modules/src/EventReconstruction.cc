@@ -41,6 +41,8 @@
 #include "NeuralNetST2022EventReconstructionAlgorithm.hh"
 #endif
 #include "NanoGRAMSEventReconstructionAlgorithm.hh"
+#include "NanoGRAMSEnergyComparisonEventReconstructionAlgorithm.hh"
+#include "NanoGRAMSKNFormulaEventReconstructionAlgorithm.hh"
 
 using namespace anlnext;
 
@@ -80,6 +82,8 @@ EventReconstruction::EventReconstruction()
 {
   add_alias("EventReconstruction");
 }
+
+EventReconstruction::~EventReconstruction() = default;
 
 ANLStatus EventReconstruction::mod_define()
 {
@@ -146,6 +150,12 @@ ANLStatus EventReconstruction::mod_initialize()
   else if (ReconstructionMethodName()=="NanoGRAMS") {
     m_Reconstruction.reset(new NanoGRAMSEventReconstructionAlgorithm);
   }
+  else if (ReconstructionMethodName()=="NanoGRAMSEnergyComparison") {
+    m_Reconstruction.reset(new NanoGRAMSEnergyComparisonEventReconstructionAlgorithm);
+  }
+  else if (ReconstructionMethodName()=="NanoGRAMSKNFormula") {
+    m_Reconstruction.reset(new NanoGRAMSKNFormulaEventReconstructionAlgorithm);
+  }
   else {
     std::cout << "Unknown reconstruction method is given: " << ReconstructionMethodName()
               << std::endl;
@@ -158,16 +168,15 @@ ANLStatus EventReconstruction::mod_initialize()
   if (m_ParameterFile != "") {
     m_Reconstruction->setParameterFile(m_ParameterFile);
     bool paramLoaded = false;
-#if CS_USE_YAMLCPP
-    if (ReconstructionMethodName()=="NanoGRAMS" && hasYAMLExtension(m_ParameterFile)) {
+    if ((ReconstructionMethodName()=="NanoGRAMS" ||
+         ReconstructionMethodName()=="NanoGRAMSEnergyComparison" ||
+         ReconstructionMethodName()=="NanoGRAMSKNFormula") &&
+        hasYAMLExtension(m_ParameterFile)) {
       paramLoaded = m_Reconstruction->readParameterYAMLFile();
     }
     else {
       paramLoaded = m_Reconstruction->readParameterFile();
     }
-#else
-    paramLoaded = m_Reconstruction->readParameterFile();
-#endif /* CS_USE_YAMLCPP */
     if (!paramLoaded) {
       return AS_QUIT_ERROR;
     }

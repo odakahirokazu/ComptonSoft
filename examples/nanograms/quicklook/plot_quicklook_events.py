@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Plot NanoGRAMS quicklook TTree entries.
 
-The input file is expected to contain the optional NanoGRAMSHitExtraction
+The input file is expected to contain the optional NanoGRAMSReadTPCEvents
 ``tpcquicklook`` tree with branches such as ``energy_cmn_sub[4][64]``,
 ``drift_time[4]``, and ``waveform[8][N]``.
 """

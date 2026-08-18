@@ -22,12 +22,9 @@
 
 #include <array>
 #include <filesystem>
-#include <memory>
 
+#include "NanoGRAMSChargeToEnergySpline.hh"
 #include "NanoGRAMSEvent.hh"
-
-class TFile;
-class TSpline3;
 
 namespace comptonsoft
 {
@@ -49,14 +46,14 @@ public:
   double posYError() const {return pos_y_error_;};
   double posZError() const {return pos_z_error_;};
 
-  void loadParamCoulomb2keVForSpline3D(const std::filesystem::path& spline_path, double efield);
+  void setChargeToEnergySpline(double efield);
   void loadParamGainMatrices(const std::filesystem::path& gain_info_path);
   void applyTemperatureCorrection(int tp_channel,
                                   int ccal,
                                   const std::array<double, NUM_VATA>& tp_adc_values);
 
   double temperatureCorrectionFactor(int fec) const;
-  double convertADC2keVWithSpline3D(int fec, int ch, double adc) const;
+  double convertADC2keV(int fec, int ch, double adc) const;
   double convertDriftTime2PosZ(double drift_time) const;
   double convertDriftTime2PosZScale(double drift_time, double max_time) const;
 
@@ -70,12 +67,9 @@ private:
   double pos_x_error_ = 0.0;
   double pos_y_error_ = 0.0;
   double pos_z_error_ = 0.0;
-  TSpline3* spline_ = nullptr;
-  double xmin_spline3d_ = 0.0;
-  double xmax_spline3d_ = 0.0;
+  ChargeToEnergySpline charge_to_energy_spline_;
   std::array<GainMatrix, NUM_VATA> gain_matrices_adc_to_c_{};
   std::array<GainMatrix, NUM_VATA> gain_matrices_ccal_to_adc_{};
-  std::unique_ptr<TFile> spline_file_;
   std::array<double, NUM_VATA> temperature_correction_factors_{};
 };
 

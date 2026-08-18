@@ -19,9 +19,6 @@
 
 #include "NanoGRAMSTPCProperty.hh"
 
-#include <TFile.h>
-#include <TSpline.h>
-
 #include <algorithm>
 #include <cmath>
 #include <format>
@@ -107,27 +104,9 @@ TPCProperty::TPCProperty()
 
 TPCProperty::~TPCProperty() = default;
 
-void TPCProperty::loadParamCoulomb2keVForSpline3D(const fs::path& spline_path, double efield)
+void TPCProperty::setChargeToEnergySpline(double efield)
 {
-  int efield_v_cm = static_cast<int>(efield / (unit::volt / unit::cm));
-  spline_file_ = std::make_unique<TFile>(spline_path.string().c_str(), "READ");
-  if (!spline_file_ || spline_file_->IsZombie()) {
-    throw std::runtime_error("Failed to open spline ROOT file: " + spline_path.string());
-  }
-
-  const std::string efield_name = std::format("E{}", efield_v_cm);
-  spline_ = dynamic_cast<TSpline3*>(spline_file_->Get(efield_name.c_str()));
-  if (!spline_) {
-    throw std::runtime_error(std::format("Missing TSpline3 '{}' in {}",
-                                         efield_name,
-                                         spline_path.string()));
-  }
-
-  const int knots = spline_->GetNp();
-  double y0 = 0.0;
-  double y1 = 0.0;
-  spline_->GetKnot(0, xmin_spline3d_, y0);
-  spline_->GetKnot(knots - 1, xmax_spline3d_, y1);
+  charge_to_energy_spline_.setElectricField(efield / (unit::volt / unit::cm));
 }
 
 void TPCProperty::loadParamGainMatrices(const fs::path& gain_info_path)
@@ -168,16 +147,14 @@ double TPCProperty::temperatureCorrectionFactor(int fec) const
   return temperature_correction_factors_[fec];
 }
 
-double TPCProperty::convertADC2keVWithSpline3D(int fec, int ch, double adc) const
+double TPCProperty::convertADC2keV(int fec, int ch, double adc) const
 {
   const GainParamArray& params = gain_matrices_adc_to_c_[fec][ch];
   double charge_coulomb = cubic(adc, params) - cubic(0.0, params);
   if (charge_coulomb <= 0.0) {
     return 0.0 * unit::keV;
   }
-  charge_coulomb = std::clamp(charge_coulomb, xmin_spline3d_, xmax_spline3d_);
-
-  return spline_->Eval(charge_coulomb) * unit::keV;
+  return charge_to_energy_spline_.evaluate(charge_coulomb) * unit::keV;
 }
 
 double TPCProperty::convertDriftTime2PosZ(double drift_time) const

@@ -45,10 +45,6 @@ namespace
 
 std::filesystem::path prepareOutputPath(const std::string& output_file_path)
 {
-  if (output_file_path.empty()) {
-    throw std::runtime_error("Output file path is empty.");
-  }
-
   std::filesystem::path output_path(output_file_path);
   const auto output_parent = output_path.parent_path();
   if (!output_parent.empty()) {
@@ -85,12 +81,14 @@ QuickLookTreeOutputWriter::QuickLookTreeOutputWriter(
     const std::string& output_file_path,
     const TPCTreeBuffer& first_tpc_tree_buffer,
     const TPCProperty& tpc_property,
-    bool save_waveforms)
+    bool save_waveforms,
+    int flush_entries)
     : output_path_(prepareOutputPath(output_file_path)),
       file_(std::make_unique<TFile>(output_path_.string().c_str(), "RECREATE")),
       quicklook_tree_(std::make_unique<TTree>(kQuickLookTreeName, kQuickLookTreeName)),
       tpc_property_(tpc_property),
       save_waveforms_(save_waveforms),
+      flush_entries_(std::max(1, flush_entries)),
       waveform_len_(first_tpc_tree_buffer.layout().waveform_len),
       waveform_dpp_ch_(save_waveforms ? registeredDPPChannels(first_tpc_tree_buffer)
                                        : std::vector<int16_t>{})
@@ -108,7 +106,9 @@ QuickLookTreeOutputWriter::QuickLookTreeOutputWriter(
   if (save_waveforms_) {
     waveform_.assign(waveform_num_channels_ * waveform_len_, 0);
   }
-  quicklook_tree_->SetDirectory(nullptr);
+  quicklook_tree_->SetDirectory(file_.get());
+  quicklook_tree_->SetAutoFlush(-flush_entries_);
+  quicklook_tree_->SetAutoSave(-flush_entries_);
   bindBranches();
 }
 
@@ -169,6 +169,17 @@ void QuickLookTreeOutputWriter::fillEvent(int64_t raw_event_id,
   }
 
   quicklook_tree_->Fill();
+  if (quicklook_tree_->GetEntries() % flush_entries_ == 0) {
+    flush();
+  }
+}
+
+void QuickLookTreeOutputWriter::flush()
+{
+  file_->cd();
+  quicklook_tree_->FlushBaskets();
+  quicklook_tree_->AutoSave();
+  file_->Flush();
 }
 
 std::string QuickLookTreeOutputWriter::close()
@@ -177,6 +188,7 @@ std::string QuickLookTreeOutputWriter::close()
   quicklook_tree_->Write();
   file_->Write();
   const auto entries = quicklook_tree_->GetEntries();
+  quicklook_tree_->SetDirectory(nullptr);
   file_->Close();
 
   std::cout << "[ROOT] Saved quicklook file: " << output_path_.string()
@@ -295,7 +307,7 @@ double QuickLookTreeOutputWriter::quicklookEnergy(int fec,
     return 0.0 * unit::keV;
   }
 
-  return tpc_property_.convertADC2keVWithSpline3D(fec, ch, corrected_adu);
+  return tpc_property_.convertADC2keV(fec, ch, corrected_adu);
 }
 
 } /* namespace grams */

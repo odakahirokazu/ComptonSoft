@@ -57,6 +57,9 @@ struct RawFECHit
   double light_roi_charge = 0.0 * unit::coulomb;
   std::vector<int16_t> channel_fecs;
   std::vector<int16_t> channels;
+  // Main-analysis energies after event-time gain correction, in internal units.
+  std::vector<double>  energies;
+  // Common-mode-subtracted ADC values retained for quicklook diagnostics.
   std::vector<float>   adus;
 };
 

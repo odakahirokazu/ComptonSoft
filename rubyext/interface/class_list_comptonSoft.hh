@@ -133,6 +133,6 @@ class ReadHXIEventFITS;
 class WriteHXIEventFITS;
 class FilterByGoodTimeIntervalsForSGD;
 class FilterByGoodTimeIntervalsForHXI;
-class NanoGRAMSHitExtraction.hh;
-class NanoGRAMSCalibration.hh;
+class NanoGRAMSReadTPCEvents;
+class NanoGRAMSWriteHitTree;
 }

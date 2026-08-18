@@ -126,8 +126,9 @@ set(CS_MODULES
   src/ExtractPhotoelectronTrajectory.cc
   ### others
   src/QuickAnalysisForDSD.cc
-  src/NanoGRAMSHitExtraction.cc
-  src/NanoGRAMSCalibration.cc
+  src/NanoGRAMSReadTPCEvents.cc
+  src/NanoGRAMSQuickLookWriter.cc
+  src/NanoGRAMSWriteHitTree.cc
   )
 
 if(CS_USE_FITSIO)
@@ -158,7 +159,7 @@ add_library(CSModules SHARED
 )
 
 set_source_files_properties(
-  src/NanoGRAMSHitExtraction.cc
+  src/NanoGRAMSReadTPCEvents.cc
   PROPERTIES
   COMPILE_OPTIONS "-std=c++20"
 )

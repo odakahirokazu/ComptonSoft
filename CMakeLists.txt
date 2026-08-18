@@ -37,7 +37,6 @@ option(CS_USE_HSQUICKLOOK "enable HSQuickLook" OFF)
 option(CS_USE_SIMX "enable SimX compatible simulation" OFF)
 option(CS_USE_VIS "enable visualization with OpenGL" OFF)
 option(CS_USE_SYSTEM_CLHEP "use system-clhep" OFF)
-option(CS_USE_YAMLCPP "use yaml-cpp" OFF)
 #### install options
 option(CS_INSTALL_HEADERS "install all header files" ON)
 option(CS_INSTALL_CMAKE_FILES "install all cmake files" ON)
@@ -57,7 +56,6 @@ if(CS_ALL)
   set(CS_USE_HEALPIX ON)
   set(CS_USE_HSQUICKLOOK ON)
   set(CS_USE_ORT ON)
-  set(CS_USE_YAMLCPP ON)
 endif(CS_ALL)
 
 if(CS_ALL_OFF)
@@ -67,7 +65,6 @@ if(CS_ALL_OFF)
   set(CS_USE_HEALPIX OFF)
   set(CS_USE_HSQUICKLOOK OFF)
   set(CS_USE_ORT OFF)
-  set(CS_USE_YAMLCPP OFF)
 endif(CS_ALL_OFF)
 
 if(CS_HARD_ALL)
@@ -78,12 +75,7 @@ if(CS_HARD_ALL)
   set(CS_USE_HSQUICKLOOK ON)
   set(CS_USE_SIMX ON)
   set(CS_USE_ORT ON)
-  set(CS_USE_YAMLCPP ON)
 endif(CS_HARD_ALL)
-
-# NanoGRAMS configuration and calibration files are YAML based.
-# Keep yaml-cpp enabled even when the old optional cache value is OFF.
-set(CS_USE_YAMLCPP ON)
 
 set(USE_RUBY ${CS_USE_RUBY})
 set(USE_PYTHON ${CS_USE_PYTHON})

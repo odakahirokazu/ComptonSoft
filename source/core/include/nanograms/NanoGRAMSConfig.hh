@@ -74,6 +74,7 @@ struct Config
 };
 
 void readConfig(Config& cfg, const std::string& config_path);
+void readDPPConfigFile(Config& cfg, const std::string& config_path);
 void readDPPConfig(Config& cfg, const std::string& tpctree_file);
 
 } /* namespace grams */

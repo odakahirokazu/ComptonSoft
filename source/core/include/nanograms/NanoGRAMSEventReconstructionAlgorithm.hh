@@ -60,9 +60,7 @@ public:
 
 protected:
   bool loadParameters(boost::property_tree::ptree& pt) override;
-#if CS_USE_YAMLCPP
   bool loadParametersYAML(YAML::Node& node) override;
-#endif /* CS_USE_YAMLCPP */
 
   bool reconstruct2HitEvent(const std::vector<DetectorHit_sptr>& hits,
                        const BasicComptonEvent& baseEvent,

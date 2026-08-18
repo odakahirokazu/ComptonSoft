@@ -150,9 +150,13 @@ std::vector<DetectorHit_sptr> buildCalibratedHits(
       throw std::runtime_error("FEC index out of range in NanoGRAMS calibration.");
     }
 
-    const std::size_t n = std::min(raw_hit.channels.size(), raw_hit.adus.size());
+    const std::size_t n = raw_hit.channels.size();
     if (n == 0) {
       continue;
+    }
+    if (raw_hit.energies.size() < n) {
+      throw std::runtime_error(
+          "Raw FEC hit is missing calibrated per-channel energy values.");
     }
 
     double total_energy   = 0.0 * unit::keV;
@@ -178,17 +182,11 @@ std::vector<DetectorHit_sptr> buildCalibratedHits(
         throw std::runtime_error("Channel index out of range in NanoGRAMS calibration.");
       }
 
-      const double correction_factor =
-          tpc_property.temperatureCorrectionFactor(fec);
-      if (!std::isfinite(correction_factor)) {
+      const double energy = raw_hit.energies[i];
+      if (!std::isfinite(energy)) {
         skip_hit = true;
         break;
       }
-
-      const double corrected_adu =
-          static_cast<double>(raw_hit.adus[i]) * correction_factor;
-      const double energy =
-          tpc_property.convertADC2keVWithSpline3D(fec, ch, corrected_adu);
       energies[i]   = energy;
       channel_fecs[i] = fec;
       total_energy += energy;

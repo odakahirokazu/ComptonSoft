@@ -190,8 +190,8 @@
 #ifdef USE_FITSIO
 #include "FilterByGoodTimeIntervalsForHXI.hh"
 #endif
-#include "NanoGRAMSCalibration.hh"
-#include "NanoGRAMSHitExtraction.hh"
+#include "NanoGRAMSReadTPCEvents.hh"
+#include "NanoGRAMSWriteHitTree.hh"
 
 #include "class_list_anlGeant4.hh"
 #include "comptonsoft_basic_classes.hh"
@@ -1309,19 +1309,19 @@ public:
 
 #endif
 
-class NanoGRAMSHitExtraction : public VCSModule
+class NanoGRAMSReadTPCEvents : public VCSModule
 {
 public:
-  NanoGRAMSHitExtraction();
-  ~NanoGRAMSHitExtraction() override;
+  NanoGRAMSReadTPCEvents();
+  ~NanoGRAMSReadTPCEvents() override;
 };
 
-class NanoGRAMSCalibration : public VCSModule
+class NanoGRAMSWriteHitTree : public VCSModule
 {
 
 public:
-  NanoGRAMSCalibration();
-  ~NanoGRAMSCalibration() override;
+  NanoGRAMSWriteHitTree();
+  ~NanoGRAMSWriteHitTree() override;
 };
 
 }

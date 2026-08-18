@@ -53,7 +53,7 @@ class EventReconstruction : public VCSModule
   DEFINE_ANL_MODULE(EventReconstruction, 3.1)
 public:
   EventReconstruction();
-  ~EventReconstruction() = default;
+  ~EventReconstruction() override;
 
   anlnext::ANLStatus mod_define() override;
   anlnext::ANLStatus mod_initialize() override;

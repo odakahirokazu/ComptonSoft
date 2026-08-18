@@ -261,7 +261,6 @@ CalibrationConfig readCalibrationConfig(const std::string& config_file)
   const auto node_position = node_calibration["position"];
 
   cfg.energy.gain_info_file       = node_energy["gain_info_file"].as<std::string>();
-  cfg.energy.q_to_kev_spline_file = node_energy["q_to_kev_spline_file"].as<std::string>();
   cfg.energy.max_time             = config_node["general"]["drift_time_max_us"].as<double>() * unit::us;
   cfg.energy.tp_channel           = node_energy["tp_channel"].as<int>();
   cfg.energy.ccal                 = node_energy["ccal"].as<int>();
@@ -273,7 +272,6 @@ CalibrationConfig readCalibrationConfig(const std::string& config_file)
   cfg.position.anode_pos_z = node_position["anode_pos_z_cm"].as<double>() * unit::cm;
 
   std::cout << "gain_info_file: "       << cfg.energy.gain_info_file << std::endl;
-  std::cout << "q_to_kev_spline_file: " << cfg.energy.q_to_kev_spline_file << std::endl;
   std::cout << "efield_v_cm: "          << cfg.general.efield / (unit::volt/unit::cm)  << std::endl;
   std::cout << "temperature_k: "        << cfg.general.temperature / unit::kelvin<< std::endl;
   std::cout << "drift_time_max_us for energy calibration: "

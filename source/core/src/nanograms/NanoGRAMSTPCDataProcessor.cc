@@ -485,7 +485,11 @@ void FECChargeSelector::fillHitChannels(
     input.claimed_pixels[selected_fec][ch] = 1;
     hit.channel_fecs.push_back(static_cast<int16_t>(selected_fec));
     hit.channels.push_back(static_cast<int16_t>(ch));
-    hit.adus.push_back(static_cast<float>(input.adu_cmn_sub_values[selected_fec][ch]));
+    const float adu_cmn_sub =
+        static_cast<float>(input.adu_cmn_sub_values[selected_fec][ch]);
+    hit.adus.push_back(adu_cmn_sub);
+    hit.energies.push_back(
+        hitSelectionEnergy(selected_fec, ch, static_cast<double>(adu_cmn_sub)));
   }
 }
 
@@ -494,6 +498,7 @@ bool FECChargeSelector::fillSelectedChannels(const FECSelectionInput& input,
 {
   hit.channel_fecs.clear();
   hit.channels.clear();
+  hit.energies.clear();
   hit.adus.clear();
 
   const int fec = input.fec;
@@ -546,7 +551,7 @@ double FECChargeSelector::hitSelectionEnergy(int fec,
     return 0.0 * unit::keV;
   }
 
-  return tpc_property_.convertADC2keVWithSpline3D(fec, ch, corrected_adu);
+  return tpc_property_.convertADC2keV(fec, ch, corrected_adu);
 }
 
 TPCTreeReader::TPCTreeReader(TTree* tpc_tree,

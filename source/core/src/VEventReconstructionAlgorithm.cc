@@ -21,9 +21,7 @@
 #include <boost/property_tree/json_parser.hpp>
 #include "DetectorHit.hh"
 
-#if CS_USE_YAMLCPP
 #include <yaml-cpp/yaml.h>
-#endif /* CS_USE_YAMLCPP */
 
 namespace comptonsoft {
 
@@ -55,7 +53,6 @@ bool VEventReconstructionAlgorithm::readParameterFile()
   return loadParameters(pt);
 }
 
-#if CS_USE_YAMLCPP
 bool VEventReconstructionAlgorithm::readParameterYAMLFile()
 {
   YAML::Node configNode;
@@ -70,7 +67,6 @@ bool VEventReconstructionAlgorithm::readParameterYAMLFile()
 
   return loadParametersYAML(configNode);
 }
-#endif /* CS_USE_YAMLCPP */
 
 double total_energy_deposits(const std::vector<DetectorHit_sptr>& hits)
 {

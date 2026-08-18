@@ -17,8 +17,8 @@
  *                                                                       *
  *************************************************************************/
 
-#ifndef COMPTONSOFT_NanoGRAMSHitExtraction_H
-#define COMPTONSOFT_NanoGRAMSHitExtraction_H 1
+#ifndef COMPTONSOFT_NanoGRAMSReadTPCEvents_H
+#define COMPTONSOFT_NanoGRAMSReadTPCEvents_H 1
 
 #include <cstdint>
 #include <limits>
@@ -28,7 +28,6 @@
 #include <vector>
 
 #include "NanoGRAMSCalibrationData.hh"
-#include "NanoGRAMSQuickLookTreeIO.hh"
 #include "NanoGRAMSTPCDataProcessor.hh"
 #include "NanoGRAMSTPCProperty.hh"
 #include "VCSModule.hh"
@@ -38,13 +37,13 @@ class TFile;
 namespace comptonsoft
 {
 
-class NanoGRAMSHitExtraction : public VCSModule
+class NanoGRAMSReadTPCEvents : public VCSModule
 {
-  DEFINE_ANL_MODULE(NanoGRAMSHitExtraction, 1.0);
+  DEFINE_ANL_MODULE(NanoGRAMSReadTPCEvents, 1.0);
 
 public:
-  NanoGRAMSHitExtraction();
-  ~NanoGRAMSHitExtraction() override;
+  NanoGRAMSReadTPCEvents();
+  ~NanoGRAMSReadTPCEvents() override;
 
   anlnext::ANLStatus mod_define()     override;
   anlnext::ANLStatus mod_initialize() override;
@@ -66,26 +65,26 @@ public:
   {
     return current_event_hits_;
   }
+  grams::TPCEventType currentEventType() const
+  { return tpc_tree_reader_->currentEventType(); }
+  const grams::TPCTreeBuffer& currentTPCBuffer() const
+  { return tpc_tree_reader_->currentBuffer(); }
+  const TPCProperty& tpcProperty() const { return tpc_property_; }
   const std::string& configFilePath() const { return config_file_; }
-  const std::string& tpcTreeFilePath() const { return tpctree_file_; }
 
 private:
+  bool readNextTPCEvent(int64_t& raw_event_id);
+  bool openNextTPCFile();
   void setupTPCPropertyForHitSelection();
   void updateGainCorrectionForCurrentEvent(uint32_t unix_time);
-  bool shouldWriteQuickLook(grams::TPCEventType event_type,
-                            const std::vector<grams::RawFECHit>& event_hits) const;
-
   std::string config_file_     = "";
-  std::string tpctree_file_    = "";
-  std::string quicklook_file_  = "";
+  std::string dpp_config_file_ = "";
+  std::vector<std::string> tpctree_files_;
   std::string gain_tp_file_    = "";
   std::map<std::string, double> gain_tp_dict_;
   double gain_tp_value_ = 0.0;
   double gain_cache_seconds_ = 60.0;
   int32_t run_id_ = 0;
-  std::vector<std::string> quicklook_event_types_;
-  int quicklook_num_hits_ = -1;
-  bool quicklook_save_waveforms_ = true;
 
   grams::Config cfg_;
   CalibrationConfig calibration_config_;
@@ -93,10 +92,11 @@ private:
   TPCProperty tpc_property_;
   std::unique_ptr<TFile> input_file_;
   std::unique_ptr<grams::TPCTreeReader> tpc_tree_reader_;
-  std::unique_ptr<grams::QuickLookTreeOutputWriter> quicklook_tree_writer_;
+  std::size_t input_file_index_ = 0;
   int64_t gamma_events_         = 0;
   int64_t processed_entries_    = 0;
   int64_t expected_tpc_entries_ = 0;
+  int64_t current_raw_event_offset_ = 0;
   int64_t current_raw_event_id_ = -1;
   int64_t cached_gain_time_bin_ = std::numeric_limits<int64_t>::min();
   uint32_t current_unix_time_ = 0;
@@ -106,4 +106,4 @@ private:
 
 } /* namespace comptonsoft */
 
-#endif /* COMPTONSOFT_NanoGRAMSHitExtraction_H */
+#endif /* COMPTONSOFT_NanoGRAMSReadTPCEvents_H */

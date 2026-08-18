@@ -133,12 +133,8 @@ if(CS_USE_ORT)
 endif(CS_USE_ORT)
 
 ### YAML-CPP ###
-if(CS_USE_YAMLCPP)
-  add_compile_definitions(CS_USE_YAMLCPP=1)
+find_package(yaml-cpp CONFIG REQUIRED)
 
-  find_package(yaml-cpp CONFIG REQUIRED)
+set(YAMLCPP_LIB yaml-cpp::yaml-cpp)
 
-  set(YAMLCPP_LIB yaml-cpp::yaml-cpp)
-
-  message("-- YAMLCPP_LIB: ${YAMLCPP_LIB}")
-endif(CS_USE_YAMLCPP)
+message("-- YAMLCPP_LIB: ${YAMLCPP_LIB}")

@@ -76,6 +76,8 @@ set(CS_CORE_CLASSES
   src/OberlackAlgorithm.cc
   src/TangoAlgorithm.cc
   src/nanograms/NanoGRAMSEventReconstructionAlgorithm.cc
+  src/nanograms/NanoGRAMSEnergyComparisonEventReconstructionAlgorithm.cc
+  src/nanograms/NanoGRAMSKNFormulaEventReconstructionAlgorithm.cc
   ### sensitive detector
   src/VCSSensitiveDetector.cc
   ### event store
@@ -115,6 +117,7 @@ set(CS_CORE_CLASSES
   src/RIDecayProperties.cc
   src/RIDecayChains.cc
   src/RIDecayCalculation.cc
+  src/nanograms/NanoGRAMSChargeToEnergySpline.cc
   src/nanograms/NanoGRAMSTPCProperty.cc
   src/nanograms/NanoGRAMSFECGeometry.cc
   src/nanograms/NanoGRAMSConfig.cc
@@ -133,15 +136,9 @@ if(CS_USE_ORT)
     )
 endif()
 
-if(CS_USE_YAMLCPP)
-  set(CS_YAMLCPP_CLASSES
-  )
-endif()
-
 add_library(CSCore SHARED
   ${CS_CORE_CLASSES}
   ${CS_ORT_CLASSES}
-  ${CS_YAMLCPP_CLASSES}
   )
 
 set_source_files_properties(
