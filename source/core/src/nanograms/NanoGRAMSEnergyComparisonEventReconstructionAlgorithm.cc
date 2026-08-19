@@ -98,6 +98,9 @@ loadParameters(boost::property_tree::ptree& pt)
 {
   known_initial_gammaray_energy_ =
       pt.get<double>("known_initial_gammaray_energy") * unit::keV;
+  required_minimum_energy_deposit_in_higher_hit_ =
+      pt.get<double>("required_minimum_energy_deposit_in_higher_hit", 0.0) *
+      unit::keV;
   energy_tolerance_sigma_ =
       pt.get<double>("energy_tolerance_sigma_keV", 0.0) * unit::keV;
   energy_correction_factors_ = readEnergyCorrectionFactors(pt);
@@ -110,6 +113,9 @@ loadParametersYAML(YAML::Node& node)
 {
   known_initial_gammaray_energy_ =
       node["known_initial_gammaray_energy"].as<double>() * unit::keV;
+  required_minimum_energy_deposit_in_higher_hit_ =
+      node["required_minimum_energy_deposit_in_higher_hit"].as<double>(0.0) *
+      unit::keV;
   if (node["energy_tolerance_sigma_keV"]) {
     energy_tolerance_sigma_ =
         node["energy_tolerance_sigma_keV"].as<double>() * unit::keV;
@@ -133,6 +139,11 @@ reconstruct(const std::vector<DetectorHit_sptr>& hits,
   }
 
   const std::vector<DetectorHit_sptr> corrected_hits = correctedHits(hits);
+  if (required_minimum_energy_deposit_in_higher_hit_ > 0.0 &&
+      corrected_hits[0]->Energy() <= required_minimum_energy_deposit_in_higher_hit_ &&
+      corrected_hits[1]->Energy() <= required_minimum_energy_deposit_in_higher_hit_) {
+    return false;
+  }
   const int first_hit_index = corrected_hits[0]->Energy() >= corrected_hits[1]->Energy()
       ? 0 : 1;
   bool escape = false;
@@ -220,6 +231,8 @@ void NanoGRAMSEnergyComparisonEventReconstructionAlgorithm::printParameters() co
   std::cout << "--- NanoGRAMS energy comparison reconstruction ---\n"
             << "known_initial_gammaray_energy: "
             << known_initial_gammaray_energy_ / unit::keV << " keV\n"
+            << "required_minimum_energy_deposit_in_higher_hit: "
+            << required_minimum_energy_deposit_in_higher_hit_ / unit::keV << " keV\n"
             << "energy_tolerance_sigma_keV: "
             << energy_tolerance_sigma_ / unit::keV << "\n";
 }

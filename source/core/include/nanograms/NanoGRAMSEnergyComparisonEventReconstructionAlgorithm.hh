@@ -49,6 +49,7 @@ private:
   void printParameters() const;
 
   double known_initial_gammaray_energy_ = 0.0;
+  double required_minimum_energy_deposit_in_higher_hit_ = 0.0;
   double energy_tolerance_sigma_ = 0.0;
   std::array<double, NUM_VATA> energy_correction_factors_{};
 };

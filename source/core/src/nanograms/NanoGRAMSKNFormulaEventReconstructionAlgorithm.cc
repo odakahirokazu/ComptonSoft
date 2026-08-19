@@ -124,6 +124,9 @@ loadParameters(boost::property_tree::ptree& pt)
 {
   known_initial_gammaray_energy_ =
       pt.get<double>("known_initial_gammaray_energy") * unit::keV;
+  required_minimum_energy_deposit_in_higher_hit_ =
+      pt.get<double>("required_minimum_energy_deposit_in_higher_hit", 0.0) *
+      unit::keV;
   energy_resolution_param0_ = pt.get<double>("energy_resolution.param0", 0.0);
   energy_resolution_param1_ = pt.get<double>("energy_resolution.param1", 0.0);
   energy_resolution_param2_ = pt.get<double>("energy_resolution.param2", 0.0);
@@ -141,6 +144,9 @@ loadParametersYAML(YAML::Node& node)
 {
   known_initial_gammaray_energy_ =
       node["known_initial_gammaray_energy"].as<double>() * unit::keV;
+  required_minimum_energy_deposit_in_higher_hit_ =
+      node["required_minimum_energy_deposit_in_higher_hit"].as<double>(0.0) *
+      unit::keV;
   if (const YAML::Node energy_resolution = node["energy_resolution"]) {
     energy_resolution_param0_ = energy_resolution["param0"].as<double>(0.0);
     energy_resolution_param1_ = energy_resolution["param1"].as<double>(0.0);
@@ -169,6 +175,11 @@ reconstruct(const std::vector<DetectorHit_sptr>& hits,
   }
 
   const std::vector<DetectorHit_sptr> corrected_hits = correctedHits(hits);
+  if (required_minimum_energy_deposit_in_higher_hit_ > 0.0 &&
+      corrected_hits[0]->Energy() <= required_minimum_energy_deposit_in_higher_hit_ &&
+      corrected_hits[1]->Energy() <= required_minimum_energy_deposit_in_higher_hit_) {
+    return false;
+  }
   const Candidate order_01 = evaluateOrder(corrected_hits, 0);
   const Candidate order_10 = evaluateOrder(corrected_hits, 1);
   const Candidate best = order_01.likelihood >= order_10.likelihood
@@ -398,6 +409,8 @@ void NanoGRAMSKNFormulaEventReconstructionAlgorithm::printParameters() const
   std::cout << "--- NanoGRAMS KN formula reconstruction ---\n"
             << "known_initial_gammaray_energy: "
             << known_initial_gammaray_energy_ / unit::keV << " keV\n"
+            << "required_minimum_energy_deposit_in_higher_hit: "
+            << required_minimum_energy_deposit_in_higher_hit_ / unit::keV << " keV\n"
             << "energy_resolution: sqrt(param0^2 + param1^2 * E_keV "
                "+ param2^2 * E_keV^2) keV\n"
             << "  param0: " << energy_resolution_param0_ << "\n"
