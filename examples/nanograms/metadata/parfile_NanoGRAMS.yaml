@@ -1,0 +1,23 @@
+incident_energy_candidates: [1274.5]
+# Used only with reconstruction_method: NanoGRAMSKNFormula.
+# This method permits the photon to escape after the second interaction.
+known_initial_gammaray_energy: 1274.5 # keV
+
+energy_resolution:
+  param0: 5.0
+  param1: 0.15
+  param2: 0.0
+
+energy_correction_factors: [1.0, 1.0, 1.0, 1.0]
+required_minimum_energy_deposit_in_higher_hit: 530.0 #keV
+
+extract_compton_events:
+    # NanoGRAMS, NanoGRAMSKNFormula, or NanoGRAMSEnergyComparison
+    #reconstruction_method: NanoGRAMSEnergyComparison
+    reconstruction_method: NanoGRAMSEnergyComparison
+    source_position: [44.8, 0.0, 0.0]
+    input_dir: products
+    output_dir: products/comptontree
+    #output_dir: products/comptontree_energy_comparison
+    data_group_list:
+      - "Na22Test"

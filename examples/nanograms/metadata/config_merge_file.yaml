@@ -1,0 +1,10 @@
+merge_hittree:
+    data_group_list:
+        - Na22Test
+
+    data_group_dir: metadata/data_group
+    products_root: products/eventfile
+    hittree_name: hittree.root
+    time_column: time
+    output_dir: products
+    output_name_pattern: hittree_{data_group}.root
