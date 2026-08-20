@@ -21,6 +21,7 @@
 #define ANLGEANT4_InitialInformation_H 1
 
 #include <cstdint>
+#include <vector>
 #include "G4ThreeVector.hh"
 
 namespace anlnext {

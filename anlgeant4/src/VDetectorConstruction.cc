@@ -18,7 +18,7 @@
  *************************************************************************/
 
 #include "VDetectorConstruction.hh"
-#include "G4VSensitivedetector.hh"
+#include "G4VSensitiveDetector.hh"
 #include "G4SDManager.hh"
 
 
