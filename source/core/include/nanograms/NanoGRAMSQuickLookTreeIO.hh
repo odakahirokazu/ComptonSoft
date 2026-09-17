@@ -67,7 +67,7 @@ private:
   void fillChargeMaps(TPCEventType event_type,
                       const TPCTreeBuffer& tpc_tree_buffer);
   void fillRegisteredWaveforms(const TPCTreeBuffer& tpc_tree_buffer);
-  double quicklookEnergy(int fec, int ch, double adu_cmn_sub) const;
+  double quicklookElectrons(int fec, int ch, double adu_cmn_sub) const;
 
   std::filesystem::path  output_path_;
   std::unique_ptr<TFile> file_;
@@ -78,7 +78,7 @@ private:
   int waveform_len_ = 0;
   int waveform_num_channels_ = 0;
   std::string adu_leaflist_;
-  std::string energy_leaflist_;
+  std::string electrons_leaflist_;
   std::string cmn_leaflist_;
   std::string ti_leaflist_;
   std::string drift_leaflist_;
@@ -93,7 +93,7 @@ private:
   int32_t waveform_len_branch_ = 0;
   int32_t waveform_num_channels_branch_ = 0;
   std::vector<float> adu_cmn_sub_;
-  std::vector<float> energy_cmn_sub_;
+  std::vector<float> electrons_cmn_sub_;
   std::array<float, NUM_VATA> cmn_{};
   std::array<uint32_t, NUM_VATA> ti_{};
   std::array<uint32_t, NUM_VATA> drift_time_{};
@@ -104,7 +104,7 @@ private:
   std::vector<int16_t> hit_pixel_fec_;
   std::vector<int16_t> hit_pixel_ch_;
   std::vector<float> hit_pixel_adu_;
-  std::vector<float> hit_pixel_energy_;
+  std::vector<float> hit_pixel_electrons_;
   std::vector<int16_t> hit_pixel_cluster_id_;
   std::vector<int16_t> hit_num_pixels_;
 };

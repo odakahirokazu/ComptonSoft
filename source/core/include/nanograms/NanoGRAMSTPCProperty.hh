@@ -53,7 +53,9 @@ public:
                                   const std::array<double, NUM_VATA>& tp_adc_values);
 
   double temperatureCorrectionFactor(int fec) const;
-  double convertADC2keV(int fec, int ch, double adc) const;
+  // ADC input has already received event-time gain correction.
+  double convertADC2Electrons(int fec, int ch, double adc) const;
+  double convertElectrons2keV(double electron_count) const;
   double convertDriftTime2PosZ(double drift_time) const;
   double convertDriftTime2PosZScale(double drift_time, double max_time) const;
 

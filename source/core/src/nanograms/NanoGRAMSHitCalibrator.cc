@@ -154,20 +154,20 @@ std::vector<DetectorHit_sptr> buildCalibratedHits(
     if (n == 0) {
       continue;
     }
-    if (raw_hit.energies.size() < n) {
+    if (raw_hit.electron_counts.size() < n) {
       throw std::runtime_error(
-          "Raw FEC hit is missing calibrated per-channel energy values.");
+          "Raw FEC hit is missing calibrated per-channel electron counts.");
     }
 
-    double total_energy   = 0.0 * unit::keV;
+    double total_electrons = 0.0;
     double posx           = 0.0 * unit::cm;
     double posy           = 0.0 * unit::cm;
     double posz           = 0.0 * unit::cm;
     std::size_t max_index = 0;
-    double max_energy     = -std::numeric_limits<double>::infinity() * unit::keV;
+    double max_electrons = -std::numeric_limits<double>::infinity();
     bool skip_hit         = false;
 
-    std::vector<double> energies(n, 0.0);
+    std::vector<double> electron_counts(n, 0.0);
     std::vector<int> channel_fecs(n, raw_hit.fec);
     for (std::size_t i = 0; i < n; ++i) {
       int fec = raw_hit.fec;
@@ -182,17 +182,17 @@ std::vector<DetectorHit_sptr> buildCalibratedHits(
         throw std::runtime_error("Channel index out of range in NanoGRAMS calibration.");
       }
 
-      const double energy = raw_hit.energies[i];
-      if (!std::isfinite(energy)) {
+      const double electrons = raw_hit.electron_counts[i];
+      if (!std::isfinite(electrons)) {
         skip_hit = true;
         break;
       }
-      energies[i]   = energy;
+      electron_counts[i]   = electrons;
       channel_fecs[i] = fec;
-      total_energy += energy;
+      total_electrons += electrons;
 
-      if (energy > max_energy) {
-        max_energy = energy;
+      if (electrons > max_electrons) {
+        max_electrons = electrons;
         max_index  = i;
       }
     }
@@ -201,14 +201,14 @@ std::vector<DetectorHit_sptr> buildCalibratedHits(
       continue;
     }
 
-    if (!(total_energy > 0.0)) {
+    if (!(total_electrons > 0.0)) {
       continue;
     }
 
     for (std::size_t i = 0; i < n; ++i) {
       const int ch = raw_hit.channels[i];
       const int fec = channel_fecs[i];
-      const double weight = energies[i] / total_energy;
+      const double weight = electron_counts[i] / total_electrons;
       posx += weight * kPosX[fec][ch];
       posy += weight * kPosY[fec][ch];
       posz += weight *
@@ -242,7 +242,8 @@ std::vector<DetectorHit_sptr> buildCalibratedHits(
 
     hit->setReadoutChannelID(channel_fec, channel_fec, channel);
     hit->setVoxel(kPixelX[channel], kPixelY[channel], VoxelID::Undefined);
-    hit->setEnergy(total_energy);
+    // Apply the nonlinear charge-to-energy conversion once per cluster.
+    hit->setEnergy(tpc_property.convertElectrons2keV(total_electrons));
     // NanoGRAMS stores the light ROI charge in the hittree epi branch.
     // HitTreeIO writes EPI divided by keV, so encode the Coulomb value as
     // a numeric value carried by the EPI field.

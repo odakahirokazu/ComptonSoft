@@ -57,8 +57,8 @@ struct RawFECHit
   double light_roi_charge = 0.0 * unit::coulomb;
   std::vector<int16_t> channel_fecs;
   std::vector<int16_t> channels;
-  // Main-analysis energies after event-time gain correction, in internal units.
-  std::vector<double>  energies;
+  // Collected electron counts after event-time gain correction (median common mode).
+  std::vector<double>  electron_counts;
   // Common-mode-subtracted ADC values retained for quicklook diagnostics.
   std::vector<float>   adus;
 };
@@ -66,7 +66,7 @@ struct RawFECHit
 struct FECSelectionInput
 {
   const std::array<PixelADU, NUM_VATA>& adu_cmn_sub_values;
-  const std::array<PixelADU, NUM_VATA>& hit_selection_energy_values;
+  const std::array<PixelADU, NUM_VATA>& hit_selection_electrons_values;
   const std::array<double, NUM_VATA>& drift_times;
   std::array<PixelMask, NUM_VATA>& claimed_pixels;
   int fec           = 0;
@@ -113,7 +113,7 @@ private:
   bool fillSelectedChannels(const FECSelectionInput& input, RawFECHit& hit) const;
   bool isTimeUp(const FECSelectionInput& input) const;
   bool isRejectedByTiming(const FECSelectionInput& input) const;
-  bool hasExcludedCorePixel(int fec, const PixelADU& hit_selection_energy) const;
+  bool hasExcludedCorePixel(int fec, const PixelADU& hit_selection_electrons) const;
   PixelMask buildAllowedPixelMask(int fec, int core_ch) const;
   bool hasExtraHighPixel(const FECSelectionInput& input,
                          const PixelMask& allowed_pixels) const;
@@ -122,7 +122,7 @@ private:
   void fillHitChannels(const FECSelectionInput& input,
                        const std::vector<std::pair<int, int>>& selected_pixels,
                        RawFECHit& hit) const;
-  double hitSelectionEnergy(int fec, int ch, double adu_cmn_sub) const;
+  double hitSelectionElectrons(int fec, int ch, double adu_cmn_sub) const;
 
   const Config& cfg_;
   const TPCProperty& tpc_property_;

@@ -49,10 +49,10 @@ struct Config
   int pix_max       = 0;
 
   double adc2mv           = (1.0 / 8192.0) * 1000.0;
-  double core_noise_energy_th = 0.0 * anlgeant4::unit::keV;
+  double core_noise_electrons_th = 0.0;
   double light_gamma_thr  = 0.0;
   double light_cosmic_thr = 0.0;
-  double spread_thr_energy = 0.0 * anlgeant4::unit::keV;
+  double spread_thr_electrons = 0.0;
   double drift_time_max   = 0.0 * anlgeant4::unit::us;
   //double late_window      = 0.0;
   //double late_peak_thr    = 0.0;

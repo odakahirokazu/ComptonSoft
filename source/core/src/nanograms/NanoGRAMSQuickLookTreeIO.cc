@@ -102,7 +102,7 @@ QuickLookTreeOutputWriter::QuickLookTreeOutputWriter(
   waveform_len_branch_ = waveform_len_;
   waveform_num_channels_branch_ = waveform_num_channels_;
   adu_cmn_sub_.assign(NUM_VATA * NUM_CH_EACH_VATA, 0.0f);
-  energy_cmn_sub_.assign(NUM_VATA * NUM_CH_EACH_VATA, 0.0f);
+  electrons_cmn_sub_.assign(NUM_VATA * NUM_CH_EACH_VATA, 0.0f);
   if (save_waveforms_) {
     waveform_.assign(waveform_num_channels_ * waveform_len_, 0);
   }
@@ -143,7 +143,7 @@ void QuickLookTreeOutputWriter::fillEvent(int64_t raw_event_id,
   hit_pixel_fec_.clear();
   hit_pixel_ch_.clear();
   hit_pixel_adu_.clear();
-  hit_pixel_energy_.clear();
+  hit_pixel_electrons_.clear();
   hit_pixel_cluster_id_.clear();
   hit_num_pixels_.clear();
   for (std::size_t ihit = 0; ihit < hits.size(); ++ihit) {
@@ -158,11 +158,11 @@ void QuickLookTreeOutputWriter::fillEvent(int64_t raw_event_id,
       hit_pixel_ch_.push_back(hit.channels[j]);
       if (j < hit.adus.size()) {
         hit_pixel_adu_.push_back(hit.adus[j]);
-        hit_pixel_energy_.push_back(static_cast<float>(
-            quicklookEnergy(hit_pixel_fec_.back(), hit.channels[j], hit.adus[j]) / unit::keV));
+        hit_pixel_electrons_.push_back(static_cast<float>(
+            quicklookElectrons(hit_pixel_fec_.back(), hit.channels[j], hit.adus[j])));
       } else {
         hit_pixel_adu_.push_back(std::numeric_limits<float>::quiet_NaN());
-        hit_pixel_energy_.push_back(std::numeric_limits<float>::quiet_NaN());
+        hit_pixel_electrons_.push_back(std::numeric_limits<float>::quiet_NaN());
       }
       hit_pixel_cluster_id_.push_back(static_cast<int16_t>(ihit));
     }
@@ -199,7 +199,7 @@ std::string QuickLookTreeOutputWriter::close()
 void QuickLookTreeOutputWriter::bindBranches()
 {
   adu_leaflist_             = std::format("adu_cmn_sub[{}][{}]/F", NUM_VATA, NUM_CH_EACH_VATA);
-  energy_leaflist_          = std::format("energy_cmn_sub[{}][{}]/F", NUM_VATA, NUM_CH_EACH_VATA);
+  electrons_leaflist_          = std::format("electrons_cmn_sub[{}][{}]/F", NUM_VATA, NUM_CH_EACH_VATA);
   cmn_leaflist_             = std::format("cmn[{}]/F", NUM_VATA);
   ti_leaflist_              = std::format("ti[{}]/i", NUM_VATA);
   drift_leaflist_           = std::format("drift_time[{}]/i", NUM_VATA);
@@ -209,9 +209,9 @@ void QuickLookTreeOutputWriter::bindBranches()
   quicklook_tree_->Branch("event_type",   &event_type_,   "event_type/S");
   quicklook_tree_->Branch("cmn_method",   &cmn_method_,   "cmn_method/S");
   quicklook_tree_->Branch("adu_cmn_sub",  adu_cmn_sub_.data(),  adu_leaflist_.c_str());
-  quicklook_tree_->Branch("energy_cmn_sub",
-                          energy_cmn_sub_.data(),
-                          energy_leaflist_.c_str());
+  quicklook_tree_->Branch("electrons_cmn_sub",
+                          electrons_cmn_sub_.data(),
+                          electrons_leaflist_.c_str());
   quicklook_tree_->Branch("cmn",          cmn_.data(),          cmn_leaflist_.c_str());
   quicklook_tree_->Branch("ti",           ti_.data(),           ti_leaflist_.c_str());
   quicklook_tree_->Branch("drift_time",   drift_time_.data(),   drift_leaflist_.c_str());
@@ -233,7 +233,7 @@ void QuickLookTreeOutputWriter::bindBranches()
   quicklook_tree_->Branch("hit_pixel_fec",        &hit_pixel_fec_);
   quicklook_tree_->Branch("hit_pixel_ch",         &hit_pixel_ch_);
   quicklook_tree_->Branch("hit_pixel_adu",        &hit_pixel_adu_);
-  quicklook_tree_->Branch("hit_pixel_energy",     &hit_pixel_energy_);
+  quicklook_tree_->Branch("hit_pixel_electrons",     &hit_pixel_electrons_);
   quicklook_tree_->Branch("hit_pixel_cluster_id", &hit_pixel_cluster_id_);
   quicklook_tree_->Branch("hit_num_pixels",       &hit_num_pixels_);
 }
@@ -256,8 +256,8 @@ void QuickLookTreeOutputWriter::fillChargeMaps(
       const double adu_cmn_sub = adu_values[ch] - cmn;
       const int index = fec * NUM_CH_EACH_VATA + ch;
       adu_cmn_sub_[index] = static_cast<float>(adu_cmn_sub);
-      energy_cmn_sub_[index] =
-          static_cast<float>(quicklookEnergy(fec, ch, adu_cmn_sub) / unit::keV);
+      electrons_cmn_sub_[index] =
+          static_cast<float>(quicklookElectrons(fec, ch, adu_cmn_sub));
     }
   }
 }
@@ -289,12 +289,12 @@ void QuickLookTreeOutputWriter::fillRegisteredWaveforms(
   }
 }
 
-double QuickLookTreeOutputWriter::quicklookEnergy(int fec,
+double QuickLookTreeOutputWriter::quicklookElectrons(int fec,
                                                   int ch,
                                                   double adu_cmn_sub) const
 {
   if (!std::isfinite(adu_cmn_sub) || adu_cmn_sub <= 0.0) {
-    return 0.0 * unit::keV;
+    return 0.0;
   }
 
   const double correction_factor = tpc_property_.temperatureCorrectionFactor(fec);
@@ -304,10 +304,10 @@ double QuickLookTreeOutputWriter::quicklookEnergy(int fec,
 
   const double corrected_adu = adu_cmn_sub * correction_factor;
   if (corrected_adu <= 0.0) {
-    return 0.0 * unit::keV;
+    return 0.0;
   }
 
-  return tpc_property_.convertADC2keV(fec, ch, corrected_adu);
+  return tpc_property_.convertADC2Electrons(fec, ch, corrected_adu);
 }
 
 } /* namespace grams */

@@ -28,6 +28,7 @@ set(ANLG4_PRIMARYGEN_CLASSES
   src/IsotropicPrimaryGenerator.cc
   src/UniformVolumePrimaryGenerator.cc
   src/PositionSamplerInVolume.cc
+  src/PolarizedPointSourcePrimaryGenerator.cc
 )
 
 if(ANLG4_USE_GDML)

@@ -147,14 +147,25 @@ double TPCProperty::temperatureCorrectionFactor(int fec) const
   return temperature_correction_factors_[fec];
 }
 
-double TPCProperty::convertADC2keV(int fec, int ch, double adc) const
+double TPCProperty::convertADC2Electrons(int fec, int ch, double adc) const
 {
+  constexpr double elementary_charge_coulomb = 1.602176634e-19;
   const GainParamArray& params = gain_matrices_adc_to_c_[fec][ch];
-  double charge_coulomb = cubic(adc, params) - cubic(0.0, params);
-  if (charge_coulomb <= 0.0) {
+  const double charge_coulomb = cubic(adc, params) - cubic(0.0, params);
+  return charge_coulomb <= 0.0 ? 0.0 : charge_coulomb / elementary_charge_coulomb;
+}
+
+double TPCProperty::convertElectrons2keV(double electron_count) const
+{
+  constexpr double elementary_charge_coulomb = 1.602176634e-19;
+  if (!std::isfinite(electron_count)) {
+    return std::numeric_limits<double>::quiet_NaN();
+  }
+  if (electron_count <= 0.0) {
     return 0.0 * unit::keV;
   }
-  return charge_to_energy_spline_.evaluate(charge_coulomb) * unit::keV;
+  return charge_to_energy_spline_.evaluate(electron_count * elementary_charge_coulomb)
+         * unit::keV;
 }
 
 double TPCProperty::convertDriftTime2PosZ(double drift_time) const

@@ -17,10 +17,10 @@
  *                                                                       *
  *************************************************************************/
 
-#ifndef ANLGEANT4_PolarizedPointSourcePrimaryGen_H
-#define ANLGEANT4_PolarizedPointSourcePrimaryGen_H 1
+#ifndef ANLGEANT4_PolarizedPointSourcePrimaryGenerator_H
+#define ANLGEANT4_PolarizedPointSourcePrimaryGenerator_H 1
 
-#include "BasicPrimaryGen.hh"
+#include "BasicPrimaryGenerator.hh"
 #include "G4ThreeVector.hh"
 
 namespace anlgeant4 {
@@ -32,31 +32,31 @@ namespace anlgeant4 {
  *
  * @author Shin Watanabe, Hirokazu Odaka
  * @date xxxx-xx-xx | Shin Watanabe | NSPrimaryGen
- * @date 2010-02-17 | Hirokazu Odaka | PolarizedPointSourcePrimaryGen
+ * @date 2010-02-17 | Hirokazu Odaka | PolarizedPointSourcePrimaryGenerator
  * @date 2012-07-10 | Hirokazu Odaka | virtual methods: sampleDirection(), samplePosition()
  * @date 2013-08-18 | Hirokazu Odaka | be moved to anlgeant4
  * @date 2017-06-27 | Hirokazu Odaka | 4.1, makePrimarySetting()
  */
-class PolarizedPointSourcePrimaryGen : public BasicPrimaryGen
+class PolarizedPointSourcePrimaryGenerator : public BasicPrimaryGenerator
 {
-  DEFINE_ANL_MODULE(PolarizedPointSourcePrimaryGen, 1.0);
+  DEFINE_ANL_MODULE(PolarizedPointSourcePrimaryGenerator, 1.0);
 public:
-  PolarizedPointSourcePrimaryGen();
-  ~PolarizedPointSourcePrimaryGen();
+  PolarizedPointSourcePrimaryGenerator();
+  ~PolarizedPointSourcePrimaryGenerator();
 
   anlnext::ANLStatus mod_define() override;
   anlnext::ANLStatus mod_initialize() override;
   anlnext::ANLStatus mod_end_run() override;
 
-  void makePrimarySetting() override;
+  PrimarySetting make_primary_setting() const override;
 
 protected:
   void setSourcePosition(G4ThreeVector v) { m_SourcePosition = v; }
   void setCenterDirection(G4ThreeVector v) { m_CenterDirection = v; }
   void calculateRotation();
 
-  G4ThreeVector sampleDirection() override;
-  G4ThreeVector samplePosition() override;
+  G4ThreeVector sample_direction() const override;
+  G4ThreeVector sample_position() const override;
 
   G4ThreeVector SourcePosition() { return m_SourcePosition; }
 
@@ -78,4 +78,4 @@ private:
 
 } /* namespace anlgeant4 */
 
-#endif /* ANLGEANT4_PolarizedPointSourcePrimaryGen_H */
+#endif /* ANLGEANT4_PolarizedPointSourcePrimaryGenerator_H */

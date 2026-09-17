@@ -281,7 +281,7 @@ FECChargeSelector::selectHits(const TPCTreeBuffer& tpc_tree_buffer,
   rejected_by_excluded_core = false;
 
   std::array<PixelADU, NUM_VATA> adu_cmn_sub_values{};
-  std::array<PixelADU, NUM_VATA> hit_selection_energy_values{};
+  std::array<PixelADU, NUM_VATA> hit_selection_electrons_values{};
   std::array<double, NUM_VATA> drift_times{};
   std::array<uint64_t, NUM_VATA> ti_values{};
   std::array<double, NUM_VATA> core_values{};
@@ -294,24 +294,26 @@ FECChargeSelector::selectHits(const TPCTreeBuffer& tpc_tree_buffer,
           static_cast<double>(tpc_tree_buffer.adc[fec * NUM_CH_EACH_VATA + pix]);
     }
 
+    // Both estimates are subtracted independently from the original ADC.
+    // Selection uses the lower mean; hit charge and quicklook use the median.
     const double output_cmn = median64(adu_values);
     const double selection_cmn = lowerMean(adu_values, 10);
     for (int ch = 0; ch < NUM_CH_EACH_VATA; ++ch) {
       adu_cmn_sub_values[fec][ch] = adu_values[ch] - output_cmn;
       const double selection_adu_cmn_sub = adu_values[ch] - selection_cmn;
-      hit_selection_energy_values[fec][ch] =
-          hitSelectionEnergy(fec, ch, selection_adu_cmn_sub);
+      hit_selection_electrons_values[fec][ch] =
+          hitSelectionElectrons(fec, ch, selection_adu_cmn_sub);
     }
 
     drift_times[fec] = driftTimeFromClock(tpc_tree_buffer.drift_time[fec]);
     ti_values[fec]   = fec_ti_tracker.absoluteTi(fec, tpc_tree_buffer.ti[fec]);
     core_values[fec] =
-        findCoreSignalChannel(hit_selection_energy_values[fec], masks_[fec]).second;
+        findCoreSignalChannel(hit_selection_electrons_values[fec], masks_[fec]).second;
     fec_order[fec]   = fec;
   }
 
   for (int fec = 0; fec < NUM_VATA; ++fec) {
-    if (hasExcludedCorePixel(fec, hit_selection_energy_values[fec])) {
+    if (hasExcludedCorePixel(fec, hit_selection_electrons_values[fec])) {
       rejected_by_excluded_core = true;
       return event_hits;
     }
@@ -333,7 +335,7 @@ FECChargeSelector::selectHits(const TPCTreeBuffer& tpc_tree_buffer,
     hit.drift_time = drift_times[fec];
 
     FECSelectionInput selection_input{adu_cmn_sub_values,
-                                      hit_selection_energy_values,
+                                      hit_selection_electrons_values,
                                       drift_times,
                                       claimed_pixels,
                                       fec,
@@ -362,7 +364,7 @@ bool FECChargeSelector::isRejectedByTiming(const FECSelectionInput& input) const
 
 bool FECChargeSelector::hasExcludedCorePixel(
     int fec,
-    const PixelADU& hit_selection_energy) const
+    const PixelADU& hit_selection_electrons) const
 {
   const auto it = cfg_.core_exclude_pix.find(fec);
   if (it == cfg_.core_exclude_pix.end()) {
@@ -371,9 +373,9 @@ bool FECChargeSelector::hasExcludedCorePixel(
 
   PixelMask all_pixels{};
   all_pixels.fill(1);
-  const auto [max_ch, max_energy] =
-      findCoreSignalChannel(hit_selection_energy, all_pixels);
-  if (!std::isfinite(max_energy) || max_energy <= cfg_.core_noise_energy_th) {
+  const auto [max_ch, max_electrons] =
+      findCoreSignalChannel(hit_selection_electrons, all_pixels);
+  if (!std::isfinite(max_electrons) || max_electrons <= cfg_.core_noise_electrons_th) {
     return false;
   }
 
@@ -406,11 +408,11 @@ bool FECChargeSelector::hasExtraHighPixel(const FECSelectionInput& input,
 {
   const int fec = input.fec;
   const PixelMask& mask_in = masks_[fec];
-  const PixelADU& hit_selection_energy = input.hit_selection_energy_values[fec];
+  const PixelADU& hit_selection_electrons = input.hit_selection_electrons_values[fec];
 
   for (int ch = 0; ch < NUM_CH_EACH_VATA; ++ch) {
     if (mask_in[ch] && !allowed_pixels[ch] &&
-        hit_selection_energy[ch] > cfg_.core_noise_energy_th) {
+        hit_selection_electrons[ch] > cfg_.core_noise_electrons_th) {
       return true;
     }
   }
@@ -428,8 +430,8 @@ FECChargeSelector::collectClusterPixels(const FECSelectionInput& input,
   auto addCandidatePixel = [&](int candidate_fec, int ch) {
     // Excluded pixels cannot seed a cluster, but can be absorbed by a real core.
     if (!input.claimed_pixels[candidate_fec][ch] &&
-        input.hit_selection_energy_values[candidate_fec][ch] >
-            cfg_.spread_thr_energy) {
+        input.hit_selection_electrons_values[candidate_fec][ch] >
+            cfg_.spread_thr_electrons) {
       addPixelIfNew(selected_pixels, candidate_fec, ch);
     }
   };
@@ -488,8 +490,8 @@ void FECChargeSelector::fillHitChannels(
     const float adu_cmn_sub =
         static_cast<float>(input.adu_cmn_sub_values[selected_fec][ch]);
     hit.adus.push_back(adu_cmn_sub);
-    hit.energies.push_back(
-        hitSelectionEnergy(selected_fec, ch, static_cast<double>(adu_cmn_sub)));
+    hit.electron_counts.push_back(
+        hitSelectionElectrons(selected_fec, ch, static_cast<double>(adu_cmn_sub)));
   }
 }
 
@@ -498,15 +500,15 @@ bool FECChargeSelector::fillSelectedChannels(const FECSelectionInput& input,
 {
   hit.channel_fecs.clear();
   hit.channels.clear();
-  hit.energies.clear();
+  hit.electron_counts.clear();
   hit.adus.clear();
 
   const int fec = input.fec;
   const PixelMask& mask_in = masks_[fec];
-  const PixelADU& hit_selection_energy = input.hit_selection_energy_values[fec];
-  const auto [core_ch, core_energy] =
-      findCoreSignalChannel(hit_selection_energy, mask_in);
-  if (core_energy <= cfg_.core_noise_energy_th ||
+  const PixelADU& hit_selection_electrons = input.hit_selection_electrons_values[fec];
+  const auto [core_ch, core_electrons] =
+      findCoreSignalChannel(hit_selection_electrons, mask_in);
+  if (core_electrons <= cfg_.core_noise_electrons_th ||
       input.claimed_pixels[fec][core_ch]) {
     return false;
   }
@@ -533,12 +535,12 @@ bool FECChargeSelector::fillSelectedChannels(const FECSelectionInput& input,
   return event_mask && !hit.channels.empty();
 }
 
-double FECChargeSelector::hitSelectionEnergy(int fec,
+double FECChargeSelector::hitSelectionElectrons(int fec,
                                              int ch,
                                              double adu_cmn_sub) const
 {
   if (!std::isfinite(adu_cmn_sub) || adu_cmn_sub <= 0.0) {
-    return 0.0 * unit::keV;
+    return 0.0;
   }
 
   const double correction_factor = tpc_property_.temperatureCorrectionFactor(fec);
@@ -548,10 +550,10 @@ double FECChargeSelector::hitSelectionEnergy(int fec,
 
   const double corrected_adu = adu_cmn_sub * correction_factor;
   if (corrected_adu <= 0.0) {
-    return 0.0 * unit::keV;
+    return 0.0;
   }
 
-  return tpc_property_.convertADC2keV(fec, ch, corrected_adu);
+  return tpc_property_.convertADC2Electrons(fec, ch, corrected_adu);
 }
 
 TPCTreeReader::TPCTreeReader(TTree* tpc_tree,

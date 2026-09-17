@@ -21,6 +21,7 @@
 #include "VUserActionAssembly.hh"
 #include "StandardUserActionAssembly.hh"
 #include "VEventStore.hh"
+#include "PolarizedPointSourcePrimaryGenerator.hh"
 #ifdef USE_VIS
 #include "VisualizeGeometry.hh"
 #endif
@@ -132,6 +133,14 @@ class IsotropicPrimaryGenerator : public anlgeant4::BasicPrimaryGenerator
 public:
   IsotropicPrimaryGenerator();
   ~IsotropicPrimaryGenerator();
+};
+
+
+class PolarizedPointSourcePrimaryGenerator : public BasicPrimaryGenerator
+{
+public:
+  PolarizedPointSourcePrimaryGenerator();
+  ~PolarizedPointSourcePrimaryGenerator();
 };
 
 

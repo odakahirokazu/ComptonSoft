@@ -17,7 +17,7 @@
  *                                                                       *
  *************************************************************************/
 
-#include "PolarizedPointSourcePrimaryGen.hh"
+#include "PolarizedPointSourcePrimaryGenerator.hh"
 #include "Randomize.hh"
 #include "AstroUnits.hh"
 #include "VANLGeometry.hh"
@@ -27,7 +27,7 @@ using namespace anlnext;
 namespace anlgeant4
 {
 
-PolarizedPointSourcePrimaryGen::PolarizedPointSourcePrimaryGen()
+PolarizedPointSourcePrimaryGenerator::PolarizedPointSourcePrimaryGenerator()
   : m_SourcePosition(0.0, 0.0, 0.0),
     m_CenterDirection(0.0, 0.0, -1.0),
     m_Theta0(0.0), m_Theta1(CLHEP::pi), m_CosTheta0(1.0), m_CosTheta1(-1.0),
@@ -35,40 +35,40 @@ PolarizedPointSourcePrimaryGen::PolarizedPointSourcePrimaryGen()
     m_Polarization0(1.0, 0.0, 0.0), m_PolarizationDegree(0.0),
     m_Luminosity(1.0*(unit::erg/unit::s))
 {
-  add_alias("PolarizedPointSourcePrimaryGen");
+  add_alias("PolarizedPointSourcePrimaryGenerator");
 }
 
-PolarizedPointSourcePrimaryGen::~PolarizedPointSourcePrimaryGen() = default;
+PolarizedPointSourcePrimaryGenerator::~PolarizedPointSourcePrimaryGenerator() = default;
 
-ANLStatus PolarizedPointSourcePrimaryGen::mod_define()
+ANLStatus PolarizedPointSourcePrimaryGenerator::mod_define()
 {
-  BasicPrimaryGen::mod_define();
+  BasicPrimaryGenerator::mod_define();
 
-  enablePowerLawInput();
-  register_parameter(&m_SourcePosition, "position",
-                     LengthUnit(), LengthUnitName());
+  enable_powerlaw_input();
+  define_parameter("position", &mod_class::m_SourcePosition,
+                     unit::cm, "cm");
   set_parameter_description("Position of the source.");
-  register_parameter(&m_CenterDirection, "direction");
+  define_parameter("direction", &mod_class::m_CenterDirection);
   set_parameter_description("Center direction of the primaries.");
-  register_parameter(&m_Theta0, "theta_min", 1.0, "radian");
+  define_parameter("theta_min", &mod_class::m_Theta0, 1.0, "radian");
   set_parameter_description("Minimum angle between the primary direction and the center direction.");
-  register_parameter(&m_Theta1, "theta_max", 1.0, "radian");
+  define_parameter("theta_max", &mod_class::m_Theta1, 1.0, "radian");
   set_parameter_description("Maximum angle between the primary direction and the center direction.");
-  register_parameter(&m_Luminosity, "luminosity", unit::erg/unit::s, "erg/s");
+  define_parameter("luminosity", &mod_class::m_Luminosity, unit::erg/unit::s, "erg/s");
   set_parameter_description("Energy luminosity of the point source. This parameter is used only for calculating real time correspoing to a simulation.");
-  register_parameter(&m_Polarization0, "polarization_vector");
+  define_parameter("polarization_vector", &mod_class::m_Polarization0);
   set_parameter_description("Polarization vector");
-  register_parameter(&m_PolarizationDegree, "degree_of_polarization");
+  define_parameter("degree_of_polarization", &mod_class::m_PolarizationDegree);
   set_parameter_description("Degree of polarization");
 
   return AS_OK;
 }
 
-ANLStatus PolarizedPointSourcePrimaryGen::mod_initialize()
+ANLStatus PolarizedPointSourcePrimaryGenerator::mod_initialize()
 {
   using std::cos;
   
-  BasicPrimaryGen::mod_initialize();
+  BasicPrimaryGenerator::mod_initialize();
   m_CenterDirection = m_CenterDirection.unit();
 
   const double posx = m_SourcePosition.x();
@@ -84,10 +84,10 @@ ANLStatus PolarizedPointSourcePrimaryGen::mod_initialize()
   m_CoveringFactor = 0.5*(m_CosTheta0-m_CosTheta1);
   
   std::cout << "--------" << std::endl;
-  std::cout << "PrimaryGen status (point source)" << std::endl;
+  std::cout << "PrimaryGenerator status (point source)" << std::endl;
   std::cout << "  Source Position: "
             << posx/unit::cm << " " << posy/unit::cm << " " << posz/unit::cm << " cm" <<std::endl;
-  printSpectralInfo();
+  print_spectral_info();
   std::cout << "  Direction: "
             << dirx << " " << diry << " " << dirz << '\n' 
             << "    theta: " << m_Theta0/unit::degree << " - " << m_Theta1/unit::degree
@@ -96,23 +96,22 @@ ANLStatus PolarizedPointSourcePrimaryGen::mod_initialize()
   return AS_OK;
 }
 
-void PolarizedPointSourcePrimaryGen::makePrimarySetting()
+PrimarySetting PolarizedPointSourcePrimaryGenerator::make_primary_setting() const
 {
-  const G4ThreeVector position = samplePosition();
-  const G4ThreeVector direction = sampleDirection();
-  const double energy = sampleEnergy();
+  const G4ThreeVector position = sample_position();
+  const G4ThreeVector direction = sample_direction();
+  const double energy = sample_energy();
 
   if (G4UniformRand() < m_PolarizationDegree) {
     G4ThreeVector polarization = (m_Polarization0 - (m_Polarization0.dot(direction))*direction).unit();
-    setPrimary(position, energy, direction, polarization);
+    return make_primary(position, energy, direction, polarization);
   }
   else {
-    setPrimary(position, energy, direction);
-    setUnpolarized();
+    return make_primary(position, energy, direction, unpolarized_vector(direction));
   }
 }
 
-G4ThreeVector PolarizedPointSourcePrimaryGen::sampleDirection()
+G4ThreeVector PolarizedPointSourcePrimaryGenerator::sample_direction() const
 {
   const double phi = CLHEP::twopi * G4UniformRand();
   const double cosTheta = m_CosTheta0+(m_CosTheta1-m_CosTheta0)*G4UniformRand();
@@ -122,27 +121,27 @@ G4ThreeVector PolarizedPointSourcePrimaryGen::sampleDirection()
   return direction;
 }
 
-G4ThreeVector PolarizedPointSourcePrimaryGen::samplePosition()
+G4ThreeVector PolarizedPointSourcePrimaryGenerator::sample_position() const
 {
   return m_SourcePosition;
 }
 
-ANLStatus PolarizedPointSourcePrimaryGen::mod_end_run()
+ANLStatus PolarizedPointSourcePrimaryGenerator::mod_end_run()
 {
   double realTime = 0.;
   double pflux = 0.;
   if (m_CoveringFactor != 0.0) {
-    realTime = (TotalEnergy()/m_CoveringFactor)/m_Luminosity;
-    pflux = (Number()/m_CoveringFactor)/realTime;
+    realTime = (total_energy()/m_CoveringFactor)/m_Luminosity;
+    pflux = (number()/m_CoveringFactor)/realTime;
   }
-  setRealTime(realTime);
+  set_real_time(realTime);
 
   std::cout.setf(std::ios::scientific);
-  std::cout << "PSPrimaryGen::mod_end_run \n"
-            << "  Number: " << Number() << "\n"
+  std::cout << "PSPrimaryGenerator::mod_end_run \n"
+            << "  Number: " << number() << "\n"
             << "  Luminosity: " << m_Luminosity/(unit::erg/unit::s) << " erg/s\n"
-            << "  Total Energy: " << TotalEnergy()/unit::keV << " keV = "
-            << TotalEnergy()/unit::erg << " erg\n"
+            << "  Total Energy: " << total_energy()/unit::keV << " keV = "
+            << total_energy()/unit::erg << " erg\n"
             << "  Covering Factor: " << m_CoveringFactor << "\n"
             << "  Real Time: " << realTime/unit::s << " s"
             << "  Photon rate: " << pflux/(1.0/unit::s) << " photons/s\n"

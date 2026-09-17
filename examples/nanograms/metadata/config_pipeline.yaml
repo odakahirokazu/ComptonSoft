@@ -27,9 +27,9 @@ light:
     transimpedance_feedback_resistance_ohm: 3200.0
     output_impedance_ohm: 50.0
 charge: 
-    noise_th_kev: 150.0
+    noise_thr_electrons: 2771.071433 # Collected electrons; approximately 150 keV at 500 V/cm.
     clustering_pix_range: [1, 3]
-    spread_thr_kev: 100.0
+    spread_thr_electrons: 1557.574772 # Collected electrons; approximately 100 keV at 500 V/cm.
     cross_fec_merge_drift_time_tolerance_us: 3.0
     core_exclude_pix:
         0: [0, 63]

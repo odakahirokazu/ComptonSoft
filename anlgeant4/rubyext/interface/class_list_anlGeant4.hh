@@ -17,4 +17,5 @@ class VUserActionAssembly;
 class StandardUserActionAssembly;
 class VEventStore;
 class VisualizeGeometry;
+class PolarizedPointSourcePrimaryGenerator;
 }

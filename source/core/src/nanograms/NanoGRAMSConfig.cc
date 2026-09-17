@@ -23,6 +23,7 @@
 #include "NanoGRAMSLightAnalysis.hh"
 
 #include <algorithm>
+#include <cmath>
 #include <filesystem>
 #include <iostream>
 #include <stdexcept>
@@ -153,11 +154,15 @@ void readClusteringPixelRange(Config& cfg, const YAML::Node& nodeCharge)
   cfg.pix_max = range[1];
 }
 
-double readChargeThresholdKeV(const YAML::Node& nodeCharge,
+double readChargeThresholdElectrons(const YAML::Node& nodeCharge,
                               const std::string& key)
 {
   if (nodeCharge[key]) {
-    return nodeCharge[key].as<double>() * unit::keV;
+    const double value = nodeCharge[key].as<double>();
+    if (!std::isfinite(value) || value < 0.0) {
+      throw std::runtime_error("charge." + key + " must be a finite, non-negative electron count.");
+    }
+    return value;
   }
   throw std::runtime_error("charge." + key + " is missing.");
 }
@@ -254,10 +259,10 @@ void readChargeConfig(Config& cfg, const YAML::Node& node)
 {
   const auto nodeCharge = node["charge"];
   readClusteringPixelRange(cfg, nodeCharge);
-  cfg.core_noise_energy_th =
-      readChargeThresholdKeV(nodeCharge, "noise_th_kev");
-  cfg.spread_thr_energy =
-      readChargeThresholdKeV(nodeCharge, "spread_thr_kev");
+  cfg.core_noise_electrons_th =
+      readChargeThresholdElectrons(nodeCharge, "noise_thr_electrons");
+  cfg.spread_thr_electrons =
+      readChargeThresholdElectrons(nodeCharge, "spread_thr_electrons");
   if (nodeCharge["cross_fec_merge_drift_time_tolerance_us"]) {
     cfg.cross_fec_merge_drift_time_tolerance =
         nodeCharge["cross_fec_merge_drift_time_tolerance_us"].as<double>() * unit::us;
@@ -276,8 +281,8 @@ void readChargeConfig(Config& cfg, const YAML::Node& node)
 
   std::cout << "pix_min: "           << cfg.pix_min           << std::endl;
   std::cout << "pix_max: "           << cfg.pix_max           << std::endl;
-  std::cout << "noise_th_kev: " << cfg.core_noise_energy_th / unit::keV << std::endl;
-  std::cout << "spread_thr_kev: "    << cfg.spread_thr_energy / unit::keV << std::endl;
+  std::cout << "noise_thr_electrons: " << cfg.core_noise_electrons_th << std::endl;
+  std::cout << "spread_thr_electrons: "    << cfg.spread_thr_electrons << std::endl;
   if (cfg.cross_fec_merge_drift_time_tolerance >= 0.0) {
     std::cout << "cross_fec_merge_drift_time_tolerance_us: "
               << cfg.cross_fec_merge_drift_time_tolerance / unit::us << std::endl;
