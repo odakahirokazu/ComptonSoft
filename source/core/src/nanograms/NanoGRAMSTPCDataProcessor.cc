@@ -553,7 +553,8 @@ double FECChargeSelector::hitSelectionElectrons(int fec,
     return 0.0;
   }
 
-  return tpc_property_.convertADC2Electrons(fec, ch, corrected_adu);
+  const double electrons = tpc_property_.convertADC2Electrons(fec, ch, corrected_adu);
+  return electrons <= 0.0 ? 0.0 : electrons;
 }
 
 TPCTreeReader::TPCTreeReader(TTree* tpc_tree,

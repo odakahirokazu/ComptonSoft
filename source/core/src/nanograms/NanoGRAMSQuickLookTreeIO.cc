@@ -293,7 +293,7 @@ double QuickLookTreeOutputWriter::quicklookElectrons(int fec,
                                                   int ch,
                                                   double adu_cmn_sub) const
 {
-  if (!std::isfinite(adu_cmn_sub) || adu_cmn_sub <= 0.0) {
+  if (!std::isfinite(adu_cmn_sub)) {
     return 0.0;
   }
 
@@ -303,10 +303,6 @@ double QuickLookTreeOutputWriter::quicklookElectrons(int fec,
   }
 
   const double corrected_adu = adu_cmn_sub * correction_factor;
-  if (corrected_adu <= 0.0) {
-    return 0.0;
-  }
-
   return tpc_property_.convertADC2Electrons(fec, ch, corrected_adu);
 }
 

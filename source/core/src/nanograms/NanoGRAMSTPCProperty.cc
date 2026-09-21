@@ -152,7 +152,7 @@ double TPCProperty::convertADC2Electrons(int fec, int ch, double adc) const
   constexpr double elementary_charge_coulomb = 1.602176634e-19;
   const GainParamArray& params = gain_matrices_adc_to_c_[fec][ch];
   const double charge_coulomb = cubic(adc, params) - cubic(0.0, params);
-  return charge_coulomb <= 0.0 ? 0.0 : charge_coulomb / elementary_charge_coulomb;
+  return charge_coulomb / elementary_charge_coulomb;
 }
 
 double TPCProperty::convertElectrons2keV(double electron_count) const
