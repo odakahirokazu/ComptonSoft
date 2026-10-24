@@ -62,7 +62,7 @@ set(ComptonSoftApplications_ComptonCamera_Modules
   compton_camera/src/ApplyRecombination.cc
   compton_camera/src/ApplyCCE.cc
   compton_camera/src/PushBackToSimulatedHits.cc
-
+  compton_camera/src/EliminateLowEnergyHits.cc
   # ## histograming
   compton_camera/src/HistogramEnergy1D.cc
   compton_camera/src/HistogramEnergy2D.cc

@@ -177,6 +177,8 @@ public:
   }
 
 protected:
+  // mode 5: NanoGRAMS-specific clustering; the other modes are the same as RealDetectorUnitLArTPCPixel
+  bool setReconstructionDetails(int mode) override;
   void reconstruct(const DetectorHitVector& hitSignals, DetectorHitVector& hitsReconstructed) override;
 
 private:

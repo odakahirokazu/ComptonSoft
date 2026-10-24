@@ -2,6 +2,7 @@
 #include "BirksModel.hh"
 #include "CSException.hh"
 #include "ModifiedBoxModel.hh"
+#include "SegretoRecombinationModel.hh"
 #include <boost/filesystem/path.hpp>
 #include <boost/format.hpp>
 #include <boost/lexical_cast.hpp>
@@ -75,6 +76,9 @@ std::unique_ptr<VLArRecombinationModel> LArRecombinationModelFactory::load(std::
   else if (*model == "ModifiedBox") {
     type = RecombinationModelType::ModifiedBox;
   }
+  else if (*model == "Segreto") {
+    type = RecombinationModelType::Segreto;
+  }
   else if (*model == "None") {
     type = RecombinationModelType::None;
   }
@@ -93,6 +97,8 @@ LArRecombinationModelFactory::create(RecombinationModelType type, const std::map
     return std::make_unique<BirksModel>(params);
   case RecombinationModelType::ModifiedBox:
     return std::make_unique<ModifiedBoxModel>(params);
+  case RecombinationModelType::Segreto:
+    return std::make_unique<SegretoRecombinationModel>(params);
   case RecombinationModelType::None:
     return nullptr;
   default: {

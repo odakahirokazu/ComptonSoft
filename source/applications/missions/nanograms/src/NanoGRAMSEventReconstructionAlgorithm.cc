@@ -321,7 +321,7 @@ NanoGRAMSEventReconstructionAlgorithm::correctedHits(
 double NanoGRAMSEventReconstructionAlgorithm::energyCorrectionFactor(
     const DetectorHit_sptr& hit) const
 {
-  const int fec = hit->ReadoutModuleID();
+  const int fec = hit->DetectorSection();
   if (fec < 0 || fec >= NUM_VATA) {
     throw std::runtime_error("NanoGRAMS hit has an invalid readout FEC ID.");
   }

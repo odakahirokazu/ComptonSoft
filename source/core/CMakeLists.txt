@@ -98,6 +98,7 @@ set(ComptonSoftCore_DetectorModels_Classes
   detector_models/src/VLArRecombinationModel.cc
   detector_models/src/BirksModel.cc
   detector_models/src/ModifiedBoxModel.cc
+  detector_models/src/SegretoRecombinationModel.cc
   detector_models/src/LArRecombinationModelFactory.cc
   ### detector unit factory
   detector_models/src/SimDetectorUnitFactory.cc

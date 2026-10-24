@@ -212,6 +212,16 @@ void RealDetectorUnitNanoGRAMS::determinePosition(DetectorHitVector& hits) const
   }
 }
 
+bool RealDetectorUnitNanoGRAMS::setReconstructionDetails(int mode)
+{
+  if (mode == 5) {
+    // NanoGRAMS-specific clustering
+    setClusteringOn(true);
+    return true;
+  }
+  return RealDetectorUnitLArTPCPixel::setReconstructionDetails(mode);
+}
+
 void RealDetectorUnitNanoGRAMS::reconstruct(const DetectorHitVector& hitSignals, DetectorHitVector& hitsReconstructed)
 {
   std::transform(hitSignals.begin(), hitSignals.end(), std::back_inserter(hitsReconstructed),
@@ -224,15 +234,26 @@ void RealDetectorUnitNanoGRAMS::reconstruct(const DetectorHitVector& hitSignals,
   determinePosition(hitsReconstructed);
 
   clusterCorrespondence_.clear();
-  if (isClusteringOn()) {
-    clusterForNanoGRAMS(hitsReconstructed, clusterCorrespondence_);
-  }
-  else {
+  if (!isClusteringOn()) {
     for (std::size_t i = 0; i < hitsReconstructed.size(); ++i) {
       clusterCorrespondence_.push_back({static_cast<int>(i)});
     }
+    setClusterFlags(hitSignals, hitsReconstructed, clusterCorrespondence_);
   }
-  setClusterFlags(hitSignals, hitsReconstructed, clusterCorrespondence_);
+  else if (ReconstructionMode() == 5) {
+    clusterForNanoGRAMS(hitsReconstructed, clusterCorrespondence_);
+    setClusterFlags(hitSignals, hitsReconstructed, clusterCorrespondence_);
+  }
+  else {
+    // generic clustering: the pixel correspondence is not available, so ClusterCorrespondence() is left empty
+    // and no NanoGRAMS cluster flags are set (all the clusters are regarded as gamma-ray events).
+    if (ReconstructionMode() == 4) {
+      clusterByThreshold(hitsReconstructed);
+    }
+    else {
+      cluster(hitsReconstructed);
+    }
+  }
 
   // EnergyCharge keeps the charge-equivalent energy (charge x W_ion) before the recombination correction
   for (auto& hit : hitsReconstructed) {

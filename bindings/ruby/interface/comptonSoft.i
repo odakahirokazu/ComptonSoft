@@ -1332,18 +1332,21 @@ public:
 
 
 class CorrectRecombination: public VCSModule {
+public:
   CorrectRecombination();
   virtual ~CorrectRecombination();
 };
 
 
 class SetEnergy : public anlnext::BasicModule {
+public:
   SetEnergy();
   virtual ~SetEnergy();
 };
 
 
 class SetPosition : public VCSModule {
+public:
   SetPosition();
   virtual ~SetPosition();
 };
@@ -1358,6 +1361,7 @@ public:
 
 
 class NumHitsInDetectorFilter : public anlnext::BasicModule {
+public:
   NumHitsInDetectorFilter();
   virtual ~NumHitsInDetectorFilter();
 };

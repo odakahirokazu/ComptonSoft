@@ -149,7 +149,7 @@ ANL パラメータ `NanoGRAMSLoadConfig.dpp_config_file` で指定すると全�
 
 | 要素/属性 | 単位 | 意味 |
 |---|---|---|
-| `reconstruction mode` | – | 0: 再構成しない（検出ヒットをそのまま出力。クラスタリングも再結合補正もなし）。1, 4: NanoGRAMS 独自のクラスタリングを行う（どちらも同じ処理）。2: クラスタリングなし（ピクセルごと）。3: クラスタリングあり |
+| `reconstruction mode` | – | 0: 再構成しない（検出ヒットをそのまま出力。クラスタリングも再結合補正もなし）。5: NanoGRAMS 独自のクラスタリングを行う。1, 3, 4: RealDetectorUnitLArTPCPixel と同じ汎用のクラスタリング（1: 隣接するピクセルを併合、3: 1 と同じで接触条件なし、4: しきい値によるクラスタリング）。ピクセルとクラスタの対応（`ClusterCorrespondence`）は作られず、NanoGRAMS のクラスタフラグも付かない（すべてガンマ線のクラスタとして扱われる）。2: クラスタリングなし（ピクセルごと） |
 | `reconstruction clustering_range` | ピクセル | コアから |Δx|, |Δy| ≤ range のピクセルを併合する（斜めを含む）。**XML でのみ指定**（指定しないと VRealDetectorUnit の既定値 2） |
 | `reconstruction clustering_energy_threshold`, `clustering_split_threshold` | keV | `NanoGRAMSLoadConfig` を使うと YAML（`charge.noise_th_kev`, `spread_thr_kev`）で上書きされる（実データ・シミュレーションとも） |
 | `reconstruction w_ion` | eV | 電離の W 値（既定 23.6 eV）。EPI = 電子数 × W_ion に使う。MCD にも伝わる |

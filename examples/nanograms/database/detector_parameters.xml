@@ -16,7 +16,7 @@
     <detector_set prefix="NanoGRAMS" type="NanoGRAMS">
       <common>
         <parameters>
-          <reconstruction mode="4" clustering_range="1" w_ion="23.6" recombination_correction="4" />
+          <reconstruction mode="5" clustering_range="1" w_ion="23.6" recombination_correction="4" />
         </parameters>
       </common>
     </detector_set>

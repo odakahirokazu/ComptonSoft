@@ -7,6 +7,7 @@ enum class RecombinationModelType
 {
   Birks,
   ModifiedBox,
+  Segreto,
   None
 };
 /**
