@@ -27,22 +27,21 @@
 #include "NanoGRAMSChannelMap.hh"
 #include "NanoGRAMSMultiChannelData.hh"
 
-namespace comptonsoft
-{
+namespace comptonsoft {
 
 constexpr int NUM_CH_DPP_MAX = 8;
 constexpr int NUM_VATA = NanoGRAMSMultiChannelData::NUM_FECS;
 constexpr int NUM_CH_EACH_VATA = NanoGRAMSMultiChannelData::NUM_CHANNELS;
+constexpr int MAX_WAVE_LENGTH = 8000;
 
-namespace grams
-{
+namespace grams {
 
-constexpr const char* kTpcTreeName       = "tpctree";
-constexpr const char* kHitTreeName       = "hittree";
+constexpr const char* kTpcTreeName = "tpctree";
+constexpr const char* kHitTreeName = "hittree";
 constexpr const char* kQuickLookTreeName = "tpcquicklook";
 
 constexpr double kDppResponseTime = 0.68 * anlgeant4::unit::us;
-constexpr double kClkToUs         = 0.01; // 1 clock = 10 ns
+constexpr double kClkToUs = 0.01; // 1 clock = 10 ns
 
 inline double driftTimeFromClock(uint32_t drift_time_count)
 {
@@ -51,7 +50,7 @@ inline double driftTimeFromClock(uint32_t drift_time_count)
 
 // the channel map of the anode is defined in the core (NanoGRAMSChannelMap.hh)
 constexpr int kFECSectionSidePixels = nanograms::FECSectionSidePixels;
-constexpr int kTPCPlaneSidePixels   = nanograms::AnodeSidePixels;
+constexpr int kTPCPlaneSidePixels = nanograms::AnodeSidePixels;
 inline constexpr const auto& kFECSectionGridToChannel = nanograms::FECSectionGridToChannel;
 
 static_assert(NUM_VATA == static_cast<int>(kFECSectionGridToChannel.size()),

@@ -19,27 +19,25 @@
 
 #include "NanoGRAMSTPCDataProcessor.hh"
 
-namespace comptonsoft
-{
-namespace grams
-{
+namespace comptonsoft {
+namespace grams {
 
 bool isTPCDataUsable(int error_flags)
 {
-  if ((error_flags==0)||(error_flags==4)) {
+  if ((error_flags == 0) || (error_flags == 4)) {
     return true;
-  } else {
+  }
+  else {
     return false;
   }
 }
 
 TPCTreeReader::TPCTreeReader(TTree* tpc_tree)
-    : tpc_tree_buffer_(tpc_tree)
+  : tpc_tree_buffer_(tpc_tree)
 {
   if (tpc_tree_buffer_.nEntries() > 0) {
     // the waveform layout (registered DPP channels) is taken from the first entry
     tpc_tree_buffer_.getEntry(0);
-    tpc_tree_buffer_.updateWaveformLayoutFromRegisteredChannels();
   }
 }
 

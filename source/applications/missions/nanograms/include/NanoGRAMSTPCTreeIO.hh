@@ -33,47 +33,32 @@
 
 class TTree;
 
-namespace comptonsoft
-{
-namespace grams
-{
-
-struct TPCTreeLayout
-{
-  int64_t n_entries             = 0;
-  int num_dpp_registered_slots  = NUM_CH_DPP_MAX;
-  int waveform_num_channels     = 0;
-  int waveform_flattened_length = 0;
-  int waveform_len              = 0;
-};
+namespace comptonsoft {
+namespace grams {
 
 class TPCTreeBuffer
 {
 public:
   explicit TPCTreeBuffer(TTree* tpc_tree);
 
-  const TPCTreeLayout& layout() const { return layout_; }
-  int64_t nEntries() const { return layout_.n_entries; }
+  int64_t nEntries() const;
   uint32_t representativeUnixTime() const;
   void getEntry(int64_t entry);
-  void updateWaveformLayoutFromRegisteredChannels();
-  int waveformSlotForDPPChannel(int dpp_ch) const;
+  bool waveRegistered(int channel) const { return wave_num[channel] > 0; }
 
   std::array<uint16_t, NUM_CH_DPP_MAX> wave_compress{};
-  std::array<bool,     NUM_CH_DPP_MAX> registered_channels{};
   std::vector<uint16_t> adc;
   std::vector<uint32_t> drift_time;
   std::vector<uint32_t> ti;
   std::array<uint32_t, NUM_VATA> unixtime{};
-  std::vector<int16_t> waveform;
+  std::array<std::array<int16_t, MAX_WAVE_LENGTH>, NUM_CH_DPP_MAX> waveform;
+  std::array<uint32_t, NUM_CH_DPP_MAX> wave_num{};
   uint16_t error_flags = 0;
 
 private:
   void bindBranches(TTree* tpc_tree);
 
   TTree* tpc_tree_ = nullptr;
-  TPCTreeLayout layout_;
-  std::array<int, NUM_CH_DPP_MAX> waveform_slot_of_dpp_channel_{};
 };
 
 } /* namespace grams */

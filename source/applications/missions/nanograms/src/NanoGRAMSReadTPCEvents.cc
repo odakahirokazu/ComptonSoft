@@ -153,7 +153,6 @@ void NanoGRAMSReadTPCEvents::fillEventsIntoDetectors()
   const auto& cfg = configLoader_->config();
 
   const grams::TPCTreeBuffer& buffer = tpc_tree_reader_->currentBuffer();
-  const int waveformLength = buffer.layout().waveform_len;
   for (auto& detector : detectorManager->getDetectors()) {
     if (!detector->checkType(DetectorType::NanoGRAMS)) {
       continue;
@@ -177,13 +176,19 @@ void NanoGRAMSReadTPCEvents::fillEventsIntoDetectors()
     // RawWaveform = digitizer ADC converted into voltage; Waveform is initialized with it and corrected later
     const double adcToVoltage = cfg.adc2mv * (unit::volt / 1000.0);
     for (int dppChannel = 0; dppChannel < nanograms->NumberOfLightData(); ++dppChannel) {
-      const int slot = buffer.waveformSlotForDPPChannel(dppChannel);
-      if (slot < 0 || !light_channel_used_[dppChannel]) {
+      LightData* lightData = nanograms->getLightData(dppChannel);
+      if (!lightData->isValid()) {
         continue;
       }
-      LightData* lightData = nanograms->getLightData(dppChannel);
+      // the waveform length is fixed by the first entry of the file (setupLightDataLayout)
+      const int waveformLength = static_cast<int>(buffer.wave_num[dppChannel]);
+      if (waveformLength != lightData->NumberOfPoints()) {
+        throw std::runtime_error((boost::format("Waveform length of DPP ch %1% changed within a file: %2% -> %3%")
+                                  % dppChannel % lightData->NumberOfPoints() % waveformLength)
+                                   .str());
+      }
       std::vector<double>& rawWaveform = lightData->RawWaveform();
-      const auto begin = buffer.waveform.begin() + static_cast<std::ptrdiff_t>(slot) * waveformLength;
+      const auto begin = buffer.waveform[dppChannel].begin();
       std::transform(begin, begin + waveformLength, rawWaveform.begin(),
                      [adcToVoltage](int16_t adc) { return adc * adcToVoltage; });
       lightData->Waveform() = rawWaveform;
@@ -201,16 +206,15 @@ void NanoGRAMSReadTPCEvents::setupLightDataLayout()
 
   // the layout is taken from the first entry of the file (the same as the light timing of TPCTreeReader)
   const grams::TPCTreeBuffer& buffer = tpc_tree_reader_->currentBuffer();
-  const int waveformLength = buffer.layout().waveform_len;
   for (auto& detector : detectorManager->getDetectors()) {
     if (!detector->checkType(DetectorType::NanoGRAMS)) {
       continue;
     }
     auto* nanograms = static_cast<RealDetectorUnitNanoGRAMS*>(detector.get());
     std::cout << "[NanoGRAMSReadTPCEvents] light data (detector " << nanograms->getID() << ", "
-              << nanograms->NumberOfLightData() << " channels, waveform length " << waveformLength << ")\n";
+              << nanograms->NumberOfLightData() << " channels)\n";
     for (int dppChannel = 0; dppChannel < nanograms->NumberOfLightData(); ++dppChannel) {
-      const bool registered = (buffer.waveformSlotForDPPChannel(dppChannel) >= 0);
+      const bool registered = buffer.waveRegistered(dppChannel);
       const bool valid = (registered && light_channel_used_[dppChannel]);
       nanograms->getLightData(dppChannel)->setValid(valid);
       std::cout << "  DPP ch " << dppChannel << ": registered=" << registered
@@ -222,8 +226,10 @@ void NanoGRAMSReadTPCEvents::setupLightDataLayout()
       const double timeWidth = static_cast<double>(buffer.wave_compress[dppChannel]) * unit::ns;
       // time = 0 at the trigger
       const double triggerDelay = static_cast<double>(cfg.light_delay_counts[dppChannel]) * 8.0 * timeWidth;
+      const int waveformLength = static_cast<int>(buffer.wave_num[dppChannel]);
       nanograms->getLightData(dppChannel)->setLayout(waveformLength, timeWidth, -triggerDelay);
-      std::cout << " time_width=" << timeWidth / unit::ns << " ns"
+      std::cout << " length=" << waveformLength
+                << " time_width=" << timeWidth / unit::ns << " ns"
                 << " time_start=" << -triggerDelay / unit::us << " us\n";
     }
   }
