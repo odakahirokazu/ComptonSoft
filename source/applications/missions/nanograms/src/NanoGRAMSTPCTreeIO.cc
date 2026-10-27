@@ -71,7 +71,7 @@ void TPCTreeBuffer::bindBranches(TTree* tpc_tree)
   tpc_tree->SetBranchAddress("ti", ti.data());
   tpc_tree->SetBranchAddress("unixtime", unixtime.data());
   for (int i = 0; i < NUM_CH_DPP_MAX; ++i) {
-    const auto waveform_name = boost::format("waveform_%1%") % i;
+    const auto waveform_name = boost::format("waveform_ch%1%") % i;
     tpc_tree->SetBranchAddress(waveform_name.str().c_str(), waveform[i].data());
     const auto waveform_length = boost::format("wave_num_ch%1%") % i;
     tpc_tree->SetBranchAddress(waveform_length.str().c_str(), &wave_num[i]);

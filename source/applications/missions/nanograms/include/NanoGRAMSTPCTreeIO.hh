@@ -52,7 +52,7 @@ public:
   std::vector<uint32_t> ti;
   std::array<uint32_t, NUM_VATA> unixtime{};
   std::array<std::array<int16_t, MAX_WAVE_LENGTH>, NUM_CH_DPP_MAX> waveform;
-  std::array<uint32_t, NUM_CH_DPP_MAX> wave_num{};
+  std::array<int32_t, NUM_CH_DPP_MAX> wave_num{};
   uint16_t error_flags = 0;
 
 private:
