@@ -115,6 +115,7 @@ class RadioactiveDecayUserActionAssembly;
 class AHStandardUserActionAssembly;
 class SampleOpticalDepth;
 class ObservationPickUpData;
+class AssignRecombinationGroup;
 class PhysicsListManager;
 class ObservationEventStore;
 class WriteObservationTree;

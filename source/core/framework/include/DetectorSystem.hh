@@ -48,6 +48,9 @@ class DeviceSimulation;
 class VCSSensitiveDetector;
 class CSEventStore;
 class LArRecombinationModelFactory;
+class LArTPCDeviceSimulation;
+class VLArRecombinationModel;
+class DetectorHit;
 
 /**
  * A manager class of a whole detector system.
@@ -124,6 +127,7 @@ public:
     boost::optional<double> timing_resolution_energy_measurement = boost::none;
     boost::optional<int> pedestal_generation_flag = boost::none;
     boost::optional<int> recombination_dedx_mode = boost::none;
+    boost::optional<int> recombination_group_mode = boost::none;
     boost::optional<std::string> recombination_dedx_file = boost::none;
     boost::optional<std::string> recombination_dedx_spline_name = boost::none;
     ChannelNodeContents channel_properties;
@@ -299,6 +303,25 @@ private:
 
   CSEventStore* event_store_ = nullptr;
   std::unique_ptr<LArRecombinationModelFactory> recombinationModelFactory_;
+
+  struct RecombinationGroupMember
+  {
+    int32_t originTrackID;
+    double originX;
+    double originY;
+    double originZ;
+    DetectorHit* hit;
+  };
+  void prepareGroupRecombination();
+  void applyGroupRecombination();
+  bool groupRecombinationPrepared_ = false;
+  // nullptr if the group mode is not used
+  VLArRecombinationModel* groupRecombinationModel_ = nullptr;
+  double groupRecombinationEField_ = 0.0;
+  // indexed in the same way as deviceSimulationVector_; 1 for the LArTPC detectors
+  std::vector<char> groupRecombinationFlags_;
+  // reused over events to avoid allocation
+  std::vector<RecombinationGroupMember> recombinationGroupMembers_;
 
 private:
   DetectorSystem(const DetectorSystem&) = delete;

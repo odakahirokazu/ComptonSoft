@@ -125,6 +125,7 @@ classList = [
   ANL::SWIGClass.new("AHStandardUserActionAssembly", false, 'USE_SIMX'),
   ANL::SWIGClass.new("SampleOpticalDepth"),
   ANL::SWIGClass.new("ObservationPickUpData"),
+  ANL::SWIGClass.new("AssignRecombinationGroup"),
   # physics list
   ANL::SWIGClass.new("PhysicsListManager"),
   # others

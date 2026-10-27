@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<RecombinationModel model="ModifiedBox">
+<RecombinationModel model="Segreto">
   <parameters>
     <model type="Birks">
       <parameter name="Ab" value="0.8" /> <!-- Dimensionless -->

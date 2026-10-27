@@ -27,7 +27,7 @@
             <threshold value="0.0" />
           </channel_properties>
           <efield bias="9000.0" /> <!-- 300 V/cm -->
-          <recombination filename="database/recombination.xml" photon_efficiency="1.0" />
+          <recombination filename="database/recombination.xml" photon_efficiency="1.0" group_mode="1" /> <!-- group_mode 0: per step, 1: per group of a primary electron and its charged descendants (requires AssignRecombinationGroup; all LArTPC detectors must share the mode, the model, and the electric field) -->
           <reconstruction mode="4" clustering_energy_threshold="2.0" clustering_split_threshold="1.0" clustering_range="3" recombination_correction="1" w_ion="23.6" w_exc="19.5" /> <!-- clustering_energy_threshold and clustering_split_threshold are in keV, clustering_range is in number of pixels W values are in eV-->
         </parameters>
       </common>

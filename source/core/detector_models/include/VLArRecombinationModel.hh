@@ -73,6 +73,14 @@ public:
   RecombinationResult calcResultWithoutRandomization(double edep, double rate) const;
 
   std::string name() const { return name_; }
+  const std::map<std::string, double>& Parameters() const { return parameters_; }
+  /**
+   * @return true if the model and the parameters given at the construction are the same.
+   */
+  bool hasSameConfiguration(const VLArRecombinationModel& r) const
+  {
+    return name() == r.name() && Parameters() == r.Parameters();
+  }
   virtual void printInfo(std::ostream& os) const;
   int RandomizeMode() const { return randomizeMode_; }
   void setRandomizeMode(int mode) { randomizeMode_ = mode; }
@@ -89,6 +97,7 @@ public:
 private:
   void calAlpha() { ionExitonRatio_ = Wion_ / Wexc_ - 1.0; }
   std::string name_ = "VLArRecombinationModel";
+  std::map<std::string, double> parameters_; // parameters given at the construction
   double Wion_ = 23.6 * CLHEP::eV; // in eV
   double Wexc_ = 19.6 * CLHEP::eV; // in eV
   double ionExitonRatio_ = Wion_ / Wexc_ - 1.0;

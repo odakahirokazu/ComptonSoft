@@ -13,7 +13,7 @@ def run_simulation(num, random, output)
   sim.set_gdml "database/mass_model.gdml"
   sim.set_physics(hadron_hp: false, cut_value: 0.0001,
                   customized_em: true, electron_range_ratio: 0.01, electron_final_range: 1.0e-5)
-  sim.set_primary_generator :GaussianBeamPrimaryGen, {
+  sim.set_primary_generator :GaussianBeamPrimaryGenerator, {
     particle: "gamma",
     photon_index: 2.1,
     energy_min: 0.4,

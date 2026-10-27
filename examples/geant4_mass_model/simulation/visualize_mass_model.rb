@@ -9,7 +9,7 @@ def run_simulation(num)
   sim = ComptonSoft::Simulation.new
   sim.random_seed = 0
   sim.set_geometry MyGeometry::MyMainGeometry
-  sim.set_primary_generator :PlaneWavePrimaryGen, {
+  sim.set_primary_generator :PlaneWavePrimaryGenerator, {
     particle: "gamma",
     photon_index: 0.0,
     energy_min: energy,

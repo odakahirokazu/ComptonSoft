@@ -30,6 +30,7 @@
 #include "MultiChannelData.hh"
 #include "VRealDetectorUnit.hh"
 #include "DeviceSimulation.hh"
+#include "RecombinationGroupTable.hh"
 #include <G4Threading.hh>
 
 namespace comptonsoft {
@@ -113,6 +114,18 @@ VCSSensitiveDetector::ProcessHits(G4Step* step, G4TouchableHistory* )
 
   hit.setStepLength(step->GetStepLength());
   hit.setKineticEnergy(kineticEnergy);
+
+  if (particleDefinition->GetPDGCharge() != 0.0) {
+    const RecombinationGroupTable::Entry* group =
+        RecombinationGroupTable::threadLocalInstance().find(track->GetTrackID());
+    if (group != nullptr) {
+      hit.setGroupOrigin(group->originTrackID, group->originPosition);
+    }
+  }
+  else {
+    // secondaries of this interaction are created at the post-step point with this track as the parent
+    hit.setGroupOrigin(track->GetTrackID(), post_step_position);
+  }
 
   G4ThreeVector local_position = position;
 

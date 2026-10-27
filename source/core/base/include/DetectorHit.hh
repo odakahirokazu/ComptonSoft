@@ -205,6 +205,24 @@ public:
   void setdEdx(double v) { dedx_ = v; }
   double dEdx() const { return dedx_; }
 
+  void setGroupOrigin(int32_t trackID, const vector3_t& position)
+  {
+    groupOriginTrackID_ = trackID;
+    groupOriginPosition_ = position;
+  }
+  int32_t GroupOriginTrackID() const { return groupOriginTrackID_; }
+  vector3_t GroupOriginPosition() const { return groupOriginPosition_; }
+  bool hasGroup() const { return groupOriginTrackID_ != 0; }
+
+  void setRecombinationRate(double rate, double quantaFluctuationFactor = 1.0)
+  {
+    recombinationRate_ = rate;
+    quantaFluctuationFactor_ = quantaFluctuationFactor;
+  }
+  double RecombinationRate() const { return recombinationRate_; }
+  double QuantaFluctuationFactor() const { return quantaFluctuationFactor_; }
+  bool hasRecombinationRate() const { return recombinationRate_ >= 0.0; }
+
   void setProcess(uint32_t v) { process_ = v; }
   uint32_t Process() const { return process_; }
   void addProcess(uint32_t f) { process_ |= f; }
@@ -357,6 +375,10 @@ private:
   double energyCharge_ = 0.0;
   double kineticEnergy_ = 0.0;
   double dedx_ = 0.0;
+  int32_t groupOriginTrackID_ = 0;
+  vector3_t groupOriginPosition_{0.0, 0.0, 0.0};
+  double recombinationRate_ = -1.0;
+  double quantaFluctuationFactor_ = 1.0;
   uint32_t process_ = 0u;
   // trigger information
   double selfTriggeredTime_ = 0.0;
