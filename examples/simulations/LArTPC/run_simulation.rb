@@ -14,8 +14,9 @@ def run_simulation(num, random, output)
                    detector_parameters: "database/detector_parameters.xml")
   sim.set_gdml "database/mass_model.gdml"
   sim.set_physics(hadron_hp: false, cut_value: 0.001)
+  sim.add_pickup_data :AssignRecombinationGroup # required for group_mode="1" in detector_parameters.xml
 
-  sim.set_primary_generator :PlaneWavePrimaryGen, {
+  sim.set_primary_generator :PlaneWavePrimaryGenerator, {
     particle: "gamma",
     photon_index: 0.0,
     energy_min: energy,
@@ -24,12 +25,12 @@ def run_simulation(num, random, output)
     direction: vec(0.0, 0.0, -1.0),
     radius: 10.0
   }
-
+  sim.num_events_per_run = 1
   sim.run(num)
 end
 
 ### main ###
 num = 10
-output = "simulation_BM.root"
+output = "simulation_test.root"
 random = 0
 run_simulation(num, random, output)

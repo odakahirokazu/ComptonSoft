@@ -14,7 +14,8 @@ VLArRecombinationModel::VLArRecombinationModel(const std::string& name)
 VLArRecombinationModel::~VLArRecombinationModel() = default;
 
 VLArRecombinationModel::VLArRecombinationModel(const std::string& name, const std::map<std::string, double>& params)
-  : name_(name)
+  : name_(name),
+    parameters_(params)
 {
   seed_ = std::random_device()();
   rng_ = std::mt19937(seed_);

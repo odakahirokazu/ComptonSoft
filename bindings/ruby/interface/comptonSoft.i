@@ -154,6 +154,7 @@
 #endif
 #include "SampleOpticalDepth.hh"
 #include "ObservationPickUpData.hh"
+#include "AssignRecombinationGroup.hh"
 #include "PhysicsListManager.hh"
 #include "ObservationEventStore.hh"
 #include "WriteObservationTree.hh"
@@ -1158,6 +1159,14 @@ class ObservationPickUpData : public anlgeant4::VUserActionAssembly
 public:
   ObservationPickUpData();
   ~ObservationPickUpData() = default;
+};
+
+
+class AssignRecombinationGroup : public anlgeant4::VUserActionAssembly
+{
+public:
+  AssignRecombinationGroup();
+  ~AssignRecombinationGroup() = default;
 };
 
 

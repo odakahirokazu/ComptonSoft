@@ -51,6 +51,7 @@ set(ComptonSoftCore_Framework_Classes
   framework/src/RealDetectorUnitFactory.cc
   ### sensitive detector
   framework/src/VCSSensitiveDetector.cc
+  framework/src/RecombinationGroupTable.cc
   ### manager
   framework/src/DetectorSystem.cc
 )
@@ -112,6 +113,8 @@ set(ComptonSoftCore_Simulation_Classes
   ### observation simulation
   simulation/src/ObservationEventStore.cc
   simulation/src/ObservationPickUpData.cc
+  ### recombination group
+  simulation/src/AssignRecombinationGroup.cc
   simulation/src/ObservationTreeIO.cc
   simulation/src/ObservationTreeIOWithInitialInfo.cc
 )

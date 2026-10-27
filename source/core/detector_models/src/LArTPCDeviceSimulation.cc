@@ -21,6 +21,9 @@
 #include <map>
 #include <vector>
 
+// print the recombination applied to each hit for diagnostics; comment out to disable
+// #define VERBOSE_GROUP_RECOMBINATION
+
 using namespace anlgeant4::unit;
 namespace comptonsoft {
 
@@ -75,6 +78,9 @@ void LArTPCDeviceSimulation::printSimulationParameters(std::ostream& os) const
                : (dEdxMode() == 1 ? "from kinetic energy" : (dEdxMode() == 2 ? "from G4EmCalculator" : "unknown")))
        << "\n";
     os << "  dEdx spline: " << (dedxSpline_ ? dedxSpline_->GetName() : "not set") << "\n";
+    os << "  Recombination group mode: "
+       << (RecombinationGroupMode() == 0 ? "per step" : (RecombinationGroupMode() == 1 ? "per group" : "unknown"))
+       << "\n";
   }
   else {
     os << "  No recombination model is set.\n";
@@ -129,6 +135,23 @@ void LArTPCDeviceSimulation::applyRecombination(DetectorHit_sptr& hit) const
     return;
   }
 
+  if (hit->hasRecombinationRate()) {
+    const double rate = hit->RecombinationRate();
+    const double totalQuanta = edep * hit->QuantaFluctuationFactor() / recombinationModel_->Wexc();
+    const double photonYield = std::max(totalQuanta - edep * rate / recombinationModel_->Wion(), 0.0);
+    hit->setPhotonCount(photonYield *
+                        PhotonEfficiency(hit->LocalPositionX(), hit->LocalPositionY(), hit->LocalPositionZ()));
+    hit->setEnergyCharge(edep * rate);
+    hit->addFlags(flag::RecombinationApplied);
+#ifdef VERBOSE_GROUP_RECOMBINATION
+    std::cout << "[GroupRecombination]     hit: track " << hit->TrackID() << ", particle " << hit->Particle()
+              << ", group origin track " << hit->GroupOriginTrackID() << ", edep = " << edep / keV << " keV"
+              << ", R = " << rate << ", echarge = " << hit->EnergyCharge() / keV << " keV"
+              << ", photons = " << photonYield << " (detected " << hit->PhotonCount() << ")" << std::endl;
+#endif
+    return;
+  }
+
   // auto particle = hit->Particle();
   // auto partDef = G4ParticleTable::GetParticleTable()->FindParticle(particle);
   // if (partDef->GetPDGCharge() == 0) {
@@ -140,7 +163,7 @@ void LArTPCDeviceSimulation::applyRecombination(DetectorHit_sptr& hit) const
   // }
 
   const double step_length = hit->StepLength();
-  const double efield = BiasVoltage() / getThickness();
+  const double efield = ElectricFieldForRecombination();
   RecombinationResult result;
 
   if (dEdxMode() == 0) {

@@ -58,9 +58,13 @@ public:
   void setDedxAveraged(bool v) { isDedxAveraged_ = v; }
   double DedxWindowLength() const { return dEdxWindowLength_; }
   void setDedxWindowLength(double v) { dEdxWindowLength_ = v; }
+  int RecombinationGroupMode() const { return recombinationGroupMode_; }
+  void setRecombinationGroupMode(int mode) { recombinationGroupMode_ = mode; }
+  double ElectricFieldForRecombination() const { return BiasVoltage() / getThickness(); }
 
   void makeRawDetectorHits() override;
   const VLArRecombinationModel* recombinationModel() const override { return recombinationModel_.get(); }
+  VLArRecombinationModel* recombinationModel() { return recombinationModel_.get(); }
 
 protected:
   void calculateEdepStepLengthAverage(const DetectorHitVector& hits);
@@ -80,6 +84,7 @@ private:
   int dedxMode_ = 0; // 0: from step information, 1: from kinetic energy using dEdx file, 2: from kinetic energy using
                      // EMcalculator, 3: from kinetic energy averaged by window, 4: from edep/length averaged by window.
   double dEdxWindowLength_ = 0.0;
+  int recombinationGroupMode_ = 0; // 0: per step, 1: per group of a primary electron and its charged descendants
   std::vector<std::pair<double, double>> averagedEdepStepLength_;
   std::vector<int> zIndicesForEPI_;
 

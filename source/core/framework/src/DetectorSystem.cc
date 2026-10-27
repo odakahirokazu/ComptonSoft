@@ -19,12 +19,17 @@
 
 #include "DetectorSystem.hh"
 
+#include <algorithm>
 #include <iostream>
 #include <sstream>
+#include <tuple>
 
 #include <boost/filesystem/path.hpp>
 #include <boost/format.hpp>
 #include <boost/lexical_cast.hpp>
+
+// print the recombination of each group for diagnostics; comment out to disable
+// #define VERBOSE_GROUP_RECOMBINATION
 #include <boost/property_tree/xml_parser.hpp>
 
 #include "TFile.h"
@@ -1106,6 +1111,12 @@ void DetectorSystem::setupDetectorParameters(const DetectorSystem::ParametersNod
     }
   }
 
+  if (auto o = parameters.recombination_group_mode) {
+    if (LArTPCDeviceSimulation* ds1 = dynamic_cast<LArTPCDeviceSimulation*>(ds)) {
+      ds1->setRecombinationGroupMode(*o);
+    }
+  }
+
   if (auto o = parameters.depth_sensing_mode) {
     ds->setDepthSensingMode(*o);
   }
@@ -1379,8 +1390,8 @@ void DetectorSystem::setupDetectorParameters(const DetectorSystem::ParametersNod
   }
   else if (photon_efficiency_mode == 2) {
     if (!parameters.photon_efficiency_filename || !parameters.photon_efficiency_function) {
-      BOOST_THROW_EXCEPTION(CSException(
-          "photon_efficiency_mode = 2 requires photon_efficiency_filename and photon_efficiency_function"));
+      BOOST_THROW_EXCEPTION(
+          CSException("photon_efficiency_mode = 2 requires photon_efficiency_filename and photon_efficiency_function"));
     }
     const std::string& filename = *parameters.photon_efficiency_filename;
     const std::string& function_name = *parameters.photon_efficiency_function;
@@ -1396,8 +1407,7 @@ void DetectorSystem::setupDetectorParameters(const DetectorSystem::ParametersNod
     ds->setPhotonEfficiency(std::unique_ptr<TF1>(func));
   }
   else if (photon_efficiency_mode != 0) {
-    BOOST_THROW_EXCEPTION(
-        CSException("Invalid photon_efficiency_mode: " + std::to_string(photon_efficiency_mode)));
+    BOOST_THROW_EXCEPTION(CSException("Invalid photon_efficiency_mode: " + std::to_string(photon_efficiency_mode)));
   }
   if (auto o = parameters.photon_noise_param0) {
     ds->setPhotonNoiseParam0(*o);
@@ -1735,6 +1745,9 @@ void DetectorSystem::ParametersNodeContents::load(const boost::property_tree::pt
   if (auto o = node.get_optional<int>("recombination.<xmlattr>.dedx_mode")) {
     recombination_dedx_mode = o;
   }
+  if (auto o = node.get_optional<int>("recombination.<xmlattr>.group_mode")) {
+    recombination_group_mode = o;
+  }
   if (auto o = node.get_optional<std::string>("recombination.<xmlattr>.dedx_file")) {
     recombination_dedx_file = o;
   }
@@ -1794,11 +1807,165 @@ void DetectorSystem::insertRawHit(DetectorHit&& hit)
 
 void DetectorSystem::distributeRawHitsToDetectors()
 {
+  if (!groupRecombinationPrepared_) {
+    prepareGroupRecombination();
+  }
+
+  recombinationGroupMembers_.clear();
   const std::vector<DetectorHit>& hits = event_store_->getHits();
   for (const DetectorHit& hit : hits) {
     const int detectorID = hit.DetectorID();
+    const int index = detectorIDMap_.at(detectorID);
     auto hit_copy = std::make_shared<DetectorHit>(hit);
-    getDeviceSimulationByID(detectorID)->insertRawHit(hit_copy);
+    getDeviceSimulationByIndex(index)->insertRawHit(hit_copy);
+
+    if (groupRecombinationModel_ != nullptr && groupRecombinationFlags_[index]) {
+      if (!hit_copy->hasGroup()) {
+        throw std::runtime_error("DetectorSystem::distributeRawHitsToDetectors: a hit has no recombination group. "
+                                 "AssignRecombinationGroup is required for the recombination group mode.");
+      }
+      const vector3_t origin = hit_copy->GroupOriginPosition();
+      recombinationGroupMembers_.push_back(
+          {hit_copy->GroupOriginTrackID(), origin.x(), origin.y(), origin.z(), hit_copy.get()});
+    }
+  }
+
+  if (!recombinationGroupMembers_.empty()) {
+    applyGroupRecombination();
+  }
+}
+
+void DetectorSystem::prepareGroupRecombination()
+{
+  groupRecombinationFlags_.assign(deviceSimulationVector_.size(), 0);
+  groupRecombinationModel_ = nullptr;
+  groupRecombinationEField_ = 0.0;
+
+  std::vector<std::pair<std::size_t, LArTPCDeviceSimulation*>> larDevices;
+  bool groupModeUsed = false;
+  for (std::size_t i = 0; i < deviceSimulationVector_.size(); i++) {
+    LArTPCDeviceSimulation* device = dynamic_cast<LArTPCDeviceSimulation*>(deviceSimulationVector_[i]);
+    if (device != nullptr) {
+      larDevices.emplace_back(i, device);
+      if (device->RecombinationGroupMode() != 0) {
+        groupModeUsed = true;
+      }
+    }
+  }
+  if (!groupModeUsed) {
+    groupRecombinationPrepared_ = true;
+    return;
+  }
+
+  // a group may span detectors, so all LArTPC detectors must share the mode, the model, and the electric field
+  LArTPCDeviceSimulation* reference = nullptr;
+  for (const auto& [index, device] : larDevices) {
+    const int detectorID = device->getID();
+    std::ostringstream message;
+    if (device->RecombinationGroupMode() == 0) {
+      message << "Error: recombination group mode must be used for all LArTPC detectors, "
+              << "but it is not used for detector ID = " << detectorID << ".\n";
+    }
+    else if (device->recombinationModel() == nullptr) {
+      message << "Error: recombination group mode requires a recombination model for all LArTPC detectors, "
+              << "but detector ID = " << detectorID << " has no recombination model.\n";
+    }
+    else if (reference != nullptr &&
+             !device->recombinationModel()->hasSameConfiguration(*reference->recombinationModel())) {
+      message << "Error: recombination group mode requires the same recombination model for all LArTPC detectors, "
+              << "but detector ID = " << detectorID << " (" << device->recombinationModel()->name()
+              << ") differs from detector ID = " << reference->getID() << " ("
+              << reference->recombinationModel()->name() << ").\n";
+    }
+    else if (reference != nullptr &&
+             device->ElectricFieldForRecombination() != reference->ElectricFieldForRecombination()) {
+      constexpr double VoltPerCm = unit::volt / unit::cm;
+      message << "Error: recombination group mode requires the same electric field for all LArTPC detectors, "
+              << "but detector ID = " << detectorID << " (" << device->ElectricFieldForRecombination() / VoltPerCm
+              << " V/cm) differs from detector ID = " << reference->getID() << " ("
+              << reference->ElectricFieldForRecombination() / VoltPerCm << " V/cm).\n";
+    }
+    if (!message.str().empty()) {
+      BOOST_THROW_EXCEPTION(CSException(message.str()));
+    }
+
+    if (reference == nullptr) {
+      reference = device;
+    }
+    groupRecombinationFlags_[index] = 1;
+  }
+
+  groupRecombinationModel_ = reference->recombinationModel();
+  groupRecombinationEField_ = reference->ElectricFieldForRecombination();
+  groupRecombinationPrepared_ = true;
+
+#ifdef VERBOSE_GROUP_RECOMBINATION
+  std::cout << "[GroupRecombination] prepared: model = " << groupRecombinationModel_->name()
+            << ", E-field = " << groupRecombinationEField_ / (unit::volt / unit::cm) << " V/cm"
+            << ", LArTPC detectors = " << larDevices.size() << std::endl;
+#endif
+}
+
+void DetectorSystem::applyGroupRecombination()
+{
+  auto key = [](const RecombinationGroupMember& m) {
+    return std::tie(m.originTrackID, m.originX, m.originY, m.originZ);
+  };
+  std::sort(recombinationGroupMembers_.begin(), recombinationGroupMembers_.end(),
+            [&key](const RecombinationGroupMember& a, const RecombinationGroupMember& b) { return key(a) < key(b); });
+
+#ifdef VERBOSE_GROUP_RECOMBINATION
+  std::cout << "[GroupRecombination] event " << recombinationGroupMembers_.front().hit->EventID() << ": "
+            << recombinationGroupMembers_.size() << " hits" << std::endl;
+#endif
+
+  const auto end = recombinationGroupMembers_.end();
+  for (auto first = recombinationGroupMembers_.begin(); first != end;) {
+    auto last = first;
+    double energy = 0.0;
+    double chargedStepLength = 0.0;
+#ifdef VERBOSE_GROUP_RECOMBINATION
+    int numChargedHits = 0;
+    int numNeutralHits = 0;
+#endif
+    for (; last != end && key(*last) == key(*first); ++last) {
+      const DetectorHit* hit = last->hit;
+      energy += hit->EnergyDeposit();
+      // a hit of a neutral particle has its own track as the origin
+      if (hit->GroupOriginTrackID() != hit->TrackID()) {
+        chargedStepLength += std::max(hit->StepLength(), 0.0);
+#ifdef VERBOSE_GROUP_RECOMBINATION
+        numChargedHits++;
+#endif
+      }
+#ifdef VERBOSE_GROUP_RECOMBINATION
+      else {
+        numNeutralHits++;
+      }
+#endif
+    }
+
+    if (energy > 0.0) {
+      // dE/dx averaged over the group; a group without charged steps gives 0 to a dE/dx-based model.
+      const double dedx = (chargedStepLength > 0.0) ? energy / chargedStepLength : 0.0;
+      const RecombinationResult result =
+          groupRecombinationModel_->calculateRecombination(energy, chargedStepLength, groupRecombinationEField_, dedx);
+      const double rate = result.electronEnergy / energy;
+      const double quantaFluctuationFactor = result.totalQuanta * groupRecombinationModel_->Wexc() / energy;
+      for (auto it = first; it != last; ++it) {
+        it->hit->setRecombinationRate(rate, quantaFluctuationFactor);
+      }
+#ifdef VERBOSE_GROUP_RECOMBINATION
+      std::cout << "[GroupRecombination]   origin (track " << first->originTrackID << ", " << first->originX / unit::cm
+                << ", " << first->originY / unit::cm << ", " << first->originZ / unit::cm << " cm)"
+                << " hits: " << numChargedHits << " charged + " << numNeutralHits << " neutral"
+                << ", E_group = " << energy / unit::keV << " keV"
+                << ", charged length = " << chargedStepLength / unit::mm << " mm"
+                << ", R = " << rate << ", quanta factor = " << quantaFluctuationFactor
+                << ", electrons = " << result.electronYield << ", photons = " << result.photonYield << std::endl;
+#endif
+    }
+    first = last;
   }
 }
 
