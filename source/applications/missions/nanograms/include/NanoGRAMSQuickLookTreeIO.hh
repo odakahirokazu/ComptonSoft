@@ -62,6 +62,8 @@ enum class TPCEventType : int16_t
  * - energy_cmn_sub: EPI of the MCDs (charge x W_ion) [keV]
  * - ti, drift_time: raw counters of the DAQ
  * - waveform: corrected light waveforms (LightData::Waveform) of the valid channels [mV]
+ *   (waveform_len is the longest length; shorter channels are padded with their last sample,
+ *    and the actual length of each channel is in waveform_ch_len)
  * - light_integrated_charge: light charge integrated in ROI of each DPP channel [C]
  *   (RealDetectorUnitNanoGRAMS::LightIntegratedCharge of the general and pileup analysis channels;
  *    0 for the other channels)
@@ -136,6 +138,7 @@ private:
   std::string light_integrated_charge_leaflist_;
   std::string light_peak_value_leaflist_;
   std::string waveform_dpp_ch_leaflist_;
+  std::string waveform_ch_len_leaflist_;
   std::string waveform_leaflist_;
 
   int64_t raw_event_id_ = 0;
@@ -152,6 +155,7 @@ private:
   std::array<double, NUM_CH_DPP_MAX> light_integrated_charge_{};
   std::array<double, NUM_CH_DPP_MAX> light_peak_value_{};
   std::vector<int16_t> waveform_dpp_ch_;
+  std::vector<int32_t> waveform_ch_len_;
   std::vector<float> waveform_;
   ClusterBranches hit_;     // selected clusters
   ClusterBranches rej_hit_; // rejected clusters

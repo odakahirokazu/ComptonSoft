@@ -29,7 +29,7 @@
 #include "FlagDefinition.hh"
 #include "LightData.hh"
 #include "NanoGRAMSConfig.hh"
-#include "NanoGRAMSReadTPCEvents.hh"
+#include "NanoGRAMSLoadConfig.hh"
 #include "RealDetectorUnitNanoGRAMS.hh"
 
 using namespace anlnext;
@@ -54,7 +54,6 @@ ANLStatus NanoGRAMSAnalyzeLight::mod_initialize()
     return status;
   }
 
-  get_module("NanoGRAMSReadTPCEvents", &reader_);
   get_module("NanoGRAMSLoadConfig", &configLoader_);
   config_ = &configLoader_->config();
   return AS_OK;

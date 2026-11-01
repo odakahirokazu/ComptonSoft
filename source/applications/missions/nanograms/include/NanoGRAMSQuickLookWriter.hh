@@ -22,6 +22,7 @@
 namespace comptonsoft {
 
 class NanoGRAMSReadTPCEvents;
+class NanoGRAMSReadDppEvents;
 class RealDetectorUnitNanoGRAMS;
 class NanoGRAMSLoadConfig;
 
@@ -30,6 +31,8 @@ class NanoGRAMSLoadConfig;
  * The event type is classified with the flags of the detector unit and the criteria of NanoGRAMSSelectEvents:
  *   Other (excluded core) > Gamma (a cluster survives the selection) > Cosmic > PileUp > TimeUp > Other.
  * Error events are not written since they are skipped by NanoGRAMSReadTPCEvents.
+ * The event ID is taken from NanoGRAMSReadTPCEvents, or from NanoGRAMSReadDppEvents for DPP-only data
+ * (then only the light branches are meaningful).
  *
  * This module should be placed after SelectHits and before NanoGRAMSSelectEvents
  * to write the events that are rejected by the selection.
@@ -62,6 +65,7 @@ private:
   int detector_id_ = 0;
 
   const NanoGRAMSReadTPCEvents* tpc_events_ = nullptr;
+  const NanoGRAMSReadDppEvents* dpp_events_ = nullptr;
   const RealDetectorUnitNanoGRAMS* detector_ = nullptr;
   const NanoGRAMSLoadConfig* configLoader_ = nullptr;
   std::unique_ptr<grams::QuickLookTreeIO> writer_;

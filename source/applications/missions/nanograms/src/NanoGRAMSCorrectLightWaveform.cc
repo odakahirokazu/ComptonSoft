@@ -28,7 +28,6 @@
 #include "NanoGRAMSConfig.hh"
 #include "NanoGRAMSLightWaveformCorrection.hh"
 #include "NanoGRAMSLoadConfig.hh"
-#include "NanoGRAMSReadTPCEvents.hh"
 #include "RealDetectorUnitNanoGRAMS.hh"
 
 using namespace anlnext;
@@ -47,9 +46,7 @@ ANLStatus NanoGRAMSCorrectLightWaveform::mod_initialize()
     return status;
   }
 
-  const NanoGRAMSReadTPCEvents* reader = nullptr;
   const NanoGRAMSLoadConfig* configLoader = nullptr;
-  get_module("NanoGRAMSReadTPCEvents", &reader);
   get_module("NanoGRAMSLoadConfig", &configLoader);
   config_ = &configLoader->config();
   return AS_OK;

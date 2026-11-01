@@ -137,6 +137,7 @@ class FilterByGoodTimeIntervalsForHXI;
 class NanoGRAMSLoadConfig;
 class AssignTimeWithExpDistribution;
 class NanoGRAMSReadTPCEvents;
+class NanoGRAMSReadDppEvents;
 class NanoGRAMSCorrectLightWaveform;
 class NanoGRAMSAnalyzeLight;
 class NanoGRAMSSelectEvents;

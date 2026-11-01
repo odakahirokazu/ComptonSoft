@@ -89,8 +89,11 @@ QuickLookTreeIO::QuickLookTreeIO(const std::string& output_file_path, const Real
 
   if (save_waveforms_) {
     waveform_dpp_ch_ = validLightChannels(detector);
-    if (!waveform_dpp_ch_.empty()) {
-      waveform_len_ = detector.getLightData(waveform_dpp_ch_.front())->NumberOfPoints();
+    // the waveform lengths can differ between the channels (e.g. different wave_compress)
+    for (const int16_t dpp_ch : waveform_dpp_ch_) {
+      const int len = detector.getLightData(dpp_ch)->NumberOfPoints();
+      waveform_ch_len_.push_back(len);
+      waveform_len_ = std::max(waveform_len_, len);
     }
   }
   waveform_num_channels_ = static_cast<int>(waveform_dpp_ch_.size());
@@ -222,10 +225,12 @@ void QuickLookTreeIO::bindBranches()
   quicklook_tree_->Branch("light_peak_value", light_peak_value_.data(), light_peak_value_leaflist_.c_str());
   if (save_waveforms_) {
     waveform_dpp_ch_leaflist_ = (boost::format("waveform_dpp_ch[%1%]/S") % waveform_num_channels_).str();
+    waveform_ch_len_leaflist_ = (boost::format("waveform_ch_len[%1%]/I") % waveform_num_channels_).str();
     waveform_leaflist_ = (boost::format("waveform[%1%][%2%]/F") % waveform_num_channels_ % waveform_len_).str();
     quicklook_tree_->Branch("waveform_len", &waveform_len_branch_, "waveform_len/I");
     quicklook_tree_->Branch("waveform_num_channels", &waveform_num_channels_branch_, "waveform_num_channels/I");
     quicklook_tree_->Branch("waveform_dpp_ch", waveform_dpp_ch_.data(), waveform_dpp_ch_leaflist_.c_str());
+    quicklook_tree_->Branch("waveform_ch_len", waveform_ch_len_.data(), waveform_ch_len_leaflist_.c_str());
     quicklook_tree_->Branch("waveform", waveform_.data(), waveform_leaflist_.c_str());
   }
   bindClusterBranches("hit", hit_);
@@ -270,6 +275,9 @@ void QuickLookTreeIO::setBranchAddresses()
     quicklook_tree_->SetBranchAddress("waveform_len", &waveform_len_branch_);
     quicklook_tree_->SetBranchAddress("waveform_num_channels", &waveform_num_channels_branch_);
     quicklook_tree_->SetBranchAddress("waveform_dpp_ch", waveform_dpp_ch_.data());
+    if (quicklook_tree_->FindBranch("waveform_ch_len")) {
+      quicklook_tree_->SetBranchAddress("waveform_ch_len", waveform_ch_len_.data());
+    }
     quicklook_tree_->SetBranchAddress("waveform", waveform_.data());
   }
 
@@ -300,13 +308,16 @@ void QuickLookTreeIO::fillWaveforms(const RealDetectorUnitNanoGRAMS& detector)
 
   for (std::size_t output_slot = 0; output_slot < waveform_dpp_ch_.size(); ++output_slot) {
     const std::vector<double>& waveform = detector.getLightData(waveform_dpp_ch_[output_slot])->Waveform();
-    if (static_cast<int>(waveform.size()) != waveform_len_) {
+    const int len = static_cast<int>(waveform.size());
+    if (len != waveform_ch_len_[output_slot]) {
       throw std::runtime_error(
           "Light waveform length changed; the quicklook waveform layout is fixed by the first event.");
     }
+    // shorter channels are padded with their last sample (empty -> 0)
     const std::size_t output_offset = output_slot * waveform_len_;
     for (int i = 0; i < waveform_len_; ++i) {
-      waveform_[output_offset + i] = static_cast<float>(waveform[i] / (unit::volt / 1000.0));
+      const double value = (len == 0) ? 0.0 : waveform[std::min(i, len - 1)];
+      waveform_[output_offset + i] = static_cast<float>(value / (unit::volt / 1000.0));
     }
   }
 }

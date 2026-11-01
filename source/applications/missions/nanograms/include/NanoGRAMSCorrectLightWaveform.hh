@@ -36,8 +36,9 @@ struct Config;
  *      time_window (samples in light.pedestal_time_window_us, time = 0 at the trigger)
  *   2. digitizer offset of the interleaved ADC phases (light.digitizer_offset_correction)
  *   3. FFT band-pass filter (light.fft_filter)
- * The configuration is taken from NanoGRAMSReadTPCEvents.
- * This module should be placed between NanoGRAMSReadTPCEvents and NanoGRAMSAnalyzeLight.
+ * The configuration is taken from NanoGRAMSLoadConfig.
+ * This module should be placed between the reader (NanoGRAMSReadTPCEvents or NanoGRAMSReadDppEvents)
+ * and NanoGRAMSAnalyzeLight.
  *
  * @date 2026-09-24 | ported from lightVoltageWaveformFromViewImpl of feature/pipeline_nanograms
  */

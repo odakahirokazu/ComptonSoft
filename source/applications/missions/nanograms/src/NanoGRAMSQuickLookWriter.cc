@@ -20,6 +20,7 @@
 #include "FlagDefinition.hh"
 #include "NanoGRAMSConfig.hh"
 #include "NanoGRAMSQuickLookTreeIO.hh"
+#include "NanoGRAMSReadDppEvents.hh"
 #include "NanoGRAMSReadTPCEvents.hh"
 #include "NanoGRAMSSelectEvents.hh"
 #include "RealDetectorUnitNanoGRAMS.hh"
@@ -69,11 +70,16 @@ ANLStatus NanoGRAMSQuickLookWriter::mod_initialize()
   if (status != AS_OK) {
     return status;
   }
-  if (!exist_module("NanoGRAMSReadTPCEvents")) {
-    std::cerr << "NanoGRAMSReadTPCEvents not found" << std::endl;
+  if (exist_module("NanoGRAMSReadTPCEvents")) {
+    get_module("NanoGRAMSReadTPCEvents", &tpc_events_);
+  }
+  else if (exist_module("NanoGRAMSReadDppEvents")) {
+    get_module("NanoGRAMSReadDppEvents", &dpp_events_);
+  }
+  else {
+    std::cerr << "NanoGRAMSReadTPCEvents or NanoGRAMSReadDppEvents not found" << std::endl;
     return AS_QUIT_ERROR;
   }
-  get_module("NanoGRAMSReadTPCEvents", &tpc_events_);
 
   if (!exist_module("NanoGRAMSLoadConfig")) {
     std::cerr << "NanoGRAMSLoadConfig not found" << std::endl;
@@ -105,7 +111,8 @@ ANLStatus NanoGRAMSQuickLookWriter::mod_analyze()
   if (!writer_) {
     writer_ = std::make_unique<grams::QuickLookTreeIO>(quicklook_file_, *detector_, save_waveforms_);
   }
-  writer_->fillEvent(tpc_events_->currentRawEventId(), event_type, *detector_, selected_clusters, rejectedClusters());
+  const int64_t raw_event_id = tpc_events_ ? tpc_events_->currentRawEventId() : dpp_events_->currentRawEventId();
+  writer_->fillEvent(raw_event_id, event_type, *detector_, selected_clusters, rejectedClusters());
   return AS_OK;
 }
 

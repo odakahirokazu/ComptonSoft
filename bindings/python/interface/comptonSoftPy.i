@@ -2,6 +2,7 @@
 
 %{
 #include "NanoGRAMSReadTPCEvents.hh"
+#include "NanoGRAMSReadDppEvents.hh"
 #include "NanoGRAMSCorrectLightWaveform.hh"
 #include "NanoGRAMSAnalyzeLight.hh"
 #include "NanoGRAMSSelectEvents.hh"
@@ -31,6 +32,13 @@ class NanoGRAMSReadTPCEvents : public anlnext::BasicModule
 public:
   NanoGRAMSReadTPCEvents();
   ~NanoGRAMSReadTPCEvents();
+};
+
+class NanoGRAMSReadDppEvents : public anlnext::BasicModule
+{
+public:
+  NanoGRAMSReadDppEvents();
+  ~NanoGRAMSReadDppEvents();
 };
 
 class NanoGRAMSCorrectLightWaveform : public anlnext::BasicModule

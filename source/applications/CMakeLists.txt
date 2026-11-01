@@ -250,6 +250,7 @@ set(ComptonSoftApplications_Missions_NanoGRAMS_Classes
   missions/nanograms/src/NanoGRAMSFECGeometry.cc
   ### data format
   missions/nanograms/src/DppListDataDefinition.cc
+  missions/nanograms/src/NanoGRAMSRootIO.cc
   missions/nanograms/src/NanoGRAMSTPCTreeIO.cc
   missions/nanograms/src/NanoGRAMSQuickLookTreeIO.cc
   ### calibration
@@ -267,6 +268,7 @@ set(ComptonSoftApplications_Missions_NanoGRAMS_Classes
 set(ComptonSoftApplications_Missions_NanoGRAMS_Modules
   missions/nanograms/src/NanoGRAMSQuickLookWriter.cc
   missions/nanograms/src/NanoGRAMSReadTPCEvents.cc
+  missions/nanograms/src/NanoGRAMSReadDppEvents.cc
   missions/nanograms/src/NanoGRAMSCorrectLightWaveform.cc
   missions/nanograms/src/NanoGRAMSAnalyzeLight.cc
   missions/nanograms/src/NanoGRAMSSelectEvents.cc

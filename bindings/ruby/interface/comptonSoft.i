@@ -202,6 +202,7 @@
 #include "NumHitsInDetectorFilter.hh"
 #include "NanoGRAMSLoadConfig.hh"
 #include "NanoGRAMSReadTPCEvents.hh"
+#include "NanoGRAMSReadDppEvents.hh"
 #include "NanoGRAMSCorrectLightWaveform.hh"
 #include "NanoGRAMSAnalyzeLight.hh"
 #include "NanoGRAMSSelectEvents.hh"
@@ -1392,6 +1393,14 @@ class NanoGRAMSReadTPCEvents : public VCSModule
 public:
   NanoGRAMSReadTPCEvents();
   ~NanoGRAMSReadTPCEvents() override;
+};
+
+
+class NanoGRAMSReadDppEvents : public VCSModule
+{
+public:
+  NanoGRAMSReadDppEvents();
+  ~NanoGRAMSReadDppEvents() override;
 };
 
 

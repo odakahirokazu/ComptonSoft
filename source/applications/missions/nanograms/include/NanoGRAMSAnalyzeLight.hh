@@ -28,7 +28,6 @@ namespace comptonsoft {
 
 class LightData;
 class RealDetectorUnitNanoGRAMS;
-class NanoGRAMSReadTPCEvents;
 class NanoGRAMSLoadConfig;
 namespace grams {
 struct Config;
@@ -49,7 +48,7 @@ struct Config;
  *   their sum over the general analysis channels is set as the photon count (RealDetectorUnitNanoGRAMS::PhotonCount).
  * - pileup analysis channels: the integrated charge is also set (not included in the photon count)
  * This module must be placed before SelectHits so that the photon count is given to the hits.
- * The parameters are taken from the configuration of NanoGRAMSReadTPCEvents.
+ * The parameters are taken from the configuration of NanoGRAMSLoadConfig.
  *
  * @date 2026-09-24 | ported from NanoGRAMSLightAnalysis (analyzeLightEvent)
  */
@@ -78,7 +77,6 @@ private:
   double integratedROICharge(const LightData& lightData) const;
 
 private:
-  const NanoGRAMSReadTPCEvents* reader_ = nullptr;
   const grams::Config* config_ = nullptr;
   const NanoGRAMSLoadConfig* configLoader_ = nullptr;
 };

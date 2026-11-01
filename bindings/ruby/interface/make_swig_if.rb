@@ -157,6 +157,7 @@ classList = [
   
   ANL::SWIGClass.new("NanoGRAMSLoadConfig"),
   ANL::SWIGClass.new("NanoGRAMSReadTPCEvents"),
+  ANL::SWIGClass.new("NanoGRAMSReadDppEvents"),
   ANL::SWIGClass.new("NanoGRAMSCorrectLightWaveform"),
   ANL::SWIGClass.new("NanoGRAMSAnalyzeLight"),
   ANL::SWIGClass.new("NanoGRAMSSelectEvents"),
