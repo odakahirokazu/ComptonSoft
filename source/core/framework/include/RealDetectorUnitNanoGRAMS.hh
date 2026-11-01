@@ -162,6 +162,9 @@ public:
   void setExcludedCorePixels(int fec, const std::vector<int>& channels);
   bool isExcludedCorePixel(int fec, int channel) const;
 
+  void setRunID(int32_t runid) { run_id_ = runid; }
+  int32_t runID() const { return run_id_; }
+
   void resetTimeTracking();
 
   NanoGRAMSMultiChannelData* getNanoGRAMSMultiChannelData(int i)
@@ -198,6 +201,7 @@ private:
   std::vector<int64_t> rawDriftTime_;
   uint32_t unixTime_;
   uint64_t eventFlags_;
+  int32_t run_id_;
   std::vector<double> lightIntegratedCharge_;
   std::vector<double> lightPeakValue_;
   double lightPHA_;

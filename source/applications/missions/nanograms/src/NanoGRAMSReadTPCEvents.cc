@@ -161,6 +161,7 @@ void NanoGRAMSReadTPCEvents::fillEventsIntoDetectors()
     // always RealDetectorUnitNanoGRAMS
     auto* nanograms = static_cast<RealDetectorUnitNanoGRAMS*>(detector.get());
     nanograms->setUnixTime(current_unix_time_);
+    nanograms->setRunID(run_id_);
     for (int fec = 0; fec < NUM_VATA; ++fec) {
       MultiChannelData* mcd = nanograms->getMultiChannelData(fec);
       for (int ch = 0; ch < NUM_CH_EACH_VATA; ++ch) {

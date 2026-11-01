@@ -94,6 +94,7 @@ void RealDetectorUnitNanoGRAMS::selectHits()
   for (int i = 0; i < NumberOfDetectorHits(); ++i) {
     DetectorHit_sptr hit = getDetectorHit(i);
     const int fec = hit->DetectorSection();
+    hit->setRunID(run_id_);
     const auto* mcd = dynamic_cast<const NanoGRAMSMultiChannelData*>(getMultiChannelData(fec));
     if (mcd) {
       hit->setEPIForSelection(mcd->getEPIForSelection(hit->DetectorChannel()));
