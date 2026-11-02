@@ -62,7 +62,7 @@ enum class TPCEventType : int16_t
  * - energy_cmn_sub: EPI of the MCDs (charge x W_ion) [keV]
  * - ti, drift_time: raw counters of the DAQ
  * - waveform: corrected light waveforms (LightData::Waveform) of the valid channels [mV]
- *   (waveform_len is the longest length; shorter channels are padded with their last sample,
+ *   (waveform_len is the longest length; shorter channels are padded with NaN,
  *    and the actual length of each channel is in waveform_ch_len)
  * - light_integrated_charge: light charge integrated in ROI of each DPP channel [C]
  *   (RealDetectorUnitNanoGRAMS::LightIntegratedCharge of the general and pileup analysis channels;

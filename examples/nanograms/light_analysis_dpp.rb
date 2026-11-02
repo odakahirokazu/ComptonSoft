@@ -32,12 +32,13 @@ class NanoGRAMSLightAnalysisDpp < ANL::ANLApp
                     detector_parameters: "database/detector_parameters.xml")
 
     # yaml configuration (light analysis parameters, analysis channels)
-    # if dpp_config_file is empty, config_dpp.yaml in the directory of each dpplist file is read
+    # dpp_config_file is required for NanoGRAMSReadDppEvents (common to all the dpplist files)
     chain :NanoGRAMSLoadConfig
     with_parameters(config_file: $config_file,
-                    dpp_config_file: @dpp_config_file || "")
+                    dpp_config_file: @dpp_config_file)
 
-    # read dpplist: entries with the same trigger ID -> one event; light waveforms -> LightData
+    # read dpplist (all the files as one TChain): entries with the same trigger ID -> one event;
+    # light waveforms -> LightData
     chain :NanoGRAMSReadDppEvents
     with_parameters(dpplist_files: @dpplist_files,
                     tree_name: "dpplist")
@@ -119,6 +120,7 @@ data_group_list.each do |tag|
     puts "[run] #{event_dir_name(time_id)}: #{dpplist_files.size} dpp_list files"
     a = NanoGRAMSLightAnalysisDpp.new
     a.dpplist_files = dpplist_files
+    a.dpp_config_file = File.join(data_dir, "config_dpp.yaml")
     a.quicklook_file = File.join(outdir, "quicklook.root")
     a.save_waveforms = true
     a.run(:all, 100000)

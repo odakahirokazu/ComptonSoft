@@ -26,6 +26,7 @@
 #include <cstdint>
 #include <filesystem>
 #include <iostream>
+#include <limits>
 #include <memory>
 #include <stdexcept>
 #include <string>
@@ -313,11 +314,11 @@ void QuickLookTreeIO::fillWaveforms(const RealDetectorUnitNanoGRAMS& detector)
       throw std::runtime_error(
           "Light waveform length changed; the quicklook waveform layout is fixed by the first event.");
     }
-    // shorter channels are padded with their last sample (empty -> 0)
+    // shorter channels are padded with NaN
     const std::size_t output_offset = output_slot * waveform_len_;
     for (int i = 0; i < waveform_len_; ++i) {
-      const double value = (len == 0) ? 0.0 : waveform[std::min(i, len - 1)];
-      waveform_[output_offset + i] = static_cast<float>(value / (unit::volt / 1000.0));
+      waveform_[output_offset + i] = (i < len) ? static_cast<float>(waveform[i] / (unit::volt / 1000.0))
+                                               : std::numeric_limits<float>::quiet_NaN();
     }
   }
 }

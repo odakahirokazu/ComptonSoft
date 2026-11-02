@@ -19,8 +19,7 @@
 
 #include "NanoGRAMSReadDppEvents.hh"
 
-#include <TFile.h>
-#include <TTree.h>
+#include <TChain.h>
 
 #include "AstroUnits.hh"
 
@@ -76,11 +75,12 @@ ANLStatus NanoGRAMSReadDppEvents::mod_initialize()
     throw std::runtime_error("dpplist input file path is empty.");
   }
 
-  input_file_index_ = 0;
   processed_entries_ = 0;
   current_raw_event_id_ = -1;
   incomplete_events_ = 0;
   duplicated_channel_entries_ = 0;
+  layout_ready_ = false;
+  events_waiting_for_layout_ = 0;
 
   if (!exist_module("NanoGRAMSLoadConfig")) {
     std::cerr << "NanoGRAMSLoadConfig not found" << std::endl;
@@ -89,7 +89,15 @@ ANLStatus NanoGRAMSReadDppEvents::mod_initialize()
 
   get_module_NC("NanoGRAMSLoadConfig", &configLoader_);
 
+  // the DPP configuration (light_delay_counts) is common to all the input files
+  if (!configLoader_->IsDppConfigSet()) {
+    std::cerr << "dpp_config_file of NanoGRAMSLoadConfig is not set" << std::endl;
+    return AS_QUIT_ALL_ERROR;
+  }
+
   selectLightChannels();
+
+  openDppChain();
 
   return AS_OK;
 }
@@ -105,53 +113,27 @@ void NanoGRAMSReadDppEvents::selectLightChannels()
   }
 }
 
-bool NanoGRAMSReadDppEvents::openNextDppFile()
+void NanoGRAMSReadDppEvents::openDppChain()
 {
-  dpp_root_io_.reset();
-  input_file_.reset();
-  auto& cfg = configLoader_->config();
-
-  while (input_file_index_ < dpplist_files_.size()) {
-    const std::string input_path = dpplist_files_[input_file_index_++];
+  chain_ = std::make_unique<TChain>(tree_name_.c_str());
+  for (const std::string& input_path : dpplist_files_) {
     if (input_path.empty()) {
       continue;
     }
-
-    // the light data settings (DPP configuration) can be different for each input file
-    if (!configLoader_->IsDppConfigSet()) {
-      grams::readDPPConfig(cfg, input_path);
-    }
-
-    auto input_file = std::make_unique<TFile>(input_path.c_str(), "READ");
-    if (input_file->IsZombie()) {
-      throw std::runtime_error("Failed to open input ROOT file: " + input_path);
-    }
-    TTree* dpp_tree = dynamic_cast<TTree*>(input_file->Get(tree_name_.c_str()));
-    if (!dpp_tree) {
+    // nentries = 0: the file is opened here to check the tree
+    if (chain_->Add(input_path.c_str(), 0) == 0) {
       throw std::runtime_error((boost::format("Missing TTree '%1%' in %2%") % tree_name_ % input_path).str());
     }
-
-    const int64_t entries = static_cast<int64_t>(dpp_tree->GetEntries());
-    if (entries == 0) {
-      std::cout << "[NanoGRAMSReadDppEvents] skip empty dpplist: " << input_path << "\n";
-      continue;
-    }
-    input_file_ = std::move(input_file);
-    dpp_root_io_ = std::make_unique<ngUtil::DppRootIO>(false, 2);
-    dpp_root_io_->LoadTree(dpp_tree);
-    dpp_root_io_->SetBranchAddress();
-    num_entries_ = entries;
-    current_entry_ = 0;
-    pending_entry_ = false;
-    // the layout is taken from the first complete event of the file (see mod_analyze)
-    layout_ready_ = false;
-    events_waiting_for_layout_ = 0;
-    std::cout << "[NanoGRAMSReadDppEvents] input file: " << input_path << "\n"
-              << "[NanoGRAMSReadDppEvents] dpplist entries: " << entries << "\n";
-
-    return true;
+    std::cout << "[NanoGRAMSReadDppEvents] input file: " << input_path << "\n";
   }
-  return false;
+
+  num_entries_ = static_cast<int64_t>(chain_->GetEntries());
+  current_entry_ = 0;
+  pending_entry_ = false;
+  dpp_root_io_ = std::make_unique<ngUtil::DppRootIO>(false, 2);
+  dpp_root_io_->LoadTree(chain_.get());
+  dpp_root_io_->SetBranchAddress();
+  std::cout << "[NanoGRAMSReadDppEvents] dpplist entries: " << num_entries_ << "\n";
 }
 
 bool NanoGRAMSReadDppEvents::readNextEntry()
@@ -168,9 +150,8 @@ void NanoGRAMSReadDppEvents::addCurrentEntry()
 {
   const int dppChannel = static_cast<int>(dpp_root_io_->GetChannel());
   if (dppChannel >= NUM_CH_DPP_MAX) {
-    throw std::runtime_error((boost::format("DPP channel %1% is out of range (entry %2%)")
-                              % dppChannel % (current_entry_ - 1))
-                               .str());
+    throw std::runtime_error(
+        (boost::format("DPP channel %1% is out of range (entry %2%)") % dppChannel % (current_entry_ - 1)).str());
   }
   if (buffer_.waveRegistered(dppChannel)) {
     // the same channel appears twice in one trigger; the first one is kept
@@ -179,9 +160,8 @@ void NanoGRAMSReadDppEvents::addCurrentEntry()
   }
   const int waveformLength = static_cast<int>(dpp_root_io_->GetWaveNum());
   if (waveformLength > MAX_WAVE_LENGTH) {
-    throw std::runtime_error((boost::format("Waveform length of DPP ch %1% exceeds the maximum: %2%")
-                              % dppChannel % waveformLength)
-                               .str());
+    throw std::runtime_error(
+        (boost::format("Waveform length of DPP ch %1% exceeds the maximum: %2%") % dppChannel % waveformLength).str());
   }
   const auto& waveData = dpp_root_io_->GetWaveData();
   std::copy(waveData.begin(), waveData.begin() + waveformLength, buffer_.waveform[dppChannel].begin());
@@ -191,37 +171,24 @@ void NanoGRAMSReadDppEvents::addCurrentEntry()
 
 bool NanoGRAMSReadDppEvents::readNextDppEvent()
 {
-  while (true) {
-    if (!dpp_root_io_ && !openNextDppFile()) {
-      return false;
-    }
-
-    // consecutive entries with the same trigger ID form one event
-    buffer_.clear();
-    bool started = false;
-    while (pending_entry_ || readNextEntry()) {
-      pending_entry_ = false;
-      const uint32_t triggerID = dpp_root_io_->GetTriggerID();
-      if (started && triggerID != buffer_.trigger_id) {
-        // this entry belongs to the next event
-        pending_entry_ = true;
-        return true;
-      }
-      if (!started) {
-        buffer_.trigger_id = triggerID;
-        buffer_.real_time = dpp_root_io_->GetRealTime();
-        started = true;
-      }
-      addCurrentEntry();
-    }
-
-    // end of the file: an event does not continue to the next file
-    dpp_root_io_.reset();
-    input_file_.reset();
-    if (started) {
+  buffer_.clear();
+  bool started = false;
+  while (pending_entry_ || readNextEntry()) {
+    pending_entry_ = false;
+    const uint32_t triggerID = dpp_root_io_->GetTriggerID();
+    if (started && triggerID != buffer_.trigger_id) {
+      // this entry belongs to the next event
+      pending_entry_ = true;
       return true;
     }
+    if (!started) {
+      buffer_.trigger_id = triggerID;
+      buffer_.real_time = dpp_root_io_->GetRealTime();
+      started = true;
+    }
+    addCurrentEntry();
   }
+  return started;
 }
 
 void NanoGRAMSReadDppEvents::fillEventsIntoDetectors()
@@ -248,12 +215,12 @@ void NanoGRAMSReadDppEvents::fillEventsIntoDetectors()
       if (!lightData->isValid()) {
         continue;
       }
-      // the waveform length is fixed by the first complete event of the file (setupLightDataLayout)
+      // the waveform length is fixed by the first complete event (setupLightDataLayout)
       const int waveformLength = static_cast<int>(buffer_.wave_num[dppChannel]);
       if (waveformLength != lightData->NumberOfPoints()) {
-        throw std::runtime_error((boost::format("Waveform length of DPP ch %1% changed within a file: %2% -> %3%")
-                                  % dppChannel % lightData->NumberOfPoints() % waveformLength)
-                                   .str());
+        throw std::runtime_error((boost::format("Waveform length of DPP ch %1% changed: %2% -> %3%") % dppChannel %
+                                  lightData->NumberOfPoints() % waveformLength)
+                                     .str());
       }
       std::vector<double>& rawWaveform = lightData->RawWaveform();
       const auto begin = buffer_.waveform[dppChannel].begin();
@@ -294,8 +261,7 @@ void NanoGRAMSReadDppEvents::setupLightDataLayout()
       const double triggerDelay = static_cast<double>(cfg.light_delay_counts[dppChannel]) * 8.0 * timeWidth;
       const int waveformLength = static_cast<int>(buffer_.wave_num[dppChannel]);
       nanograms->getLightData(dppChannel)->setLayout(waveformLength, timeWidth, -triggerDelay);
-      std::cout << " length=" << waveformLength
-                << " time_width=" << timeWidth / unit::ns << " ns"
+      std::cout << " length=" << waveformLength << " time_width=" << timeWidth / unit::ns << " ns"
                 << " time_start=" << -triggerDelay / unit::us << " us\n";
     }
   }
@@ -305,14 +271,13 @@ void NanoGRAMSReadDppEvents::setupLightDataLayout()
 ANLStatus NanoGRAMSReadDppEvents::mod_analyze()
 {
   if (!readNextDppEvent()) {
-    std::cout << "[NanoGRAMSReadDppEvents] AS_QUIT after processing " << processed_entries_
-              << " dpplist entries (" << current_raw_event_id_ + 1 << " events).\n";
+    std::cout << "[NanoGRAMSReadDppEvents] AS_QUIT after processing " << processed_entries_ << " dpplist entries ("
+              << current_raw_event_id_ + 1 << " events).\n";
     return AS_QUIT;
   }
 
   ++current_raw_event_id_;
   if (!layout_ready_) {
-    // the first event of a file can be the rest of an event split at the file boundary;
     // the layout is taken from the first event having all the light channels in use
     // (or the current event if no such event is found within kMaxEventsWaitingForLayout events)
     constexpr int kMaxEventsWaitingForLayout = 100;
@@ -361,11 +326,11 @@ ANLStatus NanoGRAMSReadDppEvents::mod_end_run()
 {
   std::cout << "Skipped events lacking light channels: " << incomplete_events_ << "\n";
   std::cout << "Ignored entries of duplicated channels in a trigger: " << duplicated_channel_entries_ << "\n";
-  std::cout << "Total processed dpplist entries: " << processed_entries_
-            << " (" << current_raw_event_id_ + 1 << " events)\n";
+  std::cout << "Total processed dpplist entries: " << processed_entries_ << " (" << current_raw_event_id_ + 1
+            << " events)\n";
 
   dpp_root_io_.reset();
-  input_file_.reset();
+  chain_.reset();
   return AS_OK;
 }
 

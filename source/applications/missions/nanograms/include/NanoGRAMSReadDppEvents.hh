@@ -22,9 +22,11 @@
  * @brief Reader of the dpplist tree (nanograms-readout) into the light data of NanoGRAMS.
  *
  * Each entry of the dpplist tree has a waveform of a single DPP channel.
- * Consecutive entries with the same trigger ID are grouped into one event,
- * and the waveforms are filled into LightData in the same way as the waveforms of the tpctree
+ * The input files are read as one TChain, and consecutive entries with the same trigger ID
+ * are grouped into one event (also across the input files).
+ * The waveforms are filled into LightData in the same way as the waveforms of the tpctree
  * (NanoGRAMSReadTPCEvents). Only the version 2 format (with trigger ID) is supported.
+ * The DPP configuration is common to all the input files (dpp_config_file of NanoGRAMSLoadConfig).
  */
 
 #ifndef COMPTONSOFT_NanoGRAMSReadDppEvents_H
@@ -40,7 +42,7 @@
 #include "NanoGRAMSLoadConfig.hh"
 #include "VCSModule.hh"
 
-class TFile;
+class TChain;
 
 namespace ngUtil {
 class DppRootIO;
@@ -84,7 +86,7 @@ public:
   const grams::DppEventBuffer& currentDppBuffer() const { return buffer_; }
 
 private:
-  bool openNextDppFile();
+  void openDppChain();
   bool readNextEntry();
   bool readNextDppEvent();
   void addCurrentEntry();
@@ -95,15 +97,15 @@ private:
   std::vector<std::string> dpplist_files_;
   std::string tree_name_ = "dpplist";
 
-  std::unique_ptr<TFile> input_file_;
+  // declared before dpp_root_io_, which refers to the chain
+  std::unique_ptr<TChain> chain_;
   std::unique_ptr<ngUtil::DppRootIO> dpp_root_io_;
-  std::size_t input_file_index_ = 0;
   int64_t num_entries_ = 0;
   int64_t current_entry_ = 0;
   // the entry read last is not yet added to an event (it belongs to the next trigger)
   bool pending_entry_ = false;
   bool layout_ready_ = false;
-  // incomplete events skipped before the layout of the current file is set
+  // incomplete events skipped before the layout is set
   int events_waiting_for_layout_ = 0;
 
   grams::DppEventBuffer buffer_;
