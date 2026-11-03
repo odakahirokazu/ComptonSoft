@@ -86,7 +86,7 @@ void LArTPCDeviceSimulation::printSimulationParameters(std::ostream& os) const
     os << "  No recombination model is set.\n";
   }
 }
-double LArTPCDeviceSimulation::DiffusionSigmaAnode3D(double z, double& longitudinal, double& transverse)
+double LArTPCDeviceSimulation::DiffusionSigmaAnode3D(double z, double& longitudinal, double& transverse) const
 {
   if (DiffusionMode() == 3) { // Calculate from drift time and diffusion coefficients
     double zAnode;
@@ -114,7 +114,7 @@ double LArTPCDeviceSimulation::DiffusionSigmaAnode3D(double z, double& longitudi
     return DeviceSimulation::DiffusionSigmaAnode(z);
   }
 }
-double LArTPCDeviceSimulation::DiffusionSigmaCathode(double)
+double LArTPCDeviceSimulation::DiffusionSigmaCathode(double) const
 {
   return 0.0; // hole diffusion is not considered
 }
@@ -428,6 +428,45 @@ void LArTPCDeviceSimulation::calculateEdepStepLengthAverage(const DetectorHitVec
 
       averagedEdepStepLength_[indices[k]] = std::make_pair(edepSum, length);
     }
+  }
+}
+
+void LArTPCDeviceSimulation::assignLocalDepth(DetectorHit_sptr hit) const
+{
+  const double localposx = hit->LocalPositionX();
+  const double localposy = hit->LocalPositionY();
+  const double localposz = hit->LocalPositionZ();
+  if (DepthSensingMode() == 2) {
+    double longitudinal, transverse;
+    DiffusionSigmaAnode3D(localposz, longitudinal, transverse);
+    double zMeasured = CLHEP::RandGauss::shoot(localposz, longitudinal);
+    if (zMeasured < -0.5 * getThickness()) {
+      zMeasured = -0.5 * getThickness();
+    }
+    else if (zMeasured > +0.5 * getThickness()) {
+      zMeasured = +0.5 * getThickness();
+    }
+    hit->setDepthSensingMode(DepthSensingMode());
+    hit->setLocalPosition(localposx, localposy, zMeasured);
+  }
+  else {
+    VDeviceSimulation::assignLocalDepth(hit);
+  }
+}
+void LArTPCDeviceSimulation::assignLocalPositionError(DetectorHit_sptr hit) const
+{
+  if (DepthSensingMode() == 2) {
+    const double conversionToSigma = 1.0 / std::sqrt(12.0);
+    const double dx = getVoxelPitchX() * conversionToSigma;
+    const double dy = getVoxelPitchY() * conversionToSigma;
+    const double localposz = hit->LocalPositionZ();
+    double longitudinal, transverse;
+    DiffusionSigmaAnode3D(localposz, longitudinal, transverse);
+    const double dz = longitudinal;
+    hit->setLocalPositionError(dx, dy, dz);
+  }
+  else {
+    VDeviceSimulation::assignLocalPositionError(hit);
   }
 }
 } // namespace comptonsoft

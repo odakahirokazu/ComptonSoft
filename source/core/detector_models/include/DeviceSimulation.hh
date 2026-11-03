@@ -170,8 +170,8 @@ public:
                                double x, double y, double z) const override;
   std::tuple<double, double> calculateEPI(double energyCharge, const PixelID& pixel) const override;
 
-  virtual double DiffusionSigmaAnode(double z);
-  virtual double DiffusionSigmaCathode(double z);
+  virtual double DiffusionSigmaAnode(double z) const;
+  virtual double DiffusionSigmaCathode(double z) const;
 
   virtual bool isCCEMapPrepared() { return false; }
   virtual void buildWPMap() {}

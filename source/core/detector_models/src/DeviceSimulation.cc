@@ -70,7 +70,7 @@ calculateEnergyCharge(const PixelID& pixel,
 }
 
 double DeviceSimulation::DiffusionSigmaAnode(double z)
-{
+const {
   // electron diffusion
   double sigma = 0.;
   if (DiffusionMode()==0) {
@@ -96,7 +96,7 @@ double DeviceSimulation::DiffusionSigmaAnode(double z)
   return sigma;
 }
 
-double DeviceSimulation::DiffusionSigmaCathode(double z)
+double DeviceSimulation::DiffusionSigmaCathode(double z) const
 {
   // hole diffusion
   double sigma = 0.;

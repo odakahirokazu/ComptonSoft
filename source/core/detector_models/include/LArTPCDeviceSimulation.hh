@@ -39,8 +39,8 @@ public:
   }
   void applyRecombination(DetectorHit_sptr& hit) const override;
   void printSimulationParameters(std::ostream& os) const override;
-  double DiffusionSigmaAnode3D(double z, double& longitudinal, double& transverse);
-  double DiffusionSigmaCathode(double z) override;
+  double DiffusionSigmaAnode3D(double z, double& longitudinal, double& transverse) const;
+  double DiffusionSigmaCathode(double z) const override;
   void setDiffusionCoefficientLongitudinal(double val) { longitudinalDiffusionCoefficient_ = val; }
   double DiffusionCoefficientLongitudinal() const { return longitudinalDiffusionCoefficient_; }
   void setDiffusionCoefficientTransverse(double val) { transverseDiffusionCoefficient_ = val; }
@@ -65,6 +65,9 @@ public:
   void makeRawDetectorHits() override;
   const VLArRecombinationModel* recombinationModel() const override { return recombinationModel_.get(); }
   VLArRecombinationModel* recombinationModel() { return recombinationModel_.get(); }
+
+  virtual void assignLocalDepth(DetectorHit_sptr hit) const override;
+  virtual void assignLocalPositionError(DetectorHit_sptr hit) const override;
 
 protected:
   void calculateEdepStepLengthAverage(const DetectorHitVector& hits);
