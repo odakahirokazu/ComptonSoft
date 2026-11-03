@@ -11,12 +11,13 @@
       <common>
         <parameters>
           <upside anode="1" readout="1" />
+          <depth_sensing mode="2" />
           <quenching factor="1.0" />
           <temperature value="87.0" />
           <charge_collection mode="0">
             <mutau electron="1e20" hole="1e20" />
           </charge_collection>
-          <diffusion mode="1">
+          <diffusion mode="3">
             <coefficient transverse="2.472" longitudinal="6.822" /> <!-- in cm2/s-->
           </diffusion>
           <drift_velocity value="164831." /> <!-- in cm/s-->
