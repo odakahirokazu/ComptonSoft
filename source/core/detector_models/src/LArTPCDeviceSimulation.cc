@@ -2,6 +2,7 @@
 #include "AstroUnits.hh"
 #include "CLHEP/Random/RandGauss.h"
 #include "CLHEP/Units/SystemOfUnits.h"
+#include "CSException.hh"
 #include "G4ParticleTable.hh"
 #include "LArEFieldModel.hh"
 #include "TFile.h"
@@ -19,6 +20,7 @@
 #include <cmath>
 #include <iostream>
 #include <map>
+#include <sstream>
 #include <vector>
 
 // print the recombination applied to each hit for diagnostics; comment out to disable
@@ -111,7 +113,11 @@ double LArTPCDeviceSimulation::DiffusionSigmaAnode3D(double z, double& longitudi
     return sigma_t;
   }
   else {
-    return DeviceSimulation::DiffusionSigmaAnode(z);
+    // longitudinal diffusion is modeled only in diffusion mode 3.
+    const double sigma = DeviceSimulation::DiffusionSigmaAnode(z);
+    longitudinal = 0.0;
+    transverse = sigma;
+    return sigma;
   }
 }
 double LArTPCDeviceSimulation::DiffusionSigmaCathode(double) const
@@ -431,12 +437,24 @@ void LArTPCDeviceSimulation::calculateEdepStepLengthAverage(const DetectorHitVec
   }
 }
 
+void LArTPCDeviceSimulation::checkLongitudinalDiffusionMode() const
+{
+  if (DiffusionMode() != 3) {
+    std::ostringstream message;
+    message << "LArTPCDeviceSimulation: depth sensing mode 2 requires diffusion mode 3, but diffusion mode is "
+            << DiffusionMode() << " (Detector ID: " << getID() << ").\n";
+    std::cerr << "Error: " << message.str() << std::flush;
+    BOOST_THROW_EXCEPTION(CSException(message.str()));
+  }
+}
+
 void LArTPCDeviceSimulation::assignLocalDepth(DetectorHit_sptr hit) const
 {
   const double localposx = hit->LocalPositionX();
   const double localposy = hit->LocalPositionY();
   const double localposz = hit->LocalPositionZ();
   if (DepthSensingMode() == 2) {
+    checkLongitudinalDiffusionMode();
     double longitudinal, transverse;
     DiffusionSigmaAnode3D(localposz, longitudinal, transverse);
     double zMeasured = CLHEP::RandGauss::shoot(localposz, longitudinal);
@@ -456,6 +474,7 @@ void LArTPCDeviceSimulation::assignLocalDepth(DetectorHit_sptr hit) const
 void LArTPCDeviceSimulation::assignLocalPositionError(DetectorHit_sptr hit) const
 {
   if (DepthSensingMode() == 2) {
+    checkLongitudinalDiffusionMode();
     const double conversionToSigma = 1.0 / std::sqrt(12.0);
     const double dx = getVoxelPitchX() * conversionToSigma;
     const double dy = getVoxelPitchY() * conversionToSigma;

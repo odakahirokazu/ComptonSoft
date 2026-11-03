@@ -71,6 +71,8 @@ public:
 
 protected:
   void calculateEdepStepLengthAverage(const DetectorHitVector& hits);
+  // depth sensing mode 2 requires diffusion mode 3; throws otherwise.
+  void checkLongitudinalDiffusionMode() const;
 
 private:
   std::unique_ptr<VLArRecombinationModel> recombinationModel_;

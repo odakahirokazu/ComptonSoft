@@ -557,7 +557,17 @@ void DetectorSystem::loadDCDetectorNode(const boost::property_tree::ptree& Detec
       detector->registerMultiChannelData(std::make_unique<NanoGRAMSMultiChannelData>());
     }
     // the channel map is also fixed (ConstructChannelMap skips this detector)
-    detector->setChannelMap(nanograms::makeChannelMap());
+    auto channelMap = nanograms::makeChannelMap();
+    const int numPixelX = static_cast<int>(detector->getNumPixelX());
+    const int numPixelY = static_cast<int>(detector->getNumPixelY());
+    if (numPixelX != static_cast<int>(channelMap->NumX()) || numPixelY != static_cast<int>(channelMap->NumY())) {
+      std::ostringstream message;
+      message << format("Error: pixel numbers (%d x %d) of NanoGRAMS detector (ID: %d) do not match the fixed channel map (%d x %d)\n")
+                     % numPixelX % numPixelY % detector->getID()
+                     % channelMap->NumX() % channelMap->NumY();
+      BOOST_THROW_EXCEPTION(CSException(message.str()));
+    }
+    detector->setChannelMap(channelMap);
     // one light data for each DPP channel; the layout is set by the reader when the data file is opened.
     for (int ch = 0; ch < RealDetectorUnitNanoGRAMS::NumLightChannels; ++ch) {
       detector->registerLightData(std::make_unique<LightData>(1, 1.0 * unit::ns, 0.0));
