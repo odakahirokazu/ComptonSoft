@@ -58,20 +58,20 @@ ANLStatus LoadMetaDataFile::mod_define()
   define_parameter("data_reader_module", &mod_class::data_reader_module_);
   define_parameter("datafile_extension", &mod_class::data_file_extension_);
   define_parameter("metafile_extension", &mod_class::meta_file_extension_);
-  
+
   return AS_OK;
 }
 
 ANLStatus LoadMetaDataFile::mod_initialize()
 {
-  get_module_IFNC(data_reader_module_, &data_reader_);
+  get_module_interface_non_const(data_reader_module_, &data_reader_);
 
   return AS_OK;
 }
 
 ANLStatus LoadMetaDataFile::mod_analyze()
 {
-  data_filename_ = data_reader_->CurrentFilename();
+  data_filename_ = data_reader_->current_filename();
 
   std::string filename = boost::filesystem::path(data_filename_).replace_extension(meta_file_extension_).string();
   boost::property_tree::ptree pt;

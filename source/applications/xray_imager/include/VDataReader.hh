@@ -20,6 +20,8 @@
 #ifndef COMPTONSOFT_VDataReader_H
 #define COMPTONSOFT_VDataReader_H 1
 
+#include <string>
+
 namespace comptonsoft {
 
 /**
@@ -31,11 +33,11 @@ namespace comptonsoft {
 class VDataReader
 {
 public:
-  virtual void addFile(const std::string& filename) = 0;
-  virtual bool hasFile(const std::string& filename) const = 0;
-  virtual bool isDone() const = 0;
+  virtual void add_file(const std::string& filename) = 0;
+  virtual bool has_file(const std::string& filename) const = 0;
+  virtual bool is_done() const = 0;
 
-  virtual std::string CurrentFilename() = 0;
+  virtual std::string current_filename() = 0;
 };
 
 } /* namespace comptonsoft */

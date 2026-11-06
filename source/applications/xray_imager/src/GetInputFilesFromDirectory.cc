@@ -45,13 +45,13 @@ ANLStatus GetInputFilesFromDirectory::mod_define()
   define_parameter("delay", &mod_class::delay_);
   define_parameter("wait", &mod_class::wait_);
   define_parameter("directory_sequence", &mod_class::directory_sequence_);
-  
+
   return AS_OK;
 }
 
 ANLStatus GetInputFilesFromDirectory::mod_initialize()
 {
-  get_module_IFNC(reader_module_, &data_reader_);
+  get_module_interface_non_const(reader_module_, &data_reader_);
   is_new_entry_ = true;
   entry_time_ = std::time(nullptr);
 
@@ -73,7 +73,7 @@ ANLStatus GetInputFilesFromDirectory::mod_analyze()
   const std::string current_directory = directory_sequence_[directory_index_];
   if (!fs::exists(current_directory)) {
     directory_index_++;
-    return AS_REDO;
+    return AS_SKIP;
   }
 
   if (is_new_entry_) {
@@ -84,36 +84,36 @@ ANLStatus GetInputFilesFromDirectory::mod_analyze()
   std::list<fs::path> files;
   for (const auto& f: boost::make_iterator_range(fs::directory_iterator(dir), {})) {
     if (fs::is_directory(f)) { continue; }
-    
+
     const fs::path file = f.path();
-    
+
     if (file.extension() != extension_) { continue; }
-    if (data_reader_->hasFile(file.string())) { continue; }
-    
+    if (data_reader_->has_file(file.string())) { continue; }
+
     files.push_back(file);
   }
 
   files.sort();
   bool added = false;
   for (const fs::path& file: files) {
-    const std::time_t timeModified = fs::last_write_time(file);
-    if (timeModified+delay_ < std::time(nullptr)) {
-      data_reader_->addFile(file.string());
+    const std::time_t time_modified = fs::last_write_time(file);
+    if (time_modified + delay_ < std::time(nullptr)) {
+      data_reader_->add_file(file.string());
       added = true;
     }
   }
 
-  if (!added && data_reader_->isDone()) {
-    if (entry_time_+wait_ < std::time(nullptr)) {
+  if (!added && data_reader_->is_done()) {
+    if (entry_time_ + wait_ < std::time(nullptr)) {
       std::cout << "[GetInputFilesFromDirectory] timeout" << std::endl;
       directory_index_++;
       is_new_entry_ = true;
-      return AS_REDO;
+      return AS_SKIP;
     }
     else {
       std::this_thread::sleep_for(std::chrono::seconds(1));
       is_new_entry_ = false;
-      return AS_REDO;
+      return AS_SKIP;
     }
   }
 

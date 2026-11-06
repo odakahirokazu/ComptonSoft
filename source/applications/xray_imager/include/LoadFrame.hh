@@ -39,11 +39,11 @@ class FrameData;
  */
 class LoadFrame : public anlnext::BasicModule, public VDataReader
 {
-  DEFINE_ANL_MODULE(LoadFrame, 1.2);
+  DEFINE_ANL_MODULE(LoadFrame, 1.3);
   // ENABLE_PARALLEL_RUN();
 public:
   LoadFrame();
-  
+
 protected:
   LoadFrame(const LoadFrame&);
 
@@ -52,11 +52,11 @@ public:
   anlnext::ANLStatus mod_initialize() override;
   anlnext::ANLStatus mod_analyze() override;
 
-  void addFile(const std::string& filename) override;
-  bool hasFile(const std::string& filename) const override;
-  bool isDone() const override;
+  void add_file(const std::string& filename) override;
+  bool has_file(const std::string& filename) const override;
+  bool is_done() const override;
 
-  std::string CurrentFilename() override { return current_filename_; };
+  std::string current_filename() override { return current_filename_; };
 
 protected:
   virtual bool load(FrameData* frame, const std::string& filename);
@@ -71,6 +71,7 @@ private:
   std::unordered_set<std::string> file_hash_;
   FrameData* frame_ = nullptr;
   std::string current_filename_;
+  std::size_t file_index_ = 0;
 };
 
 } /* namespace comptonsoft */

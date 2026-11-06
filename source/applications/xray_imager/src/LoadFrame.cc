@@ -40,14 +40,14 @@ ANLStatus LoadFrame::mod_define()
   define_parameter("read_direction_x", &mod_class::read_direction_x_);
   define_parameter("detector_id", &mod_class::detector_id_);
   define_parameter("files", &mod_class::files_);
-  
+
   return AS_OK;
 }
 
 ANLStatus LoadFrame::mod_initialize()
 {
   ConstructDetector* detectorOwner;
-  get_module_NC("ConstructDetector", &detectorOwner);
+  get_module_non_const("ConstructDetector", &detectorOwner);
   VRealDetectorUnit* detector = detectorOwner->getDetectorManager()->getDetectorByID(detector_id_);
   if (detector == nullptr) {
     std::cout << "Detector " << detector_id_ << " does not exist." << std::endl;
@@ -71,18 +71,19 @@ ANLStatus LoadFrame::mod_initialize()
 
 ANLStatus LoadFrame::mod_analyze()
 {
-  if (isDone()) {
+  if (is_done()) {
     return AS_QUIT;
   }
 
-  const std::size_t fileIndex = get_loop_index();
-  current_filename_ = files_[fileIndex];
+  const std::size_t current_file_index = file_index_++;
+
+  current_filename_ = files_[current_file_index];
   std::cout << "[LoadFrame] filename: " << current_filename_ << std::endl;
 
-  frame_->setFrameID(fileIndex);
+  frame_->setFrameID(current_file_index);
   bool status = load(frame_, current_filename_);
   if (!status) {
-    return AS_ERROR;
+    return AS_PROCEED_WITH_ERROR;
   }
 
   return AS_OK;
@@ -93,21 +94,20 @@ bool LoadFrame::load(FrameData* frame, const std::string& filename)
   return frame->load(filename);
 }
 
-void LoadFrame::addFile(const std::string& filename)
+void LoadFrame::add_file(const std::string& filename)
 {
   files_.push_back(filename);
   file_hash_.insert(filename);
 }
 
-bool LoadFrame::hasFile(const std::string& filename) const
+bool LoadFrame::has_file(const std::string& filename) const
 {
   return file_hash_.count(filename) != 0;
 }
 
-bool LoadFrame::isDone() const
+bool LoadFrame::is_done() const
 {
-  const std::size_t fileIndex = get_loop_index();
-  return (fileIndex == files_.size());
+  return (file_index_ == files_.size());
 }
 
 } /* namespace comptonsoft */
