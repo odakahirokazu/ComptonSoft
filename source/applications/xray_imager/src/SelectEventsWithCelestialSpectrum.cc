@@ -71,8 +71,8 @@ ANLStatus SelectEventsWithCelestialSpectrum::mod_define()
 
 ANLStatus SelectEventsWithCelestialSpectrum::mod_initialize()
 {
-  get_module_NC("CSHitCollection", &hitCollection_);
-  get_module_IFNC("InitialInformation", &initialInfo_);
+  get_module_non_const("CSHitCollection", &hitCollection_);
+  get_module_interface_non_const("InitialInformation", &initialInfo_);
 
   ANLStatus status = AS_OK;
   if (assignPosition_) {
@@ -86,7 +86,7 @@ ANLStatus SelectEventsWithCelestialSpectrum::mod_initialize()
   const int m = energyArray_.size();
   if (m!=n+1) {
     std::cerr << "ERROR, photons_array size is " << n << " and energy_array size is " << m << std::endl;
-    return AS_ERROR;
+    return AS_PROCEED_WITH_ERROR;
   }
 
   inputEffectiveArea(arfFilename_, effectiveArea_, &status);
@@ -187,13 +187,13 @@ void SelectEventsWithCelestialSpectrum::inputImage(std::string filename, image_t
   cfitsio::fits_open_image(&fitsFile, filename.c_str(), READONLY, &fitsStatus);
   if (fitsStatus) {
     cfitsio::fits_report_error(stderr, fitsStatus);
-    *status = AS_QUIT_ERROR;
+    *status = AS_QUIT_WITH_ERROR;
     return;
   }
   cfitsio::fits_get_img_size(fitsFile, maxdim, naxes, &fitsStatus);
   if (fitsStatus) {
     cfitsio::fits_report_error(stderr, fitsStatus);
-    *status = AS_QUIT_ERROR;
+    *status = AS_QUIT_WITH_ERROR;
     return;
   }
   image.resize(boost::extents[naxes[0]][naxes[1]]);
@@ -203,7 +203,7 @@ void SelectEventsWithCelestialSpectrum::inputImage(std::string filename, image_t
   cfitsio::fits_read_pix(fitsFile, TDOUBLE, startPixel, numPixels, &nulval, &array[0], &anynul, &fitsStatus);
   if (fitsStatus) {
     cfitsio::fits_report_error(stderr, fitsStatus);
-    *status = AS_QUIT_ERROR;
+    *status = AS_QUIT_WITH_ERROR;
     return;
   }
 
@@ -218,7 +218,7 @@ void SelectEventsWithCelestialSpectrum::inputImage(std::string filename, image_t
   cfitsio::fits_close_file(fitsFile, &fitsStatus);
   if (fitsStatus) {
     cfitsio::fits_report_error(stderr, fitsStatus);
-    *status = AS_QUIT_ERROR;
+    *status = AS_QUIT_WITH_ERROR;
     return;
   }
 }
@@ -239,14 +239,14 @@ void SelectEventsWithCelestialSpectrum::inputEffectiveArea(std::string filename,
   cfitsio::fits_open_image(&fitsFile, filename.c_str(), READONLY, &fitsStatus);
   if (fitsStatus) {
     cfitsio::fits_report_error(stderr, fitsStatus);
-    *status = AS_QUIT_ERROR;
+    *status = AS_QUIT_WITH_ERROR;
     return;
   }
 
   cfitsio::ffmahd(fitsFile, 2, IMAGE_HDU, &fitsStatus);
   if (fitsStatus) {
     cfitsio::fits_report_error(stderr, fitsStatus);
-    *status = AS_QUIT_ERROR;
+    *status = AS_QUIT_WITH_ERROR;
     return;
   }
 
@@ -254,7 +254,7 @@ void SelectEventsWithCelestialSpectrum::inputEffectiveArea(std::string filename,
     cfitsio::fits_get_colnum(fitsFile, CASEINSEN, const_cast<char*>(colname[i].c_str()), &colid[i], &fitsStatus);
     if (fitsStatus) {
       cfitsio::fits_report_error(stderr, fitsStatus);
-      *status = AS_QUIT_ERROR;
+      *status = AS_QUIT_WITH_ERROR;
       return;
     }
   }
@@ -262,7 +262,7 @@ void SelectEventsWithCelestialSpectrum::inputEffectiveArea(std::string filename,
   cfitsio::fits_read_keys_lng(fitsFile, (char*)"NAXIS", 1, 2, naxes, &nfound, &fitsStatus);
   if (fitsStatus) {
     cfitsio::fits_report_error(stderr, fitsStatus);
-    *status = AS_QUIT_ERROR;
+    *status = AS_QUIT_WITH_ERROR;
     return;
   }
   const int numPlot = static_cast<int>(naxes[1]);
@@ -273,7 +273,7 @@ void SelectEventsWithCelestialSpectrum::inputEffectiveArea(std::string filename,
     cfitsio::fits_read_col(fitsFile, TDOUBLE, colid[i], (long)1, (long)1, naxes[1], &doublenul, &(v[0]), &anynul, &fitsStatus);
     if (fitsStatus) {
       cfitsio::fits_report_error(stderr, fitsStatus);
-      *status = AS_QUIT_ERROR;
+      *status = AS_QUIT_WITH_ERROR;
       return;
     }
     for (int j=0; j<numPlot; j++) {
@@ -286,7 +286,7 @@ void SelectEventsWithCelestialSpectrum::inputEffectiveArea(std::string filename,
   cfitsio::fits_close_file(fitsFile, &fitsStatus);
   if (fitsStatus) {
     cfitsio::fits_report_error(stderr, fitsStatus);
-    *status = AS_QUIT_ERROR;
+    *status = AS_QUIT_WITH_ERROR;
     return;
   }
 

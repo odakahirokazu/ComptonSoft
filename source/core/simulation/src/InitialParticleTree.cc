@@ -40,7 +40,7 @@ ANLStatus InitialParticleTree::mod_initialize()
 {
   VCSModule::mod_initialize();
 
-  get_module_IF("InitialInformation", &initial_info);
+  get_module_interface("InitialInformation", &initial_info);
 
   tree = new TTree("ini_tree", "ini_tree");
 

@@ -55,7 +55,7 @@ ANLStatus AHRadiationBackgroundPrimaryGenerator::mod_initialize()
   file_.reset(new TFile(filename_.c_str()));
   if ( file_->IsZombie() ) {
     std::cout << "Cannot open " << filename_ << " ! " << std::endl;
-    return AS_QUIT_ERROR;
+    return AS_QUIT_WITH_ERROR;
   }
 
   TGraph* graph = (TGraph*) file_->Get("Graph");

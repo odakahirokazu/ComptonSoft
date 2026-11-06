@@ -43,7 +43,7 @@ ANLStatus InitialConditionFilter::mod_define()
 
 ANLStatus InitialConditionFilter::mod_initialize()
 {
-  get_module_IF("InitialInformation", &initialInfo_);
+  get_module_interface("InitialInformation", &initialInfo_);
 
   return AS_OK;
 }

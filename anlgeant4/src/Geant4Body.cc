@@ -61,7 +61,6 @@ ANLStatus Geant4Body::mod_define()
   define_parameter("num_threads", &mod_class::num_threads_);
   define_parameter("print_beamon_time", &mod_class::print_beamon_time_);
   define_parameter("random_engine", &mod_class::random_engine_);
-  define_parameter("random_engine", &mod_class::random_engine_);
   define_parameter("random_seed", &mod_class::random_seed_);
   define_parameter("verbose", &mod_class::verbose_level_);
   define_parameter("store_trajectory", &mod_class::store_trajectory_);
@@ -146,12 +145,12 @@ bool Geant4Body::initialize_random_generator()
 void Geant4Body::set_user_initializations()
 {
   VANLGeometry* geometry_module = nullptr;
-  get_module_NC("VANLGeometry", &geometry_module);
+  get_module_non_const("VANLGeometry", &geometry_module);
   G4VUserDetectorConstruction* user_detector_construction = geometry_module->create();
   run_manager_->SetUserInitialization(user_detector_construction);
 
   VANLPhysicsList* physics_module = nullptr;
-  get_module_NC("VANLPhysicsList", &physics_module);
+  get_module_non_const("VANLPhysicsList", &physics_module);
   G4VUserPhysicsList* user_physics_list = physics_module->create();
   run_manager_->SetUserInitialization(user_physics_list);
 

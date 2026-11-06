@@ -57,8 +57,8 @@ ANLStatus AEAssignWeightWithResponseMatrix::mod_define()
 
 ANLStatus AEAssignWeightWithResponseMatrix::mod_initialize()
 {
-  get_module_NC("CSHitCollection", &hitCollection_);
-  get_module_IFNC("InitialInformation", &initialInfo_);
+  get_module_non_const("CSHitCollection", &hitCollection_);
+  get_module_interface_non_const("InitialInformation", &initialInfo_);
 
   ANLStatus status = AS_OK;
 
@@ -137,17 +137,17 @@ ANLStatus AEAssignWeightWithResponseMatrix::readFitsResponse()
   cfitsio::fits_open_file(&fitsFile, fitsFilename_.c_str(), READONLY, &fitsStatus);
   if (fitsStatus) {
       cfitsio::fits_report_error(stderr, fitsStatus);
-      return AS_QUIT_ERROR;
+      return AS_QUIT_WITH_ERROR;
   }
   cfitsio::fits_movabs_hdu(fitsFile, 2, IMAGE_HDU, &fitsStatus);
   if (fitsStatus) {
     cfitsio::fits_report_error(stderr, fitsStatus);
-    return AS_QUIT_ERROR;
+    return AS_QUIT_WITH_ERROR;
   }
   cfitsio::fits_read_keys_lng(fitsFile, (char*)"NAXIS", 1, 2, matrix_naxes, &nfound, &fitsStatus);
   if (fitsStatus) {
     cfitsio::fits_report_error(stderr, fitsStatus);
-    return AS_QUIT_ERROR;
+    return AS_QUIT_WITH_ERROR;
   }
   const int num_energy_bin = matrix_naxes[1];
   refResponseArray_.resize(num_energy_bin);
@@ -164,14 +164,14 @@ ANLStatus AEAssignWeightWithResponseMatrix::readFitsResponse()
     cfitsio::fits_get_colnum(fitsFile, CASEINSEN, const_cast<char*>(matrix_colname[i].c_str()), &colid, &fitsStatus);
     if (fitsStatus) {
       cfitsio::fits_report_error(stderr, fitsStatus);
-      return AS_QUIT_ERROR;
+      return AS_QUIT_WITH_ERROR;
     }
     if (i<=2) {
       cfitsio::fits_read_col(fitsFile, TDOUBLE, colid, first_row, first_element, num_energy_bin,
                              &nulval, &buf[0], &anynul, &fitsStatus);
       if (fitsStatus) {
         cfitsio::fits_report_error(stderr, fitsStatus);
-        return AS_QUIT_ERROR;
+        return AS_QUIT_WITH_ERROR;
       }
       for (int j=0; j<num_energy_bin; j++) {
         if (i==0) energyRange_[j].first = buf[j];
@@ -187,14 +187,14 @@ ANLStatus AEAssignWeightWithResponseMatrix::readFitsResponse()
         cfitsio::fits_read_descript(fitsFile, colid, row_num, &length, &offset, &fitsStatus);
         if (fitsStatus) {
           cfitsio::fits_report_error(stderr, fitsStatus);
-          return AS_QUIT_ERROR;
+          return AS_QUIT_WITH_ERROR;
         }
         refResponseArray_[j].resize(length);
         cfitsio::fits_read_col(fitsFile, TDOUBLE, colid, row_num, first_element, length,
                           &nulval, &refResponseArray_[j][0], &anynul, &fitsStatus);
         if (fitsStatus) {
           cfitsio::fits_report_error(stderr, fitsStatus);
-          return AS_QUIT_ERROR;
+          return AS_QUIT_WITH_ERROR;
         }
       }
     }
@@ -203,12 +203,12 @@ ANLStatus AEAssignWeightWithResponseMatrix::readFitsResponse()
   cfitsio::fits_movabs_hdu(fitsFile, 3, IMAGE_HDU, &fitsStatus);
   if (fitsStatus) {
     cfitsio::fits_report_error(stderr, fitsStatus);
-    return AS_QUIT_ERROR;
+    return AS_QUIT_WITH_ERROR;
   }
   cfitsio::fits_read_keys_lng(fitsFile, (char*)"NAXIS", 1, 2, ebounds_naxes, &nfound, &fitsStatus);
   if (fitsStatus) {
     cfitsio::fits_report_error(stderr, fitsStatus);
-    return AS_QUIT_ERROR;
+    return AS_QUIT_WITH_ERROR;
   }
   const int num_pulse_bin = ebounds_naxes[1];
   pulseRange_.resize(num_pulse_bin);
@@ -223,13 +223,13 @@ ANLStatus AEAssignWeightWithResponseMatrix::readFitsResponse()
     cfitsio::fits_get_colnum(fitsFile, CASEINSEN, const_cast<char*>(ebounds_colname[i].c_str()), &colid, &fitsStatus);
     if (fitsStatus) {
       cfitsio::fits_report_error(stderr, fitsStatus);
-      return AS_QUIT_ERROR;
+      return AS_QUIT_WITH_ERROR;
     }
     cfitsio::fits_read_col(fitsFile, TDOUBLE, colid, first_row, first_element, num_pulse_bin,
                            &nulval, &buf[0], &anynul, &fitsStatus);
     if (fitsStatus) {
       cfitsio::fits_report_error(stderr, fitsStatus);
-      return AS_QUIT_ERROR;
+      return AS_QUIT_WITH_ERROR;
     }
     for (int j=0; j<num_pulse_bin; j++) {
       if (i==0) pulseRange_[j].first = buf[j];
@@ -240,7 +240,7 @@ ANLStatus AEAssignWeightWithResponseMatrix::readFitsResponse()
   cfitsio::fits_close_file(fitsFile, &fitsStatus);
   if (fitsStatus) {
     cfitsio::fits_report_error(stderr, fitsStatus);
-    return AS_QUIT_ERROR;
+    return AS_QUIT_WITH_ERROR;
   }
 
   return AS_OK;

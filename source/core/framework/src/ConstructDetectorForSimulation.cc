@@ -58,11 +58,11 @@ ANLStatus ConstructDetectorForSimulation::mod_initialize()
   DetectorSystem* detectorManager = getDetectorManager();
 
   anlgeant4::VANLGeometry* geometry_module = nullptr;
-  get_module_NC("VANLGeometry", &geometry_module);
+  get_module_non_const("VANLGeometry", &geometry_module);
   detectorManager->registerGeant4SensitiveDetectors(geometry_module);
 
   CSEventStore* event_store = nullptr;
-  get_module_NC("CSEventStore", &event_store);
+  get_module_non_const("CSEventStore", &event_store);
   detectorManager->setEventStore(event_store);
 
   if (VerboseLevel() > 0) {

@@ -47,7 +47,7 @@ ANLStatus ComptonEventFilter::mod_initialize()
   define_evs("ComptonEventFilter:Selected");
   define_evs("ComptonEventFilter:Exception");
   
-  get_module_NC("EventReconstruction", &m_EventReconstruction);
+  get_module_non_const("EventReconstruction", &m_EventReconstruction);
 
   auto& hitPatterns = getDetectorManager()->getHitPatterns();
   for (auto& eventSelection: m_ConditionsVector) {

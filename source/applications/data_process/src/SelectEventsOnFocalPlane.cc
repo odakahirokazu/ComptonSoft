@@ -69,7 +69,7 @@ ANLStatus SelectEventsOnFocalPlane::mod_initialize()
   }
   else {
     std::cout << "Unknown region type: " << region_type_keyword_ << std::endl;
-    return AS_QUIT_ERROR;
+    return AS_QUIT_WITH_ERROR;
   }
 
   radius_squared_ = radius_ * radius_;

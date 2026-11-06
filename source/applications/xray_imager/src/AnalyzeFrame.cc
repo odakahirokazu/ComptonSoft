@@ -50,7 +50,7 @@ ANLStatus AnalyzeFrame::mod_initialize()
 {
   VCSModule::mod_initialize();
 
-  get_module_NC("XrayEventCollection", &collection_);
+  get_module_non_const("XrayEventCollection", &collection_);
 
   return AS_OK;
 }

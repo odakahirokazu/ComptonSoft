@@ -31,7 +31,7 @@ namespace comptonsoft
 ANLStatus HXIEventSelection::mod_initialize()
 {
   VCSModule::mod_initialize();
-  get_module_NC("CSHitCollection", &m_HitCollection);
+  get_module_non_const("CSHitCollection", &m_HitCollection);
 
   DetectorSystem* detectorManager = getDetectorManager();
   for (auto& detector: detectorManager->getDetectors()) {

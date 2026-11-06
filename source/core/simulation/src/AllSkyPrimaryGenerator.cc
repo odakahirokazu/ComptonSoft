@@ -93,7 +93,7 @@ ANLStatus AllSkyPrimaryGenerator::mod_initialize()
 #endif
   else {
     std::cout << "Undefined map mode: " << map_mode_ << std::endl;
-    status = AS_QUIT_ERROR;
+    status = AS_QUIT_WITH_ERROR;
   }
   fits->close();
   if (status != AS_OK) { return status; }
@@ -230,7 +230,7 @@ void AllSkyPrimaryGenerator::loadMultiBandImages(fitshandle* fits, int num_maps,
   // check the number of the filtered maps
   if ( maps_.size() <= 1 ) {
     std::cerr << "Error: The number of the maps in the user-defined energy range is less than 2." << std::endl;
-    status = AS_QUIT_ERROR;
+    status = AS_QUIT_WITH_ERROR;
     return;
   }
 
@@ -268,7 +268,7 @@ void AllSkyPrimaryGenerator::constructMaps(ANLStatus& status)
 #endif
   else {
     std::cout << "Undefined map mode: " << map_mode_ << std::endl;
-    status = AS_QUIT_ERROR;
+    status = AS_QUIT_WITH_ERROR;
   }
 }
 
@@ -371,7 +371,7 @@ void AllSkyPrimaryGenerator::setCoordinate(ANLStatus& status)
 
   if ( abs(newX.dot(newZ)) > threshold_zero_angle_ ) {
     std::cerr << "Error: The origin is not perpendicular to the pole." << std::endl;
-    status = AS_QUIT_ERROR;
+    status = AS_QUIT_WITH_ERROR;
     return;
   }
 

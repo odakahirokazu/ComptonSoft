@@ -112,7 +112,7 @@ ANLStatus HistogramPHA::mod_initialize()
   }
   else {
     std::cout << "Histogram type \"" << histogram_type_ << "\" is invalid." << std::endl;
-    return AS_QUIT_ERROR;
+    return AS_QUIT_WITH_ERROR;
   }
 
   return AS_OK;

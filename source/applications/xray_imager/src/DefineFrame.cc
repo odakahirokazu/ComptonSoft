@@ -47,8 +47,8 @@ ANLStatus DefineFrame::mod_define()
 ANLStatus DefineFrame::mod_initialize()
 {
   VCSModule::mod_initialize();
-  get_module_IFNC("InitialInformation", &m_InitialInfo);
-  get_module_NC("CSHitCollection", &m_HitCollection);
+  get_module_interface_non_const("InitialInformation", &m_InitialInfo);
+  get_module_non_const("CSHitCollection", &m_HitCollection);
 
   return AS_OK;
 }
@@ -66,7 +66,7 @@ ANLStatus DefineFrame::mod_analyze()
   const int NumTimeGroups = m_HitCollection->NumberOfTimeGroups();
   if (NumTimeGroups!=1) {
     std::cout << "Number of time group is not 1." << std::endl;
-    return AS_QUIT_ERROR;
+    return AS_QUIT_WITH_ERROR;
   }
 
   const int32_t eventID = m_InitialInfo->event_id();

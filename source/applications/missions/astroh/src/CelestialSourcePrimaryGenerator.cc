@@ -115,7 +115,7 @@ ANLStatus CelestialSourcePrimaryGenerator::mod_initialize()
     const int uy = imageU_.shape()[1];
     if (qx!=pixelX_ || qy!=pixelY_ || ux!=pixelX_ || uy!=pixelY_) {
       std::cout << "ERROR: The sizes of 3 images are not same." << std::endl;
-      return AS_QUIT_ERROR;
+      return AS_QUIT_WITH_ERROR;
     }
   }
   else {
@@ -258,13 +258,13 @@ void CelestialSourcePrimaryGenerator::inputImage(std::string filename, image_t& 
   cfitsio::fits_open_image(&fitsFile, filename.c_str(), READONLY, &fitsStatus);
   if (fitsStatus) {
     cfitsio::fits_report_error(stderr, fitsStatus);
-    *status = AS_QUIT_ERROR;
+    *status = AS_QUIT_WITH_ERROR;
     return;
   }
   cfitsio::fits_get_img_size(fitsFile, maxdim, naxes, &fitsStatus);
   if (fitsStatus) {
     cfitsio::fits_report_error(stderr, fitsStatus);
-    *status = AS_QUIT_ERROR;
+    *status = AS_QUIT_WITH_ERROR;
     return;
   }
   image.resize(boost::extents[naxes[0]][naxes[1]]);
@@ -274,7 +274,7 @@ void CelestialSourcePrimaryGenerator::inputImage(std::string filename, image_t& 
   cfitsio::fits_read_pix(fitsFile, TDOUBLE, startPixel, numPixels, &nulval, &array[0], &anynul, &fitsStatus);
   if (fitsStatus) {
     cfitsio::fits_report_error(stderr, fitsStatus);
-    *status = AS_QUIT_ERROR;
+    *status = AS_QUIT_WITH_ERROR;
     return;
   }
 
@@ -289,7 +289,7 @@ void CelestialSourcePrimaryGenerator::inputImage(std::string filename, image_t& 
   cfitsio::fits_close_file(fitsFile, &fitsStatus);
   if (fitsStatus) {
     cfitsio::fits_report_error(stderr, fitsStatus);
-    *status = AS_QUIT_ERROR;
+    *status = AS_QUIT_WITH_ERROR;
     return;
   }
 }
@@ -312,7 +312,7 @@ void CelestialSourcePrimaryGenerator::makePolarizationMap(ANLStatus* status)
       const double Q = imageQ_[ix][iy];
       const double U = imageU_[ix][iy];
       if (I*I+eps<Q*Q+U*U) {
-        *status = AS_QUIT_ERROR;
+        *status = AS_QUIT_WITH_ERROR;
         return;
       }
       if (I==0.0) continue;
@@ -340,7 +340,7 @@ void CelestialSourcePrimaryGenerator::setCoordinate(ANLStatus* status)
   cfitsio::fits_open_image(&fitsFile, fitsFilenameI_.c_str(), READONLY, &fitsStatus);
   if (fitsStatus) {
     cfitsio::fits_report_error(stderr, fitsStatus);
-    *status = AS_QUIT_ERROR;
+    *status = AS_QUIT_WITH_ERROR;
     return;
   }
 
@@ -348,7 +348,7 @@ void CelestialSourcePrimaryGenerator::setCoordinate(ANLStatus* status)
     cfitsio::fits_read_key(fitsFile, TDOUBLE, key[i].c_str(), &keyvalue[i], nullptr, &fitsStatus);
     if (fitsStatus) {
       cfitsio::fits_report_error(stderr, fitsStatus);
-      *status = AS_QUIT_ERROR;
+      *status = AS_QUIT_WITH_ERROR;
       return;
     }
   }
@@ -356,7 +356,7 @@ void CelestialSourcePrimaryGenerator::setCoordinate(ANLStatus* status)
   cfitsio::fits_close_file(fitsFile, &fitsStatus);
   if (fitsStatus) {
     cfitsio::fits_report_error(stderr, fitsStatus);
-    *status = AS_QUIT_ERROR;
+    *status = AS_QUIT_WITH_ERROR;
     return;
   }
 

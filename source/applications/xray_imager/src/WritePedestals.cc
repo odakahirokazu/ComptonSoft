@@ -89,30 +89,30 @@ ANLStatus WritePedestals::mod_end_run()
   cfitsio::fits_create_file(&fitsFile, filename_.c_str(), &fitsStatus);
   if (fitsStatus) {
     cfitsio::fits_report_error(stderr, fitsStatus);
-    return AS_ERROR;
+    return AS_PROCEED_WITH_ERROR;
   }
 
   write_image_to_fits(pedestals, fitsFile, &fitsStatus);
   if (fitsStatus) {
     cfitsio::fits_report_error(stderr, fitsStatus);
-    return AS_ERROR;
+    return AS_PROCEED_WITH_ERROR;
   }
 
   write_image_to_fits(frameDeviation, fitsFile, &fitsStatus);
   if (fitsStatus) {
     cfitsio::fits_report_error(stderr, fitsStatus);
-    return AS_ERROR;
+    return AS_PROCEED_WITH_ERROR;
   }
   cfitsio::fits_write_key(fitsFile, TSTRING, "EXTNAME", (char*)"Sigma", "Standard deviation of the pedestal values", &fitsStatus);
   if (fitsStatus) {
     cfitsio::fits_report_error(stderr, fitsStatus);
-    return AS_ERROR;
+    return AS_PROCEED_WITH_ERROR;
   }
 
   cfitsio::fits_close_file(fitsFile, &fitsStatus);
   if (fitsStatus) {
     cfitsio::fits_report_error (stderr, fitsStatus);
-    return AS_ERROR;
+    return AS_PROCEED_WITH_ERROR;
   }
 
   return AS_OK;

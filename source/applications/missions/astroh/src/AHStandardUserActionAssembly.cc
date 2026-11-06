@@ -69,14 +69,14 @@ ANLStatus AHStandardUserActionAssembly::mod_define()
 
 ANLStatus AHStandardUserActionAssembly::mod_initialize()
 {
-  get_module_NC("CSHitCollection", &m_HitCollection);
-  get_module_IF("InitialInformation", &m_InitialInfo);
+  get_module_non_const("CSHitCollection", &m_HitCollection);
+  get_module_interface("InitialInformation", &m_InitialInfo);
   if (exist_module("SimXIF")) {
-    get_module_NC("SimXIF", &m_SimXIF);
+    get_module_non_const("SimXIF", &m_SimXIF);
   }
 
   if (exist_module("EventReconstruction")) {
-    get_module_NC("EventReconstruction", &m_EventReconstruction);
+    get_module_non_const("EventReconstruction", &m_EventReconstruction);
   }
 
   define_evs("HitTree:Fill");

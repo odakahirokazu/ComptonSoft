@@ -164,12 +164,12 @@ classList.each{|s|
 }
 
 m = ANL::SWIGModule.new(name, classList, namespace)
-m.includeFiles = ['class_list_anlGeant4.hh', 'comptonsoft_basic_classes.hh']
-m.importModules = [
+m.include_files = ['class_list_anlGeant4.hh', 'comptonsoft_basic_classes.hh']
+m.import_modules = [
   {name: 'anlnext/ANL', file: 'anlnext/ruby/ANL.i'},
   {name: 'anlgeant4/anlGeant4', file: 'anlGeant4.i'},
 ]
-m.includeModules = ["decayChains.i"]
+m.include_modules = ["decayChains.i"]
 
 if ARGV.include? '-l'
   m.print_class_list

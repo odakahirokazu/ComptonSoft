@@ -96,7 +96,7 @@ void XrayEventSelection::add_condition(const std::string& key, const std::vector
   }
   else {
     std::cerr << "Invalid key for int type: " << key << std::endl;
-    status_ = AS_QUIT_ERROR;
+    status_ = AS_QUIT_WITH_ERROR;
     return;
   }
   add_condition<int>(key, ranges);
@@ -109,7 +109,7 @@ void XrayEventSelection::add_condition(const std::string& key, const std::vector
   }
   else {
     std::cerr << "Invalid key for double type: " << key << std::endl;
-    status_ = AS_QUIT_ERROR;
+    status_ = AS_QUIT_WITH_ERROR;
     return;
   }
   add_condition<double>(key, ranges);

@@ -116,7 +116,7 @@ module ComptonSoft
     def visualize(params={})
       self.console = false
       set_visualization()
-      with(params)
+      with_parameters(params)
       self.minimal_mode = true
       @store_trajectory = true
     end
@@ -127,7 +127,7 @@ module ComptonSoft
     # @param [Bool] validate Validate the GDML file?
     def set_gdml(gdml_file, validate=false)
       set_geometry :ReadGDML
-      with(filename: gdml_file, validate: validate)
+      with_parameters(filename: gdml_file, validate: validate)
     end
 
     def enable_timing_process()

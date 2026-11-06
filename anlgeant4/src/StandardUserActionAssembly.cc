@@ -35,7 +35,7 @@ StandardUserActionAssembly::StandardUserActionAssembly()
 
 ANLStatus StandardUserActionAssembly::mod_initialize()
 {
-  get_module_NC("VEventStore", &event_store_);
+  get_module_non_const("VEventStore", &event_store_);
   return VUserActionAssembly::mod_initialize();
 }
 

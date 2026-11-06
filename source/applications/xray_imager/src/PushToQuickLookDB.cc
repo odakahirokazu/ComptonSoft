@@ -55,10 +55,10 @@ ANLStatus PushToQuickLookDB::mod_initialize()
   const int num_modules = moduleList_.size();
   modules_.resize(num_modules, nullptr);
   for (int i=0; i<num_modules; i++) {
-    get_module_NC(moduleList_[i], &modules_[i]);
+    get_module_non_const(moduleList_[i], &modules_[i]);
   }
   if (exist_module("MongoDBClient")) {
-    get_module_NC("MongoDBClient", &mongodb_);
+    get_module_non_const("MongoDBClient", &mongodb_);
     mongodb_->createCappedCollection(collection_, 100*1024*1024);
   }
 

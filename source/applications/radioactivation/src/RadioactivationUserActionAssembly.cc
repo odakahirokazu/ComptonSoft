@@ -76,7 +76,7 @@ ANLStatus RadioactivationUserActionAssembly::mod_initialize()
 {
   StandardUserActionAssembly::mod_initialize();
 
-  get_module_NC("RadioactivationEventStore", &event_store_);
+  get_module_non_const("RadioactivationEventStore", &event_store_);
 
   return AS_OK;
 }

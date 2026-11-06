@@ -86,15 +86,15 @@ ANLStatus EventReconstruction::mod_initialize()
   define_evs("EventReconstruction:NG");
 
   if (m_UseInitialInfo) {
-    get_module_IF("InitialInformation", &m_InitialInfo);
+    get_module_interface("InitialInformation", &m_InitialInfo);
     if (m_InitialInfo == nullptr) {
       std::cout << "Error: InitialInformation module is not found." << std::endl;
-      return AS_QUIT_ERROR;
+      return AS_QUIT_WITH_ERROR;
     }
   }
 
   assignSourceInformation();
-  get_module_NC("CSHitCollection", &m_HitCollection);
+  get_module_non_const("CSHitCollection", &m_HitCollection);
   initializeHitPatternData();
 
   if (ReconstructionMethodName()=="standard") {
@@ -129,7 +129,7 @@ ANLStatus EventReconstruction::mod_initialize()
   else {
     std::cout << "Unknown reconstruction method is given: " << ReconstructionMethodName()
               << std::endl;
-    return AS_QUIT_ERROR;
+    return AS_QUIT_WITH_ERROR;
   }
 
   m_Reconstruction->setMinHits(m_MinHits);
@@ -139,7 +139,7 @@ ANLStatus EventReconstruction::mod_initialize()
     m_Reconstruction->setParameterFile(m_ParameterFile);
     const bool paramLoaded = m_Reconstruction->readParameterFile();
     if (!paramLoaded) {
-      return AS_QUIT_ERROR;
+      return AS_QUIT_WITH_ERROR;
     }
   }
 

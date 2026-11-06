@@ -45,7 +45,7 @@ ANLStatus ObservationPickUpData::mod_initialize()
 {
   VUserActionAssembly::mod_initialize();
 
-  get_module_NC("ObservationEventStore", &event_store_);
+  get_module_non_const("ObservationEventStore", &event_store_);
 
   return AS_OK;
 }

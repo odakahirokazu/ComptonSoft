@@ -49,7 +49,7 @@ ANLStatus WriteEventTree::mod_initialize()
   define_evs("WriteEventTree:FillUndetected");
 
   if (exist_module("InitialInformation")) {
-    get_module_IF("InitialInformation", &initialInfo_);
+    get_module_interface("InitialInformation", &initialInfo_);
     treeIO_->enableInitialInfoRecord();
   }
   else {

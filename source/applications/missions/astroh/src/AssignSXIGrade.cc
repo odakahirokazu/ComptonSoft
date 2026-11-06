@@ -49,7 +49,7 @@ ANLStatus AssignSXIGrade::mod_define()
 ANLStatus AssignSXIGrade::mod_initialize()
 {
   VCSModule::mod_initialize();
-  get_module_NC("CSHitCollection", &hitCollection_);
+  get_module_non_const("CSHitCollection", &hitCollection_);
   image_.resize(boost::extents[outerSize_][outerSize_]);
   if (outerSplitThreshold_==0.0) {
     outerSplitThreshold_ = splitThreshold_;

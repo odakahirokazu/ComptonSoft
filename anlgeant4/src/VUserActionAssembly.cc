@@ -40,7 +40,7 @@ VUserActionAssembly::~VUserActionAssembly() = default;
 ANLStatus VUserActionAssembly::mod_initialize()
 {
   Geant4Body* geant4_body = nullptr;
-  get_module_NC("Geant4Body", &geant4_body);
+  get_module_non_const("Geant4Body", &geant4_body);
   geant4_body->register_user_action(this);
 
   return AS_OK;

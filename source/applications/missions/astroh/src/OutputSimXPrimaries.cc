@@ -43,7 +43,7 @@ ANLStatus OutputSimXPrimaries::mod_define()
 ANLStatus OutputSimXPrimaries::mod_initialize()
 {
   SimXIF* simx = 0;
-  get_module_NC("SimXIF", &simx);
+  get_module_non_const("SimXIF", &simx);
 
   simx->generatePrimaries(m_Area);
   std::cout << "Number of primaries: " << simx->NumberOfPrimaries() << std::endl;

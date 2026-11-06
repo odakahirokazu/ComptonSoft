@@ -52,7 +52,7 @@ ANLStatus ReadDataFile_SpW2::mod_initialize()
 
   // check file open
   bool check = checkFiles();
-  if (!check) return AS_QUIT_ERROR;
+  if (!check) return AS_QUIT_WITH_ERROR;
   
   int readPacketSize = HEADER_SIZE;
   DetectorSystem* detectorManager = getDetectorManager();

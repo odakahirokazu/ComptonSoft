@@ -64,7 +64,7 @@ ANLStatus MakeFrameFITS::mod_define()
 ANLStatus MakeFrameFITS::mod_initialize()
 {
   VCSModule::mod_initialize();
-  get_module_NC("CSHitCollection", &m_HitCollection);
+  get_module_non_const("CSHitCollection", &m_HitCollection);
 
   m_NumPixelsArray[0] = m_NumPixelX;
   m_NumPixelsArray[1] = m_NumPixelY;
@@ -92,19 +92,19 @@ ANLStatus MakeFrameFITS::mod_analyze()
   cfitsio::fits_create_file(&fitsFile, filename.c_str(), &fitsStatus);
   if (fitsStatus) {
     cfitsio::fits_report_error(stderr, fitsStatus);
-    return AS_ERROR;
+    return AS_PROCEED_WITH_ERROR;
   }
 
   cfitsio::fits_create_img(fitsFile, DOUBLE_IMG, 2, m_NumPixelsArray, &fitsStatus);
   if (fitsStatus) {
     cfitsio::fits_report_error(stderr, fitsStatus);
-    return AS_ERROR;
+    return AS_PROCEED_WITH_ERROR;
   }
 
   cfitsio::fits_create_img(fitsFile, LONG_IMG, 2, m_NumPixelsArray, &fitsStatus);
   if (fitsStatus) {
     cfitsio::fits_report_error(stderr, fitsStatus);
-    return AS_ERROR;
+    return AS_PROCEED_WITH_ERROR;
   }
 
   const int NumTimeGroups = m_HitCollection->NumberOfTimeGroups();
@@ -113,7 +113,7 @@ ANLStatus MakeFrameFITS::mod_analyze()
     for (DetectorHit_sptr hit: hits) {
       if (hit->PixelX() >= m_NumPixelX || hit->PixelY() >= m_NumPixelY) {
         std::cout << "This hit occurs outside the image area." << std::endl;
-        return AS_ERROR;
+        return AS_PROCEED_WITH_ERROR;
       }
       const int pixelIndex = hit->PixelY() * m_NumPixelsArray[0] + hit->PixelX();
       m_EnergyArray[pixelIndex] += hit->EPI()/unit::keV;
@@ -150,7 +150,7 @@ ANLStatus MakeFrameFITS::mod_analyze()
   cfitsio::fits_write_pix(fitsFile, TDOUBLE, StartPixel, m_NumPixels, &m_EnergyArray[0], &fitsStatus);
   if (fitsStatus) {
     cfitsio::fits_report_error(stderr, fitsStatus);
-    return AS_ERROR;
+    return AS_PROCEED_WITH_ERROR;
   }
 
   cfitsio::fits_movabs_hdu(fitsFile, 2, IMAGE_HDU, &fitsStatus);
@@ -166,7 +166,7 @@ ANLStatus MakeFrameFITS::mod_analyze()
   cfitsio::fits_close_file(fitsFile, &fitsStatus);
   if (fitsStatus) {
     cfitsio::fits_report_error(stderr, fitsStatus);
-    return AS_ERROR;
+    return AS_PROCEED_WITH_ERROR;
   }
 
   return AS_OK;

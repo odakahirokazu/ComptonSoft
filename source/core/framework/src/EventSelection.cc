@@ -54,7 +54,7 @@ ANLStatus EventSelection::mod_define()
 ANLStatus EventSelection::mod_initialize()
 {
   VCSModule::mod_initialize();
-  get_module_NC("CSHitCollection", &hit_collection_);
+  get_module_non_const("CSHitCollection", &hit_collection_);
   define_evs("EventSelection:Veto");
   define_evs("EventSelection:Trigger");
   return AS_OK;

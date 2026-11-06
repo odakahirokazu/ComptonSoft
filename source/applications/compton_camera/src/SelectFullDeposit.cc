@@ -30,8 +30,8 @@ namespace comptonsoft
 
 ANLStatus SelectFullDeposit::mod_initialize()
 {
-  get_module_NC("CSHitCollection", &m_HitCollection);
-  get_module_IF("InitialInformation", &m_InitialInfo);
+  get_module_non_const("CSHitCollection", &m_HitCollection);
+  get_module_interface("InitialInformation", &m_InitialInfo);
 
   return AS_OK;
 }

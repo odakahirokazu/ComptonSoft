@@ -48,11 +48,11 @@ ANLStatus PushXrayEventToQuickLookDB::mod_define()
 
 ANLStatus PushXrayEventToQuickLookDB::mod_initialize()
 {
-  get_module_NC(event_collection_module_name_, &event_collection_module_);
-  get_module_NC("LoadMetaDataFile", &metadata_file_module_);
+  get_module_non_const(event_collection_module_name_, &event_collection_module_);
+  get_module_non_const("LoadMetaDataFile", &metadata_file_module_);
 
   if (exist_module("MongoDBClient")) {
-    get_module_NC("MongoDBClient", &mongodb_);
+    get_module_non_const("MongoDBClient", &mongodb_);
     mongodb_->createCollection(collection_);
   }
 

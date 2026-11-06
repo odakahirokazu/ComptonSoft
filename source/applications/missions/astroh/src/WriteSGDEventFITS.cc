@@ -102,14 +102,14 @@ ANLStatus WriteSGDEventFITS::mod_initialize()
 
   get_module("CSHitCollection", &m_HitCollection);
   if (exist_module("InitialInformation")) {
-    get_module_IF("InitialInformation", &m_InitialInfo);
+    get_module_interface("InitialInformation", &m_InitialInfo);
   }
 
   define_evs("WriteSGDEventFITS:Fill");
 
   m_EventWriter->setSGDIDs(m_SGDID, m_CCID);
   if (!(m_EventWriter->open(m_Filename))) {
-    return AS_QUIT_ERROR;
+    return AS_QUIT_WITH_ERROR;
   }
 
   return AS_OK;

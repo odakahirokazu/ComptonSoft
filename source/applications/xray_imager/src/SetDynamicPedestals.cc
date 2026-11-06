@@ -42,7 +42,7 @@ ANLStatus SetDynamicPedestals::mod_initialize()
 
   if (frameStoreCapacity_ <= 0) {
     std::cout << "Error: frame_store_size <= 0." << std::endl;
-    return AS_QUIT_ERROR;
+    return AS_QUIT_WITH_ERROR;
   }
 
   return AS_OK;

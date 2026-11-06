@@ -56,7 +56,7 @@ ANLStatus Histogram2DDeltaEnergyWithARM::mod_define()
 ANLStatus Histogram2DDeltaEnergyWithARM::mod_initialize()
 {
   get_module("EventReconstruction", &eventReconstruction_);
-  get_module_IF("InitialInformation", &initialInfo_);
+  get_module_interface("InitialInformation", &initialInfo_);
 
   VCSModule::mod_initialize();
   mkdir();

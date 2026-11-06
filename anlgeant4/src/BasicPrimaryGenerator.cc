@@ -147,7 +147,7 @@ ANLStatus BasicPrimaryGenerator::mod_pre_initialize()
       std::cout << "Invalid input to \"Energy distribution\": "
                 << energy_distribution_name_
                 << std::endl;
-      return AS_QUIT_ERROR;
+      return AS_QUIT_WITH_ERROR;
     }
   }
 
@@ -161,14 +161,14 @@ ANLStatus BasicPrimaryGenerator::mod_initialize()
     std::cout << "Energy min is reset to 1.0e-9 keV." << std::endl;
   }
 
-  get_module_IFNC("InitialInformation", &initial_info_);
+  get_module_interface_non_const("InitialInformation", &initial_info_);
 
   if (energy_distribution_ == SpectralShape::histogram) {
     if (spectrum_energy_.size() != spectrum_photons_.size()+1) {
       std::cout << "Spectral historam binning is invalid.\n"
                 << "Should be energy_array.size == photons_array.size+1."
                 << std::endl;
-      return AS_QUIT_ERROR;
+      return AS_QUIT_WITH_ERROR;
     }
 
     build_spectrum_photon_integral();

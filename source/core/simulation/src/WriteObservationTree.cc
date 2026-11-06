@@ -42,7 +42,7 @@ ANLStatus WriteObservationTree::mod_initialize()
   define_evs("WriteObservationTree:Fill");
 
   if (exist_module("InitialInformation")) {
-    get_module_IF("InitialInformation", &initial_info_);
+    get_module_interface("InitialInformation", &initial_info_);
     tree_io_->enableInitialInfoRecord();
   }
   else {

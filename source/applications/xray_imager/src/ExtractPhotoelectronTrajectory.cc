@@ -61,10 +61,10 @@ ANLStatus ExtractPhotoelectronTrajectory::mod_initialize()
   define_evs("ExtractPhotoelectronTrajectory:Fill");
 
   if (exist_module("InitialInformation")) {
-    get_module_IF("InitialInformation", &initialInfo_);
+    get_module_interface("InitialInformation", &initialInfo_);
   }
   else {
-    return AS_QUIT_ERROR;
+    return AS_QUIT_WITH_ERROR;
   }
 
   image_.reset(new Array2F(boost::extents[pixelNumber_][pixelNumber_]));

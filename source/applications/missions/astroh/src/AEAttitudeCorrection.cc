@@ -66,27 +66,27 @@ ANLStatus AEAttitudeCorrection::mod_initialize()
   cfitsio::fits_open_file(&fitsFile, filename_.c_str(), READWRITE, &fitsStatus);
   if (fitsStatus) {
     cfitsio::fits_report_error(stderr, fitsStatus);
-    return AS_ERROR;
+    return AS_PROCEED_WITH_ERROR;
   }
 
   cfitsio::ffmahd(fitsFile, 2, IMAGE_HDU, &fitsStatus);
   if (fitsStatus){
     cfitsio::fits_report_error(stderr, fitsStatus);
-    return AS_ERROR;
+    return AS_PROCEED_WITH_ERROR;
   }
 
   for (int i=0; i<numColumns_; i++) {
     cfitsio::fits_get_colnum(fitsFile, CASEINSEN, const_cast<char*>(colname[i].c_str()), &colid_[i], &fitsStatus);
     if (fitsStatus) {
       cfitsio::fits_report_error(stderr, fitsStatus);
-      return AS_ERROR;
+      return AS_PROCEED_WITH_ERROR;
     }
   }
 
   cfitsio::fits_read_keys_lng(fitsFile, (char*)"NAXIS", 1, 2, naxes, &nfound, &fitsStatus);
   if (fitsStatus) {
     cfitsio::fits_report_error(stderr, fitsStatus);
-    return AS_ERROR;
+    return AS_PROCEED_WITH_ERROR;
   }
   numEvent_ = static_cast<int>(naxes[1]);
 
@@ -98,21 +98,21 @@ ANLStatus AEAttitudeCorrection::mod_initialize()
                          &pixelArrayX_[0], &anynul, &fitsStatus);
   if (fitsStatus) {
     cfitsio::fits_report_error(stderr, fitsStatus);
-    return AS_ERROR;
+    return AS_PROCEED_WITH_ERROR;
   }
 
   cfitsio::fits_read_col(fitsFile, TSHORT, colid_[1], (long)1, (long)1, naxes[1], &shortnul,
                          &pixelArrayY_[0], &anynul, &fitsStatus);
   if (fitsStatus) {
     cfitsio::fits_report_error(stderr, fitsStatus);
-    return AS_ERROR;
+    return AS_PROCEED_WITH_ERROR;
   }
 
   cfitsio::fits_read_col(fitsFile, TDOUBLE, colid_[2], (long)1, (long)1, naxes[1], &doublenul,
                          &eventTime_[0], &anynul, &fitsStatus);
   if (fitsStatus) {
     cfitsio::fits_report_error(stderr, fitsStatus);
-    return AS_ERROR;
+    return AS_PROCEED_WITH_ERROR;
   }
 
   startTime_ = eventTime_[0];
@@ -175,20 +175,20 @@ ANLStatus AEAttitudeCorrection::mod_end_run()
                           &pixelArrayX_[0], &fitsStatus);
   if (fitsStatus) {
     cfitsio::fits_report_error(stderr, fitsStatus);
-    return AS_ERROR;
+    return AS_PROCEED_WITH_ERROR;
   }
 
   cfitsio::fits_write_col(fitsFile, TSHORT, colid_[1], (long)1, (long)1, numEvent_,
                           &pixelArrayY_[0], &fitsStatus);
   if (fitsStatus) {
     cfitsio::fits_report_error(stderr, fitsStatus);
-    return AS_ERROR;
+    return AS_PROCEED_WITH_ERROR;
   }
 
   cfitsio::fits_close_file(fitsFile, &fitsStatus);
   if (fitsStatus) {
     cfitsio::fits_report_error(stderr, fitsStatus);
-    return AS_ERROR;
+    return AS_PROCEED_WITH_ERROR;
   }
 
   if (makeLog_) {

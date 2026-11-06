@@ -43,7 +43,7 @@ ANLStatus LoadRootFrame::mod_define()
 ANLStatus LoadRootFrame::mod_initialize()
 {
   ConstructDetector* detectorOwner;
-  get_module_NC("ConstructDetector", &detectorOwner);
+  get_module_non_const("ConstructDetector", &detectorOwner);
   VRealDetectorUnit* detector = detectorOwner->getDetectorManager()->getDetectorByID(detector_id_);
   if (detector == nullptr) {
     std::cout << "Detector " << detector_id_ << " does not exist." << std::endl;

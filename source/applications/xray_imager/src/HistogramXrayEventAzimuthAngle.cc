@@ -53,7 +53,7 @@ ANLStatus HistogramXrayEventAzimuthAngle::mod_define()
 
 ANLStatus HistogramXrayEventAzimuthAngle::mod_initialize()
 {
-  get_module_NC(collectionModule_, &collection_);
+  get_module_non_const(collectionModule_, &collection_);
 
   ANLStatus status = VCSModule::mod_initialize();
   if (status != AS_OK) {

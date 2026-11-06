@@ -48,13 +48,13 @@ ANLStatus SelectEventsWithDetectorSpectrum::mod_define()
 
 ANLStatus SelectEventsWithDetectorSpectrum::mod_initialize()
 {
-  get_module_NC("CSHitCollection", &hitCollection_);
-  get_module_NC("ReadEventTree", &readEventTree_);
+  get_module_non_const("CSHitCollection", &hitCollection_);
+  get_module_non_const("ReadEventTree", &readEventTree_);
 
   const int n = countRateArray_.size();
   const int m = energyArray_.size();
   if (m!=n+1) {
-    return AS_ERROR;
+    return AS_PROCEED_WITH_ERROR;
   }
   photonStack_.resize(n, 0);
   numRemainedBin_ = n;

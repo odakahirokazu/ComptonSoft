@@ -48,7 +48,7 @@ ANLStatus HistogramXrayEventProperties::mod_define()
 
 ANLStatus HistogramXrayEventProperties::mod_initialize()
 {
-  get_module_NC(collectionModule_, &collection_);
+  get_module_non_const(collectionModule_, &collection_);
 
   ANLStatus status = VCSModule::mod_initialize();
   if (status != AS_OK) {

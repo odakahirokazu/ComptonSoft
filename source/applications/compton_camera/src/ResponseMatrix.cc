@@ -56,7 +56,7 @@ ANLStatus ResponseMatrix::mod_define()
 ANLStatus ResponseMatrix::mod_initialize()
 {
   get_module("EventReconstruction", &event_reconstruction_);
-  get_module_IFNC("InitialInformation", &initial_info_);
+  get_module_interface_non_const("InitialInformation", &initial_info_);
 
   VCSModule::mod_initialize();
   mkdir();

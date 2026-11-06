@@ -52,11 +52,11 @@ ANLStatus SampleOpticalDepth::mod_define()
 
 ANLStatus SampleOpticalDepth::mod_initialize()
 {
-  get_module_IF("InitialInformation", &initialInfo_);
+  get_module_interface("InitialInformation", &initialInfo_);
 
   if (exist_module("SaveData")) {
     SaveData* saveModule;
-    get_module_NC("SaveData", &saveModule);
+    get_module_non_const("SaveData", &saveModule);
     saveModule->GetDirectory()->cd();
   }
 
@@ -73,13 +73,13 @@ ANLStatus SampleOpticalDepth::mod_initialize()
   G4VProcess* process_base = G4ProcessTable::GetProcessTable()->FindProcess(processName_, particleName_);
   if (process_base == nullptr) {
     std::cout << "Process " << processName_ << " for " << particleName_ << " is not found." << std::endl;
-    return AS_QUIT_ERROR;
+    return AS_QUIT_WITH_ERROR;
   }
 
   process_ = dynamic_cast<G4VEmProcess*>(process_base);
   if (process_ == nullptr) {
     std::cout << "Process " << processName_ << " is not an EM process." << std::endl;
-    return AS_QUIT_ERROR;
+    return AS_QUIT_WITH_ERROR;
   }
 
   return AS_OK;

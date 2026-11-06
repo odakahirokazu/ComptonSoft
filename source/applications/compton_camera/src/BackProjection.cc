@@ -68,7 +68,7 @@ ANLStatus BackProjection::mod_initialize()
 {
   VCSModule::mod_initialize();
 
-  get_module_NC("EventReconstruction", &event_reconstruction_module_);
+  get_module_non_const("EventReconstruction", &event_reconstruction_module_);
 
   mkdir();
 

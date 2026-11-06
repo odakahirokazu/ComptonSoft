@@ -72,7 +72,7 @@ ANLStatus SimXPrimaryGenerator::mod_define()
 ANLStatus SimXPrimaryGenerator::mod_initialize()
 {
   G4double area = CLHEP::pi * m_Radius * m_Radius;
-  get_module_NC("SimXIF", &m_SimXIF);
+  get_module_non_const("SimXIF", &m_SimXIF);
   m_SimXIF->generatePrimaries(area);
   std::cout << "Number of primaries: " << m_SimXIF->NumberOfPrimaries() << std::endl;
   BasicPrimaryGenerator::mod_initialize();

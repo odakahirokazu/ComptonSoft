@@ -152,7 +152,7 @@ ANLStatus PhysicsListManager::mod_initialize()
     std::cout << "PhysicsListManager: \n"
               << "Unknown hadron model is given. ===> " << hadron_model_
               << std::endl;
-    return AS_QUIT_ERROR;
+    return AS_QUIT_WITH_ERROR;
   }
 
   // radioactive decay

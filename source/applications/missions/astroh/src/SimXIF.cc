@@ -160,7 +160,7 @@ ANLStatus SimXIF::mod_pre_initialize()
   get_input_data(argc, argv, NULL, m_SimXParameters, &m_SimXStatus);
   if (m_SimXStatus != 0) {
     std::cout << "simx: Error reading input data.  Exiting without running." << std::endl;
-    return AS_QUIT_ERROR;
+    return AS_QUIT_WITH_ERROR;
   }
 
   std::string filter("SimXIF:FilterName:");
@@ -177,13 +177,13 @@ ANLStatus SimXIF::mod_initialize()
   initialize(m_SimXParameters, &m_Response, m_Source, &simcat, &m_SimXStatus);
   if (m_SimXStatus != 0) {
     std::cout << "simx: Error doing initialization.  Exiting without running." << std::endl;
-    return AS_QUIT_ERROR;
+    return AS_QUIT_WITH_ERROR;
   }
 
   off();
 
   if (exist_module("ConstructDetectorForSimulation")) {
-    m_DetectorManager = get_module_NC<ConstructDetectorForSimulation>("ConstructDetectorForSimulation")->getDetectorManager();
+    m_DetectorManager = get_module_non_const<ConstructDetectorForSimulation>("ConstructDetectorForSimulation")->getDetectorManager();
   }
   
   return AS_OK;
@@ -229,7 +229,7 @@ void SimXIF::addEvent(double time, double energy, int stripx, int stripy,
   double widthy(0.0);
 
   if (m_DetectorManager==0 && exist_module("ConstructDetector_Sim")) {
-    m_DetectorManager = get_module_NC<ConstructDetectorForSimulation>("ConstructDetectorForSimulation")->getDetectorManager();
+    m_DetectorManager = get_module_non_const<ConstructDetectorForSimulation>("ConstructDetectorForSimulation")->getDetectorManager();
   }
   
   if (m_DetectorManager) {

@@ -55,8 +55,8 @@ ANLStatus AssignTime::mod_define()
 ANLStatus AssignTime::mod_initialize()
 {
   VCSModule::mod_initialize();
-  get_module_NC("CSHitCollection", &m_HitCollection);
-  get_module_NC("ReadEventTree", &m_ReadEventTree);
+  get_module_non_const("CSHitCollection", &m_HitCollection);
+  get_module_non_const("ReadEventTree", &m_ReadEventTree);
 
   if (m_NumEvents == -1) {
     m_NumEvents = m_ReadEventTree->NumEntries();
@@ -64,7 +64,7 @@ ANLStatus AssignTime::mod_initialize()
 
   if (m_CountRate>0 && m_Exposure>0) {
     std::cout << "ERROR: Both count_rate and exposure are set. Should delete either of the two." << std::endl;
-    return AS_QUIT_ERROR;
+    return AS_QUIT_WITH_ERROR;
   }
 
   if (m_CountRate>0) {
@@ -75,7 +75,7 @@ ANLStatus AssignTime::mod_initialize()
   }
   else {
     std::cout << "ERROR: Either of count_rate or exposure should be set positive." << std::endl;
-    return AS_QUIT_ERROR;
+    return AS_QUIT_WITH_ERROR;
   }
   
   sampleEventTimes();

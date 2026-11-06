@@ -52,7 +52,7 @@ ANLStatus ComptonModeFilter::mod_initialize()
   define_evs("ComptonMode:DeltaTheta:GOOD");
   define_evs("ComptonMode:DeltaTheta:GOOD2");
 
-  get_module_NC("EventReconstruction", &m_EventReconstruction);
+  get_module_non_const("EventReconstruction", &m_EventReconstruction);
   
   mkdir();
   create_armcut_curves();

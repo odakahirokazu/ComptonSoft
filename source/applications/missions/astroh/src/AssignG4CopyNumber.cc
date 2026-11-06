@@ -55,7 +55,7 @@ ANLStatus AssignG4CopyNumber::mod_begin_run()
   std::ifstream fin(m_FileName.c_str());
   if (!fin) {
     std::cout << "AssignG4CopyNumber: file cannot open" << std::endl;
-    return AS_QUIT_ERROR;
+    return AS_QUIT_WITH_ERROR;
   }
 
   const size_t BufSize = 256;

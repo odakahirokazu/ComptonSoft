@@ -64,7 +64,7 @@ ANLStatus ConstructChannelMap::mod_initialize()
               << "message: " << ex.message() << "\n"
               << "filename: " << ex.filename() << "\n"
               << "line: " << ex.line() << std::endl;
-    return AS_QUIT_ERROR;
+    return AS_QUIT_WITH_ERROR;
   }
 
   return AS_OK;

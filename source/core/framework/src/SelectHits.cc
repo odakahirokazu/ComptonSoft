@@ -60,7 +60,7 @@ ANLStatus SelectHits::mod_define()
 ANLStatus SelectHits::mod_initialize()
 {
   VCSModule::mod_initialize();
-  get_module_NC("CSHitCollection", &hit_collection_);
+  get_module_non_const("CSHitCollection", &hit_collection_);
   return AS_OK;
 }
 

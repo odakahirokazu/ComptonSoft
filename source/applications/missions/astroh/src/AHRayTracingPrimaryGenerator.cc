@@ -61,7 +61,7 @@ ANLStatus AHRayTracingPrimaryGenerator::mod_initialize()
   fits_open_file(&fits, m_FileName.c_str(), READONLY, &fits_status);
   if (fits_status) {
     fits_report_error(stderr, fits_status);
-    return AS_QUIT_ERROR;
+    return AS_QUIT_WITH_ERROR;
   }
 
   std::string colname[NumColumns] = {"energy","x","y","xDirection","yDirection","zDirection"};
@@ -69,7 +69,7 @@ ANLStatus AHRayTracingPrimaryGenerator::mod_initialize()
   ffmahd(fits, 2, IMAGE_HDU, &fits_status);
   if (fits_status){
     fits_report_error(stderr, fits_status);
-    return AS_QUIT_ERROR;
+    return AS_QUIT_WITH_ERROR;
   }
 
   for(int i=0; i<NumColumns; ++i) {
@@ -77,7 +77,7 @@ ANLStatus AHRayTracingPrimaryGenerator::mod_initialize()
                     &colid[i], &fits_status);
     if (fits_status) {
       fits_report_error(stderr, fits_status);
-      return AS_QUIT_ERROR;
+      return AS_QUIT_WITH_ERROR;
     }
   }
 
@@ -89,7 +89,7 @@ ANLStatus AHRayTracingPrimaryGenerator::mod_initialize()
 
   if (fits_status) {
     fits_report_error(stderr, fits_status);
-    return AS_QUIT_ERROR;
+    return AS_QUIT_WITH_ERROR;
   }
 
   double doublenull(0.0);
@@ -101,7 +101,7 @@ ANLStatus AHRayTracingPrimaryGenerator::mod_initialize()
                   &(m_Columns[i][0]), &anynull, &fits_status);
     if (fits_status) {
       fits_report_error(stderr, fits_status);
-      return AS_QUIT_ERROR;
+      return AS_QUIT_WITH_ERROR;
     }
     std::cout << "  ** -> OK "<< std::endl;
   }
@@ -109,7 +109,7 @@ ANLStatus AHRayTracingPrimaryGenerator::mod_initialize()
   fits_close_file(fits, &fits_status);
   if (fits_status) {
     fits_report_error(stderr, fits_status);
-    return AS_QUIT_ERROR;
+    return AS_QUIT_WITH_ERROR;
   }
 
   return AS_OK;

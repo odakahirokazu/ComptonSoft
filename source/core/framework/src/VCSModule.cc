@@ -39,13 +39,13 @@ ANLStatus VCSModule::mod_initialize()
 {
   if (exist_module("ConstructDetector")) {
     ConstructDetector* detectorModule;
-    get_module_NC("ConstructDetector", &detectorModule);
+    get_module_non_const("ConstructDetector", &detectorModule);
     detectorSystem_ = detectorModule->getDetectorManager();
   }
   
   if (exist_module("SaveData")) {
     SaveData* saveModule;
-    get_module_NC("SaveData", &saveModule);
+    get_module_non_const("SaveData", &saveModule);
     saveDir_ = saveModule->GetDirectory();
     saveDir_->cd();
   }

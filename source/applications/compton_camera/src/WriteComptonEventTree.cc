@@ -48,10 +48,10 @@ ANLStatus WriteComptonEventTree::mod_initialize()
 {
   VCSModule::mod_initialize();
 
-  get_module_NC("EventReconstruction", &eventReconstruction_);
+  get_module_non_const("EventReconstruction", &eventReconstruction_);
 
   if (exist_module("InitialInformation")) {
-    get_module_IF("InitialInformation", &initialInfo_);
+    get_module_interface("InitialInformation", &initialInfo_);
     treeIO_->enableInitialInfoRecord();
   }
   else {

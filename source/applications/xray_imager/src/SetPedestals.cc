@@ -69,19 +69,19 @@ ANLStatus SetPedestals::mod_begin_run()
   cfitsio::fits_open_image(&fitsFile, filename_.c_str(), READONLY, &fitsStatus);
   if (fitsStatus) {
     cfitsio::fits_report_error(stderr, fitsStatus);
-    return AS_ERROR;
+    return AS_PROCEED_WITH_ERROR;
   }
 
   cfitsio::fits_read_pix(fitsFile, TDOUBLE, StartPixel, NumPixels, &nulval, &array[0], &anynul, &fitsStatus);
   if (fitsStatus) {
     cfitsio::fits_report_error(stderr, fitsStatus);
-    return AS_ERROR;
+    return AS_PROCEED_WITH_ERROR;
   }
 
   cfitsio::fits_close_file(fitsFile, &fitsStatus);
   if (fitsStatus) {
     cfitsio::fits_report_error(stderr, fitsStatus);
-    return AS_ERROR;
+    return AS_PROCEED_WITH_ERROR;
   }
 
   for (int iy=0; iy<ny; iy++){

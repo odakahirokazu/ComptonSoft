@@ -46,7 +46,7 @@ ANLStatus ReadXrayEventTree::mod_define()
 
 ANLStatus ReadXrayEventTree::mod_initialize()
 {
-  get_module_NC("XrayEventCollection", &collection_);
+  get_module_non_const("XrayEventCollection", &collection_);
 
   tree_ = std::make_unique<TChain>("xetree");
   for (const std::string& filename: fileList_) {

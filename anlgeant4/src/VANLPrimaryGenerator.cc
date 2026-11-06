@@ -34,7 +34,7 @@ VANLPrimaryGenerator::VANLPrimaryGenerator()
 ANLStatus VANLPrimaryGenerator::mod_initialize()
 {
   Geant4Body* geant4body = nullptr;
-  get_module_NC("Geant4Body", &geant4body);
+  get_module_non_const("Geant4Body", &geant4body);
   geant4body->register_user_action(this);
 
   return AS_OK;

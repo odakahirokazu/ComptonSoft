@@ -57,11 +57,11 @@ ANLStatus PushHistogramToQuickLookDB::mod_define()
 
 ANLStatus PushHistogramToQuickLookDB::mod_initialize()
 {
-  get_module_NC(event_collection_module_name_, &event_collection_module_);
-  get_module_NC("LoadMetaDataFile", &metadata_file_module_);
+  get_module_non_const(event_collection_module_name_, &event_collection_module_);
+  get_module_non_const("LoadMetaDataFile", &metadata_file_module_);
 
   if (exist_module("MongoDBClient")) {
-    get_module_NC("MongoDBClient", &mongodb_);
+    get_module_non_const("MongoDBClient", &mongodb_);
     mongodb_->createCappedCollection(recent_collection_name_, 100*1024*1024);
     mongodb_->createCollection(profile_collection_name_);
   }

@@ -50,7 +50,7 @@ ANLStatus SortEventTreeWithTime::mod_initialize()
 {
   VCSModule::mod_initialize();
 
-  get_module_NC("CSHitCollection", &hit_collection_);
+  get_module_non_const("CSHitCollection", &hit_collection_);
 
   tree_ = new TChain("eventtree");
   for (const std::string& filename: file_list_) {

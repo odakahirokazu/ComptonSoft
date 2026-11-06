@@ -49,7 +49,7 @@ ANLStatus ReadDataFile_NB0::mod_initialize()
 
   // check file open
   bool check = checkFiles();
-  if (!check) return AS_QUIT_ERROR;
+  if (!check) return AS_QUIT_WITH_ERROR;
 
   define_evs("ReadDataFile:ReadHK");
 
@@ -115,7 +115,7 @@ ANLStatus ReadDataFile_NB0::mod_analyze()
       }
       else {
         m_NewFrame = true;
-        return AS_SKIP_ERROR;
+        return AS_SKIP_WITH_ERROR;
       }
     }
     else if ((tmp&0xFF000000) == 0x02000000) {
@@ -124,12 +124,12 @@ ANLStatus ReadDataFile_NB0::mod_analyze()
       }
       else {
         m_NewFrame = true;
-        return AS_SKIP_ERROR;
+        return AS_SKIP_WITH_ERROR;
       }
     }
     else {
       std::cout << "wrong character." << std::endl;
-      return AS_QUIT_ERROR;
+      return AS_QUIT_WITH_ERROR;
     }
   }
 

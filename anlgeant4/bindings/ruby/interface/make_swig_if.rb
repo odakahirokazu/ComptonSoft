@@ -25,9 +25,9 @@ classList = [
 ]
 
 m = ANL::SWIGModule.new(name, classList, namespace)
-m.includeFiles = []
-m.importModules = [{name: 'anlnext/ANL', file: 'anlnext/ruby/ANL.i'}]
-m.includeModules = []
+m.include_files = []
+m.import_modules = [{name: 'anlnext/ANL', file: 'anlnext/ruby/ANL.i'}]
+m.include_modules = []
 
 if ARGV.include? '-l'
   m.print_class_list

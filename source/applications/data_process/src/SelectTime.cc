@@ -40,7 +40,7 @@ ANLStatus SelectTime::mod_define()
 
 ANLStatus SelectTime::mod_initialize()
 {
-  get_module_NC("ReadDataFile", &read_data_module_);
+  get_module_non_const("ReadDataFile", &read_data_module_);
   define_evs("SelectTime:OK");
 
   return AS_OK;

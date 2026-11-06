@@ -105,7 +105,7 @@ ANLStatus ProcessCodedAperture::mod_define()
 
 ANLStatus ProcessCodedAperture::mod_initialize()
 {
-  get_module_NC(imageOwnerModule_, &imageOwner_);
+  get_module_non_const(imageOwnerModule_, &imageOwner_);
 
   codedAperture_ = createCodedAperture();
   const int nx = ApertureNumX();
@@ -114,7 +114,7 @@ ANLStatus ProcessCodedAperture::mod_initialize()
   std::ifstream fin(patternFile_);
   if(!fin) {
     std::cerr << "cannnot open pattern file: " << patternFile_ << std::endl;
-    return AS_ERROR;
+    return AS_PROCEED_WITH_ERROR;
   }
   std::string reading_line_buffer;
   int ix = 0;
@@ -126,7 +126,7 @@ ANLStatus ProcessCodedAperture::mod_initialize()
     while(is >> num) {
       if (ix>=ApertureNumX() || iy>=ApertureNumY()) {
         std::cerr << "Input pattern does not match pixel number of apertures." << std::endl;
-        return AS_QUIT_ERROR;
+        return AS_QUIT_WITH_ERROR;
       }
       (*pattern)[ix][iy] = num;
       iy += 1;
@@ -144,7 +144,7 @@ ANLStatus ProcessCodedAperture::mod_initialize()
   bool sky_image_status = codedAperture_->buildSkyImage();
   if (!sky_image_status) {
     std::cerr << "Sky image was not set appropriately." << std::endl;
-    return AS_QUIT_ERROR;
+    return AS_QUIT_WITH_ERROR;
   }
   const int Nsx = codedAperture_->DecodedImage()->shape()[0];
   const int Nsy = codedAperture_->DecodedImage()->shape()[1];
@@ -166,7 +166,7 @@ ANLStatus ProcessCodedAperture::mod_initialize()
   }
   else {
     std::cerr << "Invalid output_angle_unit: " << outputAngleUnit_ << std::endl;
-    return AS_QUIT_ERROR;
+    return AS_QUIT_WITH_ERROR;
   }
 
   ANLStatus status = VCSModule::mod_initialize();

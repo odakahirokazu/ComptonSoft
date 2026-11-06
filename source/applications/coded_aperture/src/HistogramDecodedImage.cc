@@ -46,7 +46,7 @@ ANLStatus HistogramDecodedImage::mod_initialize()
 {
   modules_.resize(decodingModuleNames_.size());
   for (size_t i=0; i<decodingModuleNames_.size(); i++){
-    get_module_NC(decodingModuleNames_[i], &modules_[i]);  
+    get_module_non_const(decodingModuleNames_[i], &modules_[i]);
   }
 
   ANLStatus status = VCSModule::mod_initialize();

@@ -58,7 +58,7 @@ ANLStatus SimulateCXBShieldPlate::mod_define()
 
 ANLStatus SimulateCXBShieldPlate::mod_initialize()
 {
-  get_module_IFNC("InitialInformation", &m_InitialInfo);
+  get_module_interface_non_const("InitialInformation", &m_InitialInfo);
 
   {
     std::ifstream fin(m_CSFilename);
@@ -77,7 +77,7 @@ ANLStatus SimulateCXBShieldPlate::mod_initialize()
     }
     else {
       std::cout << "Cannot open CS file: " << m_CSFilename << std::endl;
-      return AS_QUIT_ERROR;
+      return AS_QUIT_WITH_ERROR;
     }
   }
 

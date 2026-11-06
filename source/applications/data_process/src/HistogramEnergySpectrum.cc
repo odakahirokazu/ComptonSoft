@@ -53,8 +53,8 @@ ANLStatus HistogramEnergySpectrum::mod_define()
 
 ANLStatus HistogramEnergySpectrum::mod_initialize()
 {
-  get_module_NC("CSHitCollection", &hit_collection_);
-  get_module_IFNC("InitialInformation", &initial_info_);
+  get_module_non_const("CSHitCollection", &hit_collection_);
+  get_module_interface_non_const("InitialInformation", &initial_info_);
 
   VCSModule::mod_initialize();
   mkdir();
