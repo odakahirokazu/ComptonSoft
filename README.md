@@ -1,8 +1,12 @@
 Compton Soft
 ================================================================
 
-- Version: 5.28.0
+- Version: 6 (development)
 - Author: Hirokazu Odaka
+
+The `main` branch is the development branch for Compton Soft 6 and requires
+ANL Next 3. For stable 5.x installations, use the [`5.28.1` tag](https://github.com/odakahirokazu/ComptonSoft/tree/5.28.1).
+The `maintenance/5.x` branch carries fixes for the 5.x series.
 
 ----
 

@@ -25,7 +25,7 @@ This package uses CMake to generate building scripts such as Makefiles.
 *We recommend version 1.80.0 or later*
 
 ### (4) [ANL Next framework](https://github.com/odakahirokazu/ANLNext)
-*version 2.1.3 or later*
+*version 3.x*
 
 Compton Soft uses the ANL Next framework. ANL Next is a framework for
 constructing software that performs event-by-event analysis, which usually
