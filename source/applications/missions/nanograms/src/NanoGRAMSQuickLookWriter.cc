@@ -97,6 +97,14 @@ ANLStatus NanoGRAMSQuickLookWriter::mod_initialize()
   if (detector_ == nullptr) {
     throw CSException("NanoGRAMSQuickLookWriter: no NanoGRAMS detector is found.");
   }
+  // the pixels of each cluster (ClusterCorrespondence) are given only by the NanoGRAMS clustering (mode 5)
+  // or without clustering; the generic clustering leaves it empty.
+  if (detector_->isClusteringOn() && detector_->ReconstructionMode() != 5) {
+    throw CSException("NanoGRAMSQuickLookWriter: reconstruction mode " +
+                      std::to_string(detector_->ReconstructionMode()) +
+                      " of the NanoGRAMS detector does not give the pixels of the clusters. "
+                      "Set reconstruction mode=\"5\" in detector_parameters.xml.");
+  }
   return AS_OK;
 }
 
