@@ -46,6 +46,13 @@ NanoGRAMSSelectEvents::NanoGRAMSSelectEvents() = default;
 
 NanoGRAMSSelectEvents::~NanoGRAMSSelectEvents() = default;
 
+ANLStatus NanoGRAMSSelectEvents::mod_define()
+{
+  define_parameter("reject_charge_clusters", &mod_class::rejectChargeClusters_);
+  set_parameter_description("remove the charge clusters with the rejection flags (false: event-level cut only)");
+  return AS_OK;
+}
+
 ANLStatus NanoGRAMSSelectEvents::mod_initialize()
 {
   const ANLStatus status = VCSModule::mod_initialize();
@@ -84,12 +91,12 @@ ANLStatus NanoGRAMSSelectEvents::mod_analyze()
     }
   }
 
-  auto isRejected = [&detectorRejected](const DetectorHit_sptr& hit) {
+  auto isRejected = [&detectorRejected, this](const DetectorHit_sptr& hit) {
     const auto it = detectorRejected.find(hit->DetectorID());
     if (it == detectorRejected.end()) {
       return false; // not a NanoGRAMS detector
     }
-    return it->second || isClusterRejected(*hit);
+    return it->second || (rejectChargeClusters_ && isClusterRejected(*hit));
   };
 
   std::size_t numRemainingHits = 0;
@@ -111,7 +118,8 @@ ANLStatus NanoGRAMSSelectEvents::mod_analyze()
 
 ANLStatus NanoGRAMSSelectEvents::mod_end_run()
 {
-  std::cout << "[NanoGRAMSSelectEvents] events: " << numEvents_ << "\n"
+  std::cout << "[NanoGRAMSSelectEvents] reject_charge_clusters: " << (rejectChargeClusters_ ? "true" : "false") << "\n"
+            << "[NanoGRAMSSelectEvents] events: " << numEvents_ << "\n"
             << "[NanoGRAMSSelectEvents] selected events: " << numSelectedEvents_ << "\n"
             << "[NanoGRAMSSelectEvents] rejected by event-level judgement (detector x event): "
             << numRejectedDetectorEvents_ << "\n"

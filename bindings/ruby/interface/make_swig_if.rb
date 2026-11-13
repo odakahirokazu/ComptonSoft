@@ -161,6 +161,7 @@ classList = [
   ANL::SWIGClass.new("NanoGRAMSCorrectLightWaveform"),
   ANL::SWIGClass.new("NanoGRAMSAnalyzeLight"),
   ANL::SWIGClass.new("NanoGRAMSSelectEvents"),
+  ANL::SWIGClass.new("NanoGRAMSCorrectEnergyCharge"),
   ANL::SWIGClass.new("NanoGRAMSQuickLookWriter"),
   ANL::SWIGClass.new("ApplyCCE"),
   ANL::SWIGClass.new("ApplyRecombination"),

@@ -43,7 +43,8 @@ enum class LightEventSelectionMode;
  *   - light.event_selection_mode is not disabled, and the light is cosmic-like or a pileup is found,
  *   - light.event_selection_mode is gamma_required, and the light is not gamma-like.
  * A hit (cluster) is rejected if it has any of the flags
- *   NanoGRAMSTimeUp, NanoGRAMSPixelCountOutOfRange, NanoGRAMSCollinear, NanoGRAMSMultipleClustersInFEC.
+ *   NanoGRAMSTimeUp, NanoGRAMSPixelCountOutOfRange, NanoGRAMSCollinear, NanoGRAMSMultipleClustersInFEC
+ * (only with reject_charge_clusters, default true).
  *
  * This module should be placed after SelectHits (and before the hit tree writer).
  *
@@ -57,6 +58,7 @@ public:
   NanoGRAMSSelectEvents();
   ~NanoGRAMSSelectEvents() override;
 
+  anlnext::ANLStatus mod_define() override;
   anlnext::ANLStatus mod_initialize() override;
   anlnext::ANLStatus mod_analyze() override;
   anlnext::ANLStatus mod_end_run() override;
@@ -68,6 +70,7 @@ public:
 private:
   const grams::Config* config_ = nullptr;
   CSHitCollection* hitCollection_ = nullptr;
+  bool rejectChargeClusters_ = true;
 
   int64_t numEvents_ = 0;
   int64_t numSelectedEvents_ = 0;

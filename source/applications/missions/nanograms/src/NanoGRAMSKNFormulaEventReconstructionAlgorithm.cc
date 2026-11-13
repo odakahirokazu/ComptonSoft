@@ -407,12 +407,16 @@ double NanoGRAMSKNFormulaEventReconstructionAlgorithm::energyResolution(
 void NanoGRAMSKNFormulaEventReconstructionAlgorithm::printParameters() const
 {
   std::cout << "--- NanoGRAMS KN formula reconstruction ---\n"
-            << "known_initial_gammaray_energy: "
-            << known_initial_gammaray_energy_ / unit::keV << " keV\n"
+            << "known_initial_gammaray_energy: " << known_initial_gammaray_energy_ / unit::keV << " keV\n"
             << "required_minimum_energy_deposit_in_higher_hit: "
             << required_minimum_energy_deposit_in_higher_hit_ / unit::keV << " keV\n"
+            << "energy_correction_factors: ";
+  for (size_t i = 0; i < energy_correction_factors_.size(); i++) {
+  std::cout << energy_correction_factors_[i] << ", ";
+  }
+  std::cout << "\n"
             << "energy_resolution: sqrt(param0^2 + param1^2 * E_keV "
-               "+ param2^2 * E_keV^2) keV\n"
+            << "+ param2^2 * E_keV^2) keV\n"
             << "  param0: " << energy_resolution_param0_ << "\n"
             << "  param1: " << energy_resolution_param1_ << "\n"
             << "  param2: " << energy_resolution_param2_ << "\n"

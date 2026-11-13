@@ -141,6 +141,7 @@ class NanoGRAMSReadDppEvents;
 class NanoGRAMSCorrectLightWaveform;
 class NanoGRAMSAnalyzeLight;
 class NanoGRAMSSelectEvents;
+class NanoGRAMSCorrectEnergyCharge;
 class NanoGRAMSQuickLookWriter;
 class ApplyCCE;
 class ApplyRecombination;

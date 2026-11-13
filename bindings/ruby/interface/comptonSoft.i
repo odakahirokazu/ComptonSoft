@@ -206,6 +206,7 @@
 #include "NanoGRAMSCorrectLightWaveform.hh"
 #include "NanoGRAMSAnalyzeLight.hh"
 #include "NanoGRAMSSelectEvents.hh"
+#include "NanoGRAMSCorrectEnergyCharge.hh"
 #include "NanoGRAMSQuickLookWriter.hh"
 #include "ApplyCCE.hh"
 #include "ApplyRecombination.hh"
@@ -1425,6 +1426,14 @@ class NanoGRAMSSelectEvents : public VCSModule
 public:
   NanoGRAMSSelectEvents();
   ~NanoGRAMSSelectEvents() override;
+};
+
+
+class NanoGRAMSCorrectEnergyCharge : public VCSModule
+{
+public:
+  NanoGRAMSCorrectEnergyCharge();
+  ~NanoGRAMSCorrectEnergyCharge() override;
 };
 
 

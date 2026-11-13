@@ -21,6 +21,7 @@
 #include "AnalyzeHits.hh"
 #include "WriteHitTree.hh"
 #include "HitTreeIOWithInitialInfo.hh"
+#include "NanoGRAMSChargeToEnergySpline.hh" 
 %}
 
 %import(module="anlnext.anlnextpy") "anlnext/python/anlnextpy.i"
@@ -158,6 +159,15 @@ class WriteHitTree : public anlnext::BasicModule
 public:
   WriteHitTree();
   ~WriteHitTree();
+};
+
+class ChargeToEnergySpline
+{
+public:
+  ChargeToEnergySpline();
+  ~ChargeToEnergySpline();
+  void setElectricField(double efield_v_cm);
+  double evaluate(double charge_coulomb) const;
 };
 
 }
