@@ -22,6 +22,8 @@
 #include "DetectorHit.hh"
 #include "DeviceSimulation.hh"
 #include "TRandom3.h"
+#include "CLHEP/Random/Random.h"
+#include "CLHEP/Random/RandGauss.h"
 
 using namespace anlnext;
 
@@ -29,6 +31,7 @@ namespace comptonsoft {
 
 RecalculateSimulationNoise::RecalculateSimulationNoise()
   : m_HitCollection(nullptr),
+    m_RandomSeed(-1),
     m_src_str("DetectorHit"),
     m_src(SOURCE::DetectorHit)
 {
@@ -38,12 +41,20 @@ ANLStatus RecalculateSimulationNoise::mod_define()
 {
   VCSModule::mod_define();
   define_parameter("src", &mod_class::m_src_str);
+  define_parameter("random_seed", &mod_class::m_RandomSeed);
+  set_parameter_description("Seed of the CLHEP random engine, set at the initialization so that the noise is drawn from the same random numbers every time (negative: not set).");
   return AS_OK;
 }
 
 ANLStatus RecalculateSimulationNoise::mod_initialize()
 {
   VCSModule::mod_initialize();
+
+  if (m_RandomSeed >= 0) {
+    CLHEP::HepRandom::setTheSeed(m_RandomSeed);
+    // the second number of the last Box-Muller pair is cached
+    CLHEP::RandGauss::setFlag(false);
+  }
 
   get_module_NC("CSHitCollection", &m_HitCollection);
   if (m_src_str == "DetectorHit") {

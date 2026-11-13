@@ -47,6 +47,7 @@ public:
 
 private:
   CSHitCollection* m_HitCollection;
+  int m_RandomSeed;
 
   std::string m_src_str;
   enum class SOURCE
