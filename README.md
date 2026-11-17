@@ -1,12 +1,18 @@
 Compton Soft
 ================================================================
 
-- Version: 6 (development)
+- Version: 6.0.0
 - Author: Hirokazu Odaka
 
-The `main` branch is the development branch for Compton Soft 6 and requires
-ANL Next 3. For stable 5.x installations, use the [`5.28.1` tag](https://github.com/odakahirokazu/ComptonSoft/tree/5.28.1).
-The `maintenance/5.x` branch carries fixes for the 5.x series.
+Compton Soft 6.0.0 is the stable release of the existing detector framework
+with ANL Next 3 support. Use the `6.0.0` tag for reproducible installations;
+the `maintenance/6.x` branch carries fixes for this series.
+The DetectorSystem redesign is developed separately for Compton Soft 7.
+See the [6.0.0 release notes](documentation/releases/6.0.0.md).
+
+For installations using ANL Next 2, use the
+[`5.28.1` tag](https://github.com/odakahirokazu/ComptonSoft/tree/5.28.1)
+or the `maintenance/5.x` branch.
 
 ----
 

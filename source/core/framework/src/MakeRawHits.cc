@@ -32,6 +32,16 @@ anlnext::ANLStatus MakeRawHits::mod_define()
   return anlnext::AS_OK;
 }
 
+anlnext::ANLStatus MakeRawHits::mod_initialize()
+{
+  const auto status = SelectHits::mod_initialize();
+  if (status != anlnext::AS_OK) { return status; }
+  // Raw deposits have no measured pixel yet. Reconstruction would replace
+  // their local position with the centre of an undefined pixel.
+  configure_raw_hit_recording();
+  return anlnext::AS_OK;
+}
+
 void MakeRawHits::doProcessing()
 {
   DetectorSystem* detectorManager = getDetectorManager();
@@ -46,7 +56,7 @@ void MakeRawHits::doProcessing()
   }
 }
 
-bool MakeRawHits::setAnalysisParam()
+void MakeRawHits::configure_raw_hit_recording()
 {
   DetectorSystem* detectorManager = getDetectorManager();
   for (auto& detector: detectorManager->getDetectors()) {
@@ -55,7 +65,6 @@ bool MakeRawHits::setAnalysisParam()
   for (auto ds: detectorManager->getDeviceSimulationVector()) {
     ds->resetThresholdVector(0.0);
   }
-  return true;
 }
 
 } /* namespace comptonsoft */

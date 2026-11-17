@@ -85,13 +85,16 @@ To install *parallel*, just do this:
 ### (1) Obtain Compton Soft via GitHub.
 
     unix> git clone https://github.com/odakahirokazu/ComptonSoft.git
+    unix> cd ComptonSoft
+    unix> git switch --detach 6.0.0
+
+Use `maintenance/6.x` instead of the tag to follow maintenance updates.
 
 ### (2) Perform CMake.
 
 Make a directory for building the software, and then move to the
 directory.
 
-    unix> cd ComptonSoft
     unix> mkdir build
     unix> cd build
 

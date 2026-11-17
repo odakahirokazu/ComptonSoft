@@ -26,15 +26,16 @@ namespace comptonsoft {
 
 class MakeRawHits : public SelectHits
 {
-  DEFINE_ANL_MODULE(MakeRawHits, 2.4);
+  DEFINE_ANL_MODULE(MakeRawHits, 2.5);
 public:
   MakeRawHits() = default;
   ~MakeRawHits() = default;
 
   anlnext::ANLStatus mod_define() override;
+  anlnext::ANLStatus mod_initialize() override;
 
 private:
-  bool setAnalysisParam();
+  void configure_raw_hit_recording();
   void doProcessing() override;
 };
 

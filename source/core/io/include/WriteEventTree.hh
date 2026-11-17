@@ -41,7 +41,7 @@ class CSHitCollection;
  */
 class WriteEventTree : public VCSModule
 {
-  DEFINE_ANL_MODULE(WriteEventTree, 3.0);
+  DEFINE_ANL_MODULE(WriteEventTree, 3.1);
 public:
   WriteEventTree();
   ~WriteEventTree() = default;

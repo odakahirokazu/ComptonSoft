@@ -46,7 +46,12 @@ ANLStatus WriteHitTree::mod_initialize()
 
   if (exist_module("InitialInformation")) {
     get_module_interface("InitialInformation", &initialInfo_);
-    treeIO_->enableInitialInfoRecord();
+    if (initialInfo_->initial_information_stored()) {
+      treeIO_->enableInitialInfoRecord();
+    }
+    else {
+      treeIO_->disableInitialInfoRecord();
+    }
   }
   else {
     treeIO_->disableInitialInfoRecord();
