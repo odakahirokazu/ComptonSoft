@@ -25,8 +25,10 @@ namespace comptonsoft {
 /**
  * Temperature (gain drift) correction of NanoGRAMS FECs.
  * The correction factor multiplied to PHA (ADC) values is
- *   factor = (reference test-pulse ADC at the room temperature) / (measured test-pulse ADC),
- * where the measured value is given as a fixed value or as a time series interpolated at the event time.
+ *   factor = (reference test-pulse ADC) / (measured test-pulse ADC),
+ * where the reference is the test-pulse ADC when the gain functions (ADC2C) were measured
+ * (the test-pulse time series interpolated at the specified reference time, or ccal2ADC),
+ * and the measured value is given as a fixed value or as a time series interpolated at the event time.
  * - If no measured value is given, the factor is 1.
  * - If the event time is out of the range of the time series, the factor is NaN.
  * The calibration data are read by the application side and given to this class.
@@ -40,7 +42,7 @@ public:
 
   int NumberOfFECs() const { return referenceADC_.size(); }
 
-  // test-pulse ADC value at the room temperature
+  // test-pulse ADC value when the gain functions were measured
   void setReferenceADC(int fec, double v) { referenceADC_.at(fec) = v; }
   double ReferenceADC(int fec) const { return referenceADC_.at(fec); }
 

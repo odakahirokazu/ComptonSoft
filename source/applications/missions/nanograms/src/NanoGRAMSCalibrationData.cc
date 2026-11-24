@@ -135,6 +135,58 @@ double parseGainValue(const std::string& text)
   return std::stod(value);
 }
 
+GainReferenceTime makeGainReferenceTime(const std::string& time_id)
+{
+  GainReferenceTime ref;
+  ref.time_id = normalizeTimeId(time_id);
+  ref.time = parseTimestamp(ref.time_id);
+  return ref;
+}
+
+/**
+ * gain_reference_time is either
+ *   - a time_id common to all the FECs: "YYYYMMDD/HHMM_SS", or
+ *   - a map of FEC to time_id: {0: "...", 1: "...", ...} (keys "FEC0" etc. are also accepted).
+ *     All the FECs must be given.
+ */
+std::array<GainReferenceTime, NUM_VATA> readGainReferenceTimes(const YAML::Node& node)
+{
+  std::array<GainReferenceTime, NUM_VATA> refs{};
+  if (node.IsScalar()) {
+    refs.fill(makeGainReferenceTime(node.as<std::string>()));
+    return refs;
+  }
+  if (!node.IsMap()) {
+    throw std::runtime_error("gain_reference_time must be a time_id or a map of FEC to time_id.");
+  }
+
+  std::array<bool, NUM_VATA> given{};
+  for (const auto& item : node) {
+    const std::string key = trim(item.first.as<std::string>());
+    int fec = -1;
+    for (int i = 0; i < NUM_VATA; ++i) {
+      if (key == std::to_string(i) || key == (boost::format("FEC%1%") % i).str()) {
+        fec = i;
+      }
+    }
+    if (fec < 0) {
+      throw std::runtime_error("Invalid FEC key in gain_reference_time: " + key);
+    }
+    if (given[fec]) {
+      throw std::runtime_error((boost::format("Duplicated FEC%1% in gain_reference_time.") % fec).str());
+    }
+    refs[fec] = makeGainReferenceTime(item.second.as<std::string>());
+    given[fec] = true;
+  }
+  for (int fec = 0; fec < NUM_VATA; ++fec) {
+    if (!given[fec]) {
+      throw std::runtime_error((boost::format("gain_reference_time must be given for all FECs; "
+                                              "FEC%1% is missing.") % fec).str());
+    }
+  }
+  return refs;
+}
+
 } // namespace
 
 TestPulseGainTable readTestPulseGainTable(const fs::path& csv_path)
@@ -250,6 +302,9 @@ CalibrationConfig readCalibrationConfig(const std::string& config_file)
   cfg.energy.max_time = config_node["general"]["drift_time_max_us"].as<double>() * unit::us;
   cfg.energy.tp_channel = node_energy["tp_channel"].as<int>();
   cfg.energy.ccal = node_energy["ccal"].as<int>();
+  if (const auto node_ref = node_energy["gain_reference_time"]) {
+    cfg.energy.gain_reference_times = readGainReferenceTimes(node_ref);
+  }
 
   cfg.general.efield = config_node["general"]["efield_v_cm"].as<int>() * unit::volt / unit::cm;
   cfg.general.temperature = config_node["general"]["temperature_k"].as<double>() * unit::kelvin;
@@ -261,6 +316,13 @@ CalibrationConfig readCalibrationConfig(const std::string& config_file)
   std::cout << "drift_time_max_us for energy calibration: " << cfg.energy.max_time / unit::us << std::endl;
   std::cout << "tp_channel: " << cfg.energy.tp_channel << std::endl;
   std::cout << "ccal: " << cfg.energy.ccal << std::endl;
+  if (cfg.energy.gain_reference_times) {
+    std::cout << "gain_reference_time:";
+    for (int fec = 0; fec < NUM_VATA; ++fec) {
+      std::cout << " FEC" << fec << "=" << (*cfg.energy.gain_reference_times)[fec].time_id;
+    }
+    std::cout << std::endl;
+  }
   std::cout << "anode_pos_z_cm: " << cfg.position.anode_pos_z / unit::cm << std::endl;
 
   return cfg;

@@ -9,6 +9,7 @@
 #include <cmath>
 #include <filesystem>
 #include <iostream>
+#include <stdexcept>
 
 using namespace anlnext;
 namespace comptonsoft {
@@ -45,20 +46,33 @@ void NanoGRAMSLoadConfig::setupCalibration()
   const std::filesystem::path gain_info_path =
       resolveCalibrationPath(calibration_config_.config_dir, calibration_config_.energy.gain_info_file);
 
-  // ADC2C: gain functions of the MCDs; ccal2ADC: reference test-pulse ADC for the temperature correction
+  const EnergyCalibrationConfig& energy = calibration_config_.energy;
+
+  // ADC2C: gain functions of the MCDs; ccal2ADC: test-pulse response at the gain measurement
   std::array<GainMatrix, NUM_VATA> adc2c{};
-  auto temperatureCorrection = std::make_shared<NanoGRAMSTemperatureCorrection>(NUM_VATA);
+  std::array<double, NUM_VATA> ccal2adcReference{};
   for (int fec = 0; fec < NUM_VATA; ++fec) {
     adc2c[fec] = loadGainMatrix(gain_info_path, (boost::format("/FEC%1%/ADC2C") % fec).str());
     const GainMatrix ccal2adc = loadGainMatrix(gain_info_path, (boost::format("/FEC%1%/ccal2ADC") % fec).str());
-    const double referenceADC = evaluateGainCubic(static_cast<double>(calibration_config_.energy.ccal),
-                                                  ccal2adc.at(calibration_config_.energy.tp_channel));
-    temperatureCorrection->setReferenceADC(fec, referenceADC);
+    ccal2adcReference[fec] = evaluateGainCubic(static_cast<double>(energy.ccal), ccal2adc.at(energy.tp_channel));
+  }
+
+  if (energy.gain_reference_times && gain_tp_file_.empty()) {
+    throw std::runtime_error("gain_reference_time requires gain_tp_file "
+                             "(the reference test-pulse ADC is interpolated from its time series).");
+  }
+
+  auto temperatureCorrection = std::make_shared<NanoGRAMSTemperatureCorrection>(NUM_VATA);
+
+  // reference test-pulse ADC: ccal2ADC by default, overwritten below if gain_reference_time is given
+  for (int fec = 0; fec < NUM_VATA; ++fec) {
+    temperatureCorrection->setReferenceADC(fec, ccal2adcReference[fec]);
   }
 
   if (!gain_tp_file_.empty()) {
     const std::filesystem::path gain_tp_path = resolveCalibrationPath(calibration_config_.config_dir, gain_tp_file_);
-    for (const TestPulseGainRow& row : readTestPulseGainTable(gain_tp_path)) {
+    const TestPulseGainTable rows = readTestPulseGainTable(gain_tp_path);
+    for (const TestPulseGainRow& row : rows) {
       for (int fec = 0; fec < NUM_VATA; ++fec) {
         if (std::isfinite(row.fec_gain[fec])) {
           temperatureCorrection->addTestPulseADC(fec, row.time, row.fec_gain[fec]);
@@ -66,6 +80,27 @@ void NanoGRAMSLoadConfig::setupCalibration()
       }
     }
     std::cout << "[NanoGRAMSLoadConfig] gain_tp_file for temperature correction: " << gain_tp_path << std::endl;
+
+    if (energy.gain_reference_times) {
+      std::cout << "[NanoGRAMSLoadConfig] reference test-pulse ADC at gain_reference_time:" << std::endl;
+      for (int fec = 0; fec < NUM_VATA; ++fec) {
+        const GainReferenceTime& ref = (*energy.gain_reference_times)[fec];
+        const double referenceTP = interpolatedTestPulseGains(rows, ref.time)[fec];
+        if (!std::isfinite(referenceTP)) {
+          throw std::runtime_error((boost::format("gain_reference_time %1% is out of the range of gain_tp_file "
+                                                  "for FEC%2%.") %
+                                    ref.time_id % fec)
+                                       .str());
+        }
+        temperatureCorrection->setReferenceADC(fec, referenceTP);
+        std::cout << "  FEC" << fec << " at " << ref.time_id << ": " << referenceTP
+                  << " (ccal2ADC: " << ccal2adcReference[fec]
+                  << ", ratio TP/ccal2ADC: " << referenceTP / ccal2adcReference[fec] << ")" << std::endl;
+      }
+    }
+    else {
+      std::cout << "[NanoGRAMSLoadConfig] reference test-pulse ADC from ccal2ADC (no gain_reference_time)." << std::endl;
+    }
   }
   else if (!gain_tp_dict_.empty()) {
     const std::array<double, NUM_VATA> fixed = fixedTestPulseGainsFromHash(gain_tp_dict_);

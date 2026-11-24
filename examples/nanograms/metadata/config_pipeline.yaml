@@ -47,6 +47,12 @@ calibration:
         max_time_us: 66
         tp_channel: 17
         ccal: 8
+        # gain_reference_time: "20260901/1200_00"
+        # gain_reference_time:
+        #     0: "20260901/1200_00"
+        #     1: "20260901/1200_00"
+        #     2: "20260902/0900_00"
+        #     3: "20260902/0900_00"
     position:
         anode_pos_z_cm: 5.0
 

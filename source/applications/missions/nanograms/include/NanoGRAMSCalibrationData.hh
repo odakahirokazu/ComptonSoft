@@ -23,6 +23,7 @@
 #include <array>
 #include <filesystem>
 #include <map>
+#include <optional>
 #include <string>
 #include <vector>
 
@@ -32,6 +33,12 @@
 namespace comptonsoft
 {
 
+struct GainReferenceTime
+{
+  std::string time_id; // normalized "YYYYMMDD/HHMM_SS"
+  double time = 0.0;   // unixtime [s]
+};
+
 struct EnergyCalibrationConfig
 {
   std::string gain_info_file;
@@ -39,6 +46,7 @@ struct EnergyCalibrationConfig
   int tp_channel = 17;
   int ccal = 8;
   std::array<double, NUM_VATA> tp_adc_values = {1.0, 1.0, 1.0, 1.0};
+  std::optional<std::array<GainReferenceTime, NUM_VATA>> gain_reference_times;
 };
 
 struct TestPulseGainRow

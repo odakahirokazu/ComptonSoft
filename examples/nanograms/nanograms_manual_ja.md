@@ -107,7 +107,8 @@ ANL パラメータ `NanoGRAMSLoadConfig.config_file` で指定します。読�
 |---|---|---|---|
 | `energy.gain_info_file` | パス | 必須 | ゲイン関数の HDF5 ファイル。相対パスは YAML ファイルの場所が基準。中身は `/FEC{n}/ADC2C`（64 ch × 4 の 3 次多項式係数、高次から: p0·x³+p1·x²+p2·x+p3、ADC→電荷 [C]）と `/FEC{n}/ccal2ADC`（テストパルス量 → ADC） |
 | `energy.tp_channel` | ch | 必須 | 温度補正の基準に使うテストパルスのチャンネル |
-| `energy.ccal` | – | 必須 | 温度補正の基準に使うテストパルス量。基準 ADC = ccal2ADC[tp_channel](ccal) |
+| `energy.ccal` | – | 必須 | 温度補正の基準に使うテストパルス量。`gain_reference_time` が無いとき、基準 ADC = ccal2ADC[tp_channel](ccal) |
+| `energy.gain_reference_time` | `YYYYMMDD/HHMM_SS` または FEC → 時刻のマップ | – | `gain_info_file`（ADC2C/ccal2ADC）を測定した時刻。文字列 1 つなら全 FEC 共通、マップ（`{0: "...", 1: "...", ...}`、キーは `FEC0` 形式も可）なら FEC ごと。マップの場合は全 FEC の指定が必要。指定すると、温度補正の基準 ADC は `gain_tp_file` をこの時刻で線形補間した値になる（ccal2ADC は使わない）。`gain_tp_file` が必須で、時刻はその範囲内でなければならない（どちらも満たさないと初期化時にエラー）。書式・タイムゾーンの扱いは `gain_tp_file` の `time_id` と同じ |
 | `energy.max_time_us` | µs | – | **読まれていない**。最大ドリフト時間は `general.drift_time_max_us` が使われる |
 | `energy.q_to_kev_spline_file` | パス | – | **読まれていない**。電荷→エネルギーのスプラインはコード内の再結合モデルから作られる（§3.3 ⑨） |
 | `position.anode_pos_z_cm` | cm | 必須 | 読み込むが、現状は使われない |
@@ -225,7 +226,10 @@ SaveData
 1. パイプライン YAML（§2.1）を読む。`dpp_config_file` があれば読む。
 2. ゲイン HDF5 から FEC ごとに `ADC2C`（64 ch の 3 次式）を読み、各 MCD のゲイン関数に設定する。
 3. 温度補正（`NanoGRAMSTemperatureCorrection`）を作る:
-   - 基準 ADC = `ccal2ADC[tp_channel]` を `ccal` で評価した値（FEC ごと）
+   - 基準 ADC（FEC ごと）:
+     - `gain_reference_time` あり: `gain_tp_file` の時系列をその FEC の基準時刻で線形補間した値。
+       FEC ごとの基準 ADC、ccal2ADC の値、その比（TP/ccal2ADC）がログに出る
+     - `gain_reference_time` なし: `ccal2ADC[tp_channel]` を `ccal` で評価した値
    - 測定 ADC = `gain_tp_file` の時系列（線形補間）、または `gain_tp_hash` の固定値
 4. 検出器ユニットに次を設定する: 最大ドリフト時間、電場（→スプライン生成）、温度補正、
    クラスタ閾値（`noise_th_kev` / `spread_thr_kev`）、FEC 間併合の許容差、TimeUp 上限（= `drift_time_max_us`）、
@@ -275,7 +279,8 @@ FEC（MCD）ごとに:
 1. PHA = 生 ADC（ペデスタル補正なし）
 2. CMN = 有効な 64 ch の**メディアン**（偶数個なので中央 2 つの平均）。同時に **lower mean**（下位 10 ch の平均）も計算する
 3. PHA = 生 ADC − メディアン
-4. **温度補正**: PHA × f。f = 基準 ADC / 測定テストパルス ADC（イベントの unixtime で補間）
+4. **温度補正**: PHA × f。f = 基準 ADC / 測定テストパルス ADC（イベントの unixtime で補間）。
+   `gain_reference_time` を指定した場合は f = TP(その FEC の gain_reference_time) / TP(イベント時刻)（どちらも `gain_tp_file` の補間値）
    - テストパルス情報が無ければ f = 1
    - `gain_tp_file` の時間範囲外のイベントは f = NaN になり、EPI も NaN になる（**ヒットが出ない**）
    - CSV の `time_id`（`YYYYMMDD_HHMM_SS`）は `mktime` で**ローカルタイムゾーン**として解釈される
@@ -464,6 +469,7 @@ YAML は `NanoGRAMSLoadConfig` で読み込みます（XML の例は `examples/s
 | `light.event_selection_mode` | `NanoGRAMSSelectEvents` を使う場合に有効。光のフラグはシミュレーションでは立たないので、`gamma_required` にすると全イベントが除外される。`disabled` か `veto_only` を使う |
 | `light` のその他のキー | 使われない（ただし必須キーは書いておく必要がある） |
 | `calibration.energy.gain_info_file`, `tp_channel`, `ccal` | 使われないが、**ファイルの読み込みは行われる**ので、存在する HDF5 を指定する必要がある |
+| `calibration.energy.gain_reference_time` | **書かないこと**。`gain_tp_file` を指定しないシミュレーションでは初期化時にエラーになる |
 | `general.temperature_k`, `calibration.position.anode_pos_z_cm` | 使われない（必須キー） |
 
 ### 5.3 `detector_parameters.xml` の主なパラメータ
