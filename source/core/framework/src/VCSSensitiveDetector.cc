@@ -106,7 +106,9 @@ VCSSensitiveDetector::ProcessHits(G4Step* step, G4TouchableHistory* )
 
   const G4ThreeVector pre_step_position = step->GetPreStepPoint()->GetPosition();
   const G4ThreeVector post_step_position = step->GetPostStepPoint()->GetPosition();
-  const G4ThreeVector position = 0.5 * (pre_step_position + post_step_position);
+  const G4ThreeVector position = (particleDefinition->GetPDGCharge() != 0.0)
+                                     ? G4ThreeVector(0.5 * (pre_step_position + post_step_position))
+                                     : post_step_position;
   hit.setPreStepPointPosition(pre_step_position);
   hit.setPostStepPointPosition(post_step_position);
   hit.setRealPosition(position);
