@@ -221,6 +221,16 @@ void SimDetectorUnitNanoGRAMS::reconstruct(const DetectorHitVector& hitSignals, 
   RealDetectorUnitNanoGRAMS::reconstruct(hitSignals, hitsReconstructed);
 }
 
+void SimDetectorUnitNanoGRAMS::determinePosition(DetectorHitVector& hits) const
+{
+  if (std::isfinite(eventStartTime_)) {
+    RealDetectorUnitNanoGRAMS::determinePosition(hits);
+  }
+  else {
+    RealDetectorUnitLArTPCPixel::determinePosition(hits);
+  }
+}
+
 double SimDetectorUnitNanoGRAMS::ChargeCollectionEfficiency(const VoxelID& voxel, double x, double y, double z) const
 {
   const vector3_t pixelCenter = LocalPosition(voxel);

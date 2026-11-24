@@ -71,6 +71,16 @@ private:
   TH3D* WPMap_;
   double driftTimeFromDepth(double z) const;
 
+  /**
+   * @brief Determine the positions of the hits.
+   *
+   * With the timing process, the depth of each FEC is given by its trigger time (as the data).
+   * Without it, each hit keeps its own depth (local z of the simulation), not the depth of the FEC.
+   *
+   * @param hits hits whose positions are set
+   */
+  void determinePosition(DetectorHitVector& hits) const override;
+
   double arrivalTime(const DetectorHit& hit) const;
   int FECOfPixel(const PixelID& pixel) const;
 
