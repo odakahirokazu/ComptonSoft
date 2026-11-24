@@ -54,6 +54,137 @@ void SimDetectorUnitNanoGRAMS::initializeEvent()
 {
   RealDetectorUnitNanoGRAMS::initializeEvent();
   LArTPCDeviceSimulation::initializeEvent();
+  eventStartTime_ = std::numeric_limits<double>::quiet_NaN();
+}
+
+double SimDetectorUnitNanoGRAMS::arrivalTime(const DetectorHit& hit) const
+{
+  return hit.RealTime() + driftTimeFromDepth(hit.LocalPositionZ());
+}
+
+int SimDetectorUnitNanoGRAMS::FECOfPixel(const PixelID& pixel) const
+{
+  if (getChannelMap() == nullptr) {
+    throw std::runtime_error("SimDetectorUnitNanoGRAMS: a channel map is required to find the FEC of a pixel.");
+  }
+  const int fec = PixelToChanelID(pixel).Section();
+  return (0 <= fec && fec < NumFECs) ? fec : -1;
+}
+
+void SimDetectorUnitNanoGRAMS::mergeHitsIfArrivalCoincident(double time_width, std::list<DetectorHit_sptr>& hits)
+{
+  for (auto it1 = hits.begin(); it1 != hits.end(); ++it1) {
+    auto it2 = it1;
+    ++it2;
+    while (it2 != hits.end()) {
+      if ((*it1)->isInSamePixel(**it2) && std::abs(arrivalTime(**it1) - arrivalTime(**it2)) <= time_width) {
+        (*it1)->merge(**it2);
+        it2 = hits.erase(it2);
+      }
+      else {
+        ++it2;
+      }
+    }
+  }
+}
+
+void SimDetectorUnitNanoGRAMS::prepareForTimingProcess()
+{
+  double startTime = std::numeric_limits<double>::infinity();
+  for (const DetectorHit_sptr& rawhit : getRawHits()) {
+    if (rawhit->EnergyDeposit() > 0.0) {
+      startTime = std::min(startTime, rawhit->RealTime());
+    }
+  }
+  eventStartTime_ = std::isfinite(startTime) ? startTime : std::numeric_limits<double>::quiet_NaN();
+
+  simulatePulseHeights();
+  // 光は電荷の読み出し窓に関係なくイベント全体で測るので、窓で選ぶ前にイベント全体の光子数を全ヒットに入れる
+  // (makeDetectorHits と同じ順序)
+  makePhotonCount();
+  std::list<DetectorHit_sptr>& hits = getSimulatedHits();
+  removeHitsOutOfPixelRange(hits);
+
+  const auto earlierArrival = [this](const DetectorHit_sptr& hit1, const DetectorHit_sptr& hit2) {
+    return arrivalTime(*hit1) < arrivalTime(*hit2);
+  };
+  const double SMALL_TIME = 1.0e-15 * unit::second;
+  mergeHitsIfArrivalCoincident(SMALL_TIME, hits);
+  hits.sort(earlierArrival);
+  mergeHitsIfArrivalCoincident(TimingResolutionForTrigger(), hits);
+  hits.sort(earlierArrival);
+
+  for (DetectorHit_sptr& hit : hits) {
+    if (checkTriggerDiscrimination(hit->EnergyCharge(), hit->Pixel())) {
+      hit->setSelfTriggered(true);
+      hit->setSelfTriggeredTime(arrivalTime(*hit));
+    }
+  }
+}
+
+void SimDetectorUnitNanoGRAMS::makeDetectorHitsAtTime(double /* time_triggered */, int time_group)
+{
+  std::list<DetectorHit_sptr>& simulatedHits = getSimulatedHits();
+
+  std::array<double, NumFECs> fecTriggerTime;
+  fecTriggerTime.fill(std::numeric_limits<double>::quiet_NaN());
+  for (const DetectorHit_sptr& hit : simulatedHits) {
+    if (!hit->SelfTriggered()) {
+      continue;
+    }
+    const int fec = FECOfPixel(hit->Pixel());
+    if (fec >= 0 && std::isnan(fecTriggerTime[fec])) {
+      fecTriggerTime[fec] = hit->SelfTriggeredTime();
+    }
+  }
+
+  const double halfWindow = 0.5 * TimingResolutionForEnergyMeasurement();
+  std::array<std::list<DetectorHit_sptr>, NumFECs> fecHits;
+  for (const DetectorHit_sptr& hit : simulatedHits) {
+    const int fec = FECOfPixel(hit->Pixel());
+    if (fec < 0 || std::isnan(fecTriggerTime[fec])) {
+      continue;
+    }
+    const double hitArrivalTime = arrivalTime(*hit);
+    if (fecTriggerTime[fec] - halfWindow <= hitArrivalTime && hitArrivalTime <= fecTriggerTime[fec] + halfWindow) {
+      fecHits[fec].push_back(hit);
+    }
+  }
+  simulatedHits.clear();
+
+  if (isPedestalEnabled()) {
+    std::list<DetectorHit_sptr> pedestalHits = generatePedestalSignals(time_group, 0.0);
+    for (DetectorHit_sptr& hit : pedestalHits) {
+      const int fec = FECOfPixel(hit->Pixel());
+      if (fec < 0 || std::isnan(fecTriggerTime[fec])) {
+        continue;
+      }
+      hit->setRealTime(fecTriggerTime[fec] + halfWindow);
+      fecHits[fec].push_back(hit);
+    }
+  }
+
+  for (int fec = 0; fec < NumFECs; fec++) {
+    std::list<DetectorHit_sptr>& hits = fecHits[fec];
+    if (hits.empty()) {
+      continue;
+    }
+    mergeHits(hits);
+    removeHitsAtChannelsDisabled(hits);
+    for (DetectorHit_sptr& hit : hits) {
+      makeEPI(hit);
+    }
+    removeHitsBelowThresholds(hits);
+
+    for (DetectorHit_sptr& hit : hits) {
+      hit->setTimeGroup(time_group);
+      hit->setTriggered(true);
+      hit->setTriggeredTime(fecTriggerTime[fec]);
+      assignLocalDepth(hit);
+      assignLocalPositionError(hit);
+      insertDetectorHit(hit);
+    }
+  }
 }
 
 double SimDetectorUnitNanoGRAMS::driftTimeFromDepth(double z) const
@@ -66,12 +197,19 @@ double SimDetectorUnitNanoGRAMS::driftTimeFromDepth(double z) const
 
 void SimDetectorUnitNanoGRAMS::reconstruct(const DetectorHitVector& hitSignals, DetectorHitVector& hitsReconstructed)
 {
+  const bool useTriggerTime = std::isfinite(eventStartTime_);
   std::array<double, NumFECs> maxZ;
   maxZ.fill(-std::numeric_limits<double>::infinity());
   for (const DetectorHit_sptr& hit : hitSignals) {
     hit->setEPIForSelection(hit->EPI());
     const int fec = hit->DetectorSection();
     if (fec < 0 || fec >= NumFECs) {
+      continue;
+    }
+    if (useTriggerTime) {
+      if (hit->Triggered()) {
+        setDriftTime(fec, hit->TriggeredTime() - eventStartTime_);
+      }
       continue;
     }
     const double localZ = hit->LocalPositionZ();

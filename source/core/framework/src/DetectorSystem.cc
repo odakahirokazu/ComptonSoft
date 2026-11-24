@@ -1817,6 +1817,10 @@ void DetectorSystem::insertRawHit(DetectorHit&& hit)
 
 void DetectorSystem::distributeRawHitsToDetectors()
 {
+  if (event_store_ == nullptr) {
+    return;
+  }
+
   if (!groupRecombinationPrepared_) {
     prepareGroupRecombination();
   }

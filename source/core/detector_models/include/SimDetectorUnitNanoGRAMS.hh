@@ -19,6 +19,8 @@
 
 #ifndef COMPTONSOFT_SimDetectorUnitNanoGRAMS_hh
 #define COMPTONSOFT_SimDetectorUnitNanoGRAMS_hh 1
+#include <limits>
+#include <list>
 #include "LArTPCDeviceSimulation.hh"
 #include "RealDetectorUnitNanoGRAMS.hh"
 #include "SimDetectorUnitLArTPCPixel.hh"
@@ -28,6 +30,9 @@ class SimDetectorUnitNanoGRAMS : public RealDetectorUnitNanoGRAMS, public LArTPC
 public:
   SimDetectorUnitNanoGRAMS();
   virtual ~SimDetectorUnitNanoGRAMS();
+
+  void prepareForTimingProcess() override;
+  void makeDetectorHitsAtTime(double time_triggered, int time_group) override;
 
 private:
   void initializeEvent() override;
@@ -65,6 +70,13 @@ private:
   TH3D* CCEMap_;
   TH3D* WPMap_;
   double driftTimeFromDepth(double z) const;
+
+  double arrivalTime(const DetectorHit& hit) const;
+  int FECOfPixel(const PixelID& pixel) const;
+
+  void mergeHitsIfArrivalCoincident(double time_width, std::list<DetectorHit_sptr>& hits);
+
+  double eventStartTime_ = std::numeric_limits<double>::quiet_NaN();
 };
 
 inline bool SimDetectorUnitNanoGRAMS::checkRange(const PixelID& pixel) const

@@ -215,10 +215,10 @@ public:
   void makeDetectorHits();
   virtual void makeRawDetectorHits();
 
-  void prepareForTimingProcess();
+  virtual void prepareForTimingProcess();
   bool isSelfTriggered() const;
   double FirstTriggerTime() const;
-  void makeDetectorHitsAtTime(double time_triggered, int time_group);
+  virtual void makeDetectorHitsAtTime(double time_triggered, int time_group);
 
   virtual void applyQuenching(DetectorHit_sptr hit) const;
 
@@ -274,21 +274,22 @@ protected:
   int NumberOfRawHits() const { return RawHits_.size(); }
   DetectorHit_sptr getRawHit(int i) { return RawHits_[i]; }
   DetectorHitVector& getRawHits() { return RawHits_; }
+  std::list<DetectorHit_sptr>& getSimulatedHits() { return SimulatedHits_; }
+
+  void removeHitsOutOfPixelRange(std::list<DetectorHit_sptr>& hits);
+  void removeHitsAtChannelsDisabled(std::list<DetectorHit_sptr>& hits);
+  void removeHitsBelowThresholds(std::list<DetectorHit_sptr>& hits);
+  std::list<DetectorHit_sptr> generatePedestalSignals(int time_group, double time_of_signal) const;
 
 private:
   virtual void simulatePulseHeights() = 0;
 
   void sortHitsInTimeOrder(std::list<DetectorHit_sptr>& hits);
 
-  void removeHitsOutOfPixelRange(std::list<DetectorHit_sptr>& hits);
-  void removeHitsAtChannelsDisabled(std::list<DetectorHit_sptr>& hits);
-  void removeHitsBelowThresholds(std::list<DetectorHit_sptr>& hits);
   virtual void mergeHits(std::list<DetectorHit_sptr>& hits);
   void mergeHitsIfCoincident(double time_width, std::list<DetectorHit_sptr>& hits);
 
   void performTriggerDiscrimination();
-
-  std::list<DetectorHit_sptr> generatePedestalSignals(int time_group, double time_of_signal) const;
 
 protected:
   template <typename ObjectType, typename ValueType, typename IndexType>

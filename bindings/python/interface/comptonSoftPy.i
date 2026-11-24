@@ -17,6 +17,8 @@
 #include "SetChannelProperties.hh"
 #include "NanoGRAMSLoadConfig.hh"
 #include "ReadEventTreeAsDetectorHits.hh"
+#include "ReadEventTreeAsRawHits.hh"
+#include "MakeDetectorHitsWithTimingProcess.hh"
 #include "RecalculateSimulationNoise.hh"
 #include "AnalyzeHits.hh"
 #include "WriteHitTree.hh"
@@ -138,6 +140,20 @@ class ReadEventTreeAsDetectorHits : public anlnext::BasicModule
 public:
   ReadEventTreeAsDetectorHits();
   ~ReadEventTreeAsDetectorHits();
+};
+
+class ReadEventTreeAsRawHits : public anlnext::BasicModule
+{
+public:
+  ReadEventTreeAsRawHits();
+  ~ReadEventTreeAsRawHits();
+};
+
+class MakeDetectorHitsWithTimingProcess : public anlnext::BasicModule
+{
+public:
+  MakeDetectorHitsWithTimingProcess();
+  ~MakeDetectorHitsWithTimingProcess();
 };
 
 class RecalculateSimulationNoise : public anlnext::BasicModule
