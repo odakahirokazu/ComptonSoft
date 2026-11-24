@@ -37,6 +37,7 @@ namespace comptonsoft {
  * @date 2020-11-24 | add the particle branch
  * @date 2020-12-25 | add the track ID branch
  * @date 2026-04-18 | add the run ID branch
+ * @date 2026-11-24 | add the recombination rate and quanta factor branches
  */
 class EventTreeIO
 {
@@ -106,6 +107,9 @@ private:
   std::array<float, MaxHits> edep_;
   std::array<float, MaxHits> echarge_;
   std::array<uint32_t, MaxHits> process_;
+  // recombination of the group (negative rate: not assigned)
+  std::array<float, MaxHits> recombination_rate_;
+  std::array<float, MaxHits> quanta_factor_;
   // reconstructed
   std::array<float, MaxHits> energy_;
   std::array<float, MaxHits> posx_;
@@ -116,6 +120,7 @@ private:
   std::array<float, MaxHits> local_posz_;
   std::array<double, MaxHits> time_;
   int32_t grade_ = 0;
+  std::array<int32_t, MaxHits> multiplicity_;
 };
 
 } /* namespace comptonsoft */

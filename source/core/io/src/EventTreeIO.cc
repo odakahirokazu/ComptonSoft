@@ -73,6 +73,8 @@ void EventTreeIO::define_branches()
   tree_->Branch("edep",           edep_.data(),           "edep[num_hits]/F");
   tree_->Branch("echarge",        echarge_.data(),        "echarge[num_hits]/F");
   tree_->Branch("process",        process_.data(),        "process[num_hits]/i");
+  tree_->Branch("recombination_rate", recombination_rate_.data(), "recombination_rate[num_hits]/F");
+  tree_->Branch("quanta_factor",  quanta_factor_.data(),  "quanta_factor[num_hits]/F");
 
   // reconstructed
   tree_->Branch("energy",         energy_.data(),         "energy[num_hits]/F");
@@ -84,6 +86,7 @@ void EventTreeIO::define_branches()
   tree_->Branch("local_posz",     local_posz_.data(),     "local_posz[num_hits]/F");
   tree_->Branch("time",           time_.data(),           "time[num_hits]/D");
   tree_->Branch("grade",          &grade_,                "grade/I");
+  tree_->Branch("multiplicity",   multiplicity_.data(),   "multiplicity[num_hits]/I");
 }
 
 void EventTreeIO::set_branch_addresses()
@@ -125,6 +128,8 @@ void EventTreeIO::set_branch_addresses()
   tree_->SetBranchAddress("edep",           edep_.data());
   tree_->SetBranchAddress("echarge",        echarge_.data());
   tree_->SetBranchAddress("process",        process_.data());
+  tree_->SetBranchAddress("recombination_rate", recombination_rate_.data());
+  tree_->SetBranchAddress("quanta_factor",  quanta_factor_.data());
 
   // reconstructed
   tree_->SetBranchAddress("energy",         energy_.data());
@@ -136,6 +141,7 @@ void EventTreeIO::set_branch_addresses()
   tree_->SetBranchAddress("local_posz",     local_posz_.data());
   tree_->SetBranchAddress("time",           time_.data());
   tree_->SetBranchAddress("grade",          &grade_);
+  tree_->SetBranchAddress("multiplicity",    multiplicity_.data());
 }
 
 void EventTreeIO::fillHits(const int32_t runID,
@@ -184,6 +190,8 @@ void EventTreeIO::fillHits(const int32_t runID,
     edep_[i] = hit->EnergyDeposit() / unit::keV;
     echarge_[i] = hit->EnergyCharge() / unit::keV;
     process_[i] = hit->Process();
+    recombination_rate_[i] = hit->RecombinationRate();
+    quanta_factor_[i] = hit->QuantaFluctuationFactor();
     energy_[i] = hit->Energy() / unit::keV;
     posx_[i] = hit->PositionX() / unit::cm;
     posy_[i] = hit->PositionY() / unit::cm;
@@ -192,6 +200,7 @@ void EventTreeIO::fillHits(const int32_t runID,
     local_posy_[i] = hit->LocalPositionY() / unit::cm;
     local_posz_[i] = hit->LocalPositionZ() / unit::cm;
     time_[i] = hit->Time() / unit::second;
+    multiplicity_[i] = hit->Multiplicity();
   }
 
   tree_->Fill();
@@ -239,11 +248,13 @@ DetectorHit_sptr EventTreeIO::retrieveHit(std::size_t i) const
   hit->setEnergyDeposit(edep_[i] * unit::keV);
   hit->setEnergyCharge(echarge_[i] * unit::keV);
   hit->setProcess(process_[i]);
+  hit->setRecombinationRate(recombination_rate_[i], quanta_factor_[i]);
   hit->setEnergy(energy_[i] * unit::keV);
   hit->setPosition(posx_[i] * unit::cm, posy_[i] * unit::cm, posz_[i] * unit::cm);
   hit->setLocalPosition(local_posx_[i] * unit::cm, local_posy_[i] * unit::cm, local_posz_[i] * unit::cm);
   hit->setTime(time_[i] * unit::second);
   hit->setGrade(grade_);
+  hit->setMultiplicity(multiplicity_[i]);
 
   return hit;
 }

@@ -37,6 +37,7 @@ namespace comptonsoft {
  * @date 2020-12-25 | add the track ID branch
  * @date 2022-04-27 | add the pixel-z
  * @date 2026-04-18 | add run ID
+ * @date 2026-11-24 | add the recombination rate and quanta factor branches
  */
 class HitTreeIO
 {
@@ -102,6 +103,9 @@ private:
   float echarge_ = 0.0;
   float dedx_ = 0.0;
   uint32_t process_ = 0u;
+  // recombination of the group (negative rate: not assigned)
+  float recombination_rate_ = -1.0;
+  float quanta_factor_ = 1.0;
   // reconstructed
   float energy_ = 0.0;
   float energy_error_ = 0.0;
@@ -120,6 +124,7 @@ private:
   double time_ = 0.0;
   double time_error_ = 0.0;
   int32_t grade_ = 0;
+  int32_t multiplicity_ = 0;
 };
 
 } /* namespace comptonsoft */

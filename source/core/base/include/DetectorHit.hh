@@ -291,6 +291,9 @@ public:
   void setDepthSensingMode(int v) { depthSensingMode_ = v; }
   int DepthSensingMode() const { return depthSensingMode_; }
 
+  void setMultiplicity(int v) { multiplicity_ = v; }
+  int Multiplicity() const { return multiplicity_; }
+
   /**
    * check if the given hit occurred in the same detector.
    */
@@ -394,6 +397,7 @@ private:
   double time_error_ = 0.0;
   int grade_ = 0;
   int depthSensingMode_ = 0;
+  int multiplicity_ = 1;
 };
 
 inline bool DetectorHit::isInSameDetector(const DetectorHit& r) const

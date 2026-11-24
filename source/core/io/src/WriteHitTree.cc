@@ -75,7 +75,7 @@ ANLStatus WriteHitTree::mod_analyze()
     treeIO_->setWeight(initialInfo_->weight());
   }
   else {
-    runID = 0;
+    runID = -1;
     eventID = get_loop_index();
   }
 

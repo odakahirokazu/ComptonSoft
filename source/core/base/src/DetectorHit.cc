@@ -108,6 +108,8 @@ DetectorHit& DetectorHit::merge(const DetectorHit& r)
   addProcess(r.Process());
   addFlags(r.Flags());
 
+  setMultiplicity(Multiplicity() + r.Multiplicity());
+
   return *this;
 }
 
@@ -235,6 +237,9 @@ DetectorHit& DetectorHit::mergeAdjacentSignal(const DetectorHit& r, MergedPositi
   if (setClusteredFlag) {
     addFlags(flag::AdjacentClustered);
   }
+
+  setMultiplicity(Multiplicity() + r.Multiplicity());
+  
   return *this;
 }
 
