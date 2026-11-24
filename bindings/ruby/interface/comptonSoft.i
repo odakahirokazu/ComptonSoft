@@ -23,6 +23,9 @@
 #include "HXIEventSelection.hh"
 #include "CreateRootFile.hh"
 #include "SaveData.hh"
+#ifdef USE_HEALPIX
+#include "SaveFits.hh"
+#endif
 #include "ReadDataFile.hh"
 #include "ReadDataFile_VME3.hh"
 #include "ReadDataFile_SpW2.hh"
@@ -61,6 +64,12 @@
 #include "ResponseMatrix.hh"
 #include "BackProjection.hh"
 #include "BackProjectionSky.hh"
+#ifdef USE_HEALPIX
+#include "BackProjectionHealPix.hh"
+#endif
+#ifdef USE_HEALPIX
+#include "ImageReconstructionModule.hh"
+#endif
 #include "EfficiencyMapSky.hh"
 #include "QuickAnalysisForDSD.hh"
 #include "AssignTime.hh"
@@ -384,6 +393,16 @@ public:
 };
 
 
+#ifdef USE_HEALPIX
+class SaveFits : public anlnext::BasicModule
+{
+public:
+  SaveFits();
+  ~SaveFits();
+};
+
+#endif
+
 class ReadDataFile : public VCSModule
 {
 public:
@@ -694,6 +713,26 @@ public:
   ~BackProjectionSky();
 };
 
+
+#ifdef USE_HEALPIX
+class BackProjectionHealPix : public anlnext::BasicModule
+{
+public:
+  BackProjectionHealPix();
+  ~BackProjectionHealPix();
+};
+
+#endif
+
+#ifdef USE_HEALPIX
+class ImageReconstructionModule : public anlnext::BasicModule
+{
+public:
+  ImageReconstructionModule();
+  ~ImageReconstructionModule();
+};
+
+#endif
 
 class EfficiencyMapSky : public BackProjection
 {

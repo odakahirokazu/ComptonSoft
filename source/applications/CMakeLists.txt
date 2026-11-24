@@ -244,6 +244,15 @@ if(CS_USE_SIMX)
   )
 endif(CS_USE_SIMX)
 
+if(CS_USE_HEALPIX AND CS_USE_FITSIO)
+  list(APPEND ComptonSoftApplications_ComptonCamera_Modules
+    compton_camera/src/BackProjectionHealPix.cc
+    compton_camera/src/SaveFits.cc
+    compton_camera/src/LMMLEM.cc
+    compton_camera/src/ImageReconstructionModule.cc
+  )
+endif(CS_USE_HEALPIX AND CS_USE_FITSIO)
+
 set(ComptonSoftApplications_Missions_NanoGRAMS_Classes
   ### configuration and detector description
   missions/nanograms/src/NanoGRAMSConfig.cc
