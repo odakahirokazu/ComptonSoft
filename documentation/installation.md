@@ -86,7 +86,7 @@ To install *parallel*, just do this:
 
     unix> git clone https://github.com/odakahirokazu/ComptonSoft.git
     unix> cd ComptonSoft
-    unix> git switch --detach 6.0.0
+    unix> git switch --detach 6.0.1
 
 Use `maintenance/6.x` instead of the tag to follow maintenance updates.
 

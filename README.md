@@ -1,12 +1,14 @@
 Compton Soft
 ================================================================
 
-- Version: 6.0.0
+- Version: 6.0.1
 - Author: Hirokazu Odaka
 
-Compton Soft 6.0.0 is the stable release of the existing detector framework
-with ANL Next 3 support. Use the `6.0.0` tag for reproducible installations;
-the `maintenance/6.x` branch carries fixes for this series.
+Compton Soft 6.0.1 is a patch release of the detector framework with ANL Next 3
+support. In simulated raw hits, neutral-particle interactions are now recorded
+at the step endpoint. Charged-particle energy deposits use the step midpoint.
+Use the `6.0.1` tag for reproducible installations. The `maintenance/6.x`
+branch carries fixes for this series.
 The DetectorSystem redesign is developed separately for Compton Soft 7.
 See the [6.0.0 release notes](documentation/releases/6.0.0.md).
 

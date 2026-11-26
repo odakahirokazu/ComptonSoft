@@ -14,7 +14,7 @@ set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 ### Definition of project
-project(ComptonSoft VERSION 6.0.0)
+project(ComptonSoft VERSION 6.0.1)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_MODULE_PATH ${ComptonSoft_SOURCE_DIR}/cmake ${CMAKE_MODULE_PATH})
 
